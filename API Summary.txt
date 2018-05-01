@@ -1,0 +1,133 @@
+Code 12 API Summary
+===================
+
+Text Output
+-----------
+ct.print( Object obj )       // any type, no newline added
+ct.println( Object obj )     // any type (param required), newline at end
+ct.println( )                // just a newline
+ct.log( Object… objs )       // values delimited and strings quoted
+ct.logm( String message, Object… objs)    // log with unquoted message
+
+Text Input
+----------
+int ct.inputInt( String message )             // 0 if not an integer
+double ct.inputNumber( String message )      // Nan if not a number
+boolean ct.inputBoolean( String message )    // true iff starts with 'y', 't' or '1'
+String ct.inputString( String message)       // until end of line
+
+Screen Management
+-----------------
+ct.setTitle( String title )
+ct.setHeight( double height )   // on mobile just determines landscape vs. portrait
+double ct.getWidth( )           // always 100.0
+double ct.getHeight( )          // default 100.0
+double ct.getPixelsPerUnit()    // scale factor to convert coordinate units to pixels
+String ct.getScreen( )
+ct.setScreen( String name )
+ct.clearScreen( )
+ct.clearGroup( String group )
+ct.setBackColor( String color )
+ct.setBackColorRGB( int r, int g, int b )
+ct.setBackImage( String filename )
+
+GameObj Creation
+----------------
+GameObj ct.circle( double x, double y, double diameter )
+GameObj ct.circle( double x, double y, double diameter, String color )
+GameObj ct.rect( double x, double y, double width, double height )
+GameObj ct.rect( double x, double y, double width, double height, String color )
+GameObj ct.line( double x1, double y1, double x2, double y2 )
+GameObj ct.line( double x1, double y1, double x2, double y2, String color )
+GameObj ct.text( String s, double x, double y, double height )
+GameObj ct.text( String s, double x, double y, double height, String color )
+GameObj ct.image( String filename, double x, double y, double width )
+
+Mouse and Keyboard Input
+------------------------
+boolean ct.clicked( )
+double ct.clickX( )
+double ct.clickY( )
+boolean ct.keyPressed( String keyName )
+boolean ct.charTyped( String ch )
+
+Audio
+-----
+ct.sound( String filename )
+ct.setSoundVolume( double volume )
+
+Math and Misc.
+--------------
+int ct.random( int min, int max )
+int ct.round( double d )
+double ct.round( double d, int numPlaces )
+boolean ct.isError( double d )
+double ct.distance( double x1, double y1, double x2, double y2 )
+int ct.getTimer( )
+double getVersion( )
+
+Type Conversion
+---------------
+double ct.toDouble( int i )
+int ct.toInt( double d )                // truncates
+int ct.parseInt( String s )             // 0 if failure
+boolean ct.canParseInt( String s )
+double ct.parseNumber( String s )       // NaN if failure
+boolean ct.canParseNumber( String s )
+String ct.formatDecimal( double d )
+String ct.formatDecimal( double d, int numPlaces )
+String ct.formatInt( int i )
+String ct.formatInt( int i, int numDigits )    // uses leading 0's
+
+GameObj Public Data Fields
+--------------------------
+double x, y
+double width, height
+double xSpeed, ySpeed   // at 60 fps
+int lineWidth           // in pixels
+boolean visible
+boolean clickable
+boolean autoDelete     // auto delete if it goes from on to off-screen
+String group           // for ct.deleteGroup(), default ""
+
+GameObj Methods
+---------------
+String obj.getType( )      // "circle", "image", etc.
+String obj.getText( )
+obj.setText( String s )    // can be used for print name on any object
+String obj.toString( )     // "[type at (x, y) "text"]"
+obj.setSize( double width, double height )
+obj.align( String a )      // "top left", "top", "center", "right", etc.
+obj.align( String a, boolean adjustY )    // adjustY adjusts y when aspect changes
+obj.setFillColor( String color )     // "red", "white", etc. or null
+obj.setFillColorRGB( int r, int g, int b )
+obj.setLineColor( String color )
+obj.setLineColorRGB( int r, int g, int b )
+int obj.getLayer( )
+obj.setLayer( int layer )      // objects default to layer 1
+obj.delete( )
+boolean obj.clicked( )
+boolean obj.containsPoint( double x, double y )
+boolean obj.hit( GameObj obj )
+
+Java Math Class Methods Supported
+---------------------------------
+abs, acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, 
+log, log10, max, min, pow, sin, sinh, sqrt, tan, tanh, 
+PI, E
+
+Java String Class Methods Supported
+-----------------------------------
+compareTo, equals, indexOf, length, substring, toLowerCase, toUpperCase, trim
+
+Events
+------
+void start( )
+void update( )
+void onMousePress( GameObj obj, double x, double y ) 
+void onMouseDrag( GameObj obj, double x, double y ) 
+void onMouseRelease( GameObj obj, double x, double y )
+void onKeyPress( String key )     // key code name e.g. "a", "up"
+void onKeyRelease( String key )   // key code name e.g. "a", "up"
+void onCharTyped( String ch )     // "a", "A", "$", etc.
+void onResize( ) 

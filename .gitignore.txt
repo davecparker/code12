@@ -1,0 +1,4 @@
+# Files we don't want added to the git repository
+*.class
+*.jar
+.DS_Store
