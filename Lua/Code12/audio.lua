@@ -19,6 +19,7 @@ local soundVolume = 1.0     -- Sound volume from 0.0 to 1.0
 
 ---------------- Audio API ---------------------------------------------
 
+-- API
 function ct.sound(filename, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.sound") then
@@ -48,6 +49,7 @@ function ct.sound(filename, ...)
 	end
 end
 
+-- API
 function ct.setSoundVolume(volume, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.setSoundVolume") then

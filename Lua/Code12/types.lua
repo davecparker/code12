@@ -13,6 +13,7 @@ local ct = require("Code12.runtime")
 
 ---------------- Type Conversion API -----------------------------------------
 
+-- API
 function ct.toDouble(i, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.toDouble") then
@@ -23,6 +24,7 @@ function ct.toDouble(i, ...)
 	return i
 end
 
+-- API
 function ct.toInt(x, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.toInt") then
@@ -33,6 +35,7 @@ function ct.toInt(x, ...)
 	return math.floor(x)
 end
 
+-- API
 function ct.parseInt(s, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.parseInt") then
@@ -47,6 +50,7 @@ function ct.parseInt(s, ...)
 	return 0   -- failure
 end
 
+-- API
 function ct.canParseInt(s, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.canParseInt") then
@@ -61,6 +65,7 @@ function ct.canParseInt(s, ...)
 	return false
 end
 
+-- API
 function ct.parseNumber(s, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.parseNumber") then
@@ -75,6 +80,7 @@ function ct.parseNumber(s, ...)
 	return (0 / 0)   -- NaN indicates failure
 end
 
+-- API
 function ct.canParseNumber(s, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.canParseNumber") then
@@ -89,6 +95,7 @@ function ct.canParseNumber(s, ...)
 	return false
 end
 
+-- API
 function ct.formatDecimal(x, numPlaces, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.formatDecimal") then
@@ -106,6 +113,7 @@ function ct.formatDecimal(x, numPlaces, ...)
 	return tostring(x)
 end
 
+-- API
 function ct.formatInt(i, numPlaces, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.formatInt") then

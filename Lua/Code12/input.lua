@@ -165,6 +165,7 @@ end
 
 ---------------- Mouse and Keyboard API --------------------------------------
 
+-- API
 function ct.clicked(...)
 	-- Check params
 	if g.checkAPIParams("ct.clicked") then
@@ -175,6 +176,7 @@ function ct.clicked(...)
 	return g.clicked
 end
 
+-- API
 function ct.clickX(...)
 	-- Check params
 	if g.checkAPIParams("ct.clickX") then
@@ -185,6 +187,7 @@ function ct.clickX(...)
 	return g.clickX
 end
 
+-- API
 function ct.clickY(...)
 	-- Check params
 	if g.checkAPIParams("ct.clickY") then
@@ -195,6 +198,7 @@ function ct.clickY(...)
 	return g.clickY
 end
 
+-- API
 function ct.keyPressed(keyName, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.keyPressed") then
@@ -205,6 +209,7 @@ function ct.keyPressed(keyName, ...)
 	return keysDown[keyName] ~= nil
 end
 
+-- API
 function ct.charTyped(ch, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.charTyped") then

@@ -14,6 +14,7 @@ local GameObj = require("Code12.GameObjAPI")
 
 ---------------- GameObj Creation API ----------------------------------------
 
+-- API
 function ct.circle(x, y, diameter, color, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.circle") then
@@ -28,6 +29,7 @@ function ct.circle(x, y, diameter, color, ...)
 	return GameObj:newCircle(g.screen.objs, x, y, diameter, color)
 end
 
+-- API
 function ct.rect(x, y, width, height, color, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.rect") then
@@ -42,6 +44,7 @@ function ct.rect(x, y, width, height, color, ...)
 	return GameObj:newRect(g.screen.objs, x, y, width, height, color)
 end
 
+-- API
 function ct.line(x1, y1, x2, y2, color, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.line") then
@@ -56,6 +59,7 @@ function ct.line(x1, y1, x2, y2, color, ...)
 	return GameObj:newLine(g.screen.objs, x1, y1, x2, y2, color)
 end
 
+-- API
 function ct.text(text, x, y, height, color, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.text") then
@@ -70,6 +74,7 @@ function ct.text(text, x, y, height, color, ...)
 	return GameObj:newText(g.screen.objs, text, x, y, height, color)
 end
 
+-- API
 function ct.image(filename, x, y, width, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.image") then

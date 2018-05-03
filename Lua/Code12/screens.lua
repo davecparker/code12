@@ -14,6 +14,7 @@ local GameObj = require("Code12.GameObjAPI")
 
 ---------------- Screen Management API ---------------------------------------
 
+-- API
 function ct.setTitle(title, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.setTitle") then
@@ -24,6 +25,7 @@ function ct.setTitle(title, ...)
 	native.setProperty("windowTitleText", title)
 end
 
+-- API
 function ct.setHeight(height, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.setHeight") then
@@ -55,6 +57,7 @@ function ct.setHeight(height, ...)
 	g.window.resized = true
 end
 
+-- API
 function ct.getWidth(...)
 	-- Check parameters
 	if g.checkAPIParams("ct.getWidth") then
@@ -65,6 +68,7 @@ function ct.getWidth(...)
 	return g.WIDTH
 end
 
+-- API
 function ct.getHeight(...)
 	-- Check parameters
 	if g.checkAPIParams("ct.getHeight") then
@@ -75,6 +79,7 @@ function ct.getHeight(...)
 	return g.height
 end
 
+-- API
 function ct.getPixelsPerUnit(...)
 	-- Check parameters
 	if g.checkAPIParams("ct.getPixelsPerUnit") then
@@ -85,6 +90,7 @@ function ct.getPixelsPerUnit(...)
 	return g.scale
 end
 
+-- API
 function ct.getScreen(...)
 	-- Check parameters
 	if g.checkAPIParams("ct.getScreen") then
@@ -95,6 +101,7 @@ function ct.getScreen(...)
 	return g.screen.name
 end
 
+-- API
 function ct.setScreen(name, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.setScreen") then
@@ -131,6 +138,7 @@ function ct.setScreen(name, ...)
 	screen.group.isVisible = true;
 end
 
+-- API
 function ct.clearScreen(...)
 	-- Check parameters
 	if g.checkAPIParams("ct.clearScreen") then
@@ -144,6 +152,7 @@ function ct.clearScreen(...)
 	end
 end
 
+-- API
 function ct.clearGroup(group, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.clearGroup") then
@@ -160,6 +169,7 @@ function ct.clearGroup(group, ...)
 	end
 end
 
+-- API
 function ct.setBackColor(colorName, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.setBackColor") then
@@ -182,6 +192,7 @@ function ct.setBackColor(colorName, ...)
 	g.screen.backObj = backObj
 end
 
+-- API
 function ct.setBackColorRGB(red, green, blue, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.setBackColorRGB") then
@@ -193,6 +204,7 @@ function ct.setBackColorRGB(red, green, blue, ...)
 	g.screen.backObj:setFillColorRGB(red, green, blue)
 end
 
+-- API
 function ct.setBackImage(filename, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.setBackImage") then

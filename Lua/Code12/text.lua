@@ -14,6 +14,7 @@ local GameObj = require("Code12.GameObjAPI")
 
 ---------------- Text Output API ---------------------------------------------
 
+-- API
 function ct.print(value, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.print") then
@@ -25,6 +26,7 @@ function ct.print(value, ...)
 	io.flush()
 end
 
+-- API
 -- Note that ct.println() in the API must translate to ct.println("") in Lua
 function ct.println(value, ...)
 	-- Check parameters
@@ -51,6 +53,7 @@ local function logValue(value)
 	end
 end
 
+-- API
 function ct.log(value, ...)
 	-- Parameters can be any types or count, and the first value can be nil,
 	-- so there's no parameter checking we can do.
@@ -77,6 +80,7 @@ function ct.log(value, ...)
 	io.flush()
 end
 
+-- API
 function ct.logm(message, value, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.logm") then
@@ -115,6 +119,7 @@ local function inputLine(message, ...)
 	return io.read() or ""    -- read to end of line
 end
 
+-- API
 function ct.inputInt(message, ...)
 	-- Set API so inputString can check the params
 	g.checkAPIParams("ct.inputInt", 1)
@@ -127,6 +132,7 @@ function ct.inputInt(message, ...)
 	return 0   -- 0 if error
 end
 
+-- API
 function ct.inputNumber(message, ...)
 	-- Set API so inputString can check the params
 	g.checkAPIParams("ct.inputNumber", 1)
@@ -135,6 +141,7 @@ function ct.inputNumber(message, ...)
 	return tonumber(inputLine(message, ...)) or (0 / 0)   -- NaN if error
 end
 
+-- API
 function ct.inputBoolean(message, ...)
 	-- Set API so inputString can check the params
 	g.checkAPIParams("ct.inputBoolean", 1)
@@ -152,6 +159,7 @@ function ct.inputBoolean(message, ...)
 	return false
 end
 
+-- API
 function ct.inputString(message, ...)
 	-- Set API so inputString can check the params
 	g.checkAPIParams("ct.inputString", 1)

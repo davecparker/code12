@@ -13,6 +13,7 @@ local ct = require("Code12.runtime")
 
 ---------------- Math API ---------------------------------------------
 
+-- API
 function ct.random(min, max, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.random") then
@@ -23,6 +24,7 @@ function ct.random(min, max, ...)
 	return math.random(min, max)
 end
 
+-- API
 function ct.round(x, numPlaces, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.round") then
@@ -41,6 +43,7 @@ function ct.round(x, numPlaces, ...)
 	return math.round(x)
 end
 
+-- API
 function ct.isError(x, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.isError") then
@@ -51,6 +54,7 @@ function ct.isError(x, ...)
 	return x ~= x   -- NaN is not equal to itself but everything else is
 end
 
+-- API
 function ct.distance(x1, y1, x2, y2, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.distance") then
@@ -66,6 +70,7 @@ end
 
 ---------------- Misc API ---------------------------------------------
 
+-- API
 function ct.getTimer(...)
 	-- Check parameters
 	if g.checkAPIParams("ct.getTimer") then
@@ -79,6 +84,7 @@ function ct.getTimer(...)
 	return 0   -- called before first update, just return 0
 end
 
+-- API
 function ct.getVersion(...)
 	-- Check parameters
 	if g.checkAPIParams("ct.getVersion") then

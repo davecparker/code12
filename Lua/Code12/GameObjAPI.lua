@@ -14,6 +14,7 @@ local GameObj = require("Code12.GameObj")
 
 ---------- Public GameObj APIs -----------------------------------------------
 
+-- API
 function GameObj:getType(...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "getType") then
@@ -24,6 +25,7 @@ function GameObj:getType(...)
 	return self._code12.typeName
 end
 
+-- API
 function GameObj:getText(...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "getText") then
@@ -34,6 +36,7 @@ function GameObj:getText(...)
 	return self._code12.text
 end
 
+-- API
 function GameObj:setText(text, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "setText") then
@@ -46,6 +49,7 @@ function GameObj:setText(text, ...)
 	-- TODO: Re-measure text
 end
 
+-- API
 function GameObj:toString(...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "toString") then
@@ -61,6 +65,7 @@ function GameObj:toString(...)
 	return s .. "]"
 end
 
+-- API
 function GameObj:setSize(width, height, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "setSize") then
@@ -72,6 +77,7 @@ function GameObj:setSize(width, height, ...)
 	self.height = height
 end
 
+-- API
 function GameObj:align(alignment, adjustY, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "align") then
@@ -87,6 +93,7 @@ function GameObj:align(alignment, adjustY, ...)
 	self._code12.adjustY = adjustY
 end
 
+-- API
 function GameObj:setFillColor(colorName, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "setFillColor") then
@@ -97,6 +104,7 @@ function GameObj:setFillColor(colorName, ...)
 	self:setFillColorFromName(colorName)
 end
 
+-- API
 function GameObj:setFillColorRGB(red, green, blue, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "setFillColorRGB") then
@@ -107,6 +115,7 @@ function GameObj:setFillColorRGB(red, green, blue, ...)
 	self:setFillColorFromColor({red, green, blue})
 end
 
+-- API
 function GameObj:setLineColor(colorName, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "setLineColor") then
@@ -117,6 +126,7 @@ function GameObj:setLineColor(colorName, ...)
 	self:setLineColorFromName(colorName)
 end
 
+-- API
 function GameObj:setLineColorRGB(red, green, blue, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "setLineColorRGB") then
@@ -127,6 +137,7 @@ function GameObj:setLineColorRGB(red, green, blue, ...)
 	self:setLineColorFromColor({red, green, blue})
 end
 
+-- API
 function GameObj:getLayer(...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "getLayer") then
@@ -137,6 +148,7 @@ function GameObj:getLayer(...)
 	return self._code12.layer;
 end
 
+-- API
 function GameObj:setLayer(layer, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "setLayer") then
@@ -160,6 +172,7 @@ function GameObj:setLayer(layer, ...)
 	objs:insert(i + 1, obj)
 end
 
+-- API
 function GameObj:delete(...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "delete") then
@@ -170,6 +183,7 @@ function GameObj:delete(...)
 	self:removeAndDelete()
 end
 
+-- API
 function GameObj:clicked(...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "clicked") then
@@ -180,6 +194,7 @@ function GameObj:clicked(...)
 	return (g.gameObjClicked == self)
 end
 
+-- API
 function GameObj:containsPoint(x, y, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "containsPoint") then
@@ -190,6 +205,7 @@ function GameObj:containsPoint(x, y, ...)
 	return self:objContainsPoint(x, y)
 end
 
+-- API
 function GameObj:hit(gameObj, ...)
 	-- Check parameters
 	-- TODO: If called as obj.hit, not detected due to gameObj---
