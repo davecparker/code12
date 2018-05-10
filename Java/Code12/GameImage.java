@@ -29,7 +29,8 @@ public class GameImage extends GameObj
       setFillColor(null);         // fill color is currently ignored actually
       setLineColor(null);
       
-      // Look in the project folder first, then in the Code12/images subfolder
+      // Look in the project folder first, then in the Code12/images subfolder.
+      // Finally, check if the Code12 folder is in the parent folder.
       // If the file can't be found, warn the user and substitute a stub image.
       text = filename;     // Store filename in text field by default
       String path = filename;
@@ -38,8 +39,12 @@ public class GameImage extends GameObj
          path = CODE12_IMAGE_PATH + filename;
          if (!(new File(path)).isFile())
          {   
-            game.logError("Cannot find image file", filename);
-            path = CODE12_IMAGE_PATH + NOT_FOUND;
+            path = "../" + CODE12_IMAGE_PATH + filename;
+            if (!(new File(path)).isFile())
+            {
+               game.logError("Cannot find image file", filename);
+               path = CODE12_IMAGE_PATH + NOT_FOUND;
+            }
          }
       }
          

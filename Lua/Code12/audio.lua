@@ -29,10 +29,14 @@ function ct.sound(filename, ...)
 	-- Is this sound already loaded?
 	local sound = sounds[filename]
 	if sound == nil then
-		-- Try to load from project folder first, else Code 12 sounds folder
+		-- Try to load from project folder first, else Code12 sounds folder
+		-- Finally, check to see if the Code12 folder is in the parent folder.
 		sound = audio.loadSound(filename)  -- Corona prints warnings if not found :(
 		if not sound then 
 			sound = audio.loadSound(CODE12_SOUND_PATH .. filename)
+			if not sound then 
+				sound = audio.loadSound("../" .. CODE12_SOUND_PATH .. filename)
+			end
 		end
 		sounds[filename] = sound   -- cache it if found
 	end

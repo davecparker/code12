@@ -158,15 +158,23 @@ end
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
 	-- Try to open the image at native resolution
-	-- Look in the project folder first, then the Code 12 images folder.
-	-- Unfortunately, I can't find a reliable way to avoid the Corona image not found warning.
+	-- Look in the project folder first, then the Code12 images folder.
+	-- Finally, check to see if the Code12 folder is in the parent folder.
+	-- Unfortunately, I can't find a reliable way to avoid the Corona image not found warnings.
 	local obj = display.newImage(group, filename, x, y)
 	if not obj then
 		obj = display.newImage(group, CODE12_IMAGE_PATH .. filename, x, y)
 		if not obj then
-			obj = display.newImage(group, CODE12_IMAGE_PATH .. NOT_FOUND_IMAGE, x, y)
-			if not obj then  -- just in case stub not found or I/O error
-				error("ERROR: Cannot open image file " .. filename, 3)
+			obj = display.newImage(group, "../" .. CODE12_IMAGE_PATH .. filename, x, y)
+			if not obj then
+				-- Not found anywhere, try to substitute the "Image Not Found" stub image
+				obj = display.newImage(group, CODE12_IMAGE_PATH .. NOT_FOUND_IMAGE, x, y)
+				if not obj then
+					obj = display.newImage(group, "../" + CODE12_IMAGE_PATH .. NOT_FOUND_IMAGE, x, y)
+					if not obj then  -- just in case stub not found or I/O error
+						error("ERROR: Cannot open image file " .. filename, 3)
+					end
+				end
 			end
 		end
 	end

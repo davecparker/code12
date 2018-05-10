@@ -39,7 +39,8 @@ public class GameAudio implements LineListener
       if (audioClip != null)
          return;
     
-      // Look in the project folder first, then in the Code12/sounds subfolder
+      // Look in the project folder first, then in the Code12/sounds subfolder.
+      // Finally, check to see if the Code12 folder is in the parent folder.
       // If the file can't be found, warn the user just return.
       File audioFile = new File(filename);
       if (!audioFile.isFile())
@@ -47,8 +48,12 @@ public class GameAudio implements LineListener
          audioFile = new File(CODE12_SOUND_PATH + filename);
          if (!audioFile.isFile())
          {
-            game.logError("Cannot find audio file", filename);
-            return;
+            audioFile = new File("../" + CODE12_SOUND_PATH + filename);
+            if (!audioFile.isFile())
+            {            
+               game.logError("Cannot find audio file", filename);
+               return;
+            }
          }
       }
       
