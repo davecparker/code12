@@ -42,7 +42,7 @@ settings =
 	--
 	plugins =
 	{
-
+		["plugin.tinyfiledialogs"] = { publisherId = "com.xibalbastudios" },
 	},
 
 	--
