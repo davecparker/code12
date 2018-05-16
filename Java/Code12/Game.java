@@ -6,7 +6,6 @@ import java.util.*;
 import java.awt.font.FontRenderContext;
 import java.awt.event.*;
 import java.io.*;
-import sun.audio.*;
 
 
 // A game where objects can be created and modified
