@@ -13,6 +13,14 @@ settings =
 		supported = { "portrait", },
 	},
 
+	window =
+    {
+		defaultViewWidth = 600,
+		defaultViewHeight = 900,
+		resizable = true,
+		enableMaximizeButton = true,
+	},  
+
 	--
 	-- Android section
 	--

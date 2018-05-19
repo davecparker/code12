@@ -8,11 +8,17 @@
 -----------------------------------------------------------------------------------------
 
 -- Corona modules and plugins
+local widget = require( "widget" )
 local lfs = require( "lfs" )
 local fileDialogs = require( "plugin.tinyfiledialogs" )
 
 -- Local modules
 local javalex = require("javalex")
+
+
+-- UI metrics
+local dyStatusBar = 30
+local fontSizeUI = 12
 
 
 -- Lexer test strings
@@ -29,13 +35,24 @@ local sourceFile = {
 	tokens = nil,            -- token array scanned from strContents
 }
 
--- UI objects
-local dyStatusBar = 30
-local statusBarText          -- text object in the status bar 
+-- Force the initial file (for faster repeated testing)
+-- sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
+-- sourceFile.timeLoaded = os.time()
 
 
 -- The global state table that the generated Lua code can access
-appGlobalState = {}
+appGlobalState = {
+	isMac = false,         -- true if running on Mac OS (else Windows, for now)
+	width = 0,             -- window width
+	height = 0,            -- window height
+	background = nil,      -- white background rect
+	statusBar = nil,       -- status bar rect
+	statusBarText = nil,   -- text object in the status bar
+	chooseFileBtn = nil,   -- Choose File button in status bar
+	openFileBtn = nil,     -- Open button in status bar
+	group = nil,           -- display group for all drawing objects
+}
+local g = appGlobalState
 
 
 -- Update status bar based on data in sourceFile
@@ -63,7 +80,12 @@ local function updateStatusBar()
 				end
 			end
 		end
-		statusBarText.text = fileAndExt .. "      Updated: " .. updateStr
+
+		-- Update the status bar UI
+		g.statusBarText.text = fileAndExt .. " -- Updated: " .. updateStr
+		g.openFileBtn.isVisible = true
+	else
+		g.openFileBtn.isVisible = false
 	end
 end
 
@@ -121,10 +143,10 @@ end
 -- Run the given lua code string dynamically, and then call the contained start function.
 local function runLuaCode(luaCode)
 	-- Destroy old object group if any, then make new group
-	if appGlobalState.group then
-		appGlobalState.group:removeSelf()
+	if g.group then
+		g.group:removeSelf()
 	end
-	appGlobalState.group = display.newGroup()
+	g.group = display.newGroup()
 
 	-- Load the code dynamically and execute it
 	print(luaCode)
@@ -133,8 +155,8 @@ local function runLuaCode(luaCode)
  		codeFunction()
 
  		-- Run the embedded start function
- 		if type(appGlobalState.start) == "function" then
- 			appGlobalState.start()
+ 		if type(g.start) == "function" then
+ 			g.start()
  		end
  	end
 end
@@ -190,31 +212,89 @@ local function chooseFile()
 	end
 end
 
+-- Open the source file in the system default text editor for its file type
+local function openFileInEditor()
+	if sourceFile.path then
+		if g.isMac then
+			os.execute( "open \"" .. sourceFile.path .. "\"" )
+		else
+			os.execute( "start \"" .. sourceFile.path .. "\"" )
+		end
+	end
+end
+
+-- Get device metrics and store them in the global table
+local function getDeviceMetrics()
+	g.width = display.actualContentWidth
+	g.height = display.actualContentHeight
+	print( display.screenOriginX, display.screenOriginY, g.width, g.height )
+
+end
+
+-- Handle resize event for the window
+local function onResizeWindow( event )
+	-- Get new window size and relayout UI to match
+	getDeviceMetrics()
+	g.background.width = g.width
+	g.background.height = g.height
+	g.statusBar.y = g.height - dyStatusBar / 2
+	g.statusBar.width = g.width
+	g.chooseFileBtn.y = g.statusBar.y
+	g.statusBarText.x = g.width / 2
+	g.statusBarText.y = g.statusBar.y
+	g.openFileBtn.x = g.width
+	g.openFileBtn.y = g.statusBar.y
+end
+
 -- Init the app
 function initApp()
+	-- Get initial device info
+	g.isMac = (system.getInfo( "platform" ) == "macos")
+	getDeviceMetrics()
+
 	-- White background
-	local W = display.actualContentWidth
-	local H = display.actualContentHeight
-	display.newRect( W / 2, H / 2, W, H )
+	g.background = display.newRect( 0, 0, g.width, g.height )
+	g.background.anchorX = 0
+	g.background.anchorY = 0
+	g.background:setFillColor( 1 )
 
 	-- Make a default window title
 	native.setProperty("windowTitleText", "Code12")
 	display.setStatusBar( display.HiddenStatusBar )
 
-	-- Status bar
-	local r = display.newRect( W / 2, H - dyStatusBar/ 2, W, dyStatusBar )
-	r:setFillColor( 0.8 )
-	r.strokeWidth = 1
-	r:setStrokeColor( 0 )
-	statusBarText = display.newText( "", 10, r.y, native.systemFont, 12 )
-	statusBarText.anchorX = 0
-	statusBarText:setFillColor( 0 )
-
-	-- Choose the initial file
-	-- sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
-	-- sourceFile.timeLoaded = os.time()
-	chooseFile()
+	-- Make the status bar UI
+	g.statusBar = display.newRect( 0, g.height - dyStatusBar / 2, g.width, dyStatusBar )
+	g.statusBar.anchorX = 0
+	g.statusBar:setFillColor( 0.8 )
+	g.statusBar.strokeWidth = 1
+	g.statusBar:setStrokeColor( 0 )
+	g.chooseFileBtn = widget.newButton{
+		x = 10, 
+		y = g.statusBar.y,
+		onRelease = chooseFile,
+		label = "Choose File",
+		labelAlign = "left",
+		font = native.systemFontBold,
+		fontSize = fontSizeUI,
+	}
+	g.chooseFileBtn.anchorX = 0
+	g.statusBarText = display.newText( "", g.width / 2, g.statusBar.y, native.systemFont, fontSizeUI )
+	g.statusBarText:setFillColor( 0 )
+	g.openFileBtn = widget.newButton{
+		x = g.width,
+		y = g.statusBar.y,
+		onRelease = openFileInEditor,
+		label = "Open in Editor",
+		labelAlign = "right",
+		labelXOffset = -10,
+		font = native.systemFontBold,
+		fontSize = fontSizeUI,
+	}
+	g.openFileBtn.anchorX = 1
 	updateStatusBar()
+
+	-- Install window resize handler
+	Runtime:addEventListener( "resize", onResizeWindow )
 
 	-- Install timer to check file 4x/sec
 	timer.performWithDelay( 250, checkUserFile, 0 )
