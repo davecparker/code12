@@ -367,6 +367,7 @@ end
 --     "BOOL": boolean literal (str is "false" or "true")
 --     "NULL": the null literal (str is "null")
 --     "COMMENT": a comment (str is text of the comment not including the open/close)
+--     "END": the end of the source string
 function javalex.getTokens(sourceStr)
 	-- Make array of ASCII codes for the source string
 	source = sourceStr
@@ -404,7 +405,10 @@ function javalex.getTokens(sourceStr)
 			token[1], token[2] = numericLiteralToken()
 		elseif charType == nil then
 			-- End of source string
-			break
+			token[1] = "END"
+			token[2] = ""
+			tokens[#tokens + 1] = token
+			return tokens  -- We're done, return tokens array
 		elseif type(charType) == "function" then
 			-- Possible multi-char token, or char or string literal
 			local tt, str = charType()   -- token scanning function returns tt, str
@@ -419,10 +423,7 @@ function javalex.getTokens(sourceStr)
 
 		-- Add token to tokens array
 		tokens[#tokens + 1] = token
-	until false   -- breaks internally when end of string is found
-
-	-- Return tokens array
-	return tokens
+	until false   -- returns internally when end of string is found
 end
 
 
