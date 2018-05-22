@@ -24,14 +24,14 @@ public class GameRect extends GameObj
       int widthP = (int) ((width * scale) + 0.5);
       int heightP = (int) ((height * scale) + 0.5);
                
-      // Fill the circle if fillColor is not null
+      // Fill the rectangle if fillColor is not null
       if (fillColor != null)
       {
          g.setColor(fillColor);
          g.fillRect(leftP, topP, widthP, heightP);
       }
       
-      // Outline the circle if lineColor is not null
+      // Outline the rectangle if lineColor is not null
       if (lineColor != null)
       {
          g.setStroke(new BasicStroke(lineWidth));
