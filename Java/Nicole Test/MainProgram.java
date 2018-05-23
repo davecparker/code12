@@ -3,11 +3,11 @@ import java.lang.Thread;
 
 public class MainProgram extends Code12Program
 {
-   GameObj shields[] = new GameObj[10];
+   GameObj foxes[] = new GameObj[10];
    
-   GameObj player;
-   GameObj baddie;
-   GameObj weapon;
+   GameObj rabbit;
+   GameObj fox;
+   GameObj carrot;
    
    
    
@@ -23,9 +23,9 @@ public class MainProgram extends Code12Program
       floor.lineWidth = 10;
       
       //background
-      ct.setBackImage("mountains.jpg");
+      ct.setBackImage("landscape.jpg");
       
-      player = ct.image("pixel.png", 50, ct.getHeight() - 25, 10 );
+      rabbit = ct.image("white-bunny.png", 50, ct.getHeight() - 25, 10 );
       
       
       
@@ -33,23 +33,8 @@ public class MainProgram extends Code12Program
   
    public void update()                //note. add timer to inc difficulty over time
    {
-      wrapAround( player );
+      wrapAround( rabbit );
       
-      //save for later use
-      /*for ( int i = 0; i < shields.length; i++ )
-      {
-         GameObj shield = ct.rect( player.x, player.y, 10, 10 );
-         shield.setFillColor("gray");
-      }*/
-      int count = 0;
-      
-      for ( int i = 0; i < shields.length; i++ )
-      {
-         GameObj shield = ct.rect( player.x, player.y - 30, 10, 10 );
-         shield.setFillColor("gray");
-         count++;
-        
-      }
            
    }
    
@@ -84,12 +69,12 @@ public class MainProgram extends Code12Program
       {
          case("up"):
         
-               player.y = player.y - 10;
+               rabbit.y = rabbit.y - 10;
              
             break;
          case("right"):
-            player.x = player.x + 3;
-            player.xSpeed = 0.5;
+            rabbit.x = rabbit.x + 3;
+            rabbi.xSpeed = 0.5;
             break;
          case("left"):
             player.x = player.x - 3;
