@@ -1,4 +1,5 @@
 import Code12.*;
+import java.util.*;
 
 public class MainProgram extends Code12Program
 {
@@ -9,6 +10,13 @@ public class MainProgram extends Code12Program
    
    GameObj gun; // Gun at bottom of window that fires bullets
    double yMax; // Maximum y-coordinate of the game window
+   LinkedList<GameObj> bulletsList; // List for accessing bullets on screen
+   LinkedList<GameObj> ducksList; // List for accessing ducks on screen
+   int bulletsFired;
+   int shotsMissed;
+   int ducksMade;
+   int ducksHit;
+   int ducksMissed;
       
    public void start()
    {
@@ -23,6 +31,16 @@ public class MainProgram extends Code12Program
       // Make gun
       gun = ct.image( "gun.png", 50, 0, 8 );
       setGunSizeAndPosition();
+      
+      // Initialize count variables
+      bulletsFired = 0;
+      shotsMissed = 0;
+      ducksHit = 0;
+      ducksMissed = 0;
+      
+      // Initialize GameObj lists
+      bulletsList = new LinkedList<GameObj>();
+      ducksList = new LinkedList<GameObj>();
    }
    
    public void update()
@@ -33,9 +51,50 @@ public class MainProgram extends Code12Program
          double x = 110;
          double y = ct.random( 10, (int)(yMax / 2) );
          GameObj duck = createDuck( x, y, -0.5 );
+         ducksMade++;
       }
       
-      
+      // Check for duck-bullet hits and going off screen
+      for (int i = bulletsList.size() - 1; i >= 0; i--)
+      {
+         GameObj bullet = bulletsList.get(i);
+         // Delete bullet if it has gone off screen
+         if ( bullet.y < 0 )
+         {
+            bulletsList.remove(i);
+            bullet.delete();
+            shotsMissed++;
+            ct.println("shotsMissed = " + shotsMissed );
+            // Don't let this bullet affect any ducks
+            break;
+         }
+         for (int j = ducksList.size() - 1; j >= 0; j--)
+         {
+            
+            GameObj duck = ducksList.get(j);
+            
+            // If bullet hits duck, delete both
+            if ( bullet.hit( duck ) )
+            {
+               bulletsList.remove(i);
+               bullet.delete();
+               ducksList.remove(j);
+               duck.delete();
+               ducksHit++;
+               ct.println("ducksHit = " + ducksHit );
+               // Don't let this bullet affect any more ducks
+               break;
+            }
+            // If duck goes off screen, delete it
+            else if ( duck.x < 0 )
+            {
+               ducksList.remove(j);
+               duck.delete();
+               ducksMissed++;
+               ct.println("ducksMissed = " + ducksMissed );
+            }
+         }
+      }
    }
    
    // Makes a bullet at position xStart, yStart that will then
@@ -43,8 +102,8 @@ public class MainProgram extends Code12Program
    public GameObj createBullet( double xStart, double yStart )
    {
       GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
-      bullet.autoDelete = true;
       bullet.ySpeed = -2;
+      bulletsList.add( bullet );
       return bullet;
    }
    
@@ -53,8 +112,8 @@ public class MainProgram extends Code12Program
    public GameObj createDuck( double xStart, double yStart, double xSpeed )
    {
       GameObj duck = ct.image( "rubber-duck.png", xStart, yStart, 5 );
-      duck.autoDelete = true;
       duck.xSpeed = xSpeed;
+      ducksList.add( duck );
       return duck;
    }
    
@@ -69,6 +128,8 @@ public class MainProgram extends Code12Program
       double xStart = gun.x;
       double yStart = gun.y - gun.height / 2 * 0.9;
       createBullet( xStart, yStart );
+      bulletsFired++;
+      ct.println("bulletsFired = " + bulletsFired);
    }
    
    // Sets an objects height to height and changes its width to preserve
