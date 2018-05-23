@@ -30,8 +30,8 @@ local sourceFile = {
 }
 
 -- Force the initial file (for faster repeated testing)
--- sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
--- sourceFile.timeLoaded = os.time()
+sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
+sourceFile.timeLoaded = os.time()
 
 
 -- The global state table that the generated Lua code can access
@@ -91,50 +91,47 @@ local function generateLuaCode( parseTrees )
 	local luaCode = "\nlocal g = appGlobalState\nfunction g.start" .. "()\n"
 	for i = 1, #parseTrees do
 		local node = parseTrees[i]
-		if node.t == "line" and node.p == "methCall" then
-			node = node.nodes[1]
-			if node.t == "methCall" then
-				-- Check for proper call to ct.circle
-				local nodes = node.nodes
-				local objName = nodes[1][2]
-				if objName ~= "ct" then
-					return nil, i, "Unknown object " .. objName
-				end
-				local methName = nodes[3][2]
-				if methName ~= "circle" then
-					return nil, i, "Unknown method " .. methName
-				end
-				local exprList = nodes[5]
-				if exprList.t ~= "exprList" then
-					return nil, i, "Parameter list expected"
-				end
-				local exprs = exprList.nodes
-				if #exprs ~= 3 then
-					return nil, i, "ct.circle expects 3 parameters"
-				end
-
-				-- Get parameters
-				local params = {}
-				for i = 1, #exprs do
-					local expr = exprs[i]
-					if expr.t ~= "expr" or expr.p ~= "literal" then
-						return nil, i, "parameters must be constants"
-					end
-					expr = expr.nodes[1]
-					if expr.p ~= "num" then
-						return nil, i, "parameters must be numbers"
-					end
-					params[#params + 1] = expr.nodes[1][2]  -- text of the NUM token
-				end
-
-				-- Generate Lua code for this ct.circle call
-				local s = "   local c = display.newCircle(g.group, " 
-					.. params[1] .. ", " 
-					.. params[2] .. ", " 
-					.. params[3] .. " / 2)\n"
-					.. "   c:setFillColor(1, 0, 0)\n"
-				luaCode = luaCode .. s
+		if node.t == "line" and node.p == "methCallParams" then
+			-- Check for proper call to ct.circle
+			local nodes = node.nodes
+			local objName = nodes[1].str
+			if objName ~= "ct" then
+				return nil, i, "Unknown object " .. objName
 			end
+			local methName = nodes[3].str
+			if methName ~= "circle" then
+				return nil, i, "Unknown method " .. methName
+			end
+			local exprList = nodes[5]
+			if exprList.t ~= "exprList" then
+				return nil, i, "Parameter list expected"
+			end
+			local exprs = exprList.nodes
+			if #exprs ~= 3 then
+				return nil, i, "ct.circle expects 3 parameters"
+			end
+
+			-- Get parameters
+			local params = {}
+			for i = 1, #exprs do
+				local expr = exprs[i]
+				if expr.t ~= "expr" or expr.p ~= "literal" then
+					return nil, i, "parameters must be constants"
+				end
+				expr = expr.nodes[1]
+				if expr.p ~= "num" then
+					return nil, i, "parameters must be numbers"
+				end
+				params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
+			end
+
+			-- Generate Lua code for this ct.circle call
+			local s = "   local c = display.newCircle(g.group, " 
+				.. params[1] .. ", " 
+				.. params[2] .. ", " 
+				.. params[3] .. " / 2)\n"
+				.. "   c:setFillColor(1, 0, 0)\n"
+			luaCode = luaCode .. s
 		end
 	end
 
@@ -188,15 +185,21 @@ local function checkUserFile()
 				-- Read lines and create parse tree array
 				local parseTrees = {}
 				local lineNum = 1
+				parseJava.init()
 				repeat
 					local strUserCode = file:read( "*l" )  -- read a line
 					if not strUserCode then 
 						break  -- end of file
 					end
-					local tree = parseJava.parseLine( strUserCode, 0 )
-					if not tree then
-						-- Syntax error
-						runLuaCode( makeErrorCode( "Line " .. lineNum .. ": Syntax Error: " .. strUserCode ) )
+					local tree, strErr, iChar = parseJava.parseLine( strUserCode, 0 )
+					if tree == nil then
+						-- Error
+						if strErr and iChar then
+							strErr = strErr .. " (index " .. iChar .. ")"
+						else
+							strErr = "Syntax Error: " .. strUserCode  -- TODO: Escape strUserCode
+						end
+						runLuaCode( makeErrorCode( "Line " .. lineNum .. ": " .. strErr ) )
 						io.close( file )
 						return
 					end
@@ -246,7 +249,7 @@ end
 local function getDeviceMetrics()
 	g.width = display.actualContentWidth
 	g.height = display.actualContentHeight
-	print( display.screenOriginX, display.screenOriginY, g.width, g.height )
+	-- print( display.screenOriginX, display.screenOriginY, g.width, g.height )
 
 end
 
