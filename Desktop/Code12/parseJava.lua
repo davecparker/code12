@@ -26,17 +26,17 @@ local syntaxLevel	-- the syntax level for parsing (1-12, or 0 for full)
 
 -- A literal
 local literal = { t = "literal",
-	{ 1, 12, "num",		"NUM" },
-	{ 1, 12, "str",		"STR" },
-	{ 1, 12, "char",	"CHAR" },
-	{ 1, 12, "bool",	"BOOL" },
-	{ 1, 12, "null",	"NULL" },
+	{ 1, 12, "num",			"NUM" 		},
+	{ 1, 12, "str",			"STR" 		},
+	{ 1, 12, "char",		"CHAR" 		},
+	{ 1, 12, "bool",		"BOOL" 		},
+	{ 1, 12, "null",		"NULL" 		},
 }
 
 -- An expression
 local expr = { t = "expr",
-	{ 1, 12, "literal",		literal },
-	{ 3, 12, "var",			"ID" }
+	{ 1, 12, "literal",		literal 	},
+	{ 3, 12, "var",			"ID" 		},
 }
 
 -- An expression list
@@ -44,35 +44,47 @@ local exprList = { t = "exprList",
 	{ 1, 12, "exprList",	expr,	list = true, sep = "," },
 }
 
--- A procedure call
-local procCall = { t = "procCall",
-	{ 1, 12, "procCall",			"ID", "(", ")", ";" },
-	{ 1, 12, "procCallParams",		"ID", "(", exprList, ")", ";" },
-
+-- An identifier list
+local idList = { t = "idList",
+	{ 1, 12, "idList",		"ID",	list = true, sep = "," },
 }
 
--- A method call
-local methCall = { t = "methCall",
-	{ 1, 12, "methCall",			"ID", ".", "ID", "(", ")", ";" },
-	{ 1, 12, "methCallParams",		"ID", ".", "ID", "(", exprList, ")", ";" },
+-- A variable type
+local varType = { t = "varType",
+	{ 3, 12, "int",			"int" 		},
+	{ 3, 12, "double",		"double" 	},
+	{ 3, 12, "bool",		"bool" 		},
+	{ 3, 12, "String",		"String" 	},
+	{ 3, 12, "GameObj",		"GameObj" 	},
+	{ 3, 12, "other",		"ID" 		},
 }
 
--- Allowed header lines
-local header = { t = "header",
-	{ 1, 12, "importCode12",		"import", "ID", ".", "*", ";" },
-	{ 1, 12, "classUser",			"class", "ID", "extends", "ID" },
+-- An lvalue (var or expr that can be assigned to)
+local lvalue = { t = "lvalue",
+	{ 3, 5, "var",			"ID" 		},
+}
+
+-- A statement
+local stmt = { t = "stmt",
+	{ 1, 12, "methCall",			"ID", ".", "ID", "(", ")" 					},
+	{ 1, 12, "methCallParams",		"ID", ".", "ID", "(", exprList, ")" 		},
+	{ 1, 12, "procCall",			"ID", "(", ")" 								},
+	{ 1, 12, "procCallParams",		"ID", "(", exprList, ")" 					},
+	{ 3, 12, "assign",				lvalue, "=", expr 							},
 }
 
 -- A line of code
 local line = { t = "line",
-	{ 1, 12, "blank",		"END" },
-	{ 1, 12, "comment",		"COMMENT" },
-	{ 1, 12, "methCall",	methCall, "END" },
-	{ 1, 12, "procCall",	procCall, "END" },
-	{ 1, 12, "begin",		"{", "END" },
-	{ 1, 12, "end",			"}", "END" },
-	{ 1, 12, "event",		"public", "void", "ID", "(", ")", "END" },
-	{ 1, 12, "header",		header, END },
+	{ 1, 12, "stmt",				stmt, ";",								"END" },
+	{ 3, 12, "varInit",				varType, "ID", "=", expr, ";",			"END" },
+	{ 3, 12, "varDecl",				varType, idList, ";",					"END" },
+	{ 3, 12, "constInit", 			"final", varType, "ID", "=", expr, ";",	"END" },
+	{ 1, 12, "begin",				"{",									"END" },
+	{ 1, 12, "end",					"}",									"END" },
+	{ 1, 12, "eventFn",				"public", "void", "ID", "(", ")",		"END" },
+	{ 1, 12, "importCode12",		"import", "ID", ".", "*", ";",			"END" },
+	{ 1, 12, "classUser",			"class", "ID", "extends", "ID",			"END" },
+	{ 1, 12, "blank",														"END" },
 }
 
 
@@ -108,7 +120,7 @@ function parseGrammar( grammar, iStart )
 					grammar = grammar, 
 					patternIndex = i, 
 					t = grammar.t, 
-					p = pattern[3], 
+					p = pattern[3],  -- pattern name
 					nodes = nodes, 
 				}
 				trace("------")
@@ -136,11 +148,11 @@ function parsePattern( pattern, iStart )
 		if type(item) == "string" then
 			-- Token: compare to next token
 			local token = tokens[iToken]
-			if not token or item ~= token[1] then
+			if not token or item ~= token.tt then
 				return nil   -- required token type doesn't match next token
 			end
 			-- Matched a token
-			trace("Matched token " .. iToken .. " " .. token[1])
+			trace("Matched token " .. iToken .. " " .. token.str)
 			nodes[#nodes + 1] = token
 			iToken = iToken + 1
 		else
@@ -152,12 +164,12 @@ function parsePattern( pattern, iStart )
 			-- Matched a sub-grammar item
 			nodes[#nodes + 1] = subTree
 			iToken = iNext
-			trace("Matched sub-grammar, next token is #" .. iNext .. "(" .. tokens[iNext][1] .. ")")
+			trace("Matched sub-grammar, next token is #" .. iNext .. "(" .. tokens[iNext].str .. ")")
 		end
 
 		-- Is this a list pattern?
 		if pattern.list then
-			if tokens[iToken][1] == pattern.sep then  -- next token is the list seperator
+			if tokens[iToken].tt == pattern.sep then   -- next token is the list seperator
 				iToken = iToken + 1   -- pass seperator and prepare to parse item again
 			else
 				break  -- can't parse any more list items
@@ -179,9 +191,9 @@ function printParseTree( node, indentLevel )
 
 		if node.grammar == nil then
 			-- Token node
-			s = s .. node[1]
-			if node[2] ~= node[1] then
-				s = s .. " (" .. node[2] .. ")"
+			s = s .. node.tt
+			if node.str ~= node.tt then
+				s = s .. " (" .. node.str .. ")"
 			end
 			print(s)
 		else
@@ -199,22 +211,42 @@ end
 
 ----- Module functions -------------------------------------------------------
 
+-- Init the parsing state
+function parseJava.init()
+	javalex.init()
+end
+
 -- Parse the given line of code at the given syntax level (1-12, or 0 for full),
 -- and return the parse tree (recursive array of tokens and/or grammar tables).
--- If the line cannot be parsed then return nil.
+-- If the line cannot be parsed then return (nil, strErr, iChar) for a lexical error,
+-- or just nil for an unknown syntax error.
 function parseJava.parseLine( sourceLine, level )
 	-- Run lexical analysis to get the tokens array
-	tokens = javalex.getTokens( sourceLine )
+	local strErr, iChar
+	tokens, strErr, iChar = javalex.getTokens( sourceLine )
+	if tokens == nil then
+		return nil, strErr, iChar
+	end
+
+	-- Discard comment tokens
+	local i = 1
+	while i <= #tokens do
+		if tokens[i].tt == "COMMENT" then
+			table.remove( tokens, i )
+		else
+			i = i + 1
+		end
+	end
 
 	-- Set syntax level and try to parse the line grammar
 	syntaxLevel = level
 	local parseTree = parseGrammar( line, 1 )
-	-- if parseTree then
-	-- 	print("Success:")
-	-- 	printParseTree( parseTree, 0 )
-	-- else
-	-- 	print("Failed");
-	-- end
+	if parseTree == nil then
+		-- print("*** Failed")
+		return nil
+	end
+	-- print("*** Success:")
+	-- printParseTree( parseTree, 0 )
 	return parseTree
 end
 
