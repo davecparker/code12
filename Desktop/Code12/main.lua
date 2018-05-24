@@ -91,47 +91,50 @@ local function generateLuaCode( parseTrees )
 	local luaCode = "\nlocal g = appGlobalState\nfunction g.start" .. "()\n"
 	for i = 1, #parseTrees do
 		local node = parseTrees[i]
-		if node.t == "line" and node.p == "methCallParams" then
-			-- Check for proper call to ct.circle
-			local nodes = node.nodes
-			local objName = nodes[1].str
-			if objName ~= "ct" then
-				return nil, i, "Unknown object " .. objName
-			end
-			local methName = nodes[3].str
-			if methName ~= "circle" then
-				return nil, i, "Unknown method " .. methName
-			end
-			local exprList = nodes[5]
-			if exprList.t ~= "exprList" then
-				return nil, i, "Parameter list expected"
-			end
-			local exprs = exprList.nodes
-			if #exprs ~= 3 then
-				return nil, i, "ct.circle expects 3 parameters"
-			end
-
-			-- Get parameters
-			local params = {}
-			for i = 1, #exprs do
-				local expr = exprs[i]
-				if expr.t ~= "expr" or expr.p ~= "literal" then
-					return nil, i, "parameters must be constants"
+		if node.t == "line" and node.p == "stmt" then
+			node = node.nodes[1]
+			if node.p == "methCallParams" then
+				-- Check for proper call to ct.circle
+				local nodes = node.nodes
+				local objName = nodes[1].str
+				if objName ~= "ct" then
+					return nil, i, "Unknown object " .. objName
 				end
-				expr = expr.nodes[1]
-				if expr.p ~= "num" then
-					return nil, i, "parameters must be numbers"
+				local methName = nodes[3].str
+				if methName ~= "circle" then
+					return nil, i, "Unknown method " .. methName
 				end
-				params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
-			end
+				local exprList = nodes[5]
+				if exprList.t ~= "exprList" then
+					return nil, i, "Parameter list expected"
+				end
+				local exprs = exprList.nodes
+				if #exprs ~= 3 then
+					return nil, i, "ct.circle expects 3 parameters"
+				end
 
-			-- Generate Lua code for this ct.circle call
-			local s = "   local c = display.newCircle(g.group, " 
-				.. params[1] .. ", " 
-				.. params[2] .. ", " 
-				.. params[3] .. " / 2)\n"
-				.. "   c:setFillColor(1, 0, 0)\n"
-			luaCode = luaCode .. s
+				-- Get parameters
+				local params = {}
+				for i = 1, #exprs do
+					local expr = exprs[i]
+					if expr.t ~= "expr" or expr.p ~= "literal" then
+						return nil, i, "parameters must be constants"
+					end
+					expr = expr.nodes[1]
+					if expr.p ~= "num" then
+						return nil, i, "parameters must be numbers"
+					end
+					params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
+				end
+
+				-- Generate Lua code for this ct.circle call
+				local s = "   local c = display.newCircle(g.group, " 
+					.. params[1] .. ", " 
+					.. params[2] .. ", " 
+					.. params[3] .. " / 2)\n"
+					.. "   c:setFillColor(1, 0, 0)\n"
+				luaCode = luaCode .. s
+			end
 		end
 	end
 
@@ -197,8 +200,9 @@ local function checkUserFile()
 						if strErr and iChar then
 							strErr = strErr .. " (index " .. iChar .. ")"
 						else
-							strErr = "Syntax Error: " .. strUserCode  -- TODO: Escape strUserCode
+							strErr = "Syntax Error: " .. strUserCode
 						end
+						strErr = string.gsub( strErr, "\"", "\\\"")   -- escape any double quotes
 						runLuaCode( makeErrorCode( "Line " .. lineNum .. ": " .. strErr ) )
 						io.close( file )
 						return

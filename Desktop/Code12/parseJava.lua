@@ -26,17 +26,17 @@ local syntaxLevel	-- the syntax level for parsing (1-12, or 0 for full)
 
 -- A literal
 local literal = { t = "literal",
-	{ 1, 12, "num",		"NUM" },
-	{ 1, 12, "str",		"STR" },
-	{ 1, 12, "char",	"CHAR" },
-	{ 1, 12, "bool",	"BOOL" },
-	{ 1, 12, "null",	"NULL" },
+	{ 1, 12, "num",			"NUM" 		},
+	{ 1, 12, "str",			"STR" 		},
+	{ 1, 12, "char",		"CHAR" 		},
+	{ 1, 12, "bool",		"BOOL" 		},
+	{ 1, 12, "null",		"NULL" 		},
 }
 
 -- An expression
 local expr = { t = "expr",
-	{ 1, 12, "literal",		literal },
-	{ 3, 12, "var",			"ID" }
+	{ 1, 12, "literal",		literal 	},
+	{ 3, 12, "var",			"ID" 		},
 }
 
 -- An expression list
@@ -44,18 +44,47 @@ local exprList = { t = "exprList",
 	{ 1, 12, "exprList",	expr,	list = true, sep = "," },
 }
 
+-- An identifier list
+local idList = { t = "idList",
+	{ 1, 12, "idList",		"ID",	list = true, sep = "," },
+}
+
+-- A variable type
+local varType = { t = "varType",
+	{ 3, 12, "int",			"int" 		},
+	{ 3, 12, "double",		"double" 	},
+	{ 3, 12, "bool",		"bool" 		},
+	{ 3, 12, "String",		"String" 	},
+	{ 3, 12, "GameObj",		"GameObj" 	},
+	{ 3, 12, "other",		"ID" 		},
+}
+
+-- An lvalue (var or expr that can be assigned to)
+local lvalue = { t = "lvalue",
+	{ 3, 5, "var",			"ID" 		},
+}
+
+-- A statement
+local stmt = { t = "stmt",
+	{ 1, 12, "methCall",			"ID", ".", "ID", "(", ")" 					},
+	{ 1, 12, "methCallParams",		"ID", ".", "ID", "(", exprList, ")" 		},
+	{ 1, 12, "procCall",			"ID", "(", ")" 								},
+	{ 1, 12, "procCallParams",		"ID", "(", exprList, ")" 					},
+	{ 3, 12, "assign",				lvalue, "=", expr 							},
+}
+
 -- A line of code
 local line = { t = "line",
-	{ 1, 12, "blank",				"END" },
-	{ 1, 12, "importCode12",		"import", "ID", ".", "*", ";" },
-	{ 1, 12, "classUser",			"class", "ID", "extends", "ID" },
-	{ 1, 12, "eventFn",				"public", "void", "ID", "(", ")", "END" },
-	{ 1, 12, "methCall",			"ID", ".", "ID", "(", ")", ";" },
-	{ 1, 12, "methCallParams",		"ID", ".", "ID", "(", exprList, ")", ";" },
-	{ 1, 12, "procCall",			"ID", "(", ")", ";" },
-	{ 1, 12, "procCallParams",		"ID", "(", exprList, ")", ";" },
-	{ 1, 12, "begin",				"{", "END" },
-	{ 1, 12, "end",					"}", "END" },
+	{ 1, 12, "stmt",				stmt, ";",								"END" },
+	{ 3, 12, "varInit",				varType, "ID", "=", expr, ";",			"END" },
+	{ 3, 12, "varDecl",				varType, idList, ";",					"END" },
+	{ 3, 12, "constInit", 			"final", varType, "ID", "=", expr, ";",	"END" },
+	{ 1, 12, "begin",				"{",									"END" },
+	{ 1, 12, "end",					"}",									"END" },
+	{ 1, 12, "eventFn",				"public", "void", "ID", "(", ")",		"END" },
+	{ 1, 12, "importCode12",		"import", "ID", ".", "*", ";",			"END" },
+	{ 1, 12, "classUser",			"class", "ID", "extends", "ID",			"END" },
+	{ 1, 12, "blank",														"END" },
 }
 
 

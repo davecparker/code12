@@ -23,63 +23,66 @@ local javalex = {}
 --    Chars that lead to possibly multi-char tokens: a token scanning function
 local charTypes = {}  -- built in initCharTypes()
 
--- Reserved word tokens: indexed by string, maps to token tt string or nil if not reserved
+-- Reserved word tokens: indexed by string, maps to:
+--    string (token tt) if reserved word supported by Code12
+--    false if reserved word not supported by Code12
+--    nil if not reserved word
 local reservedWordTokens = {
-	["abstract"]		= "abstract",	
-	["assert"] 			= "assert",	
+	["abstract"]		= false,	
+	["assert"] 			= false,	
 	["boolean"] 		= "boolean",	
 	["break"] 			= "break",	
-	["byte"] 			= "byte",	
-	["case"] 			= "case",
-	["catch"] 			= "catch",	
-	["char"] 			= "char",	
+	["byte"] 			= false,	
+	["case"] 			= false,
+	["catch"] 			= false,	
+	["char"] 			= false,	
 	["class"] 			= "class",	
 	["const"] 			= "const",	
 	["continue"] 		= "continue",	
-	["default"] 		= "default",
+	["default"] 		= false,
 	["do"] 				= "do",	
 	["double"] 			= "double",	
 	["else"] 			= "else",	
-	["enum"] 			= "enum",	
+	["enum"] 			= false,	
 	["extends"] 		= "extends",	
 	["final"] 			= "final",	
-	["finally"] 		= "finally",	
-	["float"] 			= "float",	
+	["finally"] 		= false,	
+	["float"] 			= false,	
 	["for"] 			= "for",	
-	["goto"] 			= "goto",	
+	["goto"] 			= false,	
 	["if"] 				= "if",
-	["implements"] 		= "implements",	
+	["implements"] 		= false,	
 	["import"] 			= "import",	
-	["instanceof"] 		= "instanceof",	
+	["instanceof"] 		= false,	
 	["int"] 			= "int",	
-	["interface"] 		= "interface",	
-	["long"] 			= "long",
-	["native"] 			= "native",	
-	["new"] 			= "new",	
-	["package"] 		= "package",	
-	["private"] 		= "private",	
-	["protected"] 		= "protected",
+	["interface"] 		= false,	
+	["long"] 			= false,
+	["native"] 			= false,	
+	["new"] 			= false,	
+	["package"] 		= false,	
+	["private"] 		= false,	
+	["protected"] 		= false,
 	["public"] 			= "public",	
 	["return"] 			= "return",	
-	["short"] 			= "short",	
+	["short"] 			= false,	
 	["static"] 			= "static",	
-	["strictfp"]	 	= "strictfp",	
-	["super"] 			= "super",
-	["switch"] 			= "switch",	
-	["synchronized"] 	= "synchronized",	
-	["this"] 			= "this",	
-	["throw"] 			= "throw",	
-	["throws"] 			= "throws",	
-	["transient"] 		= "transient",
-	["try"] 			= "try",	
+	["strictfp"]	 	= false,	
+	["super"] 			= false,
+	["switch"] 			= false,	
+	["synchronized"] 	= false,	
+	["this"] 			= false,	
+	["throw"] 			= false,	
+	["throws"] 			= false,	
+	["transient"] 		= false,
+	["try"] 			= false,	
 	["void"] 			= "void",	
-	["volatile"] 		= "volatile",	
+	["volatile"] 		= false,	
 	["while"] 			= "while",
 
 	-- These reserved words are actually special literals
 	["true"] 			= "BOOL",	
 	["false"] 			= "BOOL",
-	["null"] 			= "NULL",	
+	["null"] 			= "NULL",
 }
 
 -- State for the lexer used by token scanning functions
@@ -420,7 +423,15 @@ function javalex.getTokens(sourceStr)
 				charType = charTypes[chars[iChar]]
 			until type(charType) ~= "boolean"    -- ID char
 			local str = string.sub(source, iCharStart, iChar - 1)
-			token.tt = reservedWordTokens[str] or "ID"    -- ID if not a reserved word
+			local tt = reservedWordTokens[str]
+			if tt == nil then
+				token.tt = "ID"   -- not a reserved word
+			elseif tt == false then
+				local strErr = "Unsupported reserved word \"" .. str .. "\""
+				return nil, strErr, iCharStart   -- unsupported reserved word
+			else
+				token.tt = tt
+			end
 			token.str = str
 		elseif charType == false then   -- numeric 0-9
 			-- Number constant

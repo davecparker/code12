@@ -2,6 +2,8 @@ import Code12.*;
 
 class UserCode extends Code12Program
 {
+	int x = 250;
+
 	public void start()
 	{
 		// Draw some circles
