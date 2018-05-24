@@ -108,10 +108,12 @@ public class MainProgram extends Code12Program
          for ( int j = ducksList.size() - 1; j >= 0; j-- )
          {
             GameObj duck = ducksList.get(j);
-            // If bullet hits duck, delete both
             if ( bullet.hit(duck) )
             {
                ct.sound("quack.wav");
+               makeDeadDuck( duck );
+               
+               // Delete bullet and duck
                deleteBullet(i);
                deleteDuck(j);
                ducksHit++;
@@ -167,6 +169,15 @@ public class MainProgram extends Code12Program
       ducksList.get(i).delete();
       ducksList.remove(i);
       duckYStartsList.remove(i);
+   }
+   
+   // Makes a dead duck at duck's position
+   public GameObj makeDeadDuck( GameObj duck )
+   {
+      GameObj deadDuck = ct.image( "dead-duck.png", duck.x, duck.y, duck.height );
+      deadDuck.autoDelete = true;
+      deadDuck.ySpeed = 1;
+      return deadDuck;
    }
    
    // Moves the gun horizontally and first a bullet when the mouse
