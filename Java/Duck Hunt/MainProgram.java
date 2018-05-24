@@ -100,6 +100,7 @@ public class MainProgram extends Code12Program
             // If bullet hits duck, delete both
             if ( bullet.hit(duck) )
             {
+               ct.sound("quack.wav");
                deleteBullet(i);
                deleteDuck(j);
                ducksHit++;
