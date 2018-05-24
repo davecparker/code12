@@ -12,12 +12,15 @@ public class MainProgram extends Code12Program
    double yMax; // Maximum y-coordinate of the game window
    LinkedList<GameObj> bulletsList; // List for accessing bullets on screen
    LinkedList<GameObj> ducksList; // List for accessing ducks on screen
-   int bulletsFired;
-   int shotsMissed;
-   int ducksMade;
-   int ducksHit;
-   int ducksMissed;
-      
+   LinkedList<Double> duckYStartsList; // List for tracking center of ducks vertical movement
+   int bulletsFired; // Count of how many bullets have been fired
+   int shotsMissed; // Count of how many shots have been missed
+   int ducksMade; // Count of how many ducks have been made
+   int ducksHit; // Count of how many ducks have been hit by a bullet
+   int ducksMissed; // Count of how many ducks have gone off screen
+   double amplitude; // Amplitude of the ducks up and down motion
+   double period; // Period of the ducs up and down motion
+   
    public void start()
    {
       // Set title
@@ -37,10 +40,15 @@ public class MainProgram extends Code12Program
       shotsMissed = 0;
       ducksHit = 0;
       ducksMissed = 0;
-      
-      // Initialize GameObj lists
+            
+      // Initialize lists
       bulletsList = new LinkedList<GameObj>();
       ducksList = new LinkedList<GameObj>();
+      duckYStartsList = new LinkedList<Double>();
+      
+      // Initialize amplitude and period
+      amplitude = 5;
+      period = 50;
    }
    
    public void update()
@@ -51,47 +59,53 @@ public class MainProgram extends Code12Program
          double x = 110;
          double y = ct.random( 10, (int)(yMax / 2) );
          GameObj duck = createDuck( x, y, -0.5 );
-         ducksMade++;
+      }
+      
+      // If a duck goes off screen, delete it
+      // Else make it go up or down randomly
+      for ( int j = ducksList.size() - 1; j >= 0; j-- )
+      {
+         GameObj duck = ducksList.get(j);
+         double duckYStart = duckYStartsList.get(j);
+         if ( duck.x < 0 )
+         {
+            deleteDuck(j);
+            ducksMissed++;
+            ct.println( "ducksMissed = " + ducksMissed );
+         }
+         else
+         {
+            //duck.ySpeed = ct.random( -1, 1 ) / 4.0;
+            duck.y = duckYStartsList.get(j) + amplitude * Math.sin( 2 * Math.PI / period * duck.x );
+         }
       }
       
       // Check for duck-bullet hits and going off screen
-      for (int i = bulletsList.size() - 1; i >= 0; i--)
+      for ( int i = bulletsList.size() - 1; i >= 0; i-- )
       {
          GameObj bullet = bulletsList.get(i);
          // Delete bullet if it has gone off screen
          if ( bullet.y < 0 )
          {
-            bulletsList.remove(i);
-            bullet.delete();
+            deleteBullet(i);
             shotsMissed++;
-            ct.println("shotsMissed = " + shotsMissed );
-            // Don't let this bullet affect any ducks
+            ct.println( "shotsMissed = " + shotsMissed );
+            // Don't check this bullet hitting ducks
             break;
          }
-         for (int j = ducksList.size() - 1; j >= 0; j--)
+         // Check for bullet hitting any ducks
+         for ( int j = ducksList.size() - 1; j >= 0; j-- )
          {
-            
             GameObj duck = ducksList.get(j);
-            
             // If bullet hits duck, delete both
-            if ( bullet.hit( duck ) )
+            if ( bullet.hit(duck) )
             {
-               bulletsList.remove(i);
-               bullet.delete();
-               ducksList.remove(j);
-               duck.delete();
+               deleteBullet(i);
+               deleteDuck(j);
                ducksHit++;
-               ct.println("ducksHit = " + ducksHit );
+               ct.println( "ducksHit = " + ducksHit );
                // Don't let this bullet affect any more ducks
                break;
-            }
-            // If duck goes off screen, delete it
-            else if ( duck.x < 0 )
-            {
-               ducksList.remove(j);
-               duck.delete();
-               ducksMissed++;
-               ct.println("ducksMissed = " + ducksMissed );
             }
          }
       }
@@ -99,12 +113,20 @@ public class MainProgram extends Code12Program
    
    // Makes a bullet at position xStart, yStart that will then
    // move up the window and delete itself once outside the window
-   public GameObj createBullet( double xStart, double yStart )
+   public GameObj fireBullet( double xStart, double yStart )
    {
       GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
       bullet.ySpeed = -2;
-      bulletsList.add( bullet );
+      bulletsList.add(bullet);
+      bulletsFired++;
       return bullet;
+   }
+   
+   // Deletes a bullet and its list data
+   public void deleteBullet( int i )
+   {
+      bulletsList.get(i).delete();
+      bulletsList.remove(i);
    }
    
    // Makes a duck to the right of the window at y-coordinate yStart
@@ -113,13 +135,23 @@ public class MainProgram extends Code12Program
    {
       GameObj duck = ct.image( "rubber-duck.png", xStart, yStart, 5 );
       duck.xSpeed = xSpeed;
-      ducksList.add( duck );
+      ducksList.add(duck);
+      duckYStartsList.add(yStart);
+      ducksMade++;
       return duck;
+   }
+   
+   // Deletes a duck and its list data
+   public void deleteDuck( int i )
+   {
+      ducksList.get(i).delete();
+      ducksList.remove(i);
+      duckYStartsList.remove(i);
    }
    
    // Moves the gun horizontally and first a bullet when the mouse
    // is clicked
-   public void onMousePress(GameObj obj, double x, double y)
+   public void onMousePress( GameObj obj, double x, double y )
    {
       // Move the gun horizontally to match the click location
       gun.x = x;
@@ -127,8 +159,7 @@ public class MainProgram extends Code12Program
       // Fire a new bullet
       double xStart = gun.x;
       double yStart = gun.y - gun.height / 2 * 0.9;
-      createBullet( xStart, yStart );
-      bulletsFired++;
+      fireBullet( xStart, yStart );
       ct.println("bulletsFired = " + bulletsFired);
    }
    
