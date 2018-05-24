@@ -9,11 +9,13 @@ public class MainProgram extends Code12Program
    }
    
    GameObj gun; // Gun at bottom of window that fires bullets
+   GameObj ducksHitDisplay; // Text display for percent of ducks hit
+   GameObj accuracyDisplay; // Text display for percent of shots on target   
    double yMax; // Maximum y-coordinate of the game window
    LinkedList<GameObj> bulletsList; // List for accessing bullets on screen
    LinkedList<GameObj> ducksList; // List for accessing ducks on screen
    LinkedList<Double> duckYStartsList; // List for tracking center of ducks vertical movement
-   int bulletsFired; // Count of how many bullets have been fired
+   int shotsFired; // Count of how many bullets have been fired
    int shotsMissed; // Count of how many shots have been missed
    int ducksMade; // Count of how many ducks have been made
    int ducksHit; // Count of how many ducks have been hit by a bullet
@@ -30,16 +32,27 @@ public class MainProgram extends Code12Program
       ct.setHeight( 100 * 9 / 16 );
       yMax = ct.getHeight();
       ct.setBackImage( "stage.png" );
-      
-      // Make gun
-      gun = ct.image( "gun.png", 50, 0, 8 );
-      setGunSizeAndPosition();
-      
+                
       // Initialize count variables
-      bulletsFired = 0;
+      shotsFired = 0;
       shotsMissed = 0;
+      ducksMade = 0;
       ducksHit = 0;
       ducksMissed = 0;
+      
+      // Make ducksHitDisplay
+      double scoreHeight = 5;
+      String scoreColor = "dark majenta";
+      ducksHitDisplay = ct.text( "Ducks hit: ", 0, yMax, scoreHeight, scoreColor );
+      ducksHitDisplay.align( "bottom left", true );
+      
+      // Make accuracyDisplay
+      accuracyDisplay = ct.text( "Shot Accuracy: ", 100, yMax, scoreHeight, scoreColor );
+      accuracyDisplay.align( "bottom right", true );
+      
+      // Make gun
+      gun = ct.image( "gun.png", 50, yMax - scoreHeight, 8 );
+      gun.align( "bottom", true );
             
       // Initialize lists
       bulletsList = new LinkedList<GameObj>();
@@ -48,7 +61,7 @@ public class MainProgram extends Code12Program
       
       // Initialize amplitude and period
       amplitude = 5;
-      period = 50;
+      period = 100;
    }
    
    public void update()
@@ -71,7 +84,6 @@ public class MainProgram extends Code12Program
          {
             deleteDuck(j);
             ducksMissed++;
-            ct.println( "ducksMissed = " + ducksMissed );
          }
          else
          {
@@ -89,7 +101,6 @@ public class MainProgram extends Code12Program
          {
             deleteBullet(i);
             shotsMissed++;
-            ct.println( "shotsMissed = " + shotsMissed );
             // Don't check this bullet hitting ducks
             break;
          }
@@ -104,12 +115,19 @@ public class MainProgram extends Code12Program
                deleteBullet(i);
                deleteDuck(j);
                ducksHit++;
-               ct.println( "ducksHit = " + ducksHit );
                // Don't let this bullet affect any more ducks
                break;
             }
          }
       }
+      
+      // update ducksHitDisplay
+      int percent = ct.round( 100.0 * ducksHit / (ducksHit + ducksMissed) );
+      ducksHitDisplay.setText( "Ducks hit: " + percent + "%" );
+      
+      // Make accuracyDisplay
+      percent = ct.round( 100.0 * ducksHit / shotsFired );
+      accuracyDisplay.setText( "Shot Accuracy: " + percent + "%" );
    }
    
    // Makes a bullet at position xStart, yStart that will then
@@ -120,7 +138,7 @@ public class MainProgram extends Code12Program
       GameObj bullet = ct.rect( xStart, yStart, 0.5, 2, "blue" );
       bullet.ySpeed = -2;
       bulletsList.add(bullet);
-      bulletsFired++;
+      shotsFired++;
       return bullet;
    }
    
@@ -163,9 +181,8 @@ public class MainProgram extends Code12Program
       
       // Fire a new bullet
       double xStart = gun.x;
-      double yStart = gun.y - gun.height / 2 * 0.8;
+      double yStart = gun.y - gun.height * 0.9;
       fireBullet( xStart, yStart );
-      ct.println("bulletsFired = " + bulletsFired);
    }
    
    // Sets an objects height to height and changes its width to preserve
@@ -175,20 +192,5 @@ public class MainProgram extends Code12Program
       double aspectRatio = obj.width / obj.height;
       obj.height = height;
       obj.width = height * aspectRatio;
-   }
-   
-   // Scales the gun so that it's height is 25% of the window height
-   // and sets it's position to the bottom of the window
-   public void setGunSizeAndPosition()
-   {
-      setHeight( gun, yMax * 0.25 );
-      gun.y = yMax - gun.height / 2;
-   }
-   
-   // Updates yMax and image positions when the window is resized.
-   public void onResize()
-   {
-      yMax = ct.getHeight();
-      setGunSizeAndPosition();
    }
 }
