@@ -116,7 +116,8 @@ public class MainProgram extends Code12Program
    // move up the window and delete itself once outside the window
    public GameObj fireBullet( double xStart, double yStart )
    {
-      GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
+      //GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
+      GameObj bullet = ct.rect( xStart, yStart, 0.5, 2, "blue" );
       bullet.ySpeed = -2;
       bulletsList.add(bullet);
       bulletsFired++;
@@ -154,12 +155,15 @@ public class MainProgram extends Code12Program
    // is clicked
    public void onMousePress( GameObj obj, double x, double y )
    {
+      // Play squirt sound
+      ct.sound( "squirt.wav" );
+      
       // Move the gun horizontally to match the click location
       gun.x = x;
       
       // Fire a new bullet
       double xStart = gun.x;
-      double yStart = gun.y - gun.height / 2 * 0.9;
+      double yStart = gun.y - gun.height / 2 * 0.8;
       fireBullet( xStart, yStart );
       ct.println("bulletsFired = " + bulletsFired);
    }
