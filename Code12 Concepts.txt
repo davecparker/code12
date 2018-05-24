@@ -14,7 +14,7 @@ Concept                     Example
 4. Expressions              (i * 3) + 20
 5. Function Calls           fish = ct.image( "goldfish.png", 100, 200, 50 )
 6. Object Data Fields       fish.x
-7. Object Method Calls      ball:setFillColor( "blue" )
+7. Object Method Calls      ball.setFillColor( "blue" )
 8. If-else                  if (fish.x < 0)
 9. Function Definitions     void updateScore()
 10. Parameters              GameObj makeAsteroid( double x, double y )
