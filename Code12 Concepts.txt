@@ -1,0 +1,51 @@
+Code12 Programming Concepts
+===========================
+
+The Code12 system is designed to allow students to concentrate
+on these 12 core programming concepts, ideally introduced in
+this order:
+
+
+Concept                     Example
+-------                     ----------
+1. Procedure Calls          ct.circle( 100, 200, 50 )
+2. Comments                 // Make the borders
+3. Variables                int x = 50;
+4. Expressions              (i * 3) + 20
+5. Function Calls           fish = ct.image( "goldfish.png", 100, 200, 50 )
+6. Object Data Fields       fish.x
+7. Object Method Calls      ball:setFillColor( "blue" )
+8. If-else                  if (fish.x < 0)
+9. Function Definitions     void updateScore()
+10. Parameters              GameObj makeAsteroid( double x, double y )
+11. Loops                   for (int i = 1; i < 10; i++)
+12. Arrays                  GameObj[] asteroids = new GameObj[10];
+
+
+Java Subset Restrictions
+========================
+
+In order to allow Code12 to do what it needs to do 
+(give better error messages, translate to Lua, etc.),
+we only support a subset of Java. The subset supports
+all of the above constructs. Intentionally left out are:
+
+* No class definitions. All code must live inside the MainProgram class.
+* The only object types allowed are GameObj and String.
+* No use of new, except for arrays. GameObj and String objects are returned by methods.
+* No use of the Java Class Library beyond the String and Math methods indicated.
+* No use of byte, char, short, long, or float (only int, double, and bool).
+* No type casts (use the conversion functions provided).
+
+There will be other syntax restrictions as well, and some enforcement of style,
+for example:
+
+* No multi-statement lines.
+* Line breaks are only allowed after complete statements/constructs, 
+  with a few exceptions (such as after a comma in a parameter list).
+* if and else and the controlled statements must all on their own lines.
+* For now, { and } must always be on their own line.
+* Assignment operators (=, +=, etc.) and ++ and -- make statements not expressions.
+* Object field/method access cannot be chained, so no a.b.c or a().b
+* No overloading in user-defined functions (only one parameter list signature).
+* Indentation errors will be enforced or warned (depending on GUI setting). 
