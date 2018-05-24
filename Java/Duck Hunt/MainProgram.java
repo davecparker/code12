@@ -56,7 +56,7 @@ public class MainProgram extends Code12Program
       // Make ducks at random times and positions
       if (ct.random(1, 50) == 1)
       {
-         double x = 110;
+         double x = ct.random( 110, 130 );
          double y = ct.random( 10, (int)(yMax / 2) );
          GameObj duck = createDuck( x, y, -0.5 );
       }
