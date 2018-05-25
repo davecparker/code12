@@ -23,79 +23,81 @@ local javalex = {}
 --    Chars that lead to possibly multi-char tokens: a token scanning function
 local charTypes = {}  -- built in initCharTypes()
 
--- Reserved word tokens: indexed by string, maps to token tt string or nil if not reserved
+-- Reserved word tokens: indexed by string, maps to:
+--    string (token tt) if reserved word supported by Code12
+--    false if reserved word not supported by Code12
+--    nil if not reserved word
 local reservedWordTokens = {
-	["abstract"]		= "abstract",	
-	["assert"] 			= "assert",	
+	["abstract"]		= false,	
+	["assert"] 			= false,	
 	["boolean"] 		= "boolean",	
 	["break"] 			= "break",	
-	["byte"] 			= "byte",	
-	["case"] 			= "case",
-	["catch"] 			= "catch",	
-	["char"] 			= "char",	
+	["byte"] 			= false,	
+	["case"] 			= false,
+	["catch"] 			= false,	
+	["char"] 			= false,	
 	["class"] 			= "class",	
 	["const"] 			= "const",	
 	["continue"] 		= "continue",	
-	["default"] 		= "default",
+	["default"] 		= false,
 	["do"] 				= "do",	
 	["double"] 			= "double",	
 	["else"] 			= "else",	
-	["enum"] 			= "enum",	
+	["enum"] 			= false,	
 	["extends"] 		= "extends",	
 	["final"] 			= "final",	
-	["finally"] 		= "finally",	
-	["float"] 			= "float",	
+	["finally"] 		= false,	
+	["float"] 			= false,	
 	["for"] 			= "for",	
-	["goto"] 			= "goto",	
+	["goto"] 			= false,	
 	["if"] 				= "if",
-	["implements"] 		= "implements",	
+	["implements"] 		= false,	
 	["import"] 			= "import",	
-	["instanceof"] 		= "instanceof",	
+	["instanceof"] 		= false,	
 	["int"] 			= "int",	
-	["interface"] 		= "interface",	
-	["long"] 			= "long",
-	["native"] 			= "native",	
-	["new"] 			= "new",	
-	["package"] 		= "package",	
-	["private"] 		= "private",	
-	["protected"] 		= "protected",
+	["interface"] 		= false,	
+	["long"] 			= false,
+	["native"] 			= false,	
+	["new"] 			= false,	
+	["package"] 		= false,	
+	["private"] 		= false,	
+	["protected"] 		= false,
 	["public"] 			= "public",	
 	["return"] 			= "return",	
-	["short"] 			= "short",	
+	["short"] 			= false,	
 	["static"] 			= "static",	
-	["strictfp"]	 	= "strictfp",	
-	["super"] 			= "super",
-	["switch"] 			= "switch",	
-	["synchronized"] 	= "synchronized",	
-	["this"] 			= "this",	
-	["throw"] 			= "throw",	
-	["throws"] 			= "throws",	
-	["transient"] 		= "transient",
-	["try"] 			= "try",	
+	["strictfp"]	 	= false,	
+	["super"] 			= false,
+	["switch"] 			= false,	
+	["synchronized"] 	= false,	
+	["this"] 			= false,	
+	["throw"] 			= false,	
+	["throws"] 			= false,	
+	["transient"] 		= false,
+	["try"] 			= false,	
 	["void"] 			= "void",	
-	["volatile"] 		= "volatile",	
+	["volatile"] 		= false,	
 	["while"] 			= "while",
 
 	-- These reserved words are actually special literals
 	["true"] 			= "BOOL",	
 	["false"] 			= "BOOL",
-	["null"] 			= "NULL",	
+	["null"] 			= "NULL",
 }
 
 -- State for the lexer used by token scanning functions
-local source    -- the source string
-local chars     -- array of ASCII codes for the source string
-local iChar     -- index to current char in chars
+local source    		-- the source string
+local chars     		-- array of ASCII codes for the source string
+local iChar     		-- index to current char in chars
+local commentLevel		-- current nesting level for block comments (/* */)
 
 
 ----- Token scanning functions ------------------------------------------------
 
--- Return string for an invalid character
+-- Return (nil, strError) for an invalid character
 local function invalidCharToken()
-	print("Invalid character code " .. chars[iChar] .. " at index " .. iChar)
-	local str = string.char(chars[iChar])
-	iChar = iChar + 1
-	return "", str   -- TODO: Report error
+	local strErr = "Invalid character code " .. chars[iChar]
+	return nil, strErr
 end
 
 -- Return string for token starting with =  (=  ==)
@@ -233,6 +235,31 @@ local function starToken()
 	return "*"
 end
 
+-- Read through a block comment (/*  */), handling nesting.
+-- The current comment level is tracked in commentLevel.
+-- Before the initial call to this function, commentLevel should
+-- be set to 1 and iChar should be just past the initial /*
+-- Return the index of the last char in the comment.
+local function skipBlockComment()
+	while true do
+		local ch = chars[iChar]
+		if ch == 42 and chars[iChar + 1] == 47 then  -- */
+			iChar = iChar + 2
+			commentLevel = commentLevel - 1
+			if commentLevel == 0 then
+				return iChar - 3
+			end
+		elseif ch == 47 and chars[iChar + 1] == 42 then  -- /*
+			iChar = iChar + 2
+			commentLevel = commentLevel + 1
+		elseif ch == nil then
+			return iChar - 1  -- unclosed comment continues to next line
+		else
+			iChar = iChar + 1
+		end
+	end	
+end
+
 -- Return string for token starting with /  (/  /=)
 -- or ("COMMENT", str) for a comment (either block or to end of line)
 local function slashToken()
@@ -240,33 +267,16 @@ local function slashToken()
 	local charNext = chars[iChar]
 	if charNext == 47 then   --  /
 		-- Comment to end of line
-		local str = string.sub(source, iChar + 1)
+		local str = string.sub( source, iChar + 1 )
 		iChar = #chars + 1
 		return "COMMENT", str
 	elseif charNext == 42 then  -- *
-		-- Block comment (possibly nested)
+		-- Block comment
 		iChar = iChar + 1
 		local iCharStart = iChar
-		local level = 1
-		while true do
-			local ch = chars[iChar]
-			if ch == 42 and chars[iChar + 1] == 47 then  -- */
-				iChar = iChar + 2
-				level = level - 1
-				if level == 0 then
-					break
-				end
-			elseif ch == 47 and chars[iChar + 1] == 42 then  -- /*
-				iChar = iChar + 2
-				level = level + 1
-			elseif ch == nil then
-				print("Unclosed block comment")   -- TODO: Support multi-line
-				return nil
-			else
-				iChar = iChar + 1
-			end
-		end
-		return "COMMENT", string.sub(source, iCharStart, iChar - 3)
+		commentLevel = 1
+		local iCharEnd = skipBlockComment()
+		return "COMMENT", string.sub( source, iCharStart, iCharEnd )
 	elseif charNext == 61 then   --  =
 		iChar = iChar + 1
 		return "/="
@@ -298,22 +308,24 @@ end
 
 -- Return ("CHAR", str) for a char literal token.
 -- The str includes the single quotes.
+-- Return (nil, strErr) if the literal is invalid.
 local function charLiteralToken()
 	local iCharStart = iChar   -- the single quote
 	iChar = iChar + 1
 	local charNext = chars[iChar]
 	-- TODO: if charNext == 92 then   --  \
 	iChar = iChar + 1
-	if chars[iChar] ~= 39 then
-		print("Invalid char literal")    -- TODO
-	end
 	local str = string.sub(source, iCharStart, iChar)
+	if chars[iChar] ~= 39 then
+		return nil, "Invalid character literal"
+	end
 	iChar = iChar + 1
 	return "CHAR", str
 end
 
 -- Return ("STR", str) for a string literal token.
 -- The str includes the double quotes.
+-- Return (nil, strErr) if the literal is unclosed by the end of line.
 local function stringLiteralToken()
 	local iCharStart = iChar    -- the double quote
 	iChar = iChar + 1
@@ -321,8 +333,8 @@ local function stringLiteralToken()
 	while charNext ~= 34 do   -- "
 		-- TODO: if charText == 92 then   -- \
 		if charNext == nil then
-			print("Unclosed string literal")    -- TODO
-			return nil
+			iChar = iCharStart
+			return nil, "Unclosed string literal"
 		end
 		iChar = iChar + 1
 		charNext = chars[iChar]
@@ -355,10 +367,17 @@ end
 
 ----- Module functions -------------------------------------------------------
 
+-- Init the state of the lexer 
+function javalex.init()
+	-- We need to remember the nested block comment level across calls to getTokens
+	commentLevel = 0
+end
+
 -- Return an array of tokens for the given source string. 
--- Each token is a 3-element array { tt, str, iCharFirst }, where iCharFirst is 
--- the index of the start of the token in sourceStr, str is the text of the token, 
--- and tt is a string that identifies the token type as follows:
+-- Each token is a table with 3 fields named, for example: 
+--     { tt = "ID", str = "foo", iChar = 23 }
+-- where iChar is the index of the start of the token in sourceStr, str is the 
+-- text of the token, and tt is a string that identifies the token type as follows:
 --     Keywords, operators, and seperators have tt == str (e.g. "for", "++", ";")
 --     "ID": an identifer that is not a reserved word
 --     "NUM": numeric literal (any numeric type)
@@ -367,16 +386,23 @@ end
 --     "BOOL": boolean literal (str is "false" or "true")
 --     "NULL": the null literal (str is "null")
 --     "COMMENT": a comment (str is text of the comment not including the open/close)
+--     "END": the end of the source string
+-- Return (nil, strErr, iChar) if a token is malformed. 
 function javalex.getTokens(sourceStr)
 	-- Make array of ASCII codes for the source string
 	source = sourceStr
 	chars = { string.byte(source, 1, string.len(source)) }   -- supposedly faster than a loop
+	iChar = 1
 
 	-- Init array of tokens to return
 	local tokens = {}
 
+	-- Are we inside a block comment that started on a previous line?
+	if commentLevel > 0 then
+		skipBlockComment()  -- don't generate COMMENT tokens for multi-line comments 
+	end
+
 	-- Scan the chars array
-	iChar = 1
 	repeat
 		-- Skip whitespace
 		local charType = charTypes[chars[iChar]]
@@ -385,8 +411,8 @@ function javalex.getTokens(sourceStr)
 			charType = charTypes[chars[iChar]]
 		end
 
-		-- Make a token, which is a 3-array: { tt, str, iCharFirst }
-		local token = { "", "", iChar }   -- TODO: get from pool
+		-- Make a token table  TODO: get from pool
+		local token = { tt = "", str = "", iChar = iChar }
 
 		-- Determine what token type to build next
 		if charType == true then    -- ID start char
@@ -397,32 +423,44 @@ function javalex.getTokens(sourceStr)
 				charType = charTypes[chars[iChar]]
 			until type(charType) ~= "boolean"    -- ID char
 			local str = string.sub(source, iCharStart, iChar - 1)
-			token[1] = reservedWordTokens[str] or "ID"    -- ID if not a reserved word
-			token[2] = str
+			local tt = reservedWordTokens[str]
+			if tt == nil then
+				token.tt = "ID"   -- not a reserved word
+			elseif tt == false then
+				local strErr = "Unsupported reserved word \"" .. str .. "\""
+				return nil, strErr, iCharStart   -- unsupported reserved word
+			else
+				token.tt = tt
+			end
+			token.str = str
 		elseif charType == false then   -- numeric 0-9
 			-- Number constant
-			token[1], token[2] = numericLiteralToken()
+			token.tt, token.str = numericLiteralToken()
 		elseif charType == nil then
 			-- End of source string
-			break
+			token.tt = "END"
+			token.str = ""
+			 -- We're done, so add this last token and return tokens array
+			tokens[#tokens + 1] = token
+			return tokens 
 		elseif type(charType) == "function" then
 			-- Possible multi-char token, or char or string literal
 			local tt, str = charType()   -- token scanning function returns tt, str
-			token[1] = tt
-			token[2] = str or tt    -- simple tokens are their own string
+			if tt == nil then 
+				return nil, str, iChar   -- token error (e.g. unclosed string literal)
+			end
+			token.tt = tt
+			token.str = str or tt    -- simple tokens are their own string
 		else
 			-- Single char token
 			iChar = iChar + 1
-			token[1] = charType   -- single char string
-			token[2] = charType   -- simple tokens are their own string
+			token.tt = charType    -- single char string
+			token.str = charType   -- simple tokens are their own string
 		end 
 
 		-- Add token to tokens array
 		tokens[#tokens + 1] = token
-	until false   -- breaks internally when end of string is found
-
-	-- Return tokens array
-	return tokens
+	until false   -- returns internally when end of string is found
 end
 
 

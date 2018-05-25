@@ -13,7 +13,7 @@ local lfs = require( "lfs" )
 local fileDialogs = require( "plugin.tinyfiledialogs" )
 
 -- Local modules
-local javalex = require("javalex")
+local parseJava = require( "parseJava" )
 
 
 -- UI metrics
@@ -21,23 +21,17 @@ local dyStatusBar = 30
 local fontSizeUI = 12
 
 
--- Lexer test strings
---local s = [[  { foo2_1(x, "ack", true,/*hey*/ch == 'a', _y, $z);  for a = 3.14;break;  if (a[23] == null)  } // this is a comment]]
---local s = " a>b  a>=b  a>>b a>>=b a>>>b a>>>=b "
---local s = "foo /*hey*/ bar /*this/*is*/nested*/ @bas // this is a comment"
-
 
 -- The user source file
 local sourceFile = {
 	path = nil,              -- full pathname to the file
 	timeLoaded = 0,          -- time this file was loaded
 	timeModLast = 0,         -- last modification time or 0 if never
-	tokens = nil,            -- token array scanned from strContents
 }
 
 -- Force the initial file (for faster repeated testing)
--- sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
--- sourceFile.timeLoaded = os.time()
+sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
+sourceFile.timeLoaded = os.time()
 
 
 -- The global state table that the generated Lua code can access
@@ -89,53 +83,61 @@ local function updateStatusBar()
 	end
 end
 
--- Generate and return the Lua code string corresponding to the sourceFile.
--- If there is an error, return 
--- (This is currently just a Proof of Concept)
-local function generateLuaCode()
-	-- Fake parse of the tokens, just look for apparent ct.circle calls,
-	-- get params as following 3 numbers, then generate corresponding Lua code.
+-- Generate and return the Lua code string corresponding to parseTrees,
+-- which is an array of parse trees for each line of Java code.
+-- If there is an error, return (nil, lineNum, errorString)
+local function generateLuaCode( parseTrees )
+	-- For now, just look for ct.circle calls
 	local luaCode = "\nlocal g = appGlobalState\nfunction g.start" .. "()\n"
-	local i = 1
-	while i <= #sourceFile.tokens do
-		local token = sourceFile.tokens[i]
-		i = i + 1
-
-		-- See if we have an apparent ct.something call
-		if token[1] == "ID" and token[2] == "ct" then
-			token = sourceFile.tokens[i]
-			if token[1] == "." then
-				i = i + 1
-				token = sourceFile.tokens[i]
-				if token[1] == "ID" then
-
-					-- Check if ct.circle or unknown function
-					if token[2] ~= "circle" then
-						return nil, "Unknown function \\\"ct." .. token[2] .. "\\\""
-					end
-
-					-- Scan for the next 3 numbers as the parameters
-					local params = {}
-					repeat 
-						i = i + 1
-						token = sourceFile.tokens[i]
-						if token[1] == "NUM" then
-							params[#params + 1] = token[2]
-						end
-					until #params == 3
-
-					-- Generate Lua code for this ct.circle call
-					local s = "   local c = display.newCircle(g.group, " 
-						.. params[1] .. ", " 
-						.. params[2] .. ", " 
-						.. params[3] .. " / 2)\n"
-						.. "   c:setFillColor(1, 0, 0)\n"
-
-					luaCode = luaCode .. s
+	for i = 1, #parseTrees do
+		local node = parseTrees[i]
+		if node.t == "line" and node.p == "stmt" then
+			node = node.nodes[1]
+			if node.p == "methCallParams" then
+				-- Check for proper call to ct.circle
+				local nodes = node.nodes
+				local objName = nodes[1].str
+				if objName ~= "ct" then
+					return nil, i, "Unknown object " .. objName
 				end
+				local methName = nodes[3].str
+				if methName ~= "circle" then
+					return nil, i, "Unknown method " .. methName
+				end
+				local exprList = nodes[5]
+				if exprList.t ~= "exprList" then
+					return nil, i, "Parameter list expected"
+				end
+				local exprs = exprList.nodes
+				if #exprs ~= 3 then
+					return nil, i, "ct.circle expects 3 parameters"
+				end
+
+				-- Get parameters
+				local params = {}
+				for i = 1, #exprs do
+					local expr = exprs[i]
+					if expr.t ~= "expr" or expr.p ~= "literal" then
+						return nil, i, "parameters must be constants"
+					end
+					expr = expr.nodes[1]
+					if expr.p ~= "num" then
+						return nil, i, "parameters must be numbers"
+					end
+					params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
+				end
+
+				-- Generate Lua code for this ct.circle call
+				local s = "   local c = display.newCircle(g.group, " 
+					.. params[1] .. ", " 
+					.. params[2] .. ", " 
+					.. params[3] .. " / 2)\n"
+					.. "   c:setFillColor(1, 0, 0)\n"
+				luaCode = luaCode .. s
 			end
 		end
 	end
+
 	luaCode = luaCode .. "end\n"
 	return luaCode
 end
@@ -167,31 +169,55 @@ local function makeErrorCode( errorStr )
 		local g = appGlobalState
 		function g.start()
 			local t = display.newText(g.group, "]] .. errorStr ..[[", 
-					50, 100, native.systemFont, 24)
+					50, 100, native.systemFont, 20)
 			t.anchorX = 0
 			t:setFillColor(0)
 		end
 	]]
 end
 
--- Function to check user file for changes and (re)scan it if modified
+-- Function to check user file for changes and (re)parse it if modified
 local function checkUserFile()
 	if sourceFile.path then
 		local timeMod = lfs.attributes( sourceFile.path, "modification" )
 		if timeMod and timeMod > sourceFile.timeModLast then
 			local file = io.open( sourceFile.path, "r" )
 			if file then
-				local strUserCode = file:read( "*a" )
-				io.close( file )
-				if strUserCode then
-					sourceFile.timeModLast = timeMod
-					sourceFile.tokens = javalex.getTokens( strUserCode )
-					local codeStr, errorStr = generateLuaCode()
-					if not codeStr then
-						codeStr = makeErrorCode( errorStr )
+				sourceFile.timeModLast = timeMod
+
+				-- Read lines and create parse tree array
+				local parseTrees = {}
+				local lineNum = 1
+				parseJava.init()
+				repeat
+					local strUserCode = file:read( "*l" )  -- read a line
+					if not strUserCode then 
+						break  -- end of file
 					end
-					runLuaCode( codeStr )
+					local tree, strErr, iChar = parseJava.parseLine( strUserCode, 0 )
+					if tree == nil then
+						-- Error
+						if strErr and iChar then
+							strErr = strErr .. " (index " .. iChar .. ")"
+						else
+							strErr = "Syntax Error: " .. strUserCode
+						end
+						strErr = string.gsub( strErr, "\"", "\\\"")   -- escape any double quotes
+						runLuaCode( makeErrorCode( "Line " .. lineNum .. ": " .. strErr ) )
+						io.close( file )
+						return
+					end
+					parseTrees[#parseTrees + 1] = tree
+					lineNum = lineNum + 1
+				until false  -- breaks or returns internally
+				io.close( file )
+
+				-- Make and run the Lua code
+				local codeStr, errLine, errStr = generateLuaCode( parseTrees )
+				if not codeStr then
+					codeStr = makeErrorCode( "Line " .. errLine .. ": " .. errStr )
 				end
+				runLuaCode( codeStr )
 			end
 		end
 		updateStatusBar()
@@ -227,7 +253,7 @@ end
 local function getDeviceMetrics()
 	g.width = display.actualContentWidth
 	g.height = display.actualContentHeight
-	print( display.screenOriginX, display.screenOriginY, g.width, g.height )
+	-- print( display.screenOriginX, display.screenOriginY, g.width, g.height )
 
 end
 
