@@ -30,6 +30,19 @@ local parseOpExpr
 local primaryExpr
 
 
+----- Debugging help -------------------------------------------------------
+
+-- Set this to true to get trace output while parsing
+local printTrace = false;
+
+-- Debug trace
+local function trace( message )
+	if printTrace then
+		print(message)
+	end
+end
+
+
 ----- Misc Tables ---------------------------------------------------------
 
 -- Operator precedence for binary operators: map operator text to precedence.
@@ -81,86 +94,145 @@ local function expr()
 end
 
 
-
 ----- Grammar Tables ---------------------------------------------------------
 
--- An expression list
-local exprList = { t = "exprList",
-	{ 1, 12, "exprList",			expr,	list = true, sep = "," },
+-- A function value (an expression that can be called as a function)
+local fnValue = { t = "fnValue",
+	{ 1, 12, "method",			"ID", ".", "ID"		},
+	{ 9, 12, "this",			"ID" 				},
 }
 
--- A primary expression (no binary operators)
-primaryExpr = { t = "expr",
-	{ 1, 12, "NUM",					"NUM" 									},
-	{ 1, 12, "CHAR",				"CHAR" 									},
-	{ 1, 12, "BOOL",				"BOOL" 									},
-	{ 1, 12, "NULL",				"NULL" 									},
-	{ 1, 12, "STR",					"STR" 									},
-	{ 4, 12, "exprParens",			"(", expr, ")"							},
-	{ 4, 12, "neg",					"-", parsePrimaryExpr 					},
-	{ 4, 12, "!",					"!", parsePrimaryExpr 					},
-	{ 5, 12, "fnCallParams",		"ID", "(", exprList, ")" 				},
-	{ 5, 12, "fnCall",				"ID", "(", ")" 							},
-	{ 7, 12, "methCallParams",		"ID", ".", "ID", "(", exprList, ")" 	},
-	{ 7, 12, "methCall",			"ID", ".", "ID", "(", ")" 				},
-	{ 6, 12, ".",					"ID", ".", "ID"							},
-	{ 3, 12, "var",					"ID" 									},
-}
-
--- An identifier list
-local idList = { t = "idList",
-	{ 1, 12, "idList",				"ID",	list = true, sep = "," },
+-- An lValue (var or expr that can be assigned to)
+local lValue = { t = "lValue",
+	{ 6, 12, "field",			"ID", ".", "ID"			},
+	{ 12, 12, "index",			"ID", "[", expr, "]"	},
+	{ 3, 12, "var",				"ID" 					},
 }
 
 -- A variable type
 local varType = { t = "varType",
-	{ 3, 12, "int",					"int" 		},
-	{ 3, 12, "double",				"double" 	},
-	{ 3, 12, "boolean",				"boolean" 	},
-	{ 3, 12, "String",				"String" 	},
-	{ 3, 12, "GameObj",				"GameObj" 	},
-	{ 3, 12, "other",				"ID" 		},
+	{ 3, 12, "int",				"int" 		},
+	{ 3, 12, "double",			"double" 	},
+	{ 3, 12, "boolean",			"boolean" 	},
+	{ 3, 12, "String",			"String" 	},
+	{ 3, 12, "GameObj",			"GameObj" 	},
+	{ 3, 12, "other",			"ID" 		},
 }
 
--- An lvalue (var or expr that can be assigned to)
-local lvalue = { t = "lvalue",
-	{ 6, 12, "field",				"ID", ".", "ID"		},
-	{ 3, 12, "var",					"ID" 				},
+-- A return type for a procedure/function definition
+local retType = { t = "retType",
+	{ 9, 12, "void",			"void" 		},
+	{ 9, 12, "value",			varType		},
+}
+
+-- A formal parameter (in a function definition)
+local param = { t = "param",
+	{ 6, 12, "param",			varType, "ID"		},
+}
+
+-- A formal parameter list, which can be empty
+local paramList = { t = "paramList",
+	{ 10, 12, "list",			param,	list = true, sep = "," 		},
+	{ 9, 12, "empty"												},
+}
+
+-- An identifier list (must have a least one)
+local idList = { t = "idList",
+	{ 1, 12, "list",			"ID",	list = true, sep = "," 		},
+}
+
+-- An expression list, which can be empty
+local exprList = { t = "exprList",
+	{ 1, 12, "list",			expr,	list = true, sep = "," 		},
+	{ 1, 12, "empty"												},
+}
+
+-- A primary expression (no binary operators)
+primaryExpr = { t = "expr",
+	{ 1, 12, "NUM",				"NUM" 								},
+	{ 1, 12, "BOOL",			"BOOL" 								},
+	{ 1, 12, "NULL",			"NULL" 								},
+	{ 1, 12, "STR",				"STR" 								},
+	{ 4, 12, "exprParens",		"(", expr, ")"						},
+	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
+	{ 4, 12, "!",				"!", parsePrimaryExpr 				},
+	{ 5, 12, "call",			fnValue, "(", exprList, ")" 		},
+	{ 4, 12, "lValue",			lValue								},
+}
+
+-- An assignment operator
+local assignOp = { t = "assignOp",
+	{ 3, 12, "=",				"=" 		},
+	{ 4, 12, "+=",				"+=" 		},
+	{ 4, 12, "-=",				"-=" 		},
+	{ 4, 12, "*=",				"*=" 		},
+	{ 4, 12, "/=",				"/=" 		},
 }
 
 -- A statement
 local stmt = { t = "stmt",
-	{ 1, 12, "methCallParams",		"ID", ".", "ID", "(", exprList, ")" 		},
-	{ 1, 12, "methCall",			"ID", ".", "ID", "(", ")" 					},
-	{ 1, 12, "procCallParams",		"ID", "(", exprList, ")" 					},
-	{ 1, 12, "procCall",			"ID", "(", ")" 								},
-	{ 3, 12, "assign",				lvalue, "=", expr 							},
+	{ 1, 12, "call",			fnValue, "(", exprList, ")" 		},
+	{ 3, 12, "assign",			lValue, assignOp, expr 				},
+	{ 4, 12, "inc",				lValue, "++"						},
+	{ 4, 12, "dec",				lValue, "--"						},
+	{ 4, 12, "inc",				"++", lValue 						},
+	{ 4, 12, "dec",				"--", lValue						},
+}
+
+-- The init part of a for loop
+local forInit = { t = "forInit",
+	{ 11, 12, "varInit",		varType, "ID", "=", expr			},
+	{ 11, 12, "stmt",			stmt								},
+	{ 11, 12, "empty",												},
+}
+
+-- The expr part of a for loop
+local forExpr = { t = "forExpr",
+	{ 11, 12, "expr",			expr		},
+	{ 11, 12, "empty",						},
+}
+
+-- The next part of a for loop
+local forNext = { t = "forNext",
+	{ 11, 12, "stmt",			stmt		},
+	{ 11, 12, "empty",						},
+}
+
+-- The control part of a for loop (inside the parens)
+local forControl = { t = "forControl",
+	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
+	{ 12, 12, "array",			varType, "ID", ":", "ID" 					},
+}
+
+-- An array initializer
+local arrayInit = { t = "arrayInit",
+	{ 12, 12, "new", 			"new", varType,	"[", expr, "]"				},
+	{ 12, 12, "list", 			"{", exprList, "}"							},
 }
 
 -- A line of code
 local line = { t = "line",
-	{ 1, 12, "stmt",				stmt, ";",								"END" },
-	{ 3, 12, "varInit",				varType, "ID", "=", expr, ";",			"END" },
-	{ 3, 12, "varDecl",				varType, idList, ";",					"END" },
-	{ 3, 12, "constInit", 			"final", varType, "ID", "=", expr, ";",	"END" },
-	{ 1, 12, "begin",				"{",									"END" },
-	{ 1, 12, "end",					"}",									"END" },
-	{ 1, 12, "eventFn",				"public", "void", "ID", "(", ")",		"END" },
-	{ 1, 12, "importCode12",		"import", "ID", ".", "*", ";",			"END" },
-	{ 1, 12, "classUser",			"class", "ID", "extends", "ID",			"END" },
-	{ 8, 12, "if",					"if", "(", expr, ")",					"END" },
-	{ 8, 12, "elseif",				"else", "if", "(", expr, ")",			"END" },
-	{ 8, 12, "else",				"else", 								"END" },
-	{ 1, 12, "blank",														"END" },
+	{ 1, 12, "blank",															"END" },
+	{ 1, 12, "stmt",			stmt, ";",										"END" },
+	{ 3, 12, "varInit",			varType, "ID", "=", expr, ";",					"END" },
+	{ 3, 12, "varDecl",			varType, idList, ";",							"END" },
+	{ 3, 12, "constInit", 		"final", varType, "ID", "=", expr, ";",			"END" },
+	{ 1, 12, "begin",			"{",											"END" },
+	{ 1, 12, "end",				"}",											"END" },
+	{ 1, 12, "eventFn",			"public", "void", "ID", "(", ")",				"END" },
+	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
+	{ 1, 12, "classUser",		"class", "ID", "extends", "ID",					"END" },
+	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },
+	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",					"END" },
+	{ 8, 12, "else",			"else", 										"END" },
+	{ 9, 12, "func",			retType, "ID", "(", paramList, ")",				"END" },
+	{ 9, 12, "return",			"return", expr, ";",							"END" },
+	{ 11, 12, "do",				"do", 											"END" },
+	{ 11, 12, "do-while",		"while", "(", expr, ")", ";",					"END" },
+	{ 11, 12, "while",			"while", "(", expr, ")",						"END" },
+	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
+	{ 12, 12, "array",			varType, "[", "]", "ID", "=", arrayInit, ";",	"END" },
 }
-
-
------ Internal functions -------------------------------------------------------
-
--- Debug trace
-local function trace(message)
-	-- print(message)
-end
 
 
 ----- Parsing Functions --------------------------------------------------------
@@ -219,7 +291,7 @@ function parseGrammar( grammar )
 		local pattern = grammar[i]
 		if syntaxLevel >= pattern[1] and syntaxLevel <= pattern[2] then
 			-- Try to match this pattern within the grammer table
-			trace("Trying " .. grammar.t .. "[" .. i .. "]")
+			trace("Trying " .. grammar.t .. "[" .. i .. "] (" .. pattern[3] .. ")")
 			local nodes = parsePattern( pattern )
 			if nodes then
 				-- This pattern matches, so make a grammar node and return it
@@ -228,9 +300,7 @@ function parseGrammar( grammar )
 					p = pattern[3],  -- pattern name
 					nodes = nodes, 
 				}
-				-- trace("------")
-				-- parseJava.printParseTree( parseTree, 0 )
-				-- trace("------")
+				trace("Returning " .. grammar.t .. "[" .. i .. "]")
 				return parseTree
 			end
 			iToken = iStart  -- reset position for next pattern
@@ -257,8 +327,11 @@ function parsePattern( pattern )
 				return nil   -- required token type doesn't match next token
 			end
 			-- Matched a token
-			trace("Matched token " .. iToken .. " " .. token.str)
-			nodes[#nodes + 1] = token
+			trace("Matched token " .. iToken .. " \"" .. token.str .. "\"")
+			-- Include tokens that are not simple separators/operators in the nodes array
+			if token.str ~= token.tt then
+				nodes[#nodes + 1] = token
+			end
 			iToken = iToken + 1
 		elseif t == "function" then
 			-- Call parsing function
@@ -305,7 +378,7 @@ function parseJava.init()
 	javalex.init()
 end
 
--- Parse the given line of code at the given syntax level.
+-- Parse the given line of code at the given syntax level (default 12).
 -- Return the parse tree (recursive array of tokens and/or nodes).
 -- If the line cannot be parsed then return (nil, strErr, iChar) for a lexical error,
 -- or just nil for an unknown syntax error.
@@ -329,7 +402,7 @@ function parseJava.parseLine( sourceLine, level )
 	end
 
 	-- Set syntax level and try to parse the line grammar
-	syntaxLevel = level
+	syntaxLevel = level or 12
 	local parseTree = parseGrammar( line )
 	if parseTree == nil then
 		-- print("*** Failed")
@@ -347,10 +420,7 @@ function parseJava.printParseTree( node, indentLevel )
 
 		if node.tt then
 			-- Token node
-			s = s .. node.tt
-			if node.str ~= node.tt then
-				s = s .. " (" .. node.str .. ")"
-			end
+			s = s .. node.tt .. " (" .. node.str .. ")"
 			print(s)
 		else
 			-- Sub-tree node

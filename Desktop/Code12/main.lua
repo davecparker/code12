@@ -91,45 +91,42 @@ local function generateLuaCode( parseTrees )
 	local luaCode = "\nlocal g = appGlobalState\nfunction g.start" .. "()\n"
 	for i = 1, #parseTrees do
 		local node = parseTrees[i]
-		if node.t == "line" and node.p == "stmt" then
+		if node.p == "stmt" then
 			node = node.nodes[1]
-			if node.p == "methCallParams" then
-				-- Check for proper call to ct.circle
-				local nodes = node.nodes
-				local objName = nodes[1].str
-				if objName ~= "ct" then
-					return nil, i, "Unknown object " .. objName
-				end
-				local methName = nodes[3].str
-				if methName ~= "circle" then
-					return nil, i, "Unknown method " .. methName
-				end
-				local exprList = nodes[5]
-				if exprList.t ~= "exprList" then
-					return nil, i, "Parameter list expected"
-				end
-				local exprs = exprList.nodes
-				if #exprs ~= 3 then
-					return nil, i, "ct.circle expects 3 parameters"
-				end
+			if node.p == "call" then
+				local f = node.nodes[1]
+				local exprs = node.nodes[2].nodes
+				if f.p == "method" then
+					-- Check for proper call to ct.circle
+					local objName = f.nodes[1].str
+					local methName = f.nodes[2].str
+					if objName == "ct" then
+						if methName ~= "circle" then
+							return nil, i, "Unknown method " .. methName
+						end
+						if #exprs ~= 3 then
+							return nil, i, "ct.circle expects 3 parameters"
+						end
 
-				-- Get parameters
-				local params = {}
-				for i = 1, #exprs do
-					local expr = exprs[i]
-					if expr.t ~= "expr" or expr.p ~= "NUM" then
-						return nil, i, "parameters must be numbers"
+						-- Get parameters
+						local params = {}
+						for i = 1, #exprs do
+							local expr = exprs[i]
+							if expr.p ~= "NUM" then
+								return nil, i, "parameters must be numbers"
+							end
+							params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
+						end
+
+						-- Generate Lua code for this ct.circle call
+						local s = "   local c = display.newCircle(g.group, " 
+							.. params[1] .. ", " 
+							.. params[2] .. ", " 
+							.. params[3] .. " / 2)\n"
+							.. "   c:setFillColor(1, 0, 0)\n"
+						luaCode = luaCode .. s
 					end
-					params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
 				end
-
-				-- Generate Lua code for this ct.circle call
-				local s = "   local c = display.newCircle(g.group, " 
-					.. params[1] .. ", " 
-					.. params[2] .. ", " 
-					.. params[3] .. " / 2)\n"
-					.. "   c:setFillColor(1, 0, 0)\n"
-				luaCode = luaCode .. s
 			end
 		end
 	end
@@ -190,7 +187,7 @@ local function checkUserFile()
 					if not strUserCode then 
 						break  -- end of file
 					end
-					local tree, strErr, iChar = parseJava.parseLine( strUserCode, 12 )
+					local tree, strErr, iChar = parseJava.parseLine( strUserCode )
 					if tree == nil then
 						-- Error
 						if strErr and iChar then
@@ -205,8 +202,10 @@ local function checkUserFile()
 					end
 
 					-- For debugging a particular line
-					if lineNum == 5 then
+					if lineNum == 8 then
+						print( "---------- Line " .. lineNum .. " ------------------------")
 						parseJava.printParseTree( tree, 0 )
+						print( "-------------------------------------------")
 					end
 
 					parseTrees[#parseTrees + 1] = tree
