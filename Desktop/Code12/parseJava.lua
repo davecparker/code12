@@ -167,7 +167,7 @@ local param = { t = "param",
 -- A formal parameter list, which can be empty
 local paramList = { t = "paramList",
 	{ 10, 12, "list",			param,	list = true, sep = "," 		},
-	{ 9, 12, "empty"												},
+	{ 1, 12, "empty"												},
 }
 
 -- An identifier list (must have a least one)
@@ -259,9 +259,7 @@ local line = { t = "line",
 	{ 3, 12, "constInit", 		"final", varType, "ID", "=", expr, ";",			"END" },
 	{ 1, 12, "begin",			"{",											"END" },
 	{ 1, 12, "end",				"}",											"END" },
-	{ 1, 12, "eventFn",			"public", "void", "ID", "(", ")",				"END" },
-	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
-	{ 1, 12, "classUser",		"class", "ID", "extends", "ID",					"END" },
+	{ 1, 12, "eventFn",			"public", "void", "ID", "(", paramList, ")",	"END" },
 	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },
 	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",					"END" },
 	{ 8, 12, "else",			"else", 										"END" },
@@ -271,6 +269,14 @@ local line = { t = "line",
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
 	{ 12, 12, "array",			varType, "[", "]", "ID", "=", arrayInit, ";",	"END" },
+	-- Boilerplate lines
+	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
+	{ 1, 12, "classUser",		"class", "ID", "extends", "ID",					"END" },
+	{ 1, 12, "main",			"public", "static", "void", "ID", 
+									"(", "ID", "[", "]", "ID", ")",				"END" },
+	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
+									"ID", "(", ")", ")", ";",					"END" },
+
 }
 
 
