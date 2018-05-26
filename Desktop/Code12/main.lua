@@ -117,11 +117,7 @@ local function generateLuaCode( parseTrees )
 				local params = {}
 				for i = 1, #exprs do
 					local expr = exprs[i]
-					if expr.t ~= "expr" or expr.p ~= "literal" then
-						return nil, i, "parameters must be constants"
-					end
-					expr = expr.nodes[1]
-					if expr.p ~= "num" then
+					if expr.t ~= "expr" or expr.p ~= "NUM" then
 						return nil, i, "parameters must be numbers"
 					end
 					params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
@@ -151,7 +147,7 @@ local function runLuaCode(luaCode)
 	g.group = display.newGroup()
 
 	-- Load the code dynamically and execute it
-	print(luaCode)
+	-- print(luaCode)
 	local codeFunction = loadstring(luaCode)
  	if type(codeFunction) == "function" then
  		codeFunction()
@@ -194,7 +190,7 @@ local function checkUserFile()
 					if not strUserCode then 
 						break  -- end of file
 					end
-					local tree, strErr, iChar = parseJava.parseLine( strUserCode, 0 )
+					local tree, strErr, iChar = parseJava.parseLine( strUserCode, 12 )
 					if tree == nil then
 						-- Error
 						if strErr and iChar then
@@ -207,6 +203,12 @@ local function checkUserFile()
 						io.close( file )
 						return
 					end
+
+					-- For debugging a particular line
+					if lineNum == 5 then
+						parseJava.printParseTree( tree, 0 )
+					end
+
 					parseTrees[#parseTrees + 1] = tree
 					lineNum = lineNum + 1
 				until false  -- breaks or returns internally
