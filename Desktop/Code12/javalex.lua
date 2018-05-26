@@ -58,7 +58,7 @@ local reservedWordTokens = {
 	["interface"] 		= false,	
 	["long"] 			= false,
 	["native"] 			= false,	
-	["new"] 			= false,	
+	["new"] 			= "new",	
 	["package"] 		= false,	
 	["private"] 		= false,	
 	["protected"] 		= false,
@@ -203,7 +203,7 @@ local function plusToken()
 	if charNext == 61 then   --  =
 		iChar = iChar + 1
 		return "+="
-	elseif charNext == 42 then  --  +
+	elseif charNext == 43 then  --  +
 		iChar = iChar + 1
 		return "++"
 	end
@@ -306,21 +306,10 @@ local function percentToken()
 	return "%"
 end
 
--- Return ("CHAR", str) for a char literal token.
--- The str includes the single quotes.
--- Return (nil, strErr) if the literal is invalid.
+-- Return (nil, strErr) for the beginning of a char literal token
+-- (not supported in Code12).
 local function charLiteralToken()
-	local iCharStart = iChar   -- the single quote
-	iChar = iChar + 1
-	local charNext = chars[iChar]
-	-- TODO: if charNext == 92 then   --  \
-	iChar = iChar + 1
-	local str = string.sub(source, iCharStart, iChar)
-	if chars[iChar] ~= 39 then
-		return nil, "Invalid character literal"
-	end
-	iChar = iChar + 1
-	return "CHAR", str
+	return nil, "char type not supported, use string"
 end
 
 -- Return ("STR", str) for a string literal token.
@@ -382,7 +371,6 @@ end
 --     "ID": an identifer that is not a reserved word
 --     "NUM": numeric literal (any numeric type)
 --     "STR": string literal (note that str includes the quotes)
---     "CHAR": char literal (note that str includes the quotes)
 --     "BOOL": boolean literal (str is "false" or "true")
 --     "NULL": the null literal (str is "null")
 --     "COMMENT": a comment (str is text of the comment not including the open/close)
