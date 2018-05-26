@@ -213,6 +213,12 @@ local stmt = { t = "stmt",
 	{ 4, 12, "--",				"--", lValue						},
 }
 
+-- The end of a while statement, either with a ; (for do-while) or not
+local whileEnd = { t = "whileEnd",
+	{ 11, 12, "do-while",		")", ";"		},
+	{ 11, 12, "while",			")"				},
+}
+
 -- The init part of a for loop
 local forInit = { t = "forInit",
 	{ 11, 12, "varInit",		varType, "ID", "=", expr			},
@@ -262,8 +268,7 @@ local line = { t = "line",
 	{ 9, 12, "func",			retType, "ID", "(", paramList, ")",				"END" },
 	{ 9, 12, "return",			"return", expr, ";",							"END" },
 	{ 11, 12, "do",				"do", 											"END" },
-	{ 11, 12, "do-while",		"while", "(", expr, ")", ";",					"END" },
-	{ 11, 12, "while",			"while", "(", expr, ")",						"END" },
+	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
 	{ 12, 12, "array",			varType, "[", "]", "ID", "=", arrayInit, ";",	"END" },
 }

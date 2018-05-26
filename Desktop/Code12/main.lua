@@ -177,6 +177,7 @@ local function checkUserFile()
 				sourceFile.timeModLast = timeMod
 
 				-- Read lines and create parse tree array
+				local startTime = system.getTimer()
 				local parseTrees = {}
 				local lineNum = 1
 				parseJava.init()
@@ -210,6 +211,7 @@ local function checkUserFile()
 					lineNum = lineNum + 1
 				until false  -- breaks or returns internally
 				io.close( file )
+				print( string.format( "File read and parsed in %.3f ms", system.getTimer() - startTime ) )
 
 				-- Make and run the Lua code
 				local codeStr, errLine, errStr = generateLuaCode( parseTrees )
