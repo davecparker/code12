@@ -75,6 +75,15 @@ local binaryOpPrecedence = {
 	[":"]	= 2,
 }
 
+-- Map known variable type names to true
+local isVarType = {
+	["int"]		= true,
+	["double"]	= true,
+	["boolean"]	= true,
+	["String"]	= true,
+	["GameObj"]	= true,
+}
+
 
 ----- Special parsing functions used in the grammar tables below  ------------
 
@@ -93,30 +102,55 @@ local function expr()
 	return parseOpExpr( leftSide, 0 )  -- include binary operators
 end
 
+-- Parse a function value (an expression that can be called as a function).
+-- This is either just an ID, or ID.ID, and if the object ID is "ct" then
+-- the "ct." is added to the front of the method name to make a single name.
+-- This is done for convenience and performance.
+-- Return an ID token for a simple name (or ct.name), a method pattern node
+-- for other object.method names, or nil if failure.
+local function fnValue()
+	local token = tokens[iToken]
+	if token.tt ~= "ID" then
+		return nil    -- not an ID
+	end
+	iToken = iToken + 1
+	if tokens[iToken].tt ~= "." then
+		return token   -- simple name token
+	end
+	iToken = iToken + 1
+	local token2 = tokens[iToken]
+	if token2.tt ~= "ID" then
+		return nil   -- expected ID after .
+	end
+	iToken = iToken + 1	
+	if token.str == "ct" then
+		token2.str = "ct." .. token2.str
+		return token2   -- ct.name token
+	end
+	-- Return a method pattern node
+	return { t = "fnValue", p = "method", nodes = { token, token2 } }
+end
+
+-- Parse a variable type. Primitive types return their reserved word token,
+-- other types return an ID token. Return nil if not an ID.
+-- Done here as a function for performance.
+local function varType()
+	local token = tokens[iToken]
+	if isVarType[token.str] or token.tt == "ID" then
+		iToken = iToken + 1
+		return token    -- a known type (may be reserved word or ID)
+	end
+	return nil
+end 
+
 
 ----- Grammar Tables ---------------------------------------------------------
-
--- A function value (an expression that can be called as a function)
-local fnValue = { t = "fnValue",
-	{ 1, 12, "method",			"ID", ".", "ID"		},
-	{ 9, 12, "this",			"ID" 				},
-}
 
 -- An lValue (var or expr that can be assigned to)
 local lValue = { t = "lValue",
 	{ 6, 12, "field",			"ID", ".", "ID"			},
 	{ 12, 12, "index",			"ID", "[", expr, "]"	},
 	{ 3, 12, "var",				"ID" 					},
-}
-
--- A variable type
-local varType = { t = "varType",
-	{ 3, 12, "int",				"int" 		},
-	{ 3, 12, "double",			"double" 	},
-	{ 3, 12, "boolean",			"boolean" 	},
-	{ 3, 12, "String",			"String" 	},
-	{ 3, 12, "GameObj",			"GameObj" 	},
-	{ 3, 12, "other",			"ID" 		},
 }
 
 -- A return type for a procedure/function definition
@@ -160,23 +194,23 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "lValue",			lValue								},
 }
 
--- An assignment operator
-local assignOp = { t = "assignOp",
-	{ 3, 12, "=",				"=" 		},
-	{ 4, 12, "+=",				"+=" 		},
-	{ 4, 12, "-=",				"-=" 		},
-	{ 4, 12, "*=",				"*=" 		},
-	{ 4, 12, "/=",				"/=" 		},
+-- The right side of things that can be done to an lValue in a stmt
+local rightSide = { t = "rightSide",
+	{ 3, 12, "=",				"=", expr 		},
+	{ 4, 12, "+=",				"+=", expr 		},
+	{ 4, 12, "-=",				"-=", expr 		},
+	{ 4, 12, "*=",				"*=", expr 		},
+	{ 4, 12, "/=",				"/=", expr 		},
+	{ 4, 12, "++",				"++"			},
+	{ 4, 12, "--",				"--"			},
 }
 
 -- A statement
 local stmt = { t = "stmt",
 	{ 1, 12, "call",			fnValue, "(", exprList, ")" 		},
-	{ 3, 12, "assign",			lValue, assignOp, expr 				},
-	{ 4, 12, "inc",				lValue, "++"						},
-	{ 4, 12, "dec",				lValue, "--"						},
-	{ 4, 12, "inc",				"++", lValue 						},
-	{ 4, 12, "dec",				"--", lValue						},
+	{ 3, 12, "assign",			lValue, rightSide 					},
+	{ 4, 12, "++",				"++", lValue 						},
+	{ 4, 12, "--",				"--", lValue						},
 }
 
 -- The init part of a for loop
@@ -300,7 +334,7 @@ function parseGrammar( grammar )
 					p = pattern[3],  -- pattern name
 					nodes = nodes, 
 				}
-				trace("Returning " .. grammar.t .. "[" .. i .. "]")
+				trace("== Returning " .. grammar.t .. "[" .. i .. "] (" .. pattern[3] .. ")")
 				return parseTree
 			end
 			iToken = iStart  -- reset position for next pattern

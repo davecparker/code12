@@ -97,36 +97,34 @@ local function generateLuaCode( parseTrees )
 				local f = node.nodes[1]
 				local exprs = node.nodes[2].nodes
 				if f.p == "method" then
-					-- Check for proper call to ct.circle
-					local objName = f.nodes[1].str
-					local methName = f.nodes[2].str
-					if objName == "ct" then
-						if methName ~= "circle" then
-							return nil, i, "Unknown method " .. methName
-						end
-						if #exprs ~= 3 then
-							return nil, i, "ct.circle expects 3 parameters"
-						end
-
-						-- Get parameters
-						local params = {}
-						for i = 1, #exprs do
-							local expr = exprs[i]
-							if expr.p ~= "NUM" then
-								return nil, i, "parameters must be numbers"
-							end
-							params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
-						end
-
-						-- Generate Lua code for this ct.circle call
-						local s = "   local c = display.newCircle(g.group, " 
-							.. params[1] .. ", " 
-							.. params[2] .. ", " 
-							.. params[3] .. " / 2)\n"
-							.. "   c:setFillColor(1, 0, 0)\n"
-						luaCode = luaCode .. s
-					end
+					return nil, i, "Unknown object " .. f.nodes[1].str
 				end
+
+				-- Check for proper call to ct.circle
+				if f.str ~= "ct.circle" then
+					return nil, i, "Unknown function " .. f.str
+				end
+				if #exprs ~= 3 then
+					return nil, i, "ct.circle expects 3 parameters"
+				end
+
+				-- Get parameters
+				local params = {}
+				for i = 1, #exprs do
+					local expr = exprs[i]
+					if expr.p ~= "NUM" then
+						return nil, i, "parameters must be numbers"
+					end
+					params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
+				end
+
+				-- Generate Lua code for this ct.circle call
+				local s = "   local c = display.newCircle(g.group, " 
+					.. params[1] .. ", " 
+					.. params[2] .. ", " 
+					.. params[3] .. " / 2)\n"
+					.. "   c:setFillColor(1, 0, 0)\n"
+				luaCode = luaCode .. s
 			end
 		end
 	end
