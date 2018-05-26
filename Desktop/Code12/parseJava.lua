@@ -155,13 +155,15 @@ local lValue = { t = "lValue",
 
 -- A return type for a procedure/function definition
 local retType = { t = "retType",
-	{ 9, 12, "void",			"void" 		},
-	{ 9, 12, "value",			varType		},
+	{ 9, 12, "void",			"void" 					},
+	{ 12, 12, "array",			varType, "[", "]"		},
+	{ 9, 12, "value",			varType					},
 }
 
 -- A formal parameter (in a function definition)
 local param = { t = "param",
-	{ 6, 12, "param",			varType, "ID"		},
+	{ 12, 12, "array",			varType, "[", "]", "ID"		},
+	{ 6, 12, "var",				varType, "ID"				},
 }
 
 -- A formal parameter list, which can be empty
