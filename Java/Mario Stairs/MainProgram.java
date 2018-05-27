@@ -36,6 +36,11 @@ public class MainProgram extends Code12Program
             block.align( "bottom right" );
          }
       }
+      
+      // Make the koopa troopa
+      double yStairsTop = yStairsBottom - tileSize * numberOfLevels;
+      GameObj koopa = ct.image( "koopa.png", 100, yStairsTop, tileSize );
+      koopa.align( "bottom right" ); 
    }
    
    public void update()
