@@ -1,0 +1,248 @@
+======= Test Started ==========================================
+(1) -----------------------------------------------------
+line (importCode12)
+    ID (Code12)
+(2) -----------------------------------------------------
+line (blank)
+(3) -----------------------------------------------------
+line (classUser)
+    ID (BubblePop)
+    ID (Code12Program)
+(4) -----------------------------------------------------
+line (begin)
+(5) -----------------------------------------------------
+line (main)
+    ID (main)
+    ID (String)
+    ID (args)
+(6) -----------------------------------------------------
+line (begin)
+(7) -----------------------------------------------------
+line (Code12Run)
+    ID (Code12)
+    ID (run)
+    ID (BubblePop)
+(8) -----------------------------------------------------
+line (end)
+(9) -----------------------------------------------------
+line (blank)
+(10) -----------------------------------------------------
+line (eventFn)
+    ID (start)
+    paramList (empty)
+(11) -----------------------------------------------------
+line (begin)
+(12) -----------------------------------------------------
+line (blank)
+(13) -----------------------------------------------------
+line (stmt)
+    stmt (call)
+        ID (ct.setHeight)
+        exprList (list)
+            expr (NUM)
+                NUM (150)
+(14) -----------------------------------------------------
+line (stmt)
+    stmt (call)
+        ID (ct.setBackImage)
+        exprList (list)
+            expr (STR)
+                STR ("underwater.jpg")
+(15) -----------------------------------------------------
+line (end)
+(16) -----------------------------------------------------
+line (blank)
+(17) -----------------------------------------------------
+line (eventFn)
+    ID (update)
+    paramList (empty)
+(18) -----------------------------------------------------
+line (begin)
+(19) -----------------------------------------------------
+line (blank)
+(20) -----------------------------------------------------
+line (if)
+    expr (==)
+        expr (call)
+            ID (ct.random)
+            exprList (list)
+                expr (NUM)
+                    NUM (1)
+                expr (NUM)
+                    NUM (20)
+        expr (NUM)
+            NUM (1)
+(21) -----------------------------------------------------
+line (begin)
+(22) -----------------------------------------------------
+line (varInit)
+    double (double)
+    ID (x)
+    expr (call)
+        ID (ct.random)
+        exprList (list)
+            expr (NUM)
+                NUM (0)
+            expr (NUM)
+                NUM (100)
+(23) -----------------------------------------------------
+line (varInit)
+    double (double)
+    ID (y)
+    expr (+)
+        expr (call)
+            ID (ct.getHeight)
+            exprList (empty)
+        expr (NUM)
+            NUM (25)
+(24) -----------------------------------------------------
+line (varInit)
+    double (double)
+    ID (size)
+    expr (call)
+        ID (ct.random)
+        exprList (list)
+            expr (NUM)
+                NUM (5)
+            expr (NUM)
+                NUM (20)
+(25) -----------------------------------------------------
+line (varInit)
+    ID (GameObj)
+    ID (bubble)
+    expr (call)
+        ID (ct.image)
+        exprList (list)
+            expr (STR)
+                STR ("bubble.png")
+            expr (lValue)
+                lValue (var)
+                    ID (x)
+            expr (lValue)
+                lValue (var)
+                    ID (y)
+            expr (lValue)
+                lValue (var)
+                    ID (size)
+(26) -----------------------------------------------------
+line (stmt)
+    stmt (assign)
+        lValue (field)
+            ID (bubble)
+            ID (ySpeed)
+        rightSide (=)
+            expr (neg)
+                expr (NUM)
+                    NUM (1)
+(27) -----------------------------------------------------
+line (stmt)
+    stmt (assign)
+        lValue (field)
+            ID (bubble)
+            ID (clickable)
+        rightSide (=)
+            expr (BOOL)
+                BOOL (true)
+(28) -----------------------------------------------------
+line (end)
+(29) -----------------------------------------------------
+line (end)
+(30) -----------------------------------------------------
+line (blank)
+(31) -----------------------------------------------------
+line (eventFn)
+    ID (onMousePress)
+    paramList (list)
+        param (var)
+            ID (GameObj)
+            ID (obj)
+        param (var)
+            double (double)
+            ID (x)
+        param (var)
+            double (double)
+            ID (y)
+(32) -----------------------------------------------------
+line (begin)
+(33) -----------------------------------------------------
+line (blank)
+(34) -----------------------------------------------------
+line (if)
+    expr (!=)
+        expr (lValue)
+            lValue (var)
+                ID (obj)
+        expr (NULL)
+            NULL (null)
+(35) -----------------------------------------------------
+line (begin)
+(36) -----------------------------------------------------
+line (stmt)
+    stmt (call)
+        fnValue (method)
+            ID (obj)
+            ID (delete)
+        exprList (empty)
+(37) -----------------------------------------------------
+line (stmt)
+    stmt (call)
+        ID (ct.sound)
+        exprList (list)
+            expr (STR)
+                STR ("pop.wav")
+(38) -----------------------------------------------------
+line (end)
+(39) -----------------------------------------------------
+line (end)
+(40) -----------------------------------------------------
+line (end)
+(41) -----------------------------------------------------
+line (blank)
+(42) -----------------------------------------------------
+line (blank)
+(43) -----------------------------------------------------
+************** Beginning of Expected Errors Section **************
+(44) -----------------------------------------------------
+line (blank)
+(45) -----------------------------------------------------
+line (blank)
+(46) -----------------------------------------------------
+Line 46: Lexical Error: Invalid character code 64 (index 1)
+(47) -----------------------------------------------------
+Line 47: Lexical Error: char type not supported, use string (index 5)
+(48) -----------------------------------------------------
+Line 48: Lexical Error: Unclosed string literal (index 5)
+(49) -----------------------------------------------------
+Line 49: Lexical Error: Unsupported reserved word "interface" (index 1)
+(50) -----------------------------------------------------
+line (blank)
+(51) -----------------------------------------------------
+line (blank)
+(52) -----------------------------------------------------
+Line 52: Syntax Error: x = 10          // missing ;
+(53) -----------------------------------------------------
+Line 53: Syntax Error: foo(x, );       // missing expr in exprList
+(54) -----------------------------------------------------
+Line 54: Syntax Error: x = a + ;       // missing expr after binary op
+(55) -----------------------------------------------------
+Line 55: Syntax Error: x = a + b * ;   // missing expr after higher precedence binary op
+(56) -----------------------------------------------------
+Line 56: Syntax Error: x = a * b + ;   // missing expr after lower precedence binary op
+(57) -----------------------------------------------------
+Line 57: Syntax Error: x = ();         // missing expr in parentheses
+(58) -----------------------------------------------------
+Line 58: Syntax Error: x = 10 + ! ;    // missing expr after unary op
+(59) -----------------------------------------------------
+Line 59: Syntax Error: x = obj.3;      // expected ID after .
+(60) -----------------------------------------------------
+Line 60: Syntax Error: if x == 3       // required next token in pattern doesn't match
+(61) -----------------------------------------------------
+Line 61: Syntax Error: x + 3;          // no matching pattern
+======= Test Complete =========================================
+
+61 lines processed in 3 ms
+
+0 unexpected errors
+0 uncaught errors (14 expected errors)
+
+SUCCESS

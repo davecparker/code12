@@ -376,7 +376,7 @@ function parsePattern( pattern )
 			-- Matched a token
 			trace("Matched token " .. iToken .. " \"" .. token.str .. "\"")
 			-- Include tokens that are not simple separators/operators in the nodes array
-			if token.str ~= token.tt then
+			if token.str ~= token.tt and token.tt ~= "END" then
 				nodes[#nodes + 1] = token
 			end
 			iToken = iToken + 1
@@ -460,24 +460,35 @@ function parseJava.parseLine( sourceLine, level )
 	return parseTree
 end
 
--- Print a parse tree recursively at the given indentLevel
-function parseJava.printParseTree( node, indentLevel )
+-- Print a parse tree recursively at the given indentLevel.
+-- If file then output to it instead of the console.
+function parseJava.printParseTree( node, indentLevel, file )
 	if node then
-		local s = string.rep("\t", indentLevel)  -- indentation
-
+		-- Make description string for this node
+		local s = string.rep("    ", indentLevel)  -- indentation
 		if node.tt then
 			-- Token node
 			s = s .. node.tt .. " (" .. node.str .. ")"
-			print(s)
 		else
 			-- Sub-tree node
 			s = s .. node.t 
 			if node.p then
 				s = s .. " (" .. node.p .. ")"
 			end
+		end
+
+		-- Output description
+		if file then
+			file:write( s )
+			file:write( "\n" )
+		else 
 			print(s)
+		end
+
+		-- Recursively print children at next indent level, if any
+		if node.nodes then
 			for i, child in ipairs(node.nodes) do
-				parseJava.printParseTree( child, indentLevel + 1 )
+				parseJava.printParseTree( child, indentLevel + 1, file )
 			end
 		end
 	end
