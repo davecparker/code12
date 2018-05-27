@@ -1,5 +1,4 @@
 import Code12.*;
-import java.util.*;
 
 public class MainProgram extends Code12Program
 {
@@ -61,7 +60,7 @@ public class MainProgram extends Code12Program
       ducksArr = new GameObj[maxSize];
       duckYStartsArr = new double[maxSize];
       
-      // Initialize amplitude and period
+      // Initialize amplitude and period for ducks' path
       amplitude = 5;
       period = 100;
    }
@@ -77,7 +76,7 @@ public class MainProgram extends Code12Program
       }
       
       // If a duck goes off screen, delete it
-      // Else make it go up or down randomly
+      // Else make it move up/down on sinusoidal path
       for ( int j = ducksCount - 1; j >= 0; j-- )
       {
          GameObj duck = ducksArr[j];
@@ -125,11 +124,11 @@ public class MainProgram extends Code12Program
          }
       }
       
-      // update ducksHitDisplay
+      // Update ducksHitDisplay
       int percent = ct.round( 100.0 * ducksHit / (ducksHit + ducksMissed) );
       ducksHitDisplay.setText( "Ducks hit: " + percent + "%" );
       
-      // Make accuracyDisplay
+      // Update accuracyDisplay
       percent = ct.round( 100.0 * ducksHit / (ducksHit + bulletsMissed) );
       accuracyDisplay.setText( "Shot Accuracy: " + percent + "%" );
    }
@@ -208,7 +207,7 @@ public class MainProgram extends Code12Program
       return deadDuck;
    }
    
-   // Moves the gun horizontally and first a bullet when the mouse
+   // Moves the gun horizontally and fires a bullet when the mouse
    // is clicked
    public void onMousePress( GameObj obj, double x, double y )
    {
@@ -222,14 +221,5 @@ public class MainProgram extends Code12Program
       double xStart = gun.x;
       double yStart = gun.y - gun.height * 0.9;
       fireBullet( xStart, yStart );
-   }
-   
-   // Sets an objects height to height and changes its width to preserve
-   // its original aspect ratio
-   public void setHeight( GameObj obj, double height )
-   {
-      double aspectRatio = obj.width / obj.height;
-      obj.height = height;
-      obj.width = height * aspectRatio;
    }
 }
