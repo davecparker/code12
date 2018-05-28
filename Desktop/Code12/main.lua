@@ -28,6 +28,7 @@ local sourceFile = {
 	path = nil,              -- full pathname to the file
 	timeLoaded = 0,          -- time this file was loaded
 	timeModLast = 0,         -- last modification time or 0 if never
+	strLines = {},           -- array of source code lines when read
 }
 
 -- Force the initial file (for faster repeated testing)
@@ -51,6 +52,7 @@ appGlobalState = {
 	group = nil,           -- display group for all drawing objects
 }
 local g = appGlobalState
+
 
 -- Temp runtime function
 function g.ctCircle( x, y, d )
@@ -131,25 +133,41 @@ local function makeErrorCode( errorStr )
 	]]
 end
 
+-- Read the sourceFile and store all of its source lines.
+-- Return true if success.
+local function readSourceFile()
+	local file = io.open( sourceFile.path, "r" )
+	if file then
+		sourceFile.strLines = {}   -- delete previous contents if any
+		local lineNum = 1
+		repeat
+			local s = file:read( "*l" )  -- read a line
+			if s == nil then 
+				break  -- end of file
+			end
+			sourceFile.strLines[lineNum] = s
+			lineNum = lineNum + 1
+		until false -- breaks internally
+		io.close( file )
+		return true
+	end
+	return false
+end
+
 -- Function to check user file for changes and (re)parse it if modified
 local function checkUserFile()
 	if sourceFile.path then
 		local timeMod = lfs.attributes( sourceFile.path, "modification" )
 		if timeMod and timeMod > sourceFile.timeModLast then
-			local file = io.open( sourceFile.path, "r" )
-			if file then
+			if readSourceFile() then
 				sourceFile.timeModLast = timeMod
 
-				-- Read lines and create parse tree array
+				-- Create parse tree array
 				local startTime = system.getTimer()
 				local parseTrees = {}
-				local lineNum = 1
 				parseJava.init()
-				repeat
-					local strUserCode = file:read( "*l" )  -- read a line
-					if not strUserCode then 
-						break  -- end of file
-					end
+				for lineNum = 1, #sourceFile.strLines do
+					local strUserCode = sourceFile.strLines[lineNum]
 					local tree, strErr, iChar = parseJava.parseLine( strUserCode, lineNum )
 					if tree == nil then
 						-- Error
@@ -165,9 +183,8 @@ local function checkUserFile()
 					end
 					parseTrees[#parseTrees + 1] = tree
 					lineNum = lineNum + 1
-				until false  -- breaks or returns internally
-				io.close( file )
-				print( string.format( "File read and parsed in %.3f ms", system.getTimer() - startTime ) )
+				end
+				print( string.format( "\nFile parsed in %.3f ms", system.getTimer() - startTime ) )
 
 				-- Make and run the Lua code
 				local codeStr, errLine, errStr = codeGenJava.getLuaCode( parseTrees )

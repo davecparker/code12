@@ -18,6 +18,12 @@ local javaFilename = "TestCode.java"
 local treeFilename = "../ParseTestOutput.txt"   -- in parent so Corona won't trigger re-run
 local outFile
 
+-- The user source file
+local sourceFile = {
+	path = nil,              -- full pathname to the file
+	strLines = {},           -- array of source code lines when read
+}
+
 -- Text objects in the app window
 local textObjs = {}
 local maxTextObjs = 30
@@ -42,12 +48,33 @@ local function outputAndDisplay( msg )
 	end
 end
 
+-- Read the sourceFile and store all of its source lines.
+-- Return true if success.
+local function readSourceFile()
+	local file = io.open( sourceFile.path, "r" )
+	if file then
+		sourceFile.strLines = {}   -- delete previous contents if any
+		local lineNum = 1
+		repeat
+			local s = file:read( "*l" )  -- read a line
+			if s == nil then 
+				break  -- end of file
+			end
+			sourceFile.strLines[lineNum] = s
+			lineNum = lineNum + 1
+		until false -- breaks internally
+		io.close( file )
+		return true
+	end
+	return false
+end
+
 -- Parse the test file and write the parse tree to the output
 local function parseTestCode()
-	-- Open the input file
-	local inFile = io.open( javaFilename, "r" )
-	if not inFile then
-		error( "Cannot open input file " .. treeFilename )
+	-- Read the input file
+	sourceFile.path = javaFilename    -- name is relative to project folder
+	if not readSourceFile() then
+		error( "Cannot open input file " .. javaFilename )
 	end
 
 	-- Open the output file
@@ -58,20 +85,16 @@ local function parseTestCode()
 
 	-- Parse input and write output
 	output( "======= Test Started ==========================================" )
-	local lineNum = 0
 	local errorSection = false    -- true when we get to the expected errors section
 	local numUnexpectedErrors = 0
 	local numExpectedErrors = 0
 	local numUncaughtErrors = 0
+	local numLines = 0
 	local startTime = system.getTimer()
 	parseJava.init()
-	repeat
-		-- Read a line from the input
-		local strCode = inFile:read( "*l" )
-		if not strCode then 
-			break  -- end of file
-		end
-		lineNum = lineNum + 1
+	for lineNum = 1, #sourceFile.strLines do
+		local strCode = sourceFile.strLines[lineNum]
+		numLines = numLines + 1
 
 		-- Output header for this line
 		outFile:write( "(" .. lineNum .. ") -----------------------------------------------------\n" )
@@ -110,13 +133,13 @@ local function parseTestCode()
 				end
 			end
 		end
-	until false  -- breaks or returns internally
+	end
 	local endTime = math.round( system.getTimer() - startTime )  -- to nearest ms
 	output( "======= Test Complete =========================================" )
 	output( "" )
 
 	-- Output and display results
-	outputAndDisplay( string.format( "%d lines processed in %d ms", lineNum, endTime ) )
+	outputAndDisplay( string.format( "%d lines processed in %d ms", numLines, endTime ) )
 	outputAndDisplay( "" )
 	outputAndDisplay( string.format( "%d unexpected errors", numUnexpectedErrors ) )
 	outputAndDisplay( string.format( "%d uncaught errors (%d expected errors)", 
@@ -127,10 +150,7 @@ local function parseTestCode()
 	else
 		outputAndDisplay( "FAILED" )
 	end
-
-	-- Close the files
 	io.close( outFile )
-	io.close( inFile )
 end
 
 -- Make the graphical text objects
