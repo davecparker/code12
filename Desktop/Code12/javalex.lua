@@ -88,16 +88,32 @@ local reservedWordTokens = {
 -- State for the lexer used by token scanning functions
 local source    		-- the source string
 local chars     		-- array of ASCII codes for the source string
+local lineNumber        -- the line number for the source string
 local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
 
 
 ----- Token scanning functions ------------------------------------------------
 
--- Return (nil, strError) for an invalid character
+-- Token scanning functions return one of:
+--     A single string for simple tokens, which is both the tt and str of the token
+--     (tt, str) for ID, literals, etc.
+--     (nil, errRecord) for an error (see makeErrRecord)
+
+
+-- Make and return an errRecord, which is, for example:
+--     { strErr = "Unclosed string literal", iLine = 10, iCharFirst = 56, iCharLast = 67 }
+-- Use the given errString, and the current lineNumber, 
+-- and optional iCharFirst (default current iChar) and iCharLast (default iCharStart).
+local function makeErrRecord( strErr, iCharFirst, iCharLast )
+	local iCharFirst = iCharFirst or iChar
+	local iCharLast = iCharLast or iCharFirst
+	return { strErr = strErr, iLine = lineNumber, iCharFirst = iCharFirst, iCharLast = iCharLast }
+end
+
+-- Return (nil, errRecord) for an invalid character
 local function invalidCharToken()
-	local strErr = "Invalid character code " .. chars[iChar]
-	return nil, strErr
+	return nil, makeErrRecord( "Invalid character" )
 end
 
 -- Return string for token starting with =  (=  ==)
@@ -306,15 +322,15 @@ local function percentToken()
 	return "%"
 end
 
--- Return (nil, strErr) for the beginning of a char literal token
+-- Return (nil, errRecord) for the beginning of a char literal token
 -- (not supported in Code12).
 local function charLiteralToken()
-	return nil, "char type not supported, use string"
+	return nil, makeErrRecord( "char type not supported, use double quotes" )
 end
 
 -- Return ("STR", str) for a string literal token.
 -- The str includes the double quotes.
--- Return (nil, strErr) if the literal is unclosed by the end of line.
+-- Return (nil, errRecord) if the literal is unclosed by the end of line.
 local function stringLiteralToken()
 	local iCharStart = iChar    -- the double quote
 	iChar = iChar + 1
@@ -322,8 +338,7 @@ local function stringLiteralToken()
 	while charNext ~= 34 do   -- "
 		-- TODO: if charText == 92 then   -- \
 		if charNext == nil then
-			iChar = iCharStart
-			return nil, "Unclosed string literal"
+			return nil, makeErrRecord( "Unclosed string literal", iCharStart, iChar - 1 )
 		end
 		iChar = iChar + 1
 		charNext = chars[iChar]
@@ -362,11 +377,12 @@ function javalex.init()
 	commentLevel = 0
 end
 
--- Return an array of tokens for the given source string. 
--- Each token is a table with 3 fields named, for example: 
---     { tt = "ID", str = "foo", iChar = 23 }
--- where iChar is the index of the start of the token in sourceStr, str is the 
--- text of the token, and tt is a string that identifies the token type as follows:
+-- Return an array of tokens for the given source string and line number. 
+-- Each token is a table with 4 fields named, for example: 
+--     { tt = "ID", str = "foo", iLine = 10, iChar = 23 }
+-- where iChar is the index of the start of the token in sourceStr, 
+-- iLine is the given lineNum, str is the text of the token, 
+-- and tt is a string that identifies the token type as follows:
 --     Keywords, operators, and seperators have tt == str (e.g. "for", "++", ";")
 --     "ID": an identifer that is not a reserved word
 --     "NUM": numeric literal (any numeric type)
@@ -374,11 +390,12 @@ end
 --     "BOOL": boolean literal (str is "false" or "true")
 --     "NULL": the null literal (str is "null")
 --     "COMMENT": a comment (str is text of the comment not including the open/close)
---     "END": the end of the source string
--- Return (nil, strErr, iChar) if a token is malformed. 
-function javalex.getTokens(sourceStr)
+--     "END": the end of the source string (str is empty string)
+-- Return (nil, errRecord) if a token is malformed or illegal (see makeErrRecord).
+function javalex.getTokens( sourceStr, lineNum )
 	-- Make array of ASCII codes for the source string
 	source = sourceStr
+	lineNumber = lineNum
 	chars = { string.byte(source, 1, string.len(source)) }   -- supposedly faster than a loop
 	iChar = 1
 
@@ -400,7 +417,7 @@ function javalex.getTokens(sourceStr)
 		end
 
 		-- Make a token table  TODO: get from pool
-		local token = { tt = "", str = "", iChar = iChar }
+		local token = { tt = "", str = "", iLine = lineNum, iChar = iChar }
 
 		-- Determine what token type to build next
 		if charType == true then    -- ID start char
@@ -410,13 +427,15 @@ function javalex.getTokens(sourceStr)
 				iChar = iChar + 1
 				charType = charTypes[chars[iChar]]
 			until type(charType) ~= "boolean"    -- ID char
-			local str = string.sub(source, iCharStart, iChar - 1)
+			local iCharEnd = iChar - 1
+			local str = string.sub( source, iCharStart, iCharEnd )
 			local tt = reservedWordTokens[str]
 			if tt == nil then
 				token.tt = "ID"   -- not a reserved word
 			elseif tt == false then
+				-- Unsupported reserved word
 				local strErr = "Unsupported reserved word \"" .. str .. "\""
-				return nil, strErr, iCharStart   -- unsupported reserved word
+				return nil, makeErrRecord( strErr, iCharStart, iCharEnd ) 
 			else
 				token.tt = tt
 			end
@@ -433,12 +452,12 @@ function javalex.getTokens(sourceStr)
 			return tokens 
 		elseif type(charType) == "function" then
 			-- Possible multi-char token, or char or string literal
-			local tt, str = charType()   -- token scanning function returns tt, str
+			local tt, more = charType()   -- tt, (tt, str) or (nil, errRecord)
 			if tt == nil then 
-				return nil, str, iChar   -- token error (e.g. unclosed string literal)
+				return nil, more   -- token error (e.g. unclosed string literal)
 			end
 			token.tt = tt
-			token.str = str or tt    -- simple tokens are their own string
+			token.str = more or tt    -- simple tokens are their own string
 		else
 			-- Single char token
 			iChar = iChar + 1

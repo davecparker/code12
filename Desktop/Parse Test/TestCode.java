@@ -22,7 +22,9 @@ class BubblePop extends Code12Program
          double x = ct.random(0, 100);
          double y = ct.getHeight() + 25;
          double size = ct.random(5, 20);
-         GameObj bubble = ct.image("bubble.png", x, y, size);
+         GameObj bubble = ct.image("bubble.png", 
+                              x, y, 
+                              size);
          bubble.ySpeed = -1; 
          bubble.clickable = true;
       }
@@ -59,3 +61,5 @@ x = 10 + ! ;    // missing expr after unary op
 x = obj.3;      // expected ID after .
 if x == 3       // required next token in pattern doesn't match
 x + 3;          // no matching pattern
+foo(x,          // (incomplete line continued below)
+y)              // missing ;
