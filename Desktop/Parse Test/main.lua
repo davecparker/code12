@@ -69,6 +69,12 @@ local function readSourceFile()
 	return false
 end
 
+-- Trim whitespace from a string (http://lua-users.org/wiki/StringTrim)
+local function trim1(s)
+	return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+
 -- Parse the test file and write the parse tree to the output
 local function parseTestCode()
 	-- Read the input file
@@ -92,11 +98,12 @@ local function parseTestCode()
 	local startTime = system.getTimer()
 	parseJava.init()
 	local lineNum = 1
+	local startTokens = nil
 	while lineNum <= #sourceFile.strLines do
 		local strCode = sourceFile.strLines[lineNum]
 
-		-- Output header for this line
-		outFile:write( "(" .. lineNum .. ") -----------------------------------------------------\n" )
+		-- Output source for this line
+		outFile:write( "\n" .. lineNum .. ". " .. trim1( strCode ) .. "\n" )
 
 		-- Check for the indicator for the expected errors section
 		if strCode == "ERRORS" then
@@ -104,32 +111,40 @@ local function parseTestCode()
 			output( "************** Beginning of Expected Errors Section **************" )
 		else
 			-- Parse this line
-			local tree, errRecord = parseJava.parseLine( strCode, lineNum, nil )
-			if tree == nil then
-				-- This line has an error on it, output it.
-				if errRecord == nil then
-					output( "*** Missing errRecord!")
-				else
-					output( string.format( "Line %d: %s (chars %d through %d)", 
-								errRecord.iLine, errRecord.strErr, 
-								errRecord.iCharFirst, errRecord.iCharLast ) );
-				end
-
-				-- Count the error
-				if errorSection then
-					numExpectedErrors = numExpectedErrors + 1
-				else
-					numUnexpectedErrors = numUnexpectedErrors + 1
-				end
+			local tree, errRecord = parseJava.parseLine( strCode, lineNum, startTokens )
+			if tree == false then
+				-- This line is unfinished, carry the tokens forward to the next line
+				startTokens = errRecord
+				outFile:write( "-- Incomplete line carried forward\n" )
 			else
-				-- Output parse tree to output file only
-				parseJava.printParseTree( tree, 0, outFile )
+				startTokens = nil
 
-				-- Did we expect an error on this line?
-				if errorSection then
-					-- Ignore blank lines
-					if tree.p ~= "blank" then
-						numUncaughtErrors = numUncaughtErrors + 1
+				if tree == nil then
+					-- This line has an error on it, output it.
+					if errRecord == nil then
+						output( "*** Missing errRecord!")
+					else
+						output( string.format( "Line %d: %s (chars %d through %d)", 
+									errRecord.iLine, errRecord.strErr, 
+									errRecord.iCharFirst, errRecord.iCharLast ) );
+					end
+
+					-- Count the error
+					if errorSection then
+						numExpectedErrors = numExpectedErrors + 1
+					else
+						numUnexpectedErrors = numUnexpectedErrors + 1
+					end
+				else
+					-- Successful parse. Output parse tree to output file only
+					parseJava.printParseTree( tree, 0, outFile )
+
+					-- Did we expect an error on this line?
+					if errorSection then
+						-- Ignore blank lines
+						if tree.p ~= "blank" then
+							numUncaughtErrors = numUncaughtErrors + 1
+						end
 					end
 				end
 			end

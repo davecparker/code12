@@ -456,8 +456,27 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	assert( #tokens > 0 )
 	assert( tokens[#tokens].tt == "END" )
 
+	-- Prepend the startTokens if any
+	if startTokens then
+		-- There should be at least one real token and an END in startTokens
+		assert( #startTokens > 1 )
+		assert( startTokens[#startTokens].tt == "END" )
+		local iToken = #startTokens   -- overwrite the END
+		for i = 1, #tokens do
+			startTokens[iToken] = tokens[i]
+			iToken = iToken + 1
+		end
+		tokens = startTokens
+		startTokens = nil
+	end
+
 	-- If this line ends in a comma token, then it is unfinished
-	-- TODO
+	assert( #tokens > 0 )
+	assert( tokens[#tokens].tt == "END" )
+	local lastToken = tokens[#tokens - 1]  -- not counting the END
+	if lastToken and lastToken.tt == "," then
+		return false, tokens
+	end
 
 	-- Set syntax level and try to parse the line grammar
 	syntaxLevel = level or 12
@@ -466,7 +485,6 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	if parseTree == nil then
 		-- Return generic syntax error for the entire line.
 		-- TODO: Return specific errors from parsing functions.
-		local lastToken = tokens[#tokens - 1]  -- not counting the END
 		assert( lastToken )    -- blank lines can't be syntax errors
 		return nil, { 
 			strErr = "Syntax Error", 

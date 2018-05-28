@@ -170,26 +170,34 @@ local function checkUserFile()
 				-- Create parse tree array
 				local startTime = system.getTimer()
 				local parseTrees = {}
+				local startTokens = nil
 				parseJava.init()
 				for lineNum = 1, #sourceFile.strLines do
 					local strUserCode = sourceFile.strLines[lineNum]
-					local tree, errRecord = parseJava.parseLine( strUserCode, lineNum, nil )
-					if tree == nil then
-						-- Error
-						local strErr
-						if errRecord == nil then
-							strErr = "*** Missing errRecord!"
-						else
-							strErr = string.format( "Line %d: %s (chars %d through %d)", 
-											errRecord.iLine, errRecord.strErr, 
-											errRecord.iCharFirst, errRecord.iCharLast );
+					local tree, errRecord = parseJava.parseLine( strUserCode, lineNum, startTokens )
+					if tree == false then
+						-- Line is incomplete, carry tokens forward to next line
+						startTokens = errRecord
+					else
+						startTokens = nil
+
+						if tree == nil then
+							-- Error
+							local strErr
+							if errRecord == nil then
+								strErr = "*** Missing errRecord!"
+							else
+								strErr = string.format( "Line %d: %s (chars %d through %d)", 
+												errRecord.iLine, errRecord.strErr, 
+												errRecord.iCharFirst, errRecord.iCharLast );
+							end
+							strErr = string.gsub( strErr, "\"", "\\\"")   -- escape any double quotes
+							print("***ERROR***", strErr)
+							runLuaCode( makeErrorCode( strErr ) )
+							return
 						end
-						strErr = string.gsub( strErr, "\"", "\\\"")   -- escape any double quotes
-						print("***ERROR***", strErr)
-						runLuaCode( makeErrorCode( strErr ) )
-						return
+						parseTrees[#parseTrees + 1] = tree
 					end
-					parseTrees[#parseTrees + 1] = tree
 				end
 				print( string.format( "\nFile parsed in %.3f ms", system.getTimer() - startTime ) )
 

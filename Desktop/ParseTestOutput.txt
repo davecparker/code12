@@ -1,66 +1,86 @@
 ======= Test Started ==========================================
-(1) -----------------------------------------------------
+
+1. import Code12.*;
 line (importCode12)
     ID (Code12)
-(2) -----------------------------------------------------
+
+2. 
 line (blank)
-(3) -----------------------------------------------------
+
+3. class BubblePop extends Code12Program
 line (classUser)
     ID (BubblePop)
     ID (Code12Program)
-(4) -----------------------------------------------------
+
+4. {
 line (begin)
-(5) -----------------------------------------------------
+
+5. public static void main(String[] args)
 line (main)
     ID (main)
     ID (String)
     ID (args)
-(6) -----------------------------------------------------
+
+6. {
 line (begin)
-(7) -----------------------------------------------------
+
+7. Code12.run(new BubblePop());
 line (Code12Run)
     ID (Code12)
     ID (run)
     ID (BubblePop)
-(8) -----------------------------------------------------
+
+8. }
 line (end)
-(9) -----------------------------------------------------
+
+9. 
 line (blank)
-(10) -----------------------------------------------------
+
+10. public void start()
 line (eventFn)
     ID (start)
     paramList (empty)
-(11) -----------------------------------------------------
+
+11. {
 line (begin)
-(12) -----------------------------------------------------
+
+12. // Make the background
 line (blank)
-(13) -----------------------------------------------------
+
+13. ct.setHeight(150);
 line (stmt)
     stmt (call)
         ID (ct.setHeight)
         exprList (list)
             expr (NUM)
                 NUM (150)
-(14) -----------------------------------------------------
+
+14. ct.setBackImage("underwater.jpg");
 line (stmt)
     stmt (call)
         ID (ct.setBackImage)
         exprList (list)
             expr (STR)
                 STR ("underwater.jpg")
-(15) -----------------------------------------------------
+
+15. }
 line (end)
-(16) -----------------------------------------------------
+
+16. 
 line (blank)
-(17) -----------------------------------------------------
+
+17. public void update()
 line (eventFn)
     ID (update)
     paramList (empty)
-(18) -----------------------------------------------------
+
+18. {
 line (begin)
-(19) -----------------------------------------------------
+
+19. // Make bubbles at random times, positions, and sizes
 line (blank)
-(20) -----------------------------------------------------
+
+20. if (ct.random(1, 20) == 1)
 line (if)
     expr (==)
         expr (call)
@@ -72,9 +92,11 @@ line (if)
                     NUM (20)
         expr (NUM)
             NUM (1)
-(21) -----------------------------------------------------
+
+21. {
 line (begin)
-(22) -----------------------------------------------------
+
+22. double x = ct.random(0, 100);
 line (varInit)
     double (double)
     ID (x)
@@ -85,7 +107,8 @@ line (varInit)
                 NUM (0)
             expr (NUM)
                 NUM (100)
-(23) -----------------------------------------------------
+
+23. double y = ct.getHeight() + 25;
 line (varInit)
     double (double)
     ID (y)
@@ -95,7 +118,8 @@ line (varInit)
             exprList (empty)
         expr (NUM)
             NUM (25)
-(24) -----------------------------------------------------
+
+24. double size = ct.random(5, 20);
 line (varInit)
     double (double)
     ID (size)
@@ -106,7 +130,14 @@ line (varInit)
                 NUM (5)
             expr (NUM)
                 NUM (20)
-(25) -----------------------------------------------------
+
+25. GameObj bubble = ct.image("bubble.png",
+-- Incomplete line carried forward
+
+26. x, y,
+-- Incomplete line carried forward
+
+27. size);
 line (varInit)
     ID (GameObj)
     ID (bubble)
@@ -124,7 +155,8 @@ line (varInit)
             expr (lValue)
                 lValue (var)
                     ID (size)
-(26) -----------------------------------------------------
+
+28. bubble.ySpeed = -1;
 line (stmt)
     stmt (assign)
         lValue (field)
@@ -134,7 +166,8 @@ line (stmt)
             expr (neg)
                 expr (NUM)
                     NUM (1)
-(27) -----------------------------------------------------
+
+29. bubble.clickable = true;
 line (stmt)
     stmt (assign)
         lValue (field)
@@ -143,13 +176,17 @@ line (stmt)
         rightSide (=)
             expr (BOOL)
                 BOOL (true)
-(28) -----------------------------------------------------
+
+30. }
 line (end)
-(29) -----------------------------------------------------
+
+31. }
 line (end)
-(30) -----------------------------------------------------
+
+32. 
 line (blank)
-(31) -----------------------------------------------------
+
+33. public void onMousePress(GameObj obj, double x, double y)
 line (eventFn)
     ID (onMousePress)
     paramList (list)
@@ -162,11 +199,14 @@ line (eventFn)
         param (var)
             double (double)
             ID (y)
-(32) -----------------------------------------------------
+
+34. {
 line (begin)
-(33) -----------------------------------------------------
+
+35. // Pop bubbles that get clicked
 line (blank)
-(34) -----------------------------------------------------
+
+36. if (obj != null)
 line (if)
     expr (!=)
         expr (lValue)
@@ -174,75 +214,108 @@ line (if)
                 ID (obj)
         expr (NULL)
             NULL (null)
-(35) -----------------------------------------------------
+
+37. {
 line (begin)
-(36) -----------------------------------------------------
+
+38. obj.delete();
 line (stmt)
     stmt (call)
         fnValue (method)
             ID (obj)
             ID (delete)
         exprList (empty)
-(37) -----------------------------------------------------
+
+39. ct.sound("pop.wav");
 line (stmt)
     stmt (call)
         ID (ct.sound)
         exprList (list)
             expr (STR)
                 STR ("pop.wav")
-(38) -----------------------------------------------------
+
+40. }
 line (end)
-(39) -----------------------------------------------------
+
+41. }
 line (end)
-(40) -----------------------------------------------------
+
+42. }
 line (end)
-(41) -----------------------------------------------------
+
+43. 
 line (blank)
-(42) -----------------------------------------------------
+
+44. ////////////////////////////////////////////////////////////////////
 line (blank)
-(43) -----------------------------------------------------
+
+45. ERRORS
 ************** Beginning of Expected Errors Section **************
-(44) -----------------------------------------------------
+
+46. 
 line (blank)
-(45) -----------------------------------------------------
+
+47. // Lexical errors
 line (blank)
-(46) -----------------------------------------------------
-Line 46: Invalid character (chars 1 through 1)
-(47) -----------------------------------------------------
-Line 47: char type not supported, use double quotes (chars 5 through 5)
-(48) -----------------------------------------------------
-Line 48: Unclosed string literal (chars 5 through 43)
-(49) -----------------------------------------------------
-Line 49: Unsupported reserved word "interface" (chars 1 through 9)
-(50) -----------------------------------------------------
+
+48. @               // invalid character
+Line 48: Invalid character (chars 1 through 1)
+
+49. foo('a');       // char literals not supported
+Line 49: char type not supported, use double quotes (chars 5 through 5)
+
+50. foo(" );        // unclosed string literal
+Line 50: Unclosed string literal (chars 5 through 43)
+
+51. interface foo   // unsupported reserved word
+Line 51: Unsupported reserved word "interface" (chars 1 through 9)
+
+52. 
 line (blank)
-(51) -----------------------------------------------------
+
+53. // Syntax errors
 line (blank)
-(52) -----------------------------------------------------
-Line 52: Syntax Error (chars 1 through 6)
-(53) -----------------------------------------------------
-Line 53: Syntax Error (chars 1 through 9)
-(54) -----------------------------------------------------
-Line 54: Syntax Error (chars 1 through 9)
-(55) -----------------------------------------------------
-Line 55: Syntax Error (chars 1 through 13)
-(56) -----------------------------------------------------
-Line 56: Syntax Error (chars 1 through 13)
-(57) -----------------------------------------------------
-Line 57: Syntax Error (chars 1 through 7)
-(58) -----------------------------------------------------
-Line 58: Syntax Error (chars 1 through 12)
-(59) -----------------------------------------------------
-Line 59: Syntax Error (chars 1 through 10)
-(60) -----------------------------------------------------
-Line 60: Syntax Error (chars 1 through 9)
-(61) -----------------------------------------------------
-Line 61: Syntax Error (chars 1 through 6)
+
+54. x = 10          // missing ;
+Line 54: Syntax Error (chars 1 through 6)
+
+55. foo(x, );       // missing expr in exprList
+Line 55: Syntax Error (chars 1 through 9)
+
+56. x = a + ;       // missing expr after binary op
+Line 56: Syntax Error (chars 1 through 9)
+
+57. x = a + b * ;   // missing expr after higher precedence binary op
+Line 57: Syntax Error (chars 1 through 13)
+
+58. x = a * b + ;   // missing expr after lower precedence binary op
+Line 58: Syntax Error (chars 1 through 13)
+
+59. x = ();         // missing expr in parentheses
+Line 59: Syntax Error (chars 1 through 7)
+
+60. x = 10 + ! ;    // missing expr after unary op
+Line 60: Syntax Error (chars 1 through 12)
+
+61. x = obj.3;      // expected ID after .
+Line 61: Syntax Error (chars 1 through 10)
+
+62. if x == 3       // required next token in pattern doesn't match
+Line 62: Syntax Error (chars 1 through 9)
+
+63. x + 3;          // no matching pattern
+Line 63: Syntax Error (chars 1 through 6)
+
+64. foo(x,          // (incomplete line continued below)
+-- Incomplete line carried forward
+
+65. y)              // missing ;
+Line 65: Syntax Error (chars 1 through 2)
 ======= Test Complete =========================================
 
-61 lines processed in 3 ms
+65 lines processed in 3 ms
 
 0 unexpected errors
-0 uncaught errors (14 expected errors)
+0 uncaught errors (15 expected errors)
 
 SUCCESS
