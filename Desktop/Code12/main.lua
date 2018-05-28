@@ -39,8 +39,9 @@ sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/User
 sourceFile.timeLoaded = os.time()
 
 
--- The global state table that the generated Lua code can access
-appGlobalState = {
+-- The global state tables that the generated Lua code can access
+ct = {}                    -- API functions
+_ctAppGlobalState = {
 	isMac = false,         -- true if running on Mac OS (else Windows, for now)
 	width = 0,             -- window width
 	height = 0,            -- window height
@@ -50,16 +51,23 @@ appGlobalState = {
 	chooseFileBtn = nil,   -- Choose File button in status bar
 	openFileBtn = nil,     -- Open button in status bar
 	group = nil,           -- display group for all drawing objects
+	vars = {},             -- namespace for user Java instance variables
+	functions = {},        -- namespace for user Java functions
 }
-local g = appGlobalState
+local g = _ctAppGlobalState   -- for use in this file
 
 
--- Temp runtime function
-function g.ctCircle( x, y, d )
+--- API Functions ------------------------------------------------
+
+-- Temp
+function ct.circle( x, y, d )
 	local c = display.newCircle( g.group, x, y, d / 2 )
 	c:setFillColor( 1, 0, 0 )
 	return c 
 end
+
+
+--- Internal Functions ------------------------------------------------
 
 -- Update status bar based on data in sourceFile
 local function updateStatusBar()
@@ -97,45 +105,26 @@ end
 
 -- Run the given lua code string dynamically, and then call the contained start function.
 local function runLuaCode( luaCode )
-	-- Destroy old object group if any, then make new group
+	-- Init new runtime state for this run
 	if g.group then
 		g.group:removeSelf()
 	end
 	g.group = display.newGroup()
-
-	-- Remove old runtime functions if any
-	g.start = nil
-	g.update = nil
-	g.userCode = nil
+	g.vars = {}
+	g.functions = {}
 
 	-- Load the code dynamically and execute it
-	-- print(luaCode)
 	local codeFunction = loadstring( luaCode )
  	if type(codeFunction) == "function" then
  		codeFunction()
 
-		-- Run the user code "class"
- 		if type(g.userCode) == "function" then
- 			g.userCode()
- 		end
  		-- Run the embedded start function
- 		if type(g.start) == "function" then
- 			g.start()
+ 		if type(g.functions.start) == "function" then
+ 			g.functions.start()
  		end
+ 	else
+ 	 	print( "*** Lua code failed to load" )
  	end
-end
-
--- Generate Lua code to display the errorStr
-local function makeErrorCode( errorStr )
-	return [[
-		local g = appGlobalState
-		function g.start()
-			local t = display.newText(g.group, "]] .. errorStr ..[[", 
-					50, 100, native.systemFont, 20)
-			t.anchorX = 0
-			t:setFillColor(0)
-		end
-	]]
 end
 
 -- Read the sourceFile and store all of its source lines.
@@ -193,19 +182,16 @@ local function checkUserFile()
 							end
 							strErr = string.gsub( strErr, "\"", "\\\"")   -- escape any double quotes
 							print("***ERROR***", strErr)
-							runLuaCode( makeErrorCode( strErr ) )
 							return
 						end
 						parseTrees[#parseTrees + 1] = tree
 					end
 				end
-				print( string.format( "\nFile parsed in %.3f ms", system.getTimer() - startTime ) )
+				print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
 				-- Make and run the Lua code
-				local codeStr, errLine, errStr = codeGenJava.getLuaCode( parseTrees )
-				if not codeStr then
-					codeStr = makeErrorCode( "Line " .. errLine .. ": " .. errStr )
-				end
+				local codeStr = codeGenJava.getLuaCode( parseTrees )
+				print( codeStr )
 				runLuaCode( codeStr )
 			end
 		end
@@ -243,8 +229,6 @@ end
 local function getDeviceMetrics()
 	g.width = display.actualContentWidth
 	g.height = display.actualContentHeight
-	-- print( display.screenOriginX, display.screenOriginY, g.width, g.height )
-
 end
 
 -- Handle resize event for the window
@@ -265,8 +249,8 @@ end
 -- Handle new frame update
 local function onEnterFrame( event )
 	-- Run the user's update function, if defined
-	if type(g.update) == "function" then
-		g.update()
+	if type(g.functions.update) == "function" then
+		g.functions.update()
 	end
 end
 
