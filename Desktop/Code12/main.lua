@@ -14,6 +14,7 @@ local fileDialogs = require( "plugin.tinyfiledialogs" )
 
 -- Local modules
 local parseJava = require( "parseJava" )
+local codeGenJava = require( "codeGenJava" )
 
 
 -- UI metrics
@@ -30,7 +31,10 @@ local sourceFile = {
 }
 
 -- Force the initial file (for faster repeated testing)
-sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
+-- Home:
+--sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
+-- Shop:
+sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/UserCode.java"
 sourceFile.timeLoaded = os.time()
 
 
@@ -48,6 +52,12 @@ appGlobalState = {
 }
 local g = appGlobalState
 
+-- Temp runtime function
+function g.ctCircle( x, y, d )
+	local c = display.newCircle( g.group, x, y, d / 2 )
+	c:setFillColor( 1, 0, 0 )
+	return c 
+end
 
 -- Update status bar based on data in sourceFile
 local function updateStatusBar()
@@ -83,50 +93,6 @@ local function updateStatusBar()
 	end
 end
 
--- Generate and return the Lua code string corresponding to parseTrees,
--- which is an array of parse trees for each line of Java code.
--- If there is an error, return (nil, lineNum, errorString)
-local function generateLuaCode( parseTrees )
-	-- For now, just look for ct.circle calls
-	local luaCode = "\nlocal g = appGlobalState\nfunction g.start" .. "()\n"
-	for i = 1, #parseTrees do
-		local node = parseTrees[i]
-		if node.p == "stmt" then
-			node = node.nodes[1]
-			if node.p == "call" then
-				local f = node.nodes[1]
-				if f.str == "ct.circle" then
-					local exprs = node.nodes[2].nodes
-					if #exprs ~= 3 then
-						return nil, i, "ct.circle expects 3 parameters"
-					end
-
-					-- Get parameters
-					local params = {}
-					for i = 1, #exprs do
-						local expr = exprs[i]
-						if expr.p ~= "NUM" then
-							return nil, i, "parameters must be numbers"
-						end
-						params[#params + 1] = expr.nodes[1].str  -- text of the NUM token
-					end
-
-					-- Generate Lua code for this ct.circle call
-					local s = "   local c = display.newCircle(g.group, " 
-						.. params[1] .. ", " 
-						.. params[2] .. ", " 
-						.. params[3] .. " / 2)\n"
-						.. "   c:setFillColor(1, 0, 0)\n"
-					luaCode = luaCode .. s
-				end
-			end
-		end
-	end
-
-	luaCode = luaCode .. "end\n"
-	return luaCode
-end
-
 -- Run the given lua code string dynamically, and then call the contained start function.
 local function runLuaCode(luaCode)
 	-- Destroy old object group if any, then make new group
@@ -141,6 +107,10 @@ local function runLuaCode(luaCode)
  	if type(codeFunction) == "function" then
  		codeFunction()
 
+		-- Run the user code "class"
+ 		if type(g.userCode) == "function" then
+ 			g.userCode()
+ 		end
  		-- Run the embedded start function
  		if type(g.start) == "function" then
  			g.start()
@@ -193,14 +163,6 @@ local function checkUserFile()
 						io.close( file )
 						return
 					end
-
-					-- For debugging a particular line
-					if lineNum == 8 then
-						print( "---------- Line " .. lineNum .. " ------------------------")
-						parseJava.printParseTree( tree, 0 )
-						print( "-------------------------------------------")
-					end
-
 					parseTrees[#parseTrees + 1] = tree
 					lineNum = lineNum + 1
 				until false  -- breaks or returns internally
@@ -208,7 +170,7 @@ local function checkUserFile()
 				print( string.format( "File read and parsed in %.3f ms", system.getTimer() - startTime ) )
 
 				-- Make and run the Lua code
-				local codeStr, errLine, errStr = generateLuaCode( parseTrees )
+				local codeStr, errLine, errStr = codeGenJava.getLuaCode( parseTrees )
 				if not codeStr then
 					codeStr = makeErrorCode( "Line " .. errLine .. ": " .. errStr )
 				end
@@ -268,6 +230,14 @@ local function onResizeWindow( event )
 	g.openFileBtn.y = g.statusBar.y
 end
 
+-- Handle new frame update
+local function onEnterFrame( event )
+	-- Run the user's update function, if defined
+	if type(g.update) == "function" then
+		g.update()
+	end
+end
+
 -- Init the app
 function initApp()
 	-- Get initial device info
@@ -315,7 +285,8 @@ function initApp()
 	g.openFileBtn.anchorX = 1
 	updateStatusBar()
 
-	-- Install window resize handler
+	-- Install listeners
+	Runtime:addEventListener( "enterFrame", onEnterFrame )
 	Runtime:addEventListener( "resize", onResizeWindow )
 
 	-- Install timer to check file 4x/sec
