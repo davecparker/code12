@@ -34,6 +34,7 @@ local function addLuaLine( strCode )
 	luaCodeStrs[#luaCodeStrs + 1] = "\n"
 end
 
+
 --- Code Generation Functions ------------------------------------------------
 
 -- Mutually recursive code gen functions
@@ -101,7 +102,8 @@ end
 -- which is an array of parse trees for each line of Java code.
 -- If there is an error, return (nil, lineNum, errorString)
 function codeGenJava.getLuaCode( parseTrees )
-	-- Set up the Java data
+	-- Set up the working state
+	luaCodeStrs = {}
 	javaParseTrees = parseTrees
 	iTree = 1
 

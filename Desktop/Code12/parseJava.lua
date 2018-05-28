@@ -426,18 +426,21 @@ function parseJava.init()
 end
 
 -- Parse the given line of code at the given syntax level (default 12).
+-- If startTokens is not nil, it is an array of tokens from a previous unfinished
+-- line to prepend to the tokens found on this line.
 -- Return the parse tree (recursive array of tokens and/or nodes).
 -- The given lineNumber will be assigned to the tokens found.
--- If the line cannot be parsed then return (nil, strErr, iChar) for a lexical error,
--- or just nil for an unknown syntax error.
-function parseJava.parseLine( sourceLine, lineNumber, level )
+-- If the line is unfinished (ends with a comma token) then return (false, tokens).
+-- If the line cannot be parsed then return (nil, errRecord).
+-- An errRecord is, for example:
+--       { strErr = "Missing semicolon", iLine = 10, iCharFirst = 56, iCharLast = 56 }
+function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	-- Run lexical analysis to get the tokens array
-	local strErr, iChar
-	tokens, strErr, iChar = javalex.getTokens( sourceLine, lineNumber )
+	local errRecord
+	tokens, errRecord = javalex.getTokens( sourceLine, lineNumber )
 	if tokens == nil then
-		return nil, strErr, iChar
+		return nil, errRecord
 	end
-	iToken = 1
 
 	-- Discard comment tokens
 	local i = 1
@@ -449,15 +452,29 @@ function parseJava.parseLine( sourceLine, lineNumber, level )
 		end
 	end
 
+	-- There sould be an "END" token at the end no matter what.
+	assert( #tokens > 0 )
+	assert( tokens[#tokens].tt == "END" )
+
+	-- If this line ends in a comma token, then it is unfinished
+	-- TODO
+
 	-- Set syntax level and try to parse the line grammar
 	syntaxLevel = level or 12
+	iToken = 1
 	local parseTree = parseGrammar( line )
 	if parseTree == nil then
-		-- print("*** Failed")
-		return nil
+		-- Return generic syntax error for the entire line.
+		-- TODO: Return specific errors from parsing functions.
+		local lastToken = tokens[#tokens - 1]  -- not counting the END
+		assert( lastToken )    -- blank lines can't be syntax errors
+		return nil, { 
+			strErr = "Syntax Error", 
+			iLine = lineNumber, 
+			iCharFirst = 1,
+			iCharLast = lastToken.iChar + string.len( lastToken.str ) - 1
+		}
 	end
-	-- print("*** Success:")
-	-- parseJava.printParseTree( parseTree, 0 )
 	return parseTree
 end
 

@@ -96,16 +96,21 @@ local function updateStatusBar()
 end
 
 -- Run the given lua code string dynamically, and then call the contained start function.
-local function runLuaCode(luaCode)
+local function runLuaCode( luaCode )
 	-- Destroy old object group if any, then make new group
 	if g.group then
 		g.group:removeSelf()
 	end
 	g.group = display.newGroup()
 
+	-- Remove old runtime functions if any
+	g.start = nil
+	g.update = nil
+	g.userCode = nil
+
 	-- Load the code dynamically and execute it
 	-- print(luaCode)
-	local codeFunction = loadstring(luaCode)
+	local codeFunction = loadstring( luaCode )
  	if type(codeFunction) == "function" then
  		codeFunction()
 
@@ -168,21 +173,23 @@ local function checkUserFile()
 				parseJava.init()
 				for lineNum = 1, #sourceFile.strLines do
 					local strUserCode = sourceFile.strLines[lineNum]
-					local tree, strErr, iChar = parseJava.parseLine( strUserCode, lineNum )
+					local tree, errRecord = parseJava.parseLine( strUserCode, lineNum, nil )
 					if tree == nil then
 						-- Error
-						if strErr and iChar then
-							strErr = strErr .. " (index " .. iChar .. ")"
+						local strErr
+						if errRecord == nil then
+							strErr = "*** Missing errRecord!"
 						else
-							strErr = "Syntax Error: " .. strUserCode
+							strErr = string.format( "Line %d: %s (chars %d through %d)", 
+											errRecord.iLine, errRecord.strErr, 
+											errRecord.iCharFirst, errRecord.iCharLast );
 						end
 						strErr = string.gsub( strErr, "\"", "\\\"")   -- escape any double quotes
-						runLuaCode( makeErrorCode( "Line " .. lineNum .. ": " .. strErr ) )
-						io.close( file )
+						print("***ERROR***", strErr)
+						runLuaCode( makeErrorCode( strErr ) )
 						return
 					end
 					parseTrees[#parseTrees + 1] = tree
-					lineNum = lineNum + 1
 				end
 				print( string.format( "\nFile parsed in %.3f ms", system.getTimer() - startTime ) )
 

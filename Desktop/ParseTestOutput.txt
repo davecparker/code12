@@ -207,37 +207,37 @@ line (blank)
 (45) -----------------------------------------------------
 line (blank)
 (46) -----------------------------------------------------
-Line 46: Lexical Error: Invalid character code 64 (index 1)
+Line 46: Invalid character (chars 1 through 1)
 (47) -----------------------------------------------------
-Line 47: Lexical Error: char type not supported, use string (index 5)
+Line 47: char type not supported, use double quotes (chars 5 through 5)
 (48) -----------------------------------------------------
-Line 48: Lexical Error: Unclosed string literal (index 5)
+Line 48: Unclosed string literal (chars 5 through 43)
 (49) -----------------------------------------------------
-Line 49: Lexical Error: Unsupported reserved word "interface" (index 1)
+Line 49: Unsupported reserved word "interface" (chars 1 through 9)
 (50) -----------------------------------------------------
 line (blank)
 (51) -----------------------------------------------------
 line (blank)
 (52) -----------------------------------------------------
-Line 52: Syntax Error: x = 10          // missing ;
+Line 52: Syntax Error (chars 1 through 6)
 (53) -----------------------------------------------------
-Line 53: Syntax Error: foo(x, );       // missing expr in exprList
+Line 53: Syntax Error (chars 1 through 9)
 (54) -----------------------------------------------------
-Line 54: Syntax Error: x = a + ;       // missing expr after binary op
+Line 54: Syntax Error (chars 1 through 9)
 (55) -----------------------------------------------------
-Line 55: Syntax Error: x = a + b * ;   // missing expr after higher precedence binary op
+Line 55: Syntax Error (chars 1 through 13)
 (56) -----------------------------------------------------
-Line 56: Syntax Error: x = a * b + ;   // missing expr after lower precedence binary op
+Line 56: Syntax Error (chars 1 through 13)
 (57) -----------------------------------------------------
-Line 57: Syntax Error: x = ();         // missing expr in parentheses
+Line 57: Syntax Error (chars 1 through 7)
 (58) -----------------------------------------------------
-Line 58: Syntax Error: x = 10 + ! ;    // missing expr after unary op
+Line 58: Syntax Error (chars 1 through 12)
 (59) -----------------------------------------------------
-Line 59: Syntax Error: x = obj.3;      // expected ID after .
+Line 59: Syntax Error (chars 1 through 10)
 (60) -----------------------------------------------------
-Line 60: Syntax Error: if x == 3       // required next token in pattern doesn't match
+Line 60: Syntax Error (chars 1 through 9)
 (61) -----------------------------------------------------
-Line 61: Syntax Error: x + 3;          // no matching pattern
+Line 61: Syntax Error (chars 1 through 6)
 ======= Test Complete =========================================
 
 61 lines processed in 3 ms

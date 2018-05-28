@@ -89,12 +89,11 @@ local function parseTestCode()
 	local numUnexpectedErrors = 0
 	local numExpectedErrors = 0
 	local numUncaughtErrors = 0
-	local numLines = 0
 	local startTime = system.getTimer()
 	parseJava.init()
-	for lineNum = 1, #sourceFile.strLines do
+	local lineNum = 1
+	while lineNum <= #sourceFile.strLines do
 		local strCode = sourceFile.strLines[lineNum]
-		numLines = numLines + 1
 
 		-- Output header for this line
 		outFile:write( "(" .. lineNum .. ") -----------------------------------------------------\n" )
@@ -105,13 +104,15 @@ local function parseTestCode()
 			output( "************** Beginning of Expected Errors Section **************" )
 		else
 			-- Parse this line
-			local tree, strErr, iChar = parseJava.parseLine( strCode, lineNum )
+			local tree, errRecord = parseJava.parseLine( strCode, lineNum, nil )
 			if tree == nil then
 				-- This line has an error on it, output it.
-				if strErr and iChar then
-					output( string.format( "Line %d: Lexical Error: %s (index %d)", lineNum, strErr, iChar ) );
+				if errRecord == nil then
+					output( "*** Missing errRecord!")
 				else
-					output( string.format( "Line %d: Syntax Error: %s", lineNum, strCode ) );
+					output( string.format( "Line %d: %s (chars %d through %d)", 
+								errRecord.iLine, errRecord.strErr, 
+								errRecord.iCharFirst, errRecord.iCharLast ) );
 				end
 
 				-- Count the error
@@ -133,13 +134,14 @@ local function parseTestCode()
 				end
 			end
 		end
+		lineNum = lineNum + 1
 	end
 	local endTime = math.round( system.getTimer() - startTime )  -- to nearest ms
 	output( "======= Test Complete =========================================" )
 	output( "" )
 
 	-- Output and display results
-	outputAndDisplay( string.format( "%d lines processed in %d ms", numLines, endTime ) )
+	outputAndDisplay( string.format( "%d lines processed in %d ms", lineNum - 1, endTime ) )
 	outputAndDisplay( "" )
 	outputAndDisplay( string.format( "%d unexpected errors", numUnexpectedErrors ) )
 	outputAndDisplay( string.format( "%d uncaught errors (%d expected errors)", 
