@@ -427,12 +427,13 @@ end
 
 -- Parse the given line of code at the given syntax level (default 12).
 -- Return the parse tree (recursive array of tokens and/or nodes).
+-- The given lineNumber will be assigned to the tokens found.
 -- If the line cannot be parsed then return (nil, strErr, iChar) for a lexical error,
 -- or just nil for an unknown syntax error.
-function parseJava.parseLine( sourceLine, level )
+function parseJava.parseLine( sourceLine, lineNumber, level )
 	-- Run lexical analysis to get the tokens array
 	local strErr, iChar
-	tokens, strErr, iChar = javalex.getTokens( sourceLine )
+	tokens, strErr, iChar = javalex.getTokens( sourceLine, lineNumber )
 	if tokens == nil then
 		return nil, strErr, iChar
 	end

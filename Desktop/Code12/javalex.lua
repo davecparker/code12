@@ -362,11 +362,12 @@ function javalex.init()
 	commentLevel = 0
 end
 
--- Return an array of tokens for the given source string. 
--- Each token is a table with 3 fields named, for example: 
---     { tt = "ID", str = "foo", iChar = 23 }
--- where iChar is the index of the start of the token in sourceStr, str is the 
--- text of the token, and tt is a string that identifies the token type as follows:
+-- Return an array of tokens for the given source string and line number. 
+-- Each token is a table with 4 fields named, for example: 
+--     { tt = "ID", str = "foo", iLine = 10, iChar = 23 }
+-- where iChar is the index of the start of the token in sourceStr, 
+-- iLine is the given lineNumber, str is the text of the token, 
+-- and tt is a string that identifies the token type as follows:
 --     Keywords, operators, and seperators have tt == str (e.g. "for", "++", ";")
 --     "ID": an identifer that is not a reserved word
 --     "NUM": numeric literal (any numeric type)
@@ -374,9 +375,9 @@ end
 --     "BOOL": boolean literal (str is "false" or "true")
 --     "NULL": the null literal (str is "null")
 --     "COMMENT": a comment (str is text of the comment not including the open/close)
---     "END": the end of the source string
+--     "END": the end of the source string (str is empty string)
 -- Return (nil, strErr, iChar) if a token is malformed. 
-function javalex.getTokens(sourceStr)
+function javalex.getTokens( sourceStr, lineNumber )
 	-- Make array of ASCII codes for the source string
 	source = sourceStr
 	chars = { string.byte(source, 1, string.len(source)) }   -- supposedly faster than a loop
@@ -400,7 +401,7 @@ function javalex.getTokens(sourceStr)
 		end
 
 		-- Make a token table  TODO: get from pool
-		local token = { tt = "", str = "", iChar = iChar }
+		local token = { tt = "", str = "", iLine = lineNumber, iChar = iChar }
 
 		-- Determine what token type to build next
 		if charType == true then    -- ID start char

@@ -32,9 +32,9 @@ local sourceFile = {
 
 -- Force the initial file (for faster repeated testing)
 -- Home:
---sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
+sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
 -- Shop:
-sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/UserCode.java"
+-- sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/UserCode.java"
 sourceFile.timeLoaded = os.time()
 
 
@@ -150,7 +150,7 @@ local function checkUserFile()
 					if not strUserCode then 
 						break  -- end of file
 					end
-					local tree, strErr, iChar = parseJava.parseLine( strUserCode )
+					local tree, strErr, iChar = parseJava.parseLine( strUserCode, lineNum )
 					if tree == nil then
 						-- Error
 						if strErr and iChar then

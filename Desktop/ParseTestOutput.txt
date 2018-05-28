@@ -240,7 +240,7 @@ Line 60: Syntax Error: if x == 3       // required next token in pattern doesn't
 Line 61: Syntax Error: x + 3;          // no matching pattern
 ======= Test Complete =========================================
 
-61 lines processed in 8 ms
+61 lines processed in 3 ms
 
 0 unexpected errors
 0 uncaught errors (14 expected errors)

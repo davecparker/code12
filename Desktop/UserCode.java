@@ -9,7 +9,6 @@ class UserCode extends Code12Program
 		int x = 200;
 
 		// Draw some circles
-		x = 201;
 		ball = ct.circle(x + 50, 100, 50);
 		ct.circle(x / 2 + 10, 200, 150);
 		ct.circle(x, 400, 200);

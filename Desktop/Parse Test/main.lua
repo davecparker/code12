@@ -82,7 +82,7 @@ local function parseTestCode()
 			output( "************** Beginning of Expected Errors Section **************" )
 		else
 			-- Parse this line
-			local tree, strErr, iChar = parseJava.parseLine( strCode )
+			local tree, strErr, iChar = parseJava.parseLine( strCode, lineNum )
 			if tree == nil then
 				-- This line has an error on it, output it.
 				if strErr and iChar then
