@@ -12,7 +12,7 @@ public class MainProgram extends Code12Program
    GameObj[] contactBlocks = new GameObj[20]; // blocks the koopa can come into contact with
    int contactBlocksCount = 0;
    double tileSize = 100 / 16;
-   int paused = false;
+   boolean paused = true;
    
    public void start()
    {
@@ -31,7 +31,7 @@ public class MainProgram extends Code12Program
          for (int i = 0; i < numberOfLevels + 1 - level; i++)
          {
             GameObj block = ct.image( "block.png", 100 - i * tileSize, yStairsBottom - level * tileSize,  tileSize );
-            block.align( "bottom right", true );
+            block.align( "bottom right" );
             if ( i == numberOfLevels - level || (level == numberOfLevels + 1 && i == 0) )
             {
                contactBlocks[contactBlocksCount] = block;
@@ -65,23 +65,39 @@ public class MainProgram extends Code12Program
    
    public void update()
    {
-      boolean koopaFalling = true;      
-      for ( int i = 0; i < contactBlocksCount; i++ )
+      if ( !paused )
       {
-         GameObj block = contactBlocks[i];
-         if ( koopa.hit(block) )
+         boolean koopaFalling = true;      
+         for ( int i = 0; i < contactBlocksCount; i++ )
          {
-            koopa.ySpeed = 0;
-            koopa.y = block.y - tileSize;
-            koopa.xSpeed = -0.2;
-            koopaFalling = false;
-            break;
+            GameObj block = contactBlocks[i];
+            if ( koopa.hit(block) )
+            {
+               koopa.ySpeed = 0;
+               koopa.y = block.y - tileSize;
+               koopa.xSpeed = -0.2;
+               koopaFalling = false;
+               break;
+            }
+         }
+         if ( koopaFalling )
+         {
+            koopa.ySpeed = 0.5;
+            koopa.xSpeed = -0.1;
          }
       }
-      if ( koopaFalling )
+      else
       {
-         koopa.ySpeed = 0.5;
-         koopa.xSpeed = -0.1;
+         koopa.xSpeed = 0;
+         koopa.ySpeed = 0;
       }
    }
+   
+   public void onKeyPress( String keyName )
+   {
+      if ( keyName.equals("space") )
+         paused = !paused;
+   }
 }
+
+
