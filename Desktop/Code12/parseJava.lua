@@ -151,6 +151,7 @@ local lValue = { t = "lValue",
 	{ 6, 12, "field",			"ID", ".", "ID"			},
 	{ 12, 12, "index",			"ID", "[", expr, "]"	},
 	{ 3, 12, "var",				"ID" 					},
+	{ 6, 12, "this",			"this", ".", "ID"		},
 }
 
 -- A return type for a procedure/function definition

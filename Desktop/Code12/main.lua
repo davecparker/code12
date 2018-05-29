@@ -54,7 +54,9 @@ _ctAppGlobalState = {
 	vars = {},             -- namespace for user Java instance variables
 	functions = {},        -- namespace for user Java functions
 }
-local g = _ctAppGlobalState   -- for use in this file
+this = _ctAppGlobalState.vars       -- generated code uses this.var
+_fn = _ctAppGlobalState.functions   -- generated code uses _fn.foo()
+local g = _ctAppGlobalState         -- for use in this file
 
 
 --- API Functions ------------------------------------------------
@@ -112,6 +114,8 @@ local function runLuaCode( luaCode )
 	g.group = display.newGroup()
 	g.vars = {}
 	g.functions = {}
+	this = g.vars
+	_fn = g.functions
 
 	-- Load the code dynamically and execute it
 	local codeFunction = loadstring( luaCode )

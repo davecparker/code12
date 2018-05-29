@@ -33,7 +33,7 @@ class UserCode extends Code12Program
 			speed = -speed;
 		}
 		else if (bigBall.x < 0)
-			speed = -speed;
+			speed = -this.speed;
 		else
 		{
 			// Nothing

@@ -12,10 +12,9 @@ local codeGenJava = {}
 
 
 -- Constants
-local globalTable = "_ctg."   -- table name for app global state
-local varTable = "_ctv."      -- table name for user instance variables
-local fnTable = "_ctf."       -- table name for user functions
-
+local varTable = "this."      -- table name for user instance variables
+local fnTable = "_fn."        -- table name for user functions
+ 
 
 -- The Java parse trees and processing state
 local javaParseTrees	      -- array of parse trees (for each line of Java)
@@ -97,16 +96,26 @@ local generateControlledStmt
 -- Return Lua code for an lValue, which might be a class or local reference.
 function lValueCode( v )
 	local p = v.p
-	local varName = v.nodes[1].str
-	if isClassVar[varName] then
-		varName = varTable .. varName
+	local name = v.nodes[1].str
+
+	if p == "this" then
+		return "this." .. name    -- explicit reference to a class variable
+	end
+
+	-- For other references, the name could be either a local var or a class var.
+	-- Look in the table of known class variables to determine which
+	-- (works because Code12 does not allow local vars to hide class vars).
+	if isClassVar[name] then
+		name = varTable .. name    -- class var, so turn name into this.name
 	end
 	if p == "var" then
-		return varName
+		return name
 	elseif p == "field" then
-		return table.concat{ varName, ".", v.nodes[2].str }
+		local field = v.nodes[2].str
+		return name .. "." .. field    --  obj.field reference
 	elseif p == "index" then
-		return table.concat{ varName, "[", exprCode( v.nodes[2] ), "]" }
+		local indexExpr = exprCode( v.nodes[2] )
+		return name .. "[" .. indexExpr .. "]"
 	end
 	error( "Unknown lValue pattern " .. p )
 end
@@ -304,11 +313,6 @@ function codeGenJava.getLuaCode( parseTrees )
 	luaCodeStrs = {}
 	isClassVar = {}
 
-	-- Start with code for Lua global state
-	beginLuaLine( "_ctv = _ctAppGlobalState.vars" )
-	beginLuaLine( "_ctf = _ctAppGlobalState.functions" )
-	beginLuaLine( "" )
-
 	-- Scan the parse trees for instance variables and functions
 	while iTree <= #parseTrees do
 		local tree = javaParseTrees[iTree]
@@ -330,7 +334,7 @@ function codeGenJava.getLuaCode( parseTrees )
 			for i = 1, #idList do
 				isClassVar[idList[i].str] = true
 			end
-			-- No code to generate
+			-- TODO: Assign primitives to 0/false
 		elseif p == "begin" then
 			blockLevel = blockLevel + 1
 		elseif p == "end" then
