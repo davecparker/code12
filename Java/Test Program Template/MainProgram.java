@@ -1,6 +1,6 @@
 import Code12.*;
 
-public class MainProgram extends Code12Program
+class MainProgram extends Code12Program
 {
    public static void main(String[] args)
    { 

@@ -1,6 +1,6 @@
 import Code12.*;
 
-public class BasicTest extends Code12Program
+class BasicTest extends Code12Program
 {
    GameObj circle, fish, wall;  
 
