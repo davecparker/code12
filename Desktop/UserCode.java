@@ -9,9 +9,21 @@ class UserCode extends Code12Program
 	final int LIMIT = 600;
 	int speed = 3;
 
+	// Move the ball
+	void moveBall(boolean wrap)
+	{
+		ball.x++;
+		if (wrap && ball != null && !(ball.x <= LIMIT))
+			ball.x = 0;
+
+		--ball.x;
+		++ball.x;
+	}
+
 	public void start()
 	{
 		int x = 10 + 50 * 2 + (45 * 2);
+		// String name = "Dave" + " " + "Parker";
 		boolean done;
 
 		// Draw some circles
@@ -27,9 +39,7 @@ class UserCode extends Code12Program
 		boolean tooFast, tooSlow;
 
 		// Move ball
-		ball.x++;
-		if (ball != null && !(ball.x <= LIMIT))
-			ball.x = 0;   // wrap around
+		moveBall( true );
 
 		// Move bigBall
 		bigBall.x += speed;
@@ -46,5 +56,13 @@ class UserCode extends Code12Program
 		{
 			// Nothing
 		}
+	}
+
+	public void onMousePress( GameObj obj, double x, double y )
+	{
+		if (obj != nil)
+			ct.println( obj.toString() + " was clicked" );
+		else
+			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
 	}
 }

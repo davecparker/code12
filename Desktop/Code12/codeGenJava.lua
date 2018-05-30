@@ -123,16 +123,29 @@ function lValueCode( v )
 	error( "Unknown lValue pattern " .. p )
 end
 
--- Return Lua code for a function call, e.g. ct.circle( x, y, d ), or myFoo()
+-- Return Lua code for a function or method call, e.g:
+--     ct.circle( x, y, d )
+--     bird.setFillColor( "red" )
+--	   foo()
 function fnCallCode( tree )
-	local exprs = tree.nodes[2].nodes
-	local fnName = tree.nodes[1].str
-	local parts = {}
-	if string.starts( fnName, "ct." ) then
-		parts = { fnName, "(" }
+	-- There could be several parts, so prepare for a table.concat
+	local parts
+
+	-- Function name/value
+	local fnValue = tree.nodes[1]
+	if fnValue.p == "method" then
+		parts = { fnValue.nodes[1].str, ":", fnValue.nodes[2].str, "(" }
 	else
-		parts = { fnTable, fnName, "(" }
+		local fnName = tree.nodes[1].str
+		if string.starts( fnName, "ct." ) then
+			parts = { fnName, "(" }
+		else
+			parts = { fnTable, fnName, "(" }
+		end
 	end
+
+	-- Parameter list
+	local exprs = tree.nodes[2].nodes
 	for i = 1, #exprs do
 		parts[#parts + 1] = exprCode( exprs[i] )
 		if i < #exprs then
@@ -146,27 +159,35 @@ end
 -- Return Lua code for an expr
 function exprCode( expr )
 	local p = expr.p
+	local nodes = expr.nodes
 	if p == "NUM" or p == "STR" or p == "BOOL" then
-		return expr.nodes[1].str
+		return nodes[1].str
 	elseif p == "NULL" then
 		return "nil"
 	elseif p == "lValue" then
-		return lValueCode( expr.nodes[1] )
+		return lValueCode( nodes[1] )
 	elseif p == "call" then
 		return fnCallCode( expr )
 	elseif p == "neg" then
-		return "-" .. exprCode( expr.nodes[1] )
+		return "-" .. exprCode( nodes[1] )
 	elseif p == "!" then
-		return "not " .. exprCode( expr.nodes[1] )
+		return "not " .. exprCode( nodes[1] )
 	elseif p == "exprParens" then
-		return "(" .. exprCode( expr.nodes[1] ) .. ")"
+		return "(" .. exprCode( nodes[1] ) .. ")"
 	end
 
 	-- Is this a Binary operator?
 	local luaOp = luaOpFromJavaOp[p]
 	if luaOp then
-		return table.concat{ exprCode( expr.nodes[1] ),
-			" ", luaOp, " ", exprCode( expr.nodes[2] ) } 
+		local leftExpr = nodes[1]
+		local rightExpr = nodes[2]
+		-- Check if the + operator is concatenating strings
+		-- TODO: Semantic anaysis needs to set expr.vt for nodes
+		if luaOp == "+" and (leftExpr.vt == "string" or rightExpr.vt == "string") then
+			luaOp = ".."  -- TODO: Lua objects will not do a toString automatically
+		end
+		return table.concat{ exprCode( leftExpr ), " ",
+						luaOp, " ", exprCode( rightExpr ) } 
 	else
 		error( "Unknown expr type " .. p )
 	end
@@ -226,12 +247,20 @@ local function generateStmt( tree )
 	if p == "call" then
 		-- fnValue ( exprList )
 		beginLuaLine( fnCallCode( tree ) )
-	elseif p == "assign" then
+		return
+	elseif p == "++" or p == "--" then
+		-- Transform to assign (post-inc or post-dec) for handling below. 
+		-- Note that these are treated as stmts not exprs, so pre is same as post.
+		tree.nodes[2] = { t = "rightSide", p = p }
+		p = "assign"
+	end
+
+	if p == "assign" then
 		-- lValue rightSide
 		local lValue = lValueCode( tree.nodes[1] )
 		beginLuaLine( lValue )
 		addLua( " = " )
-		p = tree.nodes[2].p
+		p = tree.nodes[2].p  -- rightSide
 		local expr
 		if p == "++" then
 			addLua( lValue )
@@ -251,7 +280,7 @@ local function generateStmt( tree )
 		end
 		addLua( expr )
 	else
-		print("*** Unknown stmt pattern " .. p )
+		error("*** Unknown stmt pattern " .. p )
 	end	
 end
 
@@ -340,6 +369,22 @@ function generateControlledStmt()
 	end
 end
 
+-- Generage code for a function header with the given name and paramList
+local function generateFnHeader( name, paramList )
+	beginLuaLine( "function " )
+	addLua( fnTable )
+	addLua( name )
+	addLua( "(" )
+	for i = 1, #paramList do
+		local param = paramList[i]
+		addLua( param.nodes[2].str )
+		if i < #paramList then
+			addLua( ", ")
+		end
+	end
+	addLua( ")" )
+end
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -364,20 +409,23 @@ function codeGenJava.getLuaCode( parseTrees )
 			-- Full line comment
 			beginLuaLine( "--" )
 			addLua( tree.nodes[1].str )
+		elseif p == "blank" then
+			beginLuaLine( "" )
 		elseif p == "begin" then
 			blockLevel = blockLevel + 1
 		elseif p == "end" then
 			blockLevel = blockLevel - 1
 		elseif p == "eventFn" then
 			-- Code12 event func (e.g. setup, update)
-			beginLuaLine()
-			beginLuaLine( "function " )
-			addLua( fnTable )
-			addLua( tree.nodes[1].str )
-			addLua( "()" )
+			generateFnHeader( tree.nodes[1].str, tree.nodes[2].nodes )
 			iTree = iTree + 1 
 			generateBlock()
-		end
+		elseif p == "func" then
+			-- User-defined function
+			generateFnHeader( tree.nodes[2].str, tree.nodes[3].nodes )
+			iTree = iTree + 1 
+			generateBlock()
+		end			
 		iTree = iTree + 1 
 	end
 
