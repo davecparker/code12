@@ -142,7 +142,7 @@ local function parseTestCode()
 					-- Did we expect an error on this line?
 					if errorSection then
 						-- Ignore blank lines
-						if tree.p ~= "blank" then
+						if tree.p ~= "blank" and tree.p ~= "comment" then
 							numUncaughtErrors = numUncaughtErrors + 1
 						end
 					end

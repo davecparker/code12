@@ -2,6 +2,7 @@ import Code12.*;
 
 class UserCode extends Code12Program
 {
+	// instance variables
 	GameObj ball, bigBall;
 	int count, total;
 	boolean gameOver;
@@ -25,16 +26,18 @@ class UserCode extends Code12Program
 		String name;
 		boolean tooFast, tooSlow;
 
+		// Move ball
 		ball.x++;
 		if (ball != null && !(ball.x <= LIMIT))
-			ball.x = 0;
+			ball.x = 0;   // wrap around
 
+		// Move bigBall
 		bigBall.x += speed;
 		if (bigBall.x > LIMIT)
 		{
 			bigBall.x--;
 			bigBall.width /= factor;
-			bigBall.height *= (1 / factor);
+			bigBall.height *= /* WTF? */ (1 / factor);
 			speed = -speed;
 		}
 		else if (bigBall.x < 0)

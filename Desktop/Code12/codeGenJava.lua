@@ -21,8 +21,11 @@ local javaParseTrees	      -- array of parse trees (for each line of Java)
 local iTree            	      -- index of next parse tree to process
 local blockLevel = 0          -- indent level (begin/end block level) for Lua code
 
+-- Code generation options
+local enableComments = true   -- generate Lua comments for full-line Java comments
+local enableIndent = true     -- indent the Lua code per the code structure
+
 -- Indentation for the Lua code
-local enableIndent = true     -- set to false to disable indnetation
 local strIndents = {}
 if enableIndent then
 	for i = 0, 20 do
@@ -261,6 +264,10 @@ local function generateBlockLine( tree )
 	elseif p == "blank" then
 		-- blank
 		beginLuaLine( "" )
+	elseif enableComments and p == "comment" then
+		-- Full line comment
+		beginLuaLine( "--" )
+		addLua( tree.nodes[1].str )
 	elseif generateVarDecl( tree, false ) then
 		-- Processed a local varInit, constInit, or varDecl
 	elseif p == "if" then
@@ -353,6 +360,10 @@ function codeGenJava.getLuaCode( parseTrees )
 		local p = tree.p
 		if generateVarDecl( tree, true ) then
 			-- Processed a varInit, constInit, or varDecl
+		elseif enableComments and p == "comment" then
+			-- Full line comment
+			beginLuaLine( "--" )
+			addLua( tree.nodes[1].str )
 		elseif p == "begin" then
 			blockLevel = blockLevel + 1
 		elseif p == "end" then

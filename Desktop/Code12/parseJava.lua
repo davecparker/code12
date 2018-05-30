@@ -256,6 +256,7 @@ local arrayInit = { t = "arrayInit",
 -- A line of code
 local line = { t = "line",
 	{ 1, 12, "blank",															"END" },
+	{ 1, 12, "comment",			"COMMENT",										"END" },
 	{ 1, 12, "stmt",			stmt, ";",										"END" },
 	{ 3, 12, "varInit",			varType, "ID", "=", expr, ";",					"END" },
 	{ 3, 12, "varDecl",			varType, idList, ";",							"END" },
@@ -443,16 +444,6 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		return nil, errRecord
 	end
 
-	-- Discard comment tokens
-	local i = 1
-	while i <= #tokens do
-		if tokens[i].tt == "COMMENT" then
-			table.remove( tokens, i )
-		else
-			i = i + 1
-		end
-	end
-
 	-- There sould be an "END" token at the end no matter what.
 	assert( #tokens > 0 )
 	assert( tokens[#tokens].tt == "END" )
@@ -469,6 +460,18 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		end
 		tokens = startTokens
 		startTokens = nil
+	end
+
+	-- Discard comment tokens, except if the entire line is a comment
+	if #tokens > 2 then
+		local i = 1
+		while i <= #tokens do
+			if tokens[i].tt == "COMMENT" then
+				table.remove( tokens, i )
+			else
+				i = i + 1
+			end
+		end
 	end
 
 	-- If this line ends in a comma token, then it is unfinished
