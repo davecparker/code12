@@ -4,7 +4,7 @@
 --
 -- Generates Lua code from Java Parse trees for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by David C. Parker 
 -----------------------------------------------------------------------------------------
 
 -- The codeGen module
