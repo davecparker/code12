@@ -23,7 +23,18 @@ class Platformer extends Code12Program
         "000000001110000000000000000000",
         "000002000000011100002000000000",
         "000001110000000000011100011000",
-        "111111110011110001111100111111" // level one
+        "111111110011110001111100111111", // Level One
+        "000000000000000000000000000000", // Start level two
+        "000011110000000000000000000000",
+        "000000001111000000000000000000",
+        "000000000000000000000000000000",
+        "000000000000000000000000000000",
+        "000000000000000000000000000000",
+        "000000000000000000000000000000",
+        "000000000000000000000000000000",
+        "000000000000000000000000000000",
+        "000000000000000000000000000000",
+        "111111111111111111111111111111"
     };
     
 
@@ -41,8 +52,9 @@ class Platformer extends Code12Program
      int score;
 
      double gravity = 0.5;
-     boolean onGround = false;
+     boolean onGround = true;
      double levelWidth;
+     double mult;
 
 
     public void start()
@@ -54,7 +66,7 @@ class Platformer extends Code12Program
         timerText = ct.text("Time: " + 0, ct.getWidth() - 15, ct.getHeight() - 10, 5, "white");
        
         // Multiplier is used for scaling the platforms
-        double mult = ct.getWidth() / 30;
+        mult = ct.getWidth() / 30;
         levelWidth = LEVEL1[0].length() * mult;      
 
         for (int i = 0; i < 12; i++)   // This is so I can use the charAt method
@@ -82,20 +94,19 @@ class Platformer extends Code12Program
             }
         }
      
-        player = ct.rect(5, 34, 2, 2);
-        player.setFillColor("blue");
+        player = ct.image("player_forwards.png", 5, 34, 4);
         
     }
 
     public void update()
     {
-      double time = ct.getTimer();
+      double time = ct.getTimer()/120;
       timerText.delete();
       timerText = ct.text("Time: " + time, ct.getWidth() - 15, ct.getHeight() - 10, 5, "white");
+        player.ySpeed += gravity;
+            player.y += player.ySpeed;
       
-      player.ySpeed += gravity;
-      player.y += player.ySpeed;
-      
+     
       for (GameObj platform: platforms )
       {
          if ( player.hit(platform) )
@@ -141,8 +152,35 @@ class Platformer extends Code12Program
       if ( player.x >= ct.getWidth() || player.y >= ct.getHeight() )
       {
          ct.clearScreen();
-         gameOverText = ct.text("Game Over!", ct.getWidth() / 2, ct.getHeight() / 2, 10, "white");
-         gameOverText.ySpeed = gravity;
+         // new level
+         mult = ct.getWidth() / 30;
+         levelWidth = LEVEL1[12].length() * mult;      
+        
+        for (int i = 12; i < LEVEL1.length; i++)   // This is so I can use the charAt method
+        {
+            String line = LEVEL1[i];
+            for (int j = 0; j < line.length(); j++)
+            {
+                switch (line.charAt(j))
+                {
+                    case '0':
+                        break;
+                    case '1':
+                         platform = ct.rect(j*mult, i*mult, mult, mult );
+                        
+                        platform.setFillColor("orange");
+                        platforms.add(platform);
+                        break;
+                    case '2':
+                        coin = ct.circle(j*mult, i*mult, mult/2);
+                        coin.setFillColor("yellow");
+                        coins.add(coin);
+                        break;
+                     // Maybe add case 3 for enemy ?
+                }
+            }
+        }
+
          
       }
       
@@ -154,6 +192,8 @@ class Platformer extends Code12Program
       if ( onGround )
       {
             player.ySpeed = -6.0;
+          
+            player.xSpeed = 0.5;
             onGround = false;
       }
     }
@@ -162,6 +202,7 @@ class Platformer extends Code12Program
     {
       if (player.ySpeed < -3.0)
          player.ySpeed = -3.0;
+         player.xSpeed = 0;
     }
     
    
@@ -169,51 +210,24 @@ class Platformer extends Code12Program
     {
       switch (key)
       {
-         case("w"):
+         case("space"):
              startJump();
+             ct.sound("retro_jump.wav");
              endJump();
             break;
-         case("d"):
+         case("right"):
             player.x++;
+            player.delete();
+            player = ct.image("player_forwards.png", player.x, player.y, 4);
+            ct.sound("cartoon_game_song.wav");
             break;
-         case("space"):
-            if (yPos + PLAYER_HEIGHT == height )
-            {                                      // Can only bounce from floor (bottom of game window)
-               vDelta = -8;
-               rebound = vDelta;
-               bounce = true;
-               
-               if (height > 0) 
-               {
-                  if (bounce)
-                        {
-                            // Add the vDelta (can be neg or pos) to the yPos
-                            yPos += vDelta;
-                            // Add the gravity to the vDelta, slows down the
-                            // the upward movement and speeds up the downward movement
-                            // Maybe set max speed?
-                            vDelta += gravity;
-                            // If the player is not on the ground...
-                            if (yPos + PLAYER_HEIGHT >= height)
-                            {
-                                // Put the player on the ground
-                                yPos = height - PLAYER_HEIGHT;
-                                // If the re-bound is 0 or more then bouncing has stopped
-                                if (rebound >= 0)
-                                {
-                                    // Stop bouncing
-                                    bounce = false;
-                                } else {
-                                    // Add the re-bound degregation to the re-bound
-                                    rebound += reboundDeg;
-                                    // Set the vDelta
-                                    vDelta = rebound;
-                                }
-                           }
-                        }
-                    }
-
-            }
+         case("left"):
+            player.x--;
+            player.delete();
+            player = ct.image("player_backwards.png", player.x, player.y, 4);
+            break;
+         case("m"): // Toggle music
+            ct.sound("cartoon_game_song.wav");
       }
 
     }
