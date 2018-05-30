@@ -3,12 +3,15 @@ import Code12.*;
 class UserCode extends Code12Program
 {
 	GameObj ball, bigBall;
+	int count, total;
+	boolean gameOver;
 	final int LIMIT = 600;
 	int speed = 3;
 
 	public void start()
 	{
 		int x = 10 + 50 * 2 + (45 * 2);
+		boolean done;
 
 		// Draw some circles
 		ball = ct.circle(x + 30, 70, 50);
@@ -19,6 +22,8 @@ class UserCode extends Code12Program
 	public void update()
 	{
 		double factor = 2;
+		String name;
+		boolean tooFast, tooSlow;
 
 		ball.x++;
 		if (ball != null && !(ball.x <= LIMIT))

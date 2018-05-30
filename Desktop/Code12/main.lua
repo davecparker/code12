@@ -31,11 +31,8 @@ local sourceFile = {
 	strLines = {},           -- array of source code lines when read
 }
 
--- Force the initial file (for faster repeated testing)
--- Home:
-sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
--- Shop:
--- sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/UserCode.java"
+-- Force the initial file to the standard test file (for faster repeated testing)
+sourceFile.path = "../UserCode.java"
 sourceFile.timeLoaded = os.time()
 
 

@@ -169,6 +169,54 @@ function exprCode( expr )
 	end
 end
 
+-- Look for and generate code for a varInit, constInit, or varDecl line.
+-- in tree. Return true if one was found and generated, else return false.
+-- If isInstanceVar then the line is outside all functions (else local).
+local function generateVarDecl( tree, isInstanceVar )
+	local p = tree.p
+	if p == "varInit" or p == "constInit" then
+		-- e.g. int x = y + 10;
+		local varName = tree.nodes[2].str
+		if isInstanceVar then
+			isClassVar[varName] = true   -- remember class vars
+			beginLuaLine( varTable )     -- use this.name
+		else
+			beginLuaLine( "local " )
+		end
+		addLua( varName )
+		addLua( " = " )
+		addLua( exprCode( tree.nodes[3] ) )
+		return true
+	elseif p == "varDecl" then
+		-- varType idList ;
+		local varType = tree.nodes[1].str
+		local idList = tree.nodes[2].nodes
+		beginLuaLine( "" )   -- we may have multiple statements on this line
+		for i = 1, #idList do
+			local varName = idList[i].str
+			if isInstanceVar then
+				isClassVar[varName] = true    -- remember class vars
+				addLua( varTable )            -- use this.name
+			else
+				addLua( "local " )
+			end
+			addLua( varName )
+			addLua( " = " )
+			-- Need to init primitives so they don't start as nil.
+			-- We will go ahead and init all types for completeness.
+			local value = "nil; "
+			if varType == "int" or varType == "double" then
+				value = "0; "
+			elseif varType == "boolean" then
+				value = "false; "
+			end
+			addLua( value )
+		end
+		return true
+	end
+	return false
+end
+
 -- Generate code for the single stmt in tree
 local function generateStmt( tree )
 	local p = tree.p
@@ -207,28 +255,14 @@ end
 -- Generate code for the block line in tree
 local function generateBlockLine( tree )
 	local p = tree.p
-	if p == "blank" then
-		-- blank
-		beginLuaLine( "" )
-	elseif p == "varInit" then
-		-- varType ID = expr ;
-		local varName = tree.nodes[2].str
-		beginLuaLine( "local " )
-		addLua( varName )
-		addLua( " = " )
-		addLua( exprCode( tree.nodes[3] ) )
-	elseif p == "varDecl" then
-		-- varType idList ;
-		beginLuaLine( "local " )
-		local idList = tree.nodes[1].nodes
-		for i = 1, #nodes - 1 do
-			addLua( nodes[i].str )
-			addLua( ", " )
-		end
-		addLua( nodes[#nodes].str )
-	elseif p == "stmt" then
+	if p == "stmt" then
 		-- stmt ;
 		generateStmt( tree.nodes[1] )
+	elseif p == "blank" then
+		-- blank
+		beginLuaLine( "" )
+	elseif generateVarDecl( tree, false ) then
+		-- Processed a local varInit, constInit, or varDecl
 	elseif p == "if" then
 		-- if (expr)
 		beginLuaLine( "if " )
@@ -317,24 +351,8 @@ function codeGenJava.getLuaCode( parseTrees )
 	while iTree <= #parseTrees do
 		local tree = javaParseTrees[iTree]
 		local p = tree.p
-		if p == "varInit" or p == "constInit" then
-			-- e.g. int x = y + 10;
-			-- Remember the variable name so we know class var not local
-			local varName = tree.nodes[2].str
-			isClassVar[varName] = true
-			-- Generate the init code
-			beginLuaLine( varTable )
-			addLua( varName )
-			addLua( " = " )
-			addLua( exprCode( tree.nodes[3] ) )
-		elseif p == "varDecl" then
-			-- e.g. GameObj bird, target;
-			-- Remember the variable name(s) so we know class var not local
-			local idList = tree.nodes[2].nodes
-			for i = 1, #idList do
-				isClassVar[idList[i].str] = true
-			end
-			-- TODO: Assign primitives to 0/false
+		if generateVarDecl( tree, true ) then
+			-- Processed a varInit, constInit, or varDecl
 		elseif p == "begin" then
 			blockLevel = blockLevel + 1
 		elseif p == "end" then
