@@ -14,6 +14,7 @@ local fileDialogs = require( "plugin.tinyfiledialogs" )
 
 -- Local modules
 local parseJava = require( "parseJava" )
+local codeGenJava = require( "codeGenJava" )
 
 
 -- UI metrics
@@ -27,15 +28,20 @@ local sourceFile = {
 	path = nil,              -- full pathname to the file
 	timeLoaded = 0,          -- time this file was loaded
 	timeModLast = 0,         -- last modification time or 0 if never
+	strLines = {},           -- array of source code lines when read
 }
 
 -- Force the initial file (for faster repeated testing)
--- sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
--- sourceFile.timeLoaded = os.time()
+-- Home:
+sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/UserCode.java"
+-- Shop:
+-- sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/UserCode.java"
+sourceFile.timeLoaded = os.time()
 
 
--- The global state table that the generated Lua code can access
-appGlobalState = {
+-- The global state tables that the generated Lua code can access
+ct = {}                    -- API functions
+_ctAppGlobalState = {
 	isMac = false,         -- true if running on Mac OS (else Windows, for now)
 	width = 0,             -- window width
 	height = 0,            -- window height
@@ -45,9 +51,23 @@ appGlobalState = {
 	chooseFileBtn = nil,   -- Choose File button in status bar
 	openFileBtn = nil,     -- Open button in status bar
 	group = nil,           -- display group for all drawing objects
+	vars = {},             -- namespace for user Java instance variables
+	functions = {},        -- namespace for user Java functions
 }
-local g = appGlobalState
+local g = _ctAppGlobalState   -- for use in this file
 
+
+--- API Functions ------------------------------------------------
+
+-- Temp
+function ct.circle( x, y, d )
+	local c = display.newCircle( g.group, x, y, d / 2 )
+	c:setFillColor( 1, 0, 0 )
+	return c 
+end
+
+
+--- Internal Functions ------------------------------------------------
 
 -- Update status bar based on data in sourceFile
 local function updateStatusBar()
@@ -83,97 +103,49 @@ local function updateStatusBar()
 	end
 end
 
--- Generate and return the Lua code string corresponding to parseTrees,
--- which is an array of parse trees for each line of Java code.
--- If there is an error, return (nil, lineNum, errorString)
-local function generateLuaCode( parseTrees )
-	-- For now, just look for ct.circle calls
-	local luaCode = "\nlocal g = appGlobalState\nfunction g.start" .. "()\n"
-	for i = 1, #parseTrees do
-		local node = parseTrees[i]
-		if node.t == "line" and node.p == "methCall" then
-			node = node.nodes[1]
-			if node.t == "methCall" then
-				-- Check for proper call to ct.circle
-				local nodes = node.nodes
-				local objName = nodes[1][2]
-				if objName ~= "ct" then
-					return nil, i, "Unknown object " .. objName
-				end
-				local methName = nodes[3][2]
-				if methName ~= "circle" then
-					return nil, i, "Unknown method " .. methName
-				end
-				local exprList = nodes[5]
-				if exprList.t ~= "exprList" then
-					return nil, i, "Parameter list expected"
-				end
-				local exprs = exprList.nodes
-				if #exprs ~= 3 then
-					return nil, i, "ct.circle expects 3 parameters"
-				end
-
-				-- Get parameters
-				local params = {}
-				for i = 1, #exprs do
-					local expr = exprs[i]
-					if expr.t ~= "expr" or expr.p ~= "literal" then
-						return nil, i, "parameters must be constants"
-					end
-					expr = expr.nodes[1]
-					if expr.p ~= "num" then
-						return nil, i, "parameters must be numbers"
-					end
-					params[#params + 1] = expr.nodes[1][2]  -- text of the NUM token
-				end
-
-				-- Generate Lua code for this ct.circle call
-				local s = "   local c = display.newCircle(g.group, " 
-					.. params[1] .. ", " 
-					.. params[2] .. ", " 
-					.. params[3] .. " / 2)\n"
-					.. "   c:setFillColor(1, 0, 0)\n"
-				luaCode = luaCode .. s
-			end
-		end
-	end
-
-	luaCode = luaCode .. "end\n"
-	return luaCode
-end
-
 -- Run the given lua code string dynamically, and then call the contained start function.
-local function runLuaCode(luaCode)
-	-- Destroy old object group if any, then make new group
+local function runLuaCode( luaCode )
+	-- Init new runtime state for this run
 	if g.group then
 		g.group:removeSelf()
 	end
 	g.group = display.newGroup()
+	g.vars = {}
+	g.functions = {}
 
 	-- Load the code dynamically and execute it
-	print(luaCode)
-	local codeFunction = loadstring(luaCode)
+	local codeFunction = loadstring( luaCode )
  	if type(codeFunction) == "function" then
  		codeFunction()
 
  		-- Run the embedded start function
- 		if type(g.start) == "function" then
- 			g.start()
+ 		if type(g.functions.start) == "function" then
+ 			g.functions.start()
  		end
+ 	else
+ 	 	print( "*** Lua code failed to load" )
  	end
 end
 
--- Generate Lua code to display the errorStr
-local function makeErrorCode( errorStr )
-	return [[
-		local g = appGlobalState
-		function g.start()
-			local t = display.newText(g.group, "]] .. errorStr ..[[", 
-					50, 100, native.systemFont, 20)
-			t.anchorX = 0
-			t:setFillColor(0)
-		end
-	]]
+-- Read the sourceFile and store all of its source lines.
+-- Return true if success.
+local function readSourceFile()
+	local file = io.open( sourceFile.path, "r" )
+	if file then
+		sourceFile.strLines = {}   -- delete previous contents if any
+		local lineNum = 1
+		repeat
+			local s = file:read( "*l" )  -- read a line
+			if s == nil then 
+				break  -- end of file
+			end
+			sourceFile.strLines[lineNum] = s
+			lineNum = lineNum + 1
+		until false -- breaks internally
+		io.close( file )
+		return true
+	end
+	return false
 end
 
 -- Function to check user file for changes and (re)parse it if modified
@@ -181,35 +153,45 @@ local function checkUserFile()
 	if sourceFile.path then
 		local timeMod = lfs.attributes( sourceFile.path, "modification" )
 		if timeMod and timeMod > sourceFile.timeModLast then
-			local file = io.open( sourceFile.path, "r" )
-			if file then
+			if readSourceFile() then
 				sourceFile.timeModLast = timeMod
 
-				-- Read lines and create parse tree array
+				-- Create parse tree array
+				local startTime = system.getTimer()
 				local parseTrees = {}
-				local lineNum = 1
-				repeat
-					local strUserCode = file:read( "*l" )  -- read a line
-					if not strUserCode then 
-						break  -- end of file
+				local startTokens = nil
+				parseJava.init()
+				for lineNum = 1, #sourceFile.strLines do
+					local strUserCode = sourceFile.strLines[lineNum]
+					local tree, errRecord = parseJava.parseLine( strUserCode, lineNum, startTokens )
+					if tree == false then
+						-- Line is incomplete, carry tokens forward to next line
+						startTokens = errRecord
+					else
+						startTokens = nil
+
+						if tree == nil then
+							-- Error
+							local strErr
+							if errRecord == nil then
+								strErr = "*** Missing errRecord!"
+							else
+								strErr = string.format( "Line %d: %s (chars %d through %d)", 
+												errRecord.iLine, errRecord.strErr, 
+												errRecord.iCharFirst, errRecord.iCharLast );
+							end
+							strErr = string.gsub( strErr, "\"", "\\\"")   -- escape any double quotes
+							print("***ERROR***", strErr)
+							return
+						end
+						parseTrees[#parseTrees + 1] = tree
 					end
-					local tree = parseJava.parseLine( strUserCode, 0 )
-					if not tree then
-						-- Syntax error
-						runLuaCode( makeErrorCode( "Line " .. lineNum .. ": Syntax Error: " .. strUserCode ) )
-						io.close( file )
-						return
-					end
-					parseTrees[#parseTrees + 1] = tree
-					lineNum = lineNum + 1
-				until false  -- breaks or returns internally
-				io.close( file )
+				end
+				print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
 				-- Make and run the Lua code
-				local codeStr, errLine, errStr = generateLuaCode( parseTrees )
-				if not codeStr then
-					codeStr = makeErrorCode( "Line " .. errLine .. ": " .. errStr )
-				end
+				local codeStr = codeGenJava.getLuaCode( parseTrees )
+				print( codeStr )
 				runLuaCode( codeStr )
 			end
 		end
@@ -228,6 +210,7 @@ local function chooseFile()
 	if type(result) == "string" then   -- returns false if cancelled
 		sourceFile.path = result
 		sourceFile.timeLoaded = os.time()
+		sourceFile.timeModLast = 0
 	end
 end
 
@@ -246,8 +229,6 @@ end
 local function getDeviceMetrics()
 	g.width = display.actualContentWidth
 	g.height = display.actualContentHeight
-	print( display.screenOriginX, display.screenOriginY, g.width, g.height )
-
 end
 
 -- Handle resize event for the window
@@ -263,6 +244,14 @@ local function onResizeWindow( event )
 	g.statusBarText.y = g.statusBar.y
 	g.openFileBtn.x = g.width
 	g.openFileBtn.y = g.statusBar.y
+end
+
+-- Handle new frame update
+local function onEnterFrame( event )
+	-- Run the user's update function, if defined
+	if type(g.functions.update) == "function" then
+		g.functions.update()
+	end
 end
 
 -- Init the app
@@ -312,7 +301,8 @@ function initApp()
 	g.openFileBtn.anchorX = 1
 	updateStatusBar()
 
-	-- Install window resize handler
+	-- Install listeners
+	Runtime:addEventListener( "enterFrame", onEnterFrame )
 	Runtime:addEventListener( "resize", onResizeWindow )
 
 	-- Install timer to check file 4x/sec
