@@ -38,17 +38,14 @@ public class MainProgram extends Code12Program
       ct.rect( 76.25, 20, 2.5, 10, "gray" );
       ct.rect( 23.75, 20, 2.5, 10, "gray" );
       
-      ct.circle( 37.5, 20, 20, "white" );
+     /* ct.circle( 37.5, 20, 20, "white" );
       ct.circle( 62.5, 20, 20, "white" );
-      ct.circle( 40, 20, 8, "green" );
-      ct.circle( 60, 20, 8, "green" ); 
+      /* ct.circle( 40, 20, 8, "green" );
+      ct.circle( 60, 20, 8, "green" ); */
       ct.circle( 40, 20, 4, "black" );
-      ct.circle( 60, 20, 4, "black" ); 
+      ct.circle( 60, 20, 4, "black" ); */
       
       ct.image( "mouth.png", 50, 36, 20 );
    }
    
-   public void update()
-   {        
-   }
 }

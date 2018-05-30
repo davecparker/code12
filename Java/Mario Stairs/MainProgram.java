@@ -9,34 +9,23 @@ public class MainProgram extends Code12Program
    
    GameObj koopa; // koopa-troopa image
    int numberOfLevels = 8; // how many blocks high the staircase is
-   GameObj[] contactBlocks = new GameObj[20]; // blocks the koopa can come into contact with
-   int contactBlocksCount = 0;
    double tileSize = 100 / 16;
+   double yGround = 100 - tileSize * 2;
    boolean paused = true;
    
    public void start()
-   {
-      // Initialize contactBlocks
-      contactBlocks = new GameObj[17];
-      contactBlocksCount = 0;
-      
+   {      
       // Make the background
       ct.setBackColorRGB( 104, 136, 255 );
       ct.image( "cloud.png", 25, 25, 19 );
       
       // Make the staircase
-      double yStairsBottom = 100 - tileSize * 2;
       for (int level = 0; level < numberOfLevels; level++)
       {
          for (int i = 0; i < numberOfLevels + 1 - level; i++)
          {
-            GameObj block = ct.image( "block.png", 100 - i * tileSize, yStairsBottom - level * tileSize,  tileSize );
+            GameObj block = ct.image( "block.png", 100 - i * tileSize, yGround - level * tileSize,  tileSize );
             block.align( "bottom right" );
-            if ( i == numberOfLevels - level || (level == numberOfLevels + 1 && i == 0) )
-            {
-               contactBlocks[contactBlocksCount] = block;
-               contactBlocksCount++;
-            }
          }
       }
       
@@ -48,49 +37,51 @@ public class MainProgram extends Code12Program
          {
             GameObj block = ct.image( "ground-tile.png", 100 - i * tileSize, 100 - j * tileSize, tileSize );
             block.align( "bottom right" );
-            if ( j == 1 && i > numberOfLevels )
-            {
-               contactBlocks[contactBlocksCount] = block;
-               contactBlocksCount++;
-            }
          }
       }
       
       // Make the koopa troopa
-      double yStart = yStairsBottom - tileSize * (numberOfLevels + 1);
+      double yStart = yGround - tileSize * numberOfLevels;
       koopa = ct.image( "koopa.png", 100, yStart, tileSize );
       koopa.align( "bottom right" );
-      koopa.autoDelete = true;
    }
    
    public void update()
    {
       if ( !paused )
       {
-         boolean koopaFalling = true;      
-         for ( int i = 0; i < contactBlocksCount; i++ )
+         if ( koopa.x < 0 )
          {
-            GameObj block = contactBlocks[i];
-            if ( koopa.hit(block) )
-            {
-               koopa.ySpeed = 0;
-               koopa.y = block.y - tileSize;
-               koopa.xSpeed = -0.2;
-               koopaFalling = false;
-               break;
-            }
+            // Reset koopa to top of staircase
+            koopa.y = yGround - tileSize * numberOfLevels;
+            koopa.x = 100 + koopa.width;
          }
-         if ( koopaFalling )
+         else if ( koopaFalling() )
          {
-            koopa.ySpeed = 0.5;
-            koopa.xSpeed = -0.1;
+            koopa.y = koopa.y + 1;
+            koopa.x -= 0.1;
+            ct.println("falling");
+         }
+         else
+         {
+            koopa.x = koopa.x - 0.2;
+            ct.println("not falling");
          }
       }
-      else
-      {
-         koopa.xSpeed = 0;
-         koopa.ySpeed = 0;
-      }
+   }
+   
+   public boolean koopaFalling()
+   {
+      return koopa.y < ySteps( koopa.x );
+   }
+   
+   public double ySteps( double x )
+   {
+      for ( int i = 0; i <= numberOfLevels; i++)
+      if ( x >= 100 - tileSize * (2 + i) )
+         return yGround - tileSize * ( numberOfLevels - i );
+         
+      return yGround;
    }
    
    public void onKeyPress( String keyName )
