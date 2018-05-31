@@ -12,10 +12,11 @@ local widget = require( "widget" )
 local lfs = require( "lfs" )
 local fileDialogs = require( "plugin.tinyfiledialogs" )
 
--- Local modules
+-- Code12 modules
 local parseJava = require( "parseJava" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
+local err = require( "err" )
 
 
 -- UI metrics
@@ -150,6 +151,15 @@ local function readSourceFile()
 	return false
 end
 
+-- Show the error state
+local function showError()
+	if err.hasErr() then
+		print( err.getErrString() )
+	else
+		print( "*** Missing error state for failed parse")
+	end
+end
+
 -- Function to check user file for changes and (re)parse it if modified
 local function checkUserFile()
 	if sourceFile.path then
@@ -165,25 +175,14 @@ local function checkUserFile()
 				parseJava.init()
 				for lineNum = 1, #sourceFile.strLines do
 					local strUserCode = sourceFile.strLines[lineNum]
-					local tree, errRecord = parseJava.parseLine( strUserCode, lineNum, startTokens )
+					local tree, tokens = parseJava.parseLine( strUserCode, lineNum, startTokens )
 					if tree == false then
 						-- Line is incomplete, carry tokens forward to next line
-						startTokens = errRecord
+						startTokens = tokens
 					else
 						startTokens = nil
-
 						if tree == nil then
-							-- Error
-							local strErr
-							if errRecord == nil then
-								strErr = "*** Missing errRecord!"
-							else
-								strErr = string.format( "Line %d: %s (chars %d through %d)", 
-												errRecord.iLine, errRecord.strErr, 
-												errRecord.iCharFirst, errRecord.iCharLast );
-							end
-							strErr = string.gsub( strErr, "\"", "\\\"")   -- escape any double quotes
-							print("***ERROR***", strErr)
+							showError()
 							return
 						end
 						parseTrees[#parseTrees + 1] = tree
@@ -193,12 +192,14 @@ local function checkUserFile()
 
 				-- Do Semantic Analysis on the parse trees
 				if not checkJava.initProgram( parseTrees ) then
-					print( "*** Semantic error" )   -- TODO: Get error
+					showError()
 				elseif false then  -- TODO
 					-- Make and run the Lua code
 					local codeStr = codeGenJava.getLuaCode( parseTrees )
-					if not checkJava.hasError() then
-						print( codeStr )
+					print( codeStr )
+					if err.hasError() then
+						showError()
+					else
 						runLuaCode( codeStr )
 					end
 				end

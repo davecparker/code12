@@ -9,6 +9,7 @@
 
 -- Code12 modules used
 local javalex = require( "javalex" )
+local err = require( "err" )
 
 
 -- The parseJava module
@@ -73,15 +74,6 @@ local binaryOpPrecedence = {
 	["||"]	= 3,
 	["?"]	= 2,
 	[":"]	= 2,
-}
-
--- Map known variable type names to true
-local isVarType = {
-	["int"]		= true,
-	["double"]	= true,
-	["boolean"]	= true,
-	["String"]	= true,
-	["GameObj"]	= true,
 }
 
 
@@ -418,15 +410,12 @@ end
 -- Return the parse tree (recursive array of tokens and/or nodes).
 -- The given lineNumber will be assigned to the tokens found.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
--- If the line cannot be parsed then return (nil, errRecord).
--- An errRecord is, for example:
---       { strErr = "Missing semicolon", iLine = 10, iCharFirst = 56, iCharLast = 56 }
+-- If the line cannot be parsed then return nil and set the error state.
 function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	-- Run lexical analysis to get the tokens array
-	local errRecord
-	tokens, errRecord = javalex.getTokens( sourceLine, lineNumber )
+	tokens = javalex.getTokens( sourceLine, lineNumber )
 	if tokens == nil then
-		return nil, errRecord
+		return nil
 	end
 
 	-- There sould be an "END" token at the end no matter what.
@@ -472,15 +461,15 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	iToken = 1
 	local parseTree = parseGrammar( line )
 	if parseTree == nil then
-		-- Return generic syntax error for the entire line.
-		-- TODO: Return specific errors from parsing functions.
-		assert( lastToken )    -- blank lines can't be syntax errors
-		return nil, { 
-			strErr = "Syntax Error", 
-			iLine = lineNumber, 
-			iCharFirst = 1,
-			iCharLast = lastToken.iChar + string.len( lastToken.str ) - 1
-		}
+		if not err.hasErr() then
+			-- Unknown error: Set generic syntax error for the entire line.
+			assert( lastToken )    -- blank lines can't be syntax errors
+			local iCharLast = lastToken.iChar + string.len( lastToken.str ) - 1
+			local locStart = err.makeSrcLoc( lineNumber, 1 )
+			local locEnd = err.makeSrcLoc( lineNumber, iCharLast )
+			err.setErr( err.makeErrLoc( locStart, locEnd ), nil, "Syntax Error" )
+		end
+		return nil
 	end
 	return parseTree
 end

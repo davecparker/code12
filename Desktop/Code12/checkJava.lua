@@ -7,7 +7,6 @@
 -- (c)Copyright 2018 by David C. Parker 
 -----------------------------------------------------------------------------------------
 
-
 -- Code12 modules
 local err = require( "err" )
 

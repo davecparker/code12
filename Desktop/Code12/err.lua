@@ -41,8 +41,8 @@ end
 --      iLine      source code line number
 --      iChar      character index in the source line
 function err.makeSrcLoc( iLine, iChar )
-	assert( typeof(iLine) == "number" )
-	assert( typeof(iChar) == "number" )
+	assert( type(iLine) == "number" )
+	assert( type(iChar) == "number" )
 	return { iLine = iLine, iChar = iChar }
 end
 
@@ -51,6 +51,7 @@ end
 --      first      srcLoc of first part of affected code
 --      last       srcLoc of last part of affected code
 function err.makeErrLoc( first, last )
+	print( string.format( "makeErrLoc  %d.%d  to  %d.%d", first.iLine, first.iChar, last.iLine, last.iChar ) )
 	return { first = first, last = last }
 end
 
@@ -68,11 +69,11 @@ end
 --      strErr        string message for the error
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErr( loc, refLoc, strErr, ... )
-	assert( typeof(loc) == "table" and loc.iLine ~= nil )
+	assert( type(loc) == "table" and loc.first ~= nil and loc.last ~= nil )
 	if refLoc then
-		assert( typeof(refLoc) == "table" and refLoc.iLine ~= nil )
+		assert( type(refLoc) == "table" and refLoc.first ~= nil and refLoc.last ~= nil )
 	end
-	assert( typeof(strErr) == "string" )
+	assert( type(strErr) == "string" )
 	if errRecord == nil then
 		errRecord = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
 	end
@@ -84,11 +85,11 @@ end
 --      strErr        string message for the error
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErrNodeAndRef( node, refNode, strErr, ... )
-	assert( typeof(node) == "table" )
+	assert( type(node) == "table" )
 	if refNode then
-		assert( typeof(refNode) == "table" )
+		assert( type(refNode) == "table" )
 	end
-	assert( typeof(strErr) == "string" )
+	assert( type(strErr) == "string" )
 	err.setErr( errLocFromNode( node ), errLocFromNode( refNode ), strErr, ... )
 end
 
@@ -97,26 +98,36 @@ end
 --      strErr        string message for the error
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErrNode( node, strErr, ... )
-	assert( typeof(node) == "table" )
-	assert( typeof(strErr) == "string" )
+	assert( type(node) == "table" )
+	assert( type(strErr) == "string" )
 	err.setErr( errLocFromNode( node ), nil, strErr, ... )
 end
 
--- If an error occurred then and display it and return true, else return false.
-function err.hasError()
+-- Return true if there is an error in the error state.
+function err.hasErr()
+	return (errRecord ~= nil)
+end
+
+-- Return a string describing the error state, or return nil if no error
+function err.getErrString()
 	if errRecord then
-		print( string.format( "*** Location %d.%d to %d.%d: %s", 
-					errRecord.loc.first.iLine, errRecord.loc.first.Char, 
-					errRecord.loc.last.iLine, errRecord.loc.last.Char, 
-					errRecord.strErr ) )
+		local str = string.format( "*** Location %d.%d to %d.%d: %s", 
+						errRecord.loc.first.iLine, errRecord.loc.first.iChar, 
+						errRecord.loc.last.iLine, errRecord.loc.last.iChar, 
+						errRecord.strErr ) 
 		if errRecord.refLoc then
-			print( string.format( "*** Reference %d.%d to %d.%d", 
-						errRecord.refLoc.first.iLine, errRecord.refLoc.first.Char, 
-						errRecord.refLoc.last.iLine, errRecord.refLoc.last.Char ) )
+			str = str .. string.format( "\n*** Reference %d.%d to %d.%d", 
+							errRecord.refLoc.first.iLine, errRecord.refLoc.first.iChar, 
+							errRecord.refLoc.last.iLine, errRecord.refLoc.last.iChar )
 		end
-		return true
+		return str
 	end
-	return false
+	return nil
+end
+
+-- Clear the error state
+function err.clearErr()
+	errRecord = nil
 end
 
 
