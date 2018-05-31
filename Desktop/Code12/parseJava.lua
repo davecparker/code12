@@ -134,6 +134,7 @@ end
 -- Parse a variable type. Primitive types return their reserved word token,
 -- other types return an ID token. Return nil if not an ID.
 -- Done here as a function for performance.
+-- TODO: Accept any ID here and check later?
 local function varType()
 	local token = tokens[iToken]
 	if isVarType[token.str] or token.tt == "ID" then
@@ -377,10 +378,7 @@ function parsePattern( pattern )
 			end
 			-- Matched a token
 			trace("Matched token " .. iToken .. " \"" .. token.str .. "\"")
-			-- Include tokens that are not simple separators/operators in the nodes array
-			if token.str ~= token.tt and token.tt ~= "END" then
-				nodes[#nodes + 1] = token
-			end
+			nodes[#nodes + 1] = token
 			iToken = iToken + 1
 		elseif t == "function" then
 			-- Call parsing function
@@ -508,6 +506,10 @@ function parseJava.printParseTree( node, indentLevel, file )
 		local s = string.rep("    ", indentLevel)  -- indentation
 		if node.tt then
 			-- Token node
+			-- Ignore tokens that are simple separators/operators
+			if node.str == node.tt or node.tt == "END" then
+				return
+			end
 			s = s .. node.tt .. " (" .. node.str .. ")"
 		else
 			-- Sub-tree node

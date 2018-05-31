@@ -26,7 +26,7 @@ local charTypes = {}  -- built in initCharTypes()
 -- Reserved word tokens: indexed by string, maps to:
 --    string (token tt) if reserved word supported by Code12
 --    false if reserved word not supported by Code12
---    nil if not reserved word
+--    nil if not reserved word, or not treated as a reserved word (e.g. primitive types)
 local reservedWordTokens = {
 	["abstract"]		= false,	
 	["assert"] 			= false,	
@@ -83,6 +83,10 @@ local reservedWordTokens = {
 	["true"] 			= "BOOL",	
 	["false"] 			= "BOOL",
 	["null"] 			= "NULL",
+
+	-- These reserved words are treated as normal IDs
+	-- TODO:
+
 }
 
 -- State for the lexer used by token scanning functions

@@ -7,6 +7,10 @@
 -- (c)Copyright 2018 by David C. Parker 
 -----------------------------------------------------------------------------------------
 
+-- Code12 modules
+local checkJava = require( "checkJava" )
+
+
 -- The codeGen module
 local codeGenJava = {}
 
@@ -182,8 +186,7 @@ function exprCode( expr )
 		local leftExpr = nodes[1]
 		local rightExpr = nodes[2]
 		-- Check if the + operator is concatenating strings
-		-- TODO: Semantic anaysis needs to set expr.vt for nodes
-		if luaOp == "+" and (leftExpr.vt == "string" or rightExpr.vt == "string") then
+		if luaOp == "+" and expr.vt == "String" then
 			luaOp = ".."  -- TODO: Lua objects will not do a toString automatically
 		end
 		return table.concat{ exprCode( leftExpr ), " ",
@@ -201,6 +204,8 @@ local function generateVarDecl( tree, isInstanceVar )
 	if p == "varInit" or p == "constInit" then
 		-- e.g. int x = y + 10;
 		local varName = tree.nodes[2].str
+		local expr = tree.nodes[3]
+		checkJava.doTypeAnalysis( expr )
 		if isInstanceVar then
 			isClassVar[varName] = true   -- remember class vars
 			beginLuaLine( varTable )     -- use this.name
@@ -209,7 +214,7 @@ local function generateVarDecl( tree, isInstanceVar )
 		end
 		addLua( varName )
 		addLua( " = " )
-		addLua( exprCode( tree.nodes[3] ) )
+		addLua( exprCode( expr ) )
 		return true
 	elseif p == "varDecl" then
 		-- varType idList ;
@@ -286,6 +291,7 @@ end
 
 -- Generate code for the block line in tree
 local function generateBlockLine( tree )
+	checkJava.doTypeAnalysis( tree )
 	local p = tree.p
 	if p == "stmt" then
 		-- stmt ;
@@ -323,6 +329,10 @@ local function generateBlockLine( tree )
 		-- Process the controlled statement or block too
 		iTree = iTree + 1
 		generateControlledStmt()
+	elseif p == "return" then
+		-- return expr ;
+		beginLuaLine( "return " )
+		addLua( exprCode( tree.nodes[1] ) )		
 	else
 		print("*** Unknown line pattern " .. p )
 	end
@@ -401,8 +411,10 @@ function codeGenJava.getLuaCode( parseTrees )
 
 	-- Scan the parse trees for instance variables and functions
 	while iTree <= #parseTrees do
+		-- Do type analysis on this tree given types currently known
 		local tree = javaParseTrees[iTree]
 		local p = tree.p
+
 		if generateVarDecl( tree, true ) then
 			-- Processed a varInit, constInit, or varDecl
 		elseif enableComments and p == "comment" then
@@ -417,16 +429,20 @@ function codeGenJava.getLuaCode( parseTrees )
 			blockLevel = blockLevel - 1
 		elseif p == "eventFn" then
 			-- Code12 event func (e.g. setup, update)
-			generateFnHeader( tree.nodes[1].str, tree.nodes[2].nodes )
+			local paramList = tree.nodes[2].nodes
+			generateFnHeader( tree.nodes[1].str, paramList )
 			iTree = iTree + 1 
+			checkJava.initLocalVars( paramList )
 			generateBlock()
 		elseif p == "func" then
 			-- User-defined function
-			generateFnHeader( tree.nodes[2].str, tree.nodes[3].nodes )
+			local paramList = tree.nodes[3].nodes
+			generateFnHeader( tree.nodes[2].str, paramList )
 			iTree = iTree + 1 
+			checkJava.initLocalVars( paramList )
 			generateBlock()
 		end			
-		iTree = iTree + 1 
+		iTree = iTree + 1
 	end
 
 	-- Bulk concat and return all the Lua code

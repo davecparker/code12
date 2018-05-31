@@ -10,20 +10,21 @@ class UserCode extends Code12Program
 	int speed = 3;
 
 	// Move the ball
-	void moveBall(boolean wrap)
+	int moveBall(boolean wrap)
 	{
 		ball.x++;
-		if (wrap && ball != null && !(ball.x <= LIMIT))
+		if (wrap == true && ball != null && !(ball.x <= LIMIT))
 			ball.x = 0;
 
 		--ball.x;
 		++ball.x;
+		return ball.x;
 	}
 
 	public void start()
 	{
 		int x = 10 + 50 * 2 + (45 * 2);
-		// String name = "Dave" + " " + "Parker";
+		String name = "Dave" + " " + "Parker";
 		boolean done;
 
 		// Draw some circles
@@ -60,6 +61,7 @@ class UserCode extends Code12Program
 
 	public void onMousePress( GameObj obj, double x, double y )
 	{
+		// TODO: These are not type checking properly
 		if (obj != nil)
 			ct.println( obj.toString() + " was clicked" );
 		else

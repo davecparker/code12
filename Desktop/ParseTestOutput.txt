@@ -100,7 +100,6 @@ line (begin)
 
 22. double x = ct.random(0, 100);
 line (varInit)
-    double (double)
     ID (x)
     expr (call)
         ID (ct.random)
@@ -112,7 +111,6 @@ line (varInit)
 
 23. double y = ct.getHeight() + 25;
 line (varInit)
-    double (double)
     ID (y)
     expr (+)
         expr (call)
@@ -123,7 +121,6 @@ line (varInit)
 
 24. double size = ct.random(5, 20);
 line (varInit)
-    double (double)
     ID (size)
     expr (call)
         ID (ct.random)
@@ -196,10 +193,8 @@ line (eventFn)
             ID (GameObj)
             ID (obj)
         param (var)
-            double (double)
             ID (x)
         param (var)
-            double (double)
             ID (y)
 
 34. {
@@ -319,7 +314,7 @@ Line 63: Syntax Error (chars 1 through 6)
 Line 65: Syntax Error (chars 1 through 2)
 ======= Test Complete =========================================
 
-65 lines processed in 3 ms
+65 lines processed in 4 ms
 
 0 unexpected errors
 0 uncaught errors (15 expected errors)

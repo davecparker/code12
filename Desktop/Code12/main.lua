@@ -14,6 +14,7 @@ local fileDialogs = require( "plugin.tinyfiledialogs" )
 
 -- Local modules
 local parseJava = require( "parseJava" )
+local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
 
 
@@ -190,10 +191,17 @@ local function checkUserFile()
 				end
 				print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
-				-- Make and run the Lua code
-				local codeStr = codeGenJava.getLuaCode( parseTrees )
-				print( codeStr )
-				runLuaCode( codeStr )
+				-- Do Semantic Analysis on the parse trees
+				if not checkJava.initProgram( parseTrees ) then
+					print( "*** Semantic error" )   -- TODO: Get error
+				elseif false then  -- TODO
+					-- Make and run the Lua code
+					local codeStr = codeGenJava.getLuaCode( parseTrees )
+					if not checkJava.hasError() then
+						print( codeStr )
+						runLuaCode( codeStr )
+					end
+				end
 			end
 		end
 		updateStatusBar()
