@@ -26,37 +26,32 @@ local charTypes = {}  -- built in initCharTypes()
 -- Reserved word tokens: indexed by string, maps to:
 --    string (token tt) if reserved word supported by Code12
 --    false if reserved word not supported by Code12
---    nil if not reserved word, or not treated as a reserved word (e.g. primitive types)
+--    nil if not reserved word, or not treated as a reserved word.
+-- The following reserved words (primitive types) are treated as normal IDs:
+--    byte, boolean, char, double, float, int, long, short
 local reservedWordTokens = {
 	["abstract"]		= false,	
 	["assert"] 			= false,	
-	["boolean"] 		= "boolean",	
 	["break"] 			= "break",	
-	["byte"] 			= false,	
 	["case"] 			= false,
 	["catch"] 			= false,	
-	["char"] 			= false,	
 	["class"] 			= "class",	
 	["const"] 			= "const",	
 	["continue"] 		= "continue",	
 	["default"] 		= false,
 	["do"] 				= "do",	
-	["double"] 			= "double",	
 	["else"] 			= "else",	
 	["enum"] 			= false,	
 	["extends"] 		= "extends",	
 	["final"] 			= "final",	
 	["finally"] 		= false,	
-	["float"] 			= false,	
 	["for"] 			= "for",	
 	["goto"] 			= false,	
 	["if"] 				= "if",
 	["implements"] 		= false,	
 	["import"] 			= "import",	
 	["instanceof"] 		= false,	
-	["int"] 			= "int",	
 	["interface"] 		= false,	
-	["long"] 			= false,
 	["native"] 			= false,	
 	["new"] 			= "new",	
 	["package"] 		= false,	
@@ -64,7 +59,6 @@ local reservedWordTokens = {
 	["protected"] 		= false,
 	["public"] 			= "public",	
 	["return"] 			= "return",	
-	["short"] 			= false,	
 	["static"] 			= "static",	
 	["strictfp"]	 	= false,	
 	["super"] 			= false,
@@ -83,10 +77,6 @@ local reservedWordTokens = {
 	["true"] 			= "BOOL",	
 	["false"] 			= "BOOL",
 	["null"] 			= "NULL",
-
-	-- These reserved words are treated as normal IDs
-	-- TODO:
-
 }
 
 -- State for the lexer used by token scanning functions

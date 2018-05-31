@@ -131,19 +131,6 @@ local function fnValue()
 	return { t = "fnValue", p = "method", nodes = { token, token2 } }
 end
 
--- Parse a variable type. Primitive types return their reserved word token,
--- other types return an ID token. Return nil if not an ID.
--- Done here as a function for performance.
--- TODO: Accept any ID here and check later?
-local function varType()
-	local token = tokens[iToken]
-	if isVarType[token.str] or token.tt == "ID" then
-		iToken = iToken + 1
-		return token    -- a known type (may be reserved word or ID)
-	end
-	return nil
-end 
-
 
 ----- Grammar Tables ---------------------------------------------------------
 
@@ -158,14 +145,14 @@ local lValue = { t = "lValue",
 -- A return type for a procedure/function definition
 local retType = { t = "retType",
 	{ 9, 12, "void",			"void" 					},
-	{ 12, 12, "array",			varType, "[", "]"		},
-	{ 9, 12, "value",			varType					},
+	{ 12, 12, "array",			"ID", "[", "]"			},
+	{ 9, 12, "value",			"ID"					},
 }
 
 -- A formal parameter (in a function definition)
 local param = { t = "param",
-	{ 12, 12, "array",			varType, "[", "]", "ID"		},
-	{ 6, 12, "var",				varType, "ID"				},
+	{ 12, 12, "array",			"ID", "[", "]", "ID"		},
+	{ 6, 12, "var",				"ID", "ID"					},
 }
 
 -- A formal parameter list, which can be empty
@@ -225,7 +212,7 @@ local whileEnd = { t = "whileEnd",
 
 -- The init part of a for loop
 local forInit = { t = "forInit",
-	{ 11, 12, "varInit",		varType, "ID", "=", expr			},
+	{ 11, 12, "varInit",		"ID", "ID", "=", expr				},
 	{ 11, 12, "stmt",			stmt								},
 	{ 11, 12, "empty",												},
 }
@@ -245,12 +232,12 @@ local forNext = { t = "forNext",
 -- The control part of a for loop (inside the parens)
 local forControl = { t = "forControl",
 	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
-	{ 12, 12, "array",			varType, "ID", ":", "ID" 					},
+	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
 }
 
 -- An array initializer
 local arrayInit = { t = "arrayInit",
-	{ 12, 12, "new", 			"new", varType,	"[", expr, "]"				},
+	{ 12, 12, "new", 			"new", "ID", "[", expr, "]"					},
 	{ 12, 12, "list", 			"{", exprList, "}"							},
 }
 
@@ -259,9 +246,9 @@ local line = { t = "line",
 	{ 1, 12, "blank",															"END" },
 	{ 1, 12, "comment",			"COMMENT",										"END" },
 	{ 1, 12, "stmt",			stmt, ";",										"END" },
-	{ 3, 12, "varInit",			varType, "ID", "=", expr, ";",					"END" },
-	{ 3, 12, "varDecl",			varType, idList, ";",							"END" },
-	{ 3, 12, "constInit", 		"final", varType, "ID", "=", expr, ";",			"END" },
+	{ 3, 12, "varInit",			"ID", "ID", "=", expr, ";",						"END" },
+	{ 3, 12, "varDecl",			"ID", idList, ";",								"END" },
+	{ 3, 12, "constInit", 		"final", "ID", "ID", "=", expr, ";",			"END" },
 	{ 1, 12, "begin",			"{",											"END" },
 	{ 1, 12, "end",				"}",											"END" },
 	{ 1, 12, "eventFn",			"public", "void", "ID", "(", paramList, ")",	"END" },
@@ -273,7 +260,7 @@ local line = { t = "line",
 	{ 11, 12, "do",				"do", 											"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
-	{ 12, 12, "array",			varType, "[", "]", "ID", "=", arrayInit, ";",	"END" },
+	{ 12, 12, "array",			"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
 	-- Boilerplate lines
 	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
 	{ 1, 12, "classUser",		"class", "ID", "extends", "ID",					"END" },
