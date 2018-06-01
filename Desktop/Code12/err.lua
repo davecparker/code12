@@ -13,7 +13,20 @@ local err = {}
 
 
 -- The error state. We only detect and store the first error in the program.
+-- The errRecord is a table as follows:
+-- {
+-- 	   strErr = "Error text",
+--     loc = {     -- error location
+--         first = { iLine = lineNumber, iChar = charIndex },
+--         last  = { iLine = lineNumber, iChar = charIndex },
+--     }
+--     refLoc = {   -- other referenced location or nil if none
+--         first = { iLine = lineNumber, iChar = charIndex },
+--         last  = { iLine = lineNumber, iChar = charIndex },
+--     }
+-- }
 local errRecord
+
 
 
 

@@ -10,8 +10,12 @@ class UserCode extends Code12Program
 	int speed = 3;
 
 	// Move the ball
-	int moveBall(boolean wrap)
+	int moveBall(boolean wrap,
+//		  int wrap,
+		  int bar)
 	{
+		int wrap = true;
+
 		ball.x++;
 		ball.x--;
 		ball.x += 1;

@@ -47,7 +47,7 @@ local substituteType = {
 -- Type analysis tables
 local methodTypes = {}       -- map method names to value type
 local classVarTypes = {}     -- map instance var name to value type
-local localVarTypes = {}     -- map local var name to value type
+local localVars = {}         -- map local var name to { node = token, vt = vt }
 
 
 --- Analysis Functions -------------------------------------------------------
@@ -268,14 +268,43 @@ local function getMethodTypes( parseTrees )
 	return true
 end
 
+-- Define the local variable with the given nameNode and type (vt, isArray).
+-- Return true if successful, false if error.
+local function defineLocalVar( nameNode, vt, isArray )
+	if vt == nil then
+		return false
+	end
+	if isArray then
+		vt = { vt = vt }   -- array of specified type
+	end
+	-- Check for existing definition
+	local varName = nameNode.str
+	local varFound = localVars[varName]
+	if varFound ~= nil then
+		err.setErrNodeAndRef( nameNode, varFound.node, 
+				"Variable %s was already defined", varName )
+		return false
+	end
+	-- Define it
+	localVars[varName] = { node = nameNode, vt = vt }
+	return true
+end
+
 
 --- Module Functions ---------------------------------------------------------
 
--- Clear then init the local variable state for a new fucntion 
--- with the given paramList
+-- Clear then init the local variable state for a new function with the paramList
 function checkJava.initLocalVars( paramList )
-	localVarTypes = {}
-	-- TODO
+	localVars = {}
+	for i = 1, #paramList do
+		local param = paramList[i]
+		local vt = vtFromVarType( param.nodes[1] )
+		if param.p == "array" then
+			defineLocalVar( param.nodes[4], vt, true )
+		else
+			defineLocalVar( param.nodes[2], vt, false )
+		end
+	end
 end
 
 -- Init the state for a new program with the given parseTrees
@@ -283,7 +312,7 @@ end
 function checkJava.initProgram( parseTrees )
 	methodTypes = {}
  	classVarTypes = {}
- 	localVarTypes = {}
+ 	localVars = {}
  	err.initProgram()
 
 	-- Get method types first, since vars can forward reference them
