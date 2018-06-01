@@ -83,7 +83,7 @@ end
 --      first      srcLoc of first part of affected code
 --      last       srcLoc of last part of affected code
 function err.makeErrLoc( first, last )
-	print( string.format( "makeErrLoc  %d.%d  to  %d.%d", first.iLine, first.iChar, last.iLine, last.iChar ) )
+	-- print( string.format( "makeErrLoc  %d.%d  to  %d.%d", first.iLine, first.iChar, last.iLine, last.iChar ) )
 	return { first = first, last = last }
 end
 
@@ -130,6 +130,11 @@ end
 -- Return true if there is an error in the error state.
 function err.hasErr()
 	return (errRecord ~= nil)
+end
+
+-- Return the error record (nil if no error)
+function err.getErrRecord()
+	return errRecord
 end
 
 -- Return a string describing the error state, or return nil if no error

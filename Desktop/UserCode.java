@@ -15,7 +15,7 @@ class UserCode extends Code12Program
 		ball.x++;
 		ball.x--;
 		ball.x += 1;
-		if (wrap == true && ball != null && !(ball.x <= LIMIT))
+		if (ball.x >= LIMIT)  // if (wrap == true && ball != null && !(ball.x >= LIMIT))
 			ball.x = 0;
 
 		--ball.x;
@@ -25,7 +25,7 @@ class UserCode extends Code12Program
 
 	public void start()
 	{
-		int x = 10 + 50 * 2 + (45 * 2);
+		int x = 10 + 50 * 10 + (45 * 2);
 		String name = "Dave" + " " + "Parker";
 		boolean done;
 
@@ -63,7 +63,7 @@ class UserCode extends Code12Program
 
 	public void onMousePress( GameObj obj, double x, double y )
 	{
-		if (obj != null)
+		if (true)  // obj != null)
 			ct.println( obj.toString() + " was clicked" );
 		else
 			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );

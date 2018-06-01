@@ -24,7 +24,6 @@ local dyStatusBar = 30
 local fontSizeUI = 12
 
 
-
 -- The user source file
 local sourceFile = {
 	path = nil,              -- full pathname to the file
@@ -37,10 +36,8 @@ local sourceFile = {
 sourceFile.path = "../UserCode.java"
 sourceFile.timeLoaded = os.time()
 
-
--- The global state tables that the generated Lua code can access
-ct = {}                    -- API functions
-_ctAppGlobalState = {
+-- UI elements and state
+local ui = {
 	isMac = false,         -- true if running on Mac OS (else Windows, for now)
 	width = 0,             -- window width
 	height = 0,            -- window height
@@ -49,20 +46,22 @@ _ctAppGlobalState = {
 	statusBarText = nil,   -- text object in the status bar
 	chooseFileBtn = nil,   -- Choose File button in status bar
 	openFileBtn = nil,     -- Open button in status bar
-	group = nil,           -- display group for all drawing objects
-	vars = {},             -- namespace for user Java instance variables
-	functions = {},        -- namespace for user Java functions
+	gameGroup = nil,       -- display group for game output
+	errGroup = nil,        -- display group for error display
+	errCharWidth = 0,      -- char width for text in error displays
 }
-this = _ctAppGlobalState.vars       -- generated code uses this.var
-_fn = _ctAppGlobalState.functions   -- generated code uses _fn.foo()
-local g = _ctAppGlobalState         -- for use in this file
+
+-- The global state tables that the generated Lua code can access (Lua globals)
+ct = {}        -- API functions
+this = {}      -- generated code uses this.var
+_fn = {}       -- generated code uses _fn.foo()
 
 
 --- API Functions ------------------------------------------------
 
 -- Temp
 function ct.circle( x, y, d )
-	local c = display.newCircle( g.group, x, y, d / 2 )
+	local c = display.newCircle( ui.gameGroup, x, y, d / 2 )
 	c:setFillColor( 1, 0, 0 )
 	return c 
 end
@@ -97,37 +96,50 @@ local function updateStatusBar()
 		end
 
 		-- Update the status bar UI
-		g.statusBarText.text = fileAndExt .. " -- Updated: " .. updateStr
-		g.openFileBtn.isVisible = true
+		ui.statusBarText.text = fileAndExt .. " -- Updated: " .. updateStr
+		ui.openFileBtn.isVisible = true
 	else
-		g.openFileBtn.isVisible = false
+		ui.openFileBtn.isVisible = false
 	end
+end
+
+-- Prepare for a new run of the user program
+local function initNewProgram()
+	-- Clear user functions and variables tables
+	this = {}
+	_fn = {}
+
+	-- Init new runtime state for this run
+	if ui.gameGroup then
+		ui.gameGroup:removeSelf()
+	end
+	ui.gameGroup = display.newGroup()
+	ui.gameGroup.isVisible = false
+	ui.errGroup.isVisible = false
 end
 
 -- Run the given lua code string dynamically, and then call the contained start function.
 local function runLuaCode( luaCode )
-	-- Init new runtime state for this run
-	if g.group then
-		g.group:removeSelf()
-	end
-	g.group = display.newGroup()
-	g.vars = {}
-	g.functions = {}
-	this = g.vars
-	_fn = g.functions
-
 	-- Load the code dynamically and execute it
 	local codeFunction = loadstring( luaCode )
  	if type(codeFunction) == "function" then
  		codeFunction()
 
- 		-- Run the embedded start function
- 		if type(g.functions.start) == "function" then
- 			g.functions.start()
+ 		-- Run the start function if defined
+ 		if type(_fn.start) == "function" then
+ 			_fn.start()
  		end
+
+ 		-- Show the game output
+		ui.gameGroup.isVisible = true
  	else
  	 	print( "*** Lua code failed to load" )
  	end
+end
+
+-- Return a detabbed version of str using the given tabWidth
+local function detabString( str )
+	return string.gsub( str, "\t", "    " )   -- TODO (temp)
 end
 
 -- Read the sourceFile and store all of its source lines.
@@ -142,7 +154,7 @@ local function readSourceFile()
 			if s == nil then 
 				break  -- end of file
 			end
-			sourceFile.strLines[lineNum] = s
+			sourceFile.strLines[lineNum] = detabString(s)
 			lineNum = lineNum + 1
 		until false -- breaks internally
 		io.close( file )
@@ -154,7 +166,46 @@ end
 -- Show the error state
 local function showError()
 	if err.hasErr() then
+		-- Set the error text
 		print( err.getErrString() )
+		local errRecord = err.getErrRecord()
+		ui.errGroup.errText.text = errRecord.strErr
+
+		-- Load the source lines around the error
+		local iLine = errRecord.loc.first.iLine   -- main error location
+		local sourceGroup = ui.errGroup.sourceGroup
+		local lineNumGroup = ui.errGroup.lineNumGroup
+		local numLines = lineNumGroup.numChildren
+		local before = (numLines - 1) / 2
+		for i = 1, numLines do 
+			local lineNum = iLine - before + i - 1
+			if lineNum < 1 or lineNum > #sourceFile.strLines then
+				lineNumGroup[i].text = ""
+				sourceGroup[i].text = ""
+			else
+				lineNumGroup[i].text = tostring( lineNum )
+				sourceGroup[i].text = sourceFile.strLines[lineNum]
+			end
+		end
+
+		-- Position the highlight(s)  TODO: handle multi-line
+		local dxExtra = 2   -- extra pixels of highlight horizontally
+		local r = ui.errGroup.sourceRect
+		r.x = (errRecord.loc.first.iChar - 1) * ui.errCharWidth - dxExtra
+		local numChars = errRecord.loc.last.iChar - errRecord.loc.first.iChar + 1 
+		r.width = numChars * ui.errCharWidth + dxExtra * 2
+		r = ui.errGroup.refRect
+		if errRecord.refLoc then
+			r.x = (errRecord.refLoc.first.iChar - 1) * ui.errCharWidth - dxExtra
+			numChars = errRecord.refLoc.last.iChar - errRecord.refLoc.first.iChar + 1
+			r.width = numChars * ui.errCharWidth + dxExtra * 2
+			r.isVisible = true
+		else
+			r.isVisible = false
+		end
+
+		-- Show the error display
+		ui.errGroup.isVisible = true
 	else
 		print( "*** Missing error state for failed parse")
 	end
@@ -167,6 +218,9 @@ local function checkUserFile()
 		if timeMod and timeMod > sourceFile.timeModLast then
 			if readSourceFile() then
 				sourceFile.timeModLast = timeMod
+
+				-- Get ready to run a new program
+				initNewProgram()
 
 				-- Create parse tree array
 				local startTime = system.getTimer()
@@ -228,7 +282,7 @@ end
 -- Open the source file in the system default text editor for its file type
 local function openFileInEditor()
 	if sourceFile.path then
-		if g.isMac then
+		if ui.isMac then
 			os.execute( "open \"" .. sourceFile.path .. "\"" )
 		else
 			os.execute( "start \"" .. sourceFile.path .. "\"" )
@@ -238,70 +292,61 @@ end
 
 -- Get device metrics and store them in the global table
 local function getDeviceMetrics()
-	g.width = display.actualContentWidth
-	g.height = display.actualContentHeight
+	ui.width = display.actualContentWidth
+	ui.height = display.actualContentHeight
 end
 
 -- Handle resize event for the window
 local function onResizeWindow( event )
-	-- Get new window size and relayout UI to match
+	-- Get new window size
 	getDeviceMetrics()
-	g.background.width = g.width
-	g.background.height = g.height
-	g.statusBar.y = g.height - dyStatusBar / 2
-	g.statusBar.width = g.width
-	g.chooseFileBtn.y = g.statusBar.y
-	g.statusBarText.x = g.width / 2
-	g.statusBarText.y = g.statusBar.y
-	g.openFileBtn.x = g.width
-	g.openFileBtn.y = g.statusBar.y
+
+	-- Status bar
+	ui.background.width = ui.width
+	ui.background.height = ui.height
+	ui.statusBar.y = ui.height - dyStatusBar / 2
+	ui.statusBar.width = ui.width
+	ui.chooseFileBtn.y = ui.statusBar.y
+	ui.statusBarText.x = ui.width / 2
+	ui.statusBarText.y = ui.statusBar.y
+	ui.openFileBtn.x = ui.width
+	ui.openFileBtn.y = ui.statusBar.y
+
+	-- Error display
+	local t = ui.errGroup.errText
+	t.width = ui.width - t.x - 20
 end
 
 -- Handle new frame update
 local function onEnterFrame( event )
 	-- Run the user's update function, if defined
-	if type(g.functions.update) == "function" then
-		g.functions.update()
+	if type(_fn.update) == "function" then
+		_fn.update()
 	end
 end
 
--- Init the app
-function initApp()
-	-- Get initial device info
-	g.isMac = (system.getInfo( "platform" ) == "macos")
-	getDeviceMetrics()
-
-	-- White background
-	g.background = display.newRect( 0, 0, g.width, g.height )
-	g.background.anchorX = 0
-	g.background.anchorY = 0
-	g.background:setFillColor( 1 )
-
-	-- Make a default window title
-	native.setProperty("windowTitleText", "Code12")
-	display.setStatusBar( display.HiddenStatusBar )
-
-	-- Make the status bar UI
-	g.statusBar = display.newRect( 0, g.height - dyStatusBar / 2, g.width, dyStatusBar )
-	g.statusBar.anchorX = 0
-	g.statusBar:setFillColor( 0.8 )
-	g.statusBar.strokeWidth = 1
-	g.statusBar:setStrokeColor( 0 )
-	g.chooseFileBtn = widget.newButton{
+-- Make the status bar UI
+local function makeStatusBar()
+	ui.statusBar = display.newRect( 0, ui.height - dyStatusBar / 2, ui.width, dyStatusBar )
+	ui.statusBar.anchorX = 0
+	ui.statusBar:setFillColor( 0.8 )
+	ui.statusBar.strokeWidth = 1
+	ui.statusBar:setStrokeColor( 0 )
+	ui.chooseFileBtn = widget.newButton{
 		x = 10, 
-		y = g.statusBar.y,
+		y = ui.statusBar.y,
 		onRelease = chooseFile,
 		label = "Choose File",
 		labelAlign = "left",
 		font = native.systemFontBold,
 		fontSize = fontSizeUI,
 	}
-	g.chooseFileBtn.anchorX = 0
-	g.statusBarText = display.newText( "", g.width / 2, g.statusBar.y, native.systemFont, fontSizeUI )
-	g.statusBarText:setFillColor( 0 )
-	g.openFileBtn = widget.newButton{
-		x = g.width,
-		y = g.statusBar.y,
+	ui.chooseFileBtn.anchorX = 0
+	ui.statusBarText = display.newText( "", ui.width / 2, ui.statusBar.y, native.systemFont, fontSizeUI )
+	ui.statusBarText:setFillColor( 0 )
+	ui.openFileBtn = widget.newButton{
+		x = ui.width,
+		y = ui.statusBar.y,
 		onRelease = openFileInEditor,
 		label = "Open in Editor",
 		labelAlign = "right",
@@ -309,8 +354,131 @@ function initApp()
 		font = native.systemFontBold,
 		fontSize = fontSizeUI,
 	}
-	g.openFileBtn.anchorX = 1
+	ui.openFileBtn.anchorX = 1
+end
+
+-- Make and return a highlight rectangle, in the reference color if ref
+local function makeHilightRect( x, y, width, height, ref )
+	local r = display.newRect( ui.errGroup.highlightGroup, x, y, width, height )
+	r.anchorX = 0
+	r.anchorY = 0
+	if ref then
+		r:setFillColor( 1, 1, 0.6 )
+	else
+		r:setFillColor( 1, 1, 0 )
+	end
+	return r
+end
+
+-- Make the error display
+function makeErrDisplay()
+	-- Make group to hold all err display items
+	local group = display.newGroup()
+	ui.errGroup = group
+	group.y = 30
+	group.isVisible = false
+	local numSourceLines = 5     -- error line plus 2 on either side
+
+	-- Get font metrics
+	local fontName = ((ui.isMac and "Consolas") or "Courier")
+	local fontSize = 16
+	local fontMetrics = graphics.getFontMetrics( fontName, fontSize )
+	local dyLine = fontMetrics.height + fontMetrics.leading
+	local temp = display.newText( "1234567890", 0, 0, fontName, fontSize )
+	ui.errCharWidth = temp.contentWidth / 10
+	temp:removeSelf()
+
+	-- Layout metrics
+	local dxLineNum = ui.errCharWidth * 6
+	local xText = dxLineNum + ui.errCharWidth 
+
+	-- Make the highlight rectangles
+	local highlightGroup = display.newGroup()
+	highlightGroup.x = xText
+	group:insert( highlightGroup )
+	group.highlightGroup = highlightGroup
+	local y = dyLine * 2
+	group.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
+	group.sourceRect = makeHilightRect( 0, y, ui.errCharWidth * 4, dyLine )
+	group.refRect = makeHilightRect( ui.errCharWidth * 5, y, 
+							ui.errCharWidth * 6, dyLine, true )
+
+	-- Make the lines numbers
+	local lineNumGroup = display.newGroup()
+	group:insert( lineNumGroup )
+	group.lineNumGroup = lineNumGroup
+	for i = 1, numSourceLines do
+		local t = display.newText{
+			parent = lineNumGroup,
+			text = "123", 
+			x = dxLineNum, 
+			y = (i - 1) * dyLine,
+			font = fontName, 
+			fontSize = fontSize,
+			align = "right",
+		}
+		t.anchorX = 1
+		t.anchorY = 0
+		t:setFillColor( 0.3 )
+	end
+
+	-- Make the source lines
+	local sourceGroup = display.newGroup()
+	sourceGroup.x = xText
+	group:insert( sourceGroup )
+	group.sourceGroup = sourceGroup
+	for i = 1, numSourceLines do
+		local t = display.newText{
+			parent = sourceGroup,
+			text = "Test Source Code", 
+			x = 0, 
+			y = (i - 1) * dyLine,
+			font = fontName, 
+			fontSize = fontSize,
+			align = "left",
+		}
+		t.anchorX = 0
+		t.anchorY = 0
+		t:setFillColor( 0 )
+	end
+
+	-- Make the error text
+	local t = display.newText{
+		parent = group,
+		text = "This is sample error text telling you what you did wrong", 
+		x = xText, 
+		y = dyLine * 6,
+		width = ui.width - xText - 20,   -- wrap near end of window
+		font = native.systemFontBold, 
+		fontSize = fontSize,
+		align = "left",
+	}
+	t.anchorX = 0
+	t.anchorY = 0
+	t:setFillColor( 0 )
+	group.errText = t
+end
+
+-- Init the app
+function initApp()
+	-- Get initial device info
+	ui.isMac = (system.getInfo( "platform" ) == "macos")
+	getDeviceMetrics()
+
+	-- Make a default window title
+	native.setProperty("windowTitleText", "Code12")
+	display.setStatusBar( display.HiddenStatusBar )
+
+	-- White background
+	ui.background = display.newRect( 0, 0, ui.width, ui.height )
+	ui.background.anchorX = 0
+	ui.background.anchorY = 0
+	ui.background:setFillColor( 1 )
+
+	-- UI and display elements
+	makeStatusBar()
 	updateStatusBar()
+	makeErrDisplay()
 
 	-- Install listeners
 	Runtime:addEventListener( "enterFrame", onEnterFrame )
