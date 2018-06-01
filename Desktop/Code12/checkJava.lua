@@ -45,58 +45,12 @@ local substituteType = {
 }
 
 -- Type analysis tables
-local methodTypes = {}       -- map method names to value type
-local classVarTypes = {}     -- map instance var name to value type
-local localVars = {}         -- map local var name to { node = token, vt = vt }
+local methods = {}      -- map method names to { node = token, vt = vt }
+local classVars = {}    -- map instance var name to { node = token, vt = vt }
+local localVars = {}    -- map local var name to { node = token, vt = vt }
 
 
 --- Analysis Functions -------------------------------------------------------
-
--- Return the value type (vt) for a variable type ID node,
--- or return nil and set the error state if the type is invalid.
-local function vtFromVarType( node )
-	assert( node.tt == "ID" )     -- varType nodes should be IDs
-	local vt = vtFromVarTypeName[node.str]
-	if vt then
-		return vt  -- known valid type
-	end
-
-	-- Invalid type
-	if vt == false then
-		-- Variables can't be void (void return type is handled in vtFromRetType)
-		err.setErrNode( node, "Variables cannot have void type" )
-	else
-		-- Unknown or unsupported type
-		local subType = substituteType[node.str]
-		if subType then
-			err.setErrNode( node, "The %s type is not supported by Code12. Use %s instead.",
-					node.str, subType )
-		else
-			err.setErrNode( node, "Unknown variable type \"%s\"", node.str )
-		end
-	end
-	return nil
-end
-
--- Return the value type (vt) for a retType node
--- or return nil and set the error state if the type is invalid.
-local function vtFromRetType( node )
-	local p = node.p
-	local vt = nil
-	if p == "void" then
-		vt = false
-	elseif p == "value" then
-		vt = vtFromVarType( node.nodes[1] )
-	elseif p == "array" then
-		vt = vtFromVarType( node.nodes[1] )
-		if vt ~= nil then
-			vt = { vt = vt }   -- array of specified type
-		end
-	else
-		error( "Unknown retType pattern " .. p )
-	end
-	return vt
-end
 
 -- Do expression type analysis for the given parse tree.
 -- Set the vt field in each expr node to its value type.
@@ -244,22 +198,24 @@ local function setExprTypes( tree )
 	return false   -- Not an expr node
 end
 
--- Find defined methods in parseTrees and put their types in methodTypes.
+-- Find defined methods in parseTrees and put them in methods.
 -- Return true if successful, false if not.
-local function getMethodTypes( parseTrees )
+local function getMethods( parseTrees )
 	for i = 1, #parseTrees do
 		local tree = parseTrees[i]
 		assert( tree.t == "line" )
 		local p = tree.p
 		if p == "eventFn" then
 			-- Code12 event func (e.g. setup, update)
-			local fnName = tree.nodes[3].str
-			methodTypes[fnName] = false   -- void
+			local node = tree.nodes[3]
+			local fnName = node.str
+			methods[fnName] = { node = node, vt = false }   -- void
 		elseif p == "func" then
 			-- User-defined function
 			local retType = tree.nodes[1]
-			local fnName = tree.nodes[2].str
-			methodTypes[fnName] = vtFromRetType( retType )
+			local node = tree.nodes[2]
+			local fnName = node.str
+			methods[fnName] = { node = node, vt = checkJava.vtFromRetType( retType ) }
 		end
 		if err.hasErr() then
 			return false
@@ -268,9 +224,65 @@ local function getMethodTypes( parseTrees )
 	return true
 end
 
--- Define the local variable with the given nameNode and type (vt, isArray).
+
+--- Module Functions ---------------------------------------------------------
+
+-- Return the value type (vt) for a variable type ID node,
+-- or return nil and set the error state if the type is invalid.
+function checkJava.vtFromVarType( node )
+	assert( node.tt == "ID" )     -- varType nodes should be IDs
+	local vt = vtFromVarTypeName[node.str]
+	if vt then
+		return vt  -- known valid type
+	end
+
+	-- Invalid type
+	if vt == false then
+		-- Variables can't be void (void return type is handled in vtFromRetType)
+		err.setErrNode( node, "Variables cannot have void type" )
+	else
+		-- Unknown or unsupported type
+		local subType = substituteType[node.str]
+		if subType then
+			err.setErrNode( node, "The %s type is not supported by Code12. Use %s instead.",
+					node.str, subType )
+		else
+			err.setErrNode( node, "Unknown variable type \"%s\"", node.str )
+		end
+	end
+	return nil
+end
+
+-- Return the value type (vt) for a retType node
+-- or return nil and set the error state if the type is invalid.
+function checkJava.vtFromRetType( node )
+	local p = node.p
+	local vt = nil
+	if p == "void" then
+		return false
+	end
+	vt = checkJava.vtFromVarType( node.nodes[1] )
+	if p == "array" then
+		vt = checkJava.vtFromVarType( node.nodes[1] )
+		if vt ~= nil then
+			vt = { vt = vt }   -- array of specified type
+		end
+	end
+	return vt
+end
+
+-- Return the vt type of the given class variable name or nil if not defined.
+function checkJava.vtClassVar( varName )
+	local classVar = classVars[varName]
+	if classVar then
+		return classVar.vt
+	end
+	return nil
+end
+
+-- Define the class variable with the given nameNode and type (vt, isArray).
 -- Return true if successful, false if error.
-local function defineLocalVar( nameNode, vt, isArray )
+function checkJava.defineClassVar( nameNode, vt, isArray )
 	if vt == nil then
 		return false
 	end
@@ -279,7 +291,38 @@ local function defineLocalVar( nameNode, vt, isArray )
 	end
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound = localVars[varName]
+	local varFound = classVars[varName]
+	if varFound ~= nil then
+		err.setErrNodeAndRef( nameNode, varFound.node, 
+				"Variable %s was already defined", varName )
+		return false
+	end
+	-- Define it
+	classVars[varName] = { node = nameNode, vt = vt }
+	return true
+end
+
+-- Return the vt type of the given local variable name or nil if not defined.
+function checkJava.vtLocalVar( varName )
+	local localVar = localVars[varName]
+	if localVar then
+		return localVar.vt
+	end
+	return nil
+end
+
+-- Define the local variable with the given nameNode and type (vt, isArray).
+-- Return true if successful, false if error.
+function checkJava.defineLocalVar( nameNode, vt, isArray )
+	if vt == nil then
+		return false
+	end
+	if isArray then
+		vt = { vt = vt }   -- array of specified type
+	end
+	-- Check for existing definition
+	local varName = nameNode.str
+	local varFound = localVars[varName] or classVars[varName]
 	if varFound ~= nil then
 		err.setErrNodeAndRef( nameNode, varFound.node, 
 				"Variable %s was already defined", varName )
@@ -290,19 +333,16 @@ local function defineLocalVar( nameNode, vt, isArray )
 	return true
 end
 
-
---- Module Functions ---------------------------------------------------------
-
 -- Clear then init the local variable state for a new function with the paramList
 function checkJava.initLocalVars( paramList )
 	localVars = {}
 	for i = 1, #paramList do
 		local param = paramList[i]
-		local vt = vtFromVarType( param.nodes[1] )
+		local vt = checkJava.vtFromVarType( param.nodes[1] )
 		if param.p == "array" then
-			defineLocalVar( param.nodes[4], vt, true )
+			checkJava.defineLocalVar( param.nodes[4], vt, true )
 		else
-			defineLocalVar( param.nodes[2], vt, false )
+			checkJava.defineLocalVar( param.nodes[2], vt, false )
 		end
 	end
 end
@@ -310,13 +350,13 @@ end
 -- Init the state for a new program with the given parseTrees
 -- Return true if successful, false if not.
 function checkJava.initProgram( parseTrees )
-	methodTypes = {}
- 	classVarTypes = {}
+	methods = {}
+ 	classVars = {}
  	localVars = {}
  	err.initProgram()
 
 	-- Get method types first, since vars can forward reference them
-	return getMethodTypes( parseTrees )
+	return getMethods( parseTrees )
 end
 
 -- Do expression type analysis for the given parseTree.

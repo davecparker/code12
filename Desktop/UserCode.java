@@ -7,14 +7,15 @@ class UserCode extends Code12Program
 	int count, total;
 	boolean gameOver;
 	final int LIMIT = 600;
+	// int count = 5;
 	int speed = 3;
 
 	// Move the ball
-	int moveBall(boolean wrap,
-//		  int wrap,
-		  int bar)
+	int moveBall(boolean wrap)
 	{
-		int wrap = true;
+		// int wrap = 5;
+		int hack = 3;
+		// String hack;
 
 		ball.x++;
 		ball.x--;

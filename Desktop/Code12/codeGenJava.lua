@@ -39,7 +39,6 @@ end
 
 -- The generated Lua code
 local luaCodeStrs = {}        -- array of strings for bulk concat
-local isClassVar = {}         -- maps variable name to true if class variable
 
 -- Map supported Java binary operators to Lua operator code (Lua op plus spaces)
 local luaOpFromJavaOp = {
@@ -117,7 +116,7 @@ function lValueCode( v )
 	-- Look in the table of known class variables to determine which
 	-- (works because Code12 does not allow local vars to hide class vars).
 	local name = v.nodes[1].str
-	if isClassVar[name] then
+	if checkJava.vtClassVar( name ) ~= nil then
 		name = varTable .. name    -- class var, so turn name into this.name
 	end
 	if p == "var" then
@@ -206,19 +205,23 @@ local function generateVarDecl( tree, isInstanceVar )
 	local nodes = tree.nodes
 	if p == "varInit" or p == "constInit" then
 		-- e.g. int x = y + 10;
-		local varName, expr
+		local vt, nameNode, expr
 		if p == "varInit" then
-			varName = nodes[2].str
+			vt = checkJava.vtFromVarType( nodes[1] )
+			nameNode = nodes[2]
 			expr = nodes[4]
 		else
-			varName = nodes[3].str
+			vt = checkJava.vtFromVarType( nodes[2] )
+			nameNode = nodes[3]
 			expr = nodes[5]
 		end
 		checkJava.doTypeAnalysis( expr )
+		local varName = nameNode.str
 		if isInstanceVar then
-			isClassVar[varName] = true   -- remember class vars
+			checkJava.defineClassVar( nameNode, vt, false )
 			beginLuaLine( varTable )     -- use this.name
 		else
+			checkJava.defineLocalVar( nameNode, vt, false )
 			beginLuaLine( "local " )
 		end
 		addLua( varName )
@@ -227,28 +230,29 @@ local function generateVarDecl( tree, isInstanceVar )
 		return true
 	elseif p == "varDecl" then
 		-- varType idList ;
-		local varType = tree.nodes[1].str
+		local vt = checkJava.vtFromVarType( tree.nodes[1] )
 		local idList = tree.nodes[2].nodes
 		beginLuaLine( "" )   -- we may have multiple statements on this line
 		for i = 1, #idList do
-			local varName = idList[i].str
+			local nameNode = idList[i]
 			if isInstanceVar then
-				isClassVar[varName] = true    -- remember class vars
+				checkJava.defineClassVar( nameNode, vt, false )
 				addLua( varTable )            -- use this.name
 			else
+				checkJava.defineLocalVar( nameNode, vt, false )
 				addLua( "local " )
 			end
-			addLua( varName )
+			addLua( nameNode.str )
 			addLua( " = " )
 			-- Need to init primitives so they don't start as nil.
 			-- We will go ahead and init all types for completeness.
-			local value = "nil; "
-			if varType == "int" or varType == "double" then
-				value = "0; "
-			elseif varType == "boolean" then
-				value = "false; "
+			local valueCode = "nil; "
+			if type(vt) == "number" then
+				valueCode = "0; "
+			elseif vt == true then
+				valueCode = "false; "
 			end
-			addLua( value )
+			addLua( valueCode )
 		end
 		return true
 	end
@@ -428,7 +432,6 @@ function codeGenJava.getLuaCode( parseTrees )
 	iTree = 1
 	blockLevel = 0
 	luaCodeStrs = {}
-	isClassVar = {}
 
 	-- Scan the parse trees for instance variables and functions
 	while iTree <= #parseTrees do
