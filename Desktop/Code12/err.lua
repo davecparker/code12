@@ -46,7 +46,7 @@ local function findNodeLoc( node, errLoc )
 		-- Non-token, search all children
 		local nodes = node.nodes
 		for i = 1, #nodes do
-			findNodeLoc( nodes[i] ) 
+			findNodeLoc( nodes[i], errLoc ) 
 		end
 	end
 end

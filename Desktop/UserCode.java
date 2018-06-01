@@ -13,6 +13,8 @@ class UserCode extends Code12Program
 	int moveBall(boolean wrap)
 	{
 		ball.x++;
+		ball.x--;
+		ball.x += 1;
 		if (wrap == true && ball != null && !(ball.x <= LIMIT))
 			ball.x = 0;
 
@@ -61,8 +63,7 @@ class UserCode extends Code12Program
 
 	public void onMousePress( GameObj obj, double x, double y )
 	{
-		// TODO: These are not type checking properly
-		if (obj != nil)
+		if (obj != null)
 			ct.println( obj.toString() + " was clicked" );
 		else
 			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );

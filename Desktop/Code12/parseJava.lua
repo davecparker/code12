@@ -97,7 +97,7 @@ end
 -- Parse a function value (an expression that can be called as a function).
 -- This is either just an ID, or ID.ID, and if the object ID is "ct" then
 -- the "ct." is added to the front of the method name to make a single name.
--- This is done for convenience and performance.
+-- This is done for both performance and more intuitive error reporting.
 -- Return an ID token for a simple name (or ct.name), a method pattern node
 -- for other object.method names, or nil if failure.
 local function fnValue()
@@ -307,7 +307,7 @@ function parseOpExpr( leftSide, minPrecedence )
 			prec = binaryOpPrecedence[token.tt]
 		end
 		-- Build the node for this op
-		leftSide = { t = "expr", p = op.tt, nodes = { leftSide, rightSide } }
+		leftSide = { t = "expr", p = op.tt, nodes = { leftSide, op, rightSide } }
 	end
 	return leftSide
 end

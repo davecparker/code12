@@ -41,21 +41,27 @@ end
 local luaCodeStrs = {}        -- array of strings for bulk concat
 local isClassVar = {}         -- maps variable name to true if class variable
 
--- Map supported Java binary operators to Lua operators
+-- Map supported Java binary operators to Lua operator code (Lua op plus spaces)
 local luaOpFromJavaOp = {
-	["*"]	= "*",
-	["/"]	= "/",
-	["%"]	= "%",
-	["+"]	= "+",
-	["-"]	= "-",
-	["<"]	= "<",
-	["<="]	= "<=",
-	[">"]	= ">",
-	[">="]	= ">=",
-	["=="]	= "==",
-	["!="]	= "~=",
-	["&&"]	= "and",
-	["||"]	= "or",
+	-- Binary ops used in expr nodes
+	["*"]	= " * ",
+	["/"]	= " / ",
+	["%"]	= " % ",
+	["+"]	= " + ",
+	["-"]	= " - ",
+	["<"]	= " < ",
+	["<="]	= " <= ",
+	[">"]	= " > ",
+	[">="]	= " >= ",
+	["=="]	= " == ",
+	["!="]	= " ~= ",
+	["&&"]	= " and ",
+	["||"]	= " or ",
+	-- Assignment ops used in rightSide nodes
+	["+="]	= " + ",
+	["-="]	= " - ",
+	["*="]	= " * ",
+	["/="]	= " / ",
 }
 
 
@@ -100,29 +106,26 @@ local exprCode
 local generateControlledStmt
 
 
--- Return Lua code for an lValue, which might be a class or local reference.
+-- Return Lua code for an lValue node, which might be a class or local reference.
 function lValueCode( v )
 	local p = v.p
-	local name = v.nodes[1].str
-
 	if p == "this" then
-		return "this." .. name    -- explicit reference to a class variable
+		return "this." .. v.nodes[3].str    -- explicit reference to a class variable
 	end
 
 	-- For other references, the name could be either a local var or a class var.
 	-- Look in the table of known class variables to determine which
 	-- (works because Code12 does not allow local vars to hide class vars).
+	local name = v.nodes[1].str
 	if isClassVar[name] then
 		name = varTable .. name    -- class var, so turn name into this.name
 	end
 	if p == "var" then
 		return name
 	elseif p == "field" then
-		local field = v.nodes[2].str
-		return name .. "." .. field    --  obj.field reference
+		return name .. "." .. v.nodes[3].str    --  obj.field reference
 	elseif p == "index" then
-		local indexExpr = exprCode( v.nodes[2] )
-		return name .. "[" .. indexExpr .. "]"
+		return name .. "[" .. exprCode( v.nodes[3] ) .. "]"
 	end
 	error( "Unknown lValue pattern " .. p )
 end
@@ -132,24 +135,23 @@ end
 --     bird.setFillColor( "red" )
 --	   foo()
 function fnCallCode( tree )
-	-- There could be several parts, so prepare for a table.concat
-	local parts
+	local parts   -- There could be several parts, so prepare for a table.concat
 
 	-- Function name/value
 	local fnValue = tree.nodes[1]
 	if fnValue.p == "method" then
-		parts = { fnValue.nodes[1].str, ":", fnValue.nodes[2].str, "(" }
+		parts = { fnValue.nodes[1].str, ":", fnValue.nodes[2].str, "(" }  -- e.g. bird:delete(
 	else
-		local fnName = tree.nodes[1].str
+		local fnName = fnValue.str
 		if string.starts( fnName, "ct." ) then
-			parts = { fnName, "(" }
+			parts = { fnName, "(" }            -- e.g. ct.circle(
 		else
-			parts = { fnTable, fnName, "(" }
+			parts = { fnTable, fnName, "(" }   -- e.g. _fn.updateScore(
 		end
 	end
 
 	-- Parameter list
-	local exprs = tree.nodes[2].nodes
+	local exprs = tree.nodes[3].nodes
 	for i = 1, #exprs do
 		parts[#parts + 1] = exprCode( exprs[i] )
 		if i < #exprs then
@@ -173,24 +175,24 @@ function exprCode( expr )
 	elseif p == "call" then
 		return fnCallCode( expr )
 	elseif p == "neg" then
-		return "-" .. exprCode( nodes[1] )
+		return "-" .. exprCode( nodes[2] )
 	elseif p == "!" then
-		return "not " .. exprCode( nodes[1] )
+		return "not " .. exprCode( nodes[2] )
 	elseif p == "exprParens" then
-		return "(" .. exprCode( nodes[1] ) .. ")"
+		return "(" .. exprCode( nodes[2] ) .. ")"
 	end
 
 	-- Is this a Binary operator?
 	local luaOp = luaOpFromJavaOp[p]
 	if luaOp then
 		local leftExpr = nodes[1]
-		local rightExpr = nodes[2]
+		local rightExpr = nodes[3]
 		-- Check if the + operator is concatenating strings
-		if luaOp == "+" and expr.vt == "String" then
-			luaOp = ".."  -- TODO: Lua objects will not do a toString automatically
+		if luaOp == " + " and expr.vt == "String" then
+			luaOp = " .. "  -- TODO: Lua tables (GameObj) will not do a toString automatically
 		end
-		return table.concat{ exprCode( leftExpr ), " ",
-						luaOp, " ", exprCode( rightExpr ) } 
+		-- TODO: Verify that we don't need parentheses (Lua precedence is same as Java)
+		return exprCode( leftExpr ) .. luaOp .. exprCode( rightExpr )
 	else
 		error( "Unknown expr type " .. p )
 	end
@@ -201,10 +203,17 @@ end
 -- If isInstanceVar then the line is outside all functions (else local).
 local function generateVarDecl( tree, isInstanceVar )
 	local p = tree.p
+	local nodes = tree.nodes
 	if p == "varInit" or p == "constInit" then
 		-- e.g. int x = y + 10;
-		local varName = tree.nodes[2].str
-		local expr = tree.nodes[3]
+		local varName, expr
+		if p == "varInit" then
+			varName = nodes[2].str
+			expr = nodes[4]
+		else
+			varName = nodes[3].str
+			expr = nodes[5]
+		end
 		checkJava.doTypeAnalysis( expr )
 		if isInstanceVar then
 			isClassVar[varName] = true   -- remember class vars
@@ -246,44 +255,53 @@ local function generateVarDecl( tree, isInstanceVar )
 	return false
 end
 
+-- Generate code for an increment or decrement (++ or --) stmt
+-- given the lValue node and p either "++" or "--"
+local function generateIncOrDecStmt( lValue, p )
+	local lValueStr = lValueCode( lValue )
+	beginLuaLine( lValueStr )
+	addLua( " = " )
+	if p == "++" then
+		addLua( lValueStr )
+		addLua( " + 1" )
+	elseif p == "--" then
+		addLua( lValueStr )
+		addLua( " - 1" )
+	end
+end
+
 -- Generate code for the single stmt in tree
 local function generateStmt( tree )
 	local p = tree.p
+	local nodes = tree.nodes
 	if p == "call" then
 		-- fnValue ( exprList )
 		beginLuaLine( fnCallCode( tree ) )
-		return
-	elseif p == "++" or p == "--" then
-		-- Transform to assign (post-inc or post-dec) for handling below. 
-		-- Note that these are treated as stmts not exprs, so pre is same as post.
-		tree.nodes[2] = { t = "rightSide", p = p }
-		p = "assign"
-	end
-
-	if p == "assign" then
+	elseif p == "assign" then
 		-- lValue rightSide
-		local lValue = lValueCode( tree.nodes[1] )
-		beginLuaLine( lValue )
-		addLua( " = " )
-		p = tree.nodes[2].p  -- rightSide
-		local expr
-		if p == "++" then
-			addLua( lValue )
-			addLua( " + " )
-			expr = "1"
-		elseif p == "--" then
-			addLua( lValue )
-			addLua( " - " )
-			expr = "1"
+		local rightSide = nodes[2]
+		p = rightSide.p
+		if p == "++" or p == "--" then
+			generateIncOrDecStmt( nodes[1], p )
 		else
-			if p ~= "=" then
+			local lValueStr = lValueCode( nodes[1] )
+			local exprStr = exprCode( rightSide.nodes[2] )
+			beginLuaLine( lValueStr )
+			addLua( " = " )
+			if p == "=" then
+				addLua( exprStr )
+			else
 				-- +=, -=, *=, /=
-				addLua( lValue )
-				addLua( string.char( 32, string.byte(p), 32 ) )  -- e.g. " + "
+				addLua( lValueStr )
+				addLua( luaOpFromJavaOp[p] )
+				addLua( "(" )
+				addLua( exprStr )
+				addLua( ")" )
 			end
-			expr = exprCode( tree.nodes[2].nodes[1] )
 		end
-		addLua( expr )
+	elseif p == "++" or p == "--" then
+		-- ++ lValue or -- lValue
+		generateIncOrDecStmt( nodes[2], p )
 	else
 		error("*** Unknown stmt pattern " .. p )
 	end	
@@ -293,22 +311,23 @@ end
 local function generateBlockLine( tree )
 	checkJava.doTypeAnalysis( tree )
 	local p = tree.p
+	local nodes = tree.nodes
 	if p == "stmt" then
 		-- stmt ;
-		generateStmt( tree.nodes[1] )
+		generateStmt( nodes[1] )
 	elseif p == "blank" then
 		-- blank
 		beginLuaLine( "" )
 	elseif enableComments and p == "comment" then
 		-- Full line comment
 		beginLuaLine( "--" )
-		addLua( tree.nodes[1].str )
+		addLua( nodes[1].str )
 	elseif generateVarDecl( tree, false ) then
 		-- Processed a local varInit, constInit, or varDecl
 	elseif p == "if" then
 		-- if (expr)
 		beginLuaLine( "if " )
-		addLua( exprCode( tree.nodes[1] ) )
+		addLua( exprCode( nodes[3] ) )
 		addLua( " then")
 		-- Process the controlled statement or block too
 		iTree = iTree + 1
@@ -317,7 +336,7 @@ local function generateBlockLine( tree )
 		-- else if (expr)
 		removeLastLuaLine()   -- remove the end we made for the if
 		beginLuaLine( "elseif " )
-		addLua( exprCode( tree.nodes[1] ) )
+		addLua( exprCode( nodes[4] ) )
 		addLua( " then")
 		-- Process the controlled statement or block too
 		iTree = iTree + 1
@@ -332,9 +351,9 @@ local function generateBlockLine( tree )
 	elseif p == "return" then
 		-- return expr ;
 		beginLuaLine( "return " )
-		addLua( exprCode( tree.nodes[1] ) )		
+		addLua( exprCode( nodes[2] ) )
 	else
-		print("*** Unknown line pattern " .. p )
+		error( "*** Unknown line pattern " .. p )
 	end
 end
 
@@ -346,11 +365,9 @@ local function generateBlock()
 		local tree = javaParseTrees[iTree]
 		local p = tree.p
 
-		if p == "begin" then
-			-- {
+		if p == "begin" then              -- {
 			blockLevel = blockLevel + 1
-		elseif p == "end" then
-			-- }
+		elseif p == "end" then            -- }
 			blockLevel = blockLevel - 1
 			beginLuaLine( "end")
 			if blockLevel == startBlockLevel then
@@ -387,7 +404,11 @@ local function generateFnHeader( name, paramList )
 	addLua( "(" )
 	for i = 1, #paramList do
 		local param = paramList[i]
-		addLua( param.nodes[2].str )
+		if param.p == "array" then
+			addLua( param.nodes[4].str )
+		else
+			addLua( param.nodes[2].str )
+		end
 		if i < #paramList then
 			addLua( ", ")
 		end
@@ -423,20 +444,20 @@ function codeGenJava.getLuaCode( parseTrees )
 			addLua( tree.nodes[1].str )
 		elseif p == "blank" then
 			beginLuaLine( "" )
-		elseif p == "begin" then
+		elseif p == "begin" then          -- {
 			blockLevel = blockLevel + 1
-		elseif p == "end" then
+		elseif p == "end" then            -- }
 			blockLevel = blockLevel - 1
 		elseif p == "eventFn" then
 			-- Code12 event func (e.g. setup, update)
-			local paramList = tree.nodes[2].nodes
-			generateFnHeader( tree.nodes[1].str, paramList )
+			local paramList = tree.nodes[5].nodes
+			generateFnHeader( tree.nodes[3].str, paramList )
 			iTree = iTree + 1 
 			checkJava.initLocalVars( paramList )
 			generateBlock()
 		elseif p == "func" then
 			-- User-defined function
-			local paramList = tree.nodes[3].nodes
+			local paramList = tree.nodes[4].nodes
 			generateFnHeader( tree.nodes[2].str, paramList )
 			iTree = iTree + 1 
 			checkJava.initLocalVars( paramList )

@@ -57,7 +57,7 @@ local localVarTypes = {}     -- map local var name to value type
 local function vtFromVarType( node )
 	assert( node.tt == "ID" )     -- varType nodes should be IDs
 	local vt = vtFromVarTypeName[node.str]
-	if vt then 
+	if vt then
 		return vt  -- known valid type
 	end
 
@@ -106,10 +106,12 @@ end
 local function setExprTypes( tree )
 	local nodes = tree.nodes
 
+	-- TODO: Make this hash to functions
+
 	-- Determine vt = the value type if this is an expr node
 	if tree.t == "expr" then
 		local p = tree.p
-		local vt
+		local vt = nil
 		if p == "NUM" then
 			vt = ((nodes[1].str:find("%.") and 1) or 0)   -- double or int
 		elseif p == "BOOL" then
@@ -126,7 +128,6 @@ local function setExprTypes( tree )
 			if type(vt) ~= "number" then
 				err.setErrNodeAndRef( nodes[1], expr, 
 						"The negate operator (-) can only apply to numbers" )
-				vt = nil
 			end
 		elseif p == "!" then
 			local expr = nodes[2]
@@ -134,7 +135,6 @@ local function setExprTypes( tree )
 			if vt ~= true then
 				err.setErrNodeAndRef( nodes[1], expr, 
 						"The not operator (!) can only apply to boolean values" )
-				vt = nil
 			end
 		elseif p == "+" then
 			-- May be numeric add or string concat, depending on the operands
@@ -146,12 +146,28 @@ local function setExprTypes( tree )
 			elseif vtLeft == "String" and vtRight == "String" then
 				vt = "String"
 			elseif vtLeft == "String" or vtRight == "String" then
-				-- TODO: Check that other operand can be promoted to string
-				vt = "String"
+				-- Check if the other operand can be promoted to string (numbers only)
+				local exprOther, vtOther
+				if vtLeft == "String" then
+					exprOther = nodes[3]
+					vtOther = vtRight
+				else
+					exprOther = nodes[1]
+					vtOther = vtLeft
+				end
+				if type(vtOther) == "number" then
+					vt = "String"   -- the number will promote to a string 
+				elseif vtOther == "GameObj" then
+					err.setErrNodeAndRef( nodes[2], exprOther, 
+							"The (+) operator cannot be used on GameObj objects directly. Use the toString() method." )
+				else
+					err.setErrNodeAndRef( nodes[2], exprOther, 
+							"The (+) operator can only apply to numbers or Strings" )
+				end
 			else
+				-- Neither side is valid
 				err.setErrNodeAndRef( nodes[2], nodes[1], 
 						"The (+) operator can only apply to numbers or Strings" )
-				vt = nil
 			end
 		elseif p == "-" or p == "*" or p == "/" or p == "%" then
 			-- Both sides must be numeric, result is number
@@ -164,7 +180,6 @@ local function setExprTypes( tree )
 				local exprErr = ((type(vtLeft) ~= "number" and nodes[1]) or nodes[3])
 				err.setErrNodeAndRef( nodes[2], exprErr, 
 						"Numeric operator (%s) can only apply to numbers", p )
-				vt = nil
 			end
 		elseif p == "&&" or p == "||" then
 			-- Both sides must be boolean, result is boolean
@@ -177,7 +192,6 @@ local function setExprTypes( tree )
 				local exprErr = ((vtLeft ~= true and nodes[1]) or nodes[3])
 				err.setErrNodeAndRef( nodes[2], exprErr, 
 						"Logical operator (%s) can only apply to boolean values", p )
-				vt = nil
 			end
 		elseif p == "<" or p == ">" or p == "<=" or p == ">=" then
 			-- Both sides must be numeric, result is boolean
@@ -190,7 +204,6 @@ local function setExprTypes( tree )
 				local exprErr = ((type(vtLeft) ~= "number" and nodes[1]) or nodes[3])
 				err.setErrNodeAndRef( nodes[2], exprErr, 
 						"Comparison operator (%s) can only apply to numbers", p )
-				vt = nil
 			end
 		elseif p == "==" or p == "!=" then
 			-- Both sides must have matching-ish type  TODO: Compare in more detail
@@ -202,7 +215,6 @@ local function setExprTypes( tree )
 			else
 				err.setErrNodeAndRef( nodes[2], nodes[3], 
 						"Compare operator (%s) must compare matching types", p )
-				vt = nil
 			end
 		elseif p == "call" then
 			-- Process parameter expressions

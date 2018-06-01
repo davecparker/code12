@@ -194,11 +194,11 @@ local function checkUserFile()
 				-- Do Semantic Analysis on the parse trees
 				if not checkJava.initProgram( parseTrees ) then
 					showError()
-				elseif false then  -- TODO
+				else
 					-- Make and run the Lua code
 					local codeStr = codeGenJava.getLuaCode( parseTrees )
 					print( codeStr )
-					if err.hasError() then
+					if err.hasErr() then
 						showError()
 					else
 						runLuaCode( codeStr )
