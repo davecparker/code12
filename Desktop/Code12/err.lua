@@ -23,9 +23,41 @@ local errRecord
 -- (see err.makeErrLoc) 
 local function findNodeLoc( node, errLoc )
 	-- Is this a token or a parse tree?
+	if node.tt then
+		-- Token
+		-- Update first position if this token is before
+		if errLoc.first.iLine == nil or node.iLine < errLoc.first.iLine then
+			errLoc.first.iLine = node.iLine
+			errLoc.first.iChar = nil
+		end
+		if errLoc.first.iChar == nil or node.iChar < errLoc.first.iChar then
+			errLoc.first.iChar = node.iChar
+		end
+		-- Update last position if this token is after
+		if errLoc.last.iLine == nil or node.iLine > errLoc.last.iLine then
+			errLoc.last.iLine = node.iLine
+			errLoc.last.iChar = nil
+		end
+		local iCharLast = node.iChar + string.len( node.str ) - 1
+		if errLoc.last.iChar == nil or iCharLast > errLoc.last.iChar then
+			errLoc.last.iChar = iCharLast
+		end
+	else
+		-- Non-token, search all children
+		local nodes = node.nodes
+		for i = 1, #nodes do
+			findNodeLoc( nodes[i] ) 
+		end
+	end
 end
 
-
+-- Make and return an errLoc (see err.makeErrLoc) using the extent of the given
+-- parse tree node for the location.
+function errLocFromNode( node )
+	local errLoc = { first = {}, last = {} }
+	findNodeLoc( node, errLoc )
+	return errLoc
+end
 
 
 --- Module Functions -------------------------------------------------------
@@ -53,14 +85,6 @@ end
 function err.makeErrLoc( first, last )
 	print( string.format( "makeErrLoc  %d.%d  to  %d.%d", first.iLine, first.iChar, last.iLine, last.iChar ) )
 	return { first = first, last = last }
-end
-
--- Make and return an errLoc (see err.makeErrLoc) using the extent of the given
--- parse tree node for the location.
-function err.errLocFromNode( node )
-	local errLoc = { first = {}, last = {} }
-	findNodeLoc( node, errLoc )
-	return errLoc
 end
 
 -- If there is not already an error recorded, then set the error state with:

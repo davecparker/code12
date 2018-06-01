@@ -172,6 +172,7 @@ local function checkUserFile()
 				local startTime = system.getTimer()
 				local parseTrees = {}
 				local startTokens = nil
+				err.initProgram()
 				parseJava.init()
 				for lineNum = 1, #sourceFile.strLines do
 					local strUserCode = sourceFile.strLines[lineNum]
