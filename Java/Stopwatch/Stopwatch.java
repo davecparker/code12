@@ -12,7 +12,10 @@ class Stopwatch extends Code12Program
    GameObj stopButton; // Button for stopping the stopwatch
    GameObj lapButton; // Button for starting a new lap;
    GameObj resetButton; // Button for resetting the stopwatch
-   int startTime; // Start time in seconds (from ct.getTimer())
+   int startTime; // Start time of start buttom being pressed in milliseconds since the app was started;
+   int lapStartTime; // Start time of a lap in milliseconds since the app was started;
+   int pauseTime; // Start time of a pause in milliseconds since the app was started;
+   int pauseLength; // How long the stopwatch has been paused in milliseconds;
    boolean stopwatchRunning; // true when the stopwatch is running
    int lapCount; // Count of how many laps have been created
    
@@ -21,31 +24,38 @@ class Stopwatch extends Code12Program
       // Make time display
       double timeHeight = 15;
       timeDisplay = ct.text( "00:00:00.00", 50, timeHeight, timeHeight );
+      timeDisplay.align( "bottom" );
       
       // Make start button
       double buttonHeight = 10;
       double buttonOffset = 15;
-      startButton = ct.text( "Start", timeDisplay.x - buttonOffset, timeHeight + buttonHeight, buttonHeight );
+      startButton = ct.text( "Start", timeDisplay.x - buttonOffset, timeDisplay.y + buttonHeight, buttonHeight );
+      startButton.align( "bottom" );
       startButton.clickable = true;
       
       // Make stop button
       stopButton = ct.text( "Stop", startButton.x, startButton.y, buttonHeight );
+      stopButton.align( "bottom" );
       stopButton.clickable = true;
       stopButton.visible = false;
       
       // Make reset button
       resetButton = ct.text( "Reset", timeDisplay.x + buttonOffset, startButton.y, buttonHeight );
+      resetButton.align( "bottom" );
       resetButton.clickable = true;
       resetButton.visible = false;
       
       // Make lap button
       lapButton = ct.text( "Lap", resetButton.x, resetButton.y, buttonHeight );
+      lapButton.align( "bottom" );
       lapButton.clickable = true;
       lapButton.visible = false;
       
       // Initialize state and count variables
       stopwatchRunning = false;
       lapCount = 0;
+      lapStartTime = 0;
+      pauseTime = 0;
    }
    
    public void update()
@@ -79,6 +89,15 @@ class Stopwatch extends Code12Program
          resetButton.visible = false;
          
          startTime = ct.getTimer();
+         if ( pauseTime != 0 )
+         {
+            pauseLength += startTime - pauseTime;
+         }
+         if ( lapStartTime == 0 )
+         {
+            lapStartTime = startTime;
+         }
+         
          // Factor in the current time on the stopwatch
          String displayedTime = timeDisplay.getText();
          if ( !displayedTime.equals("00:00:00.00") )
@@ -103,6 +122,7 @@ class Stopwatch extends Code12Program
       }
       else if ( obj == stopButton )
       {
+         pauseTime = ct.getTimer();
          stopwatchRunning = false;
          startButton.visible = true;
          stopButton.visible = false;
@@ -113,6 +133,49 @@ class Stopwatch extends Code12Program
       {
          timeDisplay.setText( "00:00:00.00" );
          resetButton.visible = false;
+         lapCount = 0;
+         lapStartTime = 0;
+         pauseTime = 0;
+      }
+      else if ( obj == lapButton )
+      {
+         lapCount++;
+         int time = ct.getTimer();
+         int lapLength = time - lapStartTime - pauseLength; 
+         lapStartTime = time;
+         pauseLength = 0;
+         String timeText = timeDisplay.getText();
+         String lapLengthText;
+         if ( lapCount == 1 )
+         {
+            lapLengthText = timeText;
+         }
+         else
+         {
+            // Convert lapLength to lapLengthText
+            double seconds = ct.toDouble( lapLength ) / 1000.0;          
+            int elapsedTime = ct.toInt( seconds );
+            int hours = elapsedTime / 3600;
+            elapsedTime %= 3600;
+            int minutes = elapsedTime / 60;
+            seconds = seconds - hours * 3600 - minutes * 60;
+            String hrs = ct.formatInt( hours, 2 );
+            String min = ct.formatInt( minutes, 2 );
+            String sec = ct.formatDecimal( seconds, 2 );
+            if (seconds < 10)
+               sec = "0" + sec;
+            lapLengthText = hrs + ":" + min + ":" + sec; 
+         }
+         String lapText = lapCount + "  " + timeText + " (+" + lapLengthText + ")";
+         double lapHeight = 8;
+         double xLap = 90;
+         double yLap = startButton.y + lapHeight * lapCount;
+         GameObj lapDisplay = ct.text( lapText, xLap, yLap, lapHeight );
+         lapDisplay.align( "bottom right" );
+         double yMax = ct.getHeight();
+         if ( yLap > yMax )
+            ct.setHeight( yMax + lapHeight );
+         
       }
          
    }
