@@ -1,10 +1,15 @@
+// Duck Hunt
+// A simple game of shooting rubber ducks.
+// Click the mouse anywhere in the app window to make the gun move horizontally to the click 
+// location and fire straight upwards towards the ducks.
+
 import Code12.*;
 
-public class MainProgram extends Code12Program
+public class DuckHunt extends Code12Program
 {
    public static void main( String[] args )
    { 
-      Code12.run( new MainProgram() ); 
+      Code12.run( new DuckHunt() ); 
    }
    
    GameObj gun; // Gun at bottom of window that fires bullets

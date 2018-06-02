@@ -1,3 +1,32 @@
+// Random Walk
+// Code12 Programming Concepts 8: If-else
+
+// An animation of a random walk.
+// Resizing the window restarts the random walk with a larger lattice.
+
+// Case use test for the following subset of the Code12 API:
+
+// Screen Management
+// -----------------
+// ct.setTitle( String title )
+// double ct.getWidth( )           // always 100.0
+// double ct.getHeight( )          // default 100.0
+// double ct.getPixelsPerUnit()    // scale factor to convert coordinate units to pixels
+// ct.clearScreen( )
+// ct.setBackColor( String color )
+
+// Math and Misc.
+// --------------
+// int ct.random( int min, int max )
+// int ct.round( double d )
+// double ct.round( double d, int numPlaces )
+// boolean ct.isError( double d )
+
+// Type Conversion
+// ---------------
+// double ct.toDouble( int i )
+// int ct.toInt( double d )                // truncates
+
 import Code12.*;
 
 class RandomWalk extends Code12Program

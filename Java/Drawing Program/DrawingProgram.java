@@ -1,3 +1,20 @@
+// Drawing Program
+// Code12 Programming Concepts 8: If-else
+
+// A simple program for drawing circles, ovals, rectangles, and lines.
+// Clicking the toolbar buttons at the top of the window sets the shape and color drawn.
+// Clicking and draging the mouse draws a new shape centered at the click and scaled to 
+// extend to the end of the drag.
+// Clicking and dragging a drawn shape moves it around the window.
+// The backspace key deletes a drawn shape after it is clicked on.
+// The "C" key clears all drawn shapes from the window.
+
+// Case use test for the following subset of the Code12 API:
+
+// Math and Misc.
+// --------------
+// double ct.distance( double x1, double y1, double x2, double y2 )
+
 import Code12.*;
 
 class DrawingProgram extends Code12Program
@@ -224,10 +241,11 @@ class DrawingProgram extends Code12Program
    
    public void onKeyPress( String keyName )
    {
-      if (keyName.equals( "backspace" ) )
+      if ( keyName.equals( "backspace" ) )
          if ( selectedObj != null )
             selectedObj.delete();
-      else if ( keyName.equals( "c" ) )
+      //else
+      if ( keyName.equals( "c" ) )
          ct.clearGroup( "drawing" );
    }
 }

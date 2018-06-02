@@ -1,3 +1,32 @@
+// Stopwatch
+// Code12 Programming Concepts 8: If-else
+
+// A stopwatch app with lap functionality.
+
+// Case use test for the following subset of the Code12 API:
+// Screen Management
+// -----------------
+// ct.setTitle( String title )
+// ct.setHeight( double height )
+// double ct.getHeight( ) 
+// ct.clearGroup( String group )
+// ct.setBackColor( String color )
+// 
+// Math and Misc.
+// --------------
+// int ct.getTimer( )
+// 
+// Type Conversion
+// ---------------
+// double ct.toDouble( int i )
+// int ct.toInt( double d )                // truncates
+// int ct.parseInt( String s )             // 0 if failure
+// boolean ct.canParseInt( String s )
+// double ct.parseNumber( String s )       // NaN if failure
+// boolean ct.canParseNumber( String s )
+// String ct.formatDecimal( double d, int numPlaces )
+// String ct.formatInt( int i, int numDigits )    // uses leading 0's
+
 import Code12.*;
 
 class Stopwatch extends Code12Program
@@ -21,6 +50,10 @@ class Stopwatch extends Code12Program
    
    public void start()
    {  
+      // Make the title and background
+      ct.setTitle( "Stopwatch" );
+      ct.setBackColor( "light blue" );
+   
       // Make time display
       double timeHeight = 15;
       timeDisplay = ct.text( "00:00:00.00", 50, timeHeight, timeHeight );
