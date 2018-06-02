@@ -321,8 +321,12 @@ local function getMethods( parseTrees )
 			-- User-defined function
 			local retType = tree.nodes[1]
 			local node = tree.nodes[2]
-			local fnName = node.str
-			methods[fnName] = { node = node, vt = checkJava.vtFromRetType( retType ) }
+			if node.tt ~= "ID" or node.str:find("%.") then 
+				err.setErrNode( node, "User-defined function names cannot contain a dot (.)" )
+			else
+				local fnName = node.str
+				methods[fnName] = { node = node, vt = checkJava.vtFromRetType( retType ) }
+			end
 		end
 		if err.hasErr() then
 			return false
