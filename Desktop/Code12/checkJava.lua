@@ -15,9 +15,11 @@ local err = require( "err" )
 local checkJava = {}
 
 
+--- Type tables -------------------------------------------------------
+
 -- A value type (vt) is one of:
 --      0            (int)
---      >0           (double)
+--      1            (double)
 --      false        (void)
 --      true         (boolean)
 --      "null"       (any Object type)
@@ -25,8 +27,19 @@ local checkJava = {}
 --      "GameObj"    (GameObj)
 --      { vt = vt }  (array of vt)
 
--- The value type (vt) of a varType name
-local vtFromVarTypeName = {
+-- The type name for a value type (vt)
+local mapVtToTypeName = {
+	[0]          = "int",
+	[1]          = "double",
+	[false]      = "void",
+	[true]       = "boolean",
+	["null"]     = "null",
+	["String"]   = "String",
+	["GameObj"]  = "GameObj",
+}
+
+-- The value type (vt) of a type name
+local mapTypeNameToVt = {
 	["int"]      = 0,
 	["double"]   = 1,
 	["void"]     = false,
@@ -49,23 +62,101 @@ local methods = {}      -- map method names to { node = token, vt = vt }
 local classVars = {}    -- map instance var name to { node = token, vt = vt }
 local localVars = {}    -- map local var name to { node = token, vt = vt }
 
+-- API return values (TODO: improve)
+local vtAPIFunctions = {
+	["ct.circle"]  = "GameObj",
+}
+
 
 --- Analysis Functions -------------------------------------------------------
 
+-- Return the type name of the given value type (vt)
+local function typeNameFromVt( vt )
+	if type(vt) == "table" then
+		return "array of " .. typeNameFromVt( vt.vt )
+	end
+	return mapVtToTypeName[vt] or "unknown"
+end
+
+-- Return the resulting numeric vt for an operation on vt1 and vt2 (both numeric)
+local function vtNumber( vt1, vt2 )
+	local vt = vt1 + vt2    -- int promotes to double
+	if vt > 1 then
+		return 1   -- both were double
+	end
+	return vt
+end
+
+-- Return the value type (vt) for a variable node.
+-- If the variable is undefined, then set the error state and return nil.
+local function vtVar( varNode )
+	assert( varNode.tt == "ID" )
+	local varName = varNode.str
+	local varFound = localVars[varName] or classVars[varName]
+	if varFound == nil then
+		err.setErrNode( varNode,  "Undefined variable %s", varName )
+		return nil
+	end
+	return varFound.vt
+end
+
+-- Set and return the value type (vt) for an lValue node.
+-- If there is an undefined type, then set the error state and return nil.
+local function vtLValue( lValue )
+	assert( lValue.t == "lValue" )
+	local p = lValue.p
+	local nodes = lValue.nodes
+	local vt = nil
+	if p == "var" then
+		vt = vtVar( nodes[1] )
+	elseif p == "index" then
+		-- indexing an array
+		local indexExpr = nodes[3]
+		setExprTypes( indexExpr )
+		if indexExpr.vt ~= 0 then
+			err.setErrNode( indexExpr, "Array index must be an integer value" )
+			return nil
+		end
+		vt = vtVar( nodes[1] )
+		if type(vt) ~= "table" then
+			err.setErrNodeAndRef( nodes[2], nodes[1], 
+					"An index in [brackets] can only be applied to an array" )
+			return nil
+		end
+		vt = vt.vt
+	elseif p == "this" then
+		-- explicit reference to class variable
+		local varNode = nodes[3]
+		if classVars[varNode.str] == nil then
+			err.setErrNodeAndRef( varNode, nodes[1],
+					"Undefined class variable %s referenced with \"this\"", 
+					varNode.str )
+			return nil
+		end
+		vt = vtVar( varNode )
+	elseif p == "field" then
+		vt = 0   -- TODO: need GameObj field types
+	else
+		error( "Unknown lValue pattern " .. p )
+	end
+	lValue.vt = vt
+	return vt
+end
+
 -- Do expression type analysis for the given parse tree.
--- Set the vt field in each expr node to its value type.
+-- Set the vt field in each expr and lValue node to its value type.
 -- If an error is found, set the error state to the first error
 -- and return nil, otherwise return the vt type of this node
 -- if node is an expr node, else return false if not an expr node.
 local function setExprTypes( tree )
+	-- Determine vt = the value type if this is an expr or lValue node
 	local nodes = tree.nodes
-
-	-- TODO: Make this hash to functions
-
-	-- Determine vt = the value type if this is an expr node
-	if tree.t == "expr" then
-		local p = tree.p
+	if tree.t == "lValue" then
+		return vtLValue( tree )
+	elseif tree.t == "expr" then
+		-- TODO: Make this hash to functions
 		local vt = nil
+		local p = tree.p
 		if p == "NUM" then
 			vt = ((nodes[1].str:find("%.") and 1) or 0)   -- double or int
 		elseif p == "BOOL" then
@@ -74,6 +165,8 @@ local function setExprTypes( tree )
 			vt = "null"
 		elseif p == "STR" then
 			vt = "String"
+		elseif p == "lValue" then
+			vt = setExprTypes( nodes[1] )
 		elseif p == "exprParens" then
 			vt = setExprTypes( nodes[2] )
 		elseif p == "neg" then
@@ -96,7 +189,7 @@ local function setExprTypes( tree )
 			local vtLeft = setExprTypes( nodes[1] )
 			local vtRight = setExprTypes( nodes[3] )
 			if type(vtLeft) == "number" and type(vtRight) == "number" then
-				vt = vtLeft + vtRight   -- int promotes automatically to double :)
+				vt = vtNumber( vtLeft, vtRight )
 			elseif vtLeft == "String" and vtRight == "String" then
 				vt = "String"
 			elseif vtLeft == "String" or vtRight == "String" then
@@ -129,7 +222,7 @@ local function setExprTypes( tree )
 			local vtLeft = setExprTypes( nodes[1] )
 			local vtRight = setExprTypes( nodes[3] )
 			if type(vtLeft) == "number" and type(vtRight) == "number" then
-				vt = vtLeft + vtRight   -- int promotes automatically to double :)
+				vt = vtNumber( vtLeft, vtRight )
 			else
 				local exprErr = ((type(vtLeft) ~= "number" and nodes[1]) or nodes[3])
 				err.setErrNodeAndRef( nodes[2], exprErr, 
@@ -176,9 +269,23 @@ local function setExprTypes( tree )
 			for i = 1, #exprs do
 				setExprTypes( exprs[i] )
 			end
-			vt = 1   -- TODO: Need function return type
-		elseif p == "lValue" then
-			vt = 1   -- TODO: Need variable/field type
+			local fnValue = nodes[1]
+			if fnValue.tt == "ID" then
+				local fnName = fnValue.str
+				vt = vtAPIFunctions[fnName]
+				if vt == nil then
+					local method = methods[fnName]
+					if method then
+						vt = method.vt
+						if vt == nil then
+							err.setErrNode( fnValue, "Undefined function %s", fnName )
+						end
+					end
+				end
+			else
+				-- TODO: Check method
+				return "String"
+			end
 		else
 			error( "Unknown expr pattern " .. p )
 		end
@@ -231,7 +338,7 @@ end
 -- or return nil and set the error state if the type is invalid.
 function checkJava.vtFromVarType( node )
 	assert( node.tt == "ID" )     -- varType nodes should be IDs
-	local vt = vtFromVarTypeName[node.str]
+	local vt = mapTypeNameToVt[node.str]
 	if vt then
 		return vt  -- known valid type
 	end
@@ -347,6 +454,52 @@ function checkJava.initLocalVars( paramList )
 	end
 end
 
+-- Return true if the expr can be assigned to the given vt (value type) at node.
+-- The expr must already have had type analysis done on it and have a vt field.
+-- If the types are not compatible then set the error state and return false.
+function checkJava.canAssignToVt( node, vt, expr )
+	local vtExpr = expr.vt
+	print("Can assign", vt, vtExpr)
+	if vt == nil or vtExpr == nil then
+		return false
+	elseif vt == vtExpr then
+		return true  -- same types so directly compatible
+	elseif vtExpr == 0 and type(vt) == "number" then
+		return true    -- int can silently promote to double
+	elseif vtExpr == "null" and type(vt) == "string" then
+		return true    -- null can be assigned to any object (String or GameObj)
+	end
+
+	-- Check for various type mismatch combinations
+	local str
+	if vtExpr == 1 and vt == 0 then          -- double assigned to int
+		str = "Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()"
+	elseif vtExpr == 1 and vt == "String" then   -- double assigned to String
+		str = "Value of type double cannot be assigned to a String, consider using ct.formatDecimal()"
+	elseif vtExpr == 0 and vt == "String" then   -- int assigned to String
+		str = "Integer value cannot be assigned to a String, consider using ct.formatInt()"
+	elseif vtExpr == "String" and vt == 1 then   -- String assigned to double
+		str = "A String cannot be assigned to a double, consider using ct.parseNumber()"
+	elseif vtExpr == "String" and vt == 0 then   -- String assigned to int
+		str = "A String cannot be assigned to an int, consider using ct.parseInt()"
+	elseif vtExpr == "GameObj" and vt == "String" then
+		str = "A GameObj cannot be assigned to a String, consider using the toString() method"
+	else
+		str = string.format( "Value of type %s cannot be assigned to type %s",
+					typeNameFromVt( vtExpr ), typeNameFromVt( vt ) )
+	end
+	err.setErrNodeAndRef( node, expr, str )
+	return false
+end	
+
+-- Return true if the expr can be assigned to the lValue node.
+-- The expr must already have had type analysis done on it and have a vt field.
+-- If the types are not compatible then set the error state and return false.
+function checkJava.canAssignToLValue( lValue, expr )
+	return checkJava.canAssignToVt( lValue, vtLValue( lValue ), expr )
+end
+
+
 -- Init the state for a new program with the given parseTrees
 -- Return true if successful, false if not.
 function checkJava.initProgram( parseTrees )
@@ -360,7 +513,7 @@ function checkJava.initProgram( parseTrees )
 end
 
 -- Do expression type analysis for the given parseTree.
--- Set the vt field in each expr node to its value type.
+-- Set the vt field in each expr and lValue node to its value type.
 -- Return true if successful, false if not.
 function checkJava.doTypeAnalysis( parseTree )
 	setExprTypes( parseTree )

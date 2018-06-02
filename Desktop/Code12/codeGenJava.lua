@@ -216,6 +216,7 @@ local function generateVarDecl( tree, isInstanceVar )
 			expr = nodes[5]
 		end
 		checkJava.doTypeAnalysis( expr )
+		checkJava.canAssignToVt( nameNode, vt, expr )
 		local varName = nameNode.str
 		if isInstanceVar then
 			checkJava.defineClassVar( nameNode, vt, false )
@@ -288,11 +289,14 @@ local function generateStmt( tree )
 		if p == "++" or p == "--" then
 			generateIncOrDecStmt( nodes[1], p )
 		else
-			local lValueStr = lValueCode( nodes[1] )
-			local exprStr = exprCode( rightSide.nodes[2] )
+			local lValue = nodes[1]
+			local expr = rightSide.nodes[2]
+			local lValueStr = lValueCode( lValue )
+			local exprStr = exprCode( expr )
 			beginLuaLine( lValueStr )
 			addLua( " = " )
 			if p == "=" then
+				checkJava.canAssignToLValue( lValue, expr )
 				addLua( exprStr )
 			else
 				-- +=, -=, *=, /=

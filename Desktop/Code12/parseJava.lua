@@ -117,6 +117,7 @@ local function fnValue()
 	iToken = iToken + 1	
 	if token.str == "ct" then
 		token2.str = "ct." .. token2.str
+		token2.iChar = token.iChar
 		return token2   -- ct.name token
 	end
 	-- Return a method pattern node

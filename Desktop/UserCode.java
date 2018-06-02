@@ -14,9 +14,10 @@ class UserCode extends Code12Program
 	int moveBall(boolean wrap)
 	{
 		// int wrap = 5;
-		int hack = 3;
+		boolean hack;
 		// String hack;
 
+		// hack = 6;
 		ball.x++;
 		ball.x--;
 		ball.x += 1;
