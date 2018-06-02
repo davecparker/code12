@@ -110,6 +110,19 @@ class DrawingProgram extends Code12Program
       pink.clickable = true;
       purple.clickable = true;
       
+      black.setText("black");
+      white.setText("white");
+      red.setText("red");
+      green.setText("green");
+      blue.setText("blue");
+      cyan.setText("cyan");
+      majenta.setText("majenta");
+      yellow.setText("yellow");
+      gray.setText("gray");
+      orange.setText("orange");
+      pink.setText("pink");
+      purple.setText("purple");
+      
       // Set xMinColors 
       xMinColors = black.x - boxSize / 2;
       
@@ -126,62 +139,47 @@ class DrawingProgram extends Code12Program
       
    public void onMousePress( GameObj obj, double x, double y )
    {
-      if ( obj == null && y > boxSize )
+      if ( obj == null )
       {
-         if ( selectedShape == circle || selectedShape == ellipse )
-            newObj = ct.circle( x, y, 0 );
-         else if ( selectedShape == rectangle )
-            newObj = ct.rect( x, y, 0, 0 );
-         else if ( selectedShape == line )
+         if ( y > boxSize )
          {
-            newObj = ct.line( x, y, x, y );
-            newObj.setLineColor( selectedColor );
-         }
-         
-         if ( selectedShape != line )
-         {
-            newObj.clickable = true;
-            newObj.setFillColor( selectedColor );
+            // draw a new shape
+            if ( selectedShape == circle || selectedShape == ellipse )
+               newObj = ct.circle( x, y, 0 );
+            else if ( selectedShape == rectangle )
+               newObj = ct.rect( x, y, 0, 0 );
+            else if ( selectedShape == line )
+            {
+               newObj = ct.line( x, y, x, y );
+               newObj.setLineColor( selectedColor );
+            }
+            
+            if ( selectedShape != line )
+            {
+               newObj.clickable = true;
+               newObj.setFillColor( selectedColor );
+            }
+            // Make newObj the selectedObj
+            selectedObj = newObj;
          }
       }
       else if ( y > boxSize )
       {
+         // obj is a drawn shape
          selectedObj = obj;
       }
       else if ( x >= xMinColors )
       {
+         // obj is a color swatch
          selectedColorSwatch.lineWidth = 1;
          selectedColorSwatch = obj;
          selectedColorSwatch.lineWidth = 3;
          selectedColorSwatch.setLayer( 2 );
-         int colorNumber = ct.round( (selectedColorSwatch.x - xMinColors + boxSize / 2) / boxSize );
-         if ( colorNumber == 1 )
-            selectedColor = "black";
-         else if ( colorNumber == 2 )
-            selectedColor = "white";
-         else if ( colorNumber == 3 )
-            selectedColor = "red";
-         else if ( colorNumber == 4 )
-            selectedColor = "green";
-         else if ( colorNumber == 5 )
-            selectedColor = "blue";
-         else if ( colorNumber == 6 )
-            selectedColor = "cyan";
-         else if ( colorNumber == 7 )
-            selectedColor = "pink";
-         else if ( colorNumber == 8 )
-            selectedColor = "yellow";
-         else if ( colorNumber == 9 )
-            selectedColor = "gray";
-         else if ( colorNumber == 10 )
-            selectedColor = "orange";
-         else if ( colorNumber == 11 )
-            selectedColor = "pink";
-         else if ( colorNumber == 12 )
-            selectedColor = "purple";
+         selectedColor = selectedColorSwatch.getText();
       }
-      else
+      else 
       {
+         // obj is a shape selector
          selectedShape.lineWidth = 1;
          selectedShape = obj;
          selectedShape.lineWidth = 3;
@@ -229,8 +227,6 @@ class DrawingProgram extends Code12Program
       if (keyName.equals( "backspace" ) )
          if ( selectedObj != null )
             selectedObj.delete();
-         else
-            newObj.delete();
       else if ( keyName.equals( "c" ) )
          ct.clearGroup( "drawing" );
    }
