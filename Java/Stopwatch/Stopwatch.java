@@ -136,6 +136,8 @@ class Stopwatch extends Code12Program
          lapCount = 0;
          lapStartTime = 0;
          pauseTime = 0;
+         ct.clearGroup( "laps" );
+         ct.setHeight( 100 );
       }
       else if ( obj == lapButton )
       {
@@ -171,6 +173,7 @@ class Stopwatch extends Code12Program
          double xLap = 90;
          double yLap = startButton.y + lapHeight * lapCount;
          GameObj lapDisplay = ct.text( lapText, xLap, yLap, lapHeight );
+         lapDisplay.group = "laps";
          lapDisplay.align( "bottom right" );
          double yMax = ct.getHeight();
          if ( yLap > yMax )
