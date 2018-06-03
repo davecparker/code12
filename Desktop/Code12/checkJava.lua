@@ -366,20 +366,29 @@ end
 
 -- Return the value type (vt) for a retType node
 -- or return nil and set the error state if the type is invalid.
-function checkJava.vtFromRetType( node )
-	local p = node.p
-	local vt = nil
-	if p == "void" then
+function checkJava.vtFromRetType( retType )
+	if retType.p == "void" then
 		return false
 	end
-	vt = checkJava.vtFromVarType( node.nodes[1] )
-	if p == "array" then
-		vt = checkJava.vtFromVarType( node.nodes[1] )
-		if vt ~= nil then
-			vt = { vt = vt }   -- array of specified type
-		end
+	local vt = checkJava.vtFromVarType( retType.nodes[1] )
+	if p == "array" and vt ~= nil then
+		vt = { vt = vt }   -- array of specified type
 	end
 	return vt
+end
+
+-- Return (vt, name) for a param node
+-- or return nil and set the error state if the type is invalid.
+function checkJava.vtAndNameFromParam( param )
+	assert( param.t == "param" )
+	local vt = checkJava.vtFromVarType( param.nodes[1] )
+	if param.p == "array" then
+		if vt == nil then
+			return nil
+		end
+		return { vt = vt }, param.nodes[4].str
+	end
+	return vt, param.nodes[2].str
 end
 
 -- Return the vt type of the given class variable name or nil if not defined.
