@@ -68,7 +68,39 @@ local vtAPIFunctions = {
 }
 
 
---- Analysis Functions -------------------------------------------------------
+--- Misc Analysis Functions --------------------------------------------------
+
+-- Find defined methods in parseTrees and put them in methods.
+-- Return true if successful, false if not.
+local function getMethods( parseTrees )
+	for i = 1, #parseTrees do
+		local tree = parseTrees[i]
+		assert( tree.t == "line" )
+		local p = tree.p
+		if p == "eventFn" then
+			-- Code12 event func (e.g. setup, update)
+			local node = tree.nodes[3]
+			local fnName = node.str
+			methods[fnName] = { node = node, vt = false }   -- void
+		elseif p == "func" then
+			-- User-defined function
+			local retType = tree.nodes[1]
+			local node = tree.nodes[2]
+			if node.tt ~= "ID" or node.str:find("%.") then 
+				err.setErrNode( node, "User-defined function names cannot contain a dot (.)" )
+			else
+				local fnName = node.str
+				methods[fnName] = { node = node, vt = checkJava.vtFromRetType( retType ) }
+			end
+		end
+		if err.hasErr() then
+			return false
+		end
+	end
+	return true
+end
+
+--- Misc Type Functions ------------------------------------------------------
 
 -- Return the type name of the given value type (vt)
 local function typeNameFromVt( vt )
@@ -102,7 +134,7 @@ end
 
 -- Set and return the value type (vt) for an lValue node.
 -- If there is an undefined type, then set the error state and return nil.
-local function vtLValue( lValue )
+local function vtLValueNode( lValue )
 	assert( lValue.t == "lValue" )
 	local p = lValue.p
 	local nodes = lValue.nodes
@@ -143,196 +175,233 @@ local function vtLValue( lValue )
 	return vt
 end
 
--- Do expression type analysis for the given parse tree.
--- Set the vt field in each expr and lValue node to its value type.
--- If an error is found, set the error state to the first error
--- and return nil, otherwise return the vt type of this node
--- if node is an expr node, else return false if not an expr node.
-local function setExprTypes( tree )
-	-- Determine vt = the value type if this is an expr or lValue node
-	local nodes = tree.nodes
-	if tree.t == "lValue" then
-		return vtLValue( tree )
-	elseif tree.t == "expr" then
-		-- TODO: Make this hash to functions
-		local vt = nil
-		local p = tree.p
-		if p == "NUM" then
-			vt = ((nodes[1].str:find("%.") and 1) or 0)   -- double or int
-		elseif p == "BOOL" then
-			vt = true
-		elseif p == "NULL" then
-			vt = "null"
-		elseif p == "STR" then
-			vt = "String"
-		elseif p == "lValue" then
-			vt = setExprTypes( nodes[1] )
-		elseif p == "exprParens" then
-			vt = setExprTypes( nodes[2] )
-		elseif p == "neg" then
-			local expr = nodes[2]
-			vt = setExprTypes( expr )
-			if type(vt) ~= "number" then
-				err.setErrNodeAndRef( nodes[1], expr, 
-						"The negate operator (-) can only apply to numbers" )
-			end
-		elseif p == "!" then
-			local expr = nodes[2]
-			vt = setExprTypes( expr )
-			if vt ~= true then
-				err.setErrNodeAndRef( nodes[1], expr, 
-						"The not operator (!) can only apply to boolean values" )
-			end
-		elseif p == "+" then
-			-- May be numeric add or string concat, depending on the operands
-			assert( nodes[2].tt == "+" )
-			local vtLeft = setExprTypes( nodes[1] )
-			local vtRight = setExprTypes( nodes[3] )
-			if type(vtLeft) == "number" and type(vtRight) == "number" then
-				vt = vtNumber( vtLeft, vtRight )
-			elseif vtLeft == "String" and vtRight == "String" then
-				vt = "String"
-			elseif vtLeft == "String" or vtRight == "String" then
-				-- Check if the other operand can be promoted to string (numbers only)
-				local exprOther, vtOther
-				if vtLeft == "String" then
-					exprOther = nodes[3]
-					vtOther = vtRight
-				else
-					exprOther = nodes[1]
-					vtOther = vtLeft
-				end
-				if type(vtOther) == "number" then
-					vt = "String"   -- the number will promote to a string 
-				elseif vtOther == "GameObj" then
-					err.setErrNodeAndRef( nodes[2], exprOther, 
-							"The (+) operator cannot be used on GameObj objects directly. Use the toString() method." )
-				else
-					err.setErrNodeAndRef( nodes[2], exprOther, 
-							"The (+) operator can only apply to numbers or Strings" )
-				end
-			else
-				-- Neither side is valid
-				err.setErrNodeAndRef( nodes[2], nodes[1], 
-						"The (+) operator can only apply to numbers or Strings" )
-			end
-		elseif p == "-" or p == "*" or p == "/" or p == "%" then
-			-- Both sides must be numeric, result is number
-			assert( nodes[2].str == p )
-			local vtLeft = setExprTypes( nodes[1] )
-			local vtRight = setExprTypes( nodes[3] )
-			if type(vtLeft) == "number" and type(vtRight) == "number" then
-				vt = vtNumber( vtLeft, vtRight )
-			else
-				local exprErr = ((type(vtLeft) ~= "number" and nodes[1]) or nodes[3])
-				err.setErrNodeAndRef( nodes[2], exprErr, 
-						"Numeric operator (%s) can only apply to numbers", p )
-			end
-		elseif p == "&&" or p == "||" then
-			-- Both sides must be boolean, result is boolean
-			assert( nodes[2].str == p )
-			local vtLeft = setExprTypes( nodes[1] )
-			local vtRight = setExprTypes( nodes[3] )
-			if vtLeft == true and vtRight == true then
-				vt = true
-			else
-				local exprErr = ((vtLeft ~= true and nodes[1]) or nodes[3])
-				err.setErrNodeAndRef( nodes[2], exprErr, 
-						"Logical operator (%s) can only apply to boolean values", p )
-			end
-		elseif p == "<" or p == ">" or p == "<=" or p == ">=" then
-			-- Both sides must be numeric, result is boolean
-			assert( nodes[2].str == p )
-			local vtLeft = setExprTypes( nodes[1] )
-			local vtRight = setExprTypes( nodes[3] )
-			if type(vtLeft) == "number" and type(vtRight) == "number" then
-				vt = true
-			else
-				local exprErr = ((type(vtLeft) ~= "number" and nodes[1]) or nodes[3])
-				err.setErrNodeAndRef( nodes[2], exprErr, 
-						"Comparison operator (%s) can only apply to numbers", p )
-			end
-		elseif p == "==" or p == "!=" then
-			-- Both sides must have matching-ish type  TODO: Compare in more detail
-			assert( nodes[2].str == p )
-			local vtLeft = setExprTypes( nodes[1] )
-			local vtRight = setExprTypes( nodes[3] )
-			if type(vtLeft) == type(vtRight) then
-				vt = true
-			else
-				err.setErrNodeAndRef( nodes[2], nodes[3], 
-						"Compare operator (%s) must compare matching types", p )
-			end
-		elseif p == "call" then
-			-- Process parameter expressions
-			local exprs = nodes[3].nodes  -- exprList
-			for i = 1, #exprs do
-				setExprTypes( exprs[i] )
-			end
-			local fnValue = nodes[1]
-			if fnValue.tt == "ID" then
-				local fnName = fnValue.str
-				vt = vtAPIFunctions[fnName]
-				if vt == nil then
-					local method = methods[fnName]
-					if method then
-						vt = method.vt
-						if vt == nil then
-							err.setErrNode( fnValue, "Undefined function %s", fnName )
-						end
-					end
-				end
-			else
-				-- TODO: Check method
-				return "String"
-			end
-		else
-			error( "Unknown expr pattern " .. p )
-		end
 
-		-- Set the node's type and return it
-		tree.vt = vt
-		return vt
+--- Type Analysis of expressions  --------------------------------------------
+
+-- The following local functions are all hashed into from the fnVtExprPatterns
+-- table below. They all return the vt of a particular pattern of an expr node
+-- (primaryExpr or expr with binary op) given the children nodes.
+-- If there is an error, they set the error state and return nil.
+
+-- primaryExpr pattern: NUM
+local function vtExprNUM( nodes )
+	return ((nodes[1].str:find("%.") and 1) or 0)   -- double or int
+end
+
+-- primaryExpr pattern: BOOL
+local function vtExprBOOL( nodes )
+	return true
+end
+
+-- primaryExpr pattern: NULL
+local function vtExprNULL( nodes )
+	return "null"
+end
+
+-- primaryExpr pattern: STR
+local function vtExprSTR( nodes )
+	return "String"
+end
+
+-- primaryExpr pattern: exprParens
+local function vtExprExprParens( nodes )
+	return nodes[2].vt
+end
+
+-- primaryExpr pattern: neg
+local function vtExprNeg( nodes )
+	local expr = nodes[2]
+	local vt = expr.vt
+	if type(vt) ~= "number" then
+		err.setErrNodeAndRef( nodes[1], expr, 
+				"The negate operator (-) can only apply to numbers" )
+		return nil
 	end
+	return vt
+end
 
-	-- Process any children nodes of non-expr nodes to look for expressions
-	-- witin other patterns, such as if (expr)
+-- primaryExpr pattern: !
+local function vtExprNot( nodes )
+	local expr = nodes[2]
+	local vt = expr.vt
+	if vt ~= true then
+		err.setErrNodeAndRef( nodes[1], expr, 
+				"The not operator (!) can only apply to boolean values" )
+		return nil
+	end
+	return vt
+end
+
+-- primaryExpr pattern: call
+local function vtExprCall( nodes )
+	local fnValue = nodes[1]
+	if fnValue.tt == "ID" then
+		local fnName = fnValue.str
+		local vt = vtAPIFunctions[fnName]  -- TODO
+		if vt == nil then
+			local method = methods[fnName]
+			if method then
+				vt = method.vt
+				if vt == nil then
+					err.setErrNode( fnValue, "Undefined function %s", fnName )
+				end
+			end
+		end
+		return vt
+	else
+		-- TODO: Check method
+		return "String"
+	end
+end
+
+-- primaryExpr pattern: lValue
+local function vtExprLValue( nodes )
+	return nodes[1].vt
+end
+
+-- expr pattern: +
+local function vtExprPlus( nodes )
+	-- May be numeric add or string concat, depending on the operands
+	assert( nodes[2].tt == "+" )
+	local vtLeft = nodes[1].vt
+	local vtRight = nodes[3].vt
+	if type(vtLeft) == "number" and type(vtRight) == "number" then
+		return vtNumber( vtLeft, vtRight )
+	elseif vtLeft == "String" and vtRight == "String" then
+		return "String"
+	elseif vtLeft == "String" or vtRight == "String" then
+		-- Check if the other operand can be promoted to string (numbers only)
+		local exprOther, vtOther
+		if vtLeft == "String" then
+			exprOther = nodes[3]
+			vtOther = vtRight
+		else
+			exprOther = nodes[1]
+			vtOther = vtLeft
+		end
+		if type(vtOther) == "number" then
+			return "String"   -- the number will promote to a string 
+		elseif vtOther == "GameObj" then
+			err.setErrNodeAndRef( nodes[2], exprOther, 
+					"The (+) operator cannot be used on GameObj objects directly. Use the toString() method." )
+		else
+			err.setErrNodeAndRef( nodes[2], exprOther, 
+					"The (+) operator can only apply to numbers or Strings" )
+		end
+	else
+		-- Neither side is valid
+		err.setErrNodeAndRef( nodes[2], nodes[1], 
+				"The (+) operator can only apply to numbers or Strings" )
+	end
+	return nil
+end
+
+-- expr patterns: -, *, /, %
+local function vtExprNumeric( nodes )
+	-- Both sides must be numeric, result is number
+	local vtLeft =  nodes[1].vt
+	local vtRight = nodes[3].vt
+	if type(vtLeft) == "number" and type(vtRight) == "number" then
+		return vtNumber( vtLeft, vtRight )
+	end
+	local exprErr = ((type(vtLeft) ~= "number" and nodes[1]) or nodes[3])
+	err.setErrNodeAndRef( nodes[2], exprErr, 
+			"Numeric operator (%s) can only apply to numbers", nodes[2].str )
+	return nil
+end
+
+-- expr patterns: &&, ||
+local function vtExprLogical( nodes )
+	-- Both sides must be boolean, result is boolean
+	local vtLeft = nodes[1].vt
+	local vtRight = nodes[3].vt
+	if vtLeft == true and vtRight == true then
+		return true
+	end
+	local exprErr = ((vtLeft ~= true and nodes[1]) or nodes[3])
+	err.setErrNodeAndRef( nodes[2], exprErr, 
+			"Logical operator (%s) can only apply to boolean values", nodes[2].str )
+	return nil
+end
+
+-- expr patterns: <, >, <=, >=
+local function vtExprInequality( nodes )
+	-- Both sides must be numeric, result is boolean
+	local vtLeft = nodes[1].vt
+	local vtRight = nodes[3].vt
+	if type(vtLeft) == "number" and type(vtRight) == "number" then
+		return true
+	end
+	local exprErr = ((type(vtLeft) ~= "number" and nodes[1]) or nodes[3])
+	err.setErrNodeAndRef( nodes[2], exprErr, 
+			"Comparison operator (%s) can only apply to numbers", nodes[2].str )
+	return nil
+end
+
+-- expr patterns: ==, !=
+local function vtExprEquality( nodes )
+	-- Both sides must have matching-ish type  TODO: Compare in more detail
+	local vtLeft = nodes[1].vt
+	local vtRight = nodes[3].vt
+	if type(vtLeft) == type(vtRight) then
+		return true
+	end
+	err.setErrNodeAndRef( nodes[2], nodes[3], 
+			"Compare operator (%s) must compare matching types", nodes[2].str )
+	return nil
+end
+
+-- Since there are so many primaryExpr and expr patterns, we hash them to functions
+local fnVtExprPatterns = {
+	-- primaryExpr patterns
+	["NUM"]         = vtExprNUM,
+	["BOOL"]        = vtExprBOOL,
+	["NULL"]        = vtExprNULL,
+	["STR"]         = vtExprSTR,
+	["exprParens"]  = vtExprExprParens,
+	["neg"]         = vtExprNeg,
+	["!"]           = vtExprNot,
+	["call"]        = vtExprCall,
+	["lValue"]      = vtExprLValue,
+	-- binary operators
+	["+"]           = vtExprPlus,
+	["-"]           = vtExprNumeric,
+	["*"]           = vtExprNumeric,
+	["/"]           = vtExprNumeric,
+	["%"]           = vtExprNumeric,
+	["&&"]          = vtExprLogical,
+	["||"]          = vtExprLogical,
+	["<"]           = vtExprInequality,
+	[">"]           = vtExprInequality,
+	["<="]          = vtExprInequality,
+	[">="]          = vtExprInequality,
+	["=="]          = vtExprEquality,
+	["!="]          = vtExprEquality,
+}
+
+-- Do expression type analysis for the given parse tree.
+-- Set the vt field in each primaryExpr, expr, and lValue node to its value type.
+-- If an error is found, set the error state to the first error.
+local function setExprTypes( tree )
+	-- Process any children nodes recursively first
+	local nodes = tree.nodes
 	if nodes then
 		for i = 1, #nodes do
 			setExprTypes( nodes[i] )
 		end
 	end
-	return false   -- Not an expr node
-end
 
--- Find defined methods in parseTrees and put them in methods.
--- Return true if successful, false if not.
-local function getMethods( parseTrees )
-	for i = 1, #parseTrees do
-		local tree = parseTrees[i]
-		assert( tree.t == "line" )
-		local p = tree.p
-		if p == "eventFn" then
-			-- Code12 event func (e.g. setup, update)
-			local node = tree.nodes[3]
-			local fnName = node.str
-			methods[fnName] = { node = node, vt = false }   -- void
-		elseif p == "func" then
-			-- User-defined function
-			local retType = tree.nodes[1]
-			local node = tree.nodes[2]
-			if node.tt ~= "ID" or node.str:find("%.") then 
-				err.setErrNode( node, "User-defined function names cannot contain a dot (.)" )
-			else
-				local fnName = node.str
-				methods[fnName] = { node = node, vt = checkJava.vtFromRetType( retType ) }
-			end
+	-- Set the vt if this tree node has a value type.
+	if tree.t == "lValue" then
+		return vtLValueNode( tree )
+	elseif tree.t == "expr" then
+		-- Look up the vt function above to call
+		local fnVt = fnVtExprPatterns[tree.p]
+		if fnVt == nil then
+			error( "Unknown expr pattern " .. p )
 		end
-		if err.hasErr() then
-			return false
-		end
+		tree.vt = fnVt( nodes )
 	end
-	return true
 end
 
 
@@ -509,9 +578,8 @@ end
 -- The expr must already have had type analysis done on it and have a vt field.
 -- If the types are not compatible then set the error state and return false.
 function checkJava.canAssignToLValue( lValue, expr )
-	return checkJava.canAssignToVt( lValue, vtLValue( lValue ), expr )
+	return checkJava.canAssignToVt( lValue, vtLValueNode( lValue ), expr )
 end
-
 
 -- Init the state for a new program with the given parseTrees
 -- Return true if successful, false if not.
