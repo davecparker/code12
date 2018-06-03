@@ -40,6 +40,10 @@ class UserCode extends Code12Program
 		ct.circle(x / 2 + 10, 200, 150);
 		bigBall = ct.circle(x, 400, 200);
 		bigBall.setFillColor( "black" );
+
+		double z = ball.x + 1;
+		if (ball == bigBall || bigBall != null)
+			z = 2;
 	}
 
 	public void update()

@@ -139,6 +139,24 @@ function javaTypes.vtCanAcceptVtExpr( vt, vtExpr )
 	return false
 end
 
+-- Return true if vt1 and vt2 can be compared for equality
+function javaTypes.canCompareVts( vt1, vt2 )
+	if vt1 == vt2 then
+		return true     -- same non-array type
+	end
+	local t1 = type(vt1)
+	local t2 = type(vt2)
+	if t1 == "number" and t2 == "number" then
+		return true       -- can compare int to double
+	elseif t1 == "string" and t2 == "string" then
+		-- Objects of different types
+		return (vt1 == "null" or vt2 == "null")  -- can compare any object to null
+	elseif t1 == "table" and t2 == "table" then
+		return t1.vt == t2.vt    -- can compare arrays of same type
+	end	
+	return false
+end
+
 
 ------------------------------------------------------------------------------
 

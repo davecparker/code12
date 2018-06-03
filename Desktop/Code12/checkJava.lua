@@ -89,7 +89,7 @@ local function vtVar( varNode )
 end
 
 -- Return the value type (vt) for an lValue node.
--- If there is an undefined type, then set the error state and return nil.
+-- If there is an error, then set the error state and return nil.
 local function vtLValueNode( lValue )
 	assert( lValue.t == "lValue" )
 	local p = lValue.p
@@ -121,10 +121,40 @@ local function vtLValueNode( lValue )
 		end
 		return vtVar( varNode )
 	elseif p == "field" then
-		return 1   -- TODO: check known field types
+		-- Public field access (only possible with Math or GameObj)
+		local object = nodes[1]
+		local field = nodes[3]
+		-- Determine the class
+		local className
+		assert( object.tt == "ID" )
+		local objName = object.str
+		if objName == "Math" then   -- Math has all static members
+			className = "Math"
+		else
+			local vtObj = vtVar( object )
+			if vtObj == "GameObj" then
+				className = vtObj
+			else
+				err.setErrNode( object, "Cannot access data fields of type %s",
+						javaTypes.typeNameFromVt( vtObj ))
+				return nil
+			end
+		end
+		local class = apiTables[className]
+
+		-- Look up the field
+		assert( field.tt == "ID" )
+		local fieldName = field.str
+		local vtField = class.fields[fieldName]
+		if vtField == nil then
+			err.setErrNodeAndRef( field, object, 
+					"Unknown field \"%s\" for class %s",
+					fieldName, className )
+			return nil
+		end
+		return vtField
 	end
 	error( "Unknown lValue pattern " .. p )
-	return nil
 end
 
 
@@ -273,20 +303,21 @@ local function vtExprInequality( nodes )
 	end
 	local exprErr = ((type(vtLeft) ~= "number" and nodes[1]) or nodes[3])
 	err.setErrNodeAndRef( nodes[2], exprErr, 
-			"Comparison operator (%s) can only apply to numbers", nodes[2].str )
+			"Inequality operator (%s) can only apply to numbers", nodes[2].str )
 	return nil
 end
 
 -- expr patterns: ==, !=
 local function vtExprEquality( nodes )
-	-- Both sides must have matching-ish type  TODO: Compare in more detail
-	local vtLeft = vtExprNode( nodes[1] )
-	local vtRight = vtExprNode( nodes[3] )
-	if type(vtLeft) == type(vtRight) then
+	local left = nodes[1]
+	local right = nodes[3]
+	local vtLeft = vtExprNode( left)
+	local vtRight = vtExprNode( right )
+	if javaTypes.canCompareVts( vtLeft, vtRight ) then
 		return true
 	end
-	err.setErrNodeAndRef( nodes[3], nodes[1], 
-			"Compare operator (%s) must compare matching types", nodes[2].str )
+	err.setErrNodeAndRef( left, right, "Cannot compare %s to %s", 
+		javaTypes.typeNameFromVt( vtLeft ), javaTypes.typeNameFromVt( vtRight ) )
 	return nil
 end
 
