@@ -11,7 +11,7 @@
 
 -- Code12 modules
 package.path = package.path .. ';../Code12/?.lua'
-local checkJava = require( "checkJava" )
+local javaTypes = require( "javaTypes" )
 local parseJava = require( "parseJava" )
 local err = require( "err" )
 
@@ -105,20 +105,20 @@ local function buildTables()
 				return false
 			end
 			local methodName = nodes[2].str
-			local vtReturn = checkJava.vtFromRetType( nodes[1] )
+			local vtReturn = javaTypes.vtFromRetType( nodes[1] )
 			-- Build the parameter table
 			local paramTable = {}
 			local params = nodes[4].nodes
 			for j = 1, #params do
 				local param = params[j]
-				local vtParam, name = checkJava.vtAndNameFromParam( param )
+				local vtParam, name = javaTypes.vtAndNameFromParam( param )
 				paramTable[#paramTable + 1] = { name = name, vt = vtParam }
 			end
 			-- Add the method record
 			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable }
 		elseif p == "varDecl" then
 			-- Add field record(s)
-			local vt = checkJava.vtFromVarType( tree.nodes[1] )
+			local vt = javaTypes.vtFromVarType( tree.nodes[1] )
 			local idList = nodes[2].nodes
 			for j = 1, #idList do
 				local idNode = idList[j]
