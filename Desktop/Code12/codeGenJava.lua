@@ -136,12 +136,18 @@ end
 --     bird.setFillColor( "red" )
 --	   foo()
 function fnCallCode( tree )
+	local nodes = tree.nodes
 	local parts   -- There could be several parts, so prepare for a table.concat
 
 	-- Function name/value
-	local fnValue = tree.nodes[1]
+	local fnValue = nodes[1]
 	if fnValue.p == "method" then
-		parts = { fnValue.nodes[1].str, ":", fnValue.nodes[2].str, "(" }  -- e.g. bird:delete(
+		local varName = fnValue.nodes[1].str
+		if checkJava.vtClassVar( varName ) ~= nil then
+			parts = { "this.", varName, ":", fnValue.nodes[2].str, "(" }  -- e.g. this.ball:delete(
+		else
+			parts = { varName, ":", fnValue.nodes[2].str, "(" }  -- e.g. obj:delete(
+		end
 	else
 		local fnName = fnValue.str
 		if string.starts( fnName, "ct." ) then
@@ -152,7 +158,7 @@ function fnCallCode( tree )
 	end
 
 	-- Parameter list
-	local exprs = tree.nodes[3].nodes
+	local exprs = nodes[3].nodes
 	for i = 1, #exprs do
 		local expr = exprs[i]
 		local vt = checkJava.vtCheckExpr( expr )
@@ -291,6 +297,9 @@ local function generateStmt( tree )
 	local nodes = tree.nodes
 	if p == "call" then
 		-- fnValue ( exprList )
+		if checkJava.vtCheckCall( nodes[1], nodes[3] ) == nil then
+			return
+		end
 		beginLuaLine( fnCallCode( tree ) )
 	elseif p == "assign" then
 		-- lValue rightSide

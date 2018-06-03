@@ -39,6 +39,7 @@ class UserCode extends Code12Program
 		ball = ct.circle(x + 30, 70, 50);
 		ct.circle(x / 2 + 10, 200, 150);
 		bigBall = ct.circle(x, 400, 200);
+		bigBall.setFillColor( "black" );
 	}
 
 	public void update()
@@ -48,7 +49,7 @@ class UserCode extends Code12Program
 		boolean tooFast, tooSlow;
 
 		// Move ball
-		moveBall( true );
+		int xNew = moveBall( true );
 
 		// Move bigBall
 		bigBall.x += speed;

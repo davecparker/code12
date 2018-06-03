@@ -27,27 +27,34 @@ local vtNodes = {}      -- types of expression nodes determined on a line
 
 --- Misc Analysis Functions --------------------------------------------------
 
--- Find defined methods in parseTrees and put them in the methods table.
+-- Find user-defined methods in parseTrees and put them in the methods table.
 -- Return true if successful, false if an error occured.
 local function getMethods( parseTrees )
 	for i = 1, #parseTrees do
 		local tree = parseTrees[i]
 		assert( tree.t == "line" )
 		local p = tree.p
+		local nodes = tree.nodes
 		if p == "eventFn" then
 			-- Code12 event func (e.g. setup, update)
-			local nameNode = tree.nodes[3]
-			assert( nameNode.tt == "ID" )
-			methods[nameNode.str] = { node = nameNode, vt = false }   -- void
+			-- TODO: Check that the API signature is what is needed for this event
 		elseif p == "func" then
 			-- User-defined function
-			local retType = tree.nodes[1]
-			local nameNode = tree.nodes[2]
+			local nameNode = nodes[2]
 			local fnName = nameNode.str
 			if nameNode.tt ~= "ID" or fnName:find("%.") then 
 				err.setErrNode( nameNode, "User-defined function names cannot contain a dot (.)" )
 			else
-				methods[fnName] = { node = nameNode, vt = javaTypes.vtFromRetType( retType ) }
+				-- Build the parameter table
+				local paramTable = {}
+				local params = nodes[4].nodes
+				for i = 1, #params do
+					local param = params[i]
+					local vtParam, name = javaTypes.vtAndNameFromParam( param )
+					paramTable[#paramTable + 1] = { name = name, vt = vtParam }
+				end
+				-- Add entry to methods table
+				methods[fnName] = { vt = javaTypes.vtFromRetType( nodes[1] ), params = paramTable }
 			end
 		end
 		if err.hasErr() then
@@ -182,24 +189,7 @@ end
 
 -- primaryExpr pattern: call
 local function vtExprCall( nodes )
-	local fnValue = nodes[1]
-	if fnValue.tt == "ID" then
-		local fnName = fnValue.str
-		local vt = "GameObj"  -- TODO: get from API table
-		if vt == nil then
-			local method = methods[fnName]
-			if method then
-				vt = method.vt
-				if vt == nil then
-					err.setErrNode( fnValue, "Undefined function %s", fnName )
-				end
-			end
-		end
-		return vt
-	else
-		-- TODO: Check method
-		return "String"
-	end
+	return checkJava.vtCheckCall( nodes[1], nodes[3] )
 end
 
 -- primaryExpr pattern: lValue
@@ -446,14 +436,8 @@ end
 -- If the types are not compatible then set the error state and return false.
 function checkJava.canAssignToVt( node, vt, expr )
 	local vtExpr = vtExprNode( expr )
-	if vt == nil or vtExpr == nil then
-		return false
-	elseif vt == vtExpr then
-		return true  -- same types so directly compatible
-	elseif vtExpr == 0 and type(vt) == "number" then
-		return true    -- int can silently promote to double
-	elseif vtExpr == "null" and type(vt) == "string" then
-		return true    -- null can be assigned to any object (String or GameObj)
+	if javaTypes.vtCanAcceptVtExpr( vt, vtExpr ) then
+		return true
 	end
 
 	-- Check for various type mismatch combinations
@@ -483,6 +467,88 @@ end
 -- If the types are not compatible then set the error state and return false.
 function checkJava.canAssignToLValue( lValue, expr )
 	return checkJava.canAssignToVt( lValue, vtLValueNode( lValue ), expr )
+end
+
+-- Do type checking on a function or method call with the given fnValue and 
+-- paramList nodes If there is an error then set the error state and return nil.
+-- Return the return type vt if successful.
+function checkJava.vtCheckCall( fnValue, paramList )
+	local method
+	local fnName
+	if fnValue.tt == "ID" then
+		-- A global API or user-defined method call
+		fnName = fnValue.str
+
+		-- Look in the ct section of the API then user-defined methods
+		method = apiTables["ct"].methods[fnName] or methods[fnName]
+		if method == nil then
+			err.setErrNode( fnValue, "Undefined function %s", fnName )
+			return nil
+		end
+	else
+		-- A method call
+		assert( fnValue.t == "fnValue" )
+		local object = fnValue.nodes[1]
+		local fnNode = fnValue.nodes[2]
+		fnName = fnNode.str
+
+		-- Determine the class
+		local className
+		assert( object.tt == "ID" )
+		local objName = object.str
+		if objName == "Math" then   -- Math has all static methods
+			className = "Math"
+		else
+			local vtObj = vtVar( object )
+			if vtObj == "String" or vtObj == "GameObj" then
+				className = vtObj
+			else
+				err.setErrNode( object, "Method call on invalid type (%s)",
+						javaTypes.typeNameFromVt( vtObj ))
+				return nil
+			end
+		end
+		local class = apiTables[className]
+
+		-- Look up the method
+		method = class.methods[fnName]
+		if method == nil then
+			err.setErrNodeAndRef( fnNode, object, 
+					"Unknown method \"%s\" for class %s",
+					fnName, className )
+			return nil
+		end
+	end
+
+	-- Check parameter count
+	local params = paramList.nodes
+	local min = method.min or #method.params
+	if #params < min then
+		err.setErrNodeAndRef( paramList, fnValue, 
+				"Not enough parameters passed to %s (requires %d)", fnName, min )
+		return nil
+	elseif #params > #method.params then
+		err.setErrNodeAndRef( paramList, fnValue, 
+				"Too many parameters passed to %s", fnName )
+		return nil
+	end
+
+	-- Check parameter types for validity and match with the API
+	print(fnName .. " was passed " .. #params .. " params")
+	for i = 1, #params do
+		local expr = params[i]
+		local vtPassed = vtExprNode( expr )
+		local vtNeeded = method.params[i].vt
+		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
+			err.setErrNode( expr, "Parameter %d of %s expects type %s, but %s was passed",
+					i, fnName, javaTypes.typeNameFromVt( vtNeeded ), 
+					javaTypes.typeNameFromVt( vtPassed ))
+			return nil
+		end
+	end
+
+	-- Result is the method's return type
+	return method.vt 
 end
 
 -- Init the state for a new line in the program

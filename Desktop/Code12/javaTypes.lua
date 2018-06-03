@@ -123,6 +123,22 @@ function javaTypes.typeNameFromVt( vt )
 	return mapVtToTypeName[vt] or "(unknown)"
 end
 
+-- Return true if vtExpr can be passed or assigned to a variable of type vt.
+function javaTypes.vtCanAcceptVtExpr( vt, vtExpr )
+	if vtExpr == nil then
+		return false   -- unknown type
+	elseif vt == nil then
+		return true    -- assigning to "Object", will accept anything
+	elseif vt == vtExpr then
+		return true  -- same types so directly compatible
+	elseif vtExpr == 0 and type(vt) == "number" then
+		return true    -- int can silently promote to double
+	elseif vtExpr == "null" and type(vt) == "string" then
+		return true    -- null can be assigned to any object (String or GameObj)
+	end
+	return false
+end
+
 
 ------------------------------------------------------------------------------
 
