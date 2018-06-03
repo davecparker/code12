@@ -162,7 +162,6 @@ function fnCallCode( tree )
 	for i = 1, #exprs do
 		local expr = exprs[i]
 		local vt = checkJava.vtCheckExpr( expr )
-		-- TODO: Check param type 
 		parts[#parts + 1] = exprCode( expr )
 		if i < #exprs then
 			parts[#parts + 1] = ", "
@@ -197,7 +196,7 @@ function exprCode( expr )
 	if luaOp then
 		local leftExpr = nodes[1]
 		local rightExpr = nodes[3]
-		-- TODO: Check if the + operator is concatenating strings
+		-- Check if the + operator is concatenating strings
 		if luaOp == " + " and checkJava.vtKnownExpr( expr ) == "String" then
 			luaOp = " .. "  -- TODO: Lua tables (GameObj) will not do a toString automatically
 		end
