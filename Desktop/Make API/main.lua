@@ -146,6 +146,47 @@ local function vtStr( vt )
 	end
 end
 
+-- Remove duplicate methods and mark them as overloaded as necessary.
+local function fixOverloads()
+	for iClass = 1, #classes do
+		local class = classes[iClass]
+
+		local prevMethod = nil
+		local i = 1
+		while i <= #class.methods do
+			local method = class.methods[i]
+
+			-- Does this method have the same name as the previous one?
+			if prevMethod and method.name == prevMethod.name then
+
+				-- Keep the one with more parameters, and set the min field
+				if #method.params > #prevMethod.params then
+					-- This one has more
+					local min = prevMethod.min or #prevMethod.params
+					method.min = min
+					table.remove( class.methods, i - 1 )  -- remove previous one
+					prevMethod = method
+				elseif #method.params < #prevMethod.params then
+					-- Previous one had more
+					prevMethod.min = #method.params
+					table.remove( class.methods, i  )  -- remove this one
+				else
+					-- They have the same number. 
+					-- This should only happen for Math.abs, Math.min, and Math.max,
+					-- which have int and double versions.
+					-- Mark as overloaded, print warning, and delete this one
+					print( string.format( "%s.%s is overloaded", class.name, method.name ) )
+					prevMethod.overloaded = true
+					table.remove( class.methods, i  )  -- remove this one
+				end
+			else
+				i = i + 1
+				prevMethod = method
+			end
+		end
+	end
+end
+
 -- Make the Lua output file from the parseTrees. Return true if successful.
 local function makeLuaFile()
 	-- Open the output file
@@ -180,9 +221,16 @@ local function makeLuaFile()
 		for i = 1, #class.methods do
 			local method = class.methods[i]
 
-			outFile:write( "        [\"" .. method.name .. "\"] = { vt = " .. vtStr(method.vt) ..", params = {" )
+			outFile:write( "        [\"" .. method.name .. "\"] = { vt = " .. vtStr(method.vt) ..", " )
+			if method.min then
+				outFile:write( "min = " .. method.min .. ", " )
+			end
+			if method.overloaded then
+				outFile:write( "overloaded = true, " )
+			end
 
 			-- Write this method's parameters
+			outFile:write( "params = {")
 			for j = 1, #method.params do
 				local param = method.params[j]
 
@@ -210,6 +258,7 @@ local function runApp()
 	if readSourceFile() then
 		if parseFile() then
 			buildTables()
+			fixOverloads()
 			makeLuaFile()
 			print( "Lua file created successfully" )
 		else
