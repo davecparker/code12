@@ -30,12 +30,14 @@ class DrawingProgram extends Code12Program
    GameObj ellipse;        // clickable square for drawing ellipses
    GameObj rectangle;      // clickable square for drawing rectangles
    GameObj line;           // clickable square for drawing lines
-   GameObj selectedShape;  // box which is currently selected
+   GameObj selectBox;      // clickable square for selecting drawn shapes
+   GameObj selectedShapeBox;  // box which is currently selected
    GameObj newObj;         // new shape currently being drawn
    GameObj selectedObj;    // last drawn object clicked on
-   
-   GameObj black;
-   GameObj white;
+
+   // clickable squares for selecting fill/line color
+   GameObj black; 
+   GameObj white; 
    GameObj red;
    GameObj green;
    GameObj blue;
@@ -46,10 +48,11 @@ class DrawingProgram extends Code12Program
    GameObj orange;
    GameObj pink;
    GameObj purple;
-   GameObj selectedColorSwatch;
-   String selectedColor;
+   GameObj selectedColorSwatch; // which color square has been selected
+   String selectedColor;        // which color has been selected
    
    double xMinColors;
+   boolean selectBoxOn;
       
    public void start()
    {  
@@ -86,6 +89,11 @@ class DrawingProgram extends Code12Program
       iconImage = ct.line( line.x - boxSize * 0.35, line.y + boxSize * 0.35, line.x + boxSize * 0.35, line.y - boxSize * 0.35 );
       line.setLayer( 2 );
       iconImage.setLayer( 2 );
+      
+      // Make arrow icon for selecting objects
+      selectBox = ct.rect( line.x + boxSize * 2, yBoxes, boxSize, boxSize, "white" );
+      selectBox.clickable = true;
+      iconImage = ct.image( "arrow.png", selectBox.x, selectBox.y, boxSize );
       
       // Make color boxes
       purple = ct.rect( 100 - boxSize / 2, yBoxes, boxSize, boxSize, "purple" );
@@ -144,9 +152,9 @@ class DrawingProgram extends Code12Program
       xMinColors = black.x - boxSize / 2;
       
       // Set selected shape
-      selectedShape = circle;
-      // selectedShape.setFillColor( "green" );
-      selectedShape.lineWidth = 3;      
+      selectedShapeBox = circle;
+      selectedShapeBox.lineWidth = 3;
+      selectBoxOn = false;
       
       // Set selected color
       selectedColor = "black";
@@ -156,22 +164,23 @@ class DrawingProgram extends Code12Program
       
    public void onMousePress( GameObj obj, double x, double y )
    {
-      if ( obj == null )
+      if ( y > boxSize ) 
       {
-         if ( y > boxSize )
-         {
+         // click is in the drawing area below the toolbox row
+         if ( !selectBoxOn )
+         {       
             // draw a new shape
-            if ( selectedShape == circle || selectedShape == ellipse )
+            if ( selectedShapeBox == circle || selectedShapeBox == ellipse )
                newObj = ct.circle( x, y, 0 );
-            else if ( selectedShape == rectangle )
+            else if ( selectedShapeBox == rectangle )
                newObj = ct.rect( x, y, 0, 0 );
-            else if ( selectedShape == line )
+            else if ( selectedShapeBox == line )
             {
                newObj = ct.line( x, y, x, y );
                newObj.setLineColor( selectedColor );
             }
             
-            if ( selectedShape != line )
+            if ( selectedShapeBox != line )
             {
                newObj.clickable = true;
                newObj.setFillColor( selectedColor );
@@ -179,28 +188,34 @@ class DrawingProgram extends Code12Program
             // Make newObj the selectedObj
             selectedObj = newObj;
          }
+         else if ( obj != null )
+         {
+            selectedObj = obj;
+         }
       }
-      else if ( y > boxSize )
+      else if ( obj != null )
       {
-         // obj is a drawn shape
-         selectedObj = obj;
-      }
-      else if ( x >= xMinColors )
-      {
-         // obj is a color swatch
-         selectedColorSwatch.lineWidth = 1;
-         selectedColorSwatch = obj;
-         selectedColorSwatch.lineWidth = 3;
-         selectedColorSwatch.setLayer( 2 );
-         selectedColor = selectedColorSwatch.getText();
-      }
-      else 
-      {
-         // obj is a shape selector
-         selectedShape.lineWidth = 1;
-         selectedShape = obj;
-         selectedShape.lineWidth = 3;
-         selectedColorSwatch.setLayer( 2 );
+         if ( x >= xMinColors )
+         {
+            // obj is a color swatch
+            selectedColorSwatch.lineWidth = 1;
+            selectedColorSwatch = obj;
+            selectedColorSwatch.lineWidth = 3;
+            selectedColorSwatch.setLayer( 2 );
+            selectedColor = selectedColorSwatch.getText();
+         }
+         else
+         {
+            // obj is a shape selector or the select box
+            selectedShapeBox.lineWidth = 1;
+            selectedShapeBox = obj;
+            selectedShapeBox.lineWidth = 3;
+                        
+            if ( obj == selectBox )
+               selectBoxOn = true;
+            else
+               selectBoxOn = false;
+         }
       }
    }
    
@@ -208,29 +223,29 @@ class DrawingProgram extends Code12Program
    {
       if ( y > boxSize )
       {
-         if ( obj == null )
+         if ( !selectBoxOn )
          {
-            if ( selectedShape == circle )
+            if ( selectedShapeBox == circle )
             {
                double newDiameter = 2 * ct.distance( newObj.x, newObj.y, x, y );
                newObj.width = newDiameter;
                newObj.height = newDiameter;
             }
-            else if ( selectedShape == ellipse || selectedShape == rectangle )
+            else if ( selectedShapeBox == ellipse || selectedShapeBox == rectangle )
             {
                double newWidth = 2 * ct.distance( newObj.x, 0, x, 0 );
                double newHeight = 2 * ct.distance( 0, newObj.y, 0, y );
                newObj.width = newWidth;
                newObj.height = newHeight;
             }
-            else if ( selectedShape == line )
+            else if ( selectedShapeBox == line )
             {
                newObj.width = x - newObj.x;
                newObj.height = y - newObj.y;
             }
             newObj.group = "drawing";
          }
-         else if ( obj.y > boxSize )
+         else if ( obj != null )
          {
             obj.x = x;
             obj.y = y;
@@ -242,10 +257,11 @@ class DrawingProgram extends Code12Program
    public void onKeyPress( String keyName )
    {
       if ( keyName.equals( "backspace" ) )
+      {
          if ( selectedObj != null )
             selectedObj.delete();
-      //else
-      if ( keyName.equals( "c" ) )
+      }
+      else if ( keyName.equals( "c" ) )
          ct.clearGroup( "drawing" );
    }
 }
