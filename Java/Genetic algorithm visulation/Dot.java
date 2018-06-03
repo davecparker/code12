@@ -10,7 +10,7 @@ public class Dot {
   public AIBrain brain;
   public boolean veteran;
   public boolean dead;
-  
+
   public Dot(Game ct, GameObj goal, GameObj[] obstacles) {
     this.ct = ct;
     this.goal = goal;
@@ -19,7 +19,7 @@ public class Dot {
     this.dot = ct.circle(ct.getWidth() / 2, ct.getHeight() - 2, 1);
     this.dot.setFillColor("blue");
   }
-  
+
   public Dot(Game ct, GameObj goal, GameObj[] obstacles, AIBrain brain) {
     this.ct = ct;
     this.goal = goal;
@@ -57,7 +57,7 @@ public class Dot {
     if (isWithinGoal())
       kill();
   }
-  
+
   private boolean isWithinGoal() {
     return this.dot.hit(this.goal);
   }
@@ -83,12 +83,12 @@ public class Dot {
   private boolean isOutOfDirections() {
     return this.brain.step >= this.brain.directions.length;
   }
-  
+
   public void kill() {
     this.dead = true;
     stopMoving();
   }
-  
+
   public void stopMoving() {
     this.dot.xSpeed = 0;
     this.dot.ySpeed = 0;

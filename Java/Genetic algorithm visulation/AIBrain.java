@@ -27,7 +27,7 @@ public class AIBrain {
       this.directions[i] = this.spatialDirections[random];
     }
   }
-  
+
   public void mutate() {
     for (int i = 0; i < 10; i++) {
       int randIndex = (int) (Math.random() * (this.directions.length - 1));
@@ -35,12 +35,12 @@ public class AIBrain {
       this.directions[randIndex] = this.spatialDirections[randDirection];
     }
   }
-  
+
   public AIBrain clone() {
     AIBrain newBrain = new AIBrain();
     for (int i = 0; i < this.directions.length; i++)
       newBrain.directions[i] = this.directions[i];
     return newBrain;
   }
-  
+
 }
