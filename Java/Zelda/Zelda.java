@@ -13,6 +13,7 @@ class MainProgram extends Code12Program
    GameObj link;
    double linkWidth;
    double wallWidth;
+   double linkSpeed;
    
    public void start()
    {  
@@ -22,6 +23,7 @@ class MainProgram extends Code12Program
       
       linkWidth = 10;
       wallWidth = 5;
+      linkSpeed = 1;
       double doorSize = 20;
       double treasureWidth = 10;
       
@@ -193,6 +195,35 @@ class MainProgram extends Code12Program
       {
          ct.setScreen( "red" );
       }
-
+      
+      if ( keyName.equals( "up" ) )
+      {
+         link.xSpeed = 0;
+         link.ySpeed = -linkSpeed;
+      }
+      else if ( keyName.equals( "down" ) )
+      {
+         link.xSpeed = 0;
+         link.ySpeed = linkSpeed;
+      }
+      else if ( keyName.equals( "left" ) )
+      {
+         link.xSpeed = -linkSpeed;
+         link.ySpeed = 0;
+      }
+      else if ( keyName.equals( "right" ) )
+      {
+         link.xSpeed = linkSpeed;
+         link.ySpeed = 0;
+      }
+   }
+   
+   public void onKeyRelease( String keyName )
+   {
+      if ( keyName.equals("up") || keyName.equals("down") || keyName.equals("left") || keyName.equals("right") )
+      {
+         link.xSpeed = 0;
+         link.ySpeed = 0;      
+      }
    }
 }
