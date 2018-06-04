@@ -20,9 +20,17 @@ local err = require( "err" )
 
 
 -- UI metrics
+local dyToolbar = 40
 local dyStatusBar = 30
 local fontSizeUI = 12
+local toolbarShade = 0.9
+local lineShade = 0.5
 
+-- Misc constants
+local numSyntaxLevels = 12
+
+-- Program state
+local syntaxLevel = numSyntaxLevels   -- programming syntax level
 
 -- The user source file
 local sourceFile = {
@@ -42,10 +50,12 @@ local ui = {
 	width = 0,             -- window width
 	height = 0,            -- window height
 	background = nil,      -- white background rect
+	toolbarGroup = nil,    -- display group for toolbar
 	statusBar = nil,       -- status bar rect
 	statusBarText = nil,   -- text object in the status bar
 	chooseFileBtn = nil,   -- Choose File button in status bar
 	openFileBtn = nil,     -- Open button in status bar
+	outputGroup = nil,     -- display group for program output area
 	gameGroup = nil,       -- display group for game output
 	errGroup = nil,        -- display group for error display
 	dyErrLine = 0,         -- line spacing for error lines
@@ -69,6 +79,20 @@ end
 
 function ct.intDiv( n, d )
 	return math.floor( n / d )
+end
+
+
+--- Utility Functions ------------------------------------------------
+
+-- Create and return a display group in parent, optionally located at x, y
+local function makeGroup( parent, x, y )
+	local g = display.newGroup()
+	if parent then
+		parent:insert( g )
+	end
+	g.x = x or 0
+	g.y = y or 0
+	return g
 end
 
 
@@ -189,9 +213,9 @@ end
 local function makeStatusBar()
 	ui.statusBar = display.newRect( 0, ui.height - dyStatusBar / 2, ui.width, dyStatusBar )
 	ui.statusBar.anchorX = 0
-	ui.statusBar:setFillColor( 0.8 )
+	ui.statusBar:setFillColor( toolbarShade )
 	ui.statusBar.strokeWidth = 1
-	ui.statusBar:setStrokeColor( 0 )
+	ui.statusBar:setStrokeColor( lineShade )
 	ui.chooseFileBtn = widget.newButton{
 		x = 10, 
 		y = ui.statusBar.y,
@@ -215,6 +239,7 @@ local function makeStatusBar()
 		fontSize = fontSizeUI,
 	}
 	ui.openFileBtn.anchorX = 1
+	updateStatusBar()
 end
 
 -- Make and return a highlight rectangle, in the reference color if ref
@@ -242,9 +267,8 @@ end
 local function makeErrDisplay()
 	-- Make group to hold all err display items
 	removeErrorDisplay()
-	local group = display.newGroup()
+	local group = makeGroup( ui.outputGroup, 0, 30 )
 	ui.errGroup = group
-	group.y = 30
 	local numSourceLines = 7
 
 	-- Get font metrics
@@ -262,9 +286,7 @@ local function makeErrDisplay()
 	local xText = math.round( dxLineNum + ui.dxErrChar )
 
 	-- Make the highlight rectangles
-	local highlightGroup = display.newGroup()
-	highlightGroup.x = xText
-	group:insert( highlightGroup )
+	local highlightGroup = makeGroup( group, xText, 0 )
 	group.highlightGroup = highlightGroup
 	local y = ((numSourceLines - 1) / 2) * dyLine
 	group.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
@@ -273,8 +295,7 @@ local function makeErrDisplay()
 							ui.dxErrChar * 6, dyLine, true )
 
 	-- Make the lines numbers
-	local lineNumGroup = display.newGroup()
-	group:insert( lineNumGroup )
+	local lineNumGroup = makeGroup( group )
 	group.lineNumGroup = lineNumGroup
 	for i = 1, numSourceLines do
 		local t = display.newText{
@@ -292,9 +313,7 @@ local function makeErrDisplay()
 	end
 
 	-- Make the source lines
-	local sourceGroup = display.newGroup()
-	sourceGroup.x = xText
-	group:insert( sourceGroup )
+	local sourceGroup = makeGroup( group, xText, 0 )
 	group.sourceGroup = sourceGroup
 	for i = 1, numSourceLines do
 		local t = display.newText{
@@ -426,9 +445,58 @@ local function initNewProgram()
 	if ui.gameGroup then
 		ui.gameGroup:removeSelf()
 	end
-	ui.gameGroup = display.newGroup()
+	ui.gameGroup = makeGroup( ui.outputGroup )
 	ui.gameGroup.isVisible = false
 	removeErrorDisplay()
+end
+
+-- Function to process the user file (parse then run or show error)
+local function processUserFile()
+	-- Read the file
+	if not readSourceFile() then
+		return
+	end
+
+	-- Get ready to run a new program
+	initNewProgram()
+
+	-- Create parse tree array
+	local startTime = system.getTimer()
+	local parseTrees = {}
+	local startTokens = nil
+	err.initProgram()
+	parseJava.init()
+	for lineNum = 1, #sourceFile.strLines do
+		local strUserCode = sourceFile.strLines[lineNum]
+		local tree, tokens = parseJava.parseLine( strUserCode, 
+									lineNum, startTokens, syntaxLevel )
+		if tree == false then
+			-- Line is incomplete, carry tokens forward to next line
+			startTokens = tokens
+		else
+			startTokens = nil
+			if tree == nil then
+				showError()
+				return
+			end
+			parseTrees[#parseTrees + 1] = tree
+		end
+	end
+	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
+
+	-- Do Semantic Analysis on the parse trees
+	if not checkJava.initProgram( parseTrees ) then
+		showError()
+	else
+		-- Make and run the Lua code
+		local codeStr = codeGenJava.getLuaCode( parseTrees )
+		-- print( codeStr )
+		if err.hasErr() then
+			showError()
+		else
+			runLuaCode( codeStr )
+		end
+	end
 end
 
 -- Function to check user file for changes and (re)parse it if modified
@@ -436,52 +504,46 @@ local function checkUserFile()
 	if sourceFile.path then
 		local timeMod = lfs.attributes( sourceFile.path, "modification" )
 		if timeMod and timeMod > sourceFile.timeModLast then
-			if readSourceFile() then
-				sourceFile.timeModLast = timeMod
-
-				-- Get ready to run a new program
-				initNewProgram()
-
-				-- Create parse tree array
-				local startTime = system.getTimer()
-				local parseTrees = {}
-				local startTokens = nil
-				err.initProgram()
-				parseJava.init()
-				for lineNum = 1, #sourceFile.strLines do
-					local strUserCode = sourceFile.strLines[lineNum]
-					local tree, tokens = parseJava.parseLine( strUserCode, lineNum, startTokens )
-					if tree == false then
-						-- Line is incomplete, carry tokens forward to next line
-						startTokens = tokens
-					else
-						startTokens = nil
-						if tree == nil then
-							showError()
-							return
-						end
-						parseTrees[#parseTrees + 1] = tree
-					end
-				end
-				print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
-
-				-- Do Semantic Analysis on the parse trees
-				if not checkJava.initProgram( parseTrees ) then
-					showError()
-				else
-					-- Make and run the Lua code
-					local codeStr = codeGenJava.getLuaCode( parseTrees )
-					print( codeStr )
-					if err.hasErr() then
-						showError()
-					else
-						runLuaCode( codeStr )
-					end
-				end
-			end
+			sourceFile.timeModLast = timeMod
+			updateStatusBar()
+			processUserFile()
 		end
-		updateStatusBar()
 	end
+end
+
+-- Make the toolbar UI
+local function makeToolbar()
+	local group = makeGroup()
+	ui.toolbarGroup = group
+
+	-- Background
+	local r = display.newRect( group, 0, 0, ui.width, dyToolbar )
+	group.background = r
+	r.anchorX = 0
+	r.anchorY = 0
+	r:setFillColor( toolbarShade )
+	r.strokeWidth = 1
+	r:setStrokeColor( lineShade )
+
+	-- Level picker
+	local segmentNames = {}
+	for i = 1, numSyntaxLevels do
+		segmentNames[i] = tostring( i )
+	end
+	local segWidth = 25
+	local controlWidth = segWidth * numSyntaxLevels
+	group.levelPicker = widget.newSegmentedControl{
+		x = ui.width - controlWidth / 2 - 10,
+		y = dyToolbar / 2,
+		segmentWidth = segWidth,
+		segments = segmentNames,
+		defaultSegment = numSyntaxLevels,
+		onPress = 
+			function (event )
+				syntaxLevel = event.target.segmentNumber
+				processUserFile()
+			end
+	}
 end
 
 -- Init the app
@@ -501,8 +563,9 @@ local function initApp()
 	ui.background:setFillColor( 1 )
 
 	-- UI and display elements
+	ui.outputGroup = makeGroup( nil, 0, dyToolbar )
 	makeStatusBar()
-	updateStatusBar()
+	makeToolbar()
 
 	-- Install listeners
 	Runtime:addEventListener( "enterFrame", onEnterFrame )

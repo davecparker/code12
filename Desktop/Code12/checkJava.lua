@@ -273,7 +273,6 @@ end
 -- expr patterns: -, *, /, %
 local function vtExprNumeric( nodes )
 	-- Both sides must be numeric, result is number
-	-- TODO: Check divide in more detail
 	local vtLeft =  vtExprNode( nodes[1] )
 	local vtRight = vtExprNode( nodes[3] )
 	if type(vtLeft) == "number" and type(vtRight) == "number" then
@@ -606,6 +605,7 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	end
 
 	-- Check parameter types for validity and match with the API
+	-- TODO: Handle overloaded Math methods
 	for i = 1, #params do
 		local expr = params[i]
 		local vtPassed = checkJava.vtCheckExpr( expr )

@@ -10,25 +10,6 @@ class UserCode extends Code12Program
 	// int count = 5;
 	int speed = 3;
 
-	// Move the ball
-	int moveBall(boolean wrap)
-	{
-		// int wrap = 5;
-		boolean hack;
-		// String hack;
-
-		// hack = 6;
-		ball.x++;
-		ball.x--;
-		ball.x += 1;
-		if (ball.x >= LIMIT)  // if (wrap == true && ball != null && !(ball.x >= LIMIT))
-			ball.x = 0;
-
-		--ball.x;
-		++ball.x;
-		return ball.x;
-	}
-
 	public void start()
 	{
 		int x = 10 + 50 * 10 + (45 / 3 * 2);
@@ -75,6 +56,25 @@ class UserCode extends Code12Program
 		{
 			// Nothing
 		}
+	}
+
+	// Move the ball
+	int moveBall(boolean wrap)
+	{
+		// int wrap = 5;
+		boolean hack;
+		// String hack;
+
+		// hack = 6;
+		ball.x++;
+		ball.x--;
+		ball.x += 1;
+		if (ball.x >= LIMIT)  // if (wrap == true && ball != null && !(ball.x >= LIMIT))
+			ball.x = 0;
+
+		--ball.x;
+		++ball.x;
+		return ball.x;
 	}
 
 	public void onMousePress( GameObj obj, double x, double y )
