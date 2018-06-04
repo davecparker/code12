@@ -19,6 +19,8 @@ class MainProgram extends Code12Program
    double xMax;
    double yMin;
    double yMax;
+      
+   GameObj[] greenObjs, orangeObjs, blueObjs, yellowObjs, redObjs;
    
    public void start()
    {  
@@ -36,6 +38,7 @@ class MainProgram extends Code12Program
       String roomColor, doorColor;
       GameObj leftWall, rightWall, topWall, bottomWall;
       GameObj wall, door, treasure;
+      int objsCount;
       
       // Make green room --------------------------------------------------------------------------------
       roomColor = "green";
@@ -48,6 +51,10 @@ class MainProgram extends Code12Program
       topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
       bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
+      // Initialize greenObjs
+      greenObjs = new GameObj[5]; // 4 doors + 1 treasure
+      objsCount = 0;
+      
       // Make doors
       // orange door on top wall
       doorColor = "orange";
@@ -55,6 +62,8 @@ class MainProgram extends Code12Program
       door = ct.rect( wall.x, wall.y, doorSize, wallWidth, doorColor );
       door.group = "door";
       door.setText( doorColor );
+      greenObjs[ objsCount ] = door;
+      objsCount++;
       
       // blue door on right wall
       doorColor = "blue";
@@ -62,6 +71,8 @@ class MainProgram extends Code12Program
       door = ct.rect( wall.x, wall.y, wallWidth, doorSize, doorColor );
       door.group = "door";
       door.setText( doorColor );
+      greenObjs[ objsCount ] = door;
+      objsCount++;
       
       // yellow door on bottom wall
       doorColor = "yellow";
@@ -69,6 +80,8 @@ class MainProgram extends Code12Program
       door = ct.rect( wall.x, wall.y, doorSize, wallWidth, doorColor );
       door.group = "door";
       door.setText( doorColor );
+      greenObjs[ objsCount ] = door;
+      objsCount++;
       
       // red door on left wall
       doorColor = "red";
@@ -76,10 +89,15 @@ class MainProgram extends Code12Program
       door = ct.rect( wall.x, wall.y, wallWidth, doorSize, doorColor );
       door.group = "door";
       door.setText( doorColor );
+      greenObjs[ objsCount ] = door;
+      objsCount++;
       
       // Make treasure in center of room
       treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
       treasure.group = "treasure";
+      treasure.setText( roomColor );
+      greenObjs[ objsCount ] = treasure;
+      objsCount++;
       
       // Make orange room --------------------------------------------------------------------------------
       roomColor = "orange";
@@ -92,6 +110,10 @@ class MainProgram extends Code12Program
       topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
       bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
+      // Initialize orangeObjs[]
+      orangeObjs = new GameObj[2]; // 1 door + 1 treasure
+      objsCount = 0;
+      
       // Make doors     
       // green door on bottom wall
       doorColor = "green";
@@ -99,10 +121,15 @@ class MainProgram extends Code12Program
       door = ct.rect( wall.x, wall.y, doorSize, wallWidth, doorColor );
       door.group = "door";
       door.setText( doorColor );
+      orangeObjs[ objsCount ] = door;
+      objsCount++;
       
       // Make treasure in center of room
       treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
       treasure.group = "treasure";
+      treasure.setText( roomColor );
+      orangeObjs[ objsCount ] = treasure;
+      objsCount++;
       
       // Make blue room --------------------------------------------------------------------------------
       roomColor = "blue";
@@ -115,6 +142,10 @@ class MainProgram extends Code12Program
       topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
       bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
+      // Initialize blueObjs[]
+      blueObjs = new GameObj[2]; // 1 door + 1 treasure
+      objsCount = 0;
+      
       // Make doors
       // green door on left wall
       doorColor = "green";
@@ -122,10 +153,15 @@ class MainProgram extends Code12Program
       door = ct.rect( wall.x, wall.y, wallWidth, doorSize, doorColor );
       door.group = "door";
       door.setText( doorColor );
+      blueObjs[ objsCount ] = door;
+      objsCount++;
       
       // Make treasure in center of room
       treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
       treasure.group = "treasure";
+      treasure.setText( roomColor );
+      blueObjs[ objsCount ] = treasure;
+      objsCount++;
       
       // Make yellow room --------------------------------------------------------------------------------
       roomColor = "yellow";
@@ -138,6 +174,10 @@ class MainProgram extends Code12Program
       topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
       bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
+      // Initialize yellowObjs[]
+      yellowObjs = new GameObj[2]; // 1 door + 1 treasure
+      objsCount = 0;
+      
       // Make doors
       // green door on top wall
       doorColor = "green";
@@ -145,10 +185,15 @@ class MainProgram extends Code12Program
       door = ct.rect( wall.x, wall.y, doorSize, wallWidth, doorColor );
       door.group = "door";
       door.setText( doorColor );
+      yellowObjs[ objsCount ] = door;
+      objsCount++;
       
       // Make treasure in center of room
       treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
       treasure.group = "treasure";
+      treasure.setText( roomColor );
+      yellowObjs[ objsCount ] = treasure;
+      objsCount++;
             
       // Make red room --------------------------------------------------------------------------------
       roomColor = "red";
@@ -161,47 +206,144 @@ class MainProgram extends Code12Program
       topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
       bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
+      // Initialize redObjs[]
+      redObjs = new GameObj[1]; // 1 door
+      objsCount = 0;
+      
       // Make doors
       // green door on right wall
       doorColor = "green";
       wall = rightWall;
       door = ct.rect( wall.x, wall.y, wallWidth, doorSize, doorColor );
-      door.group = "doors";
+      door.group = "door";
       door.setText( doorColor );
+      redObjs[ objsCount ] = door;
+      objsCount++;
       
       // Make Link
       link = ct.image( "link.png", screenWidth / 2, screenHeight / 2, linkWidth );
       
       // Set bounds for Link's x and y values
-       xMin = link.width/2 + wallWidth;
-       xMax = screenWidth - (link.width/2 + wallWidth);
-       yMin = link.height/2 + wallWidth;
-       yMax = screenHeight - (link.height/2 + wallWidth);
+      xMin = link.width/2 + wallWidth;
+      xMax = screenWidth - (link.width/2 + wallWidth);
+      yMin = link.height/2 + wallWidth;
+      yMax = screenHeight - (link.height/2 + wallWidth);
    }
    
    public void update()
-   {
-      if ( link.x < xMin )
+   {  
+      String screenName = ct.getScreen();
+      GameObj[] screenObjs;
+      
+      if ( screenName.equals( "green" ) )
       {
-         link.x = xMin;
-         link.xSpeed = 0;
+         screenObjs = greenObjs;
       }
-      else if ( link.x > xMax )
+      else if ( screenName.equals( "orange" ) )
       {
-         link.x = xMax;
-         link.xSpeed = 0;
+         screenObjs = orangeObjs;
+      }
+      else if ( screenName.equals( "blue" ) )
+      {
+         screenObjs = blueObjs;
+      }
+      else if ( screenName.equals( "yellow" ) )
+      {
+         screenObjs = yellowObjs;
+      }
+      else // ( screen.equals( "red" ) )
+      {
+         screenObjs = redObjs;
       }
       
-      if ( link.y < yMin )
+      int numObjs = screenObjs.length;
+      boolean noHits = true;
+      
+      for ( int i = 0; i < numObjs && noHits; i++ )
       {
-         link.y = yMin;
-         link.ySpeed = 0;
+         GameObj obj = screenObjs[i];
+         if ( obj.visible && link.hit( obj ) )
+         {
+            noHits = false;
+            String group = obj.group;
+            String objText = obj.getText();
+            ct.println( objText + " " + group + " hit" );
+            
+            if ( group.equals("treasure") )
+            {
+                  obj.visible = false;
+            }
+            else if ( group.equals("door") )
+            {               
+               // Save Link's data and delete him
+               double xSpeed = link.xSpeed;
+               double ySpeed = link.ySpeed;
+               double x = link.x;
+               double y = link.y;
+               link.delete();
+               
+               // Go to screen door leads to
+               ct.setScreen( objText );
+               
+               // Make a new Link
+               link = ct.image( "link.png", screenWidth / 2, screenHeight / 2, linkWidth );
+               
+               // Put link in the appropriate spot
+               if ( xSpeed > 0 )
+               {
+                  // went through a right door, set him at left side of new screen
+                  link.x = xMin;
+                  link.y = y;
+                  link.xSpeed = xSpeed;
+               }
+               else if ( xSpeed < 0 )
+               {
+                  // went through a left door, set him at the right side of new screen
+                  link.x = xMax;
+                  link.y = y;
+                  link.xSpeed = xSpeed;
+               }
+               else if ( ySpeed > 0 )
+               {
+                  // went through a top door, set him at bottom of new screen
+                  link.y = yMin;
+                  link.x = x;
+                  link.ySpeed = ySpeed;
+               }
+               else if ( ySpeed < 0 )
+               {
+                  // went through a bottom door, set him at top of new screen
+                  link.y = yMax;
+                  link.x = x;
+                  link.ySpeed = ySpeed;
+               }
+            }
+         }
       }
-      else if ( link.y > yMax )
-      {
-         link.y = yMax;
-         link.ySpeed = 0;
-      } 
+      if ( noHits )
+      {                 
+         if ( link.x < xMin )
+         {
+            link.x = xMin;
+            link.xSpeed = 0;
+         }
+         else if ( link.x > xMax )
+         {
+            link.x = xMax;
+            link.xSpeed = 0;
+         }
+         
+         if ( link.y < yMin )
+         {
+            link.y = yMin;
+            link.ySpeed = 0;
+         }
+         else if ( link.y > yMax )
+         {
+            link.y = yMax;
+            link.ySpeed = 0;
+         } 
+      }
    }
    
    public void onKeyPress( String keyName )
