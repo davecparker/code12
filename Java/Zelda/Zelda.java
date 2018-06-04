@@ -10,16 +10,21 @@ class MainProgram extends Code12Program
       Code12.run(new MainProgram()); 
    }
    
+   double screenWidth, screenHeight;
    GameObj link;
    double linkWidth;
    double wallWidth;
    double linkSpeed;
+   double xMin;
+   double xMax;
+   double yMin;
+   double yMax;
    
    public void start()
    {  
       ct.setHeight( 150 );
-      double width = ct.getWidth();
-      double height = ct.getHeight();
+      screenWidth = ct.getWidth();
+      screenHeight = ct.getHeight();
       
       linkWidth = 10;
       wallWidth = 5;
@@ -38,10 +43,10 @@ class MainProgram extends Code12Program
       ct.setBackColor( roomColor );
       
       // Make walls
-      leftWall = ct.rect( wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      rightWall = ct.rect( width - wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      topWall = ct.rect( width / 2, wallWidth / 2, width, wallWidth, wallColor );
-      bottomWall = ct.rect( width / 2 , height - wallWidth / 2, width, wallWidth, wallColor );
+      leftWall = ct.rect( wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      rightWall = ct.rect( screenWidth - wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
+      bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
       // Make doors
       // orange door on top wall
@@ -73,7 +78,7 @@ class MainProgram extends Code12Program
       door.setText( doorColor );
       
       // Make treasure in center of room
-      treasure = ct.image( "treasure.png", width / 2, height / 2, treasureWidth );
+      treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
       treasure.group = "treasure";
       
       // Make orange room --------------------------------------------------------------------------------
@@ -82,10 +87,10 @@ class MainProgram extends Code12Program
       ct.setBackColor( roomColor );
       
       // Make walls
-      leftWall = ct.rect( wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      rightWall = ct.rect( width - wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      topWall = ct.rect( width / 2, wallWidth / 2, width, wallWidth, wallColor );
-      bottomWall = ct.rect( width / 2 , height - wallWidth / 2, width, wallWidth, wallColor );
+      leftWall = ct.rect( wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      rightWall = ct.rect( screenWidth - wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
+      bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
       // Make doors     
       // green door on bottom wall
@@ -96,7 +101,7 @@ class MainProgram extends Code12Program
       door.setText( doorColor );
       
       // Make treasure in center of room
-      treasure = ct.image( "treasure.png", width / 2, height / 2, treasureWidth );
+      treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
       treasure.group = "treasure";
       
       // Make blue room --------------------------------------------------------------------------------
@@ -105,10 +110,10 @@ class MainProgram extends Code12Program
       ct.setBackColor( roomColor );
       
       // Make walls
-      leftWall = ct.rect( wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      rightWall = ct.rect( width - wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      topWall = ct.rect( width / 2, wallWidth / 2, width, wallWidth, wallColor );
-      bottomWall = ct.rect( width / 2 , height - wallWidth / 2, width, wallWidth, wallColor );
+      leftWall = ct.rect( wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      rightWall = ct.rect( screenWidth - wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
+      bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
       // Make doors
       // green door on left wall
@@ -119,7 +124,7 @@ class MainProgram extends Code12Program
       door.setText( doorColor );
       
       // Make treasure in center of room
-      treasure = ct.image( "treasure.png", width / 2, height / 2, treasureWidth );
+      treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
       treasure.group = "treasure";
       
       // Make yellow room --------------------------------------------------------------------------------
@@ -128,10 +133,10 @@ class MainProgram extends Code12Program
       ct.setBackColor( roomColor );
       
       // Make walls
-      leftWall = ct.rect( wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      rightWall = ct.rect( width - wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      topWall = ct.rect( width / 2, wallWidth / 2, width, wallWidth, wallColor );
-      bottomWall = ct.rect( width / 2 , height - wallWidth / 2, width, wallWidth, wallColor );
+      leftWall = ct.rect( wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      rightWall = ct.rect( screenWidth - wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
+      bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
       // Make doors
       // green door on top wall
@@ -142,7 +147,7 @@ class MainProgram extends Code12Program
       door.setText( doorColor );
       
       // Make treasure in center of room
-      treasure = ct.image( "treasure.png", width / 2, height / 2, treasureWidth );
+      treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
       treasure.group = "treasure";
             
       // Make red room --------------------------------------------------------------------------------
@@ -151,10 +156,10 @@ class MainProgram extends Code12Program
       ct.setBackColor( roomColor );
       
       // Make walls
-      leftWall = ct.rect( wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      rightWall = ct.rect( width - wallWidth / 2, height / 2, wallWidth, height, wallColor );
-      topWall = ct.rect( width / 2, wallWidth / 2, width, wallWidth, wallColor );
-      bottomWall = ct.rect( width / 2 , height - wallWidth / 2, width, wallWidth, wallColor );
+      leftWall = ct.rect( wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      rightWall = ct.rect( screenWidth - wallWidth / 2, screenHeight / 2, wallWidth, screenHeight, wallColor );
+      topWall = ct.rect( screenWidth / 2, wallWidth / 2, screenWidth, wallWidth, wallColor );
+      bottomWall = ct.rect( screenWidth / 2 , screenHeight - wallWidth / 2, screenWidth, wallWidth, wallColor );
       
       // Make doors
       // green door on right wall
@@ -165,12 +170,38 @@ class MainProgram extends Code12Program
       door.setText( doorColor );
       
       // Make Link
-      link = ct.image( "link.png", width / 2, height / 2, linkWidth );
+      link = ct.image( "link.png", screenWidth / 2, screenHeight / 2, linkWidth );
       
+      // Set bounds for Link's x and y values
+       xMin = link.width/2 + wallWidth;
+       xMax = screenWidth - (link.width/2 + wallWidth);
+       yMin = link.height/2 + wallWidth;
+       yMax = screenHeight - (link.height/2 + wallWidth);
    }
    
    public void update()
-   {        
+   {
+      if ( link.x < xMin )
+      {
+         link.x = xMin;
+         link.xSpeed = 0;
+      }
+      else if ( link.x > xMax )
+      {
+         link.x = xMax;
+         link.xSpeed = 0;
+      }
+      
+      if ( link.y < yMin )
+      {
+         link.y = yMin;
+         link.ySpeed = 0;
+      }
+      else if ( link.y > yMax )
+      {
+         link.y = yMax;
+         link.ySpeed = 0;
+      } 
    }
    
    public void onKeyPress( String keyName )
@@ -194,24 +225,24 @@ class MainProgram extends Code12Program
       else if ( keyName.equals( "r" ) )
       {
          ct.setScreen( "red" );
-      }
+      }      
       
-      if ( keyName.equals( "up" ) )
+      if ( keyName.equals( "up" ) && link.y > yMin )
       {
          link.xSpeed = 0;
          link.ySpeed = -linkSpeed;
       }
-      else if ( keyName.equals( "down" ) )
+      else if ( keyName.equals( "down" ) && link.y < yMax )
       {
          link.xSpeed = 0;
          link.ySpeed = linkSpeed;
       }
-      else if ( keyName.equals( "left" ) )
+      else if ( keyName.equals( "left" ) && link.x > xMin )
       {
          link.xSpeed = -linkSpeed;
          link.ySpeed = 0;
       }
-      else if ( keyName.equals( "right" ) )
+      else if ( keyName.equals( "right" ) && link.x < xMax )
       {
          link.xSpeed = linkSpeed;
          link.ySpeed = 0;
