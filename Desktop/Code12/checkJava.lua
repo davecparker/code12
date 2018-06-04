@@ -371,6 +371,37 @@ function vtExprNode( node )
 	return vt
 end
 
+-- If expr is an integer divide that might have a remainder, 
+-- then set the error state and return true, otherwise return false.
+-- The caller should have already done type analysis on expr, and
+-- notice that it is being used as a double.
+local function isBadIntDivide( expr )
+	if expr.p == "/" and checkJava.vtKnownExpr( expr ) == 0 then
+		local nodes = expr.nodes
+		local left = nodes[1]
+		local right = nodes[3]
+
+		if left.p == "NUM" and right.p == "NUM" then
+			-- Both sides are constant so we can check for a remainder
+			local n = tonumber( left.nodes[1].str )
+			local d = tonumber( right.nodes[1].str )
+			local r = n / d
+			if r == math.floor( r ) then
+				return false   -- no remainder
+			else
+				err.setErrNode( expr, "Integer divide with remainder used as a double" )
+				return true
+			end
+		else
+			-- The remainder can't be determined, but Code12 doesn't allow this
+			-- because chances are the programmer made a mistake.
+			err.setErrNode( expr, "Integer divide used as a double. Fix or use ct.toDouble()" )
+			return true
+		end
+	end
+	return false
+end
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -468,6 +499,11 @@ end
 function checkJava.canAssignToVt( node, vt, expr )
 	local vtExpr = vtExprNode( expr )
 	if javaTypes.vtCanAcceptVtExpr( vt, vtExpr ) then
+		-- Before accepting it, check for bad int divide assigned to a double
+		-- TODO: Do this with params too
+		if vt == 1 and isBadIntDivide( expr ) then
+			return false
+		end
 		return true
 	end
 
@@ -565,7 +601,6 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	end
 
 	-- Check parameter types for validity and match with the API
-	print(fnName .. " was passed " .. #params .. " params")
 	for i = 1, #params do
 		local expr = params[i]
 		local vtPassed = vtExprNode( expr )

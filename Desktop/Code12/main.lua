@@ -67,6 +67,10 @@ function ct.circle( x, y, d )
 	return c 
 end
 
+function ct.toDouble( x )
+	return x
+end
+
 
 --- Internal Functions ------------------------------------------------
 

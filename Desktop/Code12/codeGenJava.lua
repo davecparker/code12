@@ -194,14 +194,19 @@ function exprCode( expr )
 	-- Is this a Binary operator?
 	local luaOp = luaOpFromJavaOp[p]
 	if luaOp then
-		local leftExpr = nodes[1]
-		local rightExpr = nodes[3]
-		-- Check if the + operator is concatenating strings
-		if luaOp == " + " and checkJava.vtKnownExpr( expr ) == "String" then
+		local left = nodes[1]
+		local right = nodes[3]
+
+		-- Look for special cases of binary operators
+		if p == "+" and checkJava.vtKnownExpr( expr ) == "String" then
+			-- The + operator is concatenating strings, not adding
 			luaOp = " .. "  -- TODO: Lua tables (GameObj) will not do a toString automatically
+		elseif p == "/" and checkJava.vtKnownExpr( expr ) == 0 then
+			-- Integer divide
+			return "math.floor(" .. exprCode( left ) .. " / " .. exprCode( right ) .. ")"
 		end
 		-- TODO: Verify that we don't need parentheses (Lua precedence is same as Java)
-		return exprCode( leftExpr ) .. luaOp .. exprCode( rightExpr )
+		return exprCode( left ) .. luaOp .. exprCode( right )
 	else
 		error( "Unknown expr type " .. p )
 	end

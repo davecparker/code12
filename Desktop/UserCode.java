@@ -44,6 +44,11 @@ class UserCode extends Code12Program
 		double z = ball.x + 1;
 		if (ball == bigBall || bigBall != null)
 			z = 2;
+
+		double ok = 9.0 / 5;
+		double ok2 = 10 / 5;
+		// double notOk = 9 / 5;
+		double ok3 = ct.toDouble( x / 3 );
 	}
 
 	public void update()
