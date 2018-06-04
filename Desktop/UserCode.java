@@ -31,13 +31,13 @@ class UserCode extends Code12Program
 
 	public void start()
 	{
-		int x = 10 + 50 * 10 + (45 * 2);
+		int x = 10 + 50 * 10 + (45 / 3 * 2);
 		String name = "Dave" + " " + "Parker";
 		boolean done;
 
 		// Draw some circles
 		ball = ct.circle(x + 30, 70, 50);
-		ct.circle(x / 2 + 10, 200, 150);
+		ct.circle(ct.intDiv(x, 2) + 10, 200, 150);
 		bigBall = ct.circle(x, 400, 200);
 		bigBall.setFillColor( "black" );
 
@@ -47,8 +47,8 @@ class UserCode extends Code12Program
 
 		double ok = 9.0 / 5;
 		double ok2 = 10 / 5;
-		// double notOk = 9 / 5;
-		double ok3 = ct.toDouble( x / 3 );
+		//double notOk = 9 / 5;
+		//double notOK2 = x / 3;
 	}
 
 	public void update()

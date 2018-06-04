@@ -61,6 +61,7 @@ void ct.setSoundVolume( double volume )
 int ct.random( int min, int max )
 int ct.round( double d )
 double ct.round( double d, int numPlaces )
+int ct.intDiv( int n, int d )
 boolean ct.isError( double d )
 double ct.distance( double x1, double y1, double x2, double y2 )
 int ct.getTimer( )
@@ -68,7 +69,6 @@ double getVersion( )
 
 // Type Conversion
 //----------------
-double ct.toDouble( int i )
 int ct.toInt( double d )                // truncates
 int ct.parseInt( String s )             // 0 if failure
 boolean ct.canParseInt( String s )

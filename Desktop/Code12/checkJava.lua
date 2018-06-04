@@ -257,8 +257,14 @@ local function vtExprPlus( nodes )
 					"The (+) operator can only apply to numbers or Strings" )
 		end
 	else
-		-- Neither side is valid
-		err.setErrNodeAndRef( nodes[2], nodes[1], 
+		-- Find the side that is wrong
+		local exprOther
+		if vtLeft == "String" or type(vtLeft) == "number" then
+			exprOther = nodes[3]
+		else
+			exprOther = nodes[1]
+		end
+		err.setErrNodeAndRef( nodes[2], exprOther, 
 				"The (+) operator can only apply to numbers or Strings" )
 	end
 	return nil
@@ -371,10 +377,12 @@ function vtExprNode( node )
 	return vt
 end
 
+
+--- Post Check Analysis Functions  -------------------------------------------
+
 -- If expr is an integer divide that might have a remainder, 
 -- then set the error state and return true, otherwise return false.
--- The caller should have already done type analysis on expr, and
--- notice that it is being used as a double.
+-- The expr most be on the current line after type analysis is completed.
 local function isBadIntDivide( expr )
 	if expr.p == "/" and checkJava.vtKnownExpr( expr ) == 0 then
 		local nodes = expr.nodes
@@ -387,15 +395,15 @@ local function isBadIntDivide( expr )
 			local d = tonumber( right.nodes[1].str )
 			local r = n / d
 			if r == math.floor( r ) then
-				return false   -- no remainder
+				return false   -- no remainder, so OK as-is
 			else
-				err.setErrNode( expr, "Integer divide with remainder used as a double" )
+				err.setErrNode( expr, "Integer divide has remainder. Use double or ct.intDiv()" )
 				return true
 			end
 		else
 			-- The remainder can't be determined, but Code12 doesn't allow this
 			-- because chances are the programmer made a mistake.
-			err.setErrNode( expr, "Integer divide used as a double. Fix or use ct.toDouble()" )
+			err.setErrNode( expr, "Integer divide may lose remainder. Use double or ct.intDiv()" )
 			return true
 		end
 	end
@@ -408,7 +416,9 @@ end
 -- Check and return the value type (vt) for an expr, primaryExpr, or lValue node.
 -- If an error is found, set the error state and return nil.
 function checkJava.vtCheckExpr( node )
-	return vtExprNode( node )
+	local vt = vtExprNode( node )
+	checkJava.postCheck( node )
+	return vt
 end
 
 -- Return the type of an expression that has already been checked and determined
@@ -497,13 +507,8 @@ end
 -- the given vt (value type) at node.
 -- If the types are not compatible then set the error state and return false.
 function checkJava.canAssignToVt( node, vt, expr )
-	local vtExpr = vtExprNode( expr )
+	local vtExpr = checkJava.vtCheckExpr( expr )
 	if javaTypes.vtCanAcceptVtExpr( vt, vtExpr ) then
-		-- Before accepting it, check for bad int divide assigned to a double
-		-- TODO: Do this with params too
-		if vt == 1 and isBadIntDivide( expr ) then
-			return false
-		end
 		return true
 	end
 
@@ -603,7 +608,7 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	-- Check parameter types for validity and match with the API
 	for i = 1, #params do
 		local expr = params[i]
-		local vtPassed = vtExprNode( expr )
+		local vtPassed = checkJava.vtCheckExpr( expr )
 		local vtNeeded = method.params[i].vt
 		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
 			err.setErrNode( expr, "Parameter %d of %s expects type %s, but %s was passed",
@@ -615,6 +620,28 @@ function checkJava.vtCheckCall( fnValue, paramList )
 
 	-- Result is the method's return type
 	return method.vt 
+end
+
+-- Run post checks on the tree (and recursively downward), which must
+-- be on the current line after type analysis has been done on it.
+-- If there is an error then set the error state and return false
+-- Return true if no errors were detected.
+function checkJava.postCheck( tree )
+	-- Check children recursively first
+	local nodes = tree.nodes
+	if nodes then
+		for i = 1, #nodes do
+			if not checkJava.postCheck( nodes[i] ) then
+				return false
+			end
+		end
+	end
+
+	-- Check this node
+	if tree.t == "expr" and isBadIntDivide( tree ) then
+		return false
+	end
+	return true
 end
 
 -- Init the state for a new line in the program

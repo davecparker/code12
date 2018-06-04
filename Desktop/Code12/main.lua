@@ -67,8 +67,8 @@ function ct.circle( x, y, d )
 	return c 
 end
 
-function ct.toDouble( x )
-	return x
+function ct.intDiv( n, d )
+	return math.floor( n / d )
 end
 
 
