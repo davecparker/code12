@@ -81,7 +81,7 @@ local function lookupID( nameToken, knownNames )
 			local strCorrectCase = result
 			result = knownNames[result]  -- get the correct entry
 			if result then
-				err.setErrNode( nodeToken, 
+				err.setErrNode( nameToken, 
 						"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
 				return nil, strCorrectCase, result
 			end
@@ -107,19 +107,12 @@ end
 -- If the variable is undefined, then set the error state and return nil.
 local function vtVar( varNode )
 	assert( varNode.tt == "ID" )
-	print("vtVar", varNode.str)
 	local varName = varNode.str
 	local varFound = lookupID( varNode, localVars )
-	print("local result", varFound) 
 	if varFound == nil then
-		if varName == "ball" then
-			print("Looking up ball")
-		end
 		varFound = lookupID( varNode, classVars )
-		print("global result", varFound)
 	end
 	if varFound == nil then
-		assert( false )
 		err.setErrNode( varNode,  "Undefined variable %s", varName )
 		return nil
 	end
@@ -465,13 +458,9 @@ function checkJava.vtKnownExpr( node )
 	return vtNodes[node]
 end
 
--- Return the vt type of the given class variable name or nil if not defined.
-function checkJava.vtClassVar( varName )
-	local classVar = lookupName( varName, classVars )  -- TODO!
-	if classVar then
-		return classVar.vt
-	end
-	return nil
+-- Return true if the given variable node is a defined class variable.
+function checkJava.isClassVar( varNode )
+	return classVars[varNode.str] ~= nil
 end
 
 -- Define the class variable with the given nameNode and type (vt, isArray).
@@ -482,6 +471,12 @@ function checkJava.defineClassVar( nameNode, vt, isArray )
 	end
 	if isArray then
 		vt = { vt = vt }   -- make vt into array of specified type
+	end
+
+	-- Make sure we don't already have an error because we may clear
+	-- the error state below.
+	if err.hasErr() then
+		return false
 	end
 
 	-- Check for existing definition
@@ -505,17 +500,7 @@ function checkJava.defineClassVar( nameNode, vt, isArray )
 	if varNameLower ~= varName then
 		classVars[varNameLower] = varName
 	end
-	print("Defined global " .. varName, classVars[varName])
 	return true
-end
-
--- Return the vt type of the given local variable name or nil if not defined.
-function checkJava.vtLocalVar( varName )
-	local localVar = lookupName( varName, localVars )  -- TODO
-	if localVar then
-		return localVar.vt
-	end
-	return nil
 end
 
 -- Define the local variable with the given nameNode and type (vt, isArray).
@@ -552,7 +537,6 @@ function checkJava.defineLocalVar( nameNode, vt, isArray )
 	if varNameLower ~= varName then
 		localVars[varNameLower] = varName
 	end
-	print("Defined local " .. varName, localVars[varName])
 	return true
 end
 

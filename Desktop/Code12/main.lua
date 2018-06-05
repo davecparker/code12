@@ -530,7 +530,7 @@ local function processUserFile()
 	else
 		-- Make and run the Lua code
 		local codeStr = codeGenJava.getLuaCode( parseTrees )
-		-- print( codeStr )
+		print( codeStr )
 		if err.hasErr() then
 			showError()
 		else

@@ -117,8 +117,9 @@ function lValueCode( v )
 	-- For other references, the name could be either a local var or a class var.
 	-- Look in the table of known class variables to determine which
 	-- (works because Code12 does not allow local vars to hide class vars).
-	local name = v.nodes[1].str
-	if checkJava.vtClassVar( name ) ~= nil then
+	local nameNode = v.nodes[1]
+	local name = nameNode.str
+	if checkJava.isClassVar( nameNode ) then
 		name = varTable .. name    -- class var, so turn name into this.name
 	end
 	if p == "var" then
@@ -142,8 +143,9 @@ function fnCallCode( tree )
 	-- Function name/value
 	local fnValue = nodes[1]
 	if fnValue.p == "method" then
-		local varName = fnValue.nodes[1].str
-		if checkJava.vtClassVar( varName ) ~= nil then
+		local nameNode = fnValue.nodes[1]
+		local varName = nameNode.str
+		if checkJava.isClassVar( nameNode ) then
 			parts = { "this.", varName, ":", fnValue.nodes[2].str, "(" }  -- e.g. this.ball:delete(
 		else
 			parts = { varName, ":", fnValue.nodes[2].str, "(" }  -- e.g. obj:delete(
@@ -201,9 +203,6 @@ function exprCode( expr )
 		if p == "+" and checkJava.vtKnownExpr( expr ) == "String" then
 			-- The + operator is concatenating strings, not adding
 			luaOp = " .. "  -- TODO: Lua tables (GameObj) will not do a toString automatically
-		elseif p == "/" and checkJava.vtKnownExpr( expr ) == 0 then
-			-- Integer divide
-			return "math.floor(" .. exprCode( left ) .. " / " .. exprCode( right ) .. ")"
 		end
 		-- TODO: Verify that we don't need parentheses (Lua precedence is same as Java)
 		return exprCode( left ) .. luaOp .. exprCode( right )
@@ -277,7 +276,7 @@ end
 -- Generate code for an increment or decrement (++ or --) stmt
 -- given the lValue node and opToken is either a "++" or "--" token.
 local function generateIncOrDecStmt( lValue, opToken )
-	local vt = checkJava.vtKnownExpr( lValue ) 
+	local vt = checkJava.vtCheckExpr( lValue ) 
 	local tt = opToken.tt
 	assert( tt == "++" or tt == "--" )
 	if type(vt) ~= "number" then
@@ -314,21 +313,28 @@ local function generateStmt( tree )
 		else
 			local lValue = nodes[1]
 			local expr = rightSide.nodes[2]
-			local lValueStr = lValueCode( lValue )
-			local exprStr = exprCode( expr )
-			beginLuaLine( lValueStr )
-			addLua( " = " )
 			if p == "=" then
-				checkJava.canAssignToLValue( lValue, expr )
-				addLua( exprStr )
+				if checkJava.canAssignToLValue( lValue, expr ) then
+					local lValueStr = lValueCode( lValue )
+					local exprStr = exprCode( expr )
+					beginLuaLine( lValueStr )
+					addLua( " = " )
+					addLua( exprStr )
+				end
 			else
 				-- +=, -=, *=, /=
-				-- TODO: Check types
-				addLua( lValueStr )
-				addLua( luaOpFromJavaOp[p] )
-				addLua( "(" )
-				addLua( exprStr )
-				addLua( ")" )
+				-- TODO: Better type checking
+				if checkJava.canAssignToLValue( lValue, expr ) then
+					local lValueStr = lValueCode( lValue )
+					local exprStr = exprCode( expr )
+					beginLuaLine( lValueStr )
+					addLua( " = " )
+					addLua( lValueStr )
+					addLua( luaOpFromJavaOp[p] )
+					addLua( "(" )
+					addLua( exprStr )
+					addLua( ")" )
+				end
 			end
 		end
 	elseif p == "++" or p == "--" then
@@ -358,7 +364,7 @@ local function generateBlockLine( tree )
 	elseif p == "if" then
 		-- if (expr)
 		local expr = nodes[3]
-		if checkJava.vtKnownExpr( expr ) ~= true then
+		if checkJava.vtCheckExpr( expr ) ~= true then
 			err.setErrNode( expr, "Conditional test must be boolean (true or false)" )
 			return
 		end
@@ -371,7 +377,7 @@ local function generateBlockLine( tree )
 	elseif p == "elseif" then
 		-- else if (expr)
 		local expr = nodes[4]
-		if checkJava.vtKnownExpr( expr ) ~= true then
+		if checkJava.vtCheckExpr( expr ) ~= true then
 			err.setErrNode( expr, "Conditional test must be boolean (true or false)" )
 			return
 		end
@@ -392,6 +398,7 @@ local function generateBlockLine( tree )
 	elseif p == "return" then
 		-- return expr ;
 		local expr = nodes[2]
+		checkJava.vtCheckExpr( expr )
 		-- TDOO: Check correct return type
 		beginLuaLine( "return " )
 		addLua( exprCode( expr ) )

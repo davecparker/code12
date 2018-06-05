@@ -18,17 +18,17 @@ class UserCode extends Code12Program
 
 		// Draw some circles
 		ball = ct.circle(x + 30, 70, 50);
-		ct.circle(ct.intDiv(x, 2) + 10, 200, 150);
+		ct.circle(ct.intDiv(x, 2) + 10, 200, 50);
 		bigBall = ct.circle(x, 400, 200);
 		bigBall.setFillColor( "black" );
 
 		double z = ball.x + 1;
-		if (ball == bigBall || bigBall != null)
+		if (ball == bigBall | bigBall != null)
 			z = 2;
 
 		double ok = 9.0 / 5;
 		double ok2 = 10 / 5;
-		//double notOk = 9 / 5;
+		// double notOk =  1 / 2;
 		//double notOK2 = x / 3;
 	}
 
@@ -43,7 +43,8 @@ class UserCode extends Code12Program
 		moveBall( false );
 
 		// Move bigBall
-		bigBall.x += speed;
+		factor = factor + 4;
+		ball.x += speed;
 		if (bigBall.x > LIMIT)
 		{
 			bigBall.x--;
