@@ -12,6 +12,7 @@ class MainProgram extends Code12Program
    
    double screenWidth, screenHeight;
    GameObj link;
+   GameObj zelda;
    double linkWidth;
    double wallWidth;
    double linkSpeed;
@@ -19,6 +20,7 @@ class MainProgram extends Code12Program
    double xMax;
    double yMin;
    double yMax;
+   int treasuresRemaining;
       
    GameObj[] greenObjs, orangeObjs, blueObjs, yellowObjs, redObjs;
    
@@ -30,7 +32,8 @@ class MainProgram extends Code12Program
       
       linkWidth = 10;
       wallWidth = 5;
-      linkSpeed = 1;
+      linkSpeed = 2;
+      treasuresRemaining = 4;
       double doorSize = 20;
       double treasureWidth = 10;
       double treasureMargin = wallWidth + treasureWidth / 2;
@@ -269,13 +272,13 @@ class MainProgram extends Code12Program
       
       for ( int i = 0; i < numObjs && noHits; i++ )
       {
-         
          GameObj obj = screenObjs[i];
-
-         double distance = ct.distance( link.x, link.y, obj.x, obj.y );
-         double objRadius = Math.min( obj.width, obj.height ) / 2;
-         double hitDistance = link.height / 2 + objRadius;
-         if ( obj.visible && distance < hitDistance )
+         
+         double horizDist = ct.distance( link.x, 0, obj.x, 0 );
+         double vertDist = ct.distance( 0, link.y, 0, obj.y );
+         double horizHitDist = (link.width + obj.width) / 2;
+         double vertHitDist = (link.height + obj.height) / 2;
+         if ( obj.visible && (horizDist < horizHitDist && vertDist < vertHitDist) )
          {
             noHits = false;
             String group = obj.group;
@@ -285,9 +288,28 @@ class MainProgram extends Code12Program
             if ( group.equals("treasure") )
             {
                   obj.visible = false;
+                  treasuresRemaining--;
+                  if ( treasuresRemaining == 0 )
+                  {
+                     // Make Zelda appear
+                     int sign;
+                     if ( link.x < 100 - link.x )
+                     {
+                        // Link is closer to the left wall, put Zelda on his right
+                        sign = 1;
+                     }
+                     else
+                     {
+                        // Put Zelda on his left
+                        sign = -1;
+                     }
+                     double zeldaX = link.x + sign * link.width;
+                     double zeldaY = link.y;
+                     zelda = ct.image( "zelda.png", zeldaX, zeldaY, link.width );
+                  }
             }
             else if ( group.equals("door") )
-            {               
+            {            
                // Save Link's data and delete him
                double xSpeed = link.xSpeed;
                double ySpeed = link.ySpeed;
@@ -301,32 +323,32 @@ class MainProgram extends Code12Program
                // Make a new Link
                link = ct.image( "link.png", screenWidth / 2, screenHeight / 2, linkWidth );
                
-               // Put link in the appropriate spot
+               // Put link in the appropriate spot 
                if ( xSpeed > 0 )
                {
                   // went through a right door, set him at left side of new screen
-                  link.x = wallWidth / 2 + hitDistance;
+                  link.x = wallWidth / 2 + horizHitDist;
                   link.y = y;
                   link.xSpeed = xSpeed;
                }
                else if ( xSpeed < 0 )
                {
                   // went through a left door, set him at the right side of new screen
-                  link.x = screenWidth - (wallWidth / 2 + hitDistance);
+                  link.x = screenWidth - (wallWidth / 2 + horizHitDist);
                   link.y = y;
                   link.xSpeed = xSpeed;
                }
                else if ( ySpeed > 0 )
                {
                   // went through a top door, set him at bottom of new screen
-                  link.y = wallWidth / 2 + hitDistance;
+                  link.y = wallWidth / 2 + vertHitDist;
                   link.x = x;
                   link.ySpeed = ySpeed;
                }
                else if ( ySpeed < 0 )
                {
                   // went through a bottom door, set him at top of new screen
-                  link.y = screenHeight - (wallWidth / 2 + hitDistance);;
+                  link.y = screenHeight - (wallWidth / 2 + vertHitDist);;
                   link.x = x;
                   link.ySpeed = ySpeed;
                }
@@ -334,7 +356,8 @@ class MainProgram extends Code12Program
          }
       }
       if ( noHits )
-      {                 
+      {  
+         // Don't let Link go through the walls               
          if ( link.x < xMin )
          {
             link.x = xMin;
