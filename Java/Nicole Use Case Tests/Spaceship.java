@@ -8,11 +8,14 @@ public class Spaceship extends Code12Program
 {
    GameObj bg;
    GameObj topBg;
-   
+   GameObj asteroid;
    GameObj spaceship;
    GameObj rayGunParticle;
-   
+   GameObj flame;
+   GameObj blackHole; 
    GameObj beginText;
+   GameObj traveledText;
+   int lightYears;
   
    public static void main(String[] args)
    { 
@@ -34,10 +37,13 @@ public class Spaceship extends Code12Program
       // Second background is off of screen upwards
       topBg = ct.image("seamless_tileable_nebula.jpg", width/2, height/2 - height, width );
       topBg.height = height;
+      beginText = ct.text("Click on the spaceship to begin!" , width/2, height - 40, 4,"white");
+      traveledText = ct.text("Light years traveled: " + 0, 15, 5, 3,"white" );
       
-      beginText = ct.text("Press up arrow key to begin!", width/2, height - 40, 4,"white");
-      // Spaceship to be controlled via arrow keys
       spaceship = ct.image("spacecraft.png", width/2, height - 10, 5 );
+      spaceship.clickable = true;
+      spaceship.visible = true;
+      
    }
    
    public void update()
@@ -60,33 +66,50 @@ public class Spaceship extends Code12Program
            // If the spaceship goes off screen, set it back to starting position
            if ( spaceship.y < 0 )
             spaceship.y = ct.getHeight() - 10;
-           
-           // TODO: Add asteroids that explode when shot with ray gun 
+            
+          // Display light years traveled. 
+          traveledText.delete();
+          lightYears++;
+          traveledText = ct.text("Light years traveled: " + lightYears, 15, 5, 3,"white" );
+          
+          // Enter the black hole
+          if ( lightYears > 100 ) //chNGE TO 3300
+          {
+            ct.clearScreen();
+            //blackHole = ct.image("a0620-00.jpg", ct.getWidth()/2, ct.getHeight()/2, ct.getWidth() );
+            //blackHole.height = ct.getHeight();
+            spaceship = ct.image("spacecraft.png", ct.getWidth() - 10, 10, 5 );
+            spaceship.setLayer(2);
+            //origin
+            GameObj c = ct.circle(ct.getWidth()/2, ct.getHeight()/2, 1,"white");
+            // origin = (circle.x, circle.y)
+            // oribiter is the spaceship
+            // angle is current angle of spaceship
+            // speed for spaceship
+            // radius is spaceship's distance from orihin
+            double angle = 45;
+            double radius = spaceship.width/2;
+            spaceship.x = spaceship.x + Math.cos(angle)*radius;
+            spaceship.y = spaceship.y + Math.sin(angle)*radius;
+          }
+          
         }
       
    }
    
    public void onKeyPress( String keyName )
    { 
-      if ( keyName == "up" )
-         spaceship.ySpeed = -0.0025;
-      else if ( keyName == "right" && spaceship.x < ct.getWidth() )
-            spaceship.x += 5;
+     if ( keyName == "right" && spaceship.x < ct.getWidth() )
+         spaceship.x += 5;
       else if ( keyName == "left" && spaceship.x > 0 )
-            spaceship.x -= 5;
+         spaceship.x -= 5;
 
    }
   
    public void onKeyRelease(String keyName) 
    {
-      // Initialize movement
-      if ( keyName == "up" )
-      {
-         beginText.delete();
-      } 
-
       // Shoot from spaceship
-      if ( keyName == "space" )
+      if ( keyName == "up" )
       {
          rayGunParticle = ct.circle( spaceship.x, spaceship.y - 4, 1, "red");
          rayGunParticle.ySpeed = - 2;
@@ -94,5 +117,28 @@ public class Spaceship extends Code12Program
          
    }
    
-   
+   public void onMousePress( GameObj obj, double x, double y )
+   {
+      // If spaceship is clicked on, flame is "active" and both move upward
+      if ( obj == spaceship )
+      {
+         spaceship.ySpeed = -0.05;
+         flame = ct.image("transparent-flame.png", spaceship.x, spaceship.y + spaceship.height/2, 5 );
+         flame.ySpeed = spaceship.ySpeed;
+         ct.sound("spaceship-engine.wav");
+         beginText.delete();
+      }
+   }
+ 
+   public void onMouseRelease( GameObj obj, double x, double y )
+   {
+      // When nothing is being clicked,
+      // there is no movement ( besides the background )
+      if ( obj != null )
+      {
+         spaceship.ySpeed = 0;
+         flame.delete();
+      }
+   }
+ 
 }

@@ -12,10 +12,13 @@ public class Paint extends Code12Program
    GameObj greenRect;
    GameObj blueRect;
    GameObj indigoRect;
-   GameObj violetRect;
    GameObj purpleRect;
-   GameObj pinkRect;
+   GameObj majentaRect;;
    GameObj eraseRect;
+   
+   GameObj small;
+   GameObj medium;
+   GameObj large;
    
    public static void main(String[] args)
    { 
@@ -42,14 +45,24 @@ public class Paint extends Code12Program
       greenRect = ct.rect(spacing,spacing*4 - offset, WIDTH, spacing, "green");
       blueRect = ct.rect(spacing,spacing*5 - offset, WIDTH, spacing, "blue");
       indigoRect = ct.rect(spacing,spacing*6 - offset, WIDTH, spacing, "dark blue");
-      violetRect = ct.rect(spacing,spacing*7 - offset, WIDTH, spacing, "purple");
-      purpleRect = ct.rect(spacing,spacing*8 - offset, WIDTH, spacing, "dark majenta");
+      purpleRect = ct.rect(spacing,spacing*7 - offset, WIDTH, spacing, "purple");
+      majentaRect = ct.rect(spacing,spacing*8 - offset, WIDTH, spacing, "dark majenta");
          
       // This will be pressed to activate the eraser
-      eraseRect = ct.rect(spacing,spacing*9, WIDTH, spacing + 6, "white"); 
+      eraseRect = ct.rect(spacing,spacing*9, WIDTH, spacing + 6, "pink"); 
       ct.text("Eraser", spacing, spacing*9,5);
       
-      
+      // Circles to select brush size
+      GameObj box = ct.rect(width-5,10,21,21);
+      box.setFillColor("light gray");
+      //box.setLayer(2);
+      GameObj sizeText = ct.text("Brush size", width - 8, 1, 3);
+      //sizeText.setLayer(3);
+      small = ct.rect(width-5,5,2,2,"white");
+      //small.setLayer(3);
+      medium = ct.rect(width-5,10,4,4,"white");
+      large = ct.rect(width-5,17,6,6,"white");
+
    }
    
    public void update()
@@ -68,13 +81,21 @@ public class Paint extends Code12Program
       indigoRect.clickable = true;
       purpleRect.visible = true;
       purpleRect.clickable = true;
+      majentaRect.visible = true;
+      majentaRect.clickable = true;
       eraseRect.visible = true;
       eraseRect.clickable = true;
+      
+      small.visible = true;
+      small.clickable = true;
+      medium.visible = true;
+      medium.clickable = true;
+      large.visible = true;
+      large.clickable = true;
    }
    
    public void onMousePress( GameObj obj, double x, double y )
    {
-
       if ( obj != null )
       {
             if ( obj == redRect )
@@ -91,8 +112,27 @@ public class Paint extends Code12Program
                currentColor = "dark blue";
             else if ( obj == purpleRect )
                currentColor = "purple";
+            else if ( obj == majentaRect )
+               currentColor = "dark majenta";
             else if ( obj == eraseRect )
                currentColor =  "white";
+               
+      //    // For setting different brush sizes
+// 
+//          
+//             if ( obj == small )
+//             {
+//                brush = ct.line(ct.clickX(),ct.clickY(),x,y);
+//                brush.setLineColor(currentColor);
+//                brush.setFillColor(currentColor);
+//                brush.lineWidth = 4;
+//             }
+//             else if ( obj == medium )
+//                brush.lineWidth = 6;
+//             else if ( obj == large )
+//                brush.lineWidth = 10;
+//             
+         
       }
    }
    
@@ -110,11 +150,12 @@ public class Paint extends Code12Program
          brush = ct.line(ct.clickX(),ct.clickY(),x,y);
          brush.setLineColor(currentColor);
          brush.setFillColor(currentColor);
-         brush.lineWidth = 10;
+         //brush.setLineWidth(
       }
       
       
    }
+  
    
    
 }

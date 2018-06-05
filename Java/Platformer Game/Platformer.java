@@ -29,11 +29,11 @@ class Platformer extends Code12Program
         "000000001111000000000000000000",
         "000000000000000000000000000000",
         "000000000000000000000000000000",
-        "000000000000000000000000000000",
-        "000000000000000000000000000000",
-        "000000000000000000000000000000",
-        "000000000000000000000000000000",
-        "000000000000000000000000000000",
+        "000000000111000000000000000000",
+        "000000000000011100000000000000",
+        "000010000000000000000000000111",
+        "000000001111100000111000000000",
+        "000001110000000000000000000000",
         "111111111111111111111111111111"
     };
     
@@ -43,6 +43,7 @@ class Platformer extends Code12Program
      ArrayList<GameObj> enemies = new ArrayList<GameObj>();
 
      GameObj player;
+     GameObj[] health;
      GameObj platform;
      GameObj coin;
      GameObj scoreText;
@@ -95,16 +96,23 @@ class Platformer extends Code12Program
         }
      
         player = ct.image("player_forwards.png", 5, 34, 4);
+        for ( int i = 0; i < 3; i++ )
+        {
+            health[i] = ct.image("8bitheart.png", ct.getWidth() - 10 - i, 10, 5 );
+        }
         
     }
 
     public void update()
     {
-      double time = ct.getTimer()/120;
-      timerText.delete();
-      timerText = ct.text("Time: " + time, ct.getWidth() - 15, ct.getHeight() - 10, 5, "white");
-        player.ySpeed += gravity;
-            player.y += player.ySpeed;
+      if (player.x > 5 )
+      {
+         double time = ct.getTimer()/120;
+         timerText.delete();
+         timerText = ct.text("Time: " + time, ct.getWidth() - 15, ct.getHeight() - 10, 5, "white");
+      }
+      player.ySpeed += gravity;
+      player.y += player.ySpeed;
       
      
       for (GameObj platform: platforms )
@@ -118,7 +126,7 @@ class Platformer extends Code12Program
          }
       }
 
-      /*Iterator<GameObj> it = coins.iterator();
+      Iterator<GameObj> it = coins.iterator();
       while ( it.hasNext() )
       {
          GameObj coin = it.next();
@@ -128,7 +136,7 @@ class Platformer extends Code12Program
      // Delete from ArrayList coins
             score++;  
          }
-      }*/
+      }
       
       for ( GameObj coin: coins )
       {
@@ -148,6 +156,17 @@ class Platformer extends Code12Program
       scoreText.delete();
       scoreText = ct.text( "Score: " + Integer.toString(score), 12, ct.getHeight() - 10, 5, "white");
       
+      if ( player.y > ct.getHeight() )
+      {
+         for ( int i = 0; i < 3; i++ )
+         {
+            health[i].delete();
+            if ( health[i] == null )
+            {
+               ct.print("Game over!");
+            }
+         }
+      }
 
       if ( player.x >= ct.getWidth() || player.y >= ct.getHeight() )
       {
@@ -219,14 +238,13 @@ class Platformer extends Code12Program
             player.x++;
             player.delete();
             player = ct.image("player_forwards.png", player.x, player.y, 4);
-            ct.sound("cartoon_game_song.wav");
             break;
          case("left"):
             player.x--;
             player.delete();
             player = ct.image("player_backwards.png", player.x, player.y, 4);
             break;
-         case("m"): // Toggle music
+         case("m"):  // Toggle music
             ct.sound("cartoon_game_song.wav");
       }
 

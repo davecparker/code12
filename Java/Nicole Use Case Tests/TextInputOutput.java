@@ -1,6 +1,5 @@
-// Use case Test
-// 
-
+// Use Case Test for:
+// Text input/output
 
 import Code12.*;
 
@@ -12,6 +11,11 @@ public class TextInputOutput extends Code12Program
    }
    
    public void start()
+   {
+   
+   }
+   
+   public void update()
    {
    }
    
