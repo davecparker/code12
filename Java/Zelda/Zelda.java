@@ -1,5 +1,5 @@
 // Zelda
-// Case use for ct.getScreen() and ct.setScreen()
+// Case use for ct.getScreen(), ct.setScreen(), and using ct.distance() for hit testing.
 
 import Code12.*;
 
@@ -33,11 +33,13 @@ class MainProgram extends Code12Program
       linkSpeed = 1;
       double doorSize = 20;
       double treasureWidth = 10;
-      
+      double treasureMargin = wallWidth + treasureWidth / 2;
       String wallColor = "light gray";
+      
       String roomColor, doorColor;
       GameObj leftWall, rightWall, topWall, bottomWall;
       GameObj wall, door, treasure;
+      double treasureX, treasureY;
       int objsCount;
       
       // Make green room --------------------------------------------------------------------------------
@@ -93,7 +95,9 @@ class MainProgram extends Code12Program
       objsCount++;
       
       // Make treasure in center of room
-      treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
+      treasureX = ct.random( ct.round(treasureMargin), ct.round(screenWidth - treasureMargin) );
+      treasureY = ct.random(  ct.round(treasureMargin), ct.round(screenHeight - treasureMargin) );
+      treasure = ct.image( "treasure.png", treasureX, treasureY, treasureWidth );
       treasure.group = "treasure";
       treasure.setText( roomColor );
       greenObjs[ objsCount ] = treasure;
@@ -125,7 +129,9 @@ class MainProgram extends Code12Program
       objsCount++;
       
       // Make treasure in center of room
-      treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
+      treasureX = ct.random( ct.round(treasureMargin), ct.round(screenWidth - treasureMargin) );
+      treasureY = ct.random(  ct.round(treasureMargin), ct.round(screenHeight - treasureMargin) );
+      treasure = ct.image( "treasure.png", treasureX, treasureY, treasureWidth );
       treasure.group = "treasure";
       treasure.setText( roomColor );
       orangeObjs[ objsCount ] = treasure;
@@ -157,8 +163,9 @@ class MainProgram extends Code12Program
       objsCount++;
       
       // Make treasure in center of room
-      treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
-      treasure.group = "treasure";
+      treasureX = ct.random( ct.round(treasureMargin), ct.round(screenWidth - treasureMargin) );
+      treasureY = ct.random(  ct.round(treasureMargin), ct.round(screenHeight - treasureMargin) );
+      treasure = ct.image( "treasure.png", treasureX, treasureY, treasureWidth );      treasure.group = "treasure";
       treasure.setText( roomColor );
       blueObjs[ objsCount ] = treasure;
       objsCount++;
@@ -189,8 +196,9 @@ class MainProgram extends Code12Program
       objsCount++;
       
       // Make treasure in center of room
-      treasure = ct.image( "treasure.png", screenWidth / 2, screenHeight / 2, treasureWidth );
-      treasure.group = "treasure";
+      treasureX = ct.random( ct.round(treasureMargin), ct.round(screenWidth - treasureMargin) );
+      treasureY = ct.random(  ct.round(treasureMargin), ct.round(screenHeight - treasureMargin) );
+      treasure = ct.image( "treasure.png", treasureX, treasureY, treasureWidth );      treasure.group = "treasure";
       treasure.setText( roomColor );
       yellowObjs[ objsCount ] = treasure;
       objsCount++;
@@ -261,14 +269,19 @@ class MainProgram extends Code12Program
       
       for ( int i = 0; i < numObjs && noHits; i++ )
       {
+         
          GameObj obj = screenObjs[i];
-         if ( obj.visible && link.hit( obj ) )
+
+         double distance = ct.distance( link.x, link.y, obj.x, obj.y );
+         double objRadius = Math.min( obj.width, obj.height ) / 2;
+         double hitDistance = link.height / 2 + objRadius;
+         if ( obj.visible && distance < hitDistance )
          {
             noHits = false;
             String group = obj.group;
             String objText = obj.getText();
             ct.println( objText + " " + group + " hit" );
-            
+
             if ( group.equals("treasure") )
             {
                   obj.visible = false;
@@ -282,7 +295,7 @@ class MainProgram extends Code12Program
                double y = link.y;
                link.delete();
                
-               // Go to screen door leads to
+               // Go to the screen that the door leads to
                ct.setScreen( objText );
                
                // Make a new Link
@@ -292,28 +305,28 @@ class MainProgram extends Code12Program
                if ( xSpeed > 0 )
                {
                   // went through a right door, set him at left side of new screen
-                  link.x = xMin;
+                  link.x = wallWidth / 2 + hitDistance;
                   link.y = y;
                   link.xSpeed = xSpeed;
                }
                else if ( xSpeed < 0 )
                {
                   // went through a left door, set him at the right side of new screen
-                  link.x = xMax;
+                  link.x = screenWidth - (wallWidth / 2 + hitDistance);
                   link.y = y;
                   link.xSpeed = xSpeed;
                }
                else if ( ySpeed > 0 )
                {
                   // went through a top door, set him at bottom of new screen
-                  link.y = yMin;
+                  link.y = wallWidth / 2 + hitDistance;
                   link.x = x;
                   link.ySpeed = ySpeed;
                }
                else if ( ySpeed < 0 )
                {
                   // went through a bottom door, set him at top of new screen
-                  link.y = yMax;
+                  link.y = screenHeight - (wallWidth / 2 + hitDistance);;
                   link.x = x;
                   link.ySpeed = ySpeed;
                }
