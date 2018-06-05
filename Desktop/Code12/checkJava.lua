@@ -20,8 +20,8 @@ local checkJava = {}
 
 -- Type analysis tables
 local methods = {}      -- map method names to { node = token, vt = vt, params = {} }
-local classVars = {}    -- map instance var name to { node = token, vt = vt }
-local localVars = {}    -- map local var name to { node = token, vt = vt }
+local classVars = {}    -- map instance var name to { node = token, vt = vt } or strCorrectName
+local localVars = {}    -- map local var name to { node = token, vt = vt } or strCorrectName
 local vtNodes = {}      -- types of expression nodes determined on a line
 
 
@@ -68,21 +68,25 @@ local function getMethods( parseTrees )
 	return true
 end
 
--- Check for a case (upper/lower case) mismatch in an unknown name at node.
+-- Look up the name in nameToken in the knownNames table.
+-- If the name is found and the entry is a record (table) then return the record.
 -- If an entry in the knownNames table has an index differing only in case, then
--- set the error state to a description of the error and return the known name, 
--- otherwise return nil.
-local function checkCaseMismatch( node, knownNames )
-	if node.tt == "ID" then
-		local nameLower = string.lower( node.str )
-		for actualName, value in pairs( knownNames ) do
-			print( nameLower, actualName )
-			if string.lower( actualName ) == nameLower then
-				err.setErrNode( node, "Names are case-sensitive, known name is \"%s\"",
-						actualName )
-				return actualName
+-- set the error state to a description of the error and return 
+-- (nil, strCorrectCase, entryCorrectCase), where strCorrectCase is the correct name
+-- and entryCorrectCase is the entry record for the correct name, otherwise return nil.
+local function lookupID( nameToken, knownNames )
+	if nameToken.tt == "ID" then
+		local result = knownNames[nameToken.str]
+		if type(result) == "string" then
+			local strCorrectCase = result
+			result = knownNames[result]  -- get the correct entry
+			if result then
+				err.setErrNode( nodeToken, 
+						"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
+				return nil, strCorrectCase, result
 			end
 		end
+		return result  -- table or nil
 	end
 	return nil
 end
@@ -103,11 +107,19 @@ end
 -- If the variable is undefined, then set the error state and return nil.
 local function vtVar( varNode )
 	assert( varNode.tt == "ID" )
+	print("vtVar", varNode.str)
 	local varName = varNode.str
-	local varFound = localVars[varName] or classVars[varName]
+	local varFound = lookupID( varNode, localVars )
+	print("local result", varFound) 
 	if varFound == nil then
-		checkCaseMismatch( varNode, localVars ) 
-		checkCaseMismatch( varNode, classVars )
+		if varName == "ball" then
+			print("Looking up ball")
+		end
+		varFound = lookupID( varNode, classVars )
+		print("global result", varFound)
+	end
+	if varFound == nil then
+		assert( false )
 		err.setErrNode( varNode,  "Undefined variable %s", varName )
 		return nil
 	end
@@ -140,8 +152,7 @@ local function vtLValueNode( lValue )
 	elseif p == "this" then
 		-- explicit reference to class variable
 		local varNode = nodes[3]
-		if classVars[varNode.str] == nil then
-			checkCaseMismatch( varNode, classVars )
+		if lookupID( varNode, classVars ) == nil then
 			err.setErrNodeAndRef( varNode, nodes[1],
 					"Undefined class variable %s referenced with \"this\"", varNode.str )
 			return nil
@@ -456,7 +467,7 @@ end
 
 -- Return the vt type of the given class variable name or nil if not defined.
 function checkJava.vtClassVar( varName )
-	local classVar = classVars[varName]
+	local classVar = lookupName( varName, classVars )  -- TODO!
 	if classVar then
 		return classVar.vt
 	end
@@ -475,33 +486,32 @@ function checkJava.defineClassVar( nameNode, vt, isArray )
 
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound = classVars[varName]
-	if varFound ~= nil then
+	local varFound, nameCorrectCase, varCorrectCase = lookupID( nameNode, classVars )
+	if varFound then
 		err.setErrNodeAndRef( nameNode, varFound.node, 
 				"Variable %s was already defined", varName )
 		return false
-	end
-
-	-- Check for existing definition differing only by case
-	-- (not allowed in Code12)
-	local knownName = checkCaseMismatch( nameNode, classVars )
-	if knownName then
-		local varFound = classVars[knownName]
+	elseif varCorrectCase then
 		err.clearErr()
-		err.setErrNodeAndRef( nameNode, varFound.node, 
-				"Variable %s differs only by case from existing name %s", 
-				varName, knownName )
+		err.setErrNodeAndRef( nameNode, varCorrectCase, 
+				"Variable %s differs only by case from existing variable %s", 
+				varName, nameCorrectCase )
 		return false
 	end
 
-	-- Define it
+	-- Define it and the case-insensitive lower-case version as well if necessary
 	classVars[varName] = { node = nameNode, vt = vt }
+	local varNameLower = string.lower( varName )
+	if varNameLower ~= varName then
+		classVars[varNameLower] = varName
+	end
+	print("Defined global " .. varName, classVars[varName])
 	return true
 end
 
 -- Return the vt type of the given local variable name or nil if not defined.
 function checkJava.vtLocalVar( varName )
-	local localVar = localVars[varName]
+	local localVar = lookupName( varName, localVars )  -- TODO
 	if localVar then
 		return localVar.vt
 	end
@@ -520,35 +530,29 @@ function checkJava.defineLocalVar( nameNode, vt, isArray )
 
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound = localVars[varName] or classVars[varName]
-	if varFound ~= nil then
+	local varFound, nameCorrectCase, varCorrectCase = lookupID( nameNode, localVars )
+	if varFound == nil then
+		varFound, nameCorrectCase, varCorrectCase = lookupID( nameNode, classVars )
+	end
+	if varFound then
 		err.setErrNodeAndRef( nameNode, varFound.node, 
 				"Variable %s was already defined", varName )
 		return false
-	end
-
-	-- Check for existing definition differing only by case
-	-- (not allowed in Code12)
-	local varFound = nil
-	local knownName = checkCaseMismatch( nameNode, localVars )
-	if knownName then
-		varFound = localVars[knownName]
-	else
-		knownName = checkCaseMismatch( nameNode, classVars )
-		if knownName then
-			varFound = classVars[knownName]
-		end
-	end
-	if varFound then
+	elseif varCorrectCase then
 		err.clearErr()
-		err.setErrNodeAndRef( nameNode, varFound.node, 
-				"Variable %s differs only by case from existing name %s", 
-				varName, knownName )
+		err.setErrNodeAndRef( nameNode, varCorrectCase, 
+				"Variable %s differs only by case from existing variable %s", 
+				varName, nameCorrectCase )
 		return false
 	end
 
-	-- Define it
+	-- Define it and the case-insensitive lower-case version as well if necessary
 	localVars[varName] = { node = nameNode, vt = vt }
+	local varNameLower = string.lower( varName )
+	if varNameLower ~= varName then
+		localVars[varNameLower] = varName
+	end
+	print("Defined local " .. varName, localVars[varName])
 	return true
 end
 

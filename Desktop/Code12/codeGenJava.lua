@@ -161,7 +161,7 @@ function fnCallCode( tree )
 	local exprs = nodes[3].nodes
 	for i = 1, #exprs do
 		local expr = exprs[i]
-		local vt = checkJava.vtCheckExpr( expr )
+		local vt = checkJava.vtKnownExpr( expr )
 		parts[#parts + 1] = exprCode( expr )
 		if i < #exprs then
 			parts[#parts + 1] = ", "
@@ -277,11 +277,11 @@ end
 -- Generate code for an increment or decrement (++ or --) stmt
 -- given the lValue node and opToken is either a "++" or "--" token.
 local function generateIncOrDecStmt( lValue, opToken )
-	local vt = checkJava.vtCheckExpr( lValue ) 
+	local vt = checkJava.vtKnownExpr( lValue ) 
 	local tt = opToken.tt
 	assert( tt == "++" or tt == "--" )
 	if type(vt) ~= "number" then
-		err.setErrNodeAndRef( opNode, lValue, "Can only apply \"%s\" to numeric types", tt )
+		err.setErrNodeAndRef( opToken, lValue, "Can only apply \"%s\" to numeric types", tt )
 		return
 	end
 	local lValueStr = lValueCode( lValue )
@@ -358,7 +358,7 @@ local function generateBlockLine( tree )
 	elseif p == "if" then
 		-- if (expr)
 		local expr = nodes[3]
-		if checkJava.vtCheckExpr( expr ) ~= true then
+		if checkJava.vtKnownExpr( expr ) ~= true then
 			err.setErrNode( expr, "Conditional test must be boolean (true or false)" )
 			return
 		end
@@ -371,7 +371,7 @@ local function generateBlockLine( tree )
 	elseif p == "elseif" then
 		-- else if (expr)
 		local expr = nodes[4]
-		if checkJava.vtCheckExpr( expr ) ~= true then
+		if checkJava.vtKnownExpr( expr ) ~= true then
 			err.setErrNode( expr, "Conditional test must be boolean (true or false)" )
 			return
 		end
