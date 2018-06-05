@@ -40,6 +40,7 @@ class UserCode extends Code12Program
 
 		// Move ball
 		int xNew = moveBall( true );
+		moveBall( false );
 
 		// Move bigBall
 		bigBall.x += speed;

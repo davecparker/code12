@@ -19,7 +19,7 @@ local checkJava = {}
 
 
 -- Type analysis tables
-local methods = {}      -- map method names to { node = token, vt = vt }
+local methods = {}      -- map method names to { node = token, vt = vt, params = {} }
 local classVars = {}    -- map instance var name to { node = token, vt = vt }
 local localVars = {}    -- map local var name to { node = token, vt = vt }
 local vtNodes = {}      -- types of expression nodes determined on a line
@@ -54,7 +54,11 @@ local function getMethods( parseTrees )
 					paramTable[#paramTable + 1] = { name = name, vt = vtParam }
 				end
 				-- Add entry to methods table
-				methods[fnName] = { vt = javaTypes.vtFromRetType( nodes[1] ), params = paramTable }
+				methods[fnName] = { 
+					node = nameNode,
+					vt = javaTypes.vtFromRetType( nodes[1] ), 
+					params = paramTable
+				}
 			end
 		end
 		if err.hasErr() then
@@ -63,6 +67,26 @@ local function getMethods( parseTrees )
 	end
 	return true
 end
+
+-- Check for a case (upper/lower case) mismatch in an unknown name at node.
+-- If an entry in the knownNames table has an index differing only in case, then
+-- set the error state to a description of the error and return the known name, 
+-- otherwise return nil.
+local function checkCaseMismatch( node, knownNames )
+	if node.tt == "ID" then
+		local nameLower = string.lower( node.str )
+		for actualName, value in pairs( knownNames ) do
+			print( nameLower, actualName )
+			if string.lower( actualName ) == nameLower then
+				err.setErrNode( node, "Names are case-sensitive, known name is \"%s\"",
+						actualName )
+				return actualName
+			end
+		end
+	end
+	return nil
+end
+
 
 --- Misc Type Functions ------------------------------------------------------
 
@@ -82,6 +106,8 @@ local function vtVar( varNode )
 	local varName = varNode.str
 	local varFound = localVars[varName] or classVars[varName]
 	if varFound == nil then
+		checkCaseMismatch( varNode, localVars ) 
+		checkCaseMismatch( varNode, classVars )
 		err.setErrNode( varNode,  "Undefined variable %s", varName )
 		return nil
 	end
@@ -115,6 +141,7 @@ local function vtLValueNode( lValue )
 		-- explicit reference to class variable
 		local varNode = nodes[3]
 		if classVars[varNode.str] == nil then
+			checkCaseMismatch( varNode, classVars )
 			err.setErrNodeAndRef( varNode, nodes[1],
 					"Undefined class variable %s referenced with \"this\"", varNode.str )
 			return nil
@@ -147,6 +174,7 @@ local function vtLValueNode( lValue )
 		local fieldName = field.str
 		local vtField = class.fields[fieldName]
 		if vtField == nil then
+			checkCaseMismatch( field, class.fields )
 			err.setErrNodeAndRef( field, object, 
 					"Unknown field \"%s\" for class %s",
 					fieldName, className )
@@ -444,6 +472,7 @@ function checkJava.defineClassVar( nameNode, vt, isArray )
 	if isArray then
 		vt = { vt = vt }   -- make vt into array of specified type
 	end
+
 	-- Check for existing definition
 	local varName = nameNode.str
 	local varFound = classVars[varName]
@@ -452,6 +481,19 @@ function checkJava.defineClassVar( nameNode, vt, isArray )
 				"Variable %s was already defined", varName )
 		return false
 	end
+
+	-- Check for existing definition differing only by case
+	-- (not allowed in Code12)
+	local knownName = checkCaseMismatch( nameNode, classVars )
+	if knownName then
+		local varFound = classVars[knownName]
+		err.clearErr()
+		err.setErrNodeAndRef( nameNode, varFound.node, 
+				"Variable %s differs only by case from existing name %s", 
+				varName, knownName )
+		return false
+	end
+
 	-- Define it
 	classVars[varName] = { node = nameNode, vt = vt }
 	return true
@@ -475,6 +517,7 @@ function checkJava.defineLocalVar( nameNode, vt, isArray )
 	if isArray then
 		vt = { vt = vt }   -- make vt into array of specified type
 	end
+
 	-- Check for existing definition
 	local varName = nameNode.str
 	local varFound = localVars[varName] or classVars[varName]
@@ -483,6 +526,27 @@ function checkJava.defineLocalVar( nameNode, vt, isArray )
 				"Variable %s was already defined", varName )
 		return false
 	end
+
+	-- Check for existing definition differing only by case
+	-- (not allowed in Code12)
+	local varFound = nil
+	local knownName = checkCaseMismatch( nameNode, localVars )
+	if knownName then
+		varFound = localVars[knownName]
+	else
+		knownName = checkCaseMismatch( nameNode, classVars )
+		if knownName then
+			varFound = classVars[knownName]
+		end
+	end
+	if varFound then
+		err.clearErr()
+		err.setErrNodeAndRef( nameNode, varFound.node, 
+				"Variable %s differs only by case from existing name %s", 
+				varName, knownName )
+		return false
+	end
+
 	-- Define it
 	localVars[varName] = { node = nameNode, vt = vt }
 	return true
@@ -540,55 +604,96 @@ function checkJava.canAssignToLValue( lValue, expr )
 	return checkJava.canAssignToVt( lValue, vtLValueNode( lValue ), expr )
 end
 
+-- Find a known ct API or user function with the given fnValue node.
+-- Return the entry in the API or methods table if found.
+-- If not found then set the error state and return nil.
+local function findGlobalFunction( fnValue )
+	if fnValue.tt ~= "ID" then
+		return nil
+	end
+	local fnName = fnValue.str
+	local method = apiTables["ct"].methods[fnName] or methods[fnName]
+	if method == nil then
+		-- Check for misspelling by case only
+		local knownName = checkCaseMismatch( fnName, apiTables["ct"].methods )
+								or checkCaseMismatch( fnName, methods )
+		if knownName then
+			local userMethod = methods[knownName]
+			if userMethod then
+				err.setErrNodeAndRef( fnValue, userMethod.node, 
+						"Names are case-sensitive, did you mean \"%s\"?", knownName)
+			else
+				err.setErrNode( fnValue, 
+						"Names are case-sensitive, should be \"%s\"", knownName)
+			end
+		else
+			err.setErrNode( fnValue, "Undefined function %s", fnName )
+		end
+		return nil
+	end
+	return method
+end
+
+-- Find a known API method for the given non-ID fnValue node.
+-- Return the method entry in the API tables if found.
+-- If not found then set the error state and return nil.
+local function findAPIMethod( fnValue )
+	if fnValue.t ~= "fnValue" then
+		return nil
+	end
+	local object = fnValue.nodes[1]
+	local fnNode = fnValue.nodes[2]
+	local fnName = fnNode.str
+
+	-- Determine the class
+	local className
+	assert( object.tt == "ID" )
+	local objName = object.str
+	if objName == "Math" then   -- Math has all static methods
+		className = "Math"
+	else
+		local vtObj = vtVar( object )
+		if vtObj == "String" or vtObj == "GameObj" then
+			className = vtObj
+		else
+			err.setErrNode( object, "Method call on invalid type (%s)",
+					javaTypes.typeNameFromVt( vtObj ))
+			return nil
+		end
+		-- TODO: Check object name
+	end
+	local class = apiTables[className]
+
+	-- Look up the method
+	method = class.methods[fnName]
+	if method == nil then
+		err.setErrNodeAndRef( fnNode, object, 
+				"Unknown method \"%s\" for class %s",
+				fnName, className )
+		return nil
+	end
+	return method
+end
+
 -- Do type checking on a function or method call with the given fnValue and 
 -- paramList nodes If there is an error then set the error state and return nil.
 -- Return the return type vt if successful.
 function checkJava.vtCheckCall( fnValue, paramList )
-	local method
+	-- Find the method
 	local fnName
+	local method
 	if fnValue.tt == "ID" then
 		-- A global API or user-defined method call
 		fnName = fnValue.str
-
-		-- Look in the ct section of the API then user-defined methods
-		method = apiTables["ct"].methods[fnName] or methods[fnName]
-		if method == nil then
-			err.setErrNode( fnValue, "Undefined function %s", fnName )
-			return nil
-		end
+		method = findGlobalFunction( fnValue )
 	else
 		-- A method call
 		assert( fnValue.t == "fnValue" )
-		local object = fnValue.nodes[1]
-		local fnNode = fnValue.nodes[2]
-		fnName = fnNode.str
-
-		-- Determine the class
-		local className
-		assert( object.tt == "ID" )
-		local objName = object.str
-		if objName == "Math" then   -- Math has all static methods
-			className = "Math"
-		else
-			local vtObj = vtVar( object )
-			if vtObj == "String" or vtObj == "GameObj" then
-				className = vtObj
-			else
-				err.setErrNode( object, "Method call on invalid type (%s)",
-						javaTypes.typeNameFromVt( vtObj ))
-				return nil
-			end
-		end
-		local class = apiTables[className]
-
-		-- Look up the method
-		method = class.methods[fnName]
-		if method == nil then
-			err.setErrNodeAndRef( fnNode, object, 
-					"Unknown method \"%s\" for class %s",
-					fnName, className )
-			return nil
-		end
+		fnName = fnValue.nodes[2].str
+		method = findAPIMethod( fnValue )
+	end
+	if method == nil then
+		return nil
 	end
 
 	-- Check parameter count
