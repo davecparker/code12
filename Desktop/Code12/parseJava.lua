@@ -18,6 +18,23 @@ local parseJava = {}
 
 ----- File Local Variables  --------------------------------------------------
 
+-- Language feature names introduced at each syntax level
+local syntaxFeatures = {
+	"procedure calls",
+	"comments",
+	"variables",
+	"expressions",
+	"function return values",
+	"object data fields",
+	"object method calls",
+	"if-else statements",
+	"user-defined functions",
+	"parameters in user-defined functions",
+	"loops",
+	"arrays",
+}
+local numSyntaxLevels = #syntaxFeatures
+
 -- The parsing state
 local tokens     	-- array of tokens
 local iToken        -- index of current token in tokens
@@ -314,7 +331,8 @@ function parseOpExpr( leftSide, minPrecedence )
 	return leftSide
 end
 
--- Attempt to parse the given grammar table
+-- Attempt to parse the given grammar table. 
+-- Return the parseTree if sucessful or nil if failure.
 function parseGrammar( grammar )
 	-- Consider each pattern in the grammar table that includes the syntaxLevel
 	local iStart = iToken
@@ -398,6 +416,63 @@ function parsePattern( pattern )
 	return nodes
 end
 
+-- Try to parse the current token stream as a line of code at the given
+-- syntax level. If successful then return the parseTree. 
+-- If a parse cannot be made then return nil with the error state as set by
+-- the parser or a generic syntax error if the specific error is not known.
+local function parseLineGrammar( level )
+	-- Reset the parse state and parse the current token stream at level
+	err.clearErr()
+	syntaxLevel = level
+	iToken = 1
+	local parseTree = parseGrammar( line )
+	if parseTree then
+		return parseTree  -- success
+	end
+
+	-- Make a generic syntax error if the error is unknown
+	if not err.hasErr() then
+		local lastToken = tokens[#tokens - 1]  -- not counting the END
+		err.setErrTokenSpan( tokens[1], lastToken, "Syntax Error" )
+	end
+	return nil
+end
+
+-- Try to parse the current token stream as a line of code at the given
+-- syntax level. If successful then return the parseTree. 
+-- If a parse cannot be made then return nil with the error state as set by
+-- the parser or a generic syntax error if the specific error is not known.
+-- If parsing failed at this level but would succeed at a higher level, 
+-- then set the level info in the error state.
+local function parseCurrentLine( level )
+	-- Try at the requested syntax level first
+	local parseTree = parseLineGrammar( level )
+	if parseTree or level >= numSyntaxLevels then
+		return parseTree  -- success or no higher level to try
+	end
+
+	-- Try again at the highest level
+	parseTree = parseLineGrammar( numSyntaxLevels )
+	if parseTree == nil then
+		return nil   -- not parseable at all
+	end
+
+	-- Find the minimum successful syntax level
+	for tryLevel = level + 1, numSyntaxLevels do
+		parseTree = parseLineGrammar( tryLevel )
+		if parseTree then
+			-- Reparse at the requested level to restore the error state
+			parseTree = parseLineGrammar( level )
+			-- Add level info to the error state
+			local str = string.format( "(Use of %s requires syntax level %d)",
+								syntaxFeatures[tryLevel], tryLevel )
+			err.setLevelInfo( tryLevel, str )
+			return nil
+		end
+	end
+	assert( false )  -- loop should have succeeded by the last level
+end
+
 
 ----- Module functions -------------------------------------------------------
 
@@ -406,7 +481,7 @@ function parseJava.init()
 	javalex.init()
 end
 
--- Parse the given line of code at the given syntax level (default 12).
+-- Parse the given line of code at the given syntax level (default numSyntaxLevels).
 -- If startTokens is not nil, it is an array of tokens from a previous unfinished
 -- line to prepend to the tokens found on this line.
 -- Return the parse tree (recursive array of tokens and/or nodes).
@@ -458,22 +533,8 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		return false, tokens
 	end
 
-	-- Set syntax level and try to parse the line grammar
-	syntaxLevel = level or 12
-	iToken = 1
-	local parseTree = parseGrammar( line )
-	if parseTree == nil then
-		if not err.hasErr() then
-			-- Unknown error: Set generic syntax error for the entire line.
-			assert( lastToken )    -- blank lines can't be syntax errors
-			local iCharLast = lastToken.iChar + string.len( lastToken.str ) - 1
-			local locStart = err.makeSrcLoc( lineNumber, 1 )
-			local locEnd = err.makeSrcLoc( lineNumber, iCharLast )
-			err.setErr( err.makeErrLoc( locStart, locEnd ), nil, "Syntax Error" )
-		end
-		return nil
-	end
-	return parseTree
+	-- Try to parse the line
+	return parseCurrentLine( level or numSyntaxLevels )
 end
 
 -- Print a parse tree recursively at the given indentLevel.

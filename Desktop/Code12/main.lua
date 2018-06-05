@@ -20,11 +20,12 @@ local err = require( "err" )
 
 
 -- UI metrics
+local margin = 10        -- generic margin to leave between many UI items
 local dyToolbar = 40
 local dyStatusBar = 30
 local fontSizeUI = 12
 local toolbarShade = 0.9
-local lineShade = 0.5
+local borderShade = 0.5
 
 -- Misc constants
 local numSyntaxLevels = 12
@@ -51,10 +52,7 @@ local ui = {
 	height = 0,            -- window height
 	background = nil,      -- white background rect
 	toolbarGroup = nil,    -- display group for toolbar
-	statusBar = nil,       -- status bar rect
-	statusBarText = nil,   -- text object in the status bar
-	chooseFileBtn = nil,   -- Choose File button in status bar
-	openFileBtn = nil,     -- Open button in status bar
+	statusBarGroup = nil,  -- display group for status bar
 	outputGroup = nil,     -- display group for program output area
 	gameGroup = nil,       -- display group for game output
 	errGroup = nil,        -- display group for error display
@@ -95,6 +93,32 @@ local function makeGroup( parent, x, y )
 	return g
 end
 
+-- Change the given display object to be top-left anchored 
+-- with the given grayscale shades for the fill (default black) 
+-- and stroke (default none)
+local function uiItem( obj, fillShade, lineShade )
+	if obj then
+		obj.anchorX = 0
+		obj.anchorY = 0
+		obj:setFillColor( fillShade or 0 ) 
+		if lineShade then
+			obj.strokeWidth = 1
+			obj:setStrokeColor( lineShade )
+		end
+	end
+	return obj
+end
+
+-- Change the given display object to be top-left anchored and white
+local function uiWhite( obj )
+	return uiItem( obj, 1 )
+end
+
+-- Change the given display object to be top-left anchored and black
+local function uiBlack( obj )
+	return uiItem( obj, 0 )
+end
+
 
 --- Internal Functions ------------------------------------------------
 
@@ -125,10 +149,10 @@ local function updateStatusBar()
 		end
 
 		-- Update the status bar UI
-		ui.statusBarText.text = fileAndExt .. " -- Updated: " .. updateStr
-		ui.openFileBtn.isVisible = true
+		ui.statusBarGroup.message.text = fileAndExt .. " -- Updated: " .. updateStr
+		ui.statusBarGroup.openFileBtn.isVisible = true
 	else
-		ui.openFileBtn.isVisible = false
+		ui.statusBarGroup.openFileBtn.isVisible = false
 	end
 end
 
@@ -211,42 +235,50 @@ end
 
 -- Make the status bar UI
 local function makeStatusBar()
-	ui.statusBar = display.newRect( 0, ui.height - dyStatusBar / 2, ui.width, dyStatusBar )
-	ui.statusBar.anchorX = 0
-	ui.statusBar:setFillColor( toolbarShade )
-	ui.statusBar.strokeWidth = 1
-	ui.statusBar:setStrokeColor( lineShade )
-	ui.chooseFileBtn = widget.newButton{
-		x = 10, 
-		y = ui.statusBar.y,
+	local group = makeGroup( nil, 0, ui.height - dyStatusBar )
+	ui.statusBarGroup = group
+
+	group.background = uiItem( display.newRect( group, 0, 0, ui.width, dyStatusBar ),
+							toolbarShade, borderShade )
+
+	local yCenter = dyStatusBar / 2
+	local btn = widget.newButton{
+		x = margin, 
+		y = yCenter,
 		onRelease = chooseFile,
 		label = "Choose File",
 		labelAlign = "left",
 		font = native.systemFontBold,
 		fontSize = fontSizeUI,
 	}
-	ui.chooseFileBtn.anchorX = 0
-	ui.statusBarText = display.newText( "", ui.width / 2, ui.statusBar.y, native.systemFont, fontSizeUI )
-	ui.statusBarText:setFillColor( 0 )
-	ui.openFileBtn = widget.newButton{
+	group:insert( btn )
+	btn.anchorX = 0
+	group.chooseFileBtn = btn
+
+	group.message = display.newText( group, "", ui.width / 2, yCenter, 
+									native.systemFont, fontSizeUI )
+	group.message:setFillColor( 0 )
+
+	btn = widget.newButton{
 		x = ui.width,
-		y = ui.statusBar.y,
+		y = yCenter,
 		onRelease = openFileInEditor,
 		label = "Open in Editor",
 		labelAlign = "right",
-		labelXOffset = -10,
+		labelXOffset = -margin,
 		font = native.systemFontBold,
 		fontSize = fontSizeUI,
 	}
-	ui.openFileBtn.anchorX = 1
+	group:insert( btn )
+	btn.anchorX = 1
+	group.openFileBtn = btn
+
 	updateStatusBar()
 end
 
 -- Make and return a highlight rectangle, in the reference color if ref
 local function makeHilightRect( x, y, width, height, ref )
-	local r = display.newRect( ui.errGroup.highlightGroup, x, y, width, height )
-	r.anchorX = 0
-	r.anchorY = 0
+	local r = uiItem( display.newRect( ui.errGroup.highlightGroup, x, y, width, height ) )
 	if ref then
 		r:setFillColor( 1, 1, 0.6 )
 	else
@@ -267,7 +299,7 @@ end
 local function makeErrDisplay()
 	-- Make group to hold all err display items
 	removeErrorDisplay()
-	local group = makeGroup( ui.outputGroup, 0, 30 )
+	local group = makeGroup( ui.outputGroup )
 	ui.errGroup = group
 	local numSourceLines = 7
 
@@ -276,17 +308,22 @@ local function makeErrDisplay()
 	local fontSize = 16
 	local fontMetrics = graphics.getFontMetrics( fontName, fontSize )
 	local dyLine = fontMetrics.height + fontMetrics.leading
-	local temp = display.newText( "1234567890", 0, 0, fontName, fontSize )
+	local strTest = "1234567890"
+	local temp = display.newText( strTest, 0, 0, fontName, fontSize )
 	ui.dyErrLine = dyLine
-	ui.dxErrChar = temp.contentWidth / 10
+	ui.dxErrChar = temp.contentWidth / string.len( strTest )
 	temp:removeSelf()
 
 	-- Layout metrics
 	local dxLineNum = math.round( ui.dxErrChar * 6 )
 	local xText = math.round( dxLineNum + ui.dxErrChar )
+	local dySource = numSourceLines * dyLine
+
+	-- Make background rect for the source display
+	uiItem( display.newRect( group, 0, 0, ui.width, dySource + margin ), 1, borderShade )
 
 	-- Make the highlight rectangles
-	local highlightGroup = makeGroup( group, xText, 0 )
+	local highlightGroup = makeGroup( group, xText, margin )
 	group.highlightGroup = highlightGroup
 	local y = ((numSourceLines - 1) / 2) * dyLine
 	group.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
@@ -295,12 +332,12 @@ local function makeErrDisplay()
 							ui.dxErrChar * 6, dyLine, true )
 
 	-- Make the lines numbers
-	local lineNumGroup = makeGroup( group )
+	local lineNumGroup = makeGroup( group, 0, margin )
 	group.lineNumGroup = lineNumGroup
 	for i = 1, numSourceLines do
 		local t = display.newText{
 			parent = lineNumGroup,
-			text = "123", 
+			text = "", 
 			x = dxLineNum, 
 			y = (i - 1) * dyLine,
 			font = fontName, 
@@ -313,38 +350,31 @@ local function makeErrDisplay()
 	end
 
 	-- Make the source lines
-	local sourceGroup = makeGroup( group, xText, 0 )
+	local sourceGroup = makeGroup( group, xText, margin )
 	group.sourceGroup = sourceGroup
 	for i = 1, numSourceLines do
-		local t = display.newText{
+		uiBlack( display.newText{
 			parent = sourceGroup,
-			text = "Test Source Code", 
+			text = "", 
 			x = 0, 
 			y = (i - 1) * dyLine,
 			font = fontName, 
 			fontSize = fontSize,
 			align = "left",
-		}
-		t.anchorX = 0
-		t.anchorY = 0
-		t:setFillColor( 0 )
+		} )
 	end
 
 	-- Make the error text
-	local t = display.newText{
+	group.errText = uiBlack( display.newText{
 		parent = group,
-		text = "This is sample error text telling you what you did wrong", 
-		x = xText, 
-		y = dyLine * (numSourceLines + 1),
+		text = "", 
+		x = margin * 2, 
+		y = dySource + margin * 2,
 		width = ui.width - xText - 20,   -- wrap near end of window
 		font = native.systemFontBold, 
 		fontSize = fontSize,
 		align = "left",
-	}
-	t.anchorX = 0
-	t.anchorY = 0
-	t:setFillColor( 0 )
-	group.errText = t
+	} )
 end
 
 -- Show the error state
@@ -359,9 +389,14 @@ local function showError()
 	makeErrDisplay()
 
 	-- Set the error text
-	print( err.getErrString() )
 	local errRecord = err.getErrRecord()
-	ui.errGroup.errText.text = errRecord.strErr
+	print( "\n" .. errRecord.strErr )
+	local strDisplay = errRecord.strErr
+	if errRecord.strLevel then
+		print( errRecord.strLevel )
+		strDisplay = strDisplay .. "\n" .. errRecord.strLevel
+	end
+	ui.errGroup.errText.text = strDisplay
 
 	-- Load the source lines around the error
 	local iLine = errRecord.loc.first.iLine   -- main error location
@@ -410,16 +445,21 @@ local function onResizeWindow( event )
 	-- Get new window size
 	getDeviceMetrics()
 
-	-- Status bar
+	-- Window background
 	ui.background.width = ui.width
 	ui.background.height = ui.height
-	ui.statusBar.y = ui.height - dyStatusBar / 2
-	ui.statusBar.width = ui.width
-	ui.chooseFileBtn.y = ui.statusBar.y
-	ui.statusBarText.x = ui.width / 2
-	ui.statusBarText.y = ui.statusBar.y
-	ui.openFileBtn.x = ui.width
-	ui.openFileBtn.y = ui.statusBar.y
+
+	-- Toolbar
+	local group = ui.toolbarGroup
+	group.background.width = ui.width
+	group.levelPicker.x = ui.width - margin
+
+	-- Status bar
+	group = ui.statusBarGroup
+	group.y = ui.height - dyStatusBar
+	group.background.width = ui.width
+	group.message.x = ui.width / 2
+	group.openFileBtn.x = ui.width
 
 	-- Remake the error display
 	if err.hasErr() then
@@ -517,13 +557,8 @@ local function makeToolbar()
 	ui.toolbarGroup = group
 
 	-- Background
-	local r = display.newRect( group, 0, 0, ui.width, dyToolbar )
-	group.background = r
-	r.anchorX = 0
-	r.anchorY = 0
-	r:setFillColor( toolbarShade )
-	r.strokeWidth = 1
-	r:setStrokeColor( lineShade )
+	group.background = uiItem( display.newRect( group, 0, 0, ui.width, dyToolbar ),
+							toolbarShade, borderShade )
 
 	-- Level picker
 	local segmentNames = {}
@@ -533,7 +568,7 @@ local function makeToolbar()
 	local segWidth = 25
 	local controlWidth = segWidth * numSyntaxLevels
 	group.levelPicker = widget.newSegmentedControl{
-		x = ui.width - controlWidth / 2 - 10,
+		x = ui.width - margin,
 		y = dyToolbar / 2,
 		segmentWidth = segWidth,
 		segments = segmentNames,
@@ -544,6 +579,7 @@ local function makeToolbar()
 				processUserFile()
 			end
 	}
+	group.levelPicker.anchorX = 1
 end
 
 -- Init the app
@@ -557,10 +593,7 @@ local function initApp()
 	display.setStatusBar( display.HiddenStatusBar )
 
 	-- White background
-	ui.background = display.newRect( 0, 0, ui.width, ui.height )
-	ui.background.anchorX = 0
-	ui.background.anchorY = 0
-	ui.background:setFillColor( 1 )
+	ui.background = uiWhite( display.newRect( 0, 0, ui.width, ui.height ) )
 
 	-- UI and display elements
 	ui.outputGroup = makeGroup( nil, 0, dyToolbar )
