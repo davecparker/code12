@@ -162,9 +162,7 @@ function fnCallCode( tree )
 	-- Parameter list
 	local exprs = nodes[3].nodes
 	for i = 1, #exprs do
-		local expr = exprs[i]
-		local vt = checkJava.vtKnownExpr( expr )
-		parts[#parts + 1] = exprCode( expr )
+		parts[#parts + 1] = exprCode( exprs[i] )
 		if i < #exprs then
 			parts[#parts + 1] = ", "
 		end
@@ -200,7 +198,7 @@ function exprCode( expr )
 		local right = nodes[3]
 
 		-- Look for special cases of binary operators
-		if p == "+" and checkJava.vtKnownExpr( expr ) == "String" then
+		if p == "+" and expr.info.vt == "String" then
 			-- The + operator is concatenating strings, not adding
 			luaOp = " .. "  -- TODO: Lua tables (GameObj) will not do a toString automatically
 		end
@@ -276,7 +274,7 @@ end
 -- Generate code for an increment or decrement (++ or --) stmt
 -- given the lValue node and opToken is either a "++" or "--" token.
 local function generateIncOrDecStmt( lValue, opToken )
-	local vt = checkJava.vtCheckExpr( lValue ) 
+	local vt = lValue.info.vt 
 	local tt = opToken.tt
 	assert( tt == "++" or tt == "--" )
 	if type(vt) ~= "number" then
@@ -347,6 +345,9 @@ end
 
 -- Generate code for the block line in tree
 local function generateBlockLine( tree )
+	if not checkJava.doTypeChecks( tree ) then
+		return
+	end
 	local p = tree.p
 	local nodes = tree.nodes
 	if p == "stmt" then
@@ -364,7 +365,7 @@ local function generateBlockLine( tree )
 	elseif p == "if" then
 		-- if (expr)
 		local expr = nodes[3]
-		if checkJava.vtCheckExpr( expr ) ~= true then
+		if expr.info.vt ~= true then
 			err.setErrNode( expr, "Conditional test must be boolean (true or false)" )
 			return
 		end
@@ -377,7 +378,7 @@ local function generateBlockLine( tree )
 	elseif p == "elseif" then
 		-- else if (expr)
 		local expr = nodes[4]
-		if checkJava.vtCheckExpr( expr ) ~= true then
+		if expr.info.vt ~= true then
 			err.setErrNode( expr, "Conditional test must be boolean (true or false)" )
 			return
 		end
@@ -398,7 +399,7 @@ local function generateBlockLine( tree )
 	elseif p == "return" then
 		-- return expr ;
 		local expr = nodes[2]
-		checkJava.vtCheckExpr( expr )
+		local vt = expr.info.vt
 		-- TDOO: Check correct return type
 		beginLuaLine( "return " )
 		addLua( exprCode( expr ) )
@@ -409,19 +410,19 @@ end
 
 -- Generate Lua code for a { } block of code.
 -- Start with iTree at the { and return with iTree at the }.
+-- Return true if successful.
 local function generateBlock()
 	local startBlockLevel = blockLevel
 	repeat
 		local tree = javaParseTrees[iTree]
 		local p = tree.p
-
 		if p == "begin" then              -- {
 			blockLevel = blockLevel + 1
 		elseif p == "end" then            -- }
 			blockLevel = blockLevel - 1
 			beginLuaLine( "end")
 			if blockLevel == startBlockLevel then
-				return
+				return true
 			end
 		else
 			generateBlockLine( tree )
@@ -483,7 +484,10 @@ function codeGenJava.getLuaCode( parseTrees )
 	while iTree <= #parseTrees do
 		local tree = javaParseTrees[iTree]
 		local p = tree.p
-		checkJava.initLine()
+		-- print( "getLuaCode line " .. iTree )
+		if not checkJava.doTypeChecks( tree ) then
+			break
+		end
 
 		if generateVarDecl( tree, true ) then
 			-- Processed a varInit, constInit, or varDecl
@@ -503,14 +507,18 @@ function codeGenJava.getLuaCode( parseTrees )
 			generateFnHeader( tree.nodes[3].str, paramList )
 			iTree = iTree + 1 
 			checkJava.initLocalVars( paramList )
-			generateBlock()
+			if not generateBlock() then
+				break
+			end
 		elseif p == "func" then
 			-- User-defined function
 			local paramList = tree.nodes[4].nodes
 			generateFnHeader( tree.nodes[2].str, paramList )
 			iTree = iTree + 1 
 			checkJava.initLocalVars( paramList )
-			generateBlock()
+			if not generateBlock() then
+				break
+			end
 		end			
 		iTree = iTree + 1
 	end

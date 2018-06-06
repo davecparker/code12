@@ -22,7 +22,6 @@ local checkJava = {}
 local methods = {}      -- map method names to { node = token, vt = vt, params = {} }
 local classVars = {}    -- map instance var name to { node = token, vt = vt } or strCorrectName
 local localVars = {}    -- map local var name to { node = token, vt = vt } or strCorrectName
-local vtNodes = {}      -- types of expression nodes determined on a line
 
 
 --- Misc Analysis Functions --------------------------------------------------
@@ -59,6 +58,11 @@ local function getMethods( parseTrees )
 					vt = javaTypes.vtFromRetType( nodes[1] ), 
 					params = paramTable
 				}
+				-- Add lowercase version if different
+				local nameLower = string.lower( fnName )
+				if nameLower ~= fnName then
+					methods[nameLower] = fnName
+				end
 			end
 		end
 		if err.hasErr() then
@@ -68,25 +72,40 @@ local function getMethods( parseTrees )
 	return true
 end
 
--- Look up the name in nameToken in the knownNames table.
+-- Look up the name of nameToken in the names table and then optional names2 table.
 -- If the name is found and the entry is a record (table) then return the record.
--- If an entry in the knownNames table has an index differing only in case, then
--- set the error state to a description of the error and return 
--- (nil, strCorrectCase, entryCorrectCase), where strCorrectCase is the correct name
--- and entryCorrectCase is the entry record for the correct name, otherwise return nil.
-local function lookupID( nameToken, knownNames )
-	if nameToken.tt == "ID" then
-		local result = knownNames[nameToken.str]
-		if type(result) == "string" then
-			local strCorrectCase = result
-			result = knownNames[result]  -- get the correct entry
-			if result then
-				err.setErrNode( nameToken, 
-						"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
-				return nil, strCorrectCase, result
-			end
-		end
-		return result  -- table or nil
+-- If an entry has an index (name) differing only in case, then set the error state 
+-- to a description of the error and return (nil, entryCorrectCase, strCorrectCase). 
+-- If the name is not found at all then return nil.
+local function lookupID( nameToken, names, names2 )
+	assert( nameToken.tt == "ID" )
+	local name = nameToken.str
+
+	-- Try the name as-is
+	local result = names[name] or (names2 and names2[name])
+	if type(result) == "table" then
+		return result
+	end
+
+	-- Try the name in all lower-case
+	local nameLower = string.lower( name )
+	local strCorrectCase = nil
+	result = names[nameLower] or (names2 and names2[nameLower])
+	if type(result) == "table" then
+		strCorrectCase = nameLower   -- name is supposed to be all lowercase
+	elseif type(result) == "string" then
+		strCorrectCase = result      -- result gives the correct case
+		result = names[strCorrectCase] or (names2 and names2[strCorrectCase])
+		assert( type(result) == "table" )
+	else
+		strCorrectCase = nil
+	end
+
+	-- Found but wrong case?
+	if strCorrectCase then
+		err.setErrNode( nameToken, 
+				"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
+		return nil, result, strCorrectCase
 	end
 	return nil
 end
@@ -103,17 +122,13 @@ local function vtNumber( vt1, vt2 )
 	return vt
 end
 
--- Return the value type (vt) for a variable node.
+-- Return the value type (vt) for a variable name token node.
 -- If the variable is undefined, then set the error state and return nil.
 local function vtVar( varNode )
 	assert( varNode.tt == "ID" )
-	local varName = varNode.str
-	local varFound = lookupID( varNode, localVars )
+	local varFound = lookupID( varNode, localVars, classVars )
 	if varFound == nil then
-		varFound = lookupID( varNode, classVars )
-	end
-	if varFound == nil then
-		err.setErrNode( varNode,  "Undefined variable %s", varName )
+		err.setErrNode( varNode,  "Undefined variable %s", varNode.str )
 		return nil
 	end
 	return varFound.vt
@@ -130,7 +145,7 @@ local function vtLValueNode( lValue )
 	elseif p == "index" then
 		-- indexing an array
 		local indexExpr = nodes[3]
-		local vtIndex = checkJava.vtCheckExpr( indexExpr )
+		local vtIndex = indexExpr.info.vt
 		if vtIndex ~= 0 then
 			err.setErrNode( indexExpr, "Array index must be an integer value" )
 			return nil
@@ -141,7 +156,7 @@ local function vtLValueNode( lValue )
 					"An index in [brackets] can only be applied to an array" )
 			return nil
 		end
-		return vt.vt
+		return vt.vt   -- element type of the array
 	elseif p == "this" then
 		-- explicit reference to class variable
 		local varNode = nodes[3]
@@ -162,11 +177,12 @@ local function vtLValueNode( lValue )
 		if objName == "Math" then   -- Math has all static members
 			className = "Math"
 		else
+			-- object should be an instance
 			local vtObj = vtVar( object )
 			if vtObj == "GameObj" then
-				className = vtObj
+				className = "GameObj"
 			else
-				err.setErrNode( object, "Cannot access data fields of type %s",
+				err.setErrNode( object, "Type %s has no data fields",
 						javaTypes.typeNameFromVt( vtObj ))
 				return nil
 			end
@@ -175,16 +191,14 @@ local function vtLValueNode( lValue )
 
 		-- Look up the field
 		assert( field.tt == "ID" )
-		local fieldName = field.str
-		local vtField = class.fields[fieldName]
-		if vtField == nil then
-			checkCaseMismatch( field, class.fields )
+		local fieldFound = lookupID( field, class.fields )
+		if fieldFound == nil then
 			err.setErrNodeAndRef( field, object, 
 					"Unknown field \"%s\" for class %s",
-					fieldName, className )
+					field.str, className )
 			return nil
 		end
-		return vtField
+		return fieldFound.vt
 	end
 	error( "Unknown lValue pattern " .. p )
 end
@@ -222,13 +236,13 @@ end
 
 -- primaryExpr pattern: exprParens
 local function vtExprExprParens( nodes )
-	return vtExprNode( nodes[2] )
+	return nodes[2].info.vt
 end
 
 -- primaryExpr pattern: neg
 local function vtExprNeg( nodes )
 	local expr = nodes[2]
-	local vt = vtExprNode( expr )
+	local vt = expr.info.vt
 	if type(vt) ~= "number" then
 		err.setErrNodeAndRef( nodes[1], expr, 
 				"The negate operator (-) can only apply to numbers" )
@@ -240,7 +254,7 @@ end
 -- primaryExpr pattern: !
 local function vtExprNot( nodes )
 	local expr = nodes[2]
-	local vt = vtExprNode( expr )
+	local vt = expr.info.vt
 	if vt ~= true then
 		err.setErrNodeAndRef( nodes[1], expr, 
 				"The not operator (!) can only apply to boolean values" )
@@ -263,8 +277,8 @@ end
 local function vtExprPlus( nodes )
 	-- May be numeric add or string concat, depending on the operands
 	assert( nodes[2].tt == "+" )
-	local vtLeft = vtExprNode( nodes[1] )
-	local vtRight = vtExprNode( nodes[3] )
+	local vtLeft = nodes[1].info.vt
+	local vtRight = nodes[3].info.vt
 	if type(vtLeft) == "number" and type(vtRight) == "number" then
 		return vtNumber( vtLeft, vtRight )
 	elseif vtLeft == "String" and vtRight == "String" then
@@ -305,8 +319,8 @@ end
 -- expr patterns: -, *, /, %
 local function vtExprNumeric( nodes )
 	-- Both sides must be numeric, result is number
-	local vtLeft =  vtExprNode( nodes[1] )
-	local vtRight = vtExprNode( nodes[3] )
+	local vtLeft = nodes[1].info.vt
+	local vtRight = nodes[3].info.vt
 	if type(vtLeft) == "number" and type(vtRight) == "number" then
 		return vtNumber( vtLeft, vtRight )
 	end
@@ -319,8 +333,8 @@ end
 -- expr patterns: &&, ||
 local function vtExprLogical( nodes )
 	-- Both sides must be boolean, result is boolean
-	local vtLeft = vtExprNode( nodes[1] )
-	local vtRight = vtExprNode( nodes[3] )
+	local vtLeft = nodes[1].info.vt
+	local vtRight = nodes[3].info.vt
 	if vtLeft == true and vtRight == true then
 		return true
 	end
@@ -333,8 +347,8 @@ end
 -- expr patterns: <, >, <=, >=
 local function vtExprInequality( nodes )
 	-- Both sides must be numeric, result is boolean
-	local vtLeft = vtExprNode( nodes[1] )
-	local vtRight = vtExprNode( nodes[3] )
+	local vtLeft = nodes[1].info.vt
+	local vtRight = nodes[3].info.vt
 	if type(vtLeft) == "number" and type(vtRight) == "number" then
 		return true
 	end
@@ -346,14 +360,12 @@ end
 
 -- expr patterns: ==, !=
 local function vtExprEquality( nodes )
-	local left = nodes[1]
-	local right = nodes[3]
-	local vtLeft = vtExprNode( left)
-	local vtRight = vtExprNode( right )
+	local vtLeft = nodes[1].info.vt
+	local vtRight = nodes[3].info.vt
 	if javaTypes.canCompareVts( vtLeft, vtRight ) then
 		return true
 	end
-	err.setErrNodeAndRef( left, right, "Cannot compare %s to %s", 
+	err.setErrNodeAndRef( nodes[1], nodes[3], "Cannot compare %s to %s", 
 		javaTypes.typeNameFromVt( vtLeft ), javaTypes.typeNameFromVt( vtRight ) )
 	return nil
 end
@@ -387,10 +399,9 @@ local fnVtExprPatterns = {
 }
 
 -- Return the value type (vt) for an expr, primaryExpr, or lValue node.
--- Also remember the node's type in vtNodes for possible later calls 
--- to checkJava.vtKnownExpr().
+-- Also store the vt into node.info.vt for future use.
 -- If an error is found, set the error state and return nil.
-function vtExprNode( node )
+function vtSetExprNode( node )
 	local vt = nil
 	if node.t == "lValue" then
 		vt = vtLValueNode( node )
@@ -399,64 +410,48 @@ function vtExprNode( node )
 		-- Look up and call the correct vt function above
 		local fnVt = fnVtExprPatterns[node.p]
 		if fnVt == nil then
-			error( "vtExprNode: Unknown expr pattern " .. p )
+			err.setErrNode( node, "Unsupported operator" )  -- TODO: improve
+			return nil
 		end
 		vt = fnVt( node.nodes )
 	end
-	-- Remember and return the result
-	vtNodes[node] = vt       
+	-- Store and return the result
+	node.info.vt = vt       
 	return vt
 end
 
 
 --- Post Check Analysis Functions  -------------------------------------------
 
--- If expr is an integer divide that might have a remainder, 
--- then set the error state and return true, otherwise return false.
--- The expr most be on the current line after type analysis is completed.
+-- If the integer divide in expr might have a remainder, then set
+-- the error state and return true, otherwise return false.
 local function isBadIntDivide( expr )
-	if expr.p == "/" and checkJava.vtKnownExpr( expr ) == 0 then
-		local nodes = expr.nodes
-		local left = nodes[1]
-		local right = nodes[3]
+	assert( expr.p == "/" )
+	assert( expr.info.vt == 0 )
+	local nodes = expr.nodes
+	local left = nodes[1]
+	local right = nodes[3]
 
-		if left.p == "NUM" and right.p == "NUM" then
-			-- Both sides are constant so we can check for a remainder
-			local n = tonumber( left.nodes[1].str )
-			local d = tonumber( right.nodes[1].str )
-			local r = n / d
-			if r == math.floor( r ) then
-				return false   -- no remainder, so OK as-is
-			else
-				err.setErrNode( expr, "Integer divide has remainder. Use double or ct.intDiv()" )
-				return true
-			end
+	if left.p == "NUM" and right.p == "NUM" then
+		-- Both sides are constant so we can check for a remainder
+		local n = tonumber( left.nodes[1].str )
+		local d = tonumber( right.nodes[1].str )
+		local r = n / d
+		if r == math.floor( r ) then
+			return false   -- no remainder, so OK as-is
 		else
-			-- The remainder can't be determined, but Code12 doesn't allow this
-			-- because chances are the programmer made a mistake.
-			err.setErrNode( expr, "Integer divide may lose remainder. Use double or ct.intDiv()" )
+			err.setErrNode( expr, "Integer divide has remainder. Use double or ct.intDiv()" )
 			return true
 		end
 	end
-	return false
+	-- The remainder can't be determined, but Code12 doesn't allow this
+	-- because chances are the programmer made a mistake.
+	err.setErrNode( expr, "Integer divide may lose remainder. Use double or ct.intDiv()" )
+	return true
 end
 
 
 --- Module Functions ---------------------------------------------------------
-
--- Check and return the value type (vt) for an expr, primaryExpr, or lValue node.
--- If an error is found, set the error state and return nil.
-function checkJava.vtCheckExpr( node )
-	local vt = vtExprNode( node )
-	checkJava.postCheck( node )
-	return vt
-end
-
--- Return the type of an expression that has already been checked and determined
--- on the current line, or nil if unknown.
-function checkJava.vtKnownExpr( node )
-	return vtNodes[node]
-end
 
 -- Return true if the given variable node is a defined class variable.
 function checkJava.isClassVar( varNode )
@@ -466,29 +461,23 @@ end
 -- Define the class variable with the given nameNode and type (vt, isArray).
 -- Return true if successful, false if error.
 function checkJava.defineClassVar( nameNode, vt, isArray )
-	if vt == nil then
+	if vt == nil or err.hasErr() then
 		return false
 	end
 	if isArray then
 		vt = { vt = vt }   -- make vt into array of specified type
 	end
 
-	-- Make sure we don't already have an error because we may clear
-	-- the error state below.
-	if err.hasErr() then
-		return false
-	end
-
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound, nameCorrectCase, varCorrectCase = lookupID( nameNode, classVars )
+	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, classVars )
 	if varFound then
 		err.setErrNodeAndRef( nameNode, varFound.node, 
 				"Variable %s was already defined", varName )
 		return false
 	elseif varCorrectCase then
 		err.clearErr()
-		err.setErrNodeAndRef( nameNode, varCorrectCase, 
+		err.setErrNodeAndRef( nameNode, varCorrectCase.node, 
 				"Variable %s differs only by case from existing variable %s", 
 				varName, nameCorrectCase )
 		return false
@@ -506,7 +495,7 @@ end
 -- Define the local variable with the given nameNode and type (vt, isArray).
 -- Return true if successful, false if error.
 function checkJava.defineLocalVar( nameNode, vt, isArray )
-	if vt == nil then
+	if vt == nil or err.hasErr() then
 		return false
 	end
 	if isArray then
@@ -515,17 +504,14 @@ function checkJava.defineLocalVar( nameNode, vt, isArray )
 
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound, nameCorrectCase, varCorrectCase = lookupID( nameNode, localVars )
-	if varFound == nil then
-		varFound, nameCorrectCase, varCorrectCase = lookupID( nameNode, classVars )
-	end
+	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, localVars, classVars )
 	if varFound then
 		err.setErrNodeAndRef( nameNode, varFound.node, 
 				"Variable %s was already defined", varName )
 		return false
 	elseif varCorrectCase then
 		err.clearErr()
-		err.setErrNodeAndRef( nameNode, varCorrectCase, 
+		err.setErrNodeAndRef( nameNode, varCorrectCase.node, 
 				"Variable %s differs only by case from existing variable %s", 
 				varName, nameCorrectCase )
 		return false
@@ -554,11 +540,10 @@ function checkJava.initLocalVars( paramList )
 	end
 end
 
--- Do type checking on expr and then return true if the expr can be assigned to 
--- the given vt (value type) at node.
+-- Return true if the expr can be assigned to the given vt (value type) at node.
 -- If the types are not compatible then set the error state and return false.
 function checkJava.canAssignToVt( node, vt, expr )
-	local vtExpr = checkJava.vtCheckExpr( expr )
+	local vtExpr = expr.info.vt
 	if javaTypes.vtCanAcceptVtExpr( vt, vtExpr ) then
 		return true
 	end
@@ -596,27 +581,11 @@ end
 -- Return the entry in the API or methods table if found.
 -- If not found then set the error state and return nil.
 local function findGlobalFunction( fnValue )
-	if fnValue.tt ~= "ID" then
-		return nil
-	end
+	assert( fnValue.tt == "ID" )
 	local fnName = fnValue.str
-	local method = apiTables["ct"].methods[fnName] or methods[fnName]
+	local method = lookupID( fnValue, apiTables["ct"].methods, methods )
 	if method == nil then
-		-- Check for misspelling by case only
-		local knownName = checkCaseMismatch( fnName, apiTables["ct"].methods )
-								or checkCaseMismatch( fnName, methods )
-		if knownName then
-			local userMethod = methods[knownName]
-			if userMethod then
-				err.setErrNodeAndRef( fnValue, userMethod.node, 
-						"Names are case-sensitive, did you mean \"%s\"?", knownName)
-			else
-				err.setErrNode( fnValue, 
-						"Names are case-sensitive, should be \"%s\"", knownName)
-			end
-		else
-			err.setErrNode( fnValue, "Undefined function %s", fnName )
-		end
+		err.setErrNode( fnValue, "Undefined function %s", fnName )
 		return nil
 	end
 	return method
@@ -626,9 +595,7 @@ end
 -- Return the method entry in the API tables if found.
 -- If not found then set the error state and return nil.
 local function findAPIMethod( fnValue )
-	if fnValue.t ~= "fnValue" then
-		return nil
-	end
+	assert( fnValue.t == "fnValue" )
 	local object = fnValue.nodes[1]
 	local fnNode = fnValue.nodes[2]
 	local fnName = fnNode.str
@@ -648,12 +615,11 @@ local function findAPIMethod( fnValue )
 					javaTypes.typeNameFromVt( vtObj ))
 			return nil
 		end
-		-- TODO: Check object name
 	end
 	local class = apiTables[className]
 
 	-- Look up the method
-	method = class.methods[fnName]
+	method = lookupID( fnNode, class.methods )
 	if method == nil then
 		err.setErrNodeAndRef( fnNode, object, 
 				"Unknown method \"%s\" for class %s",
@@ -701,7 +667,7 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	-- TODO: Handle overloaded Math methods
 	for i = 1, #params do
 		local expr = params[i]
-		local vtPassed = checkJava.vtCheckExpr( expr )
+		local vtPassed = expr.info.vt
 		local vtNeeded = method.params[i].vt
 		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
 			err.setErrNode( expr, "Parameter %d of %s expects type %s, but %s was passed",
@@ -715,32 +681,36 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	return method.vt 
 end
 
--- Run post checks on the tree (and recursively downward), which must
--- be on the current line after type analysis has been done on it.
--- If there is an error then set the error state and return false
--- Return true if no errors were detected.
-function checkJava.postCheck( tree )
+-- Recursively run type analysis on the given parse tree.
+-- Set the info.vt field on all expr and lValue nodes.
+-- If there is an error, then set the error state and return false,
+-- otherwise return true if there were no errors.
+function checkJava.doTypeChecks( tree )
 	-- Check children recursively first
 	local nodes = tree.nodes
 	if nodes then
 		for i = 1, #nodes do
-			if not checkJava.postCheck( nodes[i] ) then
-				return false
+			local node = nodes[i]
+			if node.t then  -- don't recurse down into tokens
+				if not checkJava.doTypeChecks( node ) then
+					return false
+				end
 			end
 		end
 	end
 
 	-- Check this node
-	if tree.t == "expr" and isBadIntDivide( tree ) then
-		return false
+	local t = tree.t
+	if t == "expr" or t == "lValue" then
+		local vt = vtSetExprNode( tree )
+
+		-- Do additional post checks after we know the type of this node
+		-- and all types underneath it.
+		if vt == 0 and tree.p == "/" and isBadIntDivide( tree ) then
+			return false   -- invalid int divide 
+		end
 	end
 	return true
-end
-
--- Init the state for a new line in the program
-function checkJava.initLine()
-	-- We only need to store the known expression types on the current line
-	vtNodes = {}
 end
 
 -- Init the state for a new program with the given parseTrees
@@ -749,7 +719,6 @@ function checkJava.initProgram( parseTrees )
 	methods = {}
  	classVars = {}
  	localVars = {}
- 	vtNodes = {}
  	err.initProgram()
 
 	-- Get method types first, since vars can forward reference them

@@ -212,7 +212,15 @@ local function makeLuaFile()
 		for i = 1, #class.fields do
 			local field = class.fields[i]
 
-			outFile:write( "        [\"" .. field.name .. "\"] = " .. vtStr(field.vt) ..",\n" )
+			-- Field entry with vt
+			outFile:write( "        [\"" .. field.name .. "\"] = { vt = " .. vtStr(field.vt) .. " },\n" )
+
+			-- Lowercase mapping if needed
+			local nameLower = string.lower( field.name )
+			if nameLower ~= field.name then
+				outFile:write( "        [\"" .. nameLower .. "\"] = \"" .. field.name .. "\",\n" )
+			end
+
 		end
 		outFile:write( "    },\n" )
 
@@ -221,6 +229,7 @@ local function makeLuaFile()
 		for i = 1, #class.methods do
 			local method = class.methods[i]
 
+			-- Method, vt, min, overloaded
 			outFile:write( "        [\"" .. method.name .. "\"] = { vt = " .. vtStr(method.vt) ..", " )
 			if method.min then
 				outFile:write( "min = " .. method.min .. ", " )
@@ -240,6 +249,12 @@ local function makeLuaFile()
 				end
 			end
 			outFile:write( "} },\n" )  -- end of params and the method
+
+			-- Lowercase mapping if needed
+			local nameLower = string.lower( method.name )
+			if nameLower ~= method.name then
+				outFile:write( "        [\"" .. nameLower .. "\"] = \"" .. method.name .. "\",\n" )
+			end
 		end
 		outFile:write( "    }\n" )  -- end of the method list
 		outFile:write( "},\n" )     -- end of the class

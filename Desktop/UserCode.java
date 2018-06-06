@@ -12,7 +12,7 @@ class UserCode extends Code12Program
 
 	public void start()
 	{
-		int x = 10 + 50 * 10 + (45 / 3 * 2);
+		int x = 10 + 50 * 5 + (45 / 3 * 2);
 		String name = "Dave" + " " + "Parker";
 		boolean done;
 
@@ -23,7 +23,7 @@ class UserCode extends Code12Program
 		bigBall.setFillColor( "black" );
 
 		double z = ball.x + 1;
-		if (ball == bigBall | bigBall != null)
+		if (ball == bigBall || bigBall != null)
 			z = 2;
 
 		double ok = 9.0 / 5;

@@ -94,6 +94,25 @@ local binaryOpPrecedence = {
 }
 
 
+----- Parse Tree Utilities  --------------------------------------------------
+
+-- A parse tree is either:
+-- 		a token node, for example:
+--          { tt = "ID", str = "foo", iLine = 10, iChar = 23 }
+--      or a tree node, for example:
+--          { t = "line", p = "stmt", nodes = {...}, info = {} }
+--      where t is the grammar or function name, p is the pattern name if any,
+--      info is an initially empty table where semantic info can be stored,
+--		and nodes is an array of children nodes.
+
+-- Create and return a parse tree node with the given type (t), pattern (p), 
+-- and children nodes
+local function makeParseTreeNode( t, p, nodes )
+	-- TODO: Get from pool
+	return { t = t, p = p, nodes = nodes, info = {} }
+end	
+
+
 ----- Special parsing functions used in the grammar tables below  ------------
 
 -- Parse the primaryExpr grammar (function version, for recursion)
@@ -138,7 +157,7 @@ local function fnValue()
 		return token2   -- ct.name token
 	end
 	-- Return a method pattern node
-	return { t = "fnValue", p = "method", nodes = { token, token2 } }
+	return makeParseTreeNode( "fnValue", "method", { token, token2 } )
 end
 
 
@@ -288,13 +307,6 @@ local line = { t = "line",
 -- Unless otherwise specified, parsing functions parse the tokens array starting 
 -- at iToken, considering only patterns that are defined within the syntaxLevel.
 -- They return a parse tree, or nil if failure.
--- A parse tree is either:
--- 		a token, for example:
---          { tt = "ID", str = "foo", iChar = 23 }
---      or a node, for example:
---          { t = "line", p = "stmt", nodes = {...} }
---      where t is the grammar or function name, p is the pattern name if any,
---		and nodes is an array of children parse tree nodes
 
 
 -- Parse the rest of an expression after leftSide using Precedence Climbing.
@@ -326,7 +338,7 @@ function parseOpExpr( leftSide, minPrecedence )
 			prec = binaryOpPrecedence[token.tt]
 		end
 		-- Build the node for this op
-		leftSide = { t = "expr", p = op.tt, nodes = { leftSide, op, rightSide } }
+		leftSide = makeParseTreeNode( "expr", op.tt, { leftSide, op, rightSide } )
 	end
 	return leftSide
 end
@@ -344,11 +356,7 @@ function parseGrammar( grammar )
 			local nodes = parsePattern( pattern )
 			if nodes then
 				-- This pattern matches, so make a grammar node and return it
-				local parseTree = {    -- TODO: get from pool
-					t = grammar.t, 
-					p = pattern[3],  -- pattern name
-					nodes = nodes, 
-				}
+				local parseTree = makeParseTreeNode( grammar.t, pattern[3], nodes )
 				trace("== Returning " .. grammar.t .. "[" .. i .. "] (" .. pattern[3] .. ")")
 				return parseTree
 			end
