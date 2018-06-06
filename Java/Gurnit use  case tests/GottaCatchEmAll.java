@@ -18,13 +18,13 @@ int count;
       ct.text("Drag the pokeball to capture the pokemon. ", 50, 20, 5, "white");
       ct.text("Catch Mewtwo and power up 2X faster! ", 50, 25, 5, "white");
       ct.text("Once you power up then you can evolve charmander. ", 50, 30, 5, "white");
-      ct.text("And watch out for Gastly or he'll drain your power. ", 50, 35, 5, "white");
+      ct.text("And watch out for Gastly, he'll drain your power. ", 50, 35, 5, "white");
       ct.text("", 50, 40, 5, "white");
       
       //evolve screen
       ct.setScreen("evolve");
       ct.setBackImage("arena.png");          
-      evolve = ct.rect(50, 50,50,30, "pink");
+      evolve = ct.rect(50, 50,50,30, "yellow");
       evolve.clickable = true;
       evolveText = ct.text("EVOLVE!", 50, 50, 10, "white");  
                  
@@ -112,7 +112,7 @@ int count;
        //press i again to switch back to game screen       
        if(ct.charTyped("i") && count % 2== 0)
          ct.setScreen("start");
-       //evolve when fully powered up
+       //evolve Charmander when fully powered up
        if(powerBar.width >=30 )
        {
          ct.setScreen("evolve");
@@ -123,8 +123,8 @@ int count;
          evolveText.visible = false;
          charm = ct.image("char.png", 50,50,50);  
          charm.xSpeed = -3;
-         if(charm.x <= 10)
-            charizard = ct.image("charizard.png", 50, 50, 20);
+         if(charm.x<= 5)
+           charizard = ct.image("charizard.png", 50, 50, 50);            
        }             
 //        if(ct.random(1, 200) == 1)
 //        {

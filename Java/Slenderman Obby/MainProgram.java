@@ -34,11 +34,11 @@ double width, height;
       barText = ct.text("HEALTH", 87, 5, 5, "black");
       
       //obby course    
-      rect1 = ct.rect(width/10, height/10*6, 12, 60, "black");
+      rect1 = ct.rect(width/10, height/10*6, 10, 60, "black");
       rect2 = ct.rect(width/3, height/8 , 43, 10, "black");     
       rect3 = ct.rect(width/2, height/10 *5, 9.5, 70, "black");       
       slider1 = ct.rect(width/3, height/2.8, 10, 1, "black");
-      slider2 = ct.rect(width/3, height/1.8,10, 1, "black");
+      slider2 = ct.rect(width/3, height/ 10 * 6,10, 1, "black");
       deathBlock = ct.rect(width/10 * 8, height/10*6, 50, 30,"white"); //can't touch this or you die
       deathBlock.setLineColor("white");      
       
@@ -105,26 +105,24 @@ double width, height;
          redRect.xSpeed = -1;
       }
       //sliders moving back and forth
-      if(slider1.hit(rect1) || slider1.hit(rect3))
-      {
+      if(slider1.hit(rect1) || slider1.hit(rect3))      
          slider1.xSpeed = -slider1.xSpeed;
-      }
-      if(slider2.hit(rect1) || slider2.hit(rect3))
-      {
+      
+      if(slider2.hit(rect1) || slider2.hit(rect3))      
          slider2.xSpeed = -slider2.xSpeed;
-      }      
-      //switches to game over screen if slenderman touches death block
-      if(slenderman.hit(deathBlock) && !( (slenderman.hit(pinkRect)) || (slenderman.hit(redRect))|| (slenderman.hit(blueRect))))
+            
+      //switches to game over screen if slenderman touches death block or the black sliders
+      if((slenderman.hit(deathBlock) || slenderman.hit(slider1) || slenderman.hit(slider2)) && !( (slenderman.hit(pinkRect)) || (slenderman.hit(redRect))|| (slenderman.hit(blueRect))))
           ct.setScreen("end");
       //checks if slenderman hit any of the rectangles or the invisible deathblock
       if(slenderman.hit(rect1) ||slenderman.hit(rect2) || slenderman.hit(rect3)||slenderman.hit(slider1)||slenderman.hit(slider2))
-         healthBar.width -= 0.3;                
+         healthBar.width -= 0.5;                
       // colored tiles stop moving if touched               
       if(slenderman.hit(pinkRect))
          pinkRect.xSpeed =0;               
-      else  if (slenderman.hit(redRect))
+      if (slenderman.hit(redRect))
          redRect.xSpeed =0;
-      else if (slenderman.hit(blueRect))
+      if (slenderman.hit(blueRect))
          blueRect.xSpeed =0;
               
       if (slenderman.hit(checkpoint))
