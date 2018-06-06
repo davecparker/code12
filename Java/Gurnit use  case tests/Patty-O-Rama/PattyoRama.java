@@ -1,13 +1,13 @@
 import Code12.*;
 
-public class MainProgram extends Code12Program
+public class PattyoRama extends Code12Program
 {
 GameObj krabbyPatty, roguePatty, pipe, play, playText, scoreText;
 int score;
 
    public static void main(String[] args)
    { 
-      Code12.run(new MainProgram()); 
+      Code12.run(new PattyoRama()); 
    }
    
    public void start()
