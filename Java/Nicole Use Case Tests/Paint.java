@@ -15,7 +15,7 @@ public class Paint extends Code12Program
    GameObj purpleRect;
    GameObj majentaRect;;
    GameObj eraseRect;
-   
+
    GameObj small;
    GameObj medium;
    GameObj large;
@@ -150,7 +150,7 @@ public class Paint extends Code12Program
          brush = ct.line(ct.clickX(),ct.clickY(),x,y);
          brush.setLineColor(currentColor);
          brush.setFillColor(currentColor);
-         //brush.setLineWidth(
+         brush.lineWidth = 10;
       }
       
       

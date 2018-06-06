@@ -96,10 +96,10 @@ class Platformer extends Code12Program
         }
      
         player = ct.image("player_forwards.png", 5, 34, 4);
-        for ( int i = 0; i < 3; i++ )
-        {
-            health[i] = ct.image("8bitheart.png", ct.getWidth() - 10 - i, 10, 5 );
-        }
+       //  for ( int i = 0; i < 3; i++ )
+//         {
+//             health[i] = ct.image("8bitheart.png", ct.getWidth() - 10 - i, 10, 5 );
+//         }
         
     }
 
