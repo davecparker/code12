@@ -40,9 +40,10 @@ public class TextTest extends Code12Program
       String concat = "Testing string...";
       ct.println(concat + " concatenation");
       
-      int LIMIT = 1;
-      LIMIT = ct.inputInt("Enter # of times to start logging stationary game objects");
-  
+      int LIMIT = ct.inputInt("Enter # of times to start logging stationary game objects");
+      if ( LIMIT == 0 )
+         LIMIT = 2;
+         
        for ( int i = 0; i < LIMIT; i++ )
        {
          ct.log(rect);
@@ -64,6 +65,8 @@ public class TextTest extends Code12Program
          ct.println("NaN or infinity");
        ct.println( d );
        boolean bool = ct.inputBoolean("Enter a boolean: ");
+      //  if ( bool != true || bool != false ) this req. user input or else crashes...
+//          bool = true;   //default
        if ( bool )
          ct.println("Boolean is true");
        else
@@ -73,8 +76,8 @@ public class TextTest extends Code12Program
        ct.println();
        String input = ct.inputString("Enter a test string to be used "
                                     + "with Java's string methods: " );
-       if ( ct.keyPressed("enter") )
-            input = "Garbage";
+       if ( input.equals("") )
+         input = "garbage";
        ct.println("The length of " + input + " is " + input.length() );
        ct.println( input + " to upper case is " + input.toUpperCase() );
        ct.println( input + " to lower case is " + input.toLowerCase() );
@@ -93,8 +96,8 @@ public class TextTest extends Code12Program
        ct.println (i >= j?"Yes, it is!":"No, it isn't.");
        
        String anotherInput = ct.inputString("Enter a second string: ");
-       if ( ct.keyPressed("enter") )
-         anotherInput = "MoreGarbage";   // Default
+       if ( anotherInput.equals("") )
+         anotherInput = "garbageagain";   // Default
          
        int comparing = input.compareTo(anotherInput);
   
@@ -111,17 +114,16 @@ public class TextTest extends Code12Program
        
        String alphabet = "abcdefghijklmnopqrstuvwxyz";
        String letter = ct.inputString("Enter an alphabet letter: ");
-       if ( ct.keyPressed("enter") )
+       if ( letter.equals("") )
             letter = "z";
        ct.println( alphabet.indexOf(letter) + 1 + " is the index of " + letter );
        
        // substring methods
        String s = ct.inputString("Enter another string: ");
-       if ( ct.keyPressed("enter") )
+       if ( s.equals("") )
             s = "DefaultCase";
        int start = ct.inputInt("Enter starting index: ");
-       if ( ct.keyPressed("enter") )
-            start = 8; 
+         // defaults to 0
             
        if ( start >= 0 )
          ct.println( s.substring(start) ); 
@@ -129,8 +131,9 @@ public class TextTest extends Code12Program
          ct.println("Index cannot be negative!");
        
        int end = ct.inputInt("Enter ending index: " );
-       if ( ct.keyPressed("enter") )
-            end = 10; 
+       if ( end == 0 )
+         end = 10;
+         
        if ( end < s.length() )
          ct.println( s.substring( start, end ) );
        else
@@ -145,7 +148,7 @@ public class TextTest extends Code12Program
       inputArray = new int[10];
       for ( i = 0; i < inputArray.length; i++ )
       {
-         inputArray[i] = ct.inputInt("Enter an integer to fill the array: ");  
+         inputArray[i] = ct.inputInt("Enter an integer to fill the array: "); 
       }
       
       for ( i = 0; i < inputArray.length; i++ )
@@ -154,7 +157,11 @@ public class TextTest extends Code12Program
       }
       
       int rows = ct.inputInt("Enter # of rows for a 2D array: " );
+      if ( rows == 0 )
+         rows = 2;
       int columns = ct.inputInt("Enter # of columns: " );
+      if ( columns == 0 )
+         columns = 2;
       
       string2DArray = new String[rows][columns];
       
@@ -163,15 +170,19 @@ public class TextTest extends Code12Program
          for ( columns = 0; columns < string2DArray[rows].length; columns++ )
          {
             string2DArray[rows][columns] = ct.inputString("Write strings into the array: ");
+            // if no user input, fill with default string
+            string2DArray[rows][columns] = "Default";
          }
       }
       
       for ( rows = 0; rows < string2DArray.length; rows++ )
       {
+         ct.print("\nrow " + rows + ":\t" );
          for ( columns = 0; columns < string2DArray[rows].length; columns++ )
          {
-            ct.println( string2DArray[rows][columns] );
+            ct.print( string2DArray[rows][columns] + "\t");
          }
+         ct.println();
       }
        
                                    
@@ -188,13 +199,7 @@ public class TextTest extends Code12Program
 //       ct.logm("There is a " + rect + " moving " + rect.y " unit upwards off-screen");
 //       ct.logm("There was a mouse click at " + ct.clickX() + "," + ct.clickY() );
          
-         
-      
-      
-      
-      
-     
-      
+
    }
    
 }
