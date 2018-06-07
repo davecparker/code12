@@ -1,22 +1,21 @@
-// Use Case Test for:
-// Text input/output
+// Black Box Test of:
+// Events 
+// ( onMousePress, onMouseRelease, onMouseDrag, etc.
 
 import Code12.*;
 
-public class TextInputOutput extends Code12Program
+public class EventsTest
 {
    public static void main(String[] args)
    { 
-      Code12.run(new TextInputOutput()); 
+      Code12.run(new EventsTest()); 
    }
    
    public void start()
    {
-   
    }
    
    public void update()
    {
    }
-   
 }

@@ -71,6 +71,7 @@ public class Spaceship extends Code12Program
       if ( spaceship.ySpeed != 0 )
       {
          
+         
            
            // If the spaceship goes off screen, set it back to starting position
          if ( spaceship.y < 0 )
@@ -131,6 +132,7 @@ public class Spaceship extends Code12Program
       {
          rayGunParticle = ct.circle( spaceship.x, spaceship.y - 4, 1, "red");
          rayGunParticle.ySpeed = - 2;
+         
           if ( rayGunParticle.hit(asteroid) )
           {
              asteroid.delete();
