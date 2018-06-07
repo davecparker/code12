@@ -65,8 +65,7 @@ public class TextTest extends Code12Program
          ct.println("NaN or infinity");
        ct.println( d );
        boolean bool = ct.inputBoolean("Enter a boolean: ");
-      //  if ( bool != true || bool != false ) this requires user input or else crashes...
-      //  bool = false;   //default
+      //  bool = false;   //bug; this should default to false if user skips it
        if ( bool )
          ct.println("Boolean is true");
        else

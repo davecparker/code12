@@ -1,3 +1,9 @@
+// Events Use Case of:
+// onMousePress()
+// onMouseDrag()
+// Level 8. If-else   
+
+
 import Code12.*;
 
 public class Paint extends Code12Program
