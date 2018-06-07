@@ -23,7 +23,5 @@ require("Code12.misc")
 require("Code12.types")
 
 
-------------------------------------------------------------------------------
-
 -- Initialize the runtime
 ct.initRuntime()

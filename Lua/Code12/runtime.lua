@@ -10,8 +10,24 @@
 local g = require("Code12.globals")
 
 
--- The main Code 12 global runtime object, where the "global" APIs live
-ct = {}
+-- The global "ct" table is the main Code 12 global runtime object, 
+-- where the "global" APIs live. If we are running in the context of the
+-- Code12 Desktop App, then ct has already been created by the app and
+-- contains an _appContext table as follows:
+--     ct = {
+--         _appContext = {
+--             outputGroup = group,      -- display group where output should go
+--             widthP = windowPixels,    -- pixel width of output area
+--             heightP = windowPixels,   -- pixel height of output area
+--             setTitle = fnSetTitle,    -- callback function to set app title
+--             setHeight = fnSetHeight,  -- callback function to change output height
+--         },
+--     }
+-- If running standalone (e.g. for a Corona SDK build), then ct starts out nil
+-- and we create it here, with no _appContext field.
+if ct == nil then
+	ct = {}
+end
 
 
 ---------------- Internal Functions ------------------------------------------
@@ -75,13 +91,22 @@ local function onFirstFrame(event)
 	Runtime:addEventListener("enterFrame", onNewFrame)
 end
 
--- Get the device metrics in native units (in portrait configuration if mobile)
+-- Get the device/output metrics in native units
 local function getDeviceMetrics()
-	-- Get device metrics 
-	g.device.horz.origin = display.screenOriginX
-	g.device.horz.size = display.actualContentWidth
-	g.device.vert.origin = display.screenOriginY
-	g.device.vert.size = display.actualContentHeight
+	-- If running standalone, then get the physical device metrics. 
+	-- If running with an _appContext then get the metrics from there.
+	local appContext = ct._appContext
+	if appContext == nil then
+		g.device.horz.origin = display.screenOriginX
+		g.device.horz.size = display.actualContentWidth
+		g.device.vert.origin = display.screenOriginY
+		g.device.vert.size = display.actualContentHeight
+	else
+		g.device.horz.origin = 0
+		g.device.horz.size = appContext.widthP
+		g.device.vert.origin = 0
+		g.device.vert.size = appContext.heightP
+	end
 end
 
 -- Handle a window resize event (desktop only)
@@ -113,7 +138,7 @@ function ct.initRuntime()
 	g.isMobile = (g.platform == "android" or g.platform == "ios")
 	g.isSimulator = (system.getInfo("environment") == "simulator")
 
-	-- Get the initial device metrics, and set to portrait for now
+	-- Get the device metrics and set for normal/portrait orientation for now.
 	getDeviceMetrics()
 	g.window.horz = g.device.horz
 	g.window.vert = g.device.vert
@@ -124,10 +149,18 @@ function ct.initRuntime()
 
 	-- Create a main outer display group so that we can rotate and place it 
 	-- to change orientation (portrait to landscape). Also, the origin of this group
-	-- corrects for Corona's origin not being at the device upper left.
+	-- corrects for Corona's origin possibly not being at the device upper left.
 	g.mainGroup = display.newGroup()
 	g.mainGroup.x = g.device.horz.origin
 	g.mainGroup.y = g.device.vert.origin
+
+	-- If in an app context then put the main display group inside the app's output group,
+	-- otherwise prepare to use the entire device screen.
+	if ct._appContext then
+		ct._appContext.outputGroup:insert( g.mainGroup )
+	else
+		display.setStatusBar(display.HiddenStatusBar)   -- hide device status bar
+	end
 
 	-- Runtime parameter check option: defaults to true, can be changed by client
 	ct.checkParams = true
@@ -136,7 +169,6 @@ function ct.initRuntime()
 	ct.setScreen("")
 
 	-- Get the Corona runtime ready to run
-	display.setStatusBar(display.HiddenStatusBar)   -- hide device status bar
 	Runtime:addEventListener("enterFrame", onFirstFrame)
 	Runtime:addEventListener("touch", g.onTouchRuntime)
 	Runtime:addEventListener("key", g.onKey)
