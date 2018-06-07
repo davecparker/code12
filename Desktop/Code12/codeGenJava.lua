@@ -447,11 +447,8 @@ function generateControlledStmt()
 	end
 end
 
--- Generage code for a function header with the given name and paramList
-local function generateFnHeader( name, paramList )
-	beginLuaLine( "function " )
-	addLua( fnTable )
-	addLua( name )
+-- Generate code for the parameter list of a function definition header
+local function generateFnParamList( paramList )
 	addLua( "(" )
 	for i = 1, #paramList do
 		local param = paramList[i]
@@ -503,8 +500,10 @@ function codeGenJava.getLuaCode( parseTrees )
 			blockLevel = blockLevel - 1
 		elseif p == "eventFn" then
 			-- Code12 event func (e.g. setup, update)
+			beginLuaLine( "function " )
+			addLua( tree.nodes[3].str )
 			local paramList = tree.nodes[5].nodes
-			generateFnHeader( tree.nodes[3].str, paramList )
+			generateFnParamList( paramList )
 			iTree = iTree + 1 
 			checkJava.initLocalVars( paramList )
 			if not generateBlock() then
@@ -512,8 +511,11 @@ function codeGenJava.getLuaCode( parseTrees )
 			end
 		elseif p == "func" then
 			-- User-defined function
+			beginLuaLine( "function " )
+			addLua( fnTable )
+			addLua( tree.nodes[2].str )
 			local paramList = tree.nodes[4].nodes
-			generateFnHeader( tree.nodes[2].str, paramList )
+			generateFnParamList( paramList )
 			iTree = iTree + 1 
 			checkJava.initLocalVars( paramList )
 			if not generateBlock() then

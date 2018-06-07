@@ -205,20 +205,6 @@ local function initRun()
 		display.setStatusBar(display.HiddenStatusBar)   -- hide device status bar
 	end
 
-	-- Set the global event functions if running under an app context. 
-	-- Otherwise a standalone Lua app can use the global names directly.
-	if appContext then
-		start = _fn.start
-		update = _fn.update
-		onMousePress = _fn.onMousePress
-		onMouseDrag = _fn.onMouseDrag
-		onMouseRelease = _fn.onMouseRelease
-		onKeyPress = _fn.onKeyPress
-		onKeyRelease = _fn.onKeyRelease
-		onCharTyped = _fn.onCharTyped
-		onResize = _fn.onResize
-	end
-
 	-- Make the first screen with default empty name
 	ct.setScreen("")
 
