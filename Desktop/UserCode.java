@@ -6,21 +6,22 @@ class UserCode extends Code12Program
 	GameObj ball, bigBall;
 	int count, total;
 	boolean gameOver;
-	final int LIMIT = 600;
+	final int LIMIT = 120;
 	// int count = 5;
-	int speed = 3;
+	double speed = 0.3;
 
 	public void start()
 	{
-		int x = 10 + 50 * 5 + (45 / 3 * 2);
+		double x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0;
+		int xInt = ct.toInt( x );
 		String name = "Dave" + " " + "Parker";
 		boolean done;
 
 		// Draw some circles
-		ball = ct.circle(x + 30, 70, 50);
-		ct.circle(ct.intDiv(x, 2) + 10, 200, 50);
-		bigBall = ct.circle(x, 400, 200);
-		bigBall.setFillColor( "black" );
+		ball = ct.circle(x + 6, 15, 5);
+		ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5);
+		bigBall = ct.circle(x, 80, 40);
+		bigBall.setFillColor( "blue" );
 
 		double z = ball.x + 1;
 		if (ball == bigBall || bigBall != null)
@@ -43,8 +44,8 @@ class UserCode extends Code12Program
 		moveBall( false );
 
 		// Move bigBall
-		factor = factor + 4;
-		ball.x += speed;
+		factor = factor + 0;
+		bigBall.x += speed;
 		if (bigBall.x > LIMIT)
 		{
 			bigBall.x--;
@@ -70,8 +71,8 @@ class UserCode extends Code12Program
 		// hack = 6;
 		ball.x++;
 		ball.x--;
-		ball.x += 1;
-		if (ball.x >= LIMIT)  // if (wrap == true && ball != null && !(ball.x >= LIMIT))
+		ball.x += 0.5;
+		if (wrap && ball.x >= LIMIT)
 			ball.x = 0;
 
 		--ball.x;

@@ -61,9 +61,13 @@ local ui = {
 }
 
 -- The global state tables that the generated Lua code can access (Lua globals)
-ct = {}        -- API functions
-this = {}      -- generated code uses this.var
-_fn = {}       -- generated code uses _fn.foo()
+ct = {
+	_appContext = nil,     -- created in initApp
+	checkParams = true,    -- set to false to disable runtime API parameter checks
+	-- The ct.xxx API functions are added here by the Lua runtime when loaded
+}
+this = {}      -- generated code uses this.varName for class/global variables
+_fn = {}       -- generated code uses _fn.setup(), _fn.update(), _fn.userFn(), etc.
 
 
 --- API Functions ------------------------------------------------
@@ -158,7 +162,7 @@ local function runLuaCode( luaCode )
  		-- Run user code main chunk, which defines the functions
  		codeFunction()
 
- 		-- Tell the runtime to init a new run
+ 		-- Tell the runtime to init and start a new run
  		ct._appContext.initRun()
 
  		-- Show the game output
@@ -462,6 +466,9 @@ end
 
 -- Prepare for a new run of the user program
 local function initNewProgram()
+	-- Stop existing run if any
+	 ct._appContext.stopRun()
+
 	-- Clear user functions and variables tables
 	this = {}
 	_fn = {}

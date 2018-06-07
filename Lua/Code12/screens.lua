@@ -128,6 +128,7 @@ function ct.setScreen(name, ...)
 		}
 		g.mainGroup:insert(screen.group)
 		screen.group:insert(screen.objs)
+		g.screens[name] = screen
 		g.screen = screen
 
 		-- Add default white background
