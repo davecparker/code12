@@ -8,7 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 local g = require("Code12.globals")
-local ct = require("Code12.runtime")
+require("Code12.runtime")
 local GameObj = require("Code12.GameObj")
 
 

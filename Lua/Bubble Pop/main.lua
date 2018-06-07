@@ -5,7 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 package.path = package.path .. ';../?.lua'
-local ct = require("Code12.api")
+require("Code12.api")
 
 
 function start()

@@ -11,7 +11,7 @@ local g = require("Code12.globals")
 
 
 -- The main Code 12 global runtime object, where the "global" APIs live
-local ct = {}
+ct = {}
 
 
 ---------------- Internal Functions ------------------------------------------
@@ -145,8 +145,3 @@ function ct.initRuntime()
 	end
 end
 
-
-------------------------------------------------------------------------------
-
--- Return the ct object
-return ct
