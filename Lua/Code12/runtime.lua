@@ -21,6 +21,9 @@ local g = require("Code12.globals")
 --             heightP = windowPixels,   -- pixel height of output area
 --             setTitle = fnSetTitle,    -- callback function to set app title
 --             setHeight = fnSetHeight,  -- callback function to change output height
+--             -- These field are added by the runtime for use by the app
+--             initRun = fnInitRun,      -- init and start a new run
+--             stopRun = fnStopRun,      -- stop a run
 --         },
 --     }
 -- If running standalone (e.g. for a Corona SDK build), then ct starts out nil
@@ -31,7 +34,6 @@ end
 
 
 ---------------- Internal Functions ------------------------------------------
-
 
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame(event)
@@ -90,6 +92,38 @@ local function onFirstFrame(event)
 	Runtime:removeEventListener("enterFrame", onFirstFrame)
 	Runtime:addEventListener("enterFrame", onNewFrame)
 end
+
+-- Init for a new run of the user program after the user's code has been loaded
+local function initRun()
+	-- Set the global event functions if running under an app context. 
+	if ct._appContext then
+		print("start", _fn.start)
+		print("update", _fn.update)
+		start = _fn.start
+		update = _fn.update
+		onMousePress = _fn.onMousePress
+		onMouseDrag = _fn.onMouseDrag
+		onMouseRelease = _fn.onMouseRelease
+		onKeyPress = _fn.onKeyPress
+		onKeyRelease = _fn.onKeyRelease
+		onCharTyped = _fn.onCharTyped
+		onResize = _fn.onResize
+	end
+
+	-- Make the first screen with default empty name
+	ct.setScreen("")
+
+	-- Get the Corona runtime ready to run or to re-run
+	Runtime:removeEventListener("enterFrame", onFirstFrame)
+	Runtime:removeEventListener("enterFrame", onNewFrame)
+	Runtime:addEventListener("enterFrame", onFirstFrame)
+end
+
+-- Stop a run (from an app context)
+local function stopRun()
+	Runtime:removeEventListener("enterFrame", onFirstFrame)
+	Runtime:removeEventListener("enterFrame", onNewFrame)
+end	
 
 -- Get the device/output metrics in native units
 local function getDeviceMetrics()
@@ -156,8 +190,11 @@ function ct.initRuntime()
 
 	-- If in an app context then put the main display group inside the app's output group,
 	-- otherwise prepare to use the entire device screen.
-	if ct._appContext then
-		ct._appContext.outputGroup:insert( g.mainGroup )
+	local appContext = ct._appContext
+	if appContext then
+		appContext.outputGroup:insert( g.mainGroup )
+		appContext.initRun = initRun
+		appContext.stopRun = stopRun
 	else
 		display.setStatusBar(display.HiddenStatusBar)   -- hide device status bar
 	end
@@ -165,15 +202,14 @@ function ct.initRuntime()
 	-- Runtime parameter check option: defaults to true, can be changed by client
 	ct.checkParams = true
 
-	-- Make the first screen with default empty name
-	ct.setScreen("")
-
-	-- Get the Corona runtime ready to run
-	Runtime:addEventListener("enterFrame", onFirstFrame)
+	-- Install keyboard and misc listeners
 	Runtime:addEventListener("touch", g.onTouchRuntime)
 	Runtime:addEventListener("key", g.onKey)
-	if not g.isMobile then
-		Runtime:addEventListener("resize", onResize)
+	if _appContext == nil then
+		initRun()
+		if not g.isMobile then
+			Runtime:addEventListener("resize", onResize)  -- for standalone window resize
+		end
 	end
 end
 

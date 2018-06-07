@@ -12,7 +12,7 @@ local widget = require( "widget" )
 local lfs = require( "lfs" )
 local fileDialogs = require( "plugin.tinyfiledialogs" )
 
--- Code12 modules
+-- Code12 app modules
 local parseJava = require( "parseJava" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
@@ -68,13 +68,7 @@ _fn = {}       -- generated code uses _fn.foo()
 
 --- API Functions ------------------------------------------------
 
--- Temp
-function ct.circle( x, y, d )
-	local c = display.newCircle( ui.gameGroup, x, y, d / 2 )
-	c:setFillColor( 1, 0, 0 )
-	return c 
-end
-
+-- TODO: Add this to the runtime API
 function ct.intDiv( n, d )
 	return math.floor( n / d )
 end
@@ -161,12 +155,11 @@ local function runLuaCode( luaCode )
 	-- Load the code dynamically and execute it
 	local codeFunction = loadstring( luaCode )
  	if type(codeFunction) == "function" then
+ 		-- Run user code main chunk, which defines the functions
  		codeFunction()
 
- 		-- Run the start function if defined
- 		if type(_fn.start) == "function" then
- 			_fn.start()
- 		end
+ 		-- Tell the runtime to init a new run
+ 		ct._appContext.initRun()
 
  		-- Show the game output
 		ui.gameGroup.isVisible = true
@@ -467,14 +460,6 @@ local function onResizeWindow( event )
 	end
 end
 
--- Handle new frame update
-local function onEnterFrame( event )
-	-- Run the user's update function, if defined
-	if type(_fn.update) == "function" then
-		_fn.update()
-	end
-end
-
 -- Prepare for a new run of the user program
 local function initNewProgram()
 	-- Clear user functions and variables tables
@@ -600,8 +585,19 @@ local function initApp()
 	makeStatusBar()
 	makeToolbar()
 
-	-- Install listeners
-	Runtime:addEventListener( "enterFrame", onEnterFrame )
+	-- Load the Code12 API and runtime.
+	-- This defines the Code12 APIs in the global ct table.
+	ct._appContext = {
+		outputGroup = ui.outputGroup,
+		widthP = ui.width,
+		heightP = ui.height,
+		-- setTitle =     -- TODO
+		-- setHeight =    -- TODO
+	}
+	package.path = package.path .. ';../../Lua/?.lua'
+	require( "Code12.api" )
+
+	-- Install listeners for the app
 	Runtime:addEventListener( "resize", onResizeWindow )
 
 	-- Install timer to check file 4x/sec
