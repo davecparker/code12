@@ -1,10 +1,15 @@
+// Minion Drawing 1
+// Code12 Programming Concepts 1: Procedure Calls
+
+// Draws a minion using rectangles, circles, and lines.
+
 import Code12.*;
 
-public class MainProgram extends Code12Program
+public class MinionDrawing1 extends Code12Program
 {
    public static void main(String[] args)
    { 
-      Code12.run(new MainProgram()); 
+      Code12.run(new MinionDrawing1()); 
    }
    
    public void start()
@@ -17,6 +22,9 @@ public class MainProgram extends Code12Program
       ct.circle( 50, 25, 50, "yellow" );
       ct.circle( 50, 60, 50, "blue" );
       ct.rect( 50, 42.5, 50, 45, "yellow" );
+      ct.circle( 50, 32, 22, "black" );
+      ct.rect( 50, 28, 50, 16, "yellow" );
+      ct.line( 25.2, 36, 74.8, 36, "yellow" );
       ct.rect( 50, 55, 35, 20, "blue" );
       ct.rect( 50, 55, 20, 10, "blue" );
       ct.rect( 27.5, 47.5, 10, 5, "blue" );
@@ -38,14 +46,13 @@ public class MainProgram extends Code12Program
       ct.rect( 76.25, 20, 2.5, 10, "gray" );
       ct.rect( 23.75, 20, 2.5, 10, "gray" );
       
-     /* ct.circle( 37.5, 20, 20, "white" );
+      ct.circle( 37.5, 20, 20, "white" );
       ct.circle( 62.5, 20, 20, "white" );
-      /* ct.circle( 40, 20, 8, "green" );
-      ct.circle( 60, 20, 8, "green" ); */
+      ct.circle( 40, 20, 8, "green" );
+      ct.circle( 60, 20, 8, "green" );
       ct.circle( 40, 20, 4, "black" );
-      ct.circle( 60, 20, 4, "black" ); */
+      ct.circle( 60, 20, 4, "black" );
       
-      ct.image( "mouth.png", 50, 36, 20 );
    }
    
 }
