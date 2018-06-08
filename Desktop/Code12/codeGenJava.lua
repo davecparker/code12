@@ -18,14 +18,16 @@ local codeGenJava = {}
 
 
 -- Constants
-local varTable = "this."      -- table name for user instance variables
-local fnTable = "_fn."        -- table name for user functions
+local ctPrefix = "ct."        -- prefix for API functions
+local thisPrefix = "this."    -- prefix for user instance variables
+local fnPrefix = "_fn."       -- prefix for user function names
  
 
 -- The Java parse trees and processing state
 local javaParseTrees	      -- array of parse trees (for each line of Java)
 local iTree            	      -- index of next parse tree to process
 local blockLevel = 0          -- indent level (begin/end block level) for Lua code
+local ctDefined = false       -- true when ct is defined (within functions)
 
 -- Code generation options
 local enableComments = true   -- generate Lua comments for full-line Java comments
@@ -105,7 +107,7 @@ local generateControlledStmt
 -- Return Lua code for a variable name
 local function varNameCode( varName )
 	if checkJava.isInstanceVarName( varName ) then
-		return varTable .. varName    -- instance var, so use this.name
+		return thisPrefix .. varName    -- instance var, so use this.name
 	end
 	return varName
 end
@@ -121,7 +123,7 @@ function lValueCode( v )
 	assert( nameNode.tt == "ID" )
 	local name = nameNode.str
 	if checkJava.isInstanceVarName( name ) then
-		name = varTable .. name    -- class var, so turn name into this.name
+		name = thisPrefix .. name    -- class var, so turn name into this.name
 	end
 	if p == "var" then
 		return name
@@ -153,10 +155,14 @@ function fnCallCode( tree )
 		end
 	else
 		local fnName = fnValue.str
-		if string.starts( fnName, "ct." ) then
+		if string.starts( fnName, ctPrefix ) then
+			if not ctDefined then
+				err.setErrNode( fnValue, "Code12 API functions cannot be called before start()" )
+				return nil
+			end
 			parts = { fnName, "(" }            -- e.g. ct.circle(
 		else
-			parts = { fnTable, fnName, "(" }   -- e.g. _fn.updateScore(
+			parts = { fnPrefix, fnName, "(" }   -- e.g. _fn.updateScore(
 		end
 	end
 
@@ -231,7 +237,7 @@ local function generateVarDecl( tree, isInstanceVar )
 		local varName = nameNode.str
 		if isInstanceVar then
 			checkJava.defineInstanceVar( nameNode, vt, false, true )
-			beginLuaLine( varTable )     -- use this.name
+			beginLuaLine( thisPrefix )     -- use this.name
 		else
 			checkJava.defineLocalVar( nameNode, vt, false, true )
 			beginLuaLine( "local " )
@@ -250,7 +256,7 @@ local function generateVarDecl( tree, isInstanceVar )
 			local nameNode = idList[i]
 			if isInstanceVar then
 				checkJava.defineInstanceVar( nameNode, vt, false )
-				addLua( varTable )            -- use this.name
+				addLua( thisPrefix )            -- use this.name
 			else
 				checkJava.defineLocalVar( nameNode, vt, false )
 				addLua( "local " )
@@ -476,14 +482,16 @@ end
 local function generateFunction( isEvent, fnName, paramList )
 	beginLuaLine( "function " )
 	if not isEvent then
-		addLua( fnTable )
+		addLua( fnPrefix )
 	end
 	addLua( fnName )
 	generateFnParamList( paramList )
 	iTree = iTree + 1 
 
 	checkJava.beginLocalBlock( paramList )
+	ctDefined = true   -- user can only call ct methods inside functions
 	local result = generateBlock()
+	ctDefined = false
 	checkJava.endLocalBlock()
 	return result
 end

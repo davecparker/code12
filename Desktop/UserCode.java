@@ -4,6 +4,7 @@ class UserCode extends Code12Program
 {
 	// instance variables
 	GameObj ball, bigBall;
+	// GameObj tooSoon = ct.circle(50, 50, 50);
 	int count, total;
 	boolean gameOver;
 	final int LIMIT = 120;

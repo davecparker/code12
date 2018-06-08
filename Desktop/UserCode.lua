@@ -4,6 +4,7 @@
 
     -- instance variables
     this.ball = nil; this.bigBall = nil; 
+    -- GameObj tooSoon = ct.circle(50, 50, 50);
     this.count = 0; this.total = 0; 
     this.gameOver = false; 
     this.LIMIT = 120
