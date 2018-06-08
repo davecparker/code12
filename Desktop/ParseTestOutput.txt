@@ -160,24 +160,22 @@ line (varInit)
 
 28. bubble.ySpeed = -1;
 line (stmt)
-    stmt (assign)
+    stmt (lValueAssign)
         lValue (field)
             ID (bubble)
             ID (ySpeed)
-        rightSide (=)
-            expr (neg)
-                expr (NUM)
-                    NUM (1)
+        expr (neg)
+            expr (NUM)
+                NUM (1)
 
 29. bubble.clickable = true;
 line (stmt)
-    stmt (assign)
+    stmt (lValueAssign)
         lValue (field)
             ID (bubble)
             ID (clickable)
-        rightSide (=)
-            expr (BOOL)
-                BOOL (true)
+        expr (BOOL)
+            BOOL (true)
 
 30. }
 line (end)
@@ -316,7 +314,7 @@ line (comment)
 -- Incomplete line carried forward
 
 65. y)              // missing ;
-*** Location 65.1 to 65.2: Syntax Error
+*** Location 64.1 to 65.2: Syntax Error
 ======= Test Complete =========================================
 
 65 lines processed in 4 ms

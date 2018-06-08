@@ -58,7 +58,7 @@ local luaOpFromJavaOp = {
 	["!="]	= " ~= ",
 	["&&"]	= " and ",
 	["||"]	= " or ",
-	-- Assignment ops used in rightSide nodes
+	-- Assignment ops used in opAssignOp nodes
 	["+="]	= " + ",
 	["-="]	= " - ",
 	["*="]	= " * ",
@@ -95,11 +95,6 @@ end
 
 --- Code Generation Functions ------------------------------------------------
 
--- NOTE: Code generation assumes that the structure of the program is a valid
--- Code12 structure, valid names, etc. So to be reliable, the program must be 
--- fully validated by semantic analysis first.
-
-
 -- Mutually recursive code gen functions
 local lValueCode
 local fnCallCode
@@ -107,17 +102,23 @@ local exprCode
 local generateControlledStmt
 
 
+-- Return Lua code for a variable name
+local function varNameCode( varName )
+	if checkJava.isInstanceVarName( varName ) then
+		return varTable .. varName    -- instance var, so use this.name
+	end
+	return varName
+end
+
 -- Return Lua code for an lValue node, which might be a class or local reference.
 function lValueCode( v )
 	local p = v.p
 	if p == "this" then
-		return "this." .. v.nodes[3].str    -- explicit reference to a class variable
+		return varNameCode( v.nodes[3].str ) 
 	end
 
-	-- For other references, the name could be either a local var or a class var.
-	-- Look in the table of known class variables to determine which
-	-- (works because Code12 does not allow local vars to hide class vars).
 	local nameNode = v.nodes[1]
+	assert( nameNode.tt == "ID" )
 	local name = nameNode.str
 	if checkJava.isInstanceVarName( name ) then
 		name = varTable .. name    -- class var, so turn name into this.name
@@ -229,13 +230,13 @@ local function generateVarDecl( tree, isInstanceVar )
 		end
 		local varName = nameNode.str
 		if isInstanceVar then
-			checkJava.defineInstanceVar( nameNode, vt, false )
+			checkJava.defineInstanceVar( nameNode, vt, false, true )
 			beginLuaLine( varTable )     -- use this.name
 		else
-			checkJava.defineLocalVar( nameNode, vt, false )
+			checkJava.defineLocalVar( nameNode, vt, false, true )
 			beginLuaLine( "local " )
 		end
-		checkJava.canAssignToVt( nameNode, vt, expr )
+		checkJava.canAssignToVarNode( nameNode, expr, true )
 		addLua( varName )
 		addLua( " = " )
 		addLua( exprCode( expr ) )
@@ -303,41 +304,43 @@ local function generateStmt( tree )
 		end
 		beginLuaLine( fnCallCode( tree ) )
 	elseif p == "assign" then
-		-- lValue rightSide
-		local rightSide = nodes[2]
-		p = rightSide.p
-		if p == "++" or p == "--" then
-			generateIncOrDecStmt( nodes[1], rightSide.nodes[1] )
-		else
-			local lValue = nodes[1]
-			local expr = rightSide.nodes[2]
-			if p == "=" then
-				if checkJava.canAssignToLValue( lValue, expr ) then
-					local lValueStr = lValueCode( lValue )
-					local exprStr = exprCode( expr )
-					beginLuaLine( lValueStr )
-					addLua( " = " )
-					addLua( exprStr )
-				end
-			else
-				-- +=, -=, *=, /=
-				-- TODO: Better type checking
-				if checkJava.canAssignToLValue( lValue, expr ) then
-					local lValueStr = lValueCode( lValue )
-					local exprStr = exprCode( expr )
-					beginLuaLine( lValueStr )
-					addLua( " = " )
-					addLua( lValueStr )
-					addLua( luaOpFromJavaOp[p] )
-					addLua( "(" )
-					addLua( exprStr )
-					addLua( ")" )
-				end
-			end
+		-- ID = expr
+		local varNode = nodes[1]
+		local expr = nodes[3]
+		if checkJava.canAssignToVarNode( varNode, expr ) then
+			assert( varNode.tt == "ID" )
+			beginLuaLine( varNameCode( varNode.str ) )
+			addLua( " = " )
+			addLua( exprCode( expr ) )
 		end
-	elseif p == "++" or p == "--" then
-		-- ++ lValue or -- lValue
+	elseif p == "lValueAssign" then
+		-- lValue = expr
+		local lValue = nodes[1]
+		local expr = nodes[3]
+		if checkJava.canAssignToLValue( lValue, expr ) then
+			beginLuaLine( lValueCode( lValue ) )
+			addLua( " = " )
+			addLua( exprCode( expr ) )
+		end
+	elseif p == "opAssign" then
+		-- lValue op= expr
+		local lValue = nodes[1]
+		local expr = nodes[3]
+		-- TODO: Better type checking, this is not correct
+		if checkJava.canAssignToLValue( lValue, expr ) then
+			local lValueStr = lValueCode( lValue )
+			beginLuaLine( lValueStr )
+			addLua( " = " )
+			addLua( lValueStr )
+			addLua( luaOpFromJavaOp[nodes[2].nodes[1].str] )
+			addLua( "(" )
+			addLua( exprCode( expr ) )
+			addLua( ")" )
+		end
+	elseif p == "preInc" or p == "preDec" then
 		generateIncOrDecStmt( nodes[2], nodes[1] )
+	elseif p == "postInc" or p == "postDec" then
+		generateIncOrDecStmt( nodes[1], nodes[2] )
 	else
 		error("*** Unknown stmt pattern " .. p )
 	end	

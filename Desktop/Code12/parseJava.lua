@@ -214,23 +214,24 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "lValue",			lValue								},
 }
 
--- The right side of things that can be done to an lValue in a stmt
-local rightSide = { t = "rightSide",
-	{ 3, 12, "=",				"=", expr 		},
-	{ 4, 12, "+=",				"+=", expr 		},
-	{ 4, 12, "-=",				"-=", expr 		},
-	{ 4, 12, "*=",				"*=", expr 		},
-	{ 4, 12, "/=",				"/=", expr 		},
-	{ 4, 12, "++",				"++"			},
-	{ 4, 12, "--",				"--"			},
+-- Shortcut "operate and assign" operators 
+local opAssignOp = { t = "opAssignOp",
+	{ 4, 12, "+=",				"+=",  		},
+	{ 4, 12, "-=",				"-=",  		},
+	{ 4, 12, "*=",				"*=",  		},
+	{ 4, 12, "/=",				"/=",  		},
 }
 
 -- A statement
 local stmt = { t = "stmt",
 	{ 1, 12, "call",			fnValue, "(", exprList, ")" 		},
-	{ 3, 12, "assign",			lValue, rightSide 					},
-	{ 4, 12, "++",				"++", lValue 						},
-	{ 4, 12, "--",				"--", lValue						},
+	{ 3, 12, "assign",			"ID", "=", expr 					},
+	{ 3, 12, "lValueAssign",	lValue, "=", expr 					},
+	{ 3, 12, "opAssign",		lValue, opAssignOp, expr 			},
+	{ 4, 12, "preInc",			"++", lValue 						},
+	{ 4, 12, "preDec",			"--", lValue						},
+	{ 4, 12, "postInc",			lValue, "++" 						},
+	{ 4, 12, "postDec",			lValue, "--"						},
 }
 
 -- The end of a while statement, either with a ; (for do-while) or not

@@ -21,9 +21,14 @@ local checkJava = {}
 -- Tables of user-defined variables and methods. These map a name to a table containing 
 -- where the name was defined (node), its value type (vt), and the params if a method. 
 -- There are also entries of type string that map a lowercase version of the name to the
--- name with the correct case. So each entry is one of:
---     { node = token, vt = vt, params = {} }   -- params are each { name = name, vt = vtParam }
---     strCorrectCase    -- string name with correct case
+-- name with the correct case. So the entries are one of:
+--     Variables:
+--         { node = token, vt = vt, assigned = false }   -- assigned set when assigned
+--     Methods:
+--         { node = token, vt = vt, params = {} }   
+--                    -- params is an array of { name = name, vt = vtParam }
+--     Either:
+--         strCorrectCase    -- string name with correct case
 local variables = {}
 local userMethods = {}
 
@@ -131,15 +136,39 @@ local function vtNumber( vt1, vt2 )
 end
 
 -- Return the value type (vt) for a variable name token node.
--- If the variable is undefined, then set the error state and return nil.
-local function vtVar( varNode )
+-- If the variable is undefined then set the error state and return nil.
+-- Unless unassignedOK is passed and true then also check to make sure the
+-- variable has been assigned and if not then set the eror state and return nil. 
+local function vtVar( varNode, unassignedOK )
 	assert( varNode.tt == "ID" )
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
 		err.setErrNode( varNode,  "Undefined variable %s", varNode.str )
 		return nil
 	end
+	if unassignedOK ~= true then
+		if not varFound.assigned then
+			err.setErrNode( varNode,  
+				"Variable %s must be assigned before it is used", varNode.str )
+			--error("Stop")
+			return nil
+		end
+	end
 	return varFound.vt
+end
+
+-- Return the variable name of a variable token or lValue node, or nil if none.
+local function varNameFromNode( node )
+	if node.tt == "ID" then
+		return node.str
+	elseif node.t == "lValue" then
+		if node.p == "var" then
+			return node.nodes[1].str
+		elseif node.p == "this" then
+			return node.nodes[3].str
+		end
+	end
+	return nil
 end
 
 -- Return the value type (vt) for an lValue node.
@@ -469,8 +498,9 @@ function checkJava.isInstanceVarName( varName )
 end
 
 -- Define the variable with the given nameNode and type (vt, isArray).
+-- If assigned (default false) then mark it as assigned.
 -- Return true if successful, false if error.
-function checkJava.defineVar( nameNode, vt, isArray )
+function checkJava.defineVar( nameNode, vt, isArray, assigned )
 	if vt == nil or err.hasErr() then
 		return false
 	end
@@ -494,7 +524,7 @@ function checkJava.defineVar( nameNode, vt, isArray )
 	end
 
 	-- Define it and the case-insensitive lower-case version as well if necessary
-	variables[varName] = { node = nameNode, vt = vt }
+	variables[varName] = { node = nameNode, vt = vt, assigned = assigned }
 	local varNameLower = string.lower( varName )
 	if varNameLower ~= varName then
 		variables[varNameLower] = varName
@@ -503,9 +533,10 @@ function checkJava.defineVar( nameNode, vt, isArray )
 end
 
 -- Define an instance variable with the given nameNode and type (vt, isArray).
+-- If assigned (default false) then mark it as assigned.
 -- Return true if successful, false if error.
-function checkJava.defineInstanceVar( nameNode, vt, isArray )
-	if not checkJava.defineVar( nameNode, vt, isArray ) then
+function checkJava.defineInstanceVar( nameNode, vt, isArray, assigned )
+	if not checkJava.defineVar( nameNode, vt, isArray, assigned ) then
 		return false
 	end
 	isInstanceVar[nameNode.str] = true
@@ -513,9 +544,10 @@ function checkJava.defineInstanceVar( nameNode, vt, isArray )
 end
 
 -- Define a local variable with the given nameNode and type (vt, isArray).
+-- If assigned (default false) then mark it as assigned.
 -- Return true if successful, false if error.
-function checkJava.defineLocalVar( nameNode, vt, isArray )
-	if not checkJava.defineVar( nameNode, vt, isArray ) then
+function checkJava.defineLocalVar( nameNode, vt, isArray, assigned )
+	if not checkJava.defineVar( nameNode, vt, isArray, assigned ) then
 		return false
 	end
 	localNameStack[#localNameStack + 1] = nameNode.str    -- push on locals stack
@@ -530,9 +562,9 @@ function checkJava.beginLocalBlock( paramList )
 			local param = paramList[i]
 			local vt = javaTypes.vtFromVarType( param.nodes[1] )
 			if param.p == "array" then
-				checkJava.defineLocalVar( param.nodes[4], vt, true )
+				checkJava.defineLocalVar( param.nodes[4], vt, true, true )
 			else
-				checkJava.defineLocalVar( param.nodes[2], vt, false )
+				checkJava.defineLocalVar( param.nodes[2], vt, false, true )
 			end
 		end
 	end
@@ -588,8 +620,23 @@ function checkJava.canAssignToVt( node, vt, expr )
 	return false
 end	
 
+-- Return true if the expr can be assigned to the variable node.
+-- If the types are not compatible then set the error state and return false.
+-- Otherwise mark the variable as assigned and return true.
+function checkJava.canAssignToVarNode( varNode, expr )
+	if not checkJava.canAssignToVt( varNode, vtVar( varNode, true ), expr ) then
+		return false
+	end
+	print("Checking " .. varNode.str)
+	local varRecord = variables[varNode.str]
+	if type(varRecord) == "table" then
+		print(varNode.str .. " was assigned")
+		varRecord.assigned = true
+	end
+	return true
+end
+
 -- Return true if the expr can be assigned to the lValue node.
--- The expr must already have had type analysis done on it and have a vt field.
 -- If the types are not compatible then set the error state and return false.
 function checkJava.canAssignToLValue( lValue, expr )
 	return checkJava.canAssignToVt( lValue, vtLValueNode( lValue ), expr )

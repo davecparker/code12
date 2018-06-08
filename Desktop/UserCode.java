@@ -12,6 +12,8 @@ class UserCode extends Code12Program
 
 	public void start()
 	{
+		// int oops = count;
+		// double nope = ball.x;
 		double x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0;
 		int xInt = ct.toInt( x );
 		String name = "Dave" + " " + "Parker";

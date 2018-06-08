@@ -11,6 +11,8 @@
     this.speed = 0.3
     
     function start()
+        -- int oops = count;
+        -- double nope = ball.x;
         local x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0
         local xInt = ct.toInt(x)
         local name = "Dave" .. " " .. "Parker"
