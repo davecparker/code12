@@ -18,15 +18,25 @@ local checkJava = {}
 
 
 
--- Type analysis tables
-local methods = {}      -- map method names to { node = token, vt = vt, params = {} }
-local classVars = {}    -- map instance var name to { node = token, vt = vt } or strCorrectName
-local localVars = {}    -- map local var name to { node = token, vt = vt } or strCorrectName
+-- Tables of user-defined variables and methods. These map a name to a table containing 
+-- where the name was defined (node), its value type (vt), and the params if a method. 
+-- There are also entries of type string that map a lowercase version of the name to the
+-- name with the correct case. So each entry is one of:
+--     { node = token, vt = vt, params = {} }   -- params are each { name = name, vt = vtParam }
+--     strCorrectCase    -- string name with correct case
+local variables = {}
+local userMethods = {}
+
+-- Table that maps a name to true if it is an instance variable (not a local variable)
+local isInstanceVar = {} 
+
+-- Stack of local variable names, with an empty name "" marking the beginning of each block
+local localNameStack = {}
 
 
 --- Misc Analysis Functions --------------------------------------------------
 
--- Find user-defined methods in parseTrees and put them in the methods table.
+-- Find user-defined methods in parseTrees and put them in the userMethods table.
 -- Return true if successful, false if an error occured.
 local function getMethods( parseTrees )
 	for i = 1, #parseTrees do
@@ -52,8 +62,8 @@ local function getMethods( parseTrees )
 					local vtParam, name = javaTypes.vtAndNameFromParam( param )
 					paramTable[#paramTable + 1] = { name = name, vt = vtParam }
 				end
-				-- Add entry to methods table
-				methods[fnName] = { 
+				-- Add entry to userMethods table
+				userMethods[fnName] = { 
 					node = nameNode,
 					vt = javaTypes.vtFromRetType( nodes[1] ), 
 					params = paramTable
@@ -61,7 +71,7 @@ local function getMethods( parseTrees )
 				-- Add lowercase version if different
 				local nameLower = string.lower( fnName )
 				if nameLower ~= fnName then
-					methods[nameLower] = fnName
+					userMethods[nameLower] = fnName
 				end
 			end
 		end
@@ -72,33 +82,31 @@ local function getMethods( parseTrees )
 	return true
 end
 
--- Look up the name of nameToken in the names table and then optional names2 table.
+-- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
 -- If the name is found and the entry is a record (table) then return the record.
 -- If an entry has an index (name) differing only in case, then set the error state 
 -- to a description of the error and return (nil, entryCorrectCase, strCorrectCase). 
 -- If the name is not found at all then return nil.
-local function lookupID( nameToken, names, names2 )
+local function lookupID( nameToken, nameTable )
 	assert( nameToken.tt == "ID" )
 	local name = nameToken.str
 
 	-- Try the name as-is
-	local result = names[name] or (names2 and names2[name])
+	local result = nameTable[name]
 	if type(result) == "table" then
-		return result
+		return result  -- found it spelled correctly
 	end
 
 	-- Try the name in all lower-case
 	local nameLower = string.lower( name )
 	local strCorrectCase = nil
-	result = names[nameLower] or (names2 and names2[nameLower])
+	result = nameTable[nameLower]
 	if type(result) == "table" then
 		strCorrectCase = nameLower   -- name is supposed to be all lowercase
 	elseif type(result) == "string" then
 		strCorrectCase = result      -- result gives the correct case
-		result = names[strCorrectCase] or (names2 and names2[strCorrectCase])
+		result = nameTable[strCorrectCase]
 		assert( type(result) == "table" )
-	else
-		strCorrectCase = nil
 	end
 
 	-- Found but wrong case?
@@ -126,7 +134,7 @@ end
 -- If the variable is undefined, then set the error state and return nil.
 local function vtVar( varNode )
 	assert( varNode.tt == "ID" )
-	local varFound = lookupID( varNode, localVars, classVars )
+	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
 		err.setErrNode( varNode,  "Undefined variable %s", varNode.str )
 		return nil
@@ -160,12 +168,14 @@ local function vtLValueNode( lValue )
 	elseif p == "this" then
 		-- explicit reference to class variable
 		local varNode = nodes[3]
-		if lookupID( varNode, classVars ) == nil then
+		local vt = vtVar( varNode )
+		if vt ~= nil and not isInstanceVar[varNode.str] then
 			err.setErrNodeAndRef( varNode, nodes[1],
-					"Undefined class variable %s referenced with \"this\"", varNode.str )
+					"Variable %s referenced with \"this\" is not a class or instance variable", 
+					varNode.str )
 			return nil
 		end
-		return vtVar( varNode )
+		return vt
 	elseif p == "field" then
 		-- Public field access (only possible with Math or GameObj)
 		local object = nodes[1]
@@ -453,14 +463,14 @@ end
 
 --- Module Functions ---------------------------------------------------------
 
--- Return true if the given variable node is a defined class variable.
-function checkJava.isClassVar( varNode )
-	return classVars[varNode.str] ~= nil
+-- Return true if the given variable name is a defined instance variable.
+function checkJava.isInstanceVarName( varName )
+	return isInstanceVar[varName]
 end
 
--- Define the class variable with the given nameNode and type (vt, isArray).
+-- Define the variable with the given nameNode and type (vt, isArray).
 -- Return true if successful, false if error.
-function checkJava.defineClassVar( nameNode, vt, isArray )
+function checkJava.defineVar( nameNode, vt, isArray )
 	if vt == nil or err.hasErr() then
 		return false
 	end
@@ -470,7 +480,7 @@ function checkJava.defineClassVar( nameNode, vt, isArray )
 
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, classVars )
+	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
 	if varFound then
 		err.setErrNodeAndRef( nameNode, varFound.node, 
 				"Variable %s was already defined", varName )
@@ -478,65 +488,73 @@ function checkJava.defineClassVar( nameNode, vt, isArray )
 	elseif varCorrectCase then
 		err.clearErr()
 		err.setErrNodeAndRef( nameNode, varCorrectCase.node, 
-				"Variable %s differs only by case from existing variable %s", 
+				"Variable %s differs only by upper/lower case from existing variable %s", 
 				varName, nameCorrectCase )
 		return false
 	end
 
 	-- Define it and the case-insensitive lower-case version as well if necessary
-	classVars[varName] = { node = nameNode, vt = vt }
+	variables[varName] = { node = nameNode, vt = vt }
 	local varNameLower = string.lower( varName )
 	if varNameLower ~= varName then
-		classVars[varNameLower] = varName
+		variables[varNameLower] = varName
 	end
 	return true
 end
 
--- Define the local variable with the given nameNode and type (vt, isArray).
+-- Define an instance variable with the given nameNode and type (vt, isArray).
+-- Return true if successful, false if error.
+function checkJava.defineInstanceVar( nameNode, vt, isArray )
+	if not checkJava.defineVar( nameNode, vt, isArray ) then
+		return false
+	end
+	isInstanceVar[nameNode.str] = true
+	return true
+end
+
+-- Define a local variable with the given nameNode and type (vt, isArray).
 -- Return true if successful, false if error.
 function checkJava.defineLocalVar( nameNode, vt, isArray )
-	if vt == nil or err.hasErr() then
+	if not checkJava.defineVar( nameNode, vt, isArray ) then
 		return false
 	end
-	if isArray then
-		vt = { vt = vt }   -- make vt into array of specified type
-	end
-
-	-- Check for existing definition
-	local varName = nameNode.str
-	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, localVars, classVars )
-	if varFound then
-		err.setErrNodeAndRef( nameNode, varFound.node, 
-				"Variable %s was already defined", varName )
-		return false
-	elseif varCorrectCase then
-		err.clearErr()
-		err.setErrNodeAndRef( nameNode, varCorrectCase.node, 
-				"Variable %s differs only by case from existing variable %s", 
-				varName, nameCorrectCase )
-		return false
-	end
-
-	-- Define it and the case-insensitive lower-case version as well if necessary
-	localVars[varName] = { node = nameNode, vt = vt }
-	local varNameLower = string.lower( varName )
-	if varNameLower ~= varName then
-		localVars[varNameLower] = varName
-	end
+	localNameStack[#localNameStack + 1] = nameNode.str    -- push on locals stack
 	return true
 end
 
--- Clear then init the local variable state for a new function with the paramList
-function checkJava.initLocalVars( paramList )
-	localVars = {}
-	for i = 1, #paramList do
-		local param = paramList[i]
-		local vt = javaTypes.vtFromVarType( param.nodes[1] )
-		if param.p == "array" then
-			checkJava.defineLocalVar( param.nodes[4], vt, true )
-		else
-			checkJava.defineLocalVar( param.nodes[2], vt, false )
+-- Begin a new local variable block, then if paramList then define the params.
+function checkJava.beginLocalBlock( paramList )
+	localNameStack[#localNameStack + 1] = ""   -- push special sentinel marking block start
+	if paramList then
+		for i = 1, #paramList do
+			local param = paramList[i]
+			local vt = javaTypes.vtFromVarType( param.nodes[1] )
+			if param.p == "array" then
+				checkJava.defineLocalVar( param.nodes[4], vt, true )
+			else
+				checkJava.defineLocalVar( param.nodes[2], vt, false )
+			end
 		end
+	end
+end
+
+-- End a local variable block, discarding any definitions in the top block
+function checkJava.endLocalBlock()
+	local iTop = #localNameStack
+	while iTop > 0 do
+		-- Pop a name off the localNameStack
+		local varName = localNameStack[iTop]
+		localNameStack[iTop] = nil
+		iTop = iTop - 1
+
+		-- Is this the end of block sentinel? 
+		if varName == "" then
+			break
+		end
+
+		-- Remove the definition of this variable and lowercase version too
+		variables[varName] = nil
+		variables[string.lower( varName )] = nil
 	end
 end
 
@@ -578,14 +596,16 @@ function checkJava.canAssignToLValue( lValue, expr )
 end
 
 -- Find a known ct API or user function with the given fnValue node.
--- Return the entry in the API or methods table if found.
+-- Return the entry in the API or userMethods table if found.
 -- If not found then set the error state and return nil.
 local function findGlobalFunction( fnValue )
 	assert( fnValue.tt == "ID" )
-	local fnName = fnValue.str
-	local method = lookupID( fnValue, apiTables["ct"].methods, methods )
+	local method = lookupID( fnValue, apiTables["ct"].methods )
 	if method == nil then
-		err.setErrNode( fnValue, "Undefined function %s", fnName )
+		method = lookupID( fnValue, userMethods )
+	end
+	if method == nil then
+		err.setErrNode( fnValue, "Undefined function %s", fnValue.str )
 		return nil
 	end
 	return method
@@ -716,9 +736,11 @@ end
 -- Init the state for a new program with the given parseTrees
 -- Return true if successful, false if not.
 function checkJava.initProgram( parseTrees )
-	methods = {}
- 	classVars = {}
- 	localVars = {}
+	variables = {}
+	userMethods = {}
+ 	isInstanceVar = {}
+ 	localNameStack = {}
+
  	err.initProgram()
 
 	-- Get method types first, since vars can forward reference them

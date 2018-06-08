@@ -22,6 +22,7 @@ class UserCode extends Code12Program
 		ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5);
 		bigBall = ct.circle(x, 80, 40);
 		bigBall.setFillColor( "blue" );
+		bigBall.clickable = true;
 
 		double z = ball.x + 1;
 		if (ball == bigBall || bigBall != null)
@@ -48,6 +49,7 @@ class UserCode extends Code12Program
 		bigBall.x += speed;
 		if (bigBall.x > LIMIT)
 		{
+			double localX = 1.1 + 5;
 			bigBall.x--;
 			bigBall.width /= factor;
 			bigBall.height *= /* WTF? */ (1 / factor);
@@ -57,7 +59,7 @@ class UserCode extends Code12Program
 			speed = -this.speed;
 		else
 		{
-			// Nothing
+			int localX = 3;
 		}
 	}
 
@@ -82,7 +84,7 @@ class UserCode extends Code12Program
 
 	public void onMousePress( GameObj obj, double x, double y )
 	{
-		if (true)  // obj != null)
+		if (obj != null)
 			ct.println( obj.toString() + " was clicked" );
 		else
 			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );

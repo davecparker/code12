@@ -510,14 +510,6 @@ function GameObj:setLineColorFromName(colorName)
 end
 
 
----------------- Touch Events ------------------------------------------------
-
--- Touch listener function for objects
-function GameObj:touch(event)
-end 
-
-
-------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 
 -- Init and return the GameObj class

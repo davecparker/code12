@@ -119,7 +119,7 @@ function lValueCode( v )
 	-- (works because Code12 does not allow local vars to hide class vars).
 	local nameNode = v.nodes[1]
 	local name = nameNode.str
-	if checkJava.isClassVar( nameNode ) then
+	if checkJava.isInstanceVarName( name ) then
 		name = varTable .. name    -- class var, so turn name into this.name
 	end
 	if p == "var" then
@@ -145,7 +145,7 @@ function fnCallCode( tree )
 	if fnValue.p == "method" then
 		local nameNode = fnValue.nodes[1]
 		local varName = nameNode.str
-		if checkJava.isClassVar( nameNode ) then
+		if checkJava.isInstanceVarName( varName ) then
 			parts = { "this.", varName, ":", fnValue.nodes[2].str, "(" }  -- e.g. this.ball:delete(
 		else
 			parts = { varName, ":", fnValue.nodes[2].str, "(" }  -- e.g. obj:delete(
@@ -227,15 +227,15 @@ local function generateVarDecl( tree, isInstanceVar )
 			nameNode = nodes[3]
 			expr = nodes[5]
 		end
-		checkJava.canAssignToVt( nameNode, vt, expr )
 		local varName = nameNode.str
 		if isInstanceVar then
-			checkJava.defineClassVar( nameNode, vt, false )
+			checkJava.defineInstanceVar( nameNode, vt, false )
 			beginLuaLine( varTable )     -- use this.name
 		else
 			checkJava.defineLocalVar( nameNode, vt, false )
 			beginLuaLine( "local " )
 		end
+		checkJava.canAssignToVt( nameNode, vt, expr )
 		addLua( varName )
 		addLua( " = " )
 		addLua( exprCode( expr ) )
@@ -248,7 +248,7 @@ local function generateVarDecl( tree, isInstanceVar )
 		for i = 1, #idList do
 			local nameNode = idList[i]
 			if isInstanceVar then
-				checkJava.defineClassVar( nameNode, vt, false )
+				checkJava.defineInstanceVar( nameNode, vt, false )
 				addLua( varTable )            -- use this.name
 			else
 				checkJava.defineLocalVar( nameNode, vt, false )
@@ -417,8 +417,10 @@ local function generateBlock()
 		local tree = javaParseTrees[iTree]
 		local p = tree.p
 		if p == "begin" then              -- {
+			checkJava.beginLocalBlock()
 			blockLevel = blockLevel + 1
 		elseif p == "end" then            -- }
+			checkJava.endLocalBlock()
 			blockLevel = blockLevel - 1
 			beginLuaLine( "end")
 			if blockLevel == startBlockLevel then
@@ -464,6 +466,25 @@ local function generateFnParamList( paramList )
 	addLua( ")" )
 end
 
+-- Generate code for a function definition with the given name and param list.
+-- The function is a Code12 event function if isEvent, otherwise user-defined.
+-- starting with the name of the function, then generate its code block afterwards.
+-- Return true if successful.
+local function generateFunction( isEvent, fnName, paramList )
+	beginLuaLine( "function " )
+	if not isEvent then
+		addLua( fnTable )
+	end
+	addLua( fnName )
+	generateFnParamList( paramList )
+	iTree = iTree + 1 
+
+	checkJava.beginLocalBlock( paramList )
+	local result = generateBlock()
+	checkJava.endLocalBlock()
+	return result
+end
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -478,49 +499,33 @@ function codeGenJava.getLuaCode( parseTrees )
 	luaCodeStrs = {}
 
 	-- Scan the parse trees for instance variables and functions
-	while iTree <= #parseTrees do
+	while iTree <= #parseTrees and not err.hasErr() do
 		local tree = javaParseTrees[iTree]
-		local p = tree.p
 		-- print( "getLuaCode line " .. iTree )
 		if not checkJava.doTypeChecks( tree ) then
 			break
 		end
+		local p = tree.p
+		local nodes = tree.nodes
 
 		if generateVarDecl( tree, true ) then
 			-- Processed a varInit, constInit, or varDecl
 		elseif enableComments and p == "comment" then
 			-- Full line comment
 			beginLuaLine( "--" )
-			addLua( tree.nodes[1].str )
+			addLua( nodes[1].str )
 		elseif p == "blank" then
 			beginLuaLine( "" )
-		elseif p == "begin" then          -- {
+		elseif p == "begin" then          -- {  in boilerplate code
 			blockLevel = blockLevel + 1
-		elseif p == "end" then            -- }
+		elseif p == "end" then            -- }  in boilerplate code
 			blockLevel = blockLevel - 1
 		elseif p == "eventFn" then
 			-- Code12 event func (e.g. setup, update)
-			beginLuaLine( "function " )
-			addLua( tree.nodes[3].str )
-			local paramList = tree.nodes[5].nodes
-			generateFnParamList( paramList )
-			iTree = iTree + 1 
-			checkJava.initLocalVars( paramList )
-			if not generateBlock() then
-				break
-			end
+			generateFunction( true, nodes[3].str, nodes[5].nodes)
 		elseif p == "func" then
 			-- User-defined function
-			beginLuaLine( "function " )
-			addLua( fnTable )
-			addLua( tree.nodes[2].str )
-			local paramList = tree.nodes[4].nodes
-			generateFnParamList( paramList )
-			iTree = iTree + 1 
-			checkJava.initLocalVars( paramList )
-			if not generateBlock() then
-				break
-			end
+			generateFunction( false, nodes[2].str, nodes[4].nodes)
 		end			
 		iTree = iTree + 1
 	end

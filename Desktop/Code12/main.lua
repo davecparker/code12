@@ -16,6 +16,7 @@ local fileDialogs = require( "plugin.tinyfiledialogs" )
 local parseJava = require( "parseJava" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
+local apiTables = require( "apiTables" )
 local err = require( "err" )
 
 
@@ -491,9 +492,14 @@ local function initNewProgram()
 	-- Stop existing run if any
 	 ct._appContext.stopRun()
 
-	-- Clear user functions and variables tables
+	-- Clear class variables, user functions, and global event functions
 	this = {}
 	_fn = {}
+	for eventName, fnRecord in pairs( apiTables.Code12Program.methods ) do
+		if type(fnRecord) == "table" then
+			_G[eventName] = nil
+		end
+	end
 
 	-- Init new runtime state for this run
 	if ui.gameGroup then

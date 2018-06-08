@@ -21,6 +21,7 @@
         ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5)
         this.bigBall = ct.circle(x, 80, 40)
         this.bigBall:setFillColor("blue")
+        this.bigBall.clickable = true
         
         local z = this.ball.x + 1
         if this.ball == this.bigBall or this.bigBall ~= nil then
@@ -46,6 +47,7 @@
         factor = factor + 0
         this.bigBall.x = this.bigBall.x + (this.speed)
         if this.bigBall.x > this.LIMIT then
+            local localX = 1.1 + 5
             this.bigBall.x = this.bigBall.x - 1
             this.bigBall.width = this.bigBall.width / (factor)
             this.bigBall.height = this.bigBall.height * ((1 / factor))
@@ -53,7 +55,7 @@
         elseif this.bigBall.x < 0 then
             this.speed = -this.speed
         else 
-            -- Nothing
+            local localX = 3
         end
     end
     
@@ -77,7 +79,7 @@
     end
     
     function onMousePress(obj, x, y)
-        if true then
+        if obj ~= nil then
             ct.println(obj:toString() .. " was clicked")
         else 
             ct.println("Mouse was pressed at (" .. x .. ", " .. y .. ")")
