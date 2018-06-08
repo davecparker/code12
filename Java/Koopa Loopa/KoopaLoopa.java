@@ -1,10 +1,18 @@
+// Koopa Loopa
+// Code12 Programming Concepts 11: Loops
+
+// An animation of a koopa troopa going down tower of blocks.
+// Press the space bar to start/pause the animation.
+// When the koopa troopa goes off the screen it should loop back
+// to it's starting location.
+
 import Code12.*;
 
-public class MainProgram extends Code12Program
+public class KoopaLoopa extends Code12Program
 {
    public static void main(String[] args)
    { 
-      Code12.run(new MainProgram()); 
+      Code12.run(new KoopaLoopa()); 
    }
    
    GameObj koopa; // koopa-troopa image
@@ -15,7 +23,8 @@ public class MainProgram extends Code12Program
    
    public void start()
    {      
-      // Make the background
+      // Make the title and background
+      ct.setTitle( "Koopa Loopa" );
       ct.setBackColorRGB( 104, 136, 255 );
       ct.image( "cloud.png", 25, 25, 19 );
       
@@ -56,34 +65,33 @@ public class MainProgram extends Code12Program
             koopa.y = yGround - tileSize * numberOfLevels;
             koopa.x = 100 + koopa.width;
          }
-         else if ( koopaFalling() )
+         else 
          {
-            koopa.y = koopa.y + 1;
-            koopa.x -= 0.1;
-            ct.println("falling");
-         }
-         else
-         {
-            koopa.x = koopa.x - 0.2;
-            ct.println("not falling");
+            // Calculate the y-value of the step koopa should be on
+            double yStep = yGround;
+            for ( int i = 0; i <= numberOfLevels; i++)
+            {
+               if ( koopa.x >= 100 - tileSize * (2 + i) )
+               {
+                  yStep = yGround - tileSize * ( numberOfLevels - i );
+                  break;
+               }
+            }
+            // If koopa is above the step, make it fall
+            if ( koopa.y < yStep )
+            {
+               koopa.y = koopa.y + 1;
+               koopa.x -= 0.1;
+            }
+            // Else make it move to the left
+            else
+            {
+               koopa.x = koopa.x - 0.2;
+            }
          }
       }
    }
-   
-   public boolean koopaFalling()
-   {
-      return koopa.y < ySteps( koopa.x );
-   }
-   
-   public double ySteps( double x )
-   {
-      for ( int i = 0; i <= numberOfLevels; i++)
-      if ( x >= 100 - tileSize * (2 + i) )
-         return yGround - tileSize * ( numberOfLevels - i );
-         
-      return yGround;
-   }
-   
+      
    public void onKeyPress( String keyName )
    {
       if ( keyName.equals("space") )
