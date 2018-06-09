@@ -287,6 +287,20 @@ public class Game implements GameInterface
       return Math.rint(d * f) / f;
    }
    
+   public int intDiv(int n, int d)
+   {
+      if (d == 0)
+      {
+         if (n == 0)
+            return 0;
+         else if (n > 0)
+            return Integer.MAX_VALUE;
+         else
+            return Integer.MIN_VALUE;
+      }
+      return Math.floorDiv(n, d);
+   }
+
    public boolean isError(double d)
    {
       return Double.isNaN(d);
@@ -311,7 +325,6 @@ public class Game implements GameInterface
    
    //===================== Type Conversion API ========================
    
-   public double toDouble(int i)      { return (double) i; }
    public int toInt(double d)         { return (int) d; }
    
    public int parseInt(String s)

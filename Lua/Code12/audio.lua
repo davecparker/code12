@@ -12,7 +12,6 @@ require("Code12.runtime")
 
 
 -- Data for this module
-local CODE12_SOUND_PATH = "Code12/sounds/"   -- path to built-in sounds relative to project
 local sounds = {}           -- Cached loaded sounds, indexed by filename
 local soundVolume = 1.0     -- Sound volume from 0.0 to 1.0
 
@@ -29,16 +28,12 @@ function ct.sound(filename, ...)
 	-- Is this sound already loaded?
 	local sound = sounds[filename]
 	if sound == nil then
-		-- Try to load from project folder first, else Code12 sounds folder
-		-- Finally, check to see if the Code12 folder is in the parent folder.
-		sound = audio.loadSound(filename)  -- Corona prints warnings if not found :(
-		if not sound then 
-			sound = audio.loadSound(CODE12_SOUND_PATH .. filename)
-			if not sound then 
-				sound = audio.loadSound("../" .. CODE12_SOUND_PATH .. filename)
-			end
+		sound = audio.loadSound(filename)
+		if sound then 
+			sounds[filename] = sound   -- cache it
+		else
+			g.warning("Cannot find sound file", filename)
 		end
-		sounds[filename] = sound   -- cache it if found
 	end
 
 	-- Play sound if successfully loaded
