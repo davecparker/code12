@@ -221,10 +221,13 @@ local function writeLuaCode( codeStr )
 	local outFile = io.open( outPath, "w" )
 	if outFile then
 		-- Start with our marker then code to enable standalone runs with the Lua runtime
-		-- from sibling and cousin folders and one lower.
+		-- from test app folders in the Lua folder or one subfolder lower.
 		outFile:write( firstLine )
 		outFile:write( "\n-- Source file was: " .. filename .. "\n\n" )
-		outFile:write( "package.path = package.path .. '../Lua/?.lua;../../Lua/?.lua;../../../Lua/?.lua'\n" )
+		outFile:write( "package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Code12/?.lua'\n" )
+
+		package.path = package.path .. ';../../Desktop/Code12/?.lua'
+
 		outFile:write( "require('Code12.api')\n\n" )
 		outFile:write( "this = {}; _fn = {}\n" )
 		-- Write the user code
@@ -667,7 +670,6 @@ local function initApp()
 		-- setTitle =     -- TODO
 		-- setHeight =    -- TODO
 	}
-	package.path = package.path .. ';../../Lua/?.lua'
 	require( "Code12.api" )
 
 	-- Install listeners for the app

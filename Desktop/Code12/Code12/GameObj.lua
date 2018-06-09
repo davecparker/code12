@@ -155,7 +155,7 @@ function GameObj:newImage(group, filename, x, y, width)
 	-- If an app context tells us the working directory then use it, else current dir.
 	local path = filename
 	if ct._appContext and ct._appContext.sourceDir then
-		-- TODO: local hack = "../../../../../../.."
+		local hack = "../../../../../../.."  -- TODO
 		path = hack .. ct._appContext.sourceDir .. filename
 		print(path)
 	end
