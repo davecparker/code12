@@ -42,9 +42,11 @@ local sourceFile = {
 	strLines = {},           -- array of source code lines when read
 }
 
--- Force the initial file to the standard test file (for faster repeated testing)
-sourceFile.path = "../UserCode.java"
-sourceFile.timeLoaded = os.time()
+-- Force the initial file to the standard test file for faster dev testing
+if system.getInfo( "environment" ) == "simulator" then
+	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.timeLoaded = os.time()
+end
 
 -- UI elements and state
 local ui = {
@@ -514,23 +516,40 @@ local function onResizeWindow( event )
 	end
 end
 
+-- Return a relative path in the file system leading from fromDir to destDir.
+local function relativePath( fromDir, destDir )
+	-- TODO: This is Mac-only for now and doesn't feel very reliable
+	local str, count = string.gsub( fromDir, "/", "." )
+	local upDirs = string.rep( "../", count )
+	print(count, upDirs)
+	return upDirs .. string.sub( destDir, 2 )
+end
+
 -- Prepare for a new run of the user program
 local function initNewProgram()
 	-- Stop existing run if any
 	local appContext = ct._appContext
 	appContext.stopRun()
 
-	print("Source path:")
-	print(sourceFile.path)
-	print("Resource dir:")
-	print(system.pathForFile(nil, system.ResourceDirectory))
-	print("Documents dir:")
-	print(system.pathForFile(nil, system.DocumentsDirectory))
-
 	-- Set the source dir and filename
 	local dir, filename, ext = dirFilenameAndExtFromPath( sourceFile.path )
 	appContext.sourceDir = dir
 	appContext.sourceFilename = filename
+
+	-- Set the mediaBaseDir and the mediaDir.
+	-- Good grief, Corona requires the path to images and sounds to be
+	-- a relative path, not absolute, and the only reliable dir to be
+	-- relative to seems to be the system.DocumentsDirectory.
+	local docsDir = system.pathForFile(nil, system.DocumentsDirectory)
+	appContext.mediaBaseDir = system.DocumentsDirectory
+	appContext.mediaDir = relativePath( docsDir, dir )
+
+	print( "\n--- New Run ----------------------" )
+	print( "sourceFile.path: " .. sourceFile.path )
+	print( "sourceDir: " .. appContext.sourceDir )
+	print( "sourceFilename: " .. appContext.sourceFilename )
+	print( "docsDir: " .. docsDir )
+	print( "mediaDir: " .. appContext.mediaDir )
 
 	-- Clear class variables, user functions, and global event functions
 	this = {}

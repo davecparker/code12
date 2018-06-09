@@ -152,16 +152,19 @@ end
 
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
-	-- If an app context tells us the working directory then use it, else current dir.
-	local path = filename
-	if ct._appContext and ct._appContext.sourceDir then
-		local hack = "../../../../../../.."  -- TODO
-		path = hack .. ct._appContext.sourceDir .. filename
-		print(path)
+	-- If an app context tells us the media directory then use it, else current dir.
+	local baseDir, path
+	local appContext = ct._appContext
+	if appContext and appContext.mediaDir then
+		path = appContext.mediaDir .. filename
+		baseDir = appContext.mediaBaseDir
+	else
+		path = filename
+		baseDir = system.ResourceDirectory
 	end
 
 	-- Try to open the image at native resolution
-	local obj = display.newImage(group, path, x, y)
+	local obj = display.newImage(group, path, baseDir, x, y)
 	if not obj then
 		-- Can't open image, substitute a text object with a red X
 		g.warning("Cannot find image file", filename)

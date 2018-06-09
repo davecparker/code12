@@ -31,6 +31,9 @@ this = {}; _fn = {}
         this.bigBall:setFillColor("blue")
         this.bigBall.clickable = true
         
+        -- Add a fish
+        ct.image("goldfish.png", 50, 50, 15)
+        
         local z = this.ball.x + 1
         if this.ball == this.bigBall or this.bigBall ~= nil then
             z = 2

@@ -16,6 +16,24 @@ local sounds = {}           -- Cached loaded sounds, indexed by filename
 local soundVolume = 1.0     -- Sound volume from 0.0 to 1.0
 
 
+---------------- Internal Functions ------------------------------------
+
+-- Load and return the sound with the given filename (nil if failure)
+local function loadSound( filename )
+	-- If an app context tells us the media directory then use it, else current dir.
+	local baseDir, path
+	local appContext = ct._appContext
+	if appContext and appContext.mediaDir then
+		path = appContext.mediaDir .. filename
+		baseDir = appContext.mediaBaseDir
+	else
+		path = filename
+		baseDir = system.ResourceDirectory
+	end
+	return audio.loadSound(path)
+end
+
+
 ---------------- Audio API ---------------------------------------------
 
 -- API
@@ -28,12 +46,7 @@ function ct.sound(filename, ...)
 	-- Is this sound already loaded?
 	local sound = sounds[filename]
 	if sound == nil then
-		-- Load it from app context working directory if any, else current dir. 
-		local path = filename
-		if ct._appContext and ct._appContext.sourceDir then
-			path = ct._appContext.sourceDir .. filename
-		end
-		sound = audio.loadSound(path)
+		sound = loadSound(filename)
 		if sound then 
 			sounds[filename] = sound   -- cache it
 		else
