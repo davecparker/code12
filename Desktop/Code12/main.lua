@@ -71,14 +71,6 @@ this = {}      -- generated code uses this.varName for class/global variables
 _fn = {}       -- generated code uses _fn.setup(), _fn.update(), _fn.userFn(), etc.
 
 
---- API Functions ------------------------------------------------
-
--- TODO: Add this to the runtime API
-function ct.intDiv( n, d )
-	return math.floor( n / d )
-end
-
-
 --- Utility Functions ------------------------------------------------
 
 -- Create and return a display group in parent, optionally located at x, y
@@ -232,6 +224,14 @@ local function writeLuaCode( codeStr )
 		outFile:write( codeStr )
 		outFile:write( "\n" )
 		io.close( outFile )
+	end
+
+	-- Also write a config.lua file so that we can get the right fps, etc.
+	local configPath = dir .. "config.lua"
+	local configFile = io.open( configPath, "w" )
+	if configFile then
+		configFile:write( "application = { content = { width = 600, height = 900, scale = 'adaptive', fps = 60 } }" )
+		io.close( configFile )
 	end
 
 	-- Print user code to console for debugging

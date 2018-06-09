@@ -44,6 +44,16 @@ function ct.round(x, numPlaces, ...)
 end
 
 -- API
+function ct.intDiv( n, d, ... )
+	-- Check parameters
+	if g.checkAPIParams("ct.intDiv") then
+		g.checkTypes({"number", "number"}, n, d, ...)
+	end
+
+	return math.floor( n / d )
+end
+
+-- API
 function ct.isError(x, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.isError") then
