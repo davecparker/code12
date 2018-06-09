@@ -16,6 +16,8 @@ local g = require("Code12.globals")
 -- should contain fields as follows:
 --     ct = {
 --         _appContext = {
+--             sourceDir = dir,          -- directory where user code file lives
+--             sourceFilename = name,    -- user code filename (in sourceDir)
 --             outputGroup = group,      -- display group where output should go
 --             widthP = windowPixels,    -- pixel width of output area
 --             heightP = windowPixels,   -- pixel height of output area

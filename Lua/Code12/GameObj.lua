@@ -152,9 +152,18 @@ end
 
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
+	-- If an app context tells us the working directory then use it, else current dir.
+	local path = filename
+	if ct._appContext and ct._appContext.sourceDir then
+		-- TODO: local hack = "../../../../../../.."
+		path = hack .. ct._appContext.sourceDir .. filename
+		print(path)
+	end
+
 	-- Try to open the image at native resolution
-	local obj = display.newImage(group, filename, x, y)
+	local obj = display.newImage(group, path, x, y)
 	if not obj then
+		-- Can't open image, substitute a text object with a red X
 		g.warning("Cannot find image file", filename)
 		return GameObj:newText(group, "[X]", x, y, width, "red")
 	end

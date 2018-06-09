@@ -110,6 +110,13 @@ local function uiBlack( obj )
 	return uiItem( obj, 0 )
 end
 
+-- Split a file pathname into dir, filename (includes ext), and ext.
+-- Return (dir, filename, ext).
+local function dirFilenameAndExtFromPath( path )
+	-- TODO: Got this from internet, does it really work?
+	return string.match( path, "(.-)([^\\/]-%.?([^%.\\/]*))$" )
+end
+
 
 --- Internal Functions ------------------------------------------------
 
@@ -117,7 +124,7 @@ end
 local function updateStatusBar()
 	if sourceFile.path then
 		-- Get just the filename with extension from the path
-		local dir, fileAndExt, ext = string.match( sourceFile.path, "(.-)([^\\/]-%.?([^%.\\/]*))$" )
+		local dir, fileAndExt, ext = dirFilenameAndExtFromPath( sourceFile.path )
 
 		-- Get the update time to display
 		local updateStr = "Never"
@@ -195,7 +202,7 @@ end
 -- Put it next to the Java source file.
 local function writeLuaCode( codeStr )
 	-- Put the output file in the same location as the source but named "main.lua"
-	local dir, filename, ext = string.match( sourceFile.path, "(.-)([^\\/]-%.?([^%.\\/]*))$" )
+	local dir, filename, ext = dirFilenameAndExtFromPath( sourceFile.path )
 	local outPath = dir .. "main.lua"
 
 	-- If the file already exists, then only overwrite it if we created it
@@ -507,7 +514,20 @@ end
 -- Prepare for a new run of the user program
 local function initNewProgram()
 	-- Stop existing run if any
-	 ct._appContext.stopRun()
+	local appContext = ct._appContext
+	appContext.stopRun()
+
+	print("Source path:")
+	print(sourceFile.path)
+	print("Resource dir:")
+	print(system.pathForFile(nil, system.ResourceDirectory))
+	print("Documents dir:")
+	print(system.pathForFile(nil, system.DocumentsDirectory))
+
+	-- Set the source dir and filename
+	local dir, filename, ext = dirFilenameAndExtFromPath( sourceFile.path )
+	appContext.sourceDir = dir
+	appContext.sourceFilename = filename
 
 	-- Clear class variables, user functions, and global event functions
 	this = {}
@@ -638,7 +658,8 @@ local function initApp()
 	makeToolbar()
 
 	-- Load the Code12 API and runtime.
-	-- This defines the Code12 APIs in the global ct table.
+	-- This defines the Code12 APIs in the global ct table
+	-- and sets the runtime's fields in ct._appContext.
 	ct._appContext = {
 		outputGroup = ui.outputGroup,
 		widthP = ui.width,

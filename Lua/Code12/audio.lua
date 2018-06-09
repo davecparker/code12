@@ -28,7 +28,12 @@ function ct.sound(filename, ...)
 	-- Is this sound already loaded?
 	local sound = sounds[filename]
 	if sound == nil then
-		sound = audio.loadSound(filename)
+		-- Load it from app context working directory if any, else current dir. 
+		local path = filename
+		if ct._appContext and ct._appContext.sourceDir then
+			path = ct._appContext.sourceDir .. filename
+		end
+		sound = audio.loadSound(path)
 		if sound then 
 			sounds[filename] = sound   -- cache it
 		else
