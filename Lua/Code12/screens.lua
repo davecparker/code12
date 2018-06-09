@@ -8,7 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 local g = require("Code12.globals")
-local ct = require("Code12.runtime")
+require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
 
 
@@ -128,6 +128,7 @@ function ct.setScreen(name, ...)
 		}
 		g.mainGroup:insert(screen.group)
 		screen.group:insert(screen.objs)
+		g.screens[name] = screen
 		g.screen = screen
 
 		-- Add default white background

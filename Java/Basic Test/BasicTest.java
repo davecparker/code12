@@ -20,6 +20,7 @@ class BasicTest extends Code12Program
       ct.print("Testing the ");
       ct.print("API");
       ct.println();
+      ct.log(ct.intDiv(9,2));
       ct.log(ct.canParseInt("-3"), ct.canParseInt(" -3"), ct.canParseInt("-3 e2"));
       ct.log(ct.parseInt("-3"), ct.parseInt(" -3"), ct.parseInt("-3 e2"));
       ct.log(ct.canParseNumber("-3.14"), ct.canParseNumber(" -3.14"), ct.canParseNumber("-3e2g"));

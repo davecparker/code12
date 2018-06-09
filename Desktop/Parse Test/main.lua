@@ -11,6 +11,7 @@
 -- The parsing module
 package.path = package.path .. ';../Code12/?.lua'
 local parseJava = require( "parseJava" )
+local err = require( "err" )
 
 
 -- Input and output files
@@ -111,22 +112,20 @@ local function parseTestCode()
 			output( "************** Beginning of Expected Errors Section **************" )
 		else
 			-- Parse this line
-			local tree, errRecord = parseJava.parseLine( strCode, lineNum, startTokens )
+			err.clearErr()
+			local tree, tokens = parseJava.parseLine( strCode, lineNum, startTokens )
 			if tree == false then
 				-- This line is unfinished, carry the tokens forward to the next line
-				startTokens = errRecord
+				startTokens = tokens
 				outFile:write( "-- Incomplete line carried forward\n" )
 			else
 				startTokens = nil
-
 				if tree == nil then
 					-- This line has an error on it, output it.
-					if errRecord == nil then
-						output( "*** Missing errRecord!")
+					if not err.hasErr() then
+						output( "*** Missing error state!")
 					else
-						output( string.format( "Line %d: %s (chars %d through %d)", 
-									errRecord.iLine, errRecord.strErr, 
-									errRecord.iCharFirst, errRecord.iCharLast ) );
+						output( err.getErrString() )
 					end
 
 					-- Count the error
@@ -142,7 +141,7 @@ local function parseTestCode()
 					-- Did we expect an error on this line?
 					if errorSection then
 						-- Ignore blank lines
-						if tree.p ~= "blank" then
+						if tree.p ~= "blank" and tree.p ~= "comment" then
 							numUncaughtErrors = numUncaughtErrors + 1
 						end
 					end

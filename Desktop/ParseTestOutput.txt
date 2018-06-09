@@ -45,7 +45,8 @@ line (eventFn)
 line (begin)
 
 12. // Make the background
-line (blank)
+line (comment)
+    COMMENT ( Make the background )
 
 13. ct.setHeight(150);
 line (stmt)
@@ -78,7 +79,8 @@ line (eventFn)
 line (begin)
 
 19. // Make bubbles at random times, positions, and sizes
-line (blank)
+line (comment)
+    COMMENT ( Make bubbles at random times, positions, and sizes)
 
 20. if (ct.random(1, 20) == 1)
 line (if)
@@ -98,7 +100,7 @@ line (begin)
 
 22. double x = ct.random(0, 100);
 line (varInit)
-    double (double)
+    ID (double)
     ID (x)
     expr (call)
         ID (ct.random)
@@ -110,7 +112,7 @@ line (varInit)
 
 23. double y = ct.getHeight() + 25;
 line (varInit)
-    double (double)
+    ID (double)
     ID (y)
     expr (+)
         expr (call)
@@ -121,7 +123,7 @@ line (varInit)
 
 24. double size = ct.random(5, 20);
 line (varInit)
-    double (double)
+    ID (double)
     ID (size)
     expr (call)
         ID (ct.random)
@@ -158,24 +160,22 @@ line (varInit)
 
 28. bubble.ySpeed = -1;
 line (stmt)
-    stmt (assign)
+    stmt (lValueAssign)
         lValue (field)
             ID (bubble)
             ID (ySpeed)
-        rightSide (=)
-            expr (neg)
-                expr (NUM)
-                    NUM (1)
+        expr (neg)
+            expr (NUM)
+                NUM (1)
 
 29. bubble.clickable = true;
 line (stmt)
-    stmt (assign)
+    stmt (lValueAssign)
         lValue (field)
             ID (bubble)
             ID (clickable)
-        rightSide (=)
-            expr (BOOL)
-                BOOL (true)
+        expr (BOOL)
+            BOOL (true)
 
 30. }
 line (end)
@@ -194,17 +194,18 @@ line (eventFn)
             ID (GameObj)
             ID (obj)
         param (var)
-            double (double)
+            ID (double)
             ID (x)
         param (var)
-            double (double)
+            ID (double)
             ID (y)
 
 34. {
 line (begin)
 
 35. // Pop bubbles that get clicked
-line (blank)
+line (comment)
+    COMMENT ( Pop bubbles that get clicked)
 
 36. if (obj != null)
 line (if)
@@ -247,7 +248,8 @@ line (end)
 line (blank)
 
 44. ////////////////////////////////////////////////////////////////////
-line (blank)
+line (comment)
+    COMMENT (//////////////////////////////////////////////////////////////////)
 
 45. ERRORS
 ************** Beginning of Expected Errors Section **************
@@ -256,64 +258,66 @@ line (blank)
 line (blank)
 
 47. // Lexical errors
-line (blank)
+line (comment)
+    COMMENT ( Lexical errors)
 
 48. @               // invalid character
-Line 48: Invalid character (chars 1 through 1)
+*** Location 48.1 to 48.1: Invalid character
 
 49. foo('a');       // char literals not supported
-Line 49: char type not supported, use double quotes (chars 5 through 5)
+*** Location 49.5 to 49.5: char type not supported, use double quotes
 
 50. foo(" );        // unclosed string literal
-Line 50: Unclosed string literal (chars 5 through 43)
+*** Location 50.5 to 50.43: Unclosed string literal
 
 51. interface foo   // unsupported reserved word
-Line 51: Unsupported reserved word "interface" (chars 1 through 9)
+*** Location 51.1 to 51.9: Unsupported reserved word "interface"
 
 52. 
 line (blank)
 
 53. // Syntax errors
-line (blank)
+line (comment)
+    COMMENT ( Syntax errors)
 
 54. x = 10          // missing ;
-Line 54: Syntax Error (chars 1 through 6)
+*** Location 54.1 to 54.6: Syntax Error
 
 55. foo(x, );       // missing expr in exprList
-Line 55: Syntax Error (chars 1 through 9)
+*** Location 55.1 to 55.9: Syntax Error
 
 56. x = a + ;       // missing expr after binary op
-Line 56: Syntax Error (chars 1 through 9)
+*** Location 56.1 to 56.9: Syntax Error
 
 57. x = a + b * ;   // missing expr after higher precedence binary op
-Line 57: Syntax Error (chars 1 through 13)
+*** Location 57.1 to 57.13: Syntax Error
 
 58. x = a * b + ;   // missing expr after lower precedence binary op
-Line 58: Syntax Error (chars 1 through 13)
+*** Location 58.1 to 58.13: Syntax Error
 
 59. x = ();         // missing expr in parentheses
-Line 59: Syntax Error (chars 1 through 7)
+*** Location 59.1 to 59.7: Syntax Error
 
 60. x = 10 + ! ;    // missing expr after unary op
-Line 60: Syntax Error (chars 1 through 12)
+*** Location 60.1 to 60.12: Syntax Error
 
 61. x = obj.3;      // expected ID after .
-Line 61: Syntax Error (chars 1 through 10)
+*** Location 61.1 to 61.10: Syntax Error
 
 62. if x == 3       // required next token in pattern doesn't match
-Line 62: Syntax Error (chars 1 through 9)
+*** Location 62.1 to 62.9: Syntax Error
 
 63. x + 3;          // no matching pattern
-Line 63: Syntax Error (chars 1 through 6)
+*** Location 63.1 to 63.6: Syntax Error
 
 64. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
 65. y)              // missing ;
-Line 65: Syntax Error (chars 1 through 2)
+*** Location 64.1 to 65.2: Syntax Error
 ======= Test Complete =========================================
 
-65 lines processed in 3 ms
+65 lines processed in 5 ms
 
 0 unexpected errors
 0 uncaught errors (15 expected errors)
