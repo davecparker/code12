@@ -627,10 +627,8 @@ function checkJava.canAssignToVarNode( varNode, expr )
 	if not checkJava.canAssignToVt( varNode, vtVar( varNode, true ), expr ) then
 		return false
 	end
-	print("Checking " .. varNode.str)
 	local varRecord = variables[varNode.str]
 	if type(varRecord) == "table" then
-		print(varNode.str .. " was assigned")
 		varRecord.assigned = true
 	end
 	return true
