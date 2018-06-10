@@ -8,7 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 local g = require("Code12.globals")
-local ct = require("Code12.runtime")
+require("Code12.runtime")
 
 
 ---------------- Math API ---------------------------------------------
@@ -41,6 +41,16 @@ function ct.round(x, numPlaces, ...)
 		return math.round(x * f) / f
 	end
 	return math.round(x)
+end
+
+-- API
+function ct.intDiv( n, d, ... )
+	-- Check parameters
+	if g.checkAPIParams("ct.intDiv") then
+		g.checkTypes({"number", "number"}, n, d, ...)
+	end
+
+	return math.floor( n / d )
 end
 
 -- API

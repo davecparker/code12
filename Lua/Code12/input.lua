@@ -8,7 +8,7 @@
 ----------------------------------------------------------------------------------------
 
 local g = require("Code12.globals")
-local ct = require("Code12.runtime")
+require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
 
 
@@ -18,8 +18,9 @@ local GameObj = require("Code12.GameObjAPI")
 -- for the given touch event and gameObj.
 local function clickEvent(event, gameObj)
 	-- Get logical click location 
-	local x = event.x / g.scale
-	local y = event.y / g.scale
+	local xP, yP = g.mainGroup:contentToLocal( event.x, event.y )
+	local x = xP / g.scale
+	local y = yP / g.scale
 
 	if event.phase == "began" then
 		-- Set last click state

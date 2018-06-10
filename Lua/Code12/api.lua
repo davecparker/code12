@@ -10,7 +10,7 @@
 
 
 -- Create the main Code 12 Runtime object
-local ct = require("Code12.runtime")
+require("Code12.runtime")
 
 -- Submodule API files that add functions to the runtime object
 require("Code12.errors")
@@ -23,8 +23,5 @@ require("Code12.misc")
 require("Code12.types")
 
 
-------------------------------------------------------------------------------
-
--- Initialize the runtime and return the ct object
+-- Initialize the runtime
 ct.initRuntime()
-return ct

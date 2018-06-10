@@ -8,21 +8,10 @@
 -----------------------------------------------------------------------------------------
 
 local g = require("Code12.globals")
-local ct = require("Code12.runtime")
+require("Code12.runtime")
 
 
 ---------------- Type Conversion API -----------------------------------------
-
--- API
-function ct.toDouble(i, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.toDouble") then
-		g.check1Param("number", i, ...)
-	end
-
-	-- Integer and number are the same in Lua
-	return i
-end
 
 -- API
 function ct.toInt(x, ...)
