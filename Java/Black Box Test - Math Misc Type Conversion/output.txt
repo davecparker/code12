@@ -8,6 +8,6 @@ ct.parseInt tests done
 ct.canParseInt tests done
 ct.parseNumber tests done
 ct.canParseNumber tests done
+ct.formatDecimal(-Infinity) = -Infinity; Infinity expected
 ct.formatDecimal tests done
 ct.formatInt tests done
-All tests passed

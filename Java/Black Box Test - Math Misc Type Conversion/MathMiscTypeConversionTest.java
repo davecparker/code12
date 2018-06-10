@@ -585,9 +585,13 @@ class MathMiscTypeConversionTest extends Code12Program
          
          testFormatDecimal( Math.E, "" + Math.E );
          testFormatDecimal( Math.PI, "" + Math.PI );
+         
          testFormatDecimal( Math.sqrt(-1), "NaN" );
          testFormatDecimal( 1/0.0, "Infinity" );
-
+         
+         testFormatDecimal( -Math.sqrt(-1), "NaN" );
+         testFormatDecimal( -1/0.0, "-Infinity" );
+         
          // Very large and small doubles formated in exponential notation
          testFormatDecimal( 1234567.0 , "1234567.0" );
          testFormatDecimal( 12345678.0 , "1.2345678E7" ); 
