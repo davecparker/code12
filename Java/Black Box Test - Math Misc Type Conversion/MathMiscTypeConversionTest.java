@@ -34,7 +34,6 @@ class MathMiscTypeConversionTest extends Code12Program
    }
 
    final double EPSILON = 0.0000001; // doubles differing by this or less will test equal
-   final int randomMaxCount = 1000;  // sample size for testing chi square tests
    
    boolean allTestsPassed = true;
 
@@ -52,7 +51,7 @@ class MathMiscTypeConversionTest extends Code12Program
    {  
       // ct.random( 100, 0 ); // Throws Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: bound must be positive   
                               //    	at java.util.Random.nextInt(Random.java:388)
-	                        //       at Code12.Game.random(Game.java:276)
+	                           //       at Code12.Game.random(Game.java:276)
       try
       {
          writer = new PrintWriter( "output.txt" );
@@ -235,6 +234,8 @@ class MathMiscTypeConversionTest extends Code12Program
                int max = min + range;
                int[] observedFreq = new int[range + 1];
                
+               int randomMaxCount = 500;  // sample size for testing chi square tests
+               
                for ( int count = 1; count <= randomMaxCount; count++ )
                {                
                   int rand = ct.random( min, max );
@@ -260,11 +261,12 @@ class MathMiscTypeConversionTest extends Code12Program
                if ( pValue < alpha )
                    chiSqrTestsFailed++;
             }
-            
-            double fractionOfChiSqrTestsFailed = (double)(chiSqrTestsFailed) / chiSqrTestsDone;
-            if ( fractionOfChiSqrTestsFailed > alpha )
-               printError( "Fraction of Chi Square Tests Failed = " + fractionOfChiSqrTestsFailed + " (alpha = " + alpha + ")" );
          }
+         
+         double fractionOfChiSqrTestsFailed = (double)(chiSqrTestsFailed) / chiSqrTestsDone;
+         if ( fractionOfChiSqrTestsFailed > alpha )
+            printError( "Fraction of Chi Square Tests Failed = " + fractionOfChiSqrTestsFailed + " (alpha = " + alpha + ")" );
+               
          print( "ct.random tests done" );
       }
    }
