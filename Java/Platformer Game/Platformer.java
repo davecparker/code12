@@ -156,17 +156,17 @@ class Platformer extends Code12Program
       scoreText.delete();
       scoreText = ct.text( "Score: " + Integer.toString(score), 12, ct.getHeight() - 10, 5, "white");
       
-      if ( player.y > ct.getHeight() )
-      {
-         for ( int i = 0; i < 3; i++ )
-         {
-            health[i].delete();
-            if ( health[i] == null )
-            {
-               ct.print("Game over!");
-            }
-         }
-      }
+      // if ( player.y > ct.getHeight() )
+//       {
+//          for ( int i = 0; i < 3; i++ )
+//          {
+//             health[i].delete();
+//             if ( health[i] == null )
+//             {
+//                ct.print("Game over!");
+//             }
+//          }
+//       }
 
       if ( player.x >= ct.getWidth() || player.y >= ct.getHeight() )
       {
@@ -186,7 +186,6 @@ class Platformer extends Code12Program
                         break;
                     case '1':
                          platform = ct.rect(j*mult, i*mult, mult, mult );
-                        
                         platform.setFillColor("orange");
                         platforms.add(platform);
                         break;
@@ -199,7 +198,8 @@ class Platformer extends Code12Program
                 }
             }
         }
-
+         // initial player position
+         player = ct.image("player_forwards.png", platforms.get(0).x, platforms.get(0).y, 5);
          
       }
       

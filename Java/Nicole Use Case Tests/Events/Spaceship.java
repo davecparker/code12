@@ -143,6 +143,7 @@ public class Spaceship extends Code12Program
                asteroid.xSpeed = (origin.x - asteroid.x) / 10.0;
                asteroid.ySpeed = (origin.y - asteroid.y) / 10.0;
                traveledText.delete();
+               ct.setTitle("Game over");
                ct.text("Game over! You traveled: " + lightYears + " light years.", ct.getWidth() /2, ct.getHeight() - 20, 5,"white" );
                
          }
