@@ -16,8 +16,10 @@ local g = require("Code12.globals")
 -- should contain fields as follows:
 --     ct = {
 --         _appContext = {
---             sourceDir = dir,          -- directory where user code file lives
+--             sourceDir = dir,          -- dir where user code is (absolute)
 --             sourceFilename = name,    -- user code filename (in sourceDir)
+--             mediaBaseDir = (const),   -- Corona baseDir to use for media files  
+--             mediaDir = mediaDir,      -- media dir relative to mediaBaseDir
 --             outputGroup = group,      -- display group where output should go
 --             widthP = windowPixels,    -- pixel width of output area
 --             heightP = windowPixels,   -- pixel height of output area
