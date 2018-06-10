@@ -1,6 +1,16 @@
 /** Black Box Test of Events:
 *   onMousePress(), onMouseDrag(), onMouseRelease(),
 *   onKeyPress(), onKeyRelease(), on charTyped(), onResize()
+
+*   There are six objects to interact with utilizing these methods:
+    -- a pixel sprite, which can be dragged and released with differing velocities
+    -- four "obstacles" (GameObj circle), which can be controlled with WASD and arrow keys
+    -- a help menu
+    
+    Instructions are available via pressing the capital h key ("H")
+    Resizing the game window results in different background colors 
+      depending on the aspect ratio.
+
 */
 
 import Code12.*;
@@ -8,11 +18,14 @@ import Code12.*;
 class EventsTest extends Code12Program
 {
    GameObj helpMenu;
+   GameObj text;
+   GameObj text1;
+   GameObj text2;
    GameObj sprite;
    GameObj dialogue;
+   GameObj[] obstacles = new GameObj[4];
    int seconds;
-   boolean paused = false;
-   
+
    public static void main(String[] args)
    { 
       Code12.run(new EventsTest()); 
@@ -21,22 +34,34 @@ class EventsTest extends Code12Program
    public void start()
    {
       sprite = ct.image("sprite.png", 50, 50, 10 );
+      obstacles[0] = ct.circle(10,ct.getHeight()-10,10);
+      obstacles[1] = ct.circle(ct.getWidth() - 10, 10, 10, "green");
+      obstacles[2] = ct.circle(10,10,20,"purple");
+      obstacles[3] = ct.circle(ct.getWidth()-10,ct.getHeight()-10,15,"blue");
       
    }
    
    public void update()
-   {
-      if ( !paused)
-      {
+   {  
          sprite.clickable = true;
-         ct.log(sprite);
          
-         if ( sprite.y <= 0 || sprite.x >= ct.getWidth() || sprite.y >= ct.getHeight() || sprite.x <= 0 )
+         // reverseDirection method keeps objects on screen
+         for ( int i = 0; i < obstacles.length; i++ )
          {
-            sprite.ySpeed = -sprite.ySpeed;
-            sprite.xSpeed = -sprite.xSpeed;
+            reverseDirection(obstacles[i]);
+            
+            // if the sprite hits an obstacle, deflect
+            if ( sprite.hit(obstacles[i]) )
+            {
+               sprite.xSpeed *= -1;
+               sprite.ySpeed *= -1;
+            }
          }
-      }
+         
+         // Bounce sprite off of walls
+         reverseDirection(sprite);
+
+     
    }
    
    public void onMousePress( GameObj obj, double x, double y )
@@ -78,7 +103,6 @@ class EventsTest extends Code12Program
       {
          if ( obj == sprite )
          {
-         // 
             seconds++;
             dialogue.delete();
             
@@ -105,11 +129,17 @@ class EventsTest extends Code12Program
                   sprite.xSpeed -= v;
                }
                
-               // The longer the sprite is held down, the faster its velocity
-               if ( seconds > 2 ) //replace wi variable
+               // The longer the sprite is held down whilst being moved around, the faster its velocity
+               if ( seconds > 2 ) 
                {
                   sprite.ySpeed -= 2*v;
                   sprite.xSpeed += 2*v;
+               }
+               
+               if ( seconds > 3 )
+               {
+                  sprite.ySpeed -= 3*v;
+                  sprite.xSpeed += 3*v;
                }
 
             }
@@ -118,24 +148,98 @@ class EventsTest extends Code12Program
       
    }
    
+   // Move around obstacles
    public void onKeyPress( String keyName ) 
    {
+      if ( keyName.equals("right") )
+         obstacles[0].xSpeed = 0.5;
+      else if ( keyName.equals("left") )
+         obstacles[0].xSpeed = -0.5;
+      else if ( keyName.equals("up") )
+         obstacles[1].ySpeed = -2;
+      else if ( keyName.equals("down") )
+         obstacles[1].ySpeed = 2;
+      else if ( keyName.equals("w") )
+         obstacles[2].ySpeed  = -1;
+      else if ( keyName.equals("s") )
+         obstacles[2].ySpeed = 1; 
+      else if ( keyName.equals("d") )
+         obstacles[3].xSpeed = 0.25;
+      else if ( keyName.equals("a") )
+         obstacles[3].xSpeed = -0.25; 
+      
+   }
+   
+   public void reverseDirection( GameObj obj )
+   {
+      if ( obj != null )
+      {
+         if ( obj.x <= 0 || obj.x >= ct.getWidth() )
+            obj.xSpeed *= -1;
+         if ( obj.y <= 0 || obj.y >= ct.getHeight() )
+            obj.ySpeed *= -1;
+      }
    }
    
    public void onKeyRelease(String keyName )
    {
+      if ( keyName.equals("right") )
+         obstacles[0].xSpeed = 0;
+      else if ( keyName.equals("left") )
+         obstacles[0].xSpeed = 0;
+      else if ( keyName.equals("up") )
+         obstacles[1].ySpeed = 0;
+      else if ( keyName.equals("down") )
+         obstacles[1].ySpeed = 0;
+      else if ( keyName.equals("w") )
+         obstacles[2].ySpeed  = 0;
+      else if ( keyName.equals("s") )
+         obstacles[2].ySpeed = 0; 
+      else if ( keyName.equals("d") )
+         obstacles[3].xSpeed = 0;
+      else if ( keyName.equals("a") )
+         obstacles[3].xSpeed = 0;
    }
    
    public void onCharTyped( String ch )
    {
+      // Instructions/Help Menu
       if ( ch.equals("H") )
       {
-         paused = false;
-         helpMenu = ct.rect(50,50,10,10,"gray");
+         helpMenu = ct.rect(50,50,30,30,"gray");
+         helpMenu.lineWidth = 2;
+         helpMenu.setLayer(2);
+         
+         text = ct.text("Functional keys: " ,helpMenu.x, helpMenu.y - 5, 3 );
+         text1 = ct.text("WASD and arrow keys", helpMenu.x, helpMenu.y, 3);
+         text2 = ct.text("[ Press escape to exit ]", helpMenu.x, helpMenu.y + 10, 2 );
+         
+         text.setLayer(3);
+         text1.setLayer(3);
+         text2.setLayer(3);
+         
       }
+      
+      if ( ct.keyPressed("escape") )
+      {
+         helpMenu.delete();
+         text.delete();
+         text1.delete();
+         text2.delete();
+      }
+      
    }
    
    public void onResize()
    {
+      double aspectRatio = ct.getWidth() / ct.getHeight();
+      ct.print(aspectRatio);
+      if ( aspectRatio < 0.50)
+         ct.setBackColor("light cyan");
+      else if ( aspectRatio < 1 )
+         ct.setBackColor("light red");
+      else
+         ct.setBackColor("light yellow");
+
    }
 }
