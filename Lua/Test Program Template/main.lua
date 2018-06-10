@@ -4,7 +4,7 @@
 --
 -----------------------------------------------------------------------------------------
 
-package.path = package.path .. ';../?.lua'
+package.path = package.path .. ';../../Desktop/Code12/?.lua'
 require("Code12.api")
 
 
