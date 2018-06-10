@@ -12,8 +12,19 @@ local yImageDir = 160
 
 --- Utility functions from Code12 app ----------------------------
 
+local isWindowsFileSystem = false
+if system.getInfo( "environment" ) == "simulator" then
+	-- Can't easily tell if this is actually on Windows, so look
+	-- at a pathname to see if it starts with a / (not Windows)
+	if not string.starts( system.pathForFile( nil, system.DocumentsDirectory ), "/" ) then
+		isWindowsFileSystem = true
+	end
+elseif system.getInfo( "platform" ) == "win32" then
+	isWindowsFileSystem = true
+end
+print( "isWindowsFileSystem:", isWindowsFileSystem )
 local chDirSeperator
-if system.getInfo( "platform" ) == "win32" then
+if isWindowsFileSystem then
 	chDirSeperator = "\\"
 else
 	chDirSeperator = "/"
@@ -51,19 +62,23 @@ end
 -- Return (dir, filename). The dir includes the last / or \.
 local function dirAndFilenameOfPath( path )
 	-- Find the last / or \ if any
-	local iChar = string.find( path, chDirSeperator )
-	if iChar == nil then
-		return "", path
+	local byteDirSeperator = string.byte( chDirSeperator )
+	print(chDirSeperator, byteDirSeperator)
+	local iChar = string.len( path )
+	while iChar > 0 do
+		if string.byte( path, iChar ) == byteDirSeperator then
+			break
+		end
+		iChar = iChar - 1
 	end
-	local iCharLast
-	while iChar do
-		iCharLast = iChar
-		iChar = string.find( path, chDirSeperator, iChar + 1 )
+	print(iChar)
+	if iChar <= 0 then
+		return "", path  -- simple filename with no dir
 	end
 
 	-- Split the path and return the parts
-	return string.sub( path, 1, iCharLast ), 
-			(string.sub( path, iCharLast + 1 ) or "")
+	return string.sub( path, 1, iChar ), 
+			(string.sub( path, iChar + 1 ) or "")
 end
 
 
