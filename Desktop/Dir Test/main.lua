@@ -2,84 +2,17 @@
 --
 -- main.lua
 --
+-- Test of directory handling for images
 -----------------------------------------------------------------------------------------
 
-local fileDialogs = require( "plugin.tinyfiledialogs" )
+-- Use Code12's env module to test it
+package.path = package.path .. ';../?.lua'
+local env = require("Code12.env")
 
+
+-- File local data
 local resultGroup
 local yImageDir = 160
-
-
---- Utility functions from Code12 app ----------------------------
-
-local isWindowsFileSystem = false
-if system.getInfo( "environment" ) == "simulator" then
-	-- Can't easily tell if this is actually on Windows, so look
-	-- at a pathname to see if it starts with a / (not Windows)
-	if not string.starts( system.pathForFile( nil, system.DocumentsDirectory ), "/" ) then
-		isWindowsFileSystem = true
-	end
-elseif system.getInfo( "platform" ) == "win32" then
-	isWindowsFileSystem = true
-end
-print( "isWindowsFileSystem:", isWindowsFileSystem )
-local chDirSeperator
-if isWindowsFileSystem then
-	chDirSeperator = "\\"
-else
-	chDirSeperator = "/"
-end
-
--- Return a relative path in the file system leading from fromDir to destDir.
-local function relativePath( fromDir, destDir )
-	-- TODO: This is annoying and doesn't feel very reliable
-
-	-- Count the chDirSeperators in fromDir and create upDirs to go up to root
-	local str, count = string.gsub( fromDir, chDirSeperator, "." )
-	local up = ".." .. chDirSeperator
-	local upDirs = string.rep( up, count )
-	print(count, upDirs)
-
-	-- Remove the drive from destDir if any
-	-- TODO: This means it won't work across drives
-	if system.getInfo( "platform" ) == "win32" then
-		local iCharColon = string.find( destDir, ":" )
-		if iCharColon then
-			destDir = string.sub( destDir, iCharColon + 1 )
-		end
-	end
-
-	-- Remove root folder indicator from destDir if any
-	if string.sub( destDir, 1, 1 ) == chDirSeperator then
-		destDir = string.sub( destDir, 2 )
-	end
-
-	-- Attach the relative dir and return it
-	return upDirs .. destDir
-end
-
--- Split a file pathname into dir and filename parts.
--- Return (dir, filename). The dir includes the last / or \.
-local function dirAndFilenameOfPath( path )
-	-- Find the last / or \ if any
-	local byteDirSeperator = string.byte( chDirSeperator )
-	print(chDirSeperator, byteDirSeperator)
-	local iChar = string.len( path )
-	while iChar > 0 do
-		if string.byte( path, iChar ) == byteDirSeperator then
-			break
-		end
-		iChar = iChar - 1
-	end
-	print(iChar)
-	if iChar <= 0 then
-		return "", path  -- simple filename with no dir
-	end
-
-	-- Split the path and return the parts
-	return string.sub( path, 1, iChar ), 
-			(string.sub( path, iChar + 1 ) or "")
-end
 
 
 --- Test program ----------------------------------------------------
@@ -110,22 +43,19 @@ end
 
 -- Run the open file dialog and display the result
 local function useOpenDialog()
-	local path = fileDialogs.openFileDialog{
-		title = "Choose Image",
-		allow_multiple_selects = false,
-	}
-	if type(path) == "string" then 
+	local path = env.pathFromOpenFileDialog( "Choose Image" )
+	if path then 
 		resultGroup = showDir( yImageDir, "Chosen file", path )
 
 		-- Build the relative path and display the results
-		local dir, filename = dirAndFilenameOfPath( path )
+		local dir, filename = env.dirAndFilenameOfPath( path )
 		print( "dir = \"" .. dir .. "\"" )
 		print( "filename = \"" .. filename .. "\"" )
 
 		showDir( yImageDir + 30, "File dir", dir )
-		local relDir = relativePath( system.pathForFile(nil, system.DocumentsDirectory), dir )
+		local relDir = env.relativePath( env.docsDir, dir )
 		local relPath = relDir .. filename
-		showDir( yImageDir + 60, "Relative Path from Documents dir", relPath )
+		showDir( yImageDir + 60, "Relative Path from env.docsDir", relPath )
 
 		-- Try to open the image and display it
 		local w = display.contentWidth
@@ -153,6 +83,10 @@ local function onTap()
 	end
 	timer.performWithDelay( 100, useOpenDialog )
 end
+
+
+-- Init the display
+display.setStatusBar( display.HiddenStatusBar )
 
 -- Display Corona's available base directories
 showDir( 10, "Documents dir", system.pathForFile(nil, system.DocumentsDirectory) )

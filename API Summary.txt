@@ -65,7 +65,7 @@ int ct.intDiv( int n, int d )
 boolean ct.isError( double d )
 double ct.distance( double x1, double y1, double x2, double y2 )
 int ct.getTimer( )
-double getVersion( )
+double ct.getVersion( )
 
 // Type Conversion
 //----------------

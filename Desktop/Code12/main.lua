@@ -9,10 +9,9 @@
 
 -- Corona modules and plugins
 local widget = require( "widget" )
-local lfs = require( "lfs" )
-local fileDialogs = require( "plugin.tinyfiledialogs" )
 
 -- Code12 app modules
+local env = require( "env" )
 local parseJava = require( "parseJava" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
@@ -43,14 +42,13 @@ local sourceFile = {
 }
 
 -- Force the initial file to the standard test file for faster dev testing
-if system.getInfo( "environment" ) == "simulator" then
+if env.isSimulator then
 	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
 -- UI elements and state
 local ui = {
-	isMac = false,         -- true if running on Mac OS (else Windows, for now)
 	width = 0,             -- window width
 	height = 0,            -- window height
 	background = nil,      -- white background rect
@@ -112,13 +110,6 @@ local function uiBlack( obj )
 	return uiItem( obj, 0 )
 end
 
--- Split a file pathname into dir, filename (includes ext), and ext.
--- Return (dir, filename, ext).
-local function dirFilenameAndExtFromPath( path )
-	-- TODO: Got this from internet, does it really work?
-	return string.match( path, "(.-)([^\\/]-%.?([^%.\\/]*))$" )
-end
-
 
 --- Internal Functions ------------------------------------------------
 
@@ -126,7 +117,7 @@ end
 local function updateStatusBar()
 	if sourceFile.path then
 		-- Get just the filename with extension from the path
-		local dir, fileAndExt, ext = dirFilenameAndExtFromPath( sourceFile.path )
+		local dir, filename = env.dirAndFilenameOfPath( sourceFile.path )
 
 		-- Get the update time to display
 		local updateStr = "Never"
@@ -149,7 +140,7 @@ local function updateStatusBar()
 		end
 
 		-- Update the status bar UI
-		ui.statusBarGroup.message.text = fileAndExt .. " -- Updated: " .. updateStr
+		ui.statusBarGroup.message.text = filename .. " -- Updated: " .. updateStr
 		ui.statusBarGroup.openFileBtn.isVisible = true
 	else
 		ui.statusBarGroup.openFileBtn.isVisible = false
@@ -204,7 +195,7 @@ end
 -- Put it next to the Java source file.
 local function writeLuaCode( codeStr )
 	-- Put the output file in the same location as the source but named "main.lua"
-	local dir, filename, ext = dirFilenameAndExtFromPath( sourceFile.path )
+	local dir, filename = env.dirAndFilenameOfPath( sourceFile.path )
 	local outPath = dir .. "main.lua"
 
 	-- If the file already exists, then only overwrite it if we created it
@@ -252,14 +243,9 @@ end
 
 -- Show dialog to choose the user source code file
 local function chooseFile()
-	local result = fileDialogs.openFileDialog{
-		title = "Choose Java Source Code File",
-		-- filter_patterns = { "*.java" },
-		-- filter_description = "Java Source Code",
-		allow_multiple_selects = false,
-	}
-	if type(result) == "string" then   -- returns false if cancelled
-		sourceFile.path = result
+	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
+	if path then
+		sourceFile.path = path
 		sourceFile.timeLoaded = os.time()
 		sourceFile.timeModLast = 0
 	end
@@ -268,11 +254,7 @@ end
 -- Open the source file in the system default text editor for its file type
 local function openFileInEditor()
 	if sourceFile.path then
-		if ui.isMac then
-			os.execute( "open \"" .. sourceFile.path .. "\"" )
-		else
-			os.execute( "start \"" .. sourceFile.path .. "\"" )
-		end
+		env.openFileInEditor( sourceFile.path )
 	end
 end
 
@@ -353,7 +335,7 @@ local function makeErrDisplay()
 	local numSourceLines = 7
 
 	-- Get font metrics
-	local fontName = ((ui.isMac and "Consolas") or "Courier")
+	local fontName = "Consolas"
 	local fontSize = 16
 	local fontMetrics = graphics.getFontMetrics( fontName, fontSize )
 	local dyLine = fontMetrics.height + fontMetrics.leading
@@ -516,14 +498,6 @@ local function onResizeWindow( event )
 	end
 end
 
--- Return a relative path in the file system leading from fromDir to destDir.
-local function relativePath( fromDir, destDir )
-	-- TODO: This is Mac-only for now and doesn't feel very reliable
-	local str, count = string.gsub( fromDir, "/", "." )
-	local upDirs = string.rep( "../", count )
-	print(count, upDirs)
-	return upDirs .. string.sub( destDir, 2 )
-end
 
 -- Prepare for a new run of the user program
 local function initNewProgram()
@@ -532,24 +506,18 @@ local function initNewProgram()
 	appContext.stopRun()
 
 	-- Set the source dir and filename
-	local dir, filename, ext = dirFilenameAndExtFromPath( sourceFile.path )
-	appContext.sourceDir = dir
-	appContext.sourceFilename = filename
+	appContext.sourceDir, appContext.sourceFilename = 
+			env.dirAndFilenameOfPath( sourceFile.path )
 
 	-- Set the mediaBaseDir and the mediaDir.
 	-- Good grief, Corona requires the path to images and sounds to be
 	-- a relative path, not absolute, and the only reliable dir to be
 	-- relative to seems to be the system.DocumentsDirectory.
-	local docsDir = system.pathForFile(nil, system.DocumentsDirectory)
-	appContext.mediaBaseDir = system.DocumentsDirectory
-	appContext.mediaDir = relativePath( docsDir, dir )
+	appContext.mediaBaseDir = env.baseDirDocs
+	appContext.mediaDir = env.relativePath( env.docsDir, appContext.sourceDir )
 
 	print( "\n--- New Run ----------------------" )
 	print( "sourceFile.path: " .. sourceFile.path )
-	print( "sourceDir: " .. appContext.sourceDir )
-	print( "sourceFilename: " .. appContext.sourceFilename )
-	print( "docsDir: " .. docsDir )
-	print( "mediaDir: " .. appContext.mediaDir )
 
 	-- Clear class variables, user functions, and global event functions
 	this = {}
@@ -621,7 +589,7 @@ end
 -- Function to check user file for changes and (re)parse it if modified
 local function checkUserFile()
 	if sourceFile.path then
-		local timeMod = lfs.attributes( sourceFile.path, "modification" )
+		local timeMod = env.fileModTimeFromPath( sourceFile.path )
 		if timeMod and timeMod > sourceFile.timeModLast then
 			sourceFile.timeModLast = timeMod
 			updateStatusBar()
@@ -664,7 +632,6 @@ end
 -- Init the app
 local function initApp()
 	-- Get initial device info
-	ui.isMac = (system.getInfo( "platform" ) == "macos")
 	getDeviceMetrics()
 
 	-- Make a default window title
