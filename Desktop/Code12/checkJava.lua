@@ -722,7 +722,7 @@ function checkJava.vtCheckCall( fnValue, paramList )
 		err.setErrNodeAndRef( paramList, fnValue, 
 				"Not enough parameters passed to %s (requires %d)", fnName, min )
 		return nil
-	elseif #params > #method.params then
+	elseif not method.variadic and #params > #method.params then
 		err.setErrNodeAndRef( paramList, fnValue, 
 				"Too many parameters passed to %s", fnName )
 		return nil
@@ -731,6 +731,10 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	-- Check parameter types for validity and match with the API
 	-- TODO: Handle overloaded Math methods
 	for i = 1, #params do
+		if i > #method.params then
+			assert( method.variadic )
+			break    -- variadic function can take any types after those specified
+		end
 		local expr = params[i]
 		local vtPassed = expr.info.vt
 		local vtNeeded = method.params[i].vt
