@@ -1,3 +1,0 @@
-ct.distance test done
-ct.parseInt test done
-ct.canParseInt test done
