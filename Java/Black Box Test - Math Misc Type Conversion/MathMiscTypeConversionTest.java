@@ -123,7 +123,7 @@ class MathMiscTypeConversionTest extends Code12Program
    {
       int output = ct.round(d);
       if ( output != expected )
-         printError( "ct.round(" + d + ") = " + output + "; " + expected + " expected" + "; " + expected + " expected" );
+         printError( "ct.round(" + d + ") = " + output + "; " + expected + " expected" );
    }
    
    public void testRound( double d, int numPlaces, double expected )
@@ -281,11 +281,6 @@ class MathMiscTypeConversionTest extends Code12Program
          testRound( -3.15, 1, -3.2 );
          testRound( -3.25, 1, -3.2 );
          
-         // how should negative for numPlaces work?
-         testRound( 123456.7, -2, 123500.0 );
-         testRound( 123456.7, -2, 123500.0 );
-         testRound( 123456.7, -3, 123000.0 );
-         
          testRound( 123.4, 0, 123.0 );
          testRound( 123.5, 0, 124.0 );
          testRound( -123.4, 0, -123.0 );
@@ -441,9 +436,7 @@ class MathMiscTypeConversionTest extends Code12Program
          if ( version != 0.5 )
          {
             allTestsPassed = false;
-            String error = "ct.getVersion() = " + version;
-            ct.println( error );
-            writer.println( error );
+            printError( "ct.getVersion() = " + version + "; 0.5 expected" );
          }
          print( "ct.getVersion tests done" );
       }
