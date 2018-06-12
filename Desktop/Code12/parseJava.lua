@@ -544,7 +544,11 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	end
 
 	-- Try to parse the line
-	return parseCurrentLine( level or numSyntaxLevels )
+	local tree = parseCurrentLine( level or numSyntaxLevels )
+	if tree then
+		tree.iLine = lineNumber  -- store Java line number in the top tree node
+	end
+	return tree
 end
 
 -- Print a parse tree recursively at the given indentLevel.

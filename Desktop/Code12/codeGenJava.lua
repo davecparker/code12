@@ -42,7 +42,8 @@ if enableIndent then
 end
 
 -- The generated Lua code
-local luaCodeStrs = {}        -- array of strings for bulk concat
+local luaCodeStrs             -- array of strings for bulk concat (many less than one line)
+local luaLineNum              -- Current line number in the Lua code
 
 -- Map supported Java binary operators to Lua operator code (Lua op plus spaces)
 local luaOpFromJavaOp = {
@@ -73,6 +74,7 @@ local luaOpFromJavaOp = {
 -- Add strCode as the start of a new Lua line, or blank line if strCode is nil
 local function beginLuaLine( strCode )
 	luaCodeStrs[#luaCodeStrs + 1] = "\n"
+	luaLineNum = luaLineNum + 1
 	if enableIndent then
 		luaCodeStrs[#luaCodeStrs + 1] = strIndents[blockLevel] or ""
 	end
@@ -92,6 +94,7 @@ local function removeLastLuaLine()
 		local code = luaCodeStrs[#luaCodeStrs]
 		luaCodeStrs[#luaCodeStrs] = nil
 	until string.find(code, "\n") or #luaCodeStrs == 0 
+	luaLineNum = luaLineNum - 1
 end
 
 
@@ -364,7 +367,6 @@ local function generateBlockLine( tree )
 		generateStmt( nodes[1] )
 	elseif p == "blank" then
 		-- blank
-		beginLuaLine( "" )
 	elseif enableComments and p == "comment" then
 		-- Full line comment
 		beginLuaLine( "--" )
@@ -453,8 +455,8 @@ function generateControlledStmt()
 		-- Single controlled statement
 		blockLevel = blockLevel + 1
 		generateBlockLine( tree )
+		addLua( "; end" )
 		blockLevel = blockLevel - 1
-		beginLuaLine( "end" )
 	end
 end
 
@@ -508,10 +510,18 @@ function codeGenJava.getLuaCode( parseTrees )
 	iTree = 1
 	blockLevel = 0
 	luaCodeStrs = {}
+	luaLineNum = 1   
 
-	-- Scan the parse trees for instance variables and functions
+	-- Process each parse tree
 	while iTree <= #parseTrees and not err.hasErr() do
 		local tree = javaParseTrees[iTree]
+
+		-- Add blank Lua lines to catch up to the Java line number if necessary
+		assert( tree.iLine ~= nil )
+		while luaLineNum < tree.iLine - 1 do
+			beginLuaLine( "" )
+		end
+
 		-- print( "getLuaCode line " .. iTree )
 		if not checkJava.doTypeChecks( tree ) then
 			break
@@ -525,8 +535,6 @@ function codeGenJava.getLuaCode( parseTrees )
 			-- Full line comment
 			beginLuaLine( "--" )
 			addLua( nodes[1].str )
-		elseif p == "blank" then
-			beginLuaLine( "" )
 		elseif p == "begin" then          -- {  in boilerplate code
 			blockLevel = blockLevel + 1
 		elseif p == "end" then            -- }  in boilerplate code

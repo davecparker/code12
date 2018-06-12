@@ -238,7 +238,7 @@ local function writeLuaCode( codeStr )
 	end
 
 	-- Print user code to console for debugging
-	-- print( codeStr )
+	print( "--- Lua Code: ---\n" ); print( codeStr )
 end
 
 -- Show dialog to choose the user source code file
