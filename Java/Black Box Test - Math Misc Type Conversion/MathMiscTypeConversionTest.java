@@ -82,6 +82,7 @@ class MathMiscTypeConversionTest extends Code12Program
       catch(Exception e)
       {
          ct.println( "Error writing to output.txt" );
+         ct.println( e.toString() );
       }
       
       initTests_getTimer( true );
@@ -122,14 +123,13 @@ class MathMiscTypeConversionTest extends Code12Program
    {
       int output = ct.round(d);
       if ( output != expected )
-         printError( "ct.round(" + d + ") = " + output + "; " + expected + " expected" + "; " + expected + " expected" );
+         printError( "ct.round(" + d + ") = " + output + "; " + expected + " expected" );
    }
    
    public void testRound( double d, int numPlaces, double expected )
    {
       double output = ct.round(d, numPlaces);
-      double eps = Math.pow(0.1, numPlaces + 1);
-      if ( Math.abs(output - expected) > eps )
+      if ( Math.abs(output - expected) > EPSILON )
          printError( "ct.round(" + d + ", " + numPlaces + ") = " + output + "; " + expected + " expected" );
    }
    
@@ -274,7 +274,21 @@ class MathMiscTypeConversionTest extends Code12Program
    public void runTests_round( boolean run )
    {
       if ( run )
-      {
+      {         
+         // if digit in next place is a five, ct.round( double d, int numPlaces ) rounds to nearest even digit
+         testRound( 0.05, 1, 0.0 );
+         testRound( -0.05, 1, 0.0 );
+         testRound( -3.15, 1, -3.2 );
+         testRound( -3.25, 1, -3.2 );
+         
+         testRound( 123.4, 0, 123.0 );
+         testRound( 123.5, 0, 124.0 );
+         testRound( -123.4, 0, -123.0 );
+         testRound( -123.5, 0, -124.0 );      
+         
+         testRound( 0.049, 1, 0.0 );
+         testRound( -0.049, 1, -0.0 );
+         
          testRound( 3.14159265, 3 );
          testRound( 3.14159265, 1, 3.1 );
          testRound( 3.14159265, 2, 3.14 );
@@ -293,7 +307,7 @@ class MathMiscTypeConversionTest extends Code12Program
          testRound( -3.14159265, 5, -3.14159 );
          testRound( -3.14159265, 6, -3.141593 );
          testRound( -3.14159265, 7, -3.1415927 );
-         testRound( -3.14159265, 8, -3.14159265 );
+         testRound( -3.14159265, 8, -3.14159265 );        
                     
          testRound( 31.622776601683793319988935444327, 32);
          testRound( 31.622776601683793319988935444327, 1, 31.6);
@@ -307,8 +321,8 @@ class MathMiscTypeConversionTest extends Code12Program
          testRound( -31.622776601683793319988935444327, 3, -31.623);
          testRound( -31.622776601683793319988935444327, 29, -31.62277660168379331998893544433);
 
-         testRound( 123.049, 1, 123.0 );
-         testRound( -123.049, 1, -123.0 );
+         testRound( -3.5, -3 );
+         testRound( -2.5, -2 ); 
          
          testRound( 2.99792458, 3 );
          testRound( 29.9792458, 30 );
@@ -422,9 +436,7 @@ class MathMiscTypeConversionTest extends Code12Program
          if ( version != 0.5 )
          {
             allTestsPassed = false;
-            String error = "ct.getVersion() = " + version;
-            ct.println( error );
-            writer.println( error );
+            printError( "ct.getVersion() = " + version + "; 0.5 expected" );
          }
          print( "ct.getVersion tests done" );
       }
@@ -583,11 +595,28 @@ class MathMiscTypeConversionTest extends Code12Program
          testFormatDecimal( 987654.321, 10, "987654.3210000000" );
          testFormatDecimal( 1.23456E2, 2, "123.46" );
          
+         testFormatDecimal( -1, "-1.0" );
+         testFormatDecimal( -4567.0, "-4567.0" );            
+         testFormatDecimal( -3.14159, "-3.14159" );
+         testFormatDecimal( -3.14159, 7, "-3.1415900" );
+         testFormatDecimal( -3.14159, 5, "-3.14159" );
+         testFormatDecimal( -3.14159, 3, "-3.142" );
+         testFormatDecimal( -987654.321, 10, "-987654.3210000000" );
+         testFormatDecimal( -1.23456E2, 2, "-123.46" );
+         
          testFormatDecimal( Math.E, "" + Math.E );
          testFormatDecimal( Math.PI, "" + Math.PI );
          testFormatDecimal( Math.sqrt(-1), "NaN" );
+         testFormatDecimal( -Math.sqrt(-1), "NaN" );
+         testFormatDecimal( 0.0/0.0, "NaN" );
+         testFormatDecimal( 0/0.0, "NaN" );
+         testFormatDecimal( 0.0/0, "NaN" );
+         testFormatDecimal( 1.0/0.0, "Infinity" );
          testFormatDecimal( 1/0.0, "Infinity" );
-
+         testFormatDecimal( 1.0/0, "Infinity" );
+         testFormatDecimal( -1/0.0, "-Infinity" );
+         
+         
          // Very large and small doubles formated in exponential notation
          testFormatDecimal( 1234567.0 , "1234567.0" );
          testFormatDecimal( 12345678.0 , "1.2345678E7" ); 
@@ -633,10 +662,10 @@ class MathMiscTypeConversionTest extends Code12Program
          testFormatInt( -123456, 6, "-123456" );
          testFormatInt( -123456, 10, "-000123456" );         
          testFormatInt( 123456789, 12, "000123456789" );
-         testFormatInt( 2147483647, 10, "2147483647" ); // Max int value
-         testFormatInt( 2147483647, 15, "000002147483647" ); 
-         testFormatInt( -2147483648, 10, "-2147483648" ); // Min int value
-         testFormatInt( -2147483648, 20, "-0000000002147483648" );
+         testFormatInt( Integer.MAX_VALUE, 10, "2147483647" ); // Max int value
+         testFormatInt( Integer.MAX_VALUE, 15, "000002147483647" ); 
+         testFormatInt( Integer.MIN_VALUE, 10, "-2147483648" ); // Min int value
+         testFormatInt( Integer.MIN_VALUE, 20, "-0000000002147483648" );
 
          print( "ct.formatInt tests done" );
       }
