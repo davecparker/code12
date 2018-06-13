@@ -17,7 +17,7 @@ public class MainProgram extends Code12Program
    
    public void start()
    {  
-   
+      ct.print("");
       buttons[0] = ct.rect( 20, 83, 15, 10, "grey");
       buttons[0].clickable = true;
       ct.text( "0" , 20, 83, 10, "black" );
@@ -72,7 +72,7 @@ public class MainProgram extends Code12Program
       
       //Initializes the display
       displayText = "";
-      display = ct.text( displayText, 54, 10, 10, "black" ); 
+      display = ct.text( displayText, 56, 18, 12, "black" ); 
       
    }
    
@@ -82,12 +82,23 @@ public class MainProgram extends Code12Program
              
    }
    
+   
+   public void onKeyPress( String keyName ) 
+   {
+      if( ct.canParseInt(keyName.substring( keyName.length() - 1 , keyName.length() ) ) )
+         {
+            int i = ct.parseInt( keyName.substring( keyName.length() - 1 , keyName.length() ) );
+            Input( i );
+         }
+   }
+  
+   
    public void onMousePress(GameObj obj, double x, double y)
    {
-  
+      int i = -1;
       if(obj instanceof GameRect)
       {
-         int i;
+         
          for(i = 0; i < buttons.length; i++ )
          {
             if(obj == buttons[i])
@@ -96,58 +107,102 @@ public class MainProgram extends Code12Program
             }
          }  
          
-         if(displayText.length() < 15 && i < 15)
-         {  
-            
-            if( i < 10 )
-            {
-                displayText = displayText + i;
-            }
-              
-            else
-            {
-               if( displayText.contains("+") || displayText.contains("-") 
-               || displayText.contains("*") || displayText.contains("/") )
-                  {
-                     String result = displayText;
-                     displayText = Calculate(result);
-                  }
-                  
-               i = i%10;
-               displayText = displayText + operatorButtons[i];
-            }
-              
-            display.setText(displayText);
-            updateDisplay(displayText);
+      }
+      
+      Input( i );
+   }
+    
+    
+   //Handles inputs from mouse and keyboard
+   private void Input ( int i ) 
+   {
+      if ( i != -1 )
+      {
+      
+      if(displayText.length() < 12 && i < 14)
+      {  
+         
+         if( i < 10 )
+         {
+             displayText = displayText + i;
          }
-                 
-         if(i == 15) // equals ( = key )
-         { 
-            if( !display.equals("") && !ct.canParseNumber(displayText) ) //tests if the display is empty or just a number
+           
+         else
+         {
+            if( displayText.contains("+") || displayText.contains("-") 
+               || displayText.contains("*") || displayText.contains("/") )
             {
                String result = displayText;
                displayText = Calculate(result);
-               updateDisplay(displayText);
             }
+               
+            displayText = displayText + operatorButtons[i%10];
          }
          
-         if(i == 19) // clear ( c key )
+         updateDisplay();
+      }
+              
+      if ( i == 14 ) //decimal ( "." key )
          {
-            displayText = "";
-            updateDisplay(displayText);
-         }   
-         
-      }           
-   }
+            String currentNumber = "";
+            
+            //Finds the last number including decimal up until a mathmatical operator
+            for ( int j = displayText.length() - 1; j >= 0; j-- )
+            {
+               if ( displayText.charAt(j) == '+' || displayText.charAt(j) == '-' 
+                  || displayText.charAt(j) == '*' || displayText.charAt(j) == '/' )
+               {
+                  break;
+               }
+               
+               currentNumber = currentNumber + displayText.charAt(j);
+               
+            }
+            
+            if ( !currentNumber.contains(".") )
+            {
+               if(currentNumber != "")
+               {
+                  displayText = displayText + operatorButtons[i%10];
+                  updateDisplay();
+               }
+               else
+               {
+                  displayText = displayText + "0" + operatorButtons[i%10];
+                  updateDisplay();
+               }
+            } 
+         }        
+      
+      if(i == 15) // equals ( = key )
+      { 
+         if( !display.equals("") && !ct.canParseNumber(displayText) ) //tests if the display is empty or just a number
+         {
+            String result = displayText;
+            displayText = Calculate(result);
+            updateDisplay();
+         }
+      }
+      
+      if(i == 19) // clear ( c key )
+      {
+         displayText = "";
+         updateDisplay();
+      }   
+     } 
+   }           
+   
+   
    
    //Method that takes a newDisplay value and redraws the display to properly display the new value
-   private void updateDisplay(String newDisplay)
+   private void updateDisplay()
    {
-      display.setText(newDisplay);
-      double newX = 75 - (display.width / 2.0);
+      display.setText(displayText);
+      double newX = 77 - (display.width / 2.0);
       display.delete();
-      display = ct.text( newDisplay, newX, 10, 10, "black" );
+      display = ct.text( displayText, newX, 18, 12, "black" );
    }
+   
    
    // Method that takes the currently displayed function and calculates the value
    // Takes a string representing the displayed value (composed of numbers and math operators)
@@ -199,8 +254,7 @@ public class MainProgram extends Code12Program
             num2 = ct.parseNumber(temp);
          }
       }
-
-
+      
       double result; 
 
       switch(operator)
@@ -215,6 +269,11 @@ public class MainProgram extends Code12Program
                    break;
          default: result = 0;
       }  
+      
+      //Formats long numbers / infinate decimals to fit on the screen
+      if( ct.formatDecimal(result).length() > 12 )
+          result = ct.round( result, 10 );
+      
       if( (result % 1) == 0 )
          return ct.formatInt( (int)result );
       return ct.formatDecimal(result);
