@@ -232,6 +232,7 @@ local stmt = { t = "stmt",
 	{ 4, 12, "preDec",			"--", lValue						},
 	{ 4, 12, "postInc",			lValue, "++" 						},
 	{ 4, 12, "postDec",			lValue, "--"						},
+	{ 11, 12, "break",			"break"								},
 }
 
 -- The end of a while statement, either with a ; (for do-while) or not
@@ -265,8 +266,8 @@ local forControl = { t = "forControl",
 	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
 }
 
--- An array initializer
-local arrayInit = { t = "arrayInit",
+-- An array value
+local arrayValue = { t = "arrayValue",
 	{ 12, 12, "new", 			"new", "ID", "[", expr, "]"					},
 	{ 12, 12, "list", 			"{", exprList, "}"							},
 }
@@ -290,7 +291,7 @@ local line = { t = "line",
 	{ 11, 12, "do",				"do", 											"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
-	{ 12, 12, "array",			"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
+	{ 12, 12, "arrayInit",		"ID", "[", "]", "ID", "=", arrayValue, ";",		"END" },
 	-- Boilerplate lines
 	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
 	{ 1, 12, "class",			"class", "ID", 									"END" },

@@ -6,7 +6,7 @@ require('Code12.api')
     this.ball = nil; this.bigBall = nil; 
     -- GameObj tooSoon = ct.circle(50, 50, 50);
     this.count = 0; this.total = 0; 
-    this.gameOver = false; 
+    this.gameOver = false
     this.LIMIT = 120
     -- int count = 5;
     this.speed = 0.3
@@ -94,4 +94,41 @@ require('Code12.api')
             ct.println(obj:toString() .. " was clicked"); 
         else 
             ct.println("Mouse was pressed at (" .. x .. ", " .. y .. ")"); end
+    end
+    
+    function _fn.loopAndArrayTest()
+        
+        while not this.gameOver do
+            
+            this.speed = this.speed + (3)
+            if this.speed > 10 then
+                break; end
+        end
+        while this.speed < 3 do
+            this.speed = this.speed + 1; end
+        
+        repeat
+            this.speed = this.speed - 1; 
+        until not (this.speed > 4)
+        
+        repeat
+            
+            this.speed = this.speed + (3)
+            this.speed = this.speed - 1
+        
+        until not (this.speed < 2)
+        
+        local scores = {}
+        
+        local counts = { 2, 4, 5 + 6, 3 }
+        local c = counts[1+(0)]
+        
+        local sum = 0
+        for cnt in ipairs(counts) do
+            sum = sum + (cnt); end
+        
+        for score in ipairs(scores) do
+            
+            sum = sum + (ct.toInt(score))
+        end
     end

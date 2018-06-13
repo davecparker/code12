@@ -132,7 +132,7 @@ function lValueCode( v )
 	elseif p == "field" then
 		return name .. "." .. v.nodes[3].str    --  obj.field reference
 	elseif p == "index" then
-		return name .. "[" .. exprCode( v.nodes[3] ) .. "]"
+		return name .. "[1+(" .. exprCode( v.nodes[3] ) .. ")]"
 	end
 	error( "Unknown lValue pattern " .. p )
 end
@@ -218,7 +218,7 @@ function exprCode( expr )
 	end
 end
 
--- Look for and generate code for a varInit, constInit, or varDecl line.
+-- Look for and generate code for a varInit, constInit, varDecl, or arrayInit line
 -- in tree. Return true if one was found and generated, else return false.
 -- If isInstanceVar then the line is outside all functions (else local).
 local function generateVarDecl( tree, isInstanceVar )
@@ -276,12 +276,58 @@ local function generateVarDecl( tree, isInstanceVar )
 			addLua( valueCode )
 		end
 		return true
+	elseif p == "arrayInit" then
+		-- type [ ] id = arrayValue ;
+		local vt = javaTypes.vtFromVarType( nodes[1] )
+		local nameNode = nodes[4]
+		local varName = nameNode.str
+		if isInstanceVar then
+			checkJava.defineInstanceVar( nameNode, vt, true, true )
+			beginLuaLine( thisPrefix )     -- use this.name
+		else
+			checkJava.defineLocalVar( nameNode, vt, true, true )
+			beginLuaLine( "local " )
+		end
+		addLua( varName )
+		addLua( " = " )
+		local arrayValue = nodes[6]
+		if arrayValue.p == "new" then
+			-- type [ ] id = new type [ expr ] ;
+			local vtNew = javaTypes.vtFromVarType( arrayValue.nodes[2] )
+			if vtNew ~= vt then
+				err.setErrNodeAndRef( arrayValue.nodes[2], nodes[1],
+						"New array type does not match variable type" )
+			end
+			local countExpr = arrayValue.nodes[4]
+			if countExpr.info.vt ~= 0 then
+				err.setErrNode( countExpr, "Array count must be an integer" )
+			end
+			addLua( "{}" )   -- TODO: Store count in array and check at runtime?
+		else
+			-- type [ ] id = { exprList } ;
+			addLua( "{ " )
+			local exprs = arrayValue.nodes[2].nodes
+			for i = 1, #exprs do
+				local expr = exprs[i]
+				if expr.info.vt ~= vt then
+					err.setErrNodeAndRef( expr, nodes[1], 
+							"Array element type does not match the array type" )
+				end
+				addLua( exprCode( expr ) )
+				if i < #exprs then
+					addLua( ", " )
+				end
+			end
+			addLua( " }" )
+		end
+		return true
 	end
 	return false
 end
 
 -- Generate code for an increment or decrement (++ or --) stmt
 -- given the lValue node and opToken is either a "++" or "--" token.
+-- The caller should have already called beginLuaLine for this stmt.
 local function generateIncOrDecStmt( lValue, opToken )
 	local vt = lValue.info.vt 
 	local tt = opToken.tt
@@ -291,7 +337,7 @@ local function generateIncOrDecStmt( lValue, opToken )
 		return
 	end
 	local lValueStr = lValueCode( lValue )
-	beginLuaLine( lValueStr )
+	addLua( lValueStr )
 	addLua( " = " )
 	addLua( lValueStr )
 	if tt == "++" then
@@ -301,7 +347,8 @@ local function generateIncOrDecStmt( lValue, opToken )
 	end
 end
 
--- Generate code for the single stmt in tree
+-- Generate code for the single stmt in tree.
+-- The caller should have already called beginLuaLine for this stmt.
 local function generateStmt( tree )
 	local p = tree.p
 	local nodes = tree.nodes
@@ -310,14 +357,14 @@ local function generateStmt( tree )
 		if checkJava.vtCheckCall( nodes[1], nodes[3] ) == nil then
 			return
 		end
-		beginLuaLine( fnCallCode( tree ) )
+		addLua( fnCallCode( tree ) )
 	elseif p == "assign" then
 		-- ID = expr
 		local varNode = nodes[1]
 		local expr = nodes[3]
 		if checkJava.canAssignToVarNode( varNode, expr ) then
 			assert( varNode.tt == "ID" )
-			beginLuaLine( varNameCode( varNode.str ) )
+			addLua( varNameCode( varNode.str ) )
 			addLua( " = " )
 			addLua( exprCode( expr ) )
 		end
@@ -326,7 +373,7 @@ local function generateStmt( tree )
 		local lValue = nodes[1]
 		local expr = nodes[3]
 		if checkJava.canAssignToLValue( lValue, expr ) then
-			beginLuaLine( lValueCode( lValue ) )
+			addLua( lValueCode( lValue ) )
 			addLua( " = " )
 			addLua( exprCode( expr ) )
 		end
@@ -337,7 +384,7 @@ local function generateStmt( tree )
 		-- TODO: Better type checking, this is not correct
 		if checkJava.canAssignToLValue( lValue, expr ) then
 			local lValueStr = lValueCode( lValue )
-			beginLuaLine( lValueStr )
+			addLua( lValueStr )
 			addLua( " = " )
 			addLua( lValueStr )
 			addLua( luaOpFromJavaOp[nodes[2].nodes[1].str] )
@@ -346,12 +393,50 @@ local function generateStmt( tree )
 			addLua( ")" )
 		end
 	elseif p == "preInc" or p == "preDec" then
+		--  ++ lValue  or  -- lValue
 		generateIncOrDecStmt( nodes[2], nodes[1] )
 	elseif p == "postInc" or p == "postDec" then
+		-- lValue ++  or  lValue -- 
 		generateIncOrDecStmt( nodes[1], nodes[2] )
+	elseif p == "break" then
+		-- break
+		addLua( "break" )
 	else
 		error("*** Unknown stmt pattern " .. p )
 	end	
+end
+
+-- Generate code for a for loop starting at tree
+local function generateForLoop( tree )
+	assert( tree.p == "for" )
+	local forControl = tree.nodes[3]
+	local nodes = forControl.nodes
+	if forControl.p == "array"  then
+		-- for ( type ID : array )
+		local vtVar = javaTypes.vtFromVarType( nodes[1] )
+		local vtArray = checkJava.vtVar( nodes[4] )
+		if type(vtArray) ~= "table" then
+			err.setErrNode( nodes[4], 
+					"The source variable in a for-each loop must be an array" );
+		elseif vtArray.vt ~= vtVar then
+			err.setErrNodeAndRef( nodes[1], nodes[4],
+					"Array \"%s\" contains elements of type %s",
+					nodes[4].str, javaTypes.typeNameFromVt( vtArray.vt ) );
+		else
+			checkJava.defineLocalVar( nodes[2], vtVar, false, true )
+			beginLuaLine( "for " )
+			addLua( nodes[2].str )
+			addLua( " in ipairs(" )
+			addLua( nodes[4].str )
+			addLua( ") do" )
+			generateControlledStmt()
+		end
+	else
+		-- for ( init ; expr ; stmt )
+		local forInit = nodes[1]
+		local forExpr = nodes[3]
+		local forNext = nodes[5]
+	end
 end
 
 -- Generate code for the block line in tree
@@ -363,6 +448,7 @@ local function generateBlockLine( tree )
 	local nodes = tree.nodes
 	if p == "stmt" then
 		-- stmt ;
+		beginLuaLine( "" )
 		generateStmt( nodes[1] )
 	elseif p == "blank" then
 		-- blank
@@ -382,8 +468,6 @@ local function generateBlockLine( tree )
 		beginLuaLine( "if " )
 		addLua( exprCode( expr ) )
 		addLua( " then")
-		-- Process the controlled statement or block too
-		iTree = iTree + 1
 		generateControlledStmt()
 	elseif p == "elseif" then
 		-- else if (expr)
@@ -396,16 +480,38 @@ local function generateBlockLine( tree )
 		beginLuaLine( "elseif " )
 		addLua( exprCode( expr ) )
 		addLua( " then")
-		-- Process the controlled statement or block too
-		iTree = iTree + 1
 		generateControlledStmt()
 	elseif p == "else" then
 		-- else
 		removeLastLuaEnd()   -- remove the end we made for the if/elseif
 		beginLuaLine( "else " )
-		-- Process the controlled statement or block too
-		iTree = iTree + 1
 		generateControlledStmt()
+	elseif p == "do" then
+		-- do
+		beginLuaLine( "repeat" )
+		generateControlledStmt()
+	elseif p == "while" then
+		-- while (expr) starting a while, or while (expr) ; ending a do-while
+		local expr = nodes[3]
+		if expr.info.vt ~= true then
+			err.setErrNode( expr, "Loop test must be boolean (true or false)" )
+			return
+		end
+		local whileEnd = nodes[4]
+		if whileEnd.p == "do-while" then
+			removeLastLuaEnd()   -- remove the end we made for the loop body
+			beginLuaLine( "until not (" )
+			addLua( exprCode( expr ) )
+			addLua( ")" )
+		else
+			beginLuaLine( "while " )
+			addLua( exprCode( expr ) )
+			addLua( " do")
+			generateControlledStmt()
+		end
+	elseif p == "for" then
+		-- for
+		generateForLoop( tree )
 	elseif p == "return" then
 		-- return expr ;
 		local expr = nodes[2]
@@ -449,11 +555,13 @@ local function generateBlock()
 	until false
 end
 
--- Generate code for a controlled statment after an if/else or loop,
--- which is a single block line, or a block nested with { } 
--- if iTree is at a {.  End with iTree still at the stmt or at the ending }
+-- Generate code for the controlled statment of an if or loop,
+-- which is a single block line, or a block nested with { }
+-- if the next line is a {.  Start with iTree at the if/loop, and
+-- end with iTree still at the single controlled stmt or at the ending }.
 function generateControlledStmt()
-	local tree = javaParseTrees[iTree]
+	iTree = iTree + 1   -- pass the if/loop 
+	local tree = javaParseTrees[iTree]  -- first line after the if/loop
 	if tree.p == "begin" then
 		generateBlock()
 	else
@@ -461,7 +569,7 @@ function generateControlledStmt()
 		blockLevel = blockLevel + 1
 		generateBlockLine( tree )
 		addLua( "; ")
-		addLua( "end" )  -- these need to be separate because of 
+		addLua( "end" )  -- these need to be separate because of removeLastLuaEnd
 		blockLevel = blockLevel - 1
 	end
 end
@@ -536,7 +644,7 @@ function codeGenJava.getLuaCode( parseTrees )
 		local nodes = tree.nodes
 
 		if generateVarDecl( tree, true ) then
-			-- Processed a varInit, constInit, or varDecl
+			-- Processed a varInit, constInit, varDecl, or arrayInit
 		elseif enableComments and p == "comment" then
 			-- Full line comment
 			beginLuaLine( "--" )

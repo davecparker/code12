@@ -6,7 +6,7 @@ class UserCode extends Code12Program
 	GameObj ball, bigBall;
 	// GameObj tooSoon = ct.circle(50, 50, 50);
 	int count, total;
-	boolean gameOver;
+	boolean gameOver = false;
 	final int LIMIT = 120;
 	// int count = 5;
 	double speed = 0.3;
@@ -94,5 +94,42 @@ class UserCode extends Code12Program
 			ct.println( obj.toString() + " was clicked" );
 		else
 			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
+	}
+
+	void loopAndArrayTest()
+	{
+		while (!gameOver)
+		{
+			speed += 3;
+			if (speed > 10)
+				break;
+		}
+		while (speed < 3)
+			speed++;
+
+		do
+			speed--;
+		while (speed > 4) ;
+
+		do
+		{
+			speed += 3;
+			speed--;
+		}
+		while (speed < 2) ;
+
+		double[] scores = new double[10];
+
+		int[] counts = { 2, 4, 5 + 6, 3 };
+		int c = counts[0];
+
+		int sum = 0;
+		for (int cnt : counts )
+			sum += cnt;
+
+		for (double score : scores )
+		{
+			sum += ct.toInt( score );
+		}
 	}
 }
