@@ -291,6 +291,7 @@ local function generateVarDecl( tree, isInstanceVar )
 		addLua( varName )
 		addLua( " = " )
 		local arrayValue = nodes[6]
+		local length = nil
 		if arrayValue.p == "new" then
 			-- type [ ] id = new type [ expr ] ;
 			local vtNew = javaTypes.vtFromVarType( arrayValue.nodes[2] )
@@ -302,7 +303,9 @@ local function generateVarDecl( tree, isInstanceVar )
 			if countExpr.info.vt ~= 0 then
 				err.setErrNode( countExpr, "Array count must be an integer" )
 			end
-			addLua( "{}" )   -- TODO: Store count in array and check at runtime?
+			addLua( "{ length = " )
+			addLua( exprCode( countExpr ) )
+			addLua( " }" )
 		else
 			-- type [ ] id = { exprList } ;
 			addLua( "{ " )
@@ -314,10 +317,10 @@ local function generateVarDecl( tree, isInstanceVar )
 							"Array element type does not match the array type" )
 				end
 				addLua( exprCode( expr ) )
-				if i < #exprs then
-					addLua( ", " )
-				end
+				addLua( ", " )
 			end
+			addLua( "length = " )
+			addLua( #exprs )
 			addLua( " }" )
 		end
 		return true

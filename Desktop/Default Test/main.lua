@@ -118,9 +118,9 @@ require('Code12.api')
         
         until not (this.speed < 2)
         
-        local scores = {}
+        local scores = { length = 10 }
         
-        local counts = { 2, 4, 5 + 6, 3 }
+        local counts = { 2, 4, 5 + 6, 3, length = 4 }
         local c = counts[1+(0)]
         
         local sum = 0
@@ -137,6 +137,6 @@ require('Code12.api')
             sum = sum + (counts[1+(c)])
         end
         
-        local i = 0; while i < 10 do
+        local i = 0; while i < counts.length do
             sum = sum + (counts[1+(i)]); i = i + 1; end
     end

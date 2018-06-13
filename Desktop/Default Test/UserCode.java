@@ -137,7 +137,7 @@ class UserCode extends Code12Program
 			sum += counts[c];
 		}
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < counts.length; i++)
 			sum += counts[i];
 	}
 }

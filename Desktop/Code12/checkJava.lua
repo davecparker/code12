@@ -183,7 +183,7 @@ local function vtLValueNode( lValue )
 		end
 		return vt
 	elseif p == "field" then
-		-- Public field access (only possible with Math or GameObj)
+		-- Public field access (only possible with Math or GameObj, or array.length)
 		local object = nodes[1]
 		local field = nodes[3]
 		-- Determine the class
@@ -197,6 +197,15 @@ local function vtLValueNode( lValue )
 			local vtObj = checkJava.vtVar( object )
 			if vtObj == "GameObj" then
 				className = "GameObj"
+			elseif type(vtObj) == "table" then
+				-- Support array.length
+				if field.str == "length" then
+					return 0  -- int
+				else
+					err.setErrNodeAndRef( field, object,
+						"Arrays can only access their \".length\" field" )
+					return nil
+				end
 			else
 				err.setErrNode( object, "Type %s has no data fields",
 						javaTypes.typeNameFromVt( vtObj ))

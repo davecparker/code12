@@ -118,7 +118,7 @@ end
 -- Return the type name of the given value type (vt)
 function javaTypes.typeNameFromVt( vt )
 	if type(vt) == "table" then
-		return "array of " .. typeNameFromVt( vt.vt )
+		return "array of " .. javaTypes.typeNameFromVt( vt.vt )
 	end
 	return mapVtToTypeName[vt] or "(unknown)"
 end
