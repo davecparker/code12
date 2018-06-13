@@ -2,31 +2,17 @@
 --
 -- main.lua
 --
+-- Test of directory handling for images
 -----------------------------------------------------------------------------------------
 
-local fileDialogs = require( "plugin.tinyfiledialogs" )
+-- Use Code12's env module to test it
+package.path = package.path .. ';../?.lua'
+local env = require("Code12.env")
 
+
+-- File local data
 local resultGroup
 local yImageDir = 160
-
-
---- Utility functions from Code12 app ----------------------------
-
--- Return a relative path in the file system leading from fromDir to destDir.
-local function relativePath( fromDir, destDir )
-	-- TODO: This is Mac-only for now and doesn't feel very reliable
-	local str, count = string.gsub( fromDir, "/", "." )
-	local upDirs = string.rep( "../", count )
-	print(count, upDirs)
-	return upDirs .. string.sub( destDir, 2 )
-end
-
--- Split a file pathname into dir, filename (includes ext), and ext.
--- Return (dir, filename, ext).
-local function dirFilenameAndExtFromPath( path )
-	-- TODO: Got this from internet, does it really work?
-	return string.match( path, "(.-)([^\\/]-%.?([^%.\\/]*))$" )
-end
 
 
 --- Test program ----------------------------------------------------
@@ -57,19 +43,19 @@ end
 
 -- Run the open file dialog and display the result
 local function useOpenDialog()
-	local path = fileDialogs.openFileDialog{
-		title = "Choose Image",
-		allow_multiple_selects = false,
-	}
-	if type(path) == "string" then 
+	local path = env.pathFromOpenFileDialog( "Choose Image" )
+	if path then 
 		resultGroup = showDir( yImageDir, "Chosen file", path )
 
 		-- Build the relative path and display the results
-		local dir, filename, ext = dirFilenameAndExtFromPath( path )
+		local dir, filename = env.dirAndFilenameOfPath( path )
+		print( "dir = \"" .. dir .. "\"" )
+		print( "filename = \"" .. filename .. "\"" )
+
 		showDir( yImageDir + 30, "File dir", dir )
-		local relDir = relativePath( system.pathForFile(nil, system.DocumentsDirectory), dir )
+		local relDir = env.relativePath( env.docsDir, dir )
 		local relPath = relDir .. filename
-		showDir( yImageDir + 60, "Relative Path from Documents dir", relPath )
+		showDir( yImageDir + 60, "Relative Path from env.docsDir", relPath )
 
 		-- Try to open the image and display it
 		local w = display.contentWidth
@@ -97,6 +83,10 @@ local function onTap()
 	end
 	timer.performWithDelay( 100, useOpenDialog )
 end
+
+
+-- Init the display
+display.setStatusBar( display.HiddenStatusBar )
 
 -- Display Corona's available base directories
 showDir( 10, "Documents dir", system.pathForFile(nil, system.DocumentsDirectory) )

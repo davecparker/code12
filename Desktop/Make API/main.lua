@@ -147,6 +147,7 @@ local function vtStr( vt )
 end
 
 -- Remove duplicate methods and mark them as overloaded as necessary.
+-- Also mark variadic functions.
 local function fixOverloads()
 	for iClass = 1, #classes do
 		local class = classes[iClass]
@@ -155,6 +156,12 @@ local function fixOverloads()
 		local i = 1
 		while i <= #class.methods do
 			local method = class.methods[i]
+
+			-- The special functions ct.log and ct.logm are variadic.
+			if method.name == "ct.log" or method.name == "ct.logm" then 
+				print( string.format( "%s is variadic", method.name ) )
+				method.variadic = true
+			end
 
 			-- Does this method have the same name as the previous one?
 			if prevMethod and method.name == prevMethod.name then
@@ -233,6 +240,9 @@ local function makeLuaFile()
 			outFile:write( "        [\"" .. method.name .. "\"] = { vt = " .. vtStr(method.vt) ..", " )
 			if method.min then
 				outFile:write( "min = " .. method.min .. ", " )
+			end
+			if method.variadic then
+				outFile:write( "variadic = true, " )
 			end
 			if method.overloaded then
 				outFile:write( "overloaded = true, " )
