@@ -88,13 +88,12 @@ local function addLua( strCode )
 	luaCodeStrs[#luaCodeStrs + 1] = strCode
 end
 
--- Remove the last line of Lua code
-local function removeLastLuaLine()
+-- Remove the last "end" in the Lua code
+local function removeLastLuaEnd()
 	repeat
 		local code = luaCodeStrs[#luaCodeStrs]
 		luaCodeStrs[#luaCodeStrs] = nil
-	until string.find(code, "\n") or #luaCodeStrs == 0 
-	luaLineNum = luaLineNum - 1
+	until code == "end" or #luaCodeStrs == 0
 end
 
 
@@ -393,7 +392,7 @@ local function generateBlockLine( tree )
 			err.setErrNode( expr, "Conditional test must be boolean (true or false)" )
 			return
 		end
-		removeLastLuaLine()   -- remove the end we made for the if
+		removeLastLuaEnd()   -- remove the end we made for the if
 		beginLuaLine( "elseif " )
 		addLua( exprCode( expr ) )
 		addLua( " then")
@@ -402,7 +401,7 @@ local function generateBlockLine( tree )
 		generateControlledStmt()
 	elseif p == "else" then
 		-- else
-		removeLastLuaLine()   -- remove the end we made for the if/elseif
+		removeLastLuaEnd()   -- remove the end we made for the if/elseif
 		beginLuaLine( "else " )
 		-- Process the controlled statement or block too
 		iTree = iTree + 1
@@ -425,7 +424,13 @@ end
 local function generateBlock()
 	local startBlockLevel = blockLevel
 	repeat
+		-- Add blank Lua lines to catch up to the Java line number if necessary
 		local tree = javaParseTrees[iTree]
+		assert( tree.iLine ~= nil )
+		while luaLineNum < tree.iLine - 1 do
+			beginLuaLine( "" )
+		end
+
 		local p = tree.p
 		if p == "begin" then              -- {
 			checkJava.beginLocalBlock()
@@ -433,7 +438,7 @@ local function generateBlock()
 		elseif p == "end" then            -- }
 			checkJava.endLocalBlock()
 			blockLevel = blockLevel - 1
-			beginLuaLine( "end")
+			beginLuaLine( "end" )
 			if blockLevel == startBlockLevel then
 				return true
 			end
@@ -455,7 +460,8 @@ function generateControlledStmt()
 		-- Single controlled statement
 		blockLevel = blockLevel + 1
 		generateBlockLine( tree )
-		addLua( "; end" )
+		addLua( "; ")
+		addLua( "end" )  -- these need to be separate because of 
 		blockLevel = blockLevel - 1
 	end
 end
