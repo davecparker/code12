@@ -726,8 +726,15 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	local params = paramList.nodes
 	local min = method.min or #method.params
 	if #params < min then
-		err.setErrNodeAndRef( paramList, fnValue, 
-				"Not enough parameters passed to %s (requires %d)", fnName, min )
+		if #params == 0 then
+			err.setErrNode( fnValue, 
+					"Function %s requires %d parameter%s", 
+					fnName, min, (min ~= 1 and "s") or "" )
+		else
+			err.setErrNodeAndRef( paramList, fnValue, 
+					"Not enough parameters passed to %s (requires %d)", 
+					fnName, min )
+		end
 		return nil
 	elseif not method.variadic and #params > #method.params then
 		err.setErrNodeAndRef( paramList, fnValue, 

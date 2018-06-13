@@ -131,4 +131,12 @@ require('Code12.api')
             
             sum = sum + (ct.toInt(score))
         end
+        
+        while true do
+            
+            sum = sum + (counts[1+(c)])
+        end
+        
+        local i = 0; while i < 10 do
+            sum = sum + (counts[1+(i)]); i = i + 1; end
     end

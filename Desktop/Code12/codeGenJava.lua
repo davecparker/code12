@@ -406,7 +406,7 @@ local function generateStmt( tree )
 	end	
 end
 
--- Generate code for a for loop starting at tree
+-- Do type checks and then generate code for a for loop starting at tree
 local function generateForLoop( tree )
 	assert( tree.p == "for" )
 	local forControl = tree.nodes[3]
@@ -436,12 +436,59 @@ local function generateForLoop( tree )
 		local forInit = nodes[1]
 		local forExpr = nodes[3]
 		local forNext = nodes[5]
+		beginLuaLine( "" )    -- We will put the loop header on one line
+		checkJava.beginLocalBlock()
+
+		-- Do the forInit if any
+		checkJava.doTypeChecks( forInit )   -- not done by generateBlockLine 
+		if forInit.p == "varInit" then
+			local vt = javaTypes.vtFromVarType( forInit.nodes[1] )
+			local nameNode = forInit.nodes[2]
+			print("Loop var ", nameNode.str, vt)
+			checkJava.defineLocalVar( nameNode, vt, false, true )
+			local expr = forInit.nodes[4]
+			checkJava.canAssignToVarNode( nameNode, expr, true )
+			addLua( "local " )
+			addLua( nameNode.str )
+			addLua( " = " )
+			addLua( exprCode( expr ) )
+			addLua( "; " )
+		elseif forInit.p == "stmt" then
+			generateStmt( forInit.nodes[1] )
+			addLua( "; " )
+		end
+
+		-- Do the loop with expr as a while loop
+		checkJava.doTypeChecks( forExpr )
+		addLua( "while " )
+		if forExpr.p == "expr" then
+			local expr = forExpr.nodes[1]
+			if expr.info.vt ~= true then
+				err.setErrNode( expr, "Loop test must evaluate to a boolean (true or false)" )
+			end
+			addLua( exprCode( expr ) )
+		else
+			addLua( "true" )
+		end
+		addLua( " do" )
+		generateControlledStmt()
+
+		-- Put the forNext stmt before the loop end if any
+		checkJava.doTypeChecks( forNext )
+		if forNext.p == "stmt" then
+			removeLastLuaEnd()
+			generateStmt( forNext.nodes[1] )
+			addLua( "; end" )
+		end
+
+		checkJava.endLocalBlock()
 	end
 end
 
 -- Generate code for the block line in tree
 local function generateBlockLine( tree )
-	if not checkJava.doTypeChecks( tree ) then
+	-- Do type checks on the line first, but not in for loop headers yet
+	if tree.p ~= "for" and not checkJava.doTypeChecks( tree ) then
 		return
 	end
 	local p = tree.p

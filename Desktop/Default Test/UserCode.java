@@ -131,5 +131,13 @@ class UserCode extends Code12Program
 		{
 			sum += ct.toInt( score );
 		}
+
+		for (;;)
+		{
+			sum += counts[c];
+		}
+
+		for (int i = 0; i < 10; i++)
+			sum += counts[i];
 	}
 }
