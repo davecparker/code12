@@ -1,6 +1,6 @@
 import Code12.*;
 
-public class BubblePop extends Code12Program
+class BubblePop extends Code12Program
 {
    public static void main(String[] args)
    { 

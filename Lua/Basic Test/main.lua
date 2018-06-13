@@ -4,8 +4,8 @@
 --
 -----------------------------------------------------------------------------------------
 
-package.path = package.path .. ';../?.lua'
-local ct = require("Code12.api")
+package.path = package.path .. ';../../Desktop/Code12/?.lua'
+require("Code12.api")
 
 
 local fish, wall

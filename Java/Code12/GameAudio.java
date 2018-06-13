@@ -8,9 +8,6 @@ import javax.sound.sampled.*;
 // Helper class for playing audio
 public class GameAudio implements LineListener 
 {
-   // Path to built-in sounds, relative to project folder
-   private final static String CODE12_SOUND_PATH = "Code12/sounds/";
-    
    // Instance data
    Game game;                    // back pointer to the Game
    double volume;                // sound volume from 0.0 to 1.0
@@ -45,16 +42,8 @@ public class GameAudio implements LineListener
       File audioFile = new File(filename);
       if (!audioFile.isFile())
       {
-         audioFile = new File(CODE12_SOUND_PATH + filename);
-         if (!audioFile.isFile())
-         {
-            audioFile = new File("../" + CODE12_SOUND_PATH + filename);
-            if (!audioFile.isFile())
-            {            
-               game.logError("Cannot find audio file", filename);
-               return;
-            }
-         }
+         game.logError("Cannot find audio file", filename);
+         return;
       }
       
       try 

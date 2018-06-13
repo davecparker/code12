@@ -8,10 +8,6 @@ import javax.swing.ImageIcon;
 // An image object that can be created in a Game
 public class GameImage extends GameObj
 {
-   // Path to built-in images, relative to project folder
-   private final static String CODE12_IMAGE_PATH = "Code12/images/";
-   private final static String NOT_FOUND = "NotFound.png";
-   
    // Private instance data
    private Image rawImage;                // unscaled image as loaded from file
    private Image scaledImage;             // cached scaled image as last drawn or null
@@ -29,23 +25,12 @@ public class GameImage extends GameObj
       setFillColor(null);         // fill color is currently ignored actually
       setLineColor(null);
       
-      // Look in the project folder first, then in the Code12/images subfolder.
-      // Finally, check if the Code12 folder is in the parent folder.
-      // If the file can't be found, warn the user and substitute a stub image.
+      // If the file can't be found, warn the user
       text = filename;     // Store filename in text field by default
       String path = filename;
       if (!(new File(path)).isFile())
       {
-         path = CODE12_IMAGE_PATH + filename;
-         if (!(new File(path)).isFile())
-         {   
-            path = "../" + CODE12_IMAGE_PATH + filename;
-            if (!(new File(path)).isFile())
-            {
-               game.logError("Cannot find image file", filename);
-               path = CODE12_IMAGE_PATH + NOT_FOUND;
-            }
-         }
+         game.logError("Cannot find image file", filename);
       }
          
       // Try to load the raw image and set the initial size as full pixel size

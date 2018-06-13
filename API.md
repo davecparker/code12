@@ -346,9 +346,6 @@ automatically to preserve the original image's aspect ratio.
 Return the `GameObj` reference to the image object.
 
 The image file must be in PNG or JPG format.
-If `filename` is a simple filename (no path),
-then the main project folder is checked first, followed by
-the `Code12/images` folder if not found in the project folder.
 
 _____________________________________________________________________
 Mouse and Keyboard Input
@@ -418,9 +415,6 @@ Audio
 ct.sound( String filename )
 ```
 Play the sound effect in the sound file `filename`.
-If `filename` is a simple filename (no path),
-then the main project folder is checked first, followed by
-the `Code12/sounds` folder if not found in the project folder.
 
 > Only standard formats of WAV sounds are reliable on all platforms,
 > although other platforms may support MP3 and others.
@@ -461,6 +455,15 @@ that number of decimal places.
 If `numPlaces` is not included, then return the number `d` rounded to
 the nearest integer.
 
+### ct.intDiv()
+```
+int ct.intDiv( int n, int d )
+```
+Return the result of an integer divide of n / d. If n / d is not an
+integer, the result is rounded down to the next smaller integer.
+If d is 0 then the result is a large positive integer if n > 0,
+a large negative integer if n < 0, and 0 if n is 0. 
+
 ### ct.isError()
 ```
 boolean ct.isError( double d )
@@ -490,12 +493,6 @@ Return the version number of the Code12 runtime system.
 _____________________________________________________________________
 Type Conversion
 ---------------
-### ct.toDouble()
-```
-double ct.toDouble( int i )
-```
-Return the value `i` as a `double`.
-
 ### ct.toInt()
 ```
 int ct.toInt( double d )
