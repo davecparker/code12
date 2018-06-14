@@ -25,7 +25,7 @@ class SimpleGuessingGame extends Code12Program
       
       while ( !stopped )
       {
-         int guess = ct.inputInt("Enter a number between 1 and 100 to begin!");
+         int guess = ct.inputInt("Enter a number between 1 and 100 to begin: ");
          if ( guess < 1 || guess > 100 )
             guess = ct.inputInt("A number between 1 and 100, please: ");
          else

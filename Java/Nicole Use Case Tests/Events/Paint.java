@@ -141,6 +141,7 @@ public class Paint extends Code12Program
    
    public void onMouseDrag( GameObj obj, double x, double y )
    {
+   // TODO draw line segments
        
       // Player can only draw on canvas, not on other game objects
       if ( ct.clickX() > palette.width + 1 )

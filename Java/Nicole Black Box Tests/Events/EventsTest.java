@@ -25,6 +25,7 @@ class EventsTest extends Code12Program
    GameObj dialogue;
    GameObj[] obstacles = new GameObj[4];
    int seconds;
+   double gravity = 1.0;
 
    public static void main(String[] args)
    { 
@@ -110,36 +111,36 @@ class EventsTest extends Code12Program
             {
                if ( sprite.x > ct.getWidth()/2 && sprite.y < ct.getHeight()/2 )
                {
-                  sprite.ySpeed -= v;
-                  sprite.xSpeed += v;
+                  sprite.ySpeed -= v * gravity;
+                  sprite.xSpeed += v * gravity;
                }
                else if ( sprite.x > ct.getWidth()/2 && sprite.y > ct.getHeight()/2 )
                {
-                  sprite.ySpeed += v;
-                  sprite.xSpeed += v;
+                  sprite.ySpeed += v*gravity;
+                  sprite.xSpeed += v*gravity;
                }
                else if ( sprite.x < ct.getWidth()/2 && sprite.y < ct.getHeight()/2 )
                {
-                  sprite.ySpeed -= v;
-                  sprite.xSpeed -= v;
+                  sprite.ySpeed -= v*gravity;
+                  sprite.xSpeed -= v*gravity;
                }
                else if ( sprite.x < ct.getWidth()/2 && sprite.y > ct.getHeight()/2 )
                {
-                  sprite.ySpeed += v;
-                  sprite.xSpeed -= v;
+                  sprite.ySpeed += v*gravity;
+                  sprite.xSpeed -= v*gravity;
                }
                
                // The longer the sprite is held down whilst being moved around, the faster its velocity
                if ( seconds > 2 ) 
                {
-                  sprite.ySpeed -= 2*v;
-                  sprite.xSpeed += 2*v;
+                  sprite.ySpeed -= 2*v*gravity;
+                  sprite.xSpeed += 2*v*gravity;
                }
                
                if ( seconds > 3 )
                {
-                  sprite.ySpeed -= 3*v;
-                  sprite.xSpeed += 3*v;
+                  sprite.ySpeed -= 3*v*gravity;
+                  sprite.xSpeed += 3*v*gravity;
                }
 
             }
@@ -175,9 +176,9 @@ class EventsTest extends Code12Program
       if ( obj != null )
       {
          if ( obj.x <= 0 || obj.x >= ct.getWidth() )
-            obj.xSpeed *= -1;
+            obj.xSpeed *= -1*gravity;
          if ( obj.y <= 0 || obj.y >= ct.getHeight() )
-            obj.ySpeed *= -1;
+            obj.ySpeed *= -1*gravity;
       }
    }
    

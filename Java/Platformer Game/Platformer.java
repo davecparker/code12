@@ -237,6 +237,7 @@ class Platformer extends Code12Program
          case("right"):
             player.x++;
             player.delete();
+            // change to two players for direction
             player = ct.image("player_forwards.png", player.x, player.y, 4);
             break;
          case("left"):

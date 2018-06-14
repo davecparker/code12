@@ -138,10 +138,10 @@ public class Spaceship extends Code12Program
                
                // A circle GameObj serves as the origin which all game objs "gravitate" towards
                GameObj origin = ct.circle(ct.getWidth()/2 + 10, ct.getHeight()/2, 10,"black");
-               spaceship.xSpeed = (origin.x - spaceship.x) / 5.0;
-               spaceship.ySpeed = (origin.y - spaceship.y) / 5.0;
-               asteroid.xSpeed = (origin.x - asteroid.x) / 10.0;
-               asteroid.ySpeed = (origin.y - asteroid.y) / 10.0;
+               spaceship.xSpeed = (origin.x - spaceship.x) / 15.0;
+               spaceship.ySpeed = (origin.y - spaceship.y) / 15.0;
+               asteroid.xSpeed = (origin.x - asteroid.x) / 15.0;
+               asteroid.ySpeed = (origin.y - asteroid.y) / 15.0;
                traveledText.delete();
                ct.setTitle("Game over");
                ct.text("Game over! You traveled: " + lightYears + " light years.", ct.getWidth() /2, ct.getHeight() - 20, 5,"white" );
