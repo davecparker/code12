@@ -249,6 +249,13 @@ local function chooseFile()
 		sourceFile.timeLoaded = os.time()
 		sourceFile.timeModLast = 0
 	end
+	native.setActivityIndicator( false )
+end
+
+-- Event handler for the Choose File button
+local function onChooseFile()
+	native.setActivityIndicator( true )
+	timer.performWithDelay( 50, chooseFile )
 end
 
 -- Open the source file in the system default text editor for its file type
@@ -269,39 +276,28 @@ local function makeStatusBar()
 	local group = makeGroup( nil, 0, ui.height - dyStatusBar )
 	ui.statusBarGroup = group
 
+	-- Background color
 	group.background = uiItem( display.newRect( group, 0, 0, ui.width, dyStatusBar ),
 							toolbarShade, borderShade )
 
+	-- Status message
 	local yCenter = dyStatusBar / 2
+	group.message = display.newText( group, "", ui.width / 2, yCenter, 
+									native.systemFont, fontSizeUI )
+	group.message:setFillColor( 0 )
+
+	-- Open in Editor button
 	local btn = widget.newButton{
-		x = margin, 
+		x = margin,
 		y = yCenter,
-		onRelease = chooseFile,
-		label = "Choose File",
+		onRelease = openFileInEditor,
+		label = "Open in Editor",
 		labelAlign = "left",
 		font = native.systemFontBold,
 		fontSize = fontSizeUI,
 	}
 	group:insert( btn )
 	btn.anchorX = 0
-	group.chooseFileBtn = btn
-
-	group.message = display.newText( group, "", ui.width / 2, yCenter, 
-									native.systemFont, fontSizeUI )
-	group.message:setFillColor( 0 )
-
-	btn = widget.newButton{
-		x = ui.width,
-		y = yCenter,
-		onRelease = openFileInEditor,
-		label = "Open in Editor",
-		labelAlign = "right",
-		labelXOffset = -margin,
-		font = native.systemFontBold,
-		fontSize = fontSizeUI,
-	}
-	group:insert( btn )
-	btn.anchorX = 1
 	group.openFileBtn = btn
 
 	updateStatusBar()
@@ -490,7 +486,6 @@ local function onResizeWindow( event )
 	group.y = ui.height - dyStatusBar
 	group.background.width = ui.width
 	group.message.x = ui.width / 2
-	group.openFileBtn.x = ui.width
 
 	-- Remake the error display
 	if err.hasErr() then
@@ -607,7 +602,22 @@ local function makeToolbar()
 	group.background = uiItem( display.newRect( group, 0, 0, ui.width, dyToolbar ),
 							toolbarShade, borderShade )
 
-	-- Level picker
+	-- Choose File Button
+	local yCenter = dyToolbar / 2
+	local btn = widget.newButton{
+		x = margin, 
+		y = yCenter,
+		onRelease = onChooseFile,
+		label = "Choose File",
+		labelAlign = "left",
+		font = native.systemFontBold,
+		fontSize = fontSizeUI,
+	}
+	group:insert( btn )
+	btn.anchorX = 0
+	group.chooseFileBtn = btn
+
+		-- Level picker
 	local segmentNames = {}
 	for i = 1, numSyntaxLevels do
 		segmentNames[i] = tostring( i )
@@ -616,7 +626,7 @@ local function makeToolbar()
 	local controlWidth = segWidth * numSyntaxLevels
 	group.levelPicker = widget.newSegmentedControl{
 		x = ui.width - margin,
-		y = dyToolbar / 2,
+		y = yCenter,
 		segmentWidth = segWidth,
 		segments = segmentNames,
 		defaultSegment = numSyntaxLevels,
