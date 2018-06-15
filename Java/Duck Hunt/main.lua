@@ -97,7 +97,7 @@ require('Code12.api')
             else 
                 
                 --duck.ySpeed = ct.random( -1, 1 ) / 4.0;
-                duck.y = this.duckYStartsArr[1+(j)] + this.amplitude * Math:sin(2 * Math.PI / this.period * duck.x)
+                duck.y = this.duckYStartsArr[1+(j)] + this.amplitude * math.sin(2 * math.pi / this.period * duck.x)
             end
         j = j - 1; end
         

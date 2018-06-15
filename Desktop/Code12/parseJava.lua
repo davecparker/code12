@@ -178,6 +178,12 @@ local retType = { t = "retType",
 	{ 9, 12, "value",			"ID"					},
 }
 
+-- An access permission specifier
+local access = { t = "access",
+	{ 9, 12, "public",			"public"				},
+	{ 9, 12, "empty",									},
+}
+
 -- A formal parameter (in a function definition)
 local param = { t = "param",
 	{ 12, 12, "array",			"ID", "[", "]", "ID"		},
@@ -287,7 +293,7 @@ local line = { t = "line",
 	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },
 	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",					"END" },
 	{ 8, 12, "else",			"else", 										"END" },
-	{ 9, 12, "func",			retType, fnValue, "(", paramList, ")",			"END" },
+	{ 9, 12, "func",			access, retType, fnValue, "(", paramList, ")",	"END" },
 	{ 9, 12, "return",			"return", expr, ";",							"END" },
 	{ 11, 12, "do",				"do", 											"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },

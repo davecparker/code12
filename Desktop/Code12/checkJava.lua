@@ -53,14 +53,14 @@ local function getMethods( parseTrees )
 			-- TODO: Check that the API signature is what is needed for this event
 		elseif p == "func" then
 			-- User-defined function
-			local nameNode = nodes[2]
+			local nameNode = nodes[3]
 			local fnName = nameNode.str
 			if nameNode.tt ~= "ID" or fnName:find("%.") then 
 				err.setErrNode( nameNode, "User-defined function names cannot contain a dot (.)" )
 			else
 				-- Build the parameter table
 				local paramTable = {}
-				local params = nodes[4].nodes
+				local params = nodes[5].nodes
 				for i = 1, #params do
 					local param = params[i]
 					local vtParam, name = javaTypes.vtAndNameFromParam( param )
@@ -69,7 +69,7 @@ local function getMethods( parseTrees )
 				-- Add entry to userMethods table
 				userMethods[fnName] = { 
 					node = nameNode,
-					vt = javaTypes.vtFromRetType( nodes[1] ), 
+					vt = javaTypes.vtFromRetType( nodes[2] ), 
 					params = paramTable
 				}
 				-- Add lowercase version if different

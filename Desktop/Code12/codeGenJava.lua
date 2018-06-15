@@ -130,7 +130,16 @@ function lValueCode( v )
 	if p == "var" then
 		return name
 	elseif p == "field" then
-		return name .. "." .. v.nodes[3].str    --  obj.field reference
+		local fieldName = v.nodes[3].str
+		if name == "Math" then
+			if fieldName == "PI" then
+				return "math.pi"
+			elseif fieldName == "E" then
+				return "math.exp(1)"
+			end
+		else
+			return name .. "." .. fieldName    --  obj.field reference
+		end
 	elseif p == "index" then
 		return name .. "[1+(" .. exprCode( v.nodes[3] ) .. ")]"
 	end
@@ -147,13 +156,17 @@ function fnCallCode( tree )
 
 	-- Function name/value
 	local fnValue = nodes[1]
+	local exprs = nodes[3].nodes
 	if fnValue.p == "method" then
-		local nameNode = fnValue.nodes[1]
-		local varName = nameNode.str
-		if checkJava.isInstanceVarName( varName ) then
-			parts = { "this.", varName, ":", fnValue.nodes[2].str, "(" }  -- e.g. this.ball:delete(
+		local objNode = fnValue.nodes[1]
+		local methodNode = fnValue.nodes[2]
+		local objName = objNode.str		
+		if objName == "Math" then 
+			parts = { "math.", methodNode.str, "(" }   -- Lua same as Java for all supported methods :)
+		elseif checkJava.isInstanceVarName( objName ) then
+			parts = { "this.", objName, ":", methodNode.str, "(" }  -- e.g. this.ball:delete(
 		else
-			parts = { varName, ":", fnValue.nodes[2].str, "(" }  -- e.g. obj:delete(
+			parts = { objName, ":", methodNode.str, "(" }  -- e.g. obj:delete(
 		end
 	else
 		local fnName = fnValue.str
@@ -169,7 +182,6 @@ function fnCallCode( tree )
 	end
 
 	-- Parameter list
-	local exprs = nodes[3].nodes
 	for i = 1, #exprs do
 		parts[#parts + 1] = exprCode( exprs[i] )
 		if i < #exprs then
@@ -726,11 +738,11 @@ function codeGenJava.getLuaCode( parseTrees )
 		elseif p == "end" then            -- }  in boilerplate code
 			blockLevel = blockLevel - 1
 		elseif p == "eventFn" then
-			-- Code12 event func (e.g. setup, update)
+			-- Code12 event (e.g. setup, update)
 			generateFunction( true, nodes[3].str, nodes[5].nodes)
 		elseif p == "func" then
 			-- User-defined function
-			generateFunction( false, nodes[2].str, nodes[4].nodes)
+			generateFunction( false, nodes[3].str, nodes[5].nodes)
 		end			
 		iTree = iTree + 1
 	end
