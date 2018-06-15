@@ -56,7 +56,7 @@ public interface GameInterface
    // Math and Time
    public int random(int min, int max);
    public int round(double d);
-   public double round(double d, int numPlaces);
+   public double roundDecimal(double d, int numPlaces);
    public int intDiv(int n, int d);
    public boolean isError(double d);
    public double distance(double x1, double y1, double x2, double y2);

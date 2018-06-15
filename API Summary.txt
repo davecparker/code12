@@ -60,7 +60,7 @@ void ct.setSoundVolume( double volume )
 //---------------
 int ct.random( int min, int max )
 int ct.round( double d )
-double ct.round( double d, int numPlaces )
+double ct.roundDecimal( double d, int numPlaces )
 int ct.intDiv( int n, int d )
 boolean ct.isError( double d )
 double ct.distance( double x1, double y1, double x2, double y2 )

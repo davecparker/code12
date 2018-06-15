@@ -298,6 +298,17 @@ local function vtExprLValue( nodes )
 	return vtLValueNode( nodes[1] )
 end
 
+-- primaryExpr pattern: newArray
+local function vtExprNewArray( nodes )
+	local countExpr = nodes[4]
+	if countExpr.info.vt ~= 0 then
+		err.setErrNode( countExpr, "Array count must be an integer" )
+		return nil
+	end
+	local vt = javaTypes.vtFromVarType( nodes[2] )
+	return { vt = vt }  -- array of specified type
+end
+
 -- expr pattern: +
 local function vtExprPlus( nodes )
 	-- May be numeric add or string concat, depending on the operands
@@ -407,6 +418,7 @@ local fnVtExprPatterns = {
 	["!"]           = vtExprNot,
 	["call"]        = vtExprCall,
 	["lValue"]      = vtExprLValue,
+	["newArray"]	= vtExprNewArray,
 	-- binary operators
 	["+"]           = vtExprPlus,
 	["-"]           = vtExprNumeric,

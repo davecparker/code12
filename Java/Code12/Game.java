@@ -281,7 +281,7 @@ public class Game implements GameInterface
       return (int) Math.round(d);
    }
    
-   public double round(double d, int numPlaces)
+   public double roundDecimal(double d, int numPlaces)
    {
       double f = Math.pow(10, numPlaces);
       return Math.rint(d * f) / f;

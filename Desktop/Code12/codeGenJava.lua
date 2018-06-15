@@ -198,6 +198,9 @@ function exprCode( expr )
 		return "not " .. exprCode( nodes[2] )
 	elseif p == "exprParens" then
 		return "(" .. exprCode( nodes[2] ) .. ")"
+	elseif p == "newArray" then
+		local vt = javaTypes.vtFromVarType( nodes[2] )
+		return "{ length = " .. exprCode( nodes[4] ) .. " }"
 	end
 
 	-- Is this a Binary operator?
@@ -218,7 +221,8 @@ function exprCode( expr )
 	end
 end
 
--- Look for and generate code for a varInit, constInit, varDecl, or arrayInit line
+-- Look for and generate code for a variable declaration or initialization 
+-- line (varInit, constInit, varDecl, arrayInit, or arrayDecl)
 -- in tree. Return true if one was found and generated, else return false.
 -- If isInstanceVar then the line is outside all functions (else local).
 local function generateVarDecl( tree, isInstanceVar )
@@ -277,7 +281,7 @@ local function generateVarDecl( tree, isInstanceVar )
 		end
 		return true
 	elseif p == "arrayInit" then
-		-- type [ ] id = arrayValue ;
+		-- type [ ] id = arrayInit ;
 		local vt = javaTypes.vtFromVarType( nodes[1] )
 		local nameNode = nodes[4]
 		local varName = nameNode.str
@@ -290,16 +294,16 @@ local function generateVarDecl( tree, isInstanceVar )
 		end
 		addLua( varName )
 		addLua( " = " )
-		local arrayValue = nodes[6]
+		local arrayInit = nodes[6]
 		local length = nil
-		if arrayValue.p == "new" then
+		if arrayInit.p == "new" then
 			-- type [ ] id = new type [ expr ] ;
-			local vtNew = javaTypes.vtFromVarType( arrayValue.nodes[2] )
+			local vtNew = javaTypes.vtFromVarType( arrayInit.nodes[2] )
 			if vtNew ~= vt then
-				err.setErrNodeAndRef( arrayValue.nodes[2], nodes[1],
+				err.setErrNodeAndRef( arrayInit.nodes[2], nodes[1],
 						"New array type does not match variable type" )
 			end
-			local countExpr = arrayValue.nodes[4]
+			local countExpr = arrayInit.nodes[4]
 			if countExpr.info.vt ~= 0 then
 				err.setErrNode( countExpr, "Array count must be an integer" )
 			end
@@ -309,7 +313,7 @@ local function generateVarDecl( tree, isInstanceVar )
 		else
 			-- type [ ] id = { exprList } ;
 			addLua( "{ " )
-			local exprs = arrayValue.nodes[2].nodes
+			local exprs = arrayInit.nodes[2].nodes
 			for i = 1, #exprs do
 				local expr = exprs[i]
 				if expr.info.vt ~= vt then
@@ -322,6 +326,24 @@ local function generateVarDecl( tree, isInstanceVar )
 			addLua( "length = " )
 			addLua( #exprs )
 			addLua( " }" )
+		end
+		return true
+	elseif p == "arrayDecl" then
+		-- varType [ ] idList ;
+		local vt = javaTypes.vtFromVarType( tree.nodes[1] )
+		local idList = tree.nodes[4].nodes
+		beginLuaLine( "" )   -- we may have multiple statements on this line
+		for i = 1, #idList do
+			local nameNode = idList[i]
+			if isInstanceVar then
+				checkJava.defineInstanceVar( nameNode, vt, true )
+				addLua( thisPrefix )            -- use this.name
+			else
+				checkJava.defineLocalVar( nameNode, vt, true )
+				addLua( "local " )
+			end
+			addLua( nameNode.str )
+			addLua( " = nil" )
 		end
 		return true
 	end

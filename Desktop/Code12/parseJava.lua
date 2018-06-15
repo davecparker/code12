@@ -212,6 +212,7 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "!",				"!", parsePrimaryExpr 				},
 	{ 5, 12, "call",			fnValue, "(", exprList, ")" 		},
 	{ 4, 12, "lValue",			lValue								},
+	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
 }
 
 -- Shortcut "operate and assign" operators 
@@ -266,8 +267,8 @@ local forControl = { t = "forControl",
 	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
 }
 
--- An array value
-local arrayValue = { t = "arrayValue",
+-- An array initializer
+local arrayInit = { t = "arrayInit",
 	{ 12, 12, "new", 			"new", "ID", "[", expr, "]"					},
 	{ 12, 12, "list", 			"{", exprList, "}"							},
 }
@@ -291,7 +292,8 @@ local line = { t = "line",
 	{ 11, 12, "do",				"do", 											"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
-	{ 12, 12, "arrayInit",		"ID", "[", "]", "ID", "=", arrayValue, ";",		"END" },
+	{ 12, 12, "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
+	{ 12, 12, "arrayDecl",		"ID", "[", "]", idList, ";",					"END" },
 	-- Boilerplate lines
 	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
 	{ 1, 12, "class",			"class", "ID", 									"END" },

@@ -139,4 +139,7 @@ require('Code12.api')
         
         local i = 0; while i < counts.length do
             sum = sum + (counts[1+(i)]); i = i + 1; end
+        
+        local aTest = nil
+        aTest = { length = 10 }
     end

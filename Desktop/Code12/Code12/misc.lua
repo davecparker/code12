@@ -25,22 +25,26 @@ function ct.random(min, max, ...)
 end
 
 -- API
-function ct.round(x, numPlaces, ...)
+function ct.round(x, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.round") then
-		g.checkType(1, "number", x)
-		if numPlaces then
-			g.checkType(2, "number", numPlaces)
-		end
-		g.checkNoMoreParams(...)
+		g.check1Param("number", x, ...)
 	end
 
-	-- Calculate round as necessary
-	if numPlaces then
-		local f = 10 ^ numPlaces
-		return math.round(x * f) / f
-	end
+	-- Do the round
 	return math.round(x)
+end
+
+-- API
+function ct.roundDecimal(x, numPlaces, ...)
+	-- Check parameters
+	if g.checkAPIParams("ct.roundDecimal") then
+		g.checkTypes({"number", "number"}, x, numPlaces, ...)
+	end
+
+	-- Calculate the round
+	local f = 10 ^ numPlaces
+	return math.round(x * f) / f
 end
 
 -- API

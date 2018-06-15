@@ -135,6 +135,8 @@ function javaTypes.vtCanAcceptVtExpr( vt, vtExpr )
 		return true    -- int can silently promote to double
 	elseif vtExpr == "null" and type(vt) == "string" then
 		return true    -- null can be assigned to any object (String or GameObj)
+	elseif type(vt) == "table" and type(vtExpr) == "table" then
+		return vt.vt == vtExpr.vt    -- array of same type
 	end
 	return false
 end
