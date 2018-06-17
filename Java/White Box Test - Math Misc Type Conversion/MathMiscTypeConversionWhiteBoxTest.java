@@ -404,6 +404,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    {
       if ( run )
       {  
+         ct.println( "ct.getTimer() = "+ct.getTimer()+" when called from start()" ); 
          timerDisplay = ct.text( "", 5, 10, 5 );
          timerDisplay.align( "left" );
          countDownDisplay = ct.text( "", 5, 20, 5 );
