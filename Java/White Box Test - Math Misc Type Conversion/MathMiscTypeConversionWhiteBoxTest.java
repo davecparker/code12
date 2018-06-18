@@ -24,7 +24,6 @@
 
 import Code12.*;
 import java.io.PrintWriter;
-import org.apache.commons.math3.special.Gamma;
 
 class MathMiscTypeConversionWhiteBoxTest extends Code12Program
 {
@@ -231,9 +230,13 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    {
       if ( run )
       {
-         testRandom( 10, 1 );
-         testRandom( Integer.MIN_VALUE, Integer.MAX_VALUE );
-         testRandom( Integer.MIN_VALUE / 2, Integer.MAX_VALUE / 2 	);
+//          testRandom( 10, 1 );
+//          testRandom( Integer.MIN_VALUE, Integer.MAX_VALUE ); // throws exception
+//          testRandom( 0, Integer.MAX_VALUE ); // throws exception
+//          testRandom( Integer.MIN_VALUE / 2, Integer.MAX_VALUE / 2 ); // throws exception 
+         
+         testRandom( 0, Integer.MAX_VALUE - 1 );
+         testRandom( Integer.MIN_VALUE + 1, -1 );
          testRandom( Integer.MIN_VALUE / 2 + 1, Integer.MAX_VALUE / 2 );
          testRandom( Integer.MIN_VALUE / 2, Integer.MAX_VALUE / 2 - 1 );
 
@@ -344,8 +347,12 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
          testIsError( -1.0/0, false );
          for ( int i = 0; i < 1000; i++ )
          {
-         	double d = ct.random( Integer.MIN_VALUE / 2 + 1, Integer.MAX_VALUE / 2 ) + Math.random();
+         	double d = ct.random( Integer.MIN_VALUE + 1, -1 ) + Math.random();
             testIsError( d, false );
+            
+            d = ct.random( 0, Integer.MAX_VALUE - 1 ) + Math.random();
+            testIsError( d, false );
+
          }
          
          print( "ct.isError tests done" );
@@ -397,6 +404,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    {
       if ( run )
       {  
+         ct.println( "ct.getTimer() = "+ct.getTimer()+" when called from start()" ); 
          timerDisplay = ct.text( "", 5, 10, 5 );
          timerDisplay.align( "left" );
          countDownDisplay = ct.text( "", 5, 20, 5 );

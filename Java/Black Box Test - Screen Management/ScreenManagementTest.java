@@ -64,12 +64,7 @@ class ScreenManagementTest extends Code12Program
          "dark cyan",
          "dark majenta",
          "dark yellow" };
-   GameObj clearSquares; // ct.text() for clearing all squares from screen2
-   GameObj clearCircles; // ct.text() for clearing all circles from screen2
-   GameObj clearLines;   // ct.text() for clearing all lines from screen2
-   GameObj clearImages;  // ct.text() for clearing all images from screen2
-   GameObj clearAll;     // ct.text() for clearing all GameObjs from screen2 
-   GameObj switchScreen; // ct.text() for switching from screen2 to screen1
+
    public void start()
    {  
       paused = false;

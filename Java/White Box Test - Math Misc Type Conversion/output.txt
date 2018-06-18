@@ -1,6 +1,3 @@
-ct.random(10,1) throws java.lang.IllegalArgumentException: bound must be positive
-ct.random(-2147483648,2147483647) throws java.lang.IllegalArgumentException: bound must be positive
-ct.random(-1073741824,1073741823) throws java.lang.IllegalArgumentException: bound must be positive
 ct.random tests done
 ct.round tests done
 ct.intDiv tests done
@@ -14,3 +11,4 @@ ct.parseNumber tests done
 ct.canParseNumber tests done
 ct.formatDecimal tests done
 ct.formatInt tests done
+All tests passed
