@@ -4,7 +4,7 @@
 // --------------
 // int ct.random( int min, int max )
 // int ct.round( double d )
-// double ct.round( double d, int numPlaces )
+// double ct.roundDecimal( double d, int numPlaces )
 // boolean ct.isError( double d )
 // double ct.distance( double x1, double y1, double x2, double y2 )
 // int ct.getTimer( )
@@ -59,6 +59,7 @@ class MathMiscTypeConversionTest extends Code12Program
          
          runTests_random( true );
          runTests_round( true );
+         runTests_roundDecimal( true );
          runTests_isError( true );
          runTests_distance( true );
          runTests_getVersion( true );
@@ -126,11 +127,11 @@ class MathMiscTypeConversionTest extends Code12Program
          printError( "ct.round(" + d + ") = " + output + "; " + expected + " expected" );
    }
    
-   public void testRound( double d, int numPlaces, double expected )
+   public void testRoundDecimal( double d, int numPlaces, double expected )
    {
-      double output = ct.round(d, numPlaces);
+      double output = ct.roundDecimal(d, numPlaces);
       if ( Math.abs(output - expected) > EPSILON )
-         printError( "ct.round(" + d + ", " + numPlaces + ") = " + output + "; " + expected + " expected" );
+         printError( "ct.roundDecimal(" + d + ", " + numPlaces + ") = " + output + "; " + expected + " expected" );
    }
    
    public void testIsError( double d, String expression )
@@ -274,52 +275,14 @@ class MathMiscTypeConversionTest extends Code12Program
    public void runTests_round( boolean run )
    {
       if ( run )
-      {         
-         // if digit in next place is a five, ct.round( double d, int numPlaces ) rounds to nearest even digit
-         testRound( 0.05, 1, 0.0 );
-         testRound( -0.05, 1, 0.0 );
-         testRound( -3.15, 1, -3.2 );
-         testRound( -3.25, 1, -3.2 );
-         
-         testRound( 123.4, 0, 123.0 );
-         testRound( 123.5, 0, 124.0 );
-         testRound( -123.4, 0, -123.0 );
-         testRound( -123.5, 0, -124.0 );      
-         
-         testRound( 0.049, 1, 0.0 );
-         testRound( -0.049, 1, -0.0 );
-         
+      {   
          testRound( 3.14159265, 3 );
-         testRound( 3.14159265, 1, 3.1 );
-         testRound( 3.14159265, 2, 3.14 );
-         testRound( 3.14159265, 3, 3.142 );
-         testRound( 3.14159265, 4, 3.1416 );
-         testRound( 3.14159265, 5, 3.14159 );
-         testRound( 3.14159265, 6, 3.141593 );
-         testRound( 3.14159265, 7, 3.1415927 );
-         testRound( 3.14159265, 8, 3.14159265 );
          
-         testRound( -3.14159265, -3 );
-         testRound( -3.14159265, 1, -3.1 );
-         testRound( -3.14159265, 2, -3.14 );
-         testRound( -3.14159265, 3, -3.142 );
-         testRound( -3.14159265, 4, -3.1416 );
-         testRound( -3.14159265, 5, -3.14159 );
-         testRound( -3.14159265, 6, -3.141593 );
-         testRound( -3.14159265, 7, -3.1415927 );
-         testRound( -3.14159265, 8, -3.14159265 );        
+         testRound( -3.14159265, -3 );    
                     
          testRound( 31.622776601683793319988935444327, 32);
-         testRound( 31.622776601683793319988935444327, 1, 31.6);
-         testRound( 31.622776601683793319988935444327, 2, 31.62);
-         testRound( 31.622776601683793319988935444327, 3, 31.623);
-         testRound( 31.622776601683793319988935444327, 29, 31.62277660168379331998893544433);
 
          testRound( -31.622776601683793319988935444327, -32);
-         testRound( -31.622776601683793319988935444327, 1, -31.6);
-         testRound( -31.622776601683793319988935444327, 2, -31.62);
-         testRound( -31.622776601683793319988935444327, 3, -31.623);
-         testRound( -31.622776601683793319988935444327, 29, -31.62277660168379331998893544433);
 
          testRound( -3.5, -3 );
          testRound( -2.5, -2 ); 
@@ -347,7 +310,57 @@ class MathMiscTypeConversionTest extends Code12Program
          print( "ct.round tests done" );
       }
    }
-   
+
+   public void runTests_roundDecimal( boolean run )
+   {
+      if ( run )
+      {         
+         // if digit in next place is a five, ct.roundDecimal( double d, int numPlaces ) rounds to nearest even digit
+         testRoundDecimal( 0.05, 1, 0.0 );
+         testRoundDecimal( -0.05, 1, 0.0 );
+         testRoundDecimal( -3.15, 1, -3.2 );
+         testRoundDecimal( -3.25, 1, -3.2 );
+         
+         testRoundDecimal( 123.4, 0, 123.0 );
+         testRoundDecimal( 123.5, 0, 124.0 );
+         testRoundDecimal( -123.4, 0, -123.0 );
+         testRoundDecimal( -123.5, 0, -124.0 );      
+         
+         testRoundDecimal( 0.049, 1, 0.0 );
+         testRoundDecimal( -0.049, 1, -0.0 );
+         
+         testRoundDecimal( 3.14159265, 1, 3.1 );
+         testRoundDecimal( 3.14159265, 2, 3.14 );
+         testRoundDecimal( 3.14159265, 3, 3.142 );
+         testRoundDecimal( 3.14159265, 4, 3.1416 );
+         testRoundDecimal( 3.14159265, 5, 3.14159 );
+         testRoundDecimal( 3.14159265, 6, 3.141593 );
+         testRoundDecimal( 3.14159265, 7, 3.1415927 );
+         testRoundDecimal( 3.14159265, 8, 3.14159265 );
+         
+         testRoundDecimal( -3.14159265, 1, -3.1 );
+         testRoundDecimal( -3.14159265, 2, -3.14 );
+         testRoundDecimal( -3.14159265, 3, -3.142 );
+         testRoundDecimal( -3.14159265, 4, -3.1416 );
+         testRoundDecimal( -3.14159265, 5, -3.14159 );
+         testRoundDecimal( -3.14159265, 6, -3.141593 );
+         testRoundDecimal( -3.14159265, 7, -3.1415927 );
+         testRoundDecimal( -3.14159265, 8, -3.14159265 );        
+                    
+         testRoundDecimal( 31.622776601683793319988935444327, 1, 31.6);
+         testRoundDecimal( 31.622776601683793319988935444327, 2, 31.62);
+         testRoundDecimal( 31.622776601683793319988935444327, 3, 31.623);
+         testRoundDecimal( 31.622776601683793319988935444327, 29, 31.62277660168379331998893544433);
+
+         testRoundDecimal( -31.622776601683793319988935444327, 1, -31.6);
+         testRoundDecimal( -31.622776601683793319988935444327, 2, -31.62);
+         testRoundDecimal( -31.622776601683793319988935444327, 3, -31.623);
+         testRoundDecimal( -31.622776601683793319988935444327, 29, -31.62277660168379331998893544433);
+         
+         print( "ct.roundDecimal tests done" );
+      }
+   }
+
    public void runTests_isError( boolean run )
    {
       if ( run )
@@ -408,11 +421,11 @@ class MathMiscTypeConversionTest extends Code12Program
          frameCount++;
          double secondsPerFrame = (newStart - start) / 1000.0;
          start = newStart;
-         double framesPerSecond = ct.round(1 / secondsPerFrame, 2);
+         double framesPerSecond = ct.roundDecimal(1 / secondsPerFrame, 2);
          // ct.println( "Frames Per Second: " + framesPerSecond );
          
          double secondsPerFrameSinceStart = newStart / 1000.0;
-         double avgFramesPerSecond = ct.round(frameCount / secondsPerFrameSinceStart, 2);          
+         double avgFramesPerSecond = ct.roundDecimal(frameCount / secondsPerFrameSinceStart, 2);          
          framesPerSecondText.setText( "Avg Frames Per Second: " + avgFramesPerSecond ); 
           
          if ( timerStarted )

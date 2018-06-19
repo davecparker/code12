@@ -18,7 +18,6 @@
 // 
 // Type Conversion
 // ---------------
-// double ct.toDouble( int i )
 // int ct.toInt( double d )                // truncates
 // int ct.parseInt( String s )             // 0 if failure
 // boolean ct.canParseInt( String s )
@@ -56,13 +55,14 @@ class Stopwatch extends Code12Program
    
       // Make time display
       double timeHeight = 15;
-      timeDisplay = ct.text( "00:00:00.00", 50, timeHeight, timeHeight );
-      timeDisplay.align( "bottom" );
+      timeDisplay = ct.text( "00:00:00.00", 0, timeHeight, timeHeight );
+      timeDisplay.x = 50 - timeDisplay.width / 2;
+      timeDisplay.align( "bottom left" );
       
       // Make start button
       double buttonHeight = 10;
       double buttonOffset = 15;
-      startButton = ct.text( "Start", timeDisplay.x - buttonOffset, timeDisplay.y + buttonHeight, buttonHeight );
+      startButton = ct.text( "Start", 50 - buttonOffset, timeDisplay.y + buttonHeight, buttonHeight );
       startButton.align( "bottom" );
       startButton.clickable = true;
       
@@ -73,7 +73,7 @@ class Stopwatch extends Code12Program
       stopButton.visible = false;
       
       // Make reset button
-      resetButton = ct.text( "Reset", timeDisplay.x + buttonOffset, startButton.y, buttonHeight );
+      resetButton = ct.text( "Reset", 50 + buttonOffset, startButton.y, buttonHeight );
       resetButton.align( "bottom" );
       resetButton.clickable = true;
       resetButton.visible = false;
@@ -86,9 +86,11 @@ class Stopwatch extends Code12Program
       
       // Initialize state and count variables
       stopwatchRunning = false;
+      startTime = 0;
       lapCount = 0;
       lapStartTime = 0;
       pauseTime = 0;
+      pauseLength = 0;
    }
    
    public void update()
@@ -96,11 +98,11 @@ class Stopwatch extends Code12Program
       if ( stopwatchRunning )
       {
          // Update timeDisplay
-         double seconds = ct.toDouble( ct.getTimer() - startTime ) / 1000.0;          
+         double seconds = ( ct.getTimer() - startTime ) / 1000.0;          
          int elapsedTime = ct.toInt( seconds );
-         int hours = elapsedTime / 3600;
-         elapsedTime %= 3600;
-         int minutes = elapsedTime / 60;
+         int hours = ct.intDiv( elapsedTime, 3600 );
+         elapsedTime = elapsedTime % 3600;
+         int minutes = ct.intDiv(elapsedTime, 60);
          seconds = seconds - hours * 3600 - minutes * 60;
          String hrs = ct.formatInt( hours, 2 );
          String min = ct.formatInt( minutes, 2 );
@@ -130,28 +132,7 @@ class Stopwatch extends Code12Program
          {
             lapStartTime = startTime;
          }
-         
-         // Factor in the current time on the stopwatch
-         String displayedTime = timeDisplay.getText();
-         if ( !displayedTime.equals("00:00:00.00") )
-         {
-            String hrs = displayedTime.substring(0, 2);
-            String min = displayedTime.substring(3, 5);
-            String sec = displayedTime.substring(6, 11);
-            if ( !ct.canParseInt(hrs) )
-               ct.println( "Can't parse hrs" );
-            int hours = ct.parseInt( hrs );
-            
-            if ( !ct.canParseInt(min) )
-               ct.println( "Can't parse min" );
-            int minutes = ct.parseInt( min );
-            
-            if ( !ct.canParseNumber(sec) )
-               ct.println( "Can't parse sec" );
-            double seconds = ct.parseNumber( sec );
-
-            startTime -= ct.toInt( (hours * 3600 + minutes * 60 + seconds) * 1000 );
-         }
+         startTime -= pauseLength;
       }
       else if ( obj == stopButton )
       {
@@ -188,11 +169,11 @@ class Stopwatch extends Code12Program
          else
          {
             // Convert lapLength to lapLengthText
-            double seconds = ct.toDouble( lapLength ) / 1000.0;          
+            double seconds =  lapLength / 1000.0;          
             int elapsedTime = ct.toInt( seconds );
-            int hours = elapsedTime / 3600;
-            elapsedTime %= 3600;
-            int minutes = elapsedTime / 60;
+            int hours = ct.intDiv( elapsedTime, 3600 );
+            elapsedTime = elapsedTime % 3600;
+            int minutes = ct.intDiv( elapsedTime, 60 );
             seconds = seconds - hours * 3600 - minutes * 60;
             String hrs = ct.formatInt( hours, 2 );
             String min = ct.formatInt( minutes, 2 );
@@ -202,19 +183,14 @@ class Stopwatch extends Code12Program
             lapLengthText = hrs + ":" + min + ":" + sec; 
          }
          String lapText = lapCount + "  " + timeText + " (+" + lapLengthText + ")";
-         double lapHeight = 8;
+         double lapHeight = 7; // Height of lap display texts
          double xLap = 90;
          double yLap = startButton.y + lapHeight * lapCount;
          GameObj lapDisplay = ct.text( lapText, xLap, yLap, lapHeight );
          lapDisplay.group = "laps";
          lapDisplay.align( "bottom right" );
-         double yMax = ct.getHeight();
-         if ( yLap > yMax )
-            ct.setHeight( yMax + lapHeight );
-         
+         if ( yLap > ct.getHeight() )
+            ct.setHeight( yLap );
       }
-         
-   }
-   
-   
+   }   
 }
