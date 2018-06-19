@@ -1,38 +1,38 @@
-Code 12 API Summary
-===================
+// Code 12 API Summary
+//====================
 
-Text Output
------------
-ct.print( Object obj )       // any type, no newline added
-ct.println( Object obj )     // any type (param required), newline at end
-ct.println( )                // just a newline
-ct.log( Object… objs )       // values delimited and strings quoted
-ct.logm( String message, Object… objs)    // log with unquoted message
+// Text Output
+//------------
+void ct.print( Object value )       // any type, no newline added
+void ct.println( Object value )     // any type (param required), newline at end
+void ct.println( )                  // just a newline
+void ct.log( Object values )        // values delimited and strings quoted
+void ct.logm( String message, Object values)    // log with unquoted message
 
-Text Input
-----------
-int ct.inputInt( String message )             // 0 if not an integer
+// Text Input
+//-----------
+int ct.inputInt( String message )            // 0 if not an integer
 double ct.inputNumber( String message )      // Nan if not a number
 boolean ct.inputBoolean( String message )    // true iff starts with 'y', 't' or '1'
-String ct.inputString( String message)       // until end of line
+String ct.inputString( String message )      // until end of line
 
-Screen Management
------------------
-ct.setTitle( String title )
-ct.setHeight( double height )   // on mobile just determines landscape vs. portrait
-double ct.getWidth( )           // always 100.0
-double ct.getHeight( )          // default 100.0
-double ct.getPixelsPerUnit()    // scale factor to convert coordinate units to pixels
+// Screen Management
+//------------------
+void ct.setTitle( String title )
+void ct.setHeight( double height )   // on mobile just determines landscape vs. portrait
+double ct.getWidth( )                // always 100.0
+double ct.getHeight( )               // default 100.0
+double ct.getPixelsPerUnit()         // scale factor to convert coordinate units to pixels
 String ct.getScreen( )
-ct.setScreen( String name )
-ct.clearScreen( )
-ct.clearGroup( String group )
-ct.setBackColor( String color )
-ct.setBackColorRGB( int r, int g, int b )
-ct.setBackImage( String filename )
+void ct.setScreen( String name )
+void ct.clearScreen( )
+void ct.clearGroup( String group )
+void ct.setBackColor( String color )
+void ct.setBackColorRGB( int red, int green, int blue )
+void ct.setBackImage( String filename )
 
-GameObj Creation
-----------------
+// GameObj Creation
+//-----------------
 GameObj ct.circle( double x, double y, double diameter )
 GameObj ct.circle( double x, double y, double diameter, String color )
 GameObj ct.rect( double x, double y, double width, double height )
@@ -43,32 +43,32 @@ GameObj ct.text( String s, double x, double y, double height )
 GameObj ct.text( String s, double x, double y, double height, String color )
 GameObj ct.image( String filename, double x, double y, double width )
 
-Mouse and Keyboard Input
-------------------------
+// Mouse and Keyboard Input
+//-------------------------
 boolean ct.clicked( )
 double ct.clickX( )
 double ct.clickY( )
 boolean ct.keyPressed( String keyName )
 boolean ct.charTyped( String ch )
 
-Audio
------
-ct.sound( String filename )
-ct.setSoundVolume( double volume )
+// Audio
+//------
+void ct.sound( String filename )
+void ct.setSoundVolume( double volume )
 
-Math and Misc.
---------------
+// Math and Misc.
+//---------------
 int ct.random( int min, int max )
 int ct.round( double d )
-double ct.round( double d, int numPlaces )
+double ct.roundDecimal( double d, int numPlaces )
+int ct.intDiv( int n, int d )
 boolean ct.isError( double d )
 double ct.distance( double x1, double y1, double x2, double y2 )
 int ct.getTimer( )
-double getVersion( )
+double ct.getVersion( )
 
-Type Conversion
----------------
-double ct.toDouble( int i )
+// Type Conversion
+//----------------
 int ct.toInt( double d )                // truncates
 int ct.parseInt( String s )             // 0 if failure
 boolean ct.canParseInt( String s )
@@ -79,55 +79,100 @@ String ct.formatDecimal( double d, int numPlaces )
 String ct.formatInt( int i )
 String ct.formatInt( int i, int numDigits )    // uses leading 0's
 
-GameObj Public Data Fields
---------------------------
-double x, y
-double width, height
-double xSpeed, ySpeed   // at 60 fps
-int lineWidth           // in pixels
-boolean visible
-boolean clickable
-boolean autoDelete     // auto delete if it goes from on to off-screen
-String group           // for ct.deleteGroup(), default ""
+class GameObj
+{
+	// GameObj Public Data Fields
+	//---------------------------
+	double x, y;
+	double width, height;
+	double xSpeed, ySpeed;   // at 60 fps
+	int lineWidth;           // in pixels
+	boolean visible;
+	boolean clickable;
+	boolean autoDelete;      // auto delete if it goes from on to off-screen
+	String group;            // for ct.deleteGroup(), default ""
 
-GameObj Methods
----------------
-String obj.getType( )      // "circle", "image", etc.
-String obj.getText( )
-obj.setText( String s )    // can be used for print name on any object
-String obj.toString( )     // "[type at (x, y) "text"]"
-obj.setSize( double width, double height )
-obj.align( String a )      // "top left", "top", "center", "right", etc.
-obj.align( String a, boolean adjustY )    // adjustY adjusts y when aspect changes
-obj.setFillColor( String color )     // "red", "white", etc. or null
-obj.setFillColorRGB( int r, int g, int b )
-obj.setLineColor( String color )
-obj.setLineColorRGB( int r, int g, int b )
-int obj.getLayer( )
-obj.setLayer( int layer )      // objects default to layer 1
-obj.delete( )
-boolean obj.clicked( )
-boolean obj.containsPoint( double x, double y )
-boolean obj.hit( GameObj obj )
+	// GameObj Methods
+	// ---------------
+	String getType( )                                  // "circle", "image", etc.
+	String getText( )
+	void setText( String text )                        // included in print output
+	String toString( )                                 // "[type at (x, y) "text"]"
+	void setSize( double width, double height )
+	void align( String alignment )                     // "top left", "top", "center", etc.
+	void align( String alignment, boolean adjustY )    // adjustY adjusts y when aspect changes
+	void setFillColor( String color )                  // "red", "white", etc. or null
+	void setFillColorRGB( int red, int green, int blue )
+	void setLineColor( String color )
+	void setLineColorRGB( int red, int green, int blue )
+	int getLayer( )
+	void setLayer( int layer )                         // objects default to layer 1
+	void delete( )
+	boolean clicked( )
+	boolean containsPoint( double x, double y )
+	boolean hit( GameObj obj )
+}
 
-Java Math Class Methods Supported
----------------------------------
-abs, acos, asin, atan, atan2, ceil, cos, cosh, exp, floor, 
-log, log10, max, min, pow, sin, sinh, sqrt, tan, tanh, 
-PI, E
+class Math
+{
+	// Java Math Class Fields Supported
+	//----------------------------------
+	double  E;
+	double  PI;
 
-Java String Class Methods Supported
------------------------------------
-compareTo, equals, indexOf, length, substring, toLowerCase, toUpperCase, trim
+	// Java Math Class Methods Supported
+	//----------------------------------
+	double  abs( double a )
+	int     abs( int a )
+	double  acos( double a )
+	double  asin( double a )
+	double  atan( double a )
+	double  atan2( double y, double x)
+	double  ceil( double a )
+	double  cos( double a )
+	double  cosh( double a )
+	double  exp( double a )
+	double  floor( double a )
+	double  log( double a )
+	double  log10( double a )
+	double  max( double a, double b )
+	int     max( int a, int b )
+	double  min( double a, double b )
+	int     min( int a, int b )
+	double  pow( double a, double b )
+	double  sin( double a )
+	double  sinh( double a )
+	double  sqrt( double a )
+	double  tan( double a )
+	double  tanh( double a )
+}
 
-Events
-------
-void start( )
-void update( )
-void onMousePress( GameObj obj, double x, double y ) 
-void onMouseDrag( GameObj obj, double x, double y ) 
-void onMouseRelease( GameObj obj, double x, double y )
-void onKeyPress( String key )     // key code name e.g. "a", "up"
-void onKeyRelease( String key )   // key code name e.g. "a", "up"
-void onCharTyped( String ch )     // "a", "A", "$", etc.
-void onResize( ) 
+class String
+{
+	// Java String Class Methods Supported
+	//------------------------------------
+	int      compareTo( String str2 )
+	boolean  equals( String str2 )
+	int      indexOf( String strFind )
+	int      length()
+	String   substring( int beginIndex )
+	String   substring( int beginIndex, int endIndex )
+	String   toLowerCase()
+	String   toUpperCase()
+	String   trim()
+}
+
+class Code12Program
+{
+	// Events in Code12Program
+	//------------------------
+	void start( )
+	void update( )
+	void onMousePress( GameObj obj, double x, double y ) 
+	void onMouseDrag( GameObj obj, double x, double y ) 
+	void onMouseRelease( GameObj obj, double x, double y )
+	void onKeyPress( String key )        // key code name e.g. "a", "up"
+	void onKeyRelease( String key )      // key code name e.g. "a", "up"
+	void onCharTyped( String ch )        // "a", "A", "$", etc.
+	void onResize( ) 
+}
