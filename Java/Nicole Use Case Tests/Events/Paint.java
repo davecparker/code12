@@ -146,11 +146,17 @@ public class Paint extends Code12Program
       // Player can only draw on canvas, not on other game objects
       if ( ct.clickX() > palette.width + 1 )
       {
-          brush = ct.line(ct.clickX(),ct.clickY(),x,y);
+          brush = ct.line(ct.clickX(),ct.clickY(),x+2,y);
           brush.setLineColor(currentColor);
           brush.setFillColor(currentColor);
           brush.lineWidth = size;
       }
 
+   }
+   
+   public void onMouseRelease( GameObj obj, double x, double y )
+   {
+      if ( ct.clickX() > palette.width + 1 )
+         brush = ct.line(x,y,ct.clickX(),ct.clickY() );
    }
 }
