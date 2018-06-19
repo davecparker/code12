@@ -1,7 +1,7 @@
 package Code12;  // (c)Copyright 2018 by David C. Parker 
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
+
 
 
 // A text object that can be created in a Game
