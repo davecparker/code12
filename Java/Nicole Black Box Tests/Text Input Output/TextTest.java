@@ -16,6 +16,7 @@ public class TextTest extends Code12Program
    int[] inputArray;
    String[][] string2DArray;
    
+
    public static void main(String[] args)
    { 
       Code12.run(new TextTest()); 
@@ -23,9 +24,11 @@ public class TextTest extends Code12Program
    
    public void start() 
    {
+   
       // Printing to console
       // ct.print()
       // ct.println()
+      // These objects will also be used to test logging methods in update()
       circle = ct.circle(50,50,10,"black");
       square = ct.rect(10,10,10,10,"gray");
       rect = ct.rect(ct.getWidth()/2, ct.getHeight()/2, 5, 10, "red");
@@ -57,7 +60,7 @@ public class TextTest extends Code12Program
        
        ct.print("Carriage return \r ");
        ct.print("Form feed \f ");
-       
+
        // Testing input methods
        ct.println();
        double d = ct.inputNumber("Enter a double: ");
@@ -143,6 +146,33 @@ public class TextTest extends Code12Program
       ct.println(excess);
       ct.println("After trimming: " + excess.trim() );
 
+      // Testing string equality
+      String a = "equal";
+      String b = "equal";
+      // Memory is allocated once
+      ct.println("Two strings pointing to the same spot in memory returns " + ( a == b ) );   // prints true
+      
+      String a1 = "equal";
+      String b1 = "equal";
+      ct.println("Two equal strings compared using the equals() method returns " + ( a1.equals(b1) ) );   // prints true
+      String a2 = "equa";
+      // Appending allocates new memory for String a1
+      a2 += "l";
+      // a1 and b1 have different references
+      String b2 = "equal";
+      ct.println("Two equal strings, but one dynamically created returns " + (a2 == b2) );  // prints false
+     
+      String a3 = "equal";
+      // Explicitly allocating new memory for the string b2
+      String b3 = new String("equal");
+      ct.println("Two equal strings, but one explictly instantiated returns " + (a3 == b3) );   // also prints false
+      
+      String a4 = "equal";
+      String b4 = new String("equal").intern();    // check to see if the string exists in pool then return a reference to it
+      ct.println("Two equal strings, one created using the intern() method returns " + (a4 == b4) );   // returns true
+
+
+      
       // Testing out printing arrays to console
       inputArray = new int[10];
       for ( i = 0; i < inputArray.length; i++ )
@@ -183,22 +213,20 @@ public class TextTest extends Code12Program
          }
          ct.println();
       }
-       
-                                   
+                
    }
    
    public void update()
    {
-      // circle.xSpeed = 1;
-//       if ( circle.x >= ct.getWidth() )
-//          circle.x = 0;
-//       ct.log(circle);
-//       
-//       rect.ySpeed = -1;
-//       ct.logm("There is a " + rect + " moving " + rect.y " unit upwards off-screen");
-//       ct.logm("There was a mouse click at " + ct.clickX() + "," + ct.clickY() );
-         
+      circle.xSpeed = 1;
+      if ( circle.x >= ct.getWidth() )
+         circle.x = 0;
+      ct.log(circle);
+      
+      rect.ySpeed = -1;
+      ct.logm("There is a " + rect + " moving " + rect.y + " unit upwards off-screen");
+      ct.logm("There was a mouse click at " + ct.clickX() + "," + ct.clickY() );
 
    }
-   
+ 
 }
