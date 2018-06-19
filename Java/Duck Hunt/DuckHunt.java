@@ -34,7 +34,7 @@ public class DuckHunt extends Code12Program
       ct.setTitle( "Duck Hunt" );
       
       // Set background
-      ct.setHeight( 100 * 9 / 16 );
+      ct.setHeight( ct.intDiv( 100 * 9, 16 ) );
       yMax = ct.getHeight();
       ct.setBackImage( "stage.png" );
                 
@@ -76,7 +76,7 @@ public class DuckHunt extends Code12Program
       if (ct.random(1, 50) == 1)
       {
          double x = ct.random( 110, 130 );
-         double y = ct.random( 10, (int)(yMax / 2) );
+         double y = ct.random( 10, ct.toInt(yMax / 2) );
          GameObj duck = createDuck( x, y, -0.5 );
       }
       
@@ -140,7 +140,7 @@ public class DuckHunt extends Code12Program
    
    // Makes a bullet at position xStart, yStart that will then
    // move up the window and delete itself once outside the window
-   public GameObj fireBullet( double xStart, double yStart )
+   GameObj fireBullet( double xStart, double yStart )
    {
       GameObj bullet = null;
       if ( bulletsCount < maxSize )
@@ -159,9 +159,10 @@ public class DuckHunt extends Code12Program
    }
    
    // Deletes a bullet
-   public void deleteBullet( int index )
+   void deleteBullet( int index )
    {
-      bulletsArr[index].delete();
+      GameObj bullet = bulletsArr[index];
+      bullet.delete();
       for( int i = index; i < bulletsCount - 1; i++ )
       {
          bulletsArr[i] = bulletsArr[i + 1];
@@ -171,7 +172,7 @@ public class DuckHunt extends Code12Program
    
    // Makes a duck to the right of the window at y-coordinate yStart
    // that will then accross the window horizontally with speed xSpeed
-   public GameObj createDuck( double xStart, double yStart, double xSpeed )
+   GameObj createDuck( double xStart, double yStart, double xSpeed )
    {
       GameObj duck = null;
       if ( ducksCount < maxSize )
@@ -191,9 +192,10 @@ public class DuckHunt extends Code12Program
    }
    
    // Deletes a duck
-   public void deleteDuck( int index )
+   void deleteDuck( int index )
    {
-      ducksArr[index].delete();
+      GameObj duck = ducksArr[index];
+      duck.delete();
       for( int i = index; i <  ducksCount - 1; i++ )
       {
          ducksArr[i] = ducksArr[i + 1];
@@ -204,7 +206,7 @@ public class DuckHunt extends Code12Program
    }
    
    // Makes a dead duck at duck's position
-   public GameObj makeDeadDuck( GameObj duck )
+   GameObj makeDeadDuck( GameObj duck )
    {
       GameObj deadDuck = ct.image( "dead-duck.png", duck.x, duck.y, duck.height );
       deadDuck.autoDelete = true;

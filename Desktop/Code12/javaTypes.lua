@@ -118,7 +118,7 @@ end
 -- Return the type name of the given value type (vt)
 function javaTypes.typeNameFromVt( vt )
 	if type(vt) == "table" then
-		return "array of " .. typeNameFromVt( vt.vt )
+		return "array of " .. javaTypes.typeNameFromVt( vt.vt )
 	end
 	return mapVtToTypeName[vt] or "(unknown)"
 end
@@ -135,6 +135,8 @@ function javaTypes.vtCanAcceptVtExpr( vt, vtExpr )
 		return true    -- int can silently promote to double
 	elseif vtExpr == "null" and type(vt) == "string" then
 		return true    -- null can be assigned to any object (String or GameObj)
+	elseif type(vt) == "table" and type(vtExpr) == "table" then
+		return vt.vt == vtExpr.vt    -- array of same type
 	end
 	return false
 end

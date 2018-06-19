@@ -178,6 +178,12 @@ local retType = { t = "retType",
 	{ 9, 12, "value",			"ID"					},
 }
 
+-- An access permission specifier
+local access = { t = "access",
+	{ 9, 12, "public",			"public"				},
+	{ 9, 12, "empty",									},
+}
+
 -- A formal parameter (in a function definition)
 local param = { t = "param",
 	{ 12, 12, "array",			"ID", "[", "]", "ID"		},
@@ -212,6 +218,7 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "!",				"!", parsePrimaryExpr 				},
 	{ 5, 12, "call",			fnValue, "(", exprList, ")" 		},
 	{ 4, 12, "lValue",			lValue								},
+	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
 }
 
 -- Shortcut "operate and assign" operators 
@@ -232,6 +239,7 @@ local stmt = { t = "stmt",
 	{ 4, 12, "preDec",			"--", lValue						},
 	{ 4, 12, "postInc",			lValue, "++" 						},
 	{ 4, 12, "postDec",			lValue, "--"						},
+	{ 11, 12, "break",			"break"								},
 }
 
 -- The end of a while statement, either with a ; (for do-while) or not
@@ -285,12 +293,13 @@ local line = { t = "line",
 	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },
 	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",					"END" },
 	{ 8, 12, "else",			"else", 										"END" },
-	{ 9, 12, "func",			retType, fnValue, "(", paramList, ")",			"END" },
+	{ 9, 12, "func",			access, retType, fnValue, "(", paramList, ")",	"END" },
 	{ 9, 12, "return",			"return", expr, ";",							"END" },
 	{ 11, 12, "do",				"do", 											"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
-	{ 12, 12, "array",			"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
+	{ 12, 12, "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
+	{ 12, 12, "arrayDecl",		"ID", "[", "]", idList, ";",					"END" },
 	-- Boilerplate lines
 	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
 	{ 1, 12, "class",			"class", "ID", 									"END" },
@@ -544,7 +553,11 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	end
 
 	-- Try to parse the line
-	return parseCurrentLine( level or numSyntaxLevels )
+	local tree = parseCurrentLine( level or numSyntaxLevels )
+	if tree then
+		tree.iLine = lineNumber  -- store Java line number in the top tree node
+	end
+	return tree
 end
 
 -- Print a parse tree recursively at the given indentLevel.

@@ -40,7 +40,7 @@ local reservedWordTokens = {
 	["catch"] 			= false,	
 	["class"] 			= "class",	
 	["const"] 			= "const",	
-	["continue"] 		= "continue",	
+	["continue"] 		= false,
 	["default"] 		= false,
 	["do"] 				= "do",	
 	["else"] 			= "else",	
@@ -506,7 +506,7 @@ local function initCharTypes()
 	-- Chars that are always single-char tokens
 	charTypes[59] = ";"
 	charTypes[44] = ","
-	charTypes[46] = "."
+	charTypes[46] = "."   -- TODO: Support double constant starting with .
 	charTypes[40] = "("
 	charTypes[41] = ")"
 	charTypes[123] = "{"
