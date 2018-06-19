@@ -4,9 +4,6 @@
 // You can press the enter key the whole way through in order to bypass manual user input.
 // ( It will be filled in with defaults )
 
-import java.io.PrintWriter;
-import java.io.IOException;
-
 import Code12.*;
 
 public class TextTest extends Code12Program
@@ -19,7 +16,6 @@ public class TextTest extends Code12Program
    int[] inputArray;
    String[][] string2DArray;
    
-   PrintWriter output;
 
    public static void main(String[] args)
    { 
@@ -28,15 +24,7 @@ public class TextTest extends Code12Program
    
    public void start() 
    {
-       try {
-      // Createprint writer for writing to a file
-      output = new PrintWriter("textoutput.txt");
-      ct.println("Starting");
-
-      }
-      catch(IOException e) {
-        ct.println("Error during reading/writing");
-      }
+   
       // Printing to console
       // ct.print()
       // ct.println()
@@ -225,10 +213,7 @@ public class TextTest extends Code12Program
          }
          ct.println();
       }
-      
-      output.close();
-
-                                   
+                
    }
    
    public void update()
@@ -243,7 +228,5 @@ public class TextTest extends Code12Program
       ct.logm("There was a mouse click at " + ct.clickX() + "," + ct.clickY() );
 
    }
-   
-   // Some user-defined methods to further test logging methods
-   public void 
+ 
 }
