@@ -1,0 +1,13 @@
+ct.random tests done
+ct.round tests done
+ct.isError tests done
+ct.distance tests done
+ct.getVersion tests done
+ct.toInt tests done
+ct.parseInt tests done
+ct.canParseInt tests done
+ct.parseNumber tests done
+ct.canParseNumber tests done
+ct.formatDecimal tests done
+ct.formatInt tests done
+All tests passed

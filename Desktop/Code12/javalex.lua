@@ -7,6 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+-- Code12 modules
+local err = require( "err" )
+
 
 -- The Java Lexer module
 local javalex = {}
@@ -26,37 +29,32 @@ local charTypes = {}  -- built in initCharTypes()
 -- Reserved word tokens: indexed by string, maps to:
 --    string (token tt) if reserved word supported by Code12
 --    false if reserved word not supported by Code12
---    nil if not reserved word
+--    nil if not reserved word, or not treated as a reserved word.
+-- The following reserved words (primitive types) are treated as normal IDs:
+--    byte, boolean, char, double, float, int, long, short
 local reservedWordTokens = {
 	["abstract"]		= false,	
 	["assert"] 			= false,	
-	["boolean"] 		= "boolean",	
 	["break"] 			= "break",	
-	["byte"] 			= false,	
 	["case"] 			= false,
 	["catch"] 			= false,	
-	["char"] 			= false,	
 	["class"] 			= "class",	
 	["const"] 			= "const",	
-	["continue"] 		= "continue",	
+	["continue"] 		= false,
 	["default"] 		= false,
 	["do"] 				= "do",	
-	["double"] 			= "double",	
 	["else"] 			= "else",	
 	["enum"] 			= false,	
 	["extends"] 		= "extends",	
 	["final"] 			= "final",	
 	["finally"] 		= false,	
-	["float"] 			= false,	
 	["for"] 			= "for",	
 	["goto"] 			= false,	
 	["if"] 				= "if",
 	["implements"] 		= false,	
 	["import"] 			= "import",	
 	["instanceof"] 		= false,	
-	["int"] 			= "int",	
 	["interface"] 		= false,	
-	["long"] 			= false,
 	["native"] 			= false,	
 	["new"] 			= "new",	
 	["package"] 		= false,	
@@ -64,13 +62,12 @@ local reservedWordTokens = {
 	["protected"] 		= false,
 	["public"] 			= "public",	
 	["return"] 			= "return",	
-	["short"] 			= false,	
 	["static"] 			= "static",	
 	["strictfp"]	 	= false,	
 	["super"] 			= false,
 	["switch"] 			= false,	
 	["synchronized"] 	= false,	
-	["this"] 			= false,	
+	["this"] 			= "this",	
 	["throw"] 			= false,	
 	["throws"] 			= false,	
 	["transient"] 		= false,
@@ -98,22 +95,21 @@ local commentLevel		-- current nesting level for block comments (/* */)
 -- Token scanning functions return one of:
 --     A single string for simple tokens, which is both the tt and str of the token
 --     (tt, str) for ID, literals, etc.
---     (nil, errRecord) for an error (see makeErrRecord)
+--     nil for an error and the error state is set
 
 
--- Make and return an errRecord, which is, for example:
---     { strErr = "Unclosed string literal", iLine = 10, iCharFirst = 56, iCharLast = 67 }
--- Use the given errString, and the current lineNumber, 
--- and optional iCharFirst (default current iChar) and iCharLast (default iCharStart).
-local function makeErrRecord( strErr, iCharFirst, iCharLast )
-	local iCharFirst = iCharFirst or iChar
-	local iCharLast = iCharLast or iCharFirst
-	return { strErr = strErr, iLine = lineNumber, iCharFirst = iCharFirst, iCharLast = iCharLast }
+-- Set the error state using the the current lineNumber, the given char index range,
+-- and strErr plus any additional arguments for string.format( strErr, ... )
+local function setTokenErr( iCharFirst, iCharLast, strErr, ... )
+	local locStart = err.makeSrcLoc( lineNumber, iCharFirst )
+	local locEnd = err.makeSrcLoc( lineNumber, iCharLast )
+	err.setErr( err.makeErrLoc( locStart, locEnd ), nil, strErr, ... )
 end
 
--- Return (nil, errRecord) for an invalid character
+-- Set the error state for an invalid character, and return nil.
 local function invalidCharToken()
-	return nil, makeErrRecord( "Invalid character" )
+	setTokenErr( iChar, iChar, "Invalid character" )
+	return nil
 end
 
 -- Return string for token starting with =  (=  ==)
@@ -322,15 +318,16 @@ local function percentToken()
 	return "%"
 end
 
--- Return (nil, errRecord) for the beginning of a char literal token
--- (not supported in Code12).
+-- Set the error state for the beginning of a char literal token
+-- (not supported in Code12), and return nil.
 local function charLiteralToken()
-	return nil, makeErrRecord( "char type not supported, use double quotes" )
+	setTokenErr( iChar, iChar, "char type not supported, use double quotes" )
+	return nil
 end
 
 -- Return ("STR", str) for a string literal token.
 -- The str includes the double quotes.
--- Return (nil, errRecord) if the literal is unclosed by the end of line.
+-- Return nil and set the error state if the literal is unclosed by the end of line.
 local function stringLiteralToken()
 	local iCharStart = iChar    -- the double quote
 	iChar = iChar + 1
@@ -338,7 +335,8 @@ local function stringLiteralToken()
 	while charNext ~= 34 do   -- "
 		-- TODO: if charText == 92 then   -- \
 		if charNext == nil then
-			return nil, makeErrRecord( "Unclosed string literal", iCharStart, iChar - 1 )
+			setTokenErr( iCharStart, iChar - 1, "Unclosed string literal" )
+			return nil
 		end
 		iChar = iChar + 1
 		charNext = chars[iChar]
@@ -391,7 +389,7 @@ end
 --     "NULL": the null literal (str is "null")
 --     "COMMENT": a comment (str is text of the comment not including the open/close)
 --     "END": the end of the source string (str is empty string)
--- Return (nil, errRecord) if a token is malformed or illegal (see makeErrRecord).
+-- Return nil and set the error state if a token is malformed or illegal.
 function javalex.getTokens( sourceStr, lineNum )
 	-- Make array of ASCII codes for the source string
 	source = sourceStr
@@ -434,8 +432,8 @@ function javalex.getTokens( sourceStr, lineNum )
 				token.tt = "ID"   -- not a reserved word
 			elseif tt == false then
 				-- Unsupported reserved word
-				local strErr = "Unsupported reserved word \"" .. str .. "\""
-				return nil, makeErrRecord( strErr, iCharStart, iCharEnd ) 
+				setTokenErr( iCharStart, iCharEnd, "Unsupported reserved word \"%s\"", str )
+				return nil
 			else
 				token.tt = tt
 			end
@@ -452,12 +450,12 @@ function javalex.getTokens( sourceStr, lineNum )
 			return tokens 
 		elseif type(charType) == "function" then
 			-- Possible multi-char token, or char or string literal
-			local tt, more = charType()   -- tt, (tt, str) or (nil, errRecord)
+			local tt, str = charType()   -- tt, (tt, str) or (nil, errRecord)
 			if tt == nil then 
-				return nil, more   -- token error (e.g. unclosed string literal)
+				return nil   -- token error (e.g. unclosed string literal)
 			end
 			token.tt = tt
-			token.str = more or tt    -- simple tokens are their own string
+			token.str = str or tt    -- simple tokens are their own string
 		else
 			-- Single char token
 			iChar = iChar + 1
@@ -508,7 +506,7 @@ local function initCharTypes()
 	-- Chars that are always single-char tokens
 	charTypes[59] = ";"
 	charTypes[44] = ","
-	charTypes[46] = "."
+	charTypes[46] = "."   -- TODO: Support double constant starting with .
 	charTypes[40] = "("
 	charTypes[41] = ")"
 	charTypes[123] = "{"

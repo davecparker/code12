@@ -9,6 +9,7 @@
 
 -- Code12 modules used
 local javalex = require( "javalex" )
+local err = require( "err" )
 
 
 -- The parseJava module
@@ -16,6 +17,23 @@ local parseJava = {}
 
 
 ----- File Local Variables  --------------------------------------------------
+
+-- Language feature names introduced at each syntax level
+local syntaxFeatures = {
+	"procedure calls",
+	"comments",
+	"variables",
+	"expressions",
+	"function return values",
+	"object data fields",
+	"object method calls",
+	"if-else statements",
+	"user-defined functions",
+	"parameters in user-defined functions",
+	"loops",
+	"arrays",
+}
+local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
 local tokens     	-- array of tokens
@@ -75,14 +93,24 @@ local binaryOpPrecedence = {
 	[":"]	= 2,
 }
 
--- Map known variable type names to true
-local isVarType = {
-	["int"]		= true,
-	["double"]	= true,
-	["boolean"]	= true,
-	["String"]	= true,
-	["GameObj"]	= true,
-}
+
+----- Parse Tree Utilities  --------------------------------------------------
+
+-- A parse tree is either:
+-- 		a token node, for example:
+--          { tt = "ID", str = "foo", iLine = 10, iChar = 23 }
+--      or a tree node, for example:
+--          { t = "line", p = "stmt", nodes = {...}, info = {} }
+--      where t is the grammar or function name, p is the pattern name if any,
+--      info is an initially empty table where semantic info can be stored,
+--		and nodes is an array of children nodes.
+
+-- Create and return a parse tree node with the given type (t), pattern (p), 
+-- and children nodes
+local function makeParseTreeNode( t, p, nodes )
+	-- TODO: Get from pool
+	return { t = t, p = p, nodes = nodes, info = {} }
+end	
 
 
 ----- Special parsing functions used in the grammar tables below  ------------
@@ -105,7 +133,7 @@ end
 -- Parse a function value (an expression that can be called as a function).
 -- This is either just an ID, or ID.ID, and if the object ID is "ct" then
 -- the "ct." is added to the front of the method name to make a single name.
--- This is done for convenience and performance.
+-- This is done for both performance and more intuitive error reporting.
 -- Return an ID token for a simple name (or ct.name), a method pattern node
 -- for other object.method names, or nil if failure.
 local function fnValue()
@@ -125,23 +153,12 @@ local function fnValue()
 	iToken = iToken + 1	
 	if token.str == "ct" then
 		token2.str = "ct." .. token2.str
+		token2.iChar = token.iChar
 		return token2   -- ct.name token
 	end
 	-- Return a method pattern node
-	return { t = "fnValue", p = "method", nodes = { token, token2 } }
+	return makeParseTreeNode( "fnValue", "method", { token, token2 } )
 end
-
--- Parse a variable type. Primitive types return their reserved word token,
--- other types return an ID token. Return nil if not an ID.
--- Done here as a function for performance.
-local function varType()
-	local token = tokens[iToken]
-	if isVarType[token.str] or token.tt == "ID" then
-		iToken = iToken + 1
-		return token    -- a known type (may be reserved word or ID)
-	end
-	return nil
-end 
 
 
 ----- Grammar Tables ---------------------------------------------------------
@@ -151,19 +168,26 @@ local lValue = { t = "lValue",
 	{ 6, 12, "field",			"ID", ".", "ID"			},
 	{ 12, 12, "index",			"ID", "[", expr, "]"	},
 	{ 3, 12, "var",				"ID" 					},
+	{ 6, 12, "this",			"this", ".", "ID"		},
 }
 
 -- A return type for a procedure/function definition
 local retType = { t = "retType",
 	{ 9, 12, "void",			"void" 					},
-	{ 12, 12, "array",			varType, "[", "]"		},
-	{ 9, 12, "value",			varType					},
+	{ 12, 12, "array",			"ID", "[", "]"			},
+	{ 9, 12, "value",			"ID"					},
+}
+
+-- An access permission specifier
+local access = { t = "access",
+	{ 9, 12, "public",			"public"				},
+	{ 9, 12, "empty",									},
 }
 
 -- A formal parameter (in a function definition)
 local param = { t = "param",
-	{ 12, 12, "array",			varType, "[", "]", "ID"		},
-	{ 6, 12, "var",				varType, "ID"				},
+	{ 12, 12, "array",			"ID", "[", "]", "ID"		},
+	{ 6, 12, "var",				"ID", "ID"					},
 }
 
 -- A formal parameter list, which can be empty
@@ -194,25 +218,28 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "!",				"!", parsePrimaryExpr 				},
 	{ 5, 12, "call",			fnValue, "(", exprList, ")" 		},
 	{ 4, 12, "lValue",			lValue								},
+	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
 }
 
--- The right side of things that can be done to an lValue in a stmt
-local rightSide = { t = "rightSide",
-	{ 3, 12, "=",				"=", expr 		},
-	{ 4, 12, "+=",				"+=", expr 		},
-	{ 4, 12, "-=",				"-=", expr 		},
-	{ 4, 12, "*=",				"*=", expr 		},
-	{ 4, 12, "/=",				"/=", expr 		},
-	{ 4, 12, "++",				"++"			},
-	{ 4, 12, "--",				"--"			},
+-- Shortcut "operate and assign" operators 
+local opAssignOp = { t = "opAssignOp",
+	{ 4, 12, "+=",				"+=",  		},
+	{ 4, 12, "-=",				"-=",  		},
+	{ 4, 12, "*=",				"*=",  		},
+	{ 4, 12, "/=",				"/=",  		},
 }
 
 -- A statement
 local stmt = { t = "stmt",
 	{ 1, 12, "call",			fnValue, "(", exprList, ")" 		},
-	{ 3, 12, "assign",			lValue, rightSide 					},
-	{ 4, 12, "++",				"++", lValue 						},
-	{ 4, 12, "--",				"--", lValue						},
+	{ 3, 12, "assign",			"ID", "=", expr 					},
+	{ 3, 12, "lValueAssign",	lValue, "=", expr 					},
+	{ 3, 12, "opAssign",		lValue, opAssignOp, expr 			},
+	{ 4, 12, "preInc",			"++", lValue 						},
+	{ 4, 12, "preDec",			"--", lValue						},
+	{ 4, 12, "postInc",			lValue, "++" 						},
+	{ 4, 12, "postDec",			lValue, "--"						},
+	{ 11, 12, "break",			"break"								},
 }
 
 -- The end of a while statement, either with a ; (for do-while) or not
@@ -223,7 +250,7 @@ local whileEnd = { t = "whileEnd",
 
 -- The init part of a for loop
 local forInit = { t = "forInit",
-	{ 11, 12, "varInit",		varType, "ID", "=", expr			},
+	{ 11, 12, "varInit",		"ID", "ID", "=", expr				},
 	{ 11, 12, "stmt",			stmt								},
 	{ 11, 12, "empty",												},
 }
@@ -243,37 +270,41 @@ local forNext = { t = "forNext",
 -- The control part of a for loop (inside the parens)
 local forControl = { t = "forControl",
 	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
-	{ 12, 12, "array",			varType, "ID", ":", "ID" 					},
+	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
 }
 
 -- An array initializer
 local arrayInit = { t = "arrayInit",
-	{ 12, 12, "new", 			"new", varType,	"[", expr, "]"				},
+	{ 12, 12, "new", 			"new", "ID", "[", expr, "]"					},
 	{ 12, 12, "list", 			"{", exprList, "}"							},
 }
 
 -- A line of code
 local line = { t = "line",
 	{ 1, 12, "blank",															"END" },
+	{ 1, 12, "comment",			"COMMENT",										"END" },
 	{ 1, 12, "stmt",			stmt, ";",										"END" },
-	{ 3, 12, "varInit",			varType, "ID", "=", expr, ";",					"END" },
-	{ 3, 12, "varDecl",			varType, idList, ";",							"END" },
-	{ 3, 12, "constInit", 		"final", varType, "ID", "=", expr, ";",			"END" },
+	{ 3, 12, "varInit",			"ID", "ID", "=", expr, ";",						"END" },
+	{ 3, 12, "varDecl",			"ID", idList, ";",								"END" },
+	{ 3, 12, "constInit", 		"final", "ID", "ID", "=", expr, ";",			"END" },
 	{ 1, 12, "begin",			"{",											"END" },
 	{ 1, 12, "end",				"}",											"END" },
 	{ 1, 12, "eventFn",			"public", "void", "ID", "(", paramList, ")",	"END" },
 	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },
 	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",					"END" },
 	{ 8, 12, "else",			"else", 										"END" },
-	{ 9, 12, "func",			retType, "ID", "(", paramList, ")",				"END" },
+	{ 9, 12, "func",			access, retType, fnValue, "(", paramList, ")",	"END" },
 	{ 9, 12, "return",			"return", expr, ";",							"END" },
 	{ 11, 12, "do",				"do", 											"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
-	{ 12, 12, "array",			varType, "[", "]", "ID", "=", arrayInit, ";",	"END" },
+	{ 12, 12, "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
+	{ 12, 12, "arrayDecl",		"ID", "[", "]", idList, ";",					"END" },
 	-- Boilerplate lines
 	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
+	{ 1, 12, "class",			"class", "ID", 									"END" },
 	{ 1, 12, "classUser",		"class", "ID", "extends", "ID",					"END" },
+	{ 1, 12, "classUserPub",	"public", "class", "ID", "extends", "ID",		"END" },
 	{ 1, 12, "main",			"public", "static", "void", "ID", 
 									"(", "ID", "[", "]", "ID", ")",				"END" },
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
@@ -287,13 +318,6 @@ local line = { t = "line",
 -- Unless otherwise specified, parsing functions parse the tokens array starting 
 -- at iToken, considering only patterns that are defined within the syntaxLevel.
 -- They return a parse tree, or nil if failure.
--- A parse tree is either:
--- 		a token, for example:
---          { tt = "ID", str = "foo", iChar = 23 }
---      or a node, for example:
---          { t = "line", p = "stmt", nodes = {...} }
---      where t is the grammar or function name, p is the pattern name if any,
---		and nodes is an array of children parse tree nodes
 
 
 -- Parse the rest of an expression after leftSide using Precedence Climbing.
@@ -325,12 +349,13 @@ function parseOpExpr( leftSide, minPrecedence )
 			prec = binaryOpPrecedence[token.tt]
 		end
 		-- Build the node for this op
-		leftSide = { t = "expr", p = op.tt, nodes = { leftSide, rightSide } }
+		leftSide = makeParseTreeNode( "expr", op.tt, { leftSide, op, rightSide } )
 	end
 	return leftSide
 end
 
--- Attempt to parse the given grammar table
+-- Attempt to parse the given grammar table. 
+-- Return the parseTree if sucessful or nil if failure.
 function parseGrammar( grammar )
 	-- Consider each pattern in the grammar table that includes the syntaxLevel
 	local iStart = iToken
@@ -342,11 +367,7 @@ function parseGrammar( grammar )
 			local nodes = parsePattern( pattern )
 			if nodes then
 				-- This pattern matches, so make a grammar node and return it
-				local parseTree = {    -- TODO: get from pool
-					t = grammar.t, 
-					p = pattern[3],  -- pattern name
-					nodes = nodes, 
-				}
+				local parseTree = makeParseTreeNode( grammar.t, pattern[3], nodes )
 				trace("== Returning " .. grammar.t .. "[" .. i .. "] (" .. pattern[3] .. ")")
 				return parseTree
 			end
@@ -375,10 +396,7 @@ function parsePattern( pattern )
 			end
 			-- Matched a token
 			trace("Matched token " .. iToken .. " \"" .. token.str .. "\"")
-			-- Include tokens that are not simple separators/operators in the nodes array
-			if token.str ~= token.tt and token.tt ~= "END" then
-				nodes[#nodes + 1] = token
-			end
+			nodes[#nodes + 1] = token
 			iToken = iToken + 1
 		elseif t == "function" then
 			-- Call parsing function
@@ -417,6 +435,63 @@ function parsePattern( pattern )
 	return nodes
 end
 
+-- Try to parse the current token stream as a line of code at the given
+-- syntax level. If successful then return the parseTree. 
+-- If a parse cannot be made then return nil with the error state as set by
+-- the parser or a generic syntax error if the specific error is not known.
+local function parseLineGrammar( level )
+	-- Reset the parse state and parse the current token stream at level
+	err.clearErr()
+	syntaxLevel = level
+	iToken = 1
+	local parseTree = parseGrammar( line )
+	if parseTree then
+		return parseTree  -- success
+	end
+
+	-- Make a generic syntax error if the error is unknown
+	if not err.hasErr() then
+		local lastToken = tokens[#tokens - 1]  -- not counting the END
+		err.setErrTokenSpan( tokens[1], lastToken, "Syntax Error" )
+	end
+	return nil
+end
+
+-- Try to parse the current token stream as a line of code at the given
+-- syntax level. If successful then return the parseTree. 
+-- If a parse cannot be made then return nil with the error state as set by
+-- the parser or a generic syntax error if the specific error is not known.
+-- If parsing failed at this level but would succeed at a higher level, 
+-- then set the level info in the error state.
+local function parseCurrentLine( level )
+	-- Try at the requested syntax level first
+	local parseTree = parseLineGrammar( level )
+	if parseTree or level >= numSyntaxLevels then
+		return parseTree  -- success or no higher level to try
+	end
+
+	-- Try again at the highest level
+	parseTree = parseLineGrammar( numSyntaxLevels )
+	if parseTree == nil then
+		return nil   -- not parseable at all
+	end
+
+	-- Find the minimum successful syntax level
+	for tryLevel = level + 1, numSyntaxLevels do
+		parseTree = parseLineGrammar( tryLevel )
+		if parseTree then
+			-- Reparse at the requested level to restore the error state
+			parseTree = parseLineGrammar( level )
+			-- Add level info to the error state
+			local str = string.format( "(Use of %s requires syntax level %d)",
+								syntaxFeatures[tryLevel], tryLevel )
+			err.setLevelInfo( tryLevel, str )
+			return nil
+		end
+	end
+	assert( false )  -- loop should have succeeded by the last level
+end
+
 
 ----- Module functions -------------------------------------------------------
 
@@ -425,31 +500,18 @@ function parseJava.init()
 	javalex.init()
 end
 
--- Parse the given line of code at the given syntax level (default 12).
+-- Parse the given line of code at the given syntax level (default numSyntaxLevels).
 -- If startTokens is not nil, it is an array of tokens from a previous unfinished
 -- line to prepend to the tokens found on this line.
 -- Return the parse tree (recursive array of tokens and/or nodes).
 -- The given lineNumber will be assigned to the tokens found.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
--- If the line cannot be parsed then return (nil, errRecord).
--- An errRecord is, for example:
---       { strErr = "Missing semicolon", iLine = 10, iCharFirst = 56, iCharLast = 56 }
+-- If the line cannot be parsed then return nil and set the error state.
 function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	-- Run lexical analysis to get the tokens array
-	local errRecord
-	tokens, errRecord = javalex.getTokens( sourceLine, lineNumber )
+	tokens = javalex.getTokens( sourceLine, lineNumber )
 	if tokens == nil then
-		return nil, errRecord
-	end
-
-	-- Discard comment tokens
-	local i = 1
-	while i <= #tokens do
-		if tokens[i].tt == "COMMENT" then
-			table.remove( tokens, i )
-		else
-			i = i + 1
-		end
+		return nil
 	end
 
 	-- There sould be an "END" token at the end no matter what.
@@ -470,6 +532,18 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		startTokens = nil
 	end
 
+	-- Discard comment tokens, except if the entire line is a comment
+	if #tokens > 2 then
+		local i = 1
+		while i <= #tokens do
+			if tokens[i].tt == "COMMENT" then
+				table.remove( tokens, i )
+			else
+				i = i + 1
+			end
+		end
+	end
+
 	-- If this line ends in a comma token, then it is unfinished
 	assert( #tokens > 0 )
 	assert( tokens[#tokens].tt == "END" )
@@ -478,22 +552,12 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		return false, tokens
 	end
 
-	-- Set syntax level and try to parse the line grammar
-	syntaxLevel = level or 12
-	iToken = 1
-	local parseTree = parseGrammar( line )
-	if parseTree == nil then
-		-- Return generic syntax error for the entire line.
-		-- TODO: Return specific errors from parsing functions.
-		assert( lastToken )    -- blank lines can't be syntax errors
-		return nil, { 
-			strErr = "Syntax Error", 
-			iLine = lineNumber, 
-			iCharFirst = 1,
-			iCharLast = lastToken.iChar + string.len( lastToken.str ) - 1
-		}
+	-- Try to parse the line
+	local tree = parseCurrentLine( level or numSyntaxLevels )
+	if tree then
+		tree.iLine = lineNumber  -- store Java line number in the top tree node
 	end
-	return parseTree
+	return tree
 end
 
 -- Print a parse tree recursively at the given indentLevel.
@@ -504,6 +568,10 @@ function parseJava.printParseTree( node, indentLevel, file )
 		local s = string.rep("    ", indentLevel)  -- indentation
 		if node.tt then
 			-- Token node
+			-- Ignore tokens that are simple separators/operators
+			if node.str == node.tt or node.tt == "END" then
+				return
+			end
 			s = s .. node.tt .. " (" .. node.str .. ")"
 		else
 			-- Sub-tree node
