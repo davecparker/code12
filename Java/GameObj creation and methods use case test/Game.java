@@ -1,7 +1,7 @@
 
 import Code12.*;
 
-public class MainProgram extends Code12Program
+public class Game extends Code12Program
 {
     public GameObj player;
     public GameObj goal;
@@ -12,7 +12,7 @@ public class MainProgram extends Code12Program
 
     public static void main(String[] args)
     {
-        Code12.run(new MainProgram());
+        Code12.run(new Game());
     }
 
     public void start()
