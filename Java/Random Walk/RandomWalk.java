@@ -24,7 +24,6 @@
 
 // Type Conversion
 // ---------------
-// double ct.toDouble( int i )
 // int ct.toInt( double d )                // truncates
 
 import Code12.*;
@@ -67,19 +66,19 @@ class RandomWalk extends Code12Program
       // Draw horizontal lines
       for ( int i = 0; i < rowCount; i++ )
       {
-         double y = (ct.toDouble(i) + 0.5) * unitsPerSquare;
+         double y = (i + 0.5) * unitsPerSquare;
          ct.line(0, y, xMax, y);
       } 
       // Draw vertical lines
       for ( int i = 0; i < columnCount; i++ )
       {
-         double x = (ct.toDouble(i) + 0.5) * unitsPerSquare;
+         double x = (i + 0.5) * unitsPerSquare;
          ct.line(x, 0, x, yMax);
       } 
       
       // Make the walk marker
-      double x = ( ct.toDouble(ct.random( 1, columnCount )) - 0.5 ) * unitsPerSquare;
-      double y = ( ct.toDouble(ct.random( 1, rowCount )) - 0.5 ) * unitsPerSquare;
+      double x = ( ct.random(1, columnCount) - 0.5 ) * unitsPerSquare;
+      double y = ( ct.random(1, rowCount) - 0.5 ) * unitsPerSquare;
 
       marker = ct.circle( x, y, unitsPerSquare );
       
@@ -211,7 +210,7 @@ class RandomWalk extends Code12Program
          newY = marker.y;
       }
       GameObj pathLine = ct.line( marker.x, marker.y, newX, newY, "red" );
-      int lineWidth = ct.round( ct.toDouble(pixelsPerSquare) / 3.0 );
+      int lineWidth = ct.round( pixelsPerSquare / 3.0 );
       if ( lineWidth > 0 )
          pathLine.lineWidth = lineWidth;
       

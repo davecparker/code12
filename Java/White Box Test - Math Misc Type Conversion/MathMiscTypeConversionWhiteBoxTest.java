@@ -4,7 +4,7 @@
 // --------------
 // int ct.random( int min, int max )
 // int ct.round( double d )
-// double ct.round( double d, int numPlaces )
+// double ct.roundDecimal( double d, int numPlaces )
 // boolean ct.isError( double d )
 // double ct.distance( double x1, double y1, double x2, double y2 )
 // int ct.getTimer( )
@@ -52,6 +52,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
          
          runTests_random( true );
          runTests_round( true );
+         runTests_roundDecimal( true );
          runTests_intDiv( true );
 			runTests_isError( true );
          runTests_distance( true );
@@ -125,11 +126,11 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
          printError( "ct.round(" + d + ") = " + output + "; " + expected + " expected" );
    }
    
-   public void testRound( double d, int numPlaces, double expected )
+   public void testRoundDecimal( double d, int numPlaces, double expected )
    {
-      double output = ct.round(d, numPlaces);
+      double output = ct.roundDecimal(d, numPlaces);
       if ( Math.abs(output - expected) > EPSILON )
-         printError( "ct.round(" + d + ", " + numPlaces + ") = " + output + "; " + expected + " expected" );
+         printError( "ct.roundDecimal(" + d + ", " + numPlaces + ") = " + output + "; " + expected + " expected" );
    }
    
    public void testIntDiv( int n, int d, int expected )
@@ -248,10 +249,6 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    {
       if ( run )
       {  
-         // Ties round to the nearest even number if numPlaces is used
-         testRound( 1.45, 1, 1.4 ); 
-         testRound( 1.35, 1, 1.4 );
-      
          // If the argument is NaN, the result is 0
          testRound( 0.0/0, 0 );
          testRound( Math.log(-1), 0 );
@@ -268,15 +265,26 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
          testRound( (double)Integer.MAX_VALUE + 1, -2147483648 );
          
          testRound( Integer.MIN_VALUE, -2147483648 );
-         testRound( (double)Integer.MIN_VALUE - 1, 2147483647 );
-         
-         // How should negative values for numPlaces work?
-         testRound( 123456.7, -1, 123460.0 );
-         testRound( 123456.7, -2, 123500.0 );
-         testRound( 123456.7, -3, 123000.0 );
-         
+         testRound( (double)Integer.MIN_VALUE - 1, 2147483647 );       
          
          print( "ct.round tests done" );
+      }
+   }
+
+   public void runTests_roundDecimal( boolean run )
+   {
+      if ( run )
+      {  
+         // Ties round to the nearest even number if numPlaces is used
+         testRoundDecimal( 1.45, 1, 1.4 ); 
+         testRoundDecimal( 1.35, 1, 1.4 );
+               
+         // How should negative values for numPlaces work?
+         testRoundDecimal( 123456.7, -1, 123460.0 );
+         testRoundDecimal( 123456.7, -2, 123500.0 );
+         testRoundDecimal( 123456.7, -3, 123000.0 );
+         
+         print( "ct.roundDecimal tests done" );
       }
    }
    
@@ -403,8 +411,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    public void initTests_getTimer( boolean run )
    {
       if ( run )
-      {  
-         ct.println( "ct.getTimer() = "+ct.getTimer()+" when called from start()" ); 
+      { 
          timerDisplay = ct.text( "", 5, 10, 5 );
          timerDisplay.align( "left" );
          countDownDisplay = ct.text( "", 5, 20, 5 );
@@ -416,7 +423,9 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
       	double minutes = hours * 60;
       	double seconds = minutes * 60 - countDownSec;
       	int extraTimeMs = (int)(seconds * 1000);
-      	startTimeMs = System.currentTimeMillis() - extraTimeMs;
+         startTimeMs = System.currentTimeMillis() - extraTimeMs;
+         
+         print( "ct.getTimer() = "+ct.getTimer()+" when called from start()" );
       }
    }
    
