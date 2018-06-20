@@ -1,0 +1,325 @@
+Lua Code Constructs
+*******************
+
+Here is a very brief introduction to Lua coding syntax, as used by the 
+Code12 system. This is just part of Lua syntax, which is used by the 
+Java-to-Lua conversion of the Code12 desktop app. Each of the 12 Code12
+coding concepts is shown with an example in Java and the equivalent in Lua.
+
+
+1. Procedure Calls
+==================
+The syntax is very similar. Semicolons at the end are optional in Lua,
+and normally not used unless you are putting multiple statements on a line. 
+
+In Java, function names live in a different "name space" than variable names 
+(you can have a function and variable named the same thing), but they share 
+the same namespace in Lua, so in generated Lua, user-defined functions are 
+put inside a table (object) named "_fn". The Code12 API functions are under 
+a "ct" object so they look the same on both sides.
+
+Java
+----
+ct.circle( x, 200, r * 2 );
+myHelper( x, y );
+
+Lua
+---
+ct.circle( x, 200, r * 2 )
+_fn.myHelper( x, y )
+
+
+2. Comments
+===========
+In both languages, you can make a comment-to-end-of-line, or a block comment.
+Code12 code generation currently only preserves a comment-to-end-of-line that 
+is on its own line (not with any code), and all block comments are discarded.
+
+Java
+----
+// Comment to end of line
+/* Block comment */
+
+Lua
+---
+-- Comment to end of line
+--[[ Block comment ]]--
+
+
+3. Variables
+============
+In Lua, the type of a variable is determined automatically, so you don't
+specify it when you declare it. Also note that Lua has only one numeric type
+("number", which is like double in Java) instead of int vs. double.
+
+The are many rules governing the "scope" of variables in both languages. 
+But in the subset used by Code12, there are two cases: instance variables
+(variables declared outside of a function -- all functions can access these),
+or local variables (declared inside a function or code block). Instance variables
+are technically fields of the "this" object in Java, so in the generated Lua code,
+we simulate this with a special object named "this" used it explicitly. Local
+variables in Lua must be introduced (declared) with the "local" keyword.
+
+If you don't initialize a new variable to a value, Java and Lua have different
+rules about what happens, so the code generation always explicitly initializes 
+them. The Lua constant "nil" corresponds to Java's "null" (for an uninitialized 
+Object -- GameObj or String in our case). 
+
+Java
+----
+class myProgram
+{
+    GameObj hero;
+    int count = 3;
+
+    void myFunc()
+    {
+        int sum;
+        double ratio = 1.5;
+    }
+}
+
+Lua
+---
+this.hero = nil
+this.count = 3
+
+function _fn.myFunc()
+    local sum = 0
+    local ratio = 1.5
+end
+
+
+4. Expressions
+==============
+Expression syntax (e.g. calculations with operators such as "x + 3") 
+are very similar. One difference is that Java uses "+" for string concatenation 
+as well as numeric addition, but in Lua strings are concatenated with ".."
+
+Java
+----
+x = (start + 3) * size - 1;
+name = firstName + " " + lastName;
+
+Lua
+---
+x = (start + 3) * size - 1
+name = firstName .. " " .. lastName
+
+
+5. Function Calls
+=================
+For the subset we are using, there are no real syntax differences for functions 
+that return a value. You can ignore the value, assign it to a variable, or use 
+it in an expression.
+
+Java
+----
+fish = ct.image( "goldfish.png", 100, 200, 50 );
+ct.setHeight( calcHeight() );
+
+Lua
+---
+fish = ct.image( "goldfish.png", 100, 200, 50 )
+ct.setHeight( calcHeight() )
+
+
+6. Object Data Fields
+=====================
+As we use them data fields have the same syntax using "." (dot).
+
+Java
+----
+fish.x = fish.x + 1;
+
+Lua
+---
+fish.x = fish.x + 1
+
+
+7. Object Method Calls
+======================
+In Lua, an object-oriented method call is called using a colon (:)
+instead of a dot (.) as in Java. You will also see dot used in Lua,
+but these calls are not in the full OOP way (Lua gives you the choice).
+
+Java
+----
+ball.setFillColor( "blue" );
+
+Lua
+---
+ball:setFillColor( "blue" )
+
+
+8. If-else 
+==========
+Take a look at the following examples to see the syntax.
+Also shown are the Lua equivalents to Java's &&, ||, and !
+operators.
+
+Java
+----
+if (x < 10)
+    x == 10;
+
+if (x < 0 && y < 0)
+    x = 0;
+else
+    x = x + 1;
+
+if (x < 0 || x > 10)
+{
+	x = 0;
+	y = 0;
+}
+else if (!done)
+{
+	x = 10;
+	y = 10;
+}
+else
+{
+	x = y + 1;
+}
+
+Lua
+---
+if x < 10 then
+    x == 10
+end
+
+if x < 0 and y < 0 then
+    x = 0
+else
+    x = x + 1
+end
+
+if x < 0 or x > 10 then
+	x = 0
+	y = 0
+elseif not done then
+	x = 10
+	y = 10
+else
+	x = y + 1
+end
+
+
+9. Function Definitions
+=======================
+Like variables, in Lua you don't specify the return type
+of a function, it is determined automatically.
+In our generated Lua, functions live in the _fn table.
+
+Java
+----
+void resetScore()
+{
+	score = 0;
+}
+
+int highScore()
+{
+	return scores[max];
+}
+
+Lua
+---
+function _fn.resetScore()
+	score = 0;
+end
+
+function _fn.highScore()
+	return scores[max]
+end
+
+
+10. Parameters
+==============
+Also like variables, function parameters listed in
+the function definition do not need types specified.
+Otherwise, they act similarly.
+
+Java
+----
+void makeHero(double x, double y, String name)
+{
+    hero = ct.circle( x, y, 10 );
+    hero.text = name;
+}
+
+Lua
+---
+function makeHero(x, y, name)
+    hero = ct.circle( x, y, 10 )
+    hero.text = name
+end
+
+
+11. Loops
+=========
+A "while" loop is similar in both Java and Lua.
+A "do-while" in Java is like "repeat-until" in Lua except
+that note that the sense of the test is reversed.
+The "for" loop in Java is very flexible. Lua also has 
+a "for" loop but is is more restricted, so a Java "for"
+loop will always generate a Lua "while" loop with other
+supporting statements.
+
+Java
+----
+while (x < 10)
+{
+	doMore();
+}
+
+do
+{
+	x = x * 2;
+}
+while (x < 10);
+
+for (int i = 0; i < 10; i++)
+{
+	ct.print(i);
+}
+
+Lua
+---
+while x < 10 do
+	doMore()
+end
+
+repeat
+	x = x * 2
+until x >= 10
+
+-- Will be generated as follows:
+local i = 0
+while i < 10 do
+	ct.print(i)
+	i = i + 1
+end
+
+                  
+12. Arrays
+==========
+Arrays in Lua are called "tables". When using an integer index,
+Lua arrays normally start at 1 instead of 0. Declaring a max
+size is not necessary, nor do you need to specify the element type.
+
+Java
+----
+GameObj[] asteroids = new GameObj[10];
+int[] scores = { 100, 200, 300, 400 };
+first = scores[0];
+
+Lua
+---
+GameObj = {}
+scores = { 100, 200, 300, 400 }
+first = scores[1]
+
+
+
