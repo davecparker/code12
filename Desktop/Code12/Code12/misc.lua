@@ -109,3 +109,38 @@ function ct.getVersion(...)
 	return g.version 
 end
 
+
+-------------- String API Support Functions (not public) --------------
+
+-- Compare strings s1 and s2 as per Java's s1.compareTo( s2 )
+function ct.stringCompare( s1, s2 )
+	if s1 == s2 then
+		return 0
+	elseif s1 < s2 then
+		return -1
+	else
+		return 1
+	end
+end
+
+-- Return the 0-based index for substring search or -1 if not found,
+-- as per Java's s1.indexOf( s2 )
+function ct.indexOfString( s1, s2 )
+	return (string.find( s1, s2, 1, true ) or 0) - 1
+end
+
+-- Return a substring per Java's s:substring( iBegin, iEnd )
+-- iEnd is optional, the indexes are 0-based, and the substring ends before iEnd.
+function ct.substring( s, iBegin, iEnd )
+	return string.sub( s, iBegin + 1, iEnd )
+end
+
+-- Return string with leading and trailing whitespace removed,
+-- as per Java's s:trim()
+function ct.trimString( s )
+	-- This is trim6 from http://lua-users.org/wiki/StringTrim
+	return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
+end
+
+
+
