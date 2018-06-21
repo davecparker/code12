@@ -143,4 +143,23 @@ class UserCode extends Code12Program
 		int [] aTest;
 		aTest = new int[10];
 	}
+
+	public void onKeyPress( String key )
+	{
+		if (key.equals("b"))
+			ct.println( "b was pressed" );
+		else if (key.length() > 1)
+			ct.println( "Long key" );
+
+		String s = "  Dave ";
+		ct.println(s.compareTo("Parker"));
+		ct.log(s, s.trim(), s.toUpperCase(), s.substring(2), s.substring(2, 6), s.indexOf("D"));
+
+		// Some common errors:
+		// if (speed = 0)
+		// 	ct.println("Still");
+
+		// if (key == "n")
+		// 	ct.print("n key");		
+	}
 }

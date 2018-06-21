@@ -399,12 +399,26 @@ local function vtExprEquality( nodes )
 	local vtLeft = nodes[1].info.vt
 	local vtRight = nodes[3].info.vt
 	if javaTypes.canCompareVts( vtLeft, vtRight ) then
+		-- Don't allow comparing Strings with ==
+		if vtLeft == "String" then
+			err.setErrNodeAndRef( nodes[2], nodes[1],
+					"Use str1.equals( str2 ) to compare two String values" )
+			return nil
+		end
 		return true
 	end
 	err.setErrNodeAndRef( nodes[1], nodes[3], "Cannot compare %s to %s", 
 		javaTypes.typeNameFromVt( vtLeft ), javaTypes.typeNameFromVt( vtRight ) )
 	return nil
 end
+
+-- expr pattern: = (incorrect use of = as a binary operator) 
+local function vtExprBadEquality( nodes )
+	err.setErrNodeAndRef( nodes[2], nodes[1],
+					"Use == to compare for equality (= is for assignment)" )
+	return nil
+end
+
 
 -- Since there are so many primaryExpr and expr patterns, we hash them to functions
 local fnVtExprPatterns = {
@@ -433,6 +447,7 @@ local fnVtExprPatterns = {
 	[">="]          = vtExprInequality,
 	["=="]          = vtExprEquality,
 	["!="]          = vtExprEquality,
+	["="]           = vtExprBadEquality,
 }
 
 -- Return the value type (vt) for an expr, primaryExpr, or lValue node.
