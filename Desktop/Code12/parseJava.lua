@@ -83,6 +83,7 @@ local binaryOpPrecedence = {
 	[">"]	= 9,
 	[">="]	= 9,
 	["=="]	= 8,
+	["="]   = 8,  -- parse as alias for == then give error later
 	["!="]	= 8,
 	["&"]	= 7,
 	["^"]	= 6,

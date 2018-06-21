@@ -7,9 +7,10 @@ application =
 {
 	content =
 	{
-		width = 600,
-		height = 900, 
-		scale = "adaptive",
+		-- Use native device pixel resolution with no scaling
+		-- width = 600,
+		-- height = 900, 
+		-- scale = "adaptive",
 		fps = 60,
 		
 		--[[

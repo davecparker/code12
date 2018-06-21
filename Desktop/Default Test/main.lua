@@ -24,11 +24,16 @@ require('Code12.api')
         this.ball = ct.circle(x + 6, 15, 5)
         ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5)
         this.bigBall = ct.circle(x, 80, 40)
-        this.bigBall:setFillColor("blue")
+        this.bigBall:setFillColorRGB(400, 127, -50)
         this.bigBall.clickable = true
         
         -- Add a fish
         ct.image("goldfish.png", 50, 50, 15)
+        
+        -- Make a line
+        local line1 = ct.line(20, 80, 80, 80, "red")
+        line1:setLineColor("MAGENTA")
+        line1:setFillColor("red")
         
         local z = this.ball.x + 1
         if this.ball == this.bigBall or this.bigBall ~= nil then
@@ -142,4 +147,23 @@ require('Code12.api')
         
         local aTest = nil
         aTest = { length = 10 }
+    end
+    
+    function onKeyPress(key)
+        
+        if (key == "b") then
+            ct.println("b was pressed"); 
+        elseif string.len(key) > 1 then
+            ct.println("Long key"); end
+        
+        local s = "  Dave "
+        ct.println(ct.stringCompare(s, "Parker"))
+        ct.log(s, ct.trimString(s), string.upper(s), ct.substring(s, 2), ct.substring(s, 2, 6), ct.indexOfString(s, "D"))
+        
+        -- Some common errors:
+        -- if (speed = 0)
+        --     ct.println("Still");
+        
+        -- if (key == "n")
+        --     ct.print("n key");        
     end

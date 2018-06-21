@@ -68,6 +68,17 @@ local luaOpFromJavaOp = {
 	["/="]	= " / ",
 }
 
+-- Map Java String methods to corresponding Lua function
+local luaFnFromJavaStringMethod = {
+    ["compareTo"]    =  "ct.stringCompare",
+    ["indexOf"]      =  "ct.indexOfString",
+    ["length"]       =  "string.len",
+    ["substring"]    =  "ct.substring",
+    ["toLowerCase"]  =  "string.lower",
+    ["toUpperCase"]  =  "string.upper",
+    ["trim"]         =  "ct.trimString",
+}
+
 
 --- Utility Functions --------------------------------------------------------
 
@@ -158,25 +169,45 @@ function fnCallCode( tree )
 	local fnValue = nodes[1]
 	local exprs = nodes[3].nodes
 	if fnValue.p == "method" then
+		-- Method call
 		local objNode = fnValue.nodes[1]
+		assert( objNode.tt == "ID" )   -- TODO: arrays
+		local objName = objNode.str
 		local methodNode = fnValue.nodes[2]
-		local objName = objNode.str		
+		assert( methodNode.tt == "ID" )
+		local methodName = methodNode.str
+
 		if objName == "Math" then 
-			parts = { "math.", methodNode.str, "(" }   -- Lua same as Java for all supported methods :)
-		elseif checkJava.isInstanceVarName( objName ) then
-			parts = { "this.", objName, ":", methodNode.str, "(" }  -- e.g. this.ball:delete(
+			-- Lua math.xxx is the same as Java Math.xxx for all supported methods :)
+			parts = { "math.", methodName, "(" }
+		elseif checkJava.vtVar( objNode ) == "String" then
+			-- Supported String class methods
+			if methodName == "equals" then
+				-- Lua does string value comparison directly with ==
+				return "(" .. varNameCode( objName ) .. " == " .. exprCode( exprs[1] ) .. ")"
+			else
+				-- Map to corresponding global Lua function, passing the object.  
+				parts = { luaFnFromJavaStringMethod[methodName], "(", varNameCode( objName ) }
+				if #exprs > 0 then
+					parts[4] = ", "
+				end
+			end
 		else
-			parts = { objName, ":", methodNode.str, "(" }  -- e.g. obj:delete(
+			-- GameObj method, e.g. obj:delete(
+			parts = { varNameCode( objName ), ":", methodName, "(" }
 		end
 	else
+		-- Function call
 		local fnName = fnValue.str
 		if string.starts( fnName, ctPrefix ) then
+			-- ct API call
 			if not ctDefined then
 				err.setErrNode( fnValue, "Code12 API functions cannot be called before start()" )
 				return nil
 			end
 			parts = { fnName, "(" }            -- e.g. ct.circle(
 		else
+			-- User-defined function call
 			parts = { fnPrefix, fnName, "(" }   -- e.g. _fn.updateScore(
 		end
 	end

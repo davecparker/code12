@@ -17,6 +17,7 @@ local GameObj = require("Code12.GameObjAPI")
 -- API
 function ct.setTitle(title, ...)
 	-- Check parameters
+	title = title or "Code12"
 	if g.checkAPIParams("ct.setTitle") then
 		g.check1Param("string", title, ...)
 	end
@@ -31,29 +32,45 @@ function ct.setHeight(height, ...)
 	if g.checkAPIParams("ct.setHeight") then
 		g.check1Param("number", height, ...)
 	end
+	height = g.pinValue(height, 1, 10000)
 
-	-- Unfortunately a Corona desktop app cannot change the window size via software,
-	-- and a Corona mobile app can't affect the screen size at all, so height here
-	-- only determines whether we switch to landscape (only on mobile).
-
-	-- Is the requested aspect landscape?
-	if g.isMobile and height < g.WIDTH then
-		-- Landscape
-		g.window.horz = g.device.vert
-		g.window.vert = g.device.horz
-		g.mainGroup.rotation = 90
-		g.mainGroup.x = g.device.horz.origin + g.device.horz.size
+	-- Are we embedded in an external app window?
+	local appContext = ct._appContext
+	if appContext then
+		-- (Embedded) Make sure we show the whole output, scaling as necessary
+		local windowAspect = appContext.widthP / appContext.heightP
+		local aspect = g.WIDTH / height
+		if aspect > windowAspect then
+			g.window.width = appContext.widthP             -- use the full width
+			g.window.height = appContext.widthP / aspect   -- extra room below
+		else
+			g.window.height = appContext.heightP           -- use the full height
+			g.window.width = appContext.heightP * aspect   -- extra room to the right
+		end
+		appContext.setClipSize(g.window.width, g.window.height)
 	else
-		-- Portrait
-		g.window.horz = g.device.horz
-		g.window.vert = g.device.vert
-		g.mainGroup.rotation = 0
-		g.mainGroup.x = g.device.horz.origin
+		-- (Standalone or mobile)
+		-- Unfortunately a Corona desktop app cannot change the window size via software,
+		-- and a Corona mobile app can't affect the screen size at all, so height here
+		-- only determines whether we switch to landscape on mobile.
+		if g.isMobile and height < g.WIDTH then
+			-- Landscape mobile: ignore height, rotate 90 degrees, and use the entire device
+			g.window.width = g.device.height
+			g.window.height = g.device.width
+			g.mainGroup.rotation = 90
+			g.mainGroup.x = g.device.width
+		else
+			-- Portrait mobile or standalone: ignore height and use the entire device
+			g.window.width = g.device.width
+			g.window.height = g.device.height
+			g.mainGroup.rotation = 0
+			g.mainGroup.x = 0
+		end
 	end
 
-	-- Compute new actual logical height
-	g.height = g.WIDTH * g.window.vert.size / g.window.horz.size
-	g.scale = g.window.horz.size / g.WIDTH
+	-- Compute new actual logical height and scaling factor
+	g.height = g.WIDTH * g.window.height / g.window.width
+	g.scale = g.window.width / g.WIDTH
 	g.window.resized = true
 end
 
@@ -104,6 +121,7 @@ end
 -- API
 function ct.setScreen(name, ...)
 	-- Check parameters
+	name = name or ""
 	if g.checkAPIParams("ct.setScreen") then
 		g.check1Param("string", name, ...)
 	end
@@ -156,6 +174,7 @@ end
 -- API
 function ct.clearGroup(group, ...)
 	-- Check parameters
+	group = group or ""
 	if g.checkAPIParams("ct.clearGroup") then
 		g.check1Param("string", group, ...)
 	end
@@ -173,6 +192,7 @@ end
 -- API
 function ct.setBackColor(colorName, ...)
 	-- Check parameters
+	colorName = colorName or ""
 	if g.checkAPIParams("ct.setBackColor") then
 		g.check1Param("string", colorName, ...)
 	end
@@ -199,6 +219,9 @@ function ct.setBackColorRGB(red, green, blue, ...)
 	if g.checkAPIParams("ct.setBackColorRGB") then
 		g.checkTypes({"number", "number", "number"}, red, green, blue, ...)
 	end
+	red = g.pinValue(red, 0, 255)
+	green = g.pinValue(green, 0, 255)
+	blue = g.pinValue(blue, 0, 255)
 
 	-- Make a default background rect first, then set its color
 	ct.setBackColor("white")
@@ -208,6 +231,7 @@ end
 -- API
 function ct.setBackImage(filename, ...)
 	-- Check parameters
+	filename = filename or ""
 	if g.checkAPIParams("ct.setBackImage") then
 		g.check1Param("string", filename, ...)
 	end
@@ -217,6 +241,9 @@ function ct.setBackImage(filename, ...)
 	if backObj then
 		backObj:delete()
 		g.screen.backObj = nil
+	end
+	if filename == "" then
+		return
 	end
 
 	-- Make an image object with temporary position and size for now
