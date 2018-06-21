@@ -24,11 +24,16 @@ class UserCode extends Code12Program
 		ball = ct.circle(x + 6, 15, 5);
 		ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5);
 		bigBall = ct.circle(x, 80, 40);
-		bigBall.setFillColor( "blue" );
+		bigBall.setFillColorRGB(400, 127, -50);
 		bigBall.clickable = true;
 
 		// Add a fish
 		ct.image("goldfish.png", 50, 50, 15);
+
+		// Make a line
+		GameObj line1 = ct.line(20, 80, 80, 80, "red");
+		line1.setLineColor("MAGENTA");
+		line1.setFillColor("red");
 
 		double z = ball.x + 1;
 		if (ball == bigBall || bigBall != null)

@@ -133,7 +133,7 @@ function GameObj:newLine(group, x1, y1, x2, y2, colorName)
 	gameObj:setObj(display.newLine(group, x1, y1, x2, y2))
 	gameObj.updateSize = GameObj.updateSizeLine   -- override sizing method
 	gameObj.objContainsPoint = function () return false end   -- lines have no interior
-	gameObj:setLineColorFromName("black")
+	gameObj:setLineColorFromName(colorName or "black")
 	return gameObj
 end
 
@@ -414,7 +414,7 @@ local alignments = {
 -- Set an object's alignment from an alignment name. 
 -- If the name is invalid, print a warning and don't change the object.
 function GameObj:setAlignmentFromName(alignment)
-	local anchorXY = alignments[alignment]
+	local anchorXY = alignments[string.lower(alignment)]
 	if anchorXY then
 		local obj = self._code12.obj
 		obj.anchorX = anchorXY[1]
@@ -436,7 +436,7 @@ local colors = {
     ["green"] =          {0, 255, 0},
     ["blue"] =           {0, 0, 255},
     ["cyan"] =           {0, 255, 255},
-    ["majenta"] =        {255, 0, 255},
+    ["magenta"] =        {255, 0, 255},
     ["yellow"] =         {255, 255, 0},
          
     ["gray"] =           {127, 127, 127},
@@ -449,7 +449,7 @@ local colors = {
     ["light green"] =    {127, 255, 127},
     ["light blue"] =     {127, 127, 255},
     ["light cyan"] =     {127, 255, 255},
-    ["light majenta"] =  {255, 127, 255},
+    ["light magenta"] =  {255, 127, 255},
     ["light yellow"] =   {255, 255, 127},
 
     ["dark gray"] =      {64, 64, 64},
@@ -457,13 +457,13 @@ local colors = {
     ["dark green"] =     {0, 127, 0},
     ["dark blue"] =      {0, 0, 127},
     ["dark cyan"] =      {0, 127, 127},
-    ["dark majenta"] =   {127, 0, 127},
+    ["dark magenta"] =   {127, 0, 127},
     ["dark yellow"] =    {127, 127, 0},
 }
 
 -- Return the color for the given color name, or gray if name not known.
 local function colorFromName(colorName)
-	local color = colors[colorName]
+	local color = colors[string.lower(colorName)]
 	if color then
 		return color
 	end
@@ -475,10 +475,15 @@ end
 function GameObj:setFillColorFromColor(color)
 	self._code12.fillColor = color
 	local obj = self._code12.obj
-	if color then
-		obj:setFillColor(color[1] / 255, color[2] / 255, color[3] / 255)
-	else
-		obj:setFillColor(0, 0, 0, 0)   -- alpha 0 makes transparent fill
+	if obj.setFillColor then  -- lines don't have a setFillColor method
+		if color then
+			obj:setFillColor(
+					g.pinValue(color[1], 0, 255) / 255, 
+					g.pinValue(color[2], 0, 255) / 255, 
+					g.pinValue(color[3], 0, 255) / 255)
+		else
+			obj:setFillColor(0, 0, 0, 0)   -- alpha 0 makes transparent fill
+		end
 	end
 end
 
@@ -487,7 +492,10 @@ function GameObj:setLineColorFromColor(color)
 	self._code12.lineColor = color  -- nil will set 0 strokeWidth at update
 	local obj = self._code12.obj
 	if color then
-		obj:setStrokeColor(color[1] / 255, color[2] / 255, color[3] / 255)
+		obj:setStrokeColor(
+				g.pinValue(color[1], 0, 255) / 255, 
+				g.pinValue(color[2], 0, 255) / 255, 
+				g.pinValue(color[3], 0, 255) / 255)
 	end
 end
 
