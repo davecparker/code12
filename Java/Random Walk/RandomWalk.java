@@ -1,5 +1,5 @@
 // Random Walk
-// Code12 Programming Concepts 8: If-else
+// Code12 Programming Concepts 9: Function Definitions
 
 // An animation of a random walk.
 // Resizing the window restarts the random walk with a larger lattice.
@@ -34,56 +34,19 @@ class RandomWalk extends Code12Program
    { 
       Code12.run(new RandomWalk()); 
    }
-   
-   int pixelsPerSquare; // Dimension of the lattice grid
-   double xMax; // Maximum x coordinate of the window
-   double yMax; // Maximum y coordinate of the window
-   double pixelsPerUnit; // Pixels per coordinate unit
-   double unitsPerSquare; // Coordinate units per lattice grid square
-   GameObj marker; // Circle used to mark the random walk
-   int rowCount; // Number of horizontal lines in the lattice
-   int columnCount; // Number of vertical lines in the lattice
+   // TODO: fields where initialized in restart(); causes Code12 runtime to see them as unitialized before use
+   int pixelsPerSquare = 0; // Dimension of the lattice grid
+   double xMax = 0.0; // Maximum x coordinate of the window
+   double yMax = 0.0; // Maximum y coordinate of the window
+   double pixelsPerUnit = 0.0; // Pixels per coordinate unit
+   double unitsPerSquare = 0.0; // Coordinate units per lattice grid square
+   GameObj marker = null; // Circle used to mark the random walk
+   int rowCount = 0; // Number of horizontal lines in the lattice
+   int columnCount = 0; // Number of vertical lines in the lattice
    
    public void start()
    {  
-      // Set the title
-      ct.setTitle( "Random Walk" );
-      
-      // Initialize size variables
-      pixelsPerSquare = 8;
-      
-      // Set background
-      ct.setBackColor( "light yellow" );
-
-      // Set the lattice variables
-      xMax = ct.getWidth();
-      yMax = ct.getHeight();
-      pixelsPerUnit = ct.getPixelsPerUnit();
-      unitsPerSquare = pixelsPerSquare / pixelsPerUnit;
-      rowCount = ct.toInt( yMax / unitsPerSquare );
-      columnCount = ct.toInt( xMax / unitsPerSquare );
-      
-      // Draw horizontal lines
-      for ( int i = 0; i < rowCount; i++ )
-      {
-         double y = (i + 0.5) * unitsPerSquare;
-         ct.line(0, y, xMax, y);
-      } 
-      // Draw vertical lines
-      for ( int i = 0; i < columnCount; i++ )
-      {
-         double x = (i + 0.5) * unitsPerSquare;
-         ct.line(x, 0, x, yMax);
-      } 
-      
-      // Make the walk marker
-      double x = ( ct.random(1, columnCount) - 0.5 ) * unitsPerSquare;
-      double y = ( ct.random(1, rowCount) - 0.5 ) * unitsPerSquare;
-
-      marker = ct.circle( x, y, unitsPerSquare );
-      
-      // Make the start marker
-      GameObj startMarker = ct.circle( marker.x, marker.y, unitsPerSquare, "green" );    
+      restart();  
    }
    
    public void update()
@@ -225,6 +188,48 @@ class RandomWalk extends Code12Program
       ct.clearScreen();
       
       // Restart the random walk
-      start();
+      restart();
+   }
+
+   void restart() // TODO: was public void restart()
+   {
+   	// Set the title
+      ct.setTitle( "Random Walk" );
+      
+      // Initialize size variables
+      pixelsPerSquare = 8;
+      
+      // Set background
+      ct.setBackColor( "light yellow" );
+
+      // Set the lattice variables
+      xMax = ct.getWidth();
+      yMax = ct.getHeight();
+      pixelsPerUnit = ct.getPixelsPerUnit();
+      unitsPerSquare = pixelsPerSquare / pixelsPerUnit;
+      rowCount = ct.toInt( yMax / unitsPerSquare );
+      columnCount = ct.toInt( xMax / unitsPerSquare );
+      
+      // Draw horizontal lines
+      for ( int i = 0; i < rowCount; i++ )
+      {
+         double y = (i + 0.5) * unitsPerSquare;
+         ct.line(0, y, xMax, y);
+      } 
+      // Draw vertical lines
+      for ( int i = 0; i < columnCount; i++ )
+      {
+         double x = (i + 0.5) * unitsPerSquare;
+         ct.line(x, 0, x, yMax);
+      } 
+      
+      // Make the walk marker
+      double x = ( ct.random(1, columnCount) - 0.5 ) * unitsPerSquare;
+      double y = ( ct.random(1, rowCount) - 0.5 ) * unitsPerSquare;
+
+      marker = ct.circle( x, y, unitsPerSquare );
+      
+      // Make the start marker
+      GameObj startMarker = ct.circle( marker.x, marker.y, unitsPerSquare, "green" );
    }
 }
