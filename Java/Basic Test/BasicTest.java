@@ -46,6 +46,7 @@ class BasicTest extends Code12Program
       r.clickable = true;
       
       circle = ct.circle(50, 20, 10, "orange");
+      circle.setFillColorRGB(400, 127, -50);
       circle.clickable = true;
       circle.group = "dots";
 

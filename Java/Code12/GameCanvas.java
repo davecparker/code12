@@ -31,6 +31,7 @@ class GameCanvas extends Canvas implements ActionListener
    {
       game = new Game(program, window, width, height);
       program.ct = game;
+      game.startTimer();
       program.start();   // main program creates objects here
 
       // Add input event listeners, sent to the GameInput helper
@@ -45,7 +46,6 @@ class GameCanvas extends Canvas implements ActionListener
       int ms = 1000 / FPS;   // frame time in milliseconds
       Timer timer = new Timer(ms, this);
       timer.start();
-      game.startTimer();
    }
     
    // Action function for frame timer: Update and redraw the canvas.

@@ -111,7 +111,10 @@ public class Game implements GameInterface
    public boolean inputBoolean(String message)
    {
       String s = inputString(message);
-      char ch = s.trim().toLowerCase().charAt(0);
+      s = s.trim().toLowerCase();
+      if (s.length() < 1)
+         return false;
+      char ch = s.charAt(0);
       return (ch == 'y' || ch == 't' || ch == '1');   // yes, true, 1, etc.
    }
    
@@ -314,6 +317,8 @@ public class Game implements GameInterface
    public int getTimer()
    {
       // Returning an int, this lasts 23 days before a roll-over.
+      if (startTimeMs == 0)
+         return 0;   // called before start
       return (int) (System.currentTimeMillis() - startTimeMs);
    }
    

@@ -95,7 +95,7 @@ function ct.getTimer(...)
 	if g.startTime then
 		return system.getTimer() - g.startTime
 	end
-	return 0   -- called before first update, just return 0
+	return 0   -- called before start
 end
 
 -- API

@@ -46,6 +46,7 @@ require('Code12.api')
         r.clickable = true
         
         this.circle = ct.circle(50, 20, 10, "orange")
+        this.circle:setFillColorRGB(400, 127, -50)
         this.circle.clickable = true
         this.circle.group = "dots"
         

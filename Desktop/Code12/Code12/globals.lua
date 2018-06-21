@@ -42,7 +42,7 @@ local g = {
 	screen = nil,       -- current screen in screens table
 
 	-- Game state
-	startTime = 0,         -- System time in ms when first udpate started
+	startTime = nil,       -- System time in ms when start function began, or nil before
 	clicked = false,       -- true if something was clicked during this update frame
 	gameObjClicked = nil,  -- Object clicked during this update frame, nil if none
 	clickX = 0,            -- Last click x location 

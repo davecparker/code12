@@ -87,6 +87,9 @@ end
 
 -- The enterFrame listener for the first update only
 local function onFirstFrame(event)
+	-- Start the game timer
+	g.startTime = system.getTimer()
+
 	-- Call client's start method if any
 	if type(start) == "function" then
 		start()
@@ -97,9 +100,6 @@ local function onFirstFrame(event)
 	for i = 1, objs.numChildren do
 		objs[i].code12GameObj:sync()
 	end
-
-	-- Start the game timer
-	g.startTime = system.getTimer()
 
 	-- Switch to the normal frame update handler for subsequent frames
 	Runtime:removeEventListener("enterFrame", onFirstFrame)
@@ -155,7 +155,7 @@ local function stopRun()
 	g.screen = nil
 
 	-- Clear misc global game state
-	g.startTime = 0
+	g.startTime = nil
 	g.clicked = false
 	g.gameObjClicked = nil
 	g.clickX = 0
