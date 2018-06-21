@@ -57,7 +57,7 @@ But in the subset used by Code12, there are two cases: instance variables
 (variables declared outside of a function -- all functions can access these),
 or local variables (declared inside a function or code block). Instance variables
 are technically fields of the "this" object in Java, so in the generated Lua code,
-we simulate this with a special object named "this" used it explicitly. Local
+we simulate this with a special object named "this" and use it explicitly. Local
 variables in Lua must be introduced (declared) with the "local" keyword.
 
 If you don't initialize a new variable to a value, Java and Lua have different
@@ -161,7 +161,7 @@ operators.
 Java
 ----
 if (x < 10)
-    x == 10;
+    x = 10;
 
 if (x < 0 && y < 0)
     x = 0;
@@ -186,7 +186,7 @@ else
 Lua
 ---
 if x < 10 then
-    x == 10
+    x = 10
 end
 
 if x < 0 and y < 0 then
@@ -227,7 +227,7 @@ int highScore()
 Lua
 ---
 function _fn.resetScore()
-	score = 0;
+	score = 0
 end
 
 function _fn.highScore()
@@ -260,12 +260,12 @@ end
 11. Loops
 =========
 A "while" loop is similar in both Java and Lua.
-A "do-while" in Java is like "repeat-until" in Lua except
-that note that the sense of the test is reversed.
+A "do-while" in Java is like "repeat-until" in Lua
+except that the sense of the test is reversed.
 The "for" loop in Java is very flexible. Lua also has 
-a "for" loop but is is more restricted, so a Java "for"
-loop will always generate a Lua "while" loop with other
-supporting statements.
+a "for" loop but it is more restricted, so a Java "for"
+loop will always generate a Lua "while" loop along with 
+other supporting statements.
 
 Java
 ----
@@ -295,7 +295,7 @@ repeat
 	x = x * 2
 until x >= 10
 
--- Will be generated as follows:
+-- Will be generated as follows (except different formatting):
 local i = 0
 while i < 10 do
 	ct.print(i)
@@ -317,9 +317,8 @@ first = scores[0];
 
 Lua
 ---
-GameObj = {}
-scores = { 100, 200, 300, 400 }
-first = scores[1]
-
+local asteroids = {}
+local scores = { 100, 200, 300, 400 }
+local first = scores[1]
 
 
