@@ -177,7 +177,10 @@ function fnCallCode( tree )
 		assert( methodNode.tt == "ID" )
 		local methodName = methodNode.str
 
-		if checkJava.vtVar( objNode ) == "String" then
+		if objName == "Math" then 
+			-- Lua math.xxx is the same as Java Math.xxx for all supported methods :)
+			parts = { "math.", methodName, "(" }
+		elseif checkJava.vtVar( objNode ) == "String" then
 			-- Supported String class methods
 			if methodName == "equals" then
 				-- Lua does string value comparison directly with ==
@@ -189,9 +192,6 @@ function fnCallCode( tree )
 					parts[4] = ", "
 				end
 			end
-		elseif objName == "Math" then 
-			-- Lua math.xxx is the same as Java Math.xxx for all supported methods :)
-			parts = { "math.", methodName, "(" }
 		else
 			-- GameObj method, e.g. obj:delete(
 			parts = { varNameCode( objName ), ":", methodName, "(" }
