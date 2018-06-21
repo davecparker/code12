@@ -317,6 +317,8 @@ public class Game implements GameInterface
    public int getTimer()
    {
       // Returning an int, this lasts 23 days before a roll-over.
+      if (startTimeMs == 0)
+         return 0;   // called before start
       return (int) (System.currentTimeMillis() - startTimeMs);
    }
    

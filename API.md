@@ -213,13 +213,13 @@ then create a new empty screen with this name and set it as the
 current screen.
 
 `GameObj` objects that are created are always created on
-the current screen, so to create two screens in your `setup`
+the current screen, so to create two screens in your `start`
 function:
 1. Call `ct.setScreen()` to name the first screen
 2. Create `GameObj` objects for the first screen
 3. Call `ct.setScreen()` to name the second screen
 4. Create `GameObj` objects for the second screen
-5. At the end of `setup`, call `ct.setScreen()` to set the
+5. At the end of `start`, call `ct.setScreen()` to set the
 desired starting screen for your application.
 
 ### ct.clearScreen()
@@ -481,8 +481,7 @@ Return the distance between the points (`x1`, `y1`) and (`x2`, `y2`).
 int ct.getTimer( )
 ```
 Return the number of milliseconds since the application started.
-Time starts after the `setup` function completes and before the
-first update cycle.
+Time starts at the begining of the `start` function.
 
 ### ct.getVersion()
 ```
@@ -991,7 +990,7 @@ occurs while the application is running).
 void update( )
 ```
 The `update` function is called at the beginning of each update cycle.
-Update cycles start after the `setup` function has completed and then
+Update cycles start after the `start` function has completed and then
 repeat continuously at 60 times per second.
 
 One use of update cycles is to achieve object motion and animation.
@@ -1016,7 +1015,7 @@ of certain amounts of time if you want.
 > in a way that causes many copies of the object to be created over
 > and over. Note that you should *not* call functions like `ct.circle()` to
 > "draw" a circle for each frame in an animation. Instead, you typically
-> want to call `ct.circle()` to create the object once in your `setup` function,
+> want to call `ct.circle()` to create the object once in your `start` function,
 > then modify the existing circle in your `update` function.
 
 ### onMousePress()
