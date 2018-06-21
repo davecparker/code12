@@ -216,7 +216,7 @@ public class MainProgram extends Code12Program
          if( !display.equals("") && !ct.canParseNumber(displayText) ) //tests if the display is empty or just a number
          {
             String result = displayText;
-           // displayText = calculate(result);
+            displayText = calculate(result);
             updateDisplay();
          }
       }
@@ -299,19 +299,19 @@ public class MainProgram extends Code12Program
       
       return 0;
    }
-   /*
+   
    public String calculate(String toCalculate)
    {
       int i = 0;
       int valueCount = 0;
       int operatorCount = 0;
       
-      while( toCalculate.length() > 0 ) //calculates until toCalculate is empty
+      while( i < toCalculate.length() ) //calculates until toCalculate is empty
       {
          if( i == toCalculate.length() - 1 ) //assumes that the last character is not an operator
          {
             values[valueCount] = ct.parseInt( toCalculate.substring(0,i) );
-            toCalculate = toCalculate.substring( i,toCalculate.length() );
+            break;
          }
          else
          { 
@@ -320,7 +320,6 @@ public class MainProgram extends Code12Program
             {
                //Having found the end of a number pushes it to the values array
                values[valueCount] = ct.parseInt( toCalculate.substring(0,i) );
-               toCalculate = toCalculate.substring( i,toCalculate.length() );
                //Checks if the operator array is empty
                if(operatorCount == 0)
                {
@@ -337,9 +336,7 @@ public class MainProgram extends Code12Program
                      String operator = operators[operatorCount - 1];//Takes the top operator
                      values[valueCount - 2] = simpleCalculate( num1, num2, operator );
                      operators[operatorCount -1] = toCalculate.substring(i,i+1);
-                     valueCount -= 1; //popped 2 values off and pushed one on
-                     
-                     
+                     valueCount -= 1; //popped 2 values off and pushed one on  
                   }
    
                }         
@@ -364,5 +361,5 @@ public class MainProgram extends Code12Program
       
       
       return ct.formatDecimal( values[0] );
-   }*/
+   }
 }   
