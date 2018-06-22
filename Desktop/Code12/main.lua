@@ -230,11 +230,12 @@ local function writeLuaCode( codeStr )
 		outFile:write( marker .. filename .. "\"\n")
 		outFile:write( "package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Code12/?.lua'\n" )
 		outFile:write( "require('Code12.api')\n" )
-		-- Write the user code minus the 3 blank lines at the beginning (if so), 
+
+		-- Remove the first 3 lines from codeStr (which should be blank or comments), 
 		-- so that line numbers match after adding our header above.
-		if string.starts( codeStr, "\n\n\n" ) then
-			codeStr = string.sub( codeStr, 4 )
-		end
+		codeStr = string.match( codeStr, "[^\n]*\n[^\n]*\n[^\n]*\n(.*)" )
+		
+		-- Write the code
 		outFile:write( codeStr )
 		outFile:write( "\n" )
 		io.close( outFile )
