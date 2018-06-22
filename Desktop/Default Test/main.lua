@@ -10,8 +10,9 @@ require('Code12.api')
     this.LIMIT = 120
     -- int count = 5;
     this.speed = 0.3
+    -- GameObj[] as, bs, cs;
     
-    function start()
+    function _fn.start()
         
         -- int oops = count;
         -- double nope = ball.x;
@@ -56,7 +57,7 @@ require('Code12.api')
         --double notOK2 = x / 3;
     end
     
-    function update()
+    function _fn.update()
         
         local factor = 2
         local name = nil; 
@@ -104,7 +105,7 @@ require('Code12.api')
         return this.ball.x
     end
     
-    function onMousePress(obj, x, y)
+    function _fn.onMousePress(obj, x, y)
         
         if obj ~= nil then
             ct.println(obj:toString() .. " was clicked"); 
@@ -156,11 +157,11 @@ require('Code12.api')
         local i = 0; while i < counts.length do
             sum = sum + (counts[1+(i)]); i = i + 1; end
         
-        local aTest = nil
+        local aTest = nil; 
         aTest = { length = 10 }
     end
     
-    function onKeyPress(key)
+    function _fn.onKeyPress(key)
         
         if (key == "b") then
             ct.println("b was pressed"); 

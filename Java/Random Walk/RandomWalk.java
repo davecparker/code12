@@ -191,7 +191,7 @@ class RandomWalk extends Code12Program
       restart();
    }
 
-   void restart() // TODO: was public void restart()
+   public void restart()
    {
    	// Set the title
       ct.setTitle( "Random Walk" );

@@ -44,8 +44,8 @@ local sourceFile = {
 
 -- Force the initial file to the standard test file for faster dev testing
 if env.isSimulator then
---	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
-	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
@@ -77,7 +77,7 @@ ct = {
 	-- The ct.xxx API functions are added here by the Lua runtime when loaded
 }
 this = {}      -- generated code uses this.varName for class/global variables
-_fn = {}       -- generated code uses _fn.setup(), _fn.update(), _fn.userFn(), etc.
+_fn = {}       -- generated code uses _fn.start(), _fn.update(), _fn.userFn(), etc.
 
 -- Cached state
 local appContext = ct._appContext
@@ -249,7 +249,8 @@ local function writeLuaCode( codeStr )
 	end
 
 	-- Print user code to console for debugging
-	print( "--- Lua Code: ---\n" ); print( codeStr )
+	print( "--- Lua Code: ---\n" ); 
+	print( codeStr )
 end
 
 -- Show dialog to choose the user source code file
@@ -605,8 +606,6 @@ end
 
 -- Runtime callback to set the output size being used
 local function setClipSize( widthP, heightP )
-	print("setClipSize", widthP, heightP)
-
 	-- Store the new output size
 	ui.outputWidth = widthP
 	ui.outputHeight = heightP

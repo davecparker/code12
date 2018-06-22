@@ -40,52 +40,6 @@ local localNameStack = {}
 
 --- Misc Analysis Functions --------------------------------------------------
 
--- Find user-defined methods in parseTrees and put them in the userMethods table.
--- Return true if successful, false if an error occured.
-local function getMethods( parseTrees )
-	for i = 1, #parseTrees do
-		local tree = parseTrees[i]
-		assert( tree.t == "line" )
-		local p = tree.p
-		local nodes = tree.nodes
-		if p == "eventFn" then
-			-- Code12 event func (e.g. setup, update)
-			-- TODO: Check that the API signature is what is needed for this event
-		elseif p == "func" then
-			-- User-defined function
-			local nameNode = nodes[3]
-			local fnName = nameNode.str
-			if nameNode.tt ~= "ID" or fnName:find("%.") then 
-				err.setErrNode( nameNode, "User-defined function names cannot contain a dot (.)" )
-			else
-				-- Build the parameter table
-				local paramTable = {}
-				local params = nodes[5].nodes
-				for i = 1, #params do
-					local param = params[i]
-					local vtParam, name = javaTypes.vtAndNameFromParam( param )
-					paramTable[#paramTable + 1] = { name = name, vt = vtParam }
-				end
-				-- Add entry to userMethods table
-				userMethods[fnName] = { 
-					node = nameNode,
-					vt = javaTypes.vtFromRetType( nodes[2] ), 
-					params = paramTable
-				}
-				-- Add lowercase version if different
-				local nameLower = string.lower( fnName )
-				if nameLower ~= fnName then
-					userMethods[nameLower] = fnName
-				end
-			end
-		end
-		if err.hasErr() then
-			return false
-		end
-	end
-	return true
-end
-
 -- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
 -- If the name is found and the entry is a record (table) then return the record.
 -- If an entry has an index (name) differing only in case, then set the error state 
@@ -120,6 +74,78 @@ local function lookupID( nameToken, nameTable )
 		return nil, result, strCorrectCase
 	end
 	return nil
+end
+
+-- Find user-defined methods in parseTrees and put them in the userMethods table.
+-- Return true if successful, false if an error occured.
+local function getMethods( parseTrees )
+	for i = 1, #parseTrees do
+		local tree = parseTrees[i]
+		assert( tree.t == "line" )
+		local p = tree.p
+		local nodes = tree.nodes
+		if p == "func" then
+			-- User-defined function or event function
+			local nameNode = nodes[3]
+			local fnName = nameNode.str
+			if nameNode.tt ~= "ID" or fnName:find("%.") then 
+				err.setErrNode( nameNode, 
+						"User-defined function names cannot contain a dot (.)" )
+			else
+				-- Build the parameter table
+				local paramTable = {}
+				local params = nodes[5].nodes
+				for i = 1, #params do
+					local param = params[i]
+					local vtParam, name = javaTypes.vtAndNameFromParam( param )
+					paramTable[#paramTable + 1] = { name = name, vt = vtParam }
+				end
+
+				-- Get the return type
+				local vtReturn = javaTypes.vtFromRetType( nodes[2] ) 
+
+				-- Is this a pre-defined event function?
+				local event = lookupID( nameNode, apiTables["Code12Program"].methods )
+				if event then
+					-- Event: Check if the signature matches
+					if event.vt ~= vtReturn then
+						err.setErrNodeAndRef( nodes[2], nameNode, 
+								"Return type of %s function should be %s",
+								fnName, javaTypes.typeNameFromVt( event.vt ))
+					elseif #event.params ~= #paramTable then
+						err.setErrNodeAndRef( nodes[5], nameNode, 
+								"Wrong number of parameters for function %s ", fnName )
+					else
+						for i = 1, #paramTable do
+							if paramTable[i].vt ~= event.params[i].vt then
+								print(paramTable[i].vt, event.params[i].vt)
+								err.setErrNodeAndRef( params[i], nameNode,
+										"Wrong type for parameter %d of function %s",
+										i, fnName )
+								break;
+							end
+						end
+					end
+				else
+					-- User-defined: Add entry to userMethods table
+					userMethods[fnName] = { 
+						node = nameNode,
+						vt = vtReturn, 
+						params = paramTable
+					}
+					-- Add lowercase version if different
+					local nameLower = string.lower( fnName )
+					if nameLower ~= fnName then
+						userMethods[nameLower] = fnName
+					end
+				end
+			end
+		end
+		if err.hasErr() then
+			return false
+		end
+	end
+	return true
 end
 
 

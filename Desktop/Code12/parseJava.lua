@@ -174,15 +174,15 @@ local lValue = { t = "lValue",
 
 -- A return type for a procedure/function definition
 local retType = { t = "retType",
-	{ 9, 12, "void",			"void" 					},
+	{ 1, 12, "void",			"void" 					},
 	{ 12, 12, "array",			"ID", "[", "]"			},
 	{ 9, 12, "value",			"ID"					},
 }
 
 -- An access permission specifier
 local access = { t = "access",
-	{ 9, 12, "public",			"public"				},
-	{ 9, 12, "empty",									},
+	{ 1, 12, "public",			"public"				},
+	{ 1, 12, "empty",									},
 }
 
 -- A formal parameter (in a function definition)
@@ -288,13 +288,12 @@ local line = { t = "line",
 	{ 3, 12, "varInit",			"ID", "ID", "=", expr, ";",						"END" },
 	{ 3, 12, "varDecl",			"ID", idList, ";",								"END" },
 	{ 3, 12, "constInit", 		"final", "ID", "ID", "=", expr, ";",			"END" },
+	{ 1, 12, "func",			access, retType, fnValue, "(", paramList, ")",	"END" },
 	{ 1, 12, "begin",			"{",											"END" },
 	{ 1, 12, "end",				"}",											"END" },
-	{ 1, 12, "eventFn",			"public", "void", "ID", "(", paramList, ")",	"END" },
 	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },
 	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",					"END" },
 	{ 8, 12, "else",			"else", 										"END" },
-	{ 9, 12, "func",			access, retType, fnValue, "(", paramList, ")",	"END" },
 	{ 9, 12, "return",			"return", expr, ";",							"END" },
 	{ 11, 12, "do",				"do", 											"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },

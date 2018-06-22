@@ -386,7 +386,7 @@ local function generateVarDecl( tree, isInstanceVar )
 				addLua( "local " )
 			end
 			addLua( nameNode.str )
-			addLua( " = nil" )
+			addLua( " = nil; " )
 		end
 		return true
 	end
@@ -512,7 +512,6 @@ local function generateForLoop( tree )
 		if forInit.p == "varInit" then
 			local vt = javaTypes.vtFromVarType( forInit.nodes[1] )
 			local nameNode = forInit.nodes[2]
-			print("Loop var ", nameNode.str, vt)
 			checkJava.defineLocalVar( nameNode, vt, false, true )
 			local expr = forInit.nodes[4]
 			checkJava.canAssignToVarNode( nameNode, expr, true )
@@ -707,14 +706,11 @@ local function generateFnParamList( paramList )
 end
 
 -- Generate code for a function definition with the given name and param list.
--- The function is a Code12 event function if isEvent, otherwise user-defined.
--- starting with the name of the function, then generate its code block afterwards.
+-- Start with the name of the function, then generate its code block afterwards.
 -- Return true if successful.
-local function generateFunction( isEvent, fnName, paramList )
+local function generateFunction( fnName, paramList )
 	beginLuaLine( "function " )
-	if not isEvent then
-		addLua( fnPrefix )
-	end
+	addLua( fnPrefix )
 	addLua( fnName )
 	generateFnParamList( paramList )
 	iTree = iTree + 1 
@@ -768,12 +764,9 @@ function codeGenJava.getLuaCode( parseTrees )
 			blockLevel = blockLevel + 1
 		elseif p == "end" then            -- }  in boilerplate code
 			blockLevel = blockLevel - 1
-		elseif p == "eventFn" then
-			-- Code12 event (e.g. setup, update)
-			generateFunction( true, nodes[3].str, nodes[5].nodes)
 		elseif p == "func" then
 			-- User-defined function
-			generateFunction( false, nodes[3].str, nodes[5].nodes)
+			generateFunction( nodes[3].str, nodes[5].nodes )
 		end			
 		iTree = iTree + 1
 	end

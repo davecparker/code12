@@ -10,6 +10,7 @@ class UserCode extends Code12Program
 	final int LIMIT = 120;
 	// int count = 5;
 	double speed = 0.3;
+	// GameObj[] as, bs, cs;
 
 	public void start()
 	{
