@@ -10,7 +10,6 @@ require('Code12.api')
     this.LIMIT = 120
     -- int count = 5;
     this.speed = 0.3
-    -- GameObj[] as, bs, cs;
     
     function _fn.start()
         
@@ -160,6 +159,11 @@ require('Code12.api')
         
         local aTest = nil; 
         aTest = { length = 10 }
+        local as = nil; local bs = nil; local cs = nil; 
+        
+        as = { length = 10 }
+        local myX = as[1+(4)].x
+        as[1+(sum - 1)].y = myX
     end
     
     function _fn.onKeyPress(key)

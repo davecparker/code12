@@ -160,98 +160,86 @@ local function vtNumber( vt1, vt2 )
 	return vt
 end
 
--- Return the variable name of a variable token or lValue node, or nil if none.
-local function varNameFromNode( node )
-	if node.tt == "ID" then
-		return node.str
-	elseif node.t == "lValue" then
-		if node.p == "var" then
-			return node.nodes[1].str
-		elseif node.p == "this" then
-			return node.nodes[3].str
-		end
-	end
-	return nil
-end
-
 -- Return the value type (vt) for an lValue node.
 -- If there is an error, then set the error state and return nil.
 local function vtLValueNode( lValue )
 	assert( lValue.t == "lValue" )
-	local p = lValue.p
 	local nodes = lValue.nodes
-	if p == "var" then
-		return checkJava.vtVar( nodes[1] )
-	elseif p == "index" then
-		-- indexing an array
-		local indexExpr = nodes[3]
+
+	-- Get the variable and its type
+	local varNode = nodes[1]
+	assert( varNode.tt == "ID" )
+	local varName = varNode.str
+	local vt = nil
+	local isClass = javaTypes.isClassWithStaticFields( varName )  --  e.g. Math.PI
+	if not isClass then
+		vt = checkJava.vtVar( varNode )
+		if vt == nil then
+			return nil
+		end
+	end
+
+	-- Check array index if any, and get the element type
+	local indexNode = nodes[2]
+	assert( indexNode.t == "index" )
+	if indexNode.p == "index" then
+		local indexExpr = indexNode.nodes[2]
+		if type(vt) ~= "table" then
+			err.setErrNodeAndRef( indexExpr, lValue, 
+					"An index in [brackets] can only be applied to an array" )
+			return nil
+		end
 		local vtIndex = indexExpr.info.vt
 		if vtIndex ~= 0 then
 			err.setErrNode( indexExpr, "Array index must be an integer value" )
 			return nil
 		end
-		vt = checkJava.vtVar( nodes[1] )
-		if type(vt) ~= "table" then
-			err.setErrNodeAndRef( nodes[2], nodes[1], 
-					"An index in [brackets] can only be applied to an array" )
-			return nil
-		end
-		return vt.vt   -- element type of the array
-	elseif p == "this" then
-		-- explicit reference to class variable
-		local varNode = nodes[3]
-		local vt = checkJava.vtVar( varNode )
-		if vt ~= nil and not isInstanceVar[varNode.str] then
-			err.setErrNodeAndRef( varNode, nodes[1],
-					"Variable %s referenced with \"this\" is not a class or instance variable", 
-					varNode.str )
-			return nil
-		end
-		return vt
-	elseif p == "field" then
-		-- Public field access (only possible with Math or GameObj, or array.length)
-		local object = nodes[1]
-		local field = nodes[3]
+		vt = vt.vt   -- get element type of the array
+	end
+
+	-- Check field type if any, and get the field type.
+	-- Public field access is only possible with Math or GameObj, or array.length
+	local fieldNode = nodes[3]
+	assert( fieldNode.t == "field" )
+	if fieldNode.p == "field" then
+		local field = fieldNode.nodes[2]
+		assert( field.tt == "ID" )
+
 		-- Determine the class
 		local className
-		assert( object.tt == "ID" )
-		local objName = object.str
-		if objName == "Math" then   -- Math has all static members
-			className = "Math"
-		else
-			-- object should be an instance
-			local vtObj = checkJava.vtVar( object )
-			if vtObj == "GameObj" then
-				className = "GameObj"
-			elseif type(vtObj) == "table" then
-				-- Support array.length
-				if field.str == "length" then
-					return 0  -- int
-				else
-					err.setErrNodeAndRef( field, object,
-						"Arrays can only access their \".length\" field" )
-					return nil
-				end
+		if isClass then
+			className = varName    -- e.g. Math
+		elseif vt == "GameObj" then
+			className = "GameObj"
+		elseif type(vt) == "table" then
+			-- Support array.length
+			if field.str == "length" then
+				return 0  -- int
 			else
-				err.setErrNode( object, "Type %s has no data fields",
-						javaTypes.typeNameFromVt( vtObj ))
+				err.setErrNodeAndRef( field, lValue,
+					"Arrays can only access their \".length\" field" )
 				return nil
 			end
+		else
+			err.setErrNodeAndRef( field, lValue, "Type %s has no data fields",
+					javaTypes.typeNameFromVt( vt ))
+			return nil
 		end
 		local class = apiTables[className]
 
 		-- Look up the field
-		assert( field.tt == "ID" )
 		local fieldFound = lookupID( field, class.fields )
 		if fieldFound == nil then
-			err.setErrNodeAndRef( field, object, 
+			err.setErrNodeAndRef( field, lValue, 
 					"Unknown field \"%s\" for class %s",
 					field.str, className )
 			return nil
 		end
-		return fieldFound.vt
+		vt = fieldFound.vt
 	end
-	error( "Unknown lValue pattern " .. p )
+	
+	-- Return the resulting type
+	return vt
 end
 
 
@@ -706,7 +694,30 @@ end
 -- Return true if the expr can be assigned to the lValue node.
 -- If the types are not compatible then set the error state and return false.
 function checkJava.canAssignToLValue( lValue, expr )
+	assert( lValue.t == "lValue" )
 	return checkJava.canAssignToVt( lValue, vtLValueNode( lValue ), expr )
+end
+
+-- Return true if the expr can be op-assigned (e.g. +=) to the lValue node.
+-- If the types are not compatible then set the error state and return false.
+function checkJava.canOpAssignToLValue( lValue, opNode, expr )
+	-- Both sides must be numeric and compatible
+	local vtLValue = lValue.info.vt
+	local vtExpr = expr.info.vt
+	if type(vtLValue) ~= "number" then
+		err.setErrNodeAndRef( opNode, lValue, 
+				"%s can only be applied to numbers", opNode.p )
+		return false
+	elseif type(vtExpr) ~= "number" then
+		err.setErrNodeAndRef( expr, opNode, 
+				"Expression for %s must be numeric", opNode.p )
+		return false
+	elseif vtLValue == 0 and vtExpr == 1 then
+		err.setErrNodeAndRef( expr, lValue, 
+				"Cannot combine double with int" )
+		return false
+	end
+	return true
 end
 
 -- Find a known ct API or user function with the given fnValue node.
@@ -738,8 +749,8 @@ local function findAPIMethod( fnValue )
 	local className
 	assert( object.tt == "ID" )
 	local objName = object.str
-	if objName == "Math" then   -- Math has all static methods
-		className = "Math"
+	if javaTypes.isClassWithStaticFields( objName ) then
+		className = objName
 	else
 		local vtObj = checkJava.vtVar( object )
 		if vtObj == "String" or vtObj == "GameObj" then

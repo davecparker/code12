@@ -10,7 +10,6 @@ class UserCode extends Code12Program
 	final int LIMIT = 120;
 	// int count = 5;
 	double speed = 0.3;
-	// GameObj[] as, bs, cs;
 
 	public void start()
 	{
@@ -80,7 +79,7 @@ class UserCode extends Code12Program
 			speed = -speed;
 		}
 		else if (bigBall.x < 0)
-			speed = -this.speed;
+			speed = -speed;
 		else
 		{
 			int localX = 3;
@@ -160,6 +159,11 @@ class UserCode extends Code12Program
 
 		int [] aTest;
 		aTest = new int[10];
+		GameObj[] as, bs, cs;
+
+		as = new GameObj[10];
+		double myX = as[4].x;
+		as[sum - 1].y = myX;
 	}
 
 	public void onKeyPress( String key )

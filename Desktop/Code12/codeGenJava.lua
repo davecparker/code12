@@ -125,36 +125,26 @@ local function varNameCode( varName )
 	return varName
 end
 
--- Return Lua code for an lValue node, which might be a class or local reference.
-function lValueCode( v )
-	local p = v.p
-	if p == "this" then
-		return varNameCode( v.nodes[3].str ) 
+-- Return Lua code for an lValue node
+function lValueCode( lValue )
+	local nodes = lValue.nodes
+	local varName = nodes[1].str
+	local code = varNameCode( varName ) 
+	if nodes[2].p == "index" then
+		code = code .. "[1+(" .. exprCode( nodes[2].nodes[2] ) .. ")]"
 	end
-
-	local nameNode = v.nodes[1]
-	assert( nameNode.tt == "ID" )
-	local name = nameNode.str
-	if checkJava.isInstanceVarName( name ) then
-		name = thisPrefix .. name    -- class var, so turn name into this.name
-	end
-	if p == "var" then
-		return name
-	elseif p == "field" then
-		local fieldName = v.nodes[3].str
-		if name == "Math" then
+	if nodes[3].p == "field" then
+		local fieldName = nodes[3].nodes[2].str
+		if varName == "Math" then
 			if fieldName == "PI" then
 				return "math.pi"
 			elseif fieldName == "E" then
 				return "math.exp(1)"
 			end
-		else
-			return name .. "." .. fieldName    --  obj.field reference
 		end
-	elseif p == "index" then
-		return name .. "[1+(" .. exprCode( v.nodes[3] ) .. ")]"
+		code = code .. "." .. fieldName
 	end
-	error( "Unknown lValue pattern " .. p )
+	return code
 end
 
 -- Return Lua code for a function or method call, e.g:
@@ -426,17 +416,16 @@ local function generateStmt( tree )
 			return
 		end
 		addLua( fnCallCode( tree ) )
-	elseif p == "assign" then
+	elseif p == "varAssign" then
 		-- ID = expr
 		local varNode = nodes[1]
 		local expr = nodes[3]
 		if checkJava.canAssignToVarNode( varNode, expr ) then
-			assert( varNode.tt == "ID" )
 			addLua( varNameCode( varNode.str ) )
 			addLua( " = " )
 			addLua( exprCode( expr ) )
 		end
-	elseif p == "lValueAssign" then
+	elseif p == "assign" then
 		-- lValue = expr
 		local lValue = nodes[1]
 		local expr = nodes[3]
@@ -448,14 +437,14 @@ local function generateStmt( tree )
 	elseif p == "opAssign" then
 		-- lValue op= expr
 		local lValue = nodes[1]
+		local op = nodes[2]
 		local expr = nodes[3]
-		-- TODO: Better type checking, this is not correct
-		if checkJava.canAssignToLValue( lValue, expr ) then
+		if checkJava.canOpAssignToLValue( lValue, op, expr ) then
 			local lValueStr = lValueCode( lValue )
 			addLua( lValueStr )
 			addLua( " = " )
 			addLua( lValueStr )
-			addLua( luaOpFromJavaOp[nodes[2].nodes[1].str] )
+			addLua( luaOpFromJavaOp[op.p] )
 			addLua( "(" )
 			addLua( exprCode( expr ) )
 			addLua( ")" )

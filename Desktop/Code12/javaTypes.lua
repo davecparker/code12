@@ -159,6 +159,12 @@ function javaTypes.canCompareVts( vt1, vt2 )
 	return false
 end
 
+-- Return true if name is the name of a class with public static fields
+function javaTypes.isClassWithStaticFields( name )
+	-- The only static fields supported are Math.PI and Math.E
+	return name == "Math"
+end
+
 
 ------------------------------------------------------------------------------
 
