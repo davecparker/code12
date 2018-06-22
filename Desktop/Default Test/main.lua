@@ -11,14 +11,26 @@ require('Code12.api')
     -- int count = 5;
     this.speed = 0.3
     
-    function start()
+    function _fn.start()
         
         -- int oops = count;
         -- double nope = ball.x;
+        -- ct.circle(50, 50, LIMIT);
         local x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0
         local xInt = ct.toInt(x)
         local name = "Dave" .. " " .. "Parker"
         local done = false; 
+        
+        -- Try some console output
+        local i = 0; while i < 10 do
+            
+            ct.println("Line " .. i)
+        i = i + 1; end
+        ct.println("This is the default Code12 test app")
+        ct.println("This is console output")
+        ct.print("Beginning of line")
+        ct.print(" Middle ")
+        ct.println("End")
         
         -- Draw some circles
         this.ball = ct.circle(x + 6, 15, 5)
@@ -45,7 +57,7 @@ require('Code12.api')
         --double notOK2 = x / 3;
     end
     
-    function update()
+    function _fn.update()
         
         local factor = 2
         local name = nil; 
@@ -93,7 +105,7 @@ require('Code12.api')
         return this.ball.x
     end
     
-    function onMousePress(obj, x, y)
+    function _fn.onMousePress(obj, x, y)
         
         if obj ~= nil then
             ct.println(obj:toString() .. " was clicked"); 
@@ -145,11 +157,16 @@ require('Code12.api')
         local i = 0; while i < counts.length do
             sum = sum + (counts[1+(i)]); i = i + 1; end
         
-        local aTest = nil
+        local aTest = nil; 
         aTest = { length = 10 }
+        local as = nil; local bs = nil; local cs = nil; 
+        
+        as = { length = 10 }
+        local myX = as[1+(4)].x
+        as[1+(sum - 1)].y = myX
     end
     
-    function onKeyPress(key)
+    function _fn.onKeyPress(key)
         
         if (key == "b") then
             ct.println("b was pressed"); 

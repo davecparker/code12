@@ -47,12 +47,12 @@ require('Code12.api')
     this.rowCount = 0
     this.columnCount = 0
     
-    function start()
+    function _fn.start()
         
         _fn.restart()
     end
     
-    function update()
+    function _fn.update()
         
         -- Choose a random direction
         local direction = nil; 
@@ -185,7 +185,7 @@ require('Code12.api')
         this.marker.y = newY
     end
     
-    function onResize()
+    function _fn.onResize()
         
         -- Clear the screen
         ct.clearScreen()
