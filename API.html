@@ -126,13 +126,13 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 <pre><code>ct.setScreen( String name )
 </code></pre><p>Set the current application screen to the screen named <code>name</code>. Your application can define multiple named screens and switch between them. Each screen has its own background and its own <code>GameObj</code> objects.</p>
 <p>If a screen named <code>name</code> is not already known, then create a new empty screen with this name and set it as the current screen.</p>
-<p><code>GameObj</code> objects that are created are always created on the current screen, so to create two screens in your <code>setup</code> function:</p>
+<p><code>GameObj</code> objects that are created are always created on the current screen, so to create two screens in your <code>start</code> function:</p>
 <ol>
 <li>Call <code>ct.setScreen()</code> to name the first screen</li>
 <li>Create <code>GameObj</code> objects for the first screen</li>
 <li>Call <code>ct.setScreen()</code> to name the second screen</li>
 <li>Create <code>GameObj</code> objects for the second screen</li>
-<li>At the end of <code>setup</code>, call <code>ct.setScreen()</code> to set the desired starting screen for your application.</li>
+<li>At the end of <code>start</code>, call <code>ct.setScreen()</code> to set the desired starting screen for your application.</li>
 </ol>
 <h3 id="ct-clearscreen-">ct.clearScreen()</h3>
 <pre><code>ct.clearScreen( )
@@ -176,7 +176,7 @@ GameObj ct.text( String s, double x, double y, double height, String color )
 <h3 id="ct-image-">ct.image()</h3>
 <pre><code>GameObj ct.image( String filename, double x, double y, double width )
 </code></pre><p>Create and add an image object to the current screen with the image <code>filename</code>, at location (<code>x</code>, <code>y</code>), and width given by <code>width</code>. The height is determined automatically to preserve the original image&#39;s aspect ratio. Return the <code>GameObj</code> reference to the image object.</p>
-<p>The image file must be in PNG or JPG format. If <code>filename</code> is a simple filename (no path), then the main project folder is checked first, followed by the <code>Code12/images</code> folder if not found in the project folder.</p>
+<p>The image file must be in PNG or JPG format.</p>
 <hr>
 <h2 id="mouse-and-keyboard-input">Mouse and Keyboard Input</h2>
 <h3 id="ct-clicked-">ct.clicked()</h3>
