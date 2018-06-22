@@ -206,14 +206,14 @@ GameObj ct.text( String s, double x, double y, double height, String color )
 <h2 id="audio">Audio</h2>
 <h3 id="ct-sound-">ct.sound()</h3>
 <pre><code>ct.sound( String filename )
-</code></pre><p>Play the sound effect in the sound file <code>filename</code>. If <code>filename</code> is a simple filename (no path), then the main project folder is checked first, followed by the <code>Code12/sounds</code> folder if not found in the project folder.</p>
+</code></pre><p>Play the sound effect in the sound file <code>filename</code>.</p>
 <blockquote>
 <p>Only standard formats of WAV sounds are reliable on all platforms, although other platforms may support MP3 and others.</p>
 </blockquote>
 <blockquote>
 <p>The sound starts playing, <code>ct.sound()</code> returns immediately, then the sound continues to play in another thread. Playing another sound while the first sound is still playing may result in mixing the two sounds. However, some platforms may not implement sound mixing, in which case attempting to play a sound while another sound is playing will be ignored.</p>
 </blockquote>
-<h3 id="ct-setvolume-">ct.setVolume()</h3>
+<h3 id="ct-setsoundvolume-">ct.setSoundVolume()</h3>
 <pre><code>ct.setSoundVolume( double volume )
 </code></pre><p>Set the relative volume to use for sounds played by <code>ct.sound()</code> to <code>volume</code>, which should be between 0.0 and 1.0. The default sound volume is 1.0. If the volume is decreased then sounds are attenuated relative to the volume they were recorded at.</p>
 <hr>
@@ -226,23 +226,23 @@ GameObj ct.text( String s, double x, double y, double height, String color )
 double ct.round( double d, int numPlaces )
 </code></pre><p>If <code>numPlaces</code> is included, then return the number <code>d</code> rounded to that number of decimal places.</p>
 <p>If <code>numPlaces</code> is not included, then return the number <code>d</code> rounded to the nearest integer.</p>
+<h3 id="ct-intdiv-">ct.intDiv()</h3>
+<pre><code>int ct.intDiv( int n, int d )
+</code></pre><p>Return the result of an integer divide of n / d. If n / d is not an integer, the result is rounded down to the next smaller integer. If d is 0 then the result is a large positive integer if n &gt; 0, a large negative integer if n &lt; 0, and 0 if n is 0. </p>
 <h3 id="ct-iserror-">ct.isError()</h3>
 <pre><code>boolean ct.isError( double d )
-</code></pre><p>Return <code>true</code> if the value of <code>d</code> is an error value (NaN or Infinity).</p>
+</code></pre><p>Return <code>true</code> if the value of <code>d</code> is an error value (NaN = &quot;Not a Number&quot;).</p>
 <h3 id="ct-distance-">ct.distance()</h3>
 <pre><code>double ct.distance( double x1, double y1, double x2, double y2 )
 </code></pre><p>Return the distance between the points (<code>x1</code>, <code>y1</code>) and (<code>x2</code>, <code>y2</code>).</p>
 <h3 id="ct-gettimer-">ct.getTimer()</h3>
 <pre><code>int ct.getTimer( )
-</code></pre><p>Return the number of milliseconds since the application started. Time starts after the <code>setup</code> function completes and before the first update cycle.</p>
+</code></pre><p>Return the number of milliseconds since the application started. Time starts at the begining of the <code>start</code> function.</p>
 <h3 id="ct-getversion-">ct.getVersion()</h3>
 <pre><code>double getVersion( )
 </code></pre><p>Return the version number of the Code12 runtime system.</p>
 <hr>
 <h2 id="type-conversion">Type Conversion</h2>
-<h3 id="ct-todouble-">ct.toDouble()</h3>
-<pre><code>double ct.toDouble( int i )
-</code></pre><p>Return the value <code>i</code> as a <code>double</code>.</p>
 <h3 id="ct-toint-">ct.toInt()</h3>
 <pre><code>int ct.toInt( double d )
 </code></pre><p>Return the value <code>d</code> truncated to an integer.</p>
@@ -335,7 +335,7 @@ String ct.formatInt( int i, int numDigits )
 </blockquote>
 <h3 id="group">group</h3>
 <pre><code>String group
-</code></pre><p>The <code>group</code> field is an optional name that you can assign to an object that will cause the function <code>ct.deleteGroup()</code> to delete all objects with the matching group name. The default group name of an object is &quot;&quot; (empty string)</p>
+</code></pre><p>The <code>group</code> field is an optional name that you can assign to an object that will cause the function <code>ct.clearGroup()</code> to delete all objects with the matching group name. The default group name of an object is &quot;&quot; (empty string)</p>
 <hr>
 <h2 id="gameobj-methods">GameObj Methods</h2>
 <p>The following method functions must be called on an existing <code>GameObj</code> object (see <a href="#gameobj-creation">GameObj Creation</a>). In the syntax shown, the <code>obj</code> can be any variable of type <code>GameObj</code>.</p>
@@ -362,7 +362,7 @@ String ct.formatInt( int i, int numDigits )
 [rect at (50, 100) &quot;bottom wall&quot;]
 </code></pre><h3 id="obj-setsize-">obj.setSize()</h3>
 <pre><code>obj.setSize( double width, double height )
-</code></pre><p>Set the size of the object using <code>width</code> and <code>height</code>. This is just a convenience method that is equivalent to setting both the <code>width</code> and <code>height</code> fields (see <a href="#width-height">width, height</a> above).</p>
+</code></pre><p>Set the size of the object using <code>width</code> and <code>height</code>. This is just a convenience method that is equivalent to setting both the <code>width</code> and <code>height</code> fields. Note that different types of objects react differently to changes in width or height. (see <a href="#width-height">width, height</a> above).</p>
 <h3 id="obj-align-">obj.align()</h3>
 <pre><code>obj.align( String a )
 obj.align( String a, boolean adjustY )
@@ -472,13 +472,13 @@ String   str.trim()
 </code></pre><p>The <code>start</code> function is called once at the beginning of your program. This is good place to create most of the objects for your program (except for any objects that get created as a result of an action that occurs while the application is running).</p>
 <h3 id="update-">update()</h3>
 <pre><code>void update( )
-</code></pre><p>The <code>update</code> function is called at the beginning of each update cycle. Update cycles start after the <code>setup</code> function has completed and then repeat continuously at 60 times per second.</p>
+</code></pre><p>The <code>update</code> function is called at the beginning of each update cycle. Update cycles start after the <code>start</code> function has completed and then repeat continuously at 60 times per second.</p>
 <p>One use of update cycles is to achieve object motion and animation. For example, if you move an object 1 display unit to the right in your <code>update</code> function, then the object will move continuously at 60 units per second.</p>
 <p>Another use of update cycles is to poll (check repeatedly) for user input, using functions such as <code>ct.clicked()</code>, <code>ct.keyPressed()</code>, and <code>ct.keyTyped()</code>, and the <code>GameObj</code> method <code>obj.clicked()</code>.</p>
 <p>You can also use update cycles to test repeatedly for object interactions that can occur during any update cycle when objects are moving. You can examine object fields such as <code>x</code> and <code>y</code> directly, call the <code>GameObj</code> methods <code>obj.containsPoint()</code> and <code>obj.hit()</code>, call the function <code>ct.distance()</code> or write any code you want that tests what you need to detect.</p>
 <p>Finally, note that you can call <code>ct.getTimer()</code> to detect the passage of certain amounts of time if you want.</p>
 <blockquote>
-<p>A common mistake is to create <code>GameObj</code> objects in the <code>update</code> function in a way that causes many copies of the object to be created over and over. Note that you should <em>not</em> call functions like <code>ct.circle()</code> to &quot;draw&quot; a circle for each frame in an animation. Instead, you typically want to call <code>ct.circle()</code> to create the object once in your <code>setup</code> function, then modify the existing circle in your <code>update</code> function.</p>
+<p>A common mistake is to create <code>GameObj</code> objects in the <code>update</code> function in a way that causes many copies of the object to be created over and over. Note that you should <em>not</em> call functions like <code>ct.circle()</code> to &quot;draw&quot; a circle for each frame in an animation. Instead, you typically want to call <code>ct.circle()</code> to create the object once in your <code>start</code> function, then modify the existing circle in your <code>update</code> function.</p>
 </blockquote>
 <h3 id="onmousepress-">onMousePress()</h3>
 <pre><code>void onMousePress( GameObj obj, double x, double y )
@@ -535,7 +535,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 &quot;green&quot;          (0, 255, 0)
 &quot;blue&quot;           (0, 0, 255)
 &quot;cyan&quot;           (0, 255, 255)
-&quot;majenta&quot;        (255, 0, 255)
+&quot;magenta&quot;        (255, 0, 255)
 &quot;yellow&quot;         (255, 255, 0)
 
 &quot;gray&quot;           (127, 127, 127)
@@ -548,7 +548,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 &quot;light green&quot;    (127, 255, 127)
 &quot;light blue&quot;     (127, 127, 255)
 &quot;light cyan&quot;     (127, 255, 255)
-&quot;light majenta&quot;  (255, 127, 255)
+&quot;light magenta&quot;  (255, 127, 255)
 &quot;light yellow&quot;   (255, 255, 127)
 
 &quot;dark gray&quot;      (64, 64, 64)
@@ -556,7 +556,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 &quot;dark green&quot;     (0, 127, 0)
 &quot;dark blue&quot;      (0, 0, 127)
 &quot;dark cyan&quot;      (0, 127, 127)
-&quot;dark majenta&quot;   (127, 0, 127)
+&quot;dark magenta&quot;   (127, 0, 127)
 &quot;dark yellow&quot;    (127, 127, 0)
 
 </code></pre><h3 id="key-names">Key Names</h3>
