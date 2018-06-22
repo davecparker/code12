@@ -40,14 +40,14 @@ public class Vectors extends Code12Program
 
             updateShade(i);
 
-            for (int j = 0; j < vectors.length; j++)
+            for (int j = i + 1; j < vectors.length; j++)
             {
-                double x1 = vectors[i].x;
-                double y1 = vectors[i].y;
-                double x2 = vectors[j].x;
-                double y2 = vectors[j].y;
+                int x1 = (int) vectors[i].x;
+                int y1 = (int) vectors[i].y;
+                int x2 = (int) vectors[j].x;
+                int y2 = (int) vectors[j].y;
                 if (ct.distance(x1, y1, x2, y2) <= 20)
-                    defineLine(x1, y1, x2, y2);
+                    defineLine(i, j, x1, y1, x2, y2);
             }
         }
 
@@ -65,14 +65,13 @@ public class Vectors extends Code12Program
         vectors[index].xSpeed = speeds[0];
         vectors[index].ySpeed = speeds[1];
 
-        shades[i] = 127;
+        shades[index] = 127;
     }
 
     public void reDefineVector(int index)
     {
         vectors[index].delete();
         defineVector(index);
-        shades[index] = 127;
     }
 
     public double[] getRandomSpeeds()
@@ -109,10 +108,10 @@ public class Vectors extends Code12Program
             vectors[index].setLayer(2);
     }
 
-    public void defineLine(int x1, int y1, int x2, int y2)
+    public void defineLine(int index1, int index2, int x1, int y1, int x2, int y2)
     {
         GameObj line = ct.line(x1, y1, x2, y2);
-        int minShade = Math.min(shades[i], shades[j]);
+        int minShade = Math.min(shades[index1], shades[index2]);
         line.setLineColorRGB(minShade, minShade, minShade);
         line.group = "lines";
         line.setLayer(0);
