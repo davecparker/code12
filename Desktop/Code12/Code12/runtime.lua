@@ -24,6 +24,8 @@ local g = require("Code12.globals")
 --             widthP = number,          -- pixel width of output area
 --             heightP = number,         -- pixel height of output area
 --             setClipSize = function,   -- called by runtime to specify output size
+--             print = function,         -- called by runtime for console output
+--             println = function,       -- called by runtime for console output
 
 --             -- These field are added by the runtime for use by the app
 --             initRun = fnInitRun,      -- init and start a new run

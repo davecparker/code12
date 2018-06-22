@@ -20,6 +20,17 @@ class UserCode extends Code12Program
 		String name = "Dave" + " " + "Parker";
 		boolean done;
 
+		// Try some console output
+		for (int i = 0; i < 10; i++)
+		{
+			ct.println("Line " + i);
+		}
+		ct.println("This is the default Code12 test app");
+		ct.println("This is console output");
+		ct.print("Beginning of line");
+		ct.print(" Middle ");
+		ct.println("End");
+
 		// Draw some circles
 		ball = ct.circle(x + 6, 15, 5);
 		ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5);

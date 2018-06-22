@@ -44,27 +44,31 @@ local sourceFile = {
 
 -- Force the initial file to the standard test file for faster dev testing
 if env.isSimulator then
-	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
---	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
 -- UI elements and state
 local ui = {
-	width = 0,             -- window width
-	height = 0,            -- window height
-	background = nil,      -- white background rect
-	toolbarGroup = nil,    -- display group for toolbar
-	statusBarGroup = nil,  -- display group for status bar
-	outputGroup = nil,     -- display group for program output area
-	outputWidth = 0,       -- width for the output area
-	outputHeight = 0,      -- height for the output area
-	lowerGroup = nil,      -- display area under the outputGroup
-	gameGroup = nil,       -- display group for game output
-	errGroup = nil,        -- display group for error display
-	dyErrLine = 0,         -- line spacing for error lines
-	dxErrChar = 0,         -- char width for text in error displays
+	width = 0,                -- window width
+	height = 0,               -- window height
+	background = nil,         -- white background rect
+	toolbarGroup = nil,       -- display group for toolbar
+	statusBarGroup = nil,     -- display group for status bar
+	outputGroup = nil,        -- display group for program output area
+	outputWidth = 0,          -- width for the output area
+	outputHeight = 0,         -- height for the output area
+	lowerGroup = nil,         -- display area under the outputGroup
+	consoleTableView = nil,   -- table view for console output
+	gameGroup = nil,          -- display group for game output
+	errGroup = nil,           -- display group for error display
+	dyErrLine = 0,            -- line spacing for error lines
+	dxErrChar = 0,            -- char width for text in error displays
 }
+
+-- Console output (array of strings)
+local consoleStrings
 
 -- The global state tables that the generated Lua code can access (Lua globals)
 ct = {
@@ -497,11 +501,71 @@ local function showError()
 	end
 end
 
+-- Add text to the last line in the console
+local function consolePrint( text )
+	if text then
+		consoleStrings[#consoleStrings] = consoleStrings[#consoleStrings] .. text
+		ui.consoleTableView:reloadData()
+	end
+end
+
+-- Print a line to the console
+local function consolePrintln( text )
+	local rowHeight = 20
+	ui.consoleTableView:insertRow{ rowHeight = rowHeight }
+	
+	consolePrint( text )
+	consoleStrings[#consoleStrings + 1] = ""   -- start of next line
+
+	-- Make sure the last line is visible
+	local numLinesVisible = math.floor( ui.consoleTableView.height / rowHeight )
+	if #consoleStrings > numLinesVisible then
+		ui.consoleTableView:scrollToIndex( #consoleStrings - numLinesVisible + 1, 0 )
+	end
+end
+
+-- Clear the console data and view
+local function clearConsole()
+	consoleStrings = {}
+	consolePrintln()   -- need to start first line as empty
+	if ui.consoleTableView:getNumRows() > 0 then
+		ui.consoleTableView:deleteAllRows()
+	end
+end
+
+-- Render a row in the console table view
+local function onRenderConsoleRow( event )
+	local row = event.row
+	local rowHeight = row.contentHeight
+	local rowWidth = row.contentWidth
+
+	local text = consoleStrings[row.index] or ""
+	local rowText = display.newText( row, text, 0, 0, "Consolas", 14 )
+	rowText:setFillColor( 0 )
+	rowText.anchorX = 0
+	rowText.x = margin
+	rowText.y = rowHeight * 0.5
+end
+
 -- Make the lower display group
 local function makeLowerGroup()
 	ui.lowerGroup = makeGroup( nil, 0, dyToolbar + ui.outputHeight + 1 )
+
+	-- Gray background
 	ui.lowerGroup.background = uiItem( display.newRect( ui.lowerGroup, 0, 0, ui.width, 0 ), 
 										extraShade, borderShade )
+
+	-- Console window
+	ui.consoleTableView = widget.newTableView{
+		left = 0,
+		top = margin,
+		width = ui.width,
+		height = 100,   -- TODO set later
+		noLines = true,
+		hideScrollBar = false,
+		onRowRender = onRenderConsoleRow,
+	}
+	ui.lowerGroup:insert( ui.consoleTableView )
 end
 
 -- Handle resize event for the window
@@ -579,8 +643,9 @@ local function initNewProgram()
 		end
 	end
 
-	-- Clear the error state
+	-- Clear the error state, console, and other state
 	err.initProgram()
+	clearConsole()
 
 	-- Init new runtime display state for this run
 	if ui.gameGroup then
@@ -719,13 +784,20 @@ local function initApp()
 	makeStatusBar()
 	makeToolbar()
 
-	-- Load the Code12 API and runtime.
-	-- This defines the Code12 APIs in the global ct table
-	-- and sets the runtime's fields in ct._appContext.
+	-- Init the console data
+	clearConsole()
+
+	-- Fill in the appContext for the runtime
 	appContext.outputGroup = ui.outputGroup
 	appContext.widthP = ui.outputWidth
 	appContext.heightP = ui.outputHeight
 	appContext.setClipSize = setClipSize
+	appContext.print = consolePrint
+	appContext.println = consolePrintln
+
+	-- Load the Code12 API and runtime.
+	-- This defines the Code12 APIs in the global ct table
+	-- and sets the runtime's fields in ct._appContext.
 	require( "Code12.api" )
 
 	-- Install listeners for the app

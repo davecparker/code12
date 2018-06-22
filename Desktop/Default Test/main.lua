@@ -20,6 +20,17 @@ require('Code12.api')
         local name = "Dave" .. " " .. "Parker"
         local done = false; 
         
+        -- Try some console output
+        local i = 0; while i < 10 do
+            
+            ct.println("Line " .. i)
+        i = i + 1; end
+        ct.println("This is the default Code12 test app")
+        ct.println("This is console output")
+        ct.print("Beginning of line")
+        ct.print(" Middle ")
+        ct.println("End")
+        
         -- Draw some circles
         this.ball = ct.circle(x + 6, 15, 5)
         ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5)
