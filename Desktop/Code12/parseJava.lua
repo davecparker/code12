@@ -218,7 +218,7 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
 	{ 4, 12, "!",				"!", parsePrimaryExpr 				},
 	{ 5, 12, "call",			fnValue, "(", exprList, ")" 		},
-	{ 4, 12, "lValue",			lValue								},
+	{ 3, 12, "lValue",			lValue								},
 	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
 }
 
