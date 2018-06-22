@@ -37,7 +37,7 @@ require('Code12.api')
         
         
     
-    
+    -- TODO: fields where initialized in restart(); causes Code12 runtime to see them as unitialized before use
     this.pixelsPerSquare = 0
     this.xMax = 0.0
     this.yMax = 0.0
@@ -155,17 +155,17 @@ require('Code12.api')
         
         -- Make marker path line
         local newX = 0; local newY = 0; 
-        if direction:equals("up") then
+        if (direction == "up") then
             
             newX = this.marker.x
             newY = this.marker.y - this.unitsPerSquare
         
-        elseif direction:equals("down") then
+        elseif (direction == "down") then
             
             newX = this.marker.x
             newY = this.marker.y + this.unitsPerSquare
         
-        elseif direction:equals("left") then
+        elseif (direction == "left") then
             
             newX = this.marker.x - this.unitsPerSquare
             newY = this.marker.y

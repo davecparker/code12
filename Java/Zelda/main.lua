@@ -251,19 +251,19 @@ require('Code12.api')
         local screenName = ct.getScreen()
         local screenObjs = nil
         
-        if screenName:equals("green") then
+        if (screenName == "green") then
             
             screenObjs = this.greenObjs
         
-        elseif screenName:equals("orange") then
+        elseif (screenName == "orange") then
             
             screenObjs = this.orangeObjs
         
-        elseif screenName:equals("blue") then
+        elseif (screenName == "blue") then
             
             screenObjs = this.blueObjs
         
-        elseif screenName:equals("yellow") then
+        elseif (screenName == "yellow") then
             
             screenObjs = this.yellowObjs
         
@@ -290,7 +290,7 @@ require('Code12.api')
                 local objText = obj:getText()
                 ct.println(objText .. " " .. group .. " hit")
                 
-                if group:equals("treasure") then
+                if (group == "treasure") then
                     
                     obj.visible = false
                     this.treasuresRemaining = this.treasuresRemaining - 1
@@ -313,7 +313,7 @@ require('Code12.api')
                         this.zelda = ct.image("zelda.png", zeldaX, zeldaY, this.link.width)
                     end
                 
-                elseif group:equals("door") then
+                elseif (group == "door") then
                     
                     -- Save Link's data and delete him
                     local xSpeed = this.link.xSpeed
@@ -389,43 +389,43 @@ require('Code12.api')
     
     function onKeyPress(keyName)
         
-        if keyName:equals("g") then
+        if (keyName == "g") then
             
             ct.setScreen("green")
         
-        elseif keyName:equals("o") then
+        elseif (keyName == "o") then
             
             ct.setScreen("orange")
         
-        elseif keyName:equals("b") then
+        elseif (keyName == "b") then
             
             ct.setScreen("blue")
         
-        elseif keyName:equals("y") then
+        elseif (keyName == "y") then
             
             ct.setScreen("yellow")
         
-        elseif keyName:equals("r") then
+        elseif (keyName == "r") then
             
             ct.setScreen("red")
         end
         
-        if keyName:equals("up") and this.link.y > this.yMin then
+        if (keyName == "up") and this.link.y > this.yMin then
             
             this.link.xSpeed = 0
             this.link.ySpeed = -this.linkSpeed
         
-        elseif keyName:equals("down") and this.link.y < this.yMax then
+        elseif (keyName == "down") and this.link.y < this.yMax then
             
             this.link.xSpeed = 0
             this.link.ySpeed = this.linkSpeed
         
-        elseif keyName:equals("left") and this.link.x > this.xMin then
+        elseif (keyName == "left") and this.link.x > this.xMin then
             
             this.link.xSpeed = -this.linkSpeed
             this.link.ySpeed = 0
         
-        elseif keyName:equals("right") and this.link.x < this.xMax then
+        elseif (keyName == "right") and this.link.x < this.xMax then
             
             this.link.xSpeed = this.linkSpeed
             this.link.ySpeed = 0
@@ -434,7 +434,7 @@ require('Code12.api')
     
     function onKeyRelease(keyName)
         
-        if keyName:equals("up") or keyName:equals("down") or keyName:equals("left") or keyName:equals("right") then
+        if (keyName == "up") or (keyName == "down") or (keyName == "left") or (keyName == "right") then
             
             this.link.xSpeed = 0
             this.link.ySpeed = 0
