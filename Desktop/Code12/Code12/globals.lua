@@ -18,16 +18,16 @@ local g = {
 	isMobile = false,      -- true if iOS or Android
 	isSimulator = false,   -- true if running on Corona Simulator
 
-	-- Device metrics, set at init time
+	-- Device pixel metrics, set at init time and when the window resizes
 	device = {
-		horz = { origin = 0, size = 0 },
-		vert = { origin = 0, size = 0 },
+		width = 0,
+		height = 0,
 	},
 
-	-- These are device units with horz and vert swapped if landscape, set at init time.
+	-- The pixel size being used for output, set by ct.setHeight()
 	window = {
-		horz = nil,
-		vert = nil,
+		width = 0,
+		height = 0,
 		resized = true,   -- true when resized since last update (force first size)
 	},
 
@@ -42,7 +42,7 @@ local g = {
 	screen = nil,       -- current screen in screens table
 
 	-- Game state
-	startTime = 0,         -- System time in ms when first udpate started
+	startTime = nil,       -- System time in ms when start function began, or nil before
 	clicked = false,       -- true if something was clicked during this update frame
 	gameObjClicked = nil,  -- Object clicked during this update frame, nil if none
 	clickX = 0,            -- Last click x location 
@@ -50,5 +50,20 @@ local g = {
 	charTyped = nil,       -- char typed during this update frame (string), nil if none
 }
 
+
+---------------- Utility Functions--------------------------------------------
+
+-- Return value pinned within the range min to max
+function g.pinValue(value, min, max)
+	if type(value) ~= "number" or value < min then
+		return min
+	elseif value > max then
+		return max
+	end
+	return value
+end
+
+
+------------------------------------------------------------------------------
 
 return g

@@ -317,7 +317,7 @@ line (comment)
 *** Location 64.1 to 65.2: Syntax Error
 ======= Test Complete =========================================
 
-65 lines processed in 4 ms
+65 lines processed in 5 ms
 
 0 unexpected errors
 0 uncaught errors (15 expected errors)

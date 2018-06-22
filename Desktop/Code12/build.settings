@@ -16,7 +16,9 @@ settings =
 	window =
     {
 		defaultViewWidth = 600,
-		defaultViewHeight = 900,
+		defaultViewHeight = 800,
+		minViewWidth = 200,
+		minViewHeight = 200,
 		resizable = true,
 		enableMaximizeButton = true,
 	},  

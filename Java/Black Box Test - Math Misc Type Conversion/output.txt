@@ -1,5 +1,6 @@
 ct.random tests done
 ct.round tests done
+ct.roundDecimal tests done
 ct.isError tests done
 ct.distance tests done
 ct.getVersion tests done
