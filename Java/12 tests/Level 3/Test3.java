@@ -6,7 +6,7 @@ class Test3 extends Code12Program
    
    public static void main(String[] args)
    { 
-      Code12.run( new Test1() ); 
+      Code12.run( new Test3() ); 
    }
    
    public void start()
@@ -53,68 +53,53 @@ class Test3 extends Code12Program
       //Creates a black circle with a center at ( x, y ) with a diameter of d
       ct.circle( x, y, d, c );  
       
+      //Creates variables to store the height and width of the rectangles we will make
+      int height = 10;
+      int width = 26;
       
+      //Sets the string for the color of the rectangle to "yellow"
+      c = "yellow";
       
-      /*/
-      //Creates a rectangle at position ( 35, 15 ) with a width of 10 and height of 5 with default color
-      ct.rect( 35, 15, 10, 5 );   
+      //Sets x and y to the x and y of the center of the rectangle we will make
+      x = 26;
+      y = 38;
       
-      //Creates a blue rectangle at position ( 52, 15 ) with a width of 10 and height of 5
-      ct.rect( 52, 15, 10, 5, "blue" ); 
+      //Creates a yellow rectangle with its center at ( 14, 20 ) with a height of height and width of width
+      ct.rect( x, y, width, height, c);  
       
-      //Creates a line at position ( 62 , 15 ) with default color 
-      ct.line( 62, 15, 72, 15 );
+      //Creates two new integar variables a and b
+      int a;
+      int b;
       
-      //Creates a cyan line at position ( 77 , 15 )
-      ct.line( 77, 15, 87, 15, "cyan" );
+      //Sets the value of a to be equal to x
+      a = x;
       
-      //Creates text at ( 33, 30 ) with a height 10
-      ct.text( "Hello world!", 33, 30, 10 );
+      //Sets b to the value 48
+      b = 52;
+      
+      //Sets c to "gray"
+      c = "gray";
+      
+      //Creates a gray rectangle with its center at ( a, b ) with a height of height and width of width
+      ct.rect( a, b, width, height, c);  
+      
+      //Sets b and c to a new values
+      b = 75;
+      c = "purple";
+       
+      //Creates a gray rectangle with its center at ( a, b ) with a height of width and width of height 
+      ct.rect( a, b, height, width, c); //There is nothing special about variable names   
+      
+      //Creates a variable size of type double
+      double size = 40.5;
+      
+      //Sets x and y to the desired location of the image we will create
+      x = 70;
+      y = x;
+      
+      //Creates an image of a fish
+      ct.image("goldfish.png", x, y, size );
+         
 
-      //Creates green text at ( 73, 30 ) with a height 10
-      ct.text( "Test", 73, 30, 10, "green" );
-      
-      //Creates a fish at ( 20, 45 ) with a width of 20
-      ct.image( "goldfish.png" , 20, 45, 20 );
-      
-      //Creates a larger fish at ( 60, 50 )
-      ct.image( "goldfish.png" , 65, 50, 40 );
-      //-----------------
-      
-      // Screen Management
-      //------------------
-      //Sets the title of the window
-      ct.setTitle( "Test 1" );
-      
-      //Sets the background color of the screen
-      ct.setBackColor( "white" );//Looks like nothing
-
-      //Sets the background image
-      ct.setHeight(200);
-      ct.setBackImage("underwater.jpg"); 
-      //------------------
-      
-      // Audio
-      //------------------ 
-      //Sets the volume to half the full value
-      ct.setSoundVolume( 0.5 );
-      
-      //Plays the sound bubble
-      ct.sound( "bubble.wav" );
-      //------------------
-      
-      //Draws a face below the other tests
-      
-      //Head
-      ct.circle( 50, 100, 50, "yellow");
-      
-      //Eyes
-      ct.circle( 40, 90, 10, "black");
-      ct.circle( 60, 90, 10, "black");
-      
-      //Mouth
-      ct.rect( 50, 110, 20, 8, "black");
-      
-      */
    }
 }

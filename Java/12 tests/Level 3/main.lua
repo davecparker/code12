@@ -53,67 +53,52 @@ require('Code12.api')
         --Creates a black circle with a center at ( x, y ) with a diameter of d
         ct.circle(x, y, d, c)
         
+        --Creates variables to store the height and width of the rectangles we will make
+        local height = 10
+        local width = 26
         
+        --Sets the string for the color of the rectangle to "yellow"
+        c = "yellow"
         
-        --/
+        --Sets x and y to the x and y of the center of the rectangle we will make
+        x = 26
+        y = 38
         
+        --Creates a yellow rectangle with its center at ( 14, 20 ) with a height of height and width of width
+        ct.rect(x, y, width, height, c)
         
+        --Creates two new integar variables a and b
+        local a = 0; 
+        local b = 0; 
         
+        --Sets the value of a to be equal to x
+        a = x
         
+        --Sets b to the value 48
+        b = 52
         
+        --Sets c to "gray"
+        c = "gray"
         
+        --Creates a gray rectangle with its center at ( a, b ) with a height of height and width of width
+        ct.rect(a, b, width, height, c)
         
+        --Sets b and c to a new values
+        b = 75
+        c = "purple"
         
+        --Creates a gray rectangle with its center at ( a, b ) with a height of width and width of height 
+        ct.rect(a, b, height, width, c)
         
+        --Creates a variable size of type double
+        local size = 40.5
         
+        --Sets x and y to the desired location of the image we will create
+        x = 70
+        y = x
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        --Creates an image of a fish
+        ct.image("goldfish.png", x, y, size)
         
         
     end

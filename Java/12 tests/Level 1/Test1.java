@@ -58,8 +58,6 @@ class Test1 extends Code12Program
       
       // Screen Management
       //------------------
-      //Sets the title of the window
-      ct.setTitle( "Test 1" );
       
       //Sets the background color of the screen
       ct.setBackColor( "white" );//Looks like nothing
