@@ -10,6 +10,7 @@
 local g = require("Code12.globals")
 require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
+local appContext = ct._appContext
 
 
 ---------------- Text Output API ---------------------------------------------
@@ -22,8 +23,13 @@ function ct.print(value, ...)
 	end
 
 	-- Print the value
-	io.write(tostring(value))
-	io.flush()
+	local text = tostring(value)
+	if appContext then
+		appContext.print(text)
+	else
+		io.write(text)
+		io.flush()
+	end
 end
 
 -- API
@@ -35,9 +41,14 @@ function ct.println(value, ...)
 	end
 
 	-- Print the value and a newline
-	io.write(tostring(value))
-	io.write("\n")
-	io.flush()
+	local text = tostring(value)
+	if appContext then
+		appContext.println(text)
+	else
+		io.write(text)
+		io.write("\n")
+		io.flush()
+	end
 end
 
 -- Print a value as it should appear in ct.log output

@@ -24,7 +24,8 @@ local margin = 10        -- generic margin to leave between many UI items
 local dyToolbar = 40
 local dyStatusBar = 30
 local fontSizeUI = 12
-local toolbarShade = 0.9
+local toolbarShade = 0.8
+local extraShade = 0.9
 local borderShade = 0.5
 
 -- Misc constants
@@ -50,26 +51,36 @@ end
 
 -- UI elements and state
 local ui = {
-	width = 0,             -- window width
-	height = 0,            -- window height
-	background = nil,      -- white background rect
-	toolbarGroup = nil,    -- display group for toolbar
-	statusBarGroup = nil,  -- display group for status bar
-	outputGroup = nil,     -- display group for program output area
-	gameGroup = nil,       -- display group for game output
-	errGroup = nil,        -- display group for error display
-	dyErrLine = 0,         -- line spacing for error lines
-	dxErrChar = 0,         -- char width for text in error displays
+	width = 0,                -- window width
+	height = 0,               -- window height
+	background = nil,         -- white background rect
+	toolbarGroup = nil,       -- display group for toolbar
+	statusBarGroup = nil,     -- display group for status bar
+	outputGroup = nil,        -- display group for program output area
+	outputWidth = 0,          -- width for the output area
+	outputHeight = 0,         -- height for the output area
+	lowerGroup = nil,         -- display area under the outputGroup
+	consoleTableView = nil,   -- table view for console output
+	gameGroup = nil,          -- display group for game output
+	errGroup = nil,           -- display group for error display
+	dyErrLine = 0,            -- line spacing for error lines
+	dxErrChar = 0,            -- char width for text in error displays
 }
+
+-- Console output (array of strings)
+local consoleStrings
 
 -- The global state tables that the generated Lua code can access (Lua globals)
 ct = {
-	_appContext = nil,     -- created in initApp
+	_appContext = {},      -- contents set in initApp
 	checkParams = true,    -- set to false to disable runtime API parameter checks
 	-- The ct.xxx API functions are added here by the Lua runtime when loaded
 }
 this = {}      -- generated code uses this.varName for class/global variables
-_fn = {}       -- generated code uses _fn.setup(), _fn.update(), _fn.userFn(), etc.
+_fn = {}       -- generated code uses _fn.start(), _fn.update(), _fn.userFn(), etc.
+
+-- Cached state
+local appContext = ct._appContext
 
 
 --- Utility Functions ------------------------------------------------
@@ -157,7 +168,7 @@ local function runLuaCode( luaCode )
  		codeFunction()
 
  		-- Tell the runtime to init and start a new run
- 		ct._appContext.initRun()
+ 		appContext.initRun()
 
  		-- Show the game output
 		ui.gameGroup.isVisible = true
@@ -219,11 +230,12 @@ local function writeLuaCode( codeStr )
 		outFile:write( marker .. filename .. "\"\n")
 		outFile:write( "package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Code12/?.lua'\n" )
 		outFile:write( "require('Code12.api')\n" )
-		-- Write the user code minus the 3 blank lines at the beginning (if so), 
+
+		-- Remove the first 3 lines from codeStr (which should be blank or comments), 
 		-- so that line numbers match after adding our header above.
-		if string.starts( codeStr, "\n\n\n" ) then
-			codeStr = string.sub( codeStr, 4 )
-		end
+		codeStr = string.match( codeStr, "[^\n]*\n[^\n]*\n[^\n]*\n(.*)" )
+		
+		-- Write the code
 		outFile:write( codeStr )
 		outFile:write( "\n" )
 		io.close( outFile )
@@ -238,7 +250,8 @@ local function writeLuaCode( codeStr )
 	end
 
 	-- Print user code to console for debugging
-	print( "--- Lua Code: ---\n" ); print( codeStr )
+	print( "--- Lua Code: ---\n" ); 
+	print( codeStr )
 end
 
 -- Show dialog to choose the user source code file
@@ -314,12 +327,34 @@ local function makeHilightRect( x, y, width, height, ref )
 	return r
 end
 
+-- Position the clip areas
+local function resizeClipAreas()
+	local width = ui.outputWidth
+	local height = ui.outputHeight
+	if err.hasErr() then
+		-- Use more of the window for error displays
+		width = ui.width
+		height = ui.height / 2
+	end
+
+	-- Position the right bar
+	ui.rightBar.x = width + 1
+	ui.rightBar.width = ui.width    -- more than enough
+	ui.rightBar.height = ui.height  -- more than enough
+
+	-- Position the lower group
+	ui.lowerGroup.y = dyToolbar + height + 1
+	ui.lowerGroup.background.width = ui.width
+	ui.lowerGroup.background.height = ui.height  -- more than enough
+end
+
 -- Remove the error display if it exists
 local function removeErrorDisplay()
 	if ui.errGroup then
 		ui.errGroup:removeSelf()
 		ui.errGroup = nil
 	end
+	resizeClipAreas()
 end
 
 -- Make the error display, or destroy and remake it if it exists
@@ -414,6 +449,7 @@ local function showError()
 
 	-- Make the error display elements
 	makeErrDisplay()
+	resizeClipAreas()
 
 	-- Set the error text
 	local errRecord = err.getErrRecord()
@@ -467,6 +503,73 @@ local function showError()
 	end
 end
 
+-- Add text to the last line in the console
+local function consolePrint( text )
+	if text then
+		consoleStrings[#consoleStrings] = consoleStrings[#consoleStrings] .. text
+		ui.consoleTableView:reloadData()
+	end
+end
+
+-- Print a line to the console
+local function consolePrintln( text )
+	local rowHeight = 20
+	ui.consoleTableView:insertRow{ rowHeight = rowHeight }
+	
+	consolePrint( text )
+	consoleStrings[#consoleStrings + 1] = ""   -- start of next line
+
+	-- Make sure the last line is visible
+	local numLinesVisible = math.floor( ui.consoleTableView.height / rowHeight )
+	if #consoleStrings > numLinesVisible then
+		ui.consoleTableView:scrollToIndex( #consoleStrings - numLinesVisible + 1, 0 )
+	end
+end
+
+-- Clear the console data and view
+local function clearConsole()
+	consoleStrings = {}
+	consolePrintln()   -- need to start first line as empty
+	if ui.consoleTableView:getNumRows() > 0 then
+		ui.consoleTableView:deleteAllRows()
+	end
+end
+
+-- Render a row in the console table view
+local function onRenderConsoleRow( event )
+	local row = event.row
+	local rowHeight = row.contentHeight
+	local rowWidth = row.contentWidth
+
+	local text = consoleStrings[row.index] or ""
+	local rowText = display.newText( row, text, 0, 0, "Consolas", 14 )
+	rowText:setFillColor( 0 )
+	rowText.anchorX = 0
+	rowText.x = margin
+	rowText.y = rowHeight * 0.5
+end
+
+-- Make the lower display group
+local function makeLowerGroup()
+	ui.lowerGroup = makeGroup( nil, 0, dyToolbar + ui.outputHeight + 1 )
+
+	-- Gray background
+	ui.lowerGroup.background = uiItem( display.newRect( ui.lowerGroup, 0, 0, ui.width, 0 ), 
+										extraShade, borderShade )
+
+	-- Console window
+	ui.consoleTableView = widget.newTableView{
+		left = 0,
+		top = margin,
+		width = ui.width,
+		height = 100,   -- TODO set later
+		noLines = true,
+		hideScrollBar = false,
+		onRowRender = onRenderConsoleRow,
+	}
+	ui.lowerGroup:insert( ui.consoleTableView )
+end
+
 -- Handle resize event for the window
 local function onResizeWindow( event )
 	-- Get new window size
@@ -487,17 +590,34 @@ local function onResizeWindow( event )
 	group.background.width = ui.width
 	group.message.x = ui.width / 2
 
-	-- Remake the error display
+	-- Remake the error display, if any
 	if err.hasErr() then
 		showError()
 	end
+
+	-- Calculate the output space and tell the runtime we resized. 
+	-- This will result in a call to ct.setHeight() internally, 
+	-- which will then call us back at setClipSize().
+	appContext.widthP = math.max( ui.width, 1 )
+	appContext.heightP = math.max( ui.height - dyToolbar - dyStatusBar, 1 )
+	if appContext.onResize then
+		appContext.onResize()
+	end
 end
 
+-- Runtime callback to set the output size being used
+local function setClipSize( widthP, heightP )
+	-- Store the new output size
+	ui.outputWidth = widthP
+	ui.outputHeight = heightP
+
+	-- Re-layout the clip areas
+	resizeClipAreas()
+end
 
 -- Prepare for a new run of the user program
 local function initNewProgram()
 	-- Stop existing run if any
-	local appContext = ct._appContext
 	appContext.stopRun()
 
 	-- Set the source dir and filename
@@ -523,7 +643,11 @@ local function initNewProgram()
 		end
 	end
 
-	-- Init new runtime state for this run
+	-- Clear the error state, console, and other state
+	err.initProgram()
+	clearConsole()
+
+	-- Init new runtime display state for this run
 	if ui.gameGroup then
 		ui.gameGroup:removeSelf()
 	end
@@ -546,7 +670,6 @@ local function processUserFile()
 	local startTime = system.getTimer()
 	local parseTrees = {}
 	local startTokens = nil
-	err.initProgram()
 	parseJava.init()
 	for lineNum = 1, #sourceFile.strLines do
 		local strUserCode = sourceFile.strLines[lineNum]
@@ -643,6 +766,8 @@ end
 local function initApp()
 	-- Get initial device info
 	getDeviceMetrics()
+	ui.outputWidth = ui.width
+	ui.outputHeight = ui.height - dyToolbar - dyStatusBar
 
 	-- Make a default window title
 	native.setProperty("windowTitleText", "Code12")
@@ -653,19 +778,26 @@ local function initApp()
 
 	-- UI and display elements
 	ui.outputGroup = makeGroup( nil, 0, dyToolbar )
+	ui.rightBar = uiItem( display.newRect( ui.width + 1, dyToolbar, 0, ui.height ), 
+							extraShade, borderShade )
+	makeLowerGroup()
 	makeStatusBar()
 	makeToolbar()
+
+	-- Init the console data
+	clearConsole()
+
+	-- Fill in the appContext for the runtime
+	appContext.outputGroup = ui.outputGroup
+	appContext.widthP = ui.outputWidth
+	appContext.heightP = ui.outputHeight
+	appContext.setClipSize = setClipSize
+	appContext.print = consolePrint
+	appContext.println = consolePrintln
 
 	-- Load the Code12 API and runtime.
 	-- This defines the Code12 APIs in the global ct table
 	-- and sets the runtime's fields in ct._appContext.
-	ct._appContext = {
-		outputGroup = ui.outputGroup,
-		widthP = ui.width,
-		heightP = ui.height,
-		-- setTitle =     -- TODO
-		-- setHeight =    -- TODO
-	}
 	require( "Code12.api" )
 
 	-- Install listeners for the app

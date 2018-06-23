@@ -15,20 +15,37 @@ class UserCode extends Code12Program
 	{
 		// int oops = count;
 		// double nope = ball.x;
+		// ct.circle(50, 50, LIMIT);
 		double x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0;
 		int xInt = ct.toInt( x );
 		String name = "Dave" + " " + "Parker";
 		boolean done;
 
+		// Try some console output
+		for (int i = 0; i < 10; i++)
+		{
+			ct.println("Line " + i);
+		}
+		ct.println("This is the default Code12 test app");
+		ct.println("This is console output");
+		ct.print("Beginning of line");
+		ct.print(" Middle ");
+		ct.println("End");
+
 		// Draw some circles
 		ball = ct.circle(x + 6, 15, 5);
 		ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5);
 		bigBall = ct.circle(x, 80, 40);
-		bigBall.setFillColor( "blue" );
+		bigBall.setFillColorRGB(400, 127, -50);
 		bigBall.clickable = true;
 
 		// Add a fish
 		ct.image("goldfish.png", 50, 50, 15);
+
+		// Make a line
+		GameObj line1 = ct.line(20, 80, 80, 80, "red");
+		line1.setLineColor("MAGENTA");
+		line1.setFillColor("red");
 
 		double z = ball.x + 1;
 		if (ball == bigBall || bigBall != null)
@@ -62,7 +79,7 @@ class UserCode extends Code12Program
 			speed = -speed;
 		}
 		else if (bigBall.x < 0)
-			speed = -this.speed;
+			speed = -speed;
 		else
 		{
 			int localX = 3;
@@ -142,5 +159,29 @@ class UserCode extends Code12Program
 
 		int [] aTest;
 		aTest = new int[10];
+		GameObj[] as, bs, cs;
+
+		as = new GameObj[10];
+		double myX = as[4].x;
+		as[sum - 1].y = myX;
+	}
+
+	public void onKeyPress( String key )
+	{
+		if (key.equals("b"))
+			ct.println( "b was pressed" );
+		else if (key.length() > 1)
+			ct.println( "Long key" );
+
+		String s = "  Dave ";
+		ct.println(s.compareTo("Parker"));
+		ct.log(s, s.trim(), s.toUpperCase(), s.substring(2), s.substring(2, 6), s.indexOf("D"));
+
+		// Some common errors:
+		// if (speed = 0)
+		// 	ct.println("Still");
+
+		// if (key == "n")
+		// 	ct.print("n key");		
 	}
 }

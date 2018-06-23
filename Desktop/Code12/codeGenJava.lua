@@ -68,6 +68,17 @@ local luaOpFromJavaOp = {
 	["/="]	= " / ",
 }
 
+-- Map Java String methods to corresponding Lua function
+local luaFnFromJavaStringMethod = {
+    ["compareTo"]    =  "ct.stringCompare",
+    ["indexOf"]      =  "ct.indexOfString",
+    ["length"]       =  "string.len",
+    ["substring"]    =  "ct.substring",
+    ["toLowerCase"]  =  "string.lower",
+    ["toUpperCase"]  =  "string.upper",
+    ["trim"]         =  "ct.trimString",
+}
+
 
 --- Utility Functions --------------------------------------------------------
 
@@ -114,36 +125,26 @@ local function varNameCode( varName )
 	return varName
 end
 
--- Return Lua code for an lValue node, which might be a class or local reference.
-function lValueCode( v )
-	local p = v.p
-	if p == "this" then
-		return varNameCode( v.nodes[3].str ) 
+-- Return Lua code for an lValue node
+function lValueCode( lValue )
+	local nodes = lValue.nodes
+	local varName = nodes[1].str
+	local code = varNameCode( varName ) 
+	if nodes[2].p == "index" then
+		code = code .. "[1+(" .. exprCode( nodes[2].nodes[2] ) .. ")]"
 	end
-
-	local nameNode = v.nodes[1]
-	assert( nameNode.tt == "ID" )
-	local name = nameNode.str
-	if checkJava.isInstanceVarName( name ) then
-		name = thisPrefix .. name    -- class var, so turn name into this.name
-	end
-	if p == "var" then
-		return name
-	elseif p == "field" then
-		local fieldName = v.nodes[3].str
-		if name == "Math" then
+	if nodes[3].p == "field" then
+		local fieldName = nodes[3].nodes[2].str
+		if varName == "Math" then
 			if fieldName == "PI" then
 				return "math.pi"
 			elseif fieldName == "E" then
 				return "math.exp(1)"
 			end
-		else
-			return name .. "." .. fieldName    --  obj.field reference
 		end
-	elseif p == "index" then
-		return name .. "[1+(" .. exprCode( v.nodes[3] ) .. ")]"
+		code = code .. "." .. fieldName
 	end
-	error( "Unknown lValue pattern " .. p )
+	return code
 end
 
 -- Return Lua code for a function or method call, e.g:
@@ -158,25 +159,45 @@ function fnCallCode( tree )
 	local fnValue = nodes[1]
 	local exprs = nodes[3].nodes
 	if fnValue.p == "method" then
+		-- Method call
 		local objNode = fnValue.nodes[1]
+		assert( objNode.tt == "ID" )   -- TODO: arrays
+		local objName = objNode.str
 		local methodNode = fnValue.nodes[2]
-		local objName = objNode.str		
+		assert( methodNode.tt == "ID" )
+		local methodName = methodNode.str
+
 		if objName == "Math" then 
-			parts = { "math.", methodNode.str, "(" }   -- Lua same as Java for all supported methods :)
-		elseif checkJava.isInstanceVarName( objName ) then
-			parts = { "this.", objName, ":", methodNode.str, "(" }  -- e.g. this.ball:delete(
+			-- Lua math.xxx is the same as Java Math.xxx for all supported methods :)
+			parts = { "math.", methodName, "(" }
+		elseif checkJava.vtVar( objNode ) == "String" then
+			-- Supported String class methods
+			if methodName == "equals" then
+				-- Lua does string value comparison directly with ==
+				return "(" .. varNameCode( objName ) .. " == " .. exprCode( exprs[1] ) .. ")"
+			else
+				-- Map to corresponding global Lua function, passing the object.  
+				parts = { luaFnFromJavaStringMethod[methodName], "(", varNameCode( objName ) }
+				if #exprs > 0 then
+					parts[4] = ", "
+				end
+			end
 		else
-			parts = { objName, ":", methodNode.str, "(" }  -- e.g. obj:delete(
+			-- GameObj method, e.g. obj:delete(
+			parts = { varNameCode( objName ), ":", methodName, "(" }
 		end
 	else
+		-- Function call
 		local fnName = fnValue.str
 		if string.starts( fnName, ctPrefix ) then
+			-- ct API call
 			if not ctDefined then
 				err.setErrNode( fnValue, "Code12 API functions cannot be called before start()" )
 				return nil
 			end
 			parts = { fnName, "(" }            -- e.g. ct.circle(
 		else
+			-- User-defined function call
 			parts = { fnPrefix, fnName, "(" }   -- e.g. _fn.updateScore(
 		end
 	end
@@ -355,7 +376,7 @@ local function generateVarDecl( tree, isInstanceVar )
 				addLua( "local " )
 			end
 			addLua( nameNode.str )
-			addLua( " = nil" )
+			addLua( " = nil; " )
 		end
 		return true
 	end
@@ -395,17 +416,16 @@ local function generateStmt( tree )
 			return
 		end
 		addLua( fnCallCode( tree ) )
-	elseif p == "assign" then
+	elseif p == "varAssign" then
 		-- ID = expr
 		local varNode = nodes[1]
 		local expr = nodes[3]
 		if checkJava.canAssignToVarNode( varNode, expr ) then
-			assert( varNode.tt == "ID" )
 			addLua( varNameCode( varNode.str ) )
 			addLua( " = " )
 			addLua( exprCode( expr ) )
 		end
-	elseif p == "lValueAssign" then
+	elseif p == "assign" then
 		-- lValue = expr
 		local lValue = nodes[1]
 		local expr = nodes[3]
@@ -417,14 +437,14 @@ local function generateStmt( tree )
 	elseif p == "opAssign" then
 		-- lValue op= expr
 		local lValue = nodes[1]
+		local op = nodes[2]
 		local expr = nodes[3]
-		-- TODO: Better type checking, this is not correct
-		if checkJava.canAssignToLValue( lValue, expr ) then
+		if checkJava.canOpAssignToLValue( lValue, op, expr ) then
 			local lValueStr = lValueCode( lValue )
 			addLua( lValueStr )
 			addLua( " = " )
 			addLua( lValueStr )
-			addLua( luaOpFromJavaOp[nodes[2].nodes[1].str] )
+			addLua( luaOpFromJavaOp[op.p] )
 			addLua( "(" )
 			addLua( exprCode( expr ) )
 			addLua( ")" )
@@ -481,7 +501,6 @@ local function generateForLoop( tree )
 		if forInit.p == "varInit" then
 			local vt = javaTypes.vtFromVarType( forInit.nodes[1] )
 			local nameNode = forInit.nodes[2]
-			print("Loop var ", nameNode.str, vt)
 			checkJava.defineLocalVar( nameNode, vt, false, true )
 			local expr = forInit.nodes[4]
 			checkJava.canAssignToVarNode( nameNode, expr, true )
@@ -676,14 +695,11 @@ local function generateFnParamList( paramList )
 end
 
 -- Generate code for a function definition with the given name and param list.
--- The function is a Code12 event function if isEvent, otherwise user-defined.
--- starting with the name of the function, then generate its code block afterwards.
+-- Start with the name of the function, then generate its code block afterwards.
 -- Return true if successful.
-local function generateFunction( isEvent, fnName, paramList )
+local function generateFunction( fnName, paramList )
 	beginLuaLine( "function " )
-	if not isEvent then
-		addLua( fnPrefix )
-	end
+	addLua( fnPrefix )
 	addLua( fnName )
 	generateFnParamList( paramList )
 	iTree = iTree + 1 
@@ -737,12 +753,9 @@ function codeGenJava.getLuaCode( parseTrees )
 			blockLevel = blockLevel + 1
 		elseif p == "end" then            -- }  in boilerplate code
 			blockLevel = blockLevel - 1
-		elseif p == "eventFn" then
-			-- Code12 event (e.g. setup, update)
-			generateFunction( true, nodes[3].str, nodes[5].nodes)
 		elseif p == "func" then
 			-- User-defined function
-			generateFunction( false, nodes[3].str, nodes[5].nodes)
+			generateFunction( nodes[3].str, nodes[5].nodes )
 		end			
 		iTree = iTree + 1
 	end

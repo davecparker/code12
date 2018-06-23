@@ -213,13 +213,13 @@ then create a new empty screen with this name and set it as the
 current screen.
 
 `GameObj` objects that are created are always created on
-the current screen, so to create two screens in your `setup`
+the current screen, so to create two screens in your `start`
 function:
 1. Call `ct.setScreen()` to name the first screen
 2. Create `GameObj` objects for the first screen
 3. Call `ct.setScreen()` to name the second screen
 4. Create `GameObj` objects for the second screen
-5. At the end of `setup`, call `ct.setScreen()` to set the
+5. At the end of `start`, call `ct.setScreen()` to set the
 desired starting screen for your application.
 
 ### ct.clearScreen()
@@ -426,7 +426,7 @@ Play the sound effect in the sound file `filename`.
 > may not implement sound mixing, in which case attempting to play
 > a sound while another sound is playing will be ignored.
 
-### ct.setVolume()
+### ct.setSoundVolume()
 ```
 ct.setSoundVolume( double volume )
 ```
@@ -468,7 +468,7 @@ a large negative integer if n < 0, and 0 if n is 0.
 ```
 boolean ct.isError( double d )
 ```
-Return `true` if the value of `d` is an error value (NaN or Infinity).
+Return `true` if the value of `d` is an error value (NaN = "Not a Number").
 
 ### ct.distance()
 ```
@@ -481,8 +481,7 @@ Return the distance between the points (`x1`, `y1`) and (`x2`, `y2`).
 int ct.getTimer( )
 ```
 Return the number of milliseconds since the application started.
-Time starts after the `setup` function completes and before the
-first update cycle.
+Time starts at the begining of the `start` function.
 
 ### ct.getVersion()
 ```
@@ -707,7 +706,7 @@ then the object will be automatically deleted if it moves off-screen
 String group
 ```
 The `group` field is an optional name that you can assign to an object
-that will cause the function `ct.deleteGroup()` to delete all objects with
+that will cause the function `ct.clearGroup()` to delete all objects with
 the matching group name. The default group name of an object is ""
 (empty string)
 
@@ -774,8 +773,9 @@ obj.setSize( double width, double height )
 ```
 Set the size of the object using `width` and `height`.
 This is just a convenience method that is equivalent to
-setting both the `width` and `height` fields
-(see [width, height](#width-height) above).
+setting both the `width` and `height` fields.
+Note that different types of objects react differently to changes
+in width or height. (see [width, height](#width-height) above).
 
 ### obj.align()
 ```
@@ -991,7 +991,7 @@ occurs while the application is running).
 void update( )
 ```
 The `update` function is called at the beginning of each update cycle.
-Update cycles start after the `setup` function has completed and then
+Update cycles start after the `start` function has completed and then
 repeat continuously at 60 times per second.
 
 One use of update cycles is to achieve object motion and animation.
@@ -1016,7 +1016,7 @@ of certain amounts of time if you want.
 > in a way that causes many copies of the object to be created over
 > and over. Note that you should *not* call functions like `ct.circle()` to
 > "draw" a circle for each frame in an animation. Instead, you typically
-> want to call `ct.circle()` to create the object once in your `setup` function,
+> want to call `ct.circle()` to create the object once in your `start` function,
 > then modify the existing circle in your `update` function.
 
 ### onMousePress()
@@ -1134,7 +1134,7 @@ Color Name       (red, green, blue)
 "green"          (0, 255, 0)
 "blue"           (0, 0, 255)
 "cyan"           (0, 255, 255)
-"majenta"        (255, 0, 255)
+"magenta"        (255, 0, 255)
 "yellow"         (255, 255, 0)
 
 "gray"           (127, 127, 127)
@@ -1147,7 +1147,7 @@ Color Name       (red, green, blue)
 "light green"    (127, 255, 127)
 "light blue"     (127, 127, 255)
 "light cyan"     (127, 255, 255)
-"light majenta"  (255, 127, 255)
+"light magenta"  (255, 127, 255)
 "light yellow"   (255, 255, 127)
 
 "dark gray"      (64, 64, 64)
@@ -1155,7 +1155,7 @@ Color Name       (red, green, blue)
 "dark green"     (0, 127, 0)
 "dark blue"      (0, 0, 127)
 "dark cyan"      (0, 127, 127)
-"dark majenta"   (127, 0, 127)
+"dark magenta"   (127, 0, 127)
 "dark yellow"    (127, 127, 0)
 
 ```

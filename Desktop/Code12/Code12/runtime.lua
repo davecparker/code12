@@ -16,15 +16,16 @@ local g = require("Code12.globals")
 -- should contain fields as follows:
 --     ct = {
 --         _appContext = {
---             sourceDir = dir,          -- dir where user code is (absolute)
---             sourceFilename = name,    -- user code filename (in sourceDir)
+--             sourceDir = string,       -- dir where user code is (absolute)
+--             sourceFilename = string,  -- user code filename (in sourceDir)
 --             mediaBaseDir = (const),   -- Corona baseDir to use for media files  
---             mediaDir = mediaDir,      -- media dir relative to mediaBaseDir
+--             mediaDir = string,        -- media dir relative to mediaBaseDir
 --             outputGroup = group,      -- display group where output should go
---             widthP = windowPixels,    -- pixel width of output area
---             heightP = windowPixels,   -- pixel height of output area
---             setTitle = fnSetTitle,    -- callback function to set app title
---             setHeight = fnSetHeight,  -- callback function to change output height
+--             widthP = number,          -- pixel width of output area
+--             heightP = number,         -- pixel height of output area
+--             setClipSize = function,   -- called by runtime to specify output size
+--             print = function,         -- called by runtime for console output
+--             println = function,       -- called by runtime for console output
 
 --             -- These field are added by the runtime for use by the app
 --             initRun = fnInitRun,      -- init and start a new run
@@ -52,8 +53,8 @@ end
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame(event)
 	-- Call the client's update function if any
-	if type(update) == "function" then
-		update()
+	if type(_fn.update) == "function" then
+		_fn.update()
 	end
 
 	-- Clear the polled input state for this frame
@@ -88,9 +89,12 @@ end
 
 -- The enterFrame listener for the first update only
 local function onFirstFrame(event)
+	-- Start the game timer
+	g.startTime = system.getTimer()
+
 	-- Call client's start method if any
-	if type(start) == "function" then
-		start()
+	if type(_fn.start) == "function" then
+		_fn.start()
 	end
 
 	-- Sync the drawing objects for the first draw
@@ -98,9 +102,6 @@ local function onFirstFrame(event)
 	for i = 1, objs.numChildren do
 		objs[i].code12GameObj:sync()
 	end
-
-	-- Start the game timer
-	g.startTime = system.getTimer()
 
 	-- Switch to the normal frame update handler for subsequent frames
 	Runtime:removeEventListener("enterFrame", onFirstFrame)
@@ -112,37 +113,21 @@ local function getDeviceMetrics()
 	-- If running with an appContext then get the metrics from the app.
 	-- Otherwise get the physical device metrics for a standalone run.
 	if appContext then
-		g.device.horz.origin = 0
-		g.device.horz.size = appContext.widthP
-		g.device.vert.origin = 0
-		g.device.vert.size = appContext.heightP
+		g.device.width = appContext.widthP
+		g.device.height = appContext.heightP
 	else
-		g.device.horz.origin = display.screenOriginX
-		g.device.horz.size = display.actualContentWidth
-		g.device.vert.origin = display.screenOriginY
-		g.device.vert.size = display.actualContentHeight
+		g.device.width = display.actualContentWidth
+		g.device.height = display.actualContentHeight
 	end
 end
 
--- Handle a window resize
+-- Handle a window resize for a standalone resizeable app
 local function onResize()
-	-- Remember old height if any
-	local oldHeight = g.height
-	
-	-- Get new device metrics and change the window size.
-	-- Note that any environment with a resizeable window (app context or mobile)
-	-- always uses normal/portrait orientation.
-	getDeviceMetrics()
-	g.window.horz = g.device.horz
-	g.window.vert = g.device.vert
-	g.window.resized = true
-
-	-- Adjust main origin
-	g.mainGroup.x = g.device.horz.origin
-	g.mainGroup.y = g.device.vert.origin
+	local oldHeight = g.height    -- remember old height if any
+	getDeviceMetrics()            -- get new device metrics
 
 	-- Set new logical height (sets g.height and g.scale)
-	ct.setHeight(g.WIDTH * g.device.vert.size / g.device.horz.size)
+	ct.setHeight(g.WIDTH * g.window.height / g.window.width)
 
 	-- Adjust objects on the current screen as necessary
 	if oldHeight and g.screen then
@@ -151,6 +136,12 @@ local function onResize()
 			objs[i].code12GameObj:adjustForWindowResize(oldHeight, g.height)
 		end
 	end
+
+	-- Send user event if necessary
+	if type(_fn.onResize) == "function" then
+		_fn.onResize()
+	end
+	g.window.resized = true
 end
 
 -- Stop a run
@@ -171,7 +162,7 @@ local function stopRun()
 	g.screen = nil
 
 	-- Clear misc global game state
-	g.startTime = 0
+	g.startTime = nil
 	g.clicked = false
 	g.gameObjClicked = nil
 	g.clickX = 0
@@ -184,22 +175,11 @@ local function initRun()
 	-- Stop any existing run in case it wasn't ended explicitly
 	stopRun()
 
-	-- Get the device metrics and init the window size for normal/portrait.
-	getDeviceMetrics()
-	g.window.horz = g.device.horz
-	g.window.vert = g.device.vert
-
-	-- Calculate initial height and scale in logical coordinates
-	g.height = g.WIDTH * g.window.vert.size / g.window.horz.size
-	g.scale = g.window.horz.size / g.WIDTH
-
 	-- Create a main outer display group so that we can rotate and place it 
 	-- to change orientation (portrait to landscape). Also, the origin of this group
 	-- corrects for Corona's origin possibly not being at the device upper left.
 	g.mainGroup = display.newGroup()
 	g.mainGroup.finalize = function () g.mainGroup = nil end   -- in case parent kills it
-	g.mainGroup.x = g.device.horz.origin
-	g.mainGroup.y = g.device.vert.origin
 
 	-- If in an app context then put the main display group inside the app's output group,
 	-- otherwise prepare to use the entire device screen.
@@ -208,6 +188,10 @@ local function initRun()
 	else
 		display.setStatusBar(display.HiddenStatusBar)   -- hide device status bar
 	end
+
+	-- Get the device metrics and set the default height
+	getDeviceMetrics()
+	ct.setHeight( g.WIDTH )
 
 	-- Make the first screen with default empty name
 	ct.setScreen("")

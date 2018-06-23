@@ -17,7 +17,7 @@ public class KoopaLoopa extends Code12Program
    
    GameObj koopa; // koopa-troopa image
    int numberOfLevels = 8; // how many blocks high the staircase is
-   double tileSize = 100 / 16;
+   double tileSize = 100.0 / 16;
    double yGround = 100 - tileSize * 2;
    boolean paused = true;
    
@@ -94,7 +94,7 @@ public class KoopaLoopa extends Code12Program
       
    public void onKeyPress( String keyName )
    {
-      if ( keyName.equals("space") )
+      if ( keyName == "space" ) // TODO: was if ( keyName.equals("space") )
          paused = !paused;
    }
 }

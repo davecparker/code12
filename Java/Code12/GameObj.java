@@ -90,9 +90,9 @@ public abstract class GameObj implements GameObjInterface
    }  
 
    public void setFillColor(String name)              { fillColor = colorFromName(name); }
-   public void setFillColorRGB(int r, int g, int b)   { fillColor = new Color(r, g, b); }
+   public void setFillColorRGB(int r, int g, int b)   { fillColor = makeColor(r, g, b); }
    public void setLineColor(String name)              { lineColor = colorFromName(name); }
-   public void setLineColorRGB(int r, int g, int b)   { lineColor = new Color(r, g, b); }
+   public void setLineColorRGB(int r, int g, int b)   { lineColor = makeColor(r, g, b); }
    
    public int getLayer()              { return layer; }
    public void setLayer(int layer)    { game.setObjLayer(this, layer); }
@@ -140,6 +140,22 @@ public abstract class GameObj implements GameObjInterface
    
    //======================= Internal Methods =========================
 
+   // Return value pinned to the range min to max
+   private int pinInt(int value, int min, int max)
+   {
+      if (value < min)
+         return min;
+      if (value > max)
+         return max;
+      return value;
+   }
+
+   // Return a valid Color given r, g, b components forced into range.
+   private Color makeColor(int r, int g, int b)
+   {
+      return new Color(pinInt(r, 0, 255), pinInt(g, 0, 255), pinInt(b, 0, 255));
+   }
+
    // Return true if the object is at least partially within the screen area
    private boolean onScreen()
    {
@@ -162,7 +178,7 @@ public abstract class GameObj implements GameObjInterface
    // Set xAlignFactor and yAlignFactor given alignment string
    private void setAlignFromString(String a)
    {
-      switch (a.trim().toLowerCase())
+      switch (a.toLowerCase())
       {
          case "top left":       xAlignFactor = 0;    yAlignFactor = 0;    break;
          case "top":
@@ -194,7 +210,7 @@ public abstract class GameObj implements GameObjInterface
          case "green":         return new Color(0, 255, 0);
          case "blue":          return new Color(0, 0, 255);
          case "cyan":          return new Color(0, 255, 255);
-         case "majenta":       return new Color(255, 0, 255);
+         case "magenta":       return new Color(255, 0, 255);
          case "yellow":        return new Color(255, 255, 0);
          
          case "gray":          return new Color(127, 127, 127);
@@ -207,7 +223,7 @@ public abstract class GameObj implements GameObjInterface
          case "light green":   return new Color(127, 255, 127);
          case "light blue":    return new Color(127, 127, 255);
          case "light cyan":    return new Color(127, 255, 255);
-         case "light majenta": return new Color(255, 127, 255);
+         case "light magenta": return new Color(255, 127, 255);
          case "light yellow":  return new Color(255, 255, 127);
 
          case "dark gray":     return new Color(64, 64, 64);
@@ -215,7 +231,7 @@ public abstract class GameObj implements GameObjInterface
          case "dark green":    return new Color(0, 127, 0);
          case "dark blue":     return new Color(0, 0, 127);
          case "dark cyan":     return new Color(0, 127, 127);
-         case "dark majenta":  return new Color(127, 0, 127);
+         case "dark magenta":  return new Color(127, 0, 127);
          case "dark yellow":   return new Color(127, 127, 0);
       }
       return new Color(127, 127, 127);   // Gray for color name not found

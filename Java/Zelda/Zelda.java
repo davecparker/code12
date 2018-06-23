@@ -168,7 +168,8 @@ class MainProgram extends Code12Program
       // Make treasure in center of room
       treasureX = ct.random( ct.round(treasureMargin), ct.round(screenWidth - treasureMargin) );
       treasureY = ct.random(  ct.round(treasureMargin), ct.round(screenHeight - treasureMargin) );
-      treasure = ct.image( "treasure.png", treasureX, treasureY, treasureWidth );      treasure.group = "treasure";
+      treasure = ct.image( "treasure.png", treasureX, treasureY, treasureWidth );
+      treasure.group = "treasure";
       treasure.setText( roomColor );
       blueObjs[ objsCount ] = treasure;
       objsCount++;
@@ -201,7 +202,8 @@ class MainProgram extends Code12Program
       // Make treasure in center of room
       treasureX = ct.random( ct.round(treasureMargin), ct.round(screenWidth - treasureMargin) );
       treasureY = ct.random(  ct.round(treasureMargin), ct.round(screenHeight - treasureMargin) );
-      treasure = ct.image( "treasure.png", treasureX, treasureY, treasureWidth );      treasure.group = "treasure";
+      treasure = ct.image( "treasure.png", treasureX, treasureY, treasureWidth );
+      treasure.group = "treasure";
       treasure.setText( roomColor );
       yellowObjs[ objsCount ] = treasure;
       objsCount++;
@@ -348,7 +350,7 @@ class MainProgram extends Code12Program
                else if ( ySpeed < 0 )
                {
                   // went through a bottom door, set him at top of new screen
-                  link.y = screenHeight - (wallWidth / 2 + vertHitDist);;
+                  link.y = screenHeight - (wallWidth / 2 + vertHitDist);
                   link.x = x;
                   link.ySpeed = ySpeed;
                }

@@ -90,7 +90,7 @@ class GameObj
 	boolean visible;
 	boolean clickable;
 	boolean autoDelete;      // auto delete if it goes from on to off-screen
-	String group;            // for ct.deleteGroup(), default ""
+	String group;            // for ct.clearGroup(), default ""
 
 	// GameObj Methods
 	// ---------------
