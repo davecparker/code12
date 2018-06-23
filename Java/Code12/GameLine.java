@@ -92,26 +92,22 @@ public class GameLine extends GameObj
    	return true;
    }
 
-   // Tests if this line hits another line from (x3,y3) to (x4,y4)
-	protected boolean hitLine(double x3, double y3, double x4, double y4)
+   // Determines if this line intersects a vertical line from (x2, yTop) to (x1, yBottom)
+   // Assumes yTop < yBottom and this line is not vertical
+   protected boolean hitVertLine(double x2, double yTop, double yBottom)
    {
-   	double x1 = x;
-   	double y1 = y;
-   	double x2 = x + width;
-   	double y2 = y + height;
+   	double yIntersect = height / width * (x2 - x) + y;
+   	return yTop <= yIntersect && yIntersect <= yBottom;
 
-		// Calculate the distance to intersection point
-   	double d = (y4-y3)*(x2-x1) - (x4-x3)*(y2-y1);
+   }
 
-		double uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / d;
-		if (uA < 0 || uA > 1)
-			return false;
+   // Determines if this line intersects a horizontal line from (xLeft, y2) to (xRight, y2)
+   // Assumes xLeft < xRight and this line is not horizontal
+   protected boolean hitHorizLine(double y2, double xLeft, double xRight)
+   {
+   	double xIntersect = width / height * (y2 - y) + x;
+   	return xLeft <= xIntersect && xIntersect <= xRight;
 
-		double uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / d;
-		if (uB < 0 || uB > 1)
-			return false;
-
-		return true;
    }
 
    // Determine if the line has hit another GameObj
@@ -140,42 +136,62 @@ public class GameLine extends GameObj
          return false;
 
       // Line and obj's bounding rectangels are intersecting
-      if (isVerticalLine() || isHorizontalLine())
-      	if (!obj.isLine())
+      // Case this line is vertical or horizontal
+      if (width == 0 || height == 0)
+      {
+      	if (obj.isLine())
+      	{
+      		if (obj.width == 0 || obj.height == 0)
+      			return true;
+
+      		if (width == 0)
+      			return objLeft <= x && x <= objRight;
+      		else // isHorizontalLine() == true
+      			return objTop <= y && y <= objBottom;
+      	}
+      	else
       		return true;
+      }
 
   		if (obj.isLine())
-  			return hitLine(obj.x, obj.y, obj.x + obj.width, obj.y + obj.height);
+  		{
+  			double x1 = x;
+   		double y1 = y;
+   		double x2 = x + width;
+   		double y2 = y + height;
+
+			// Calculate the intersection point
+	   	double det = obj.height * width - obj.width * height;
+	  		if (det == 0) // parallel lines and bounding boxes intersect
+	  			return true;
+
+			double t = ( obj.width * (y - obj.y) - obj.height * (x - obj.x) ) / det;
+			if (t < 0 || t > 1)
+				return false;
+
+			double s = ( width * (y - obj.y) - height * (x - obj.x) ) / det;
+			if (s < 0 || s > 1)
+				return false;
+
+			return true;
+  		}
   		else
   		{
   			// If line hits left side of bounding rect return true
-  			if (hitLine(objLeft, objTop, objLeft, objBottom))
+  			if (hitVertLine(objLeft, objTop, objBottom))
   				return true;
   			// If line hits right side of bounding rect return true
-  			if (hitLine(objRight, objTop, objRight, objBottom))
+  			if (hitVertLine(objRight, objTop, objBottom))
   				return true;
   			// If line hits top of bounding rect return true
-  			if (hitLine(objLeft, objTop, objRight, objTop))
+  			if (hitHorizLine(objTop, objLeft, objRight))
   				return true;
   			// If line hits bottom of bounding rect return true
-  			if (hitLine(objLeft, objBottom, objRight, objBottom))
+  			if (hitHorizLine(objBottom, objLeft, objRight))
   				return true;
+
   			return false;
   		}
-   }
-
-   @Override
-   protected boolean isHorizontalLine()
-   {
-   	double epsilon = 0.001;
-   	return -epsilon < width && width < epsilon;
-   }
-
-   @Override
-   protected boolean isVerticalLine()
-   {
-   	double epsilon = 0.001;
-   	return -epsilon < height && height < epsilon;
    }
 
 }

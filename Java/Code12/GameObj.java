@@ -162,16 +162,6 @@ public abstract class GameObj implements GameObjInterface
    	return false;
    }
 
-   protected boolean isHorizontalLine()
-   {
-   	return false;
-   }
-
-   protected boolean isVerticalLine()
-   {
-   	return false;
-   }
-
    //======================= Internal Methods =========================
 
    // Return value pinned to the range min to max
