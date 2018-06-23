@@ -20,7 +20,7 @@ public class Spaceship extends Code12Program
    GameObj blackHole; 
    GameObj beginText;
    GameObj traveledText;
-   double lightYears;
+   double lightYears = 0;
    double hit;
    double collision;
   
@@ -77,10 +77,8 @@ public class Spaceship extends Code12Program
       
       // If ray gun goes off screen, put it back in its original position
       if ( rayGun.y < 0 )
-      {
          rayGun = ct.circle( spaceship.x, spaceship.y - 2, 1, "red");
-      }
-      ;
+
 
       // If the spaceship is moving upwards and the current time is less than one minute (basically, while game is active)
       if ( spaceship.ySpeed != 0 && ct.getTimer() / 1000.0 < 60 )

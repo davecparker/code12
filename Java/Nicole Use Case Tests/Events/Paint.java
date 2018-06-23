@@ -20,7 +20,7 @@ public class Paint extends Code12Program
    GameObj blueRect;
    GameObj indigoRect;
    GameObj purpleRect;
-   GameObj majentaRect;;
+   GameObj majentaRect;
    GameObj eraseRect;
    
    // Objects to be used to change brush size
@@ -36,37 +36,37 @@ public class Paint extends Code12Program
    
    public void start()
    {
-      double width = ct.getWidth();
-      double height = ct.getHeight();
+      double gameWidth = ct.getWidth();
+      double gameHeight = ct.getHeight();
       ct.setTitle("Cheesy MS Paint");
       
       double offset = 3;       // For a pro-looking bezel
-      double spacing = height / 10;
+      double spacing = gameHeight / 10;
       
-      final double WIDTH = 17; // 20 minus offset
+      final double BOX_WIDTH = 17; // 20 minus offset
       
-      palette = ct.rect(10,height/2,20,height,"black");
-      ct.rect(10,height/2,WIDTH,height-offset,"gray");
+      palette = ct.rect(10,gameHeight/2,20,gameHeight,"black");
+      ct.rect(10,gameHeight/2,BOX_WIDTH,gameHeight-offset,"gray");
          
-      redRect = ct.rect(spacing, spacing - offset, WIDTH, spacing, "red");
-      orangeRect = ct.rect(spacing,spacing*2 - offset, WIDTH, spacing, "orange");
-      yellowRect = ct.rect(spacing,spacing*3 - offset, WIDTH, spacing, "yellow");
-      greenRect = ct.rect(spacing,spacing*4 - offset, WIDTH, spacing, "green");
-      blueRect = ct.rect(spacing,spacing*5 - offset, WIDTH, spacing, "blue");
-      indigoRect = ct.rect(spacing,spacing*6 - offset, WIDTH, spacing, "dark blue");
-      purpleRect = ct.rect(spacing,spacing*7 - offset, WIDTH, spacing, "purple");
-      majentaRect = ct.rect(spacing,spacing*8 - offset, WIDTH, spacing, "dark majenta");
+      redRect = ct.rect(spacing, spacing - offset, BOX_WIDTH, spacing, "red");
+      orangeRect = ct.rect(spacing,spacing*2 - offset, BOX_WIDTH, spacing, "orange");
+      yellowRect = ct.rect(spacing,spacing*3 - offset, BOX_WIDTH, spacing, "yellow");
+      greenRect = ct.rect(spacing,spacing*4 - offset, BOX_WIDTH, spacing, "green");
+      blueRect = ct.rect(spacing,spacing*5 - offset, BOX_WIDTH, spacing, "blue");
+      indigoRect = ct.rect(spacing,spacing*6 - offset, BOX_WIDTH, spacing, "dark blue");
+      purpleRect = ct.rect(spacing,spacing*7 - offset, BOX_WIDTH, spacing, "purple");
+      majentaRect = ct.rect(spacing,spacing*8 - offset, BOX_WIDTH, spacing, "dark majenta");
          
       // This will be pressed to activate the eraser
-      eraseRect = ct.rect(spacing,spacing*9 - offset, WIDTH, spacing, "pink"); 
+      eraseRect = ct.rect(spacing,spacing*9 - offset, BOX_WIDTH, spacing, "pink"); 
       ct.text("Eraser", spacing, spacing*9 - offset,5);
       
       // Squares to select brush size
-      small = ct.rect(4.5, height - 5, WIDTH/3, spacing- offset - 1,"white");
+      small = ct.rect(4.5, gameHeight - 5, BOX_WIDTH/3, spacing- offset - 1,"white");
       ct.text("s", small.x, small.y, 4);
-      medium = ct.rect(spacing, height - 5, WIDTH/3, spacing - offset - 1,"white");
+      medium = ct.rect(spacing, gameHeight - 5,BOX_WIDTH/3, spacing - offset - 1,"white");
       ct.text("m", medium.x, medium.y, 4);
-      large = ct.rect(15.7, height - 5, WIDTH/3, spacing - offset - 1,"white");
+      large = ct.rect(15.7, gameHeight - 5, BOX_WIDTH/3, spacing - offset - 1,"white");
       ct.text("l", large.x, large.y, 4 );
       
    }

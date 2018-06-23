@@ -14,7 +14,7 @@ public class TextTest extends Code12Program
    GameObj line;
    
    int[] inputArray;
-   String[][] string2DArray;
+   //String[][] string2DArray;
    
 
    public static void main(String[] args)
@@ -56,7 +56,7 @@ public class TextTest extends Code12Program
        ct.print("Line feeds \nusing Java's \nescape character.");
        
        ct.println();
-       ct.println("\"Double quotes!\" tab:\t\'Single quotes!\'");
+       //ct.println("\"Double quotes!\" tab:\t\'Single quotes!\'");
        
        ct.print("Carriage return \r ");
        ct.print("Form feed \f ");
@@ -192,27 +192,27 @@ public class TextTest extends Code12Program
       if ( columns == 0 )
          columns = 2;
       
-      string2DArray = new String[rows][columns];
-      
-      for ( rows = 0; rows < string2DArray.length; rows++ )
-      {
-         for ( columns = 0; columns < string2DArray[rows].length; columns++ )
-         {
-            string2DArray[rows][columns] = ct.inputString("Write strings into the array: ");
-            // if no user input, fill with default string
-            string2DArray[rows][columns] = "Default";
-         }
-      }
-      
-      for ( rows = 0; rows < string2DArray.length; rows++ )
-      {
-         ct.print("\nrow " + rows + ":\t" );
-         for ( columns = 0; columns < string2DArray[rows].length; columns++ )
-         {
-            ct.print( string2DArray[rows][columns] + "\t");
-         }
-         ct.println();
-      }
+      // string2DArray = new String[rows][columns];
+//       
+//       for ( rows = 0; rows < string2DArray.length; rows++ )
+//       {
+//          for ( columns = 0; columns < string2DArray[rows].length; columns++ )
+//          {
+//             string2DArray[rows][columns] = ct.inputString("Write strings into the array: ");
+//             // if no user input, fill with default string
+//             string2DArray[rows][columns] = "Default";
+//          }
+//       }
+//       
+//       for ( rows = 0; rows < string2DArray.length; rows++ )
+//       {
+//          ct.print("\nrow " + rows + ":\t" );
+//          for ( columns = 0; columns < string2DArray[rows].length; columns++ )
+//          {
+//             ct.print( string2DArray[rows][columns] + "\t");
+//          }
+//          ct.println();
+//       }
                 
    }
    
