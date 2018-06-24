@@ -33,6 +33,7 @@ local numDisplayLines        -- number of lines we can display
 local completedLines         -- array of strings for completed text lines
 local currentLineStrings     -- array of strings making up the current line
 local currentLineLength      -- number of chars in current line
+local scrollStartLine        -- starting line if scrolled back or nil if at end
 local changed = false        -- true when contents have changed since last update 
 
 
@@ -51,12 +52,16 @@ local function onNewFrame()
 			lines[numLines] = table.concat( currentLineStrings )
 		end
 
-		-- Find scroll position so that the end is showing
-		local start = math.max( numLines - numDisplayLines + 1, 1 )
-		console.scrollbar:adjust( 1, start, start, numDisplayLines / numLines )
+		-- Use scrollStartLine if any, otherwise use scroll position 
+		-- so that the end is showing.
+		local lastStartLine = math.max( numLines - numDisplayLines + 1, 1 )
+		local startLine = scrollStartLine or lastStartLine
+		local ratio = numDisplayLines / numLines
+		console.scrollbar:adjust( 1, lastStartLine, startLine, ratio )
 
 		-- Assemble the text and update the text object
-		textObj.text = table.concat( lines, "\n", start )
+		local endLine = math.min( startLine + numDisplayLines, numLines )
+		textObj.text = table.concat( lines, "\n", startLine, endLine )
 
 		-- Take the current line back out if we added it
 		if #currentLineStrings > 0 then
@@ -66,6 +71,12 @@ local function onNewFrame()
 		-- Done until the next change
 		changed = false
 	end
+end
+
+-- Scroll callback for the console scrollbar
+local function onScroll( newPos )
+	scrollStartLine = newPos
+	changed = true
 end
 
 
@@ -92,6 +103,7 @@ function console.println( text )
 		currentLineStrings = {}
 		currentLineLength = 0
 	else
+		-- TODO: Don't allow this to grow unbounded?
 		completedLines[#completedLines + 1] = text
 	end
 	changed = true
@@ -102,6 +114,7 @@ function console.clear()
 	completedLines = {}
 	currentLineStrings = {}
 	currentLineLength = 0
+	scrollStartLine = nil
 	changed = true
 end
 
@@ -133,7 +146,8 @@ function console.create( parent, x, y, width, height )
 	} )
 
 	-- Scrollbar
-	console.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height )
+	console.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, 
+								height, onScroll )
 	console.scrollbar:adjust( 0, 100, 10, 25 )
 end
 

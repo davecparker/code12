@@ -10,6 +10,7 @@ require('Code12.api')
     this.LIMIT = 120
     -- int count = 5;
     this.speed = 0.3
+    this.frameCount = 0
     
     function _fn.start()
         
@@ -63,10 +64,13 @@ require('Code12.api')
         local name = nil; 
         local tooFast = false; local tooSlow = false; 
         
-        -- ct.println(ct.getTimer());
+        this.frameCount = this.frameCount + 1
+        if this.frameCount < 100 then
+            ct.println(ct.getTimer()); end
         
         -- Move ball
         local xNew = _fn.moveBall(true)
+        xNew = xNew + 1
         _fn.moveBall(false)
         
         -- Move bigBall

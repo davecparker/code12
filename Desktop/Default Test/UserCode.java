@@ -10,6 +10,7 @@ class UserCode extends Code12Program
 	final int LIMIT = 120;
 	// int count = 5;
 	double speed = 0.3;
+	int frameCount = 0;
 
 	public void start()
 	{
@@ -63,10 +64,13 @@ class UserCode extends Code12Program
 		String name;
 		boolean tooFast, tooSlow;
 
-		// ct.println(ct.getTimer());
+		frameCount++;
+		if (frameCount < 100)
+			ct.println(ct.getTimer());
 
 		// Move ball
 		int xNew = moveBall( true );
+		xNew++;
 		moveBall( false );
 
 		// Move bigBall

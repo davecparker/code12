@@ -50,16 +50,67 @@ function Scrollbar:layoutTrack()
 	self.trackBottom.y = margin + self.trackMiddle.height
 end
 
--- Move the shuttle using the given touch position and notify the app
-function Scrollbar:moveShuttle( y )
-	-- Compute new shuttle top
-	local yTop = y - self.yDragOffset
-	yTop = math.min( math.max( yTop, self.yMinShuttle ), self.yMaxShuttle )
+-- Set a new scroll pos and notify the app
+function Scrollbar:setPos( pos )
+	-- Force pos in range and adjust the scrollbar
+	pos = app.pinValue( pos, self.rangeMin, self.rangeMax ) 
+	self:adjust( self.rangeMin, self.rangeMax, pos, self.ratio )
 
-	-- Move the graphics
-	self.shuttleTop.y = yTop
-	self.shuttleMiddle.y = yTop + radius
-	self.shuttleBottom.y = yTop + self.shuttleMiddle.height
+	-- Notify the app, using nil if at the end of scroll range
+	if pos == self.rangeMax then
+		pos = nil
+	end
+	if self.onChangePos then
+		self.onChangePos( pos )
+	end
+end
+
+-- Handle touch events on the shuttle given phase and x, y within the scrollbar
+function Scrollbar:touchShuttle( phase, x, y )
+	local yTop = self.shuttleTop.y
+	if phase == "began" then
+		display.getCurrentStage():setFocus( self.shuttleTop )
+		self.dragging = true
+		self.yDragOffset = y - yTop
+	else
+		if phase ~= "cancelled" and self.dragging then
+			-- Compute new shuttle top
+			local yTop = y - self.yDragOffset
+			yTop = app.pinValue( yTop, self.yMinShuttle , self.yMaxShuttle )
+
+			-- Move the graphics
+			self.shuttleTop.y = yTop
+			self.shuttleMiddle.y = yTop + radius
+			self.shuttleBottom.y = yTop + self.shuttleMiddle.height
+
+			-- Compute new pos and set it
+			local range = self.rangeMax - self.rangeMin
+			local yRange = self.yMaxShuttle - self.yMinShuttle
+			local newPos = self.rangeMin + math.round( 
+					(yTop - self.yMinShuttle) * range / yRange )
+			self:setPos( newPos )
+		end
+		if phase ~= "moved" then
+			self.dragging = false
+			display.getCurrentStage():setFocus( nil )
+		end
+	end
+	return true
+end
+
+-- Handle touch events on the shuttle given phase and x, y within the scrollbar
+function Scrollbar:touchTrack( phase, x, y )
+	-- Touch on track. Go up or down down one "page" on a click
+	if phase == "began" then
+		local pageSize = math.round( self.ratio * (self.rangeMax - self.rangeMin) )
+		-- print(self.rangeMin, self.rangeMax, self.ratio, pageSize)
+		if y < self.shuttleTop.y then
+			self:setPos( self.pos - pageSize )
+		else
+			self:setPos( self.pos + pageSize )
+		end
+	end
+	return true
 end
 
 -- Handle touch events on a scrollbar
@@ -67,35 +118,10 @@ function Scrollbar:touch( event )
 	-- Which part got touched?
 	local x, y = self.group:contentToLocal( event.x, event.y )
 	local yTop = self.shuttleTop.y
-	if y >= yTop and y <= self.shuttleBottom.y + diameter then
-		-- Touch on shuttle
-		if event.phase == "began" then
-			display.getCurrentStage():setFocus( event.target )
-			self.dragging = true
-			self.yDragOffset = event.y - yTop
-		else
-			if event.phase ~= "cancelled" and self.dragging then
-				self:moveShuttle( event.y )
-			end
-			if event.phase ~= "moved" then
-				self.dragging = false
-				display.getCurrentStage():setFocus( nil )
-			end
-		end
-	else
-		-- Touch on track. Go up or down down one "page" on a click
-		if event.phase == "began" then
-			local pageSize = self.rangeMax - self.rangeMin
-			local newPos
-			if y < yTop then
-				newPos = self.pos - pageSize
-			else
-				newPos = self.pos + pageSize
-			end
-			self:adjust( self.rangeMin, self.rangeMax, newPos, self.ratio )
-		end
+	if self.dragging or (y >= yTop and y <= self.shuttleBottom.y + diameter) then
+		return self:touchShuttle( event.phase, x, y )
 	end
-	return true
+	return self:touchTrack( event.phase, x, y )
 end
 
 
@@ -158,7 +184,7 @@ end
 -- If ratio is >= 1 then the scrollbar is hidden.
 function Scrollbar:adjust( rangeMin, rangeMax, pos, ratio )
 	-- Store the metrics
-	pos = math.min( math.max( pos, rangeMin ), rangeMax )  -- force pos inside range
+	pos = app.pinValue( pos, rangeMin, rangeMax )  -- force pos inside range
 	self.rangeMin = rangeMin
 	self.rangeMax = rangeMax
 	self.pos = pos

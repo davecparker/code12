@@ -38,6 +38,16 @@ local app =  {
 
 --- Utility Functions ------------------------------------------------
 
+-- Pin a value within a range
+function app.pinValue( value, min, max )
+	if value < min then
+		return min
+	elseif value > max then
+		return max
+	end
+	return value
+end
+
 -- Create and return a display group in parent, optionally located at x, y
 function app.makeGroup( parent, x, y )
 	local g = display.newGroup()
