@@ -179,9 +179,11 @@ public class GameLine extends GameObj
 
 			return true;
   		}
-  		else // obj is not a line
-  		{
-  			// Check if this line is vertical or horizontal
+  		else 
+      {
+  			// obj is not a line 
+  		   // TODO: Circles?
+         // Check if this line is vertical or horizontal
 			if (width == 0 || height == 0 )
 				return true;
   			// Check for line hitting each side of obj

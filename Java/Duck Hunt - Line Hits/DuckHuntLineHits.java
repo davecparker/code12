@@ -16,7 +16,8 @@ public class DuckHuntLineHits extends Code12Program
    GameObj ducksHitDisplay; // Text display for percent of ducks hit
    GameObj accuracyDisplay; // Text display for percent of shots on target
    double yMax; // Maximum y-coordinate of the game window
-   int maxSize; // Maximum array size
+   int maxSizeBullets; // Maximum bullets array size
+   int maxSizeDucks; // Maximum ducks array size
    GameObj[] bulletsArr; // Array for accessing bullets on screen
    GameObj[] ducksArr; // Array for accessing ducks on screen
    double[] duckYStartsArr; // Array for tracking center of ducks vertical movement
@@ -30,6 +31,7 @@ public class DuckHuntLineHits extends Code12Program
    GameObj leftWall, topWall; // Lines to test line hits
    boolean paused; // For starting/stopping new duck creation
    boolean turboMode; // For a crazy number of ducks;
+   int frameCount = 0;
 
    public void start()
    {
@@ -63,10 +65,11 @@ public class DuckHuntLineHits extends Code12Program
       gun.align( "bottom", true );
 
       // Initialize arrays
-      maxSize = 500;
-      bulletsArr = new GameObj[maxSize];
-      ducksArr = new GameObj[maxSize];
-      duckYStartsArr = new double[maxSize];
+      maxSizeDucks = 5000;
+      maxSizeBullets = 100;
+      bulletsArr = new GameObj[maxSizeBullets];
+      ducksArr = new GameObj[maxSizeDucks];
+      duckYStartsArr = new double[maxSizeDucks];
 
       // Initialize amplitude and period for ducks' path
       amplitude = 5;
@@ -76,13 +79,14 @@ public class DuckHuntLineHits extends Code12Program
       leftWall = ct.line(0, 0, 0, ct.getHeight(), "red");
       topWall = ct.line(0, 0, 100, 0, "red");
 
-      // Start the game unpaused and in normal mode
-      paused = false;
+      // Start the game paused and in normal mode
+      paused = true;
       turboMode = false;
    }
 
    public void update()
    {
+         frameCount++;
 //       if ( ct.keyPressed("space") )
 //       {
 //          paused = !paused;
@@ -95,14 +99,14 @@ public class DuckHuntLineHits extends Code12Program
 //       }
       
       // Make ducks at random times and positions
-      if (!paused && ct.random(1, 50) == 1)
+      if (!paused && frameCount % 180 == 1)
       {
-         int numberOfDucks = (turboMode ? 10 : 1);
+         int numberOfDucks = (turboMode ? 100 : 1);
          for (int i = 1; i <= numberOfDucks; i++)
          {
-            double x = 110;
+            double x = 95;
             double y = ct.random( 10, ct.toInt(yMax / 2) );
-            GameObj duck = createDuck( x, y, -1 );
+            GameObj duck = createDuck( x, y, -0.1);
          }
       }
 
@@ -112,7 +116,7 @@ public class DuckHuntLineHits extends Code12Program
       {
          GameObj duck = ducksArr[j];
          double duckYStart = duckYStartsArr[j];
-         if ( leftWall.hit(duck) )
+         if ( duck.hit(leftWall) )
          {
             deleteDuck(j);
             ducksMissed++;
@@ -143,7 +147,7 @@ public class DuckHuntLineHits extends Code12Program
          for ( int j = ducksCount - 1; j >= 0; j-- )
          {
             GameObj duck = ducksArr[j];
-            if ( bullet.hit(duck) )
+            if ( duck.hit(bullet) )
             {
                ct.sound("quack.wav");
                makeDeadDuck( duck );
@@ -172,12 +176,12 @@ public class DuckHuntLineHits extends Code12Program
    GameObj fireBullet( double xStart, double yStart )
    {
       GameObj bullet = null;
-      if ( bulletsCount < maxSize )
+      if ( bulletsCount < maxSizeBullets )
       {
          //GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
          bullet = ct.line( xStart, yStart, xStart, yStart + 2, "blue" );
          bullet.lineWidth = 5;
-         bullet.ySpeed = -4;
+         bullet.ySpeed = -3;
          bulletsArr[bulletsCount] = bullet;
          bulletsCount++;
       }
@@ -205,7 +209,7 @@ public class DuckHuntLineHits extends Code12Program
    GameObj createDuck( double xStart, double yStart, double xSpeed )
    {
       GameObj duck = null;
-      if ( ducksCount < maxSize )
+      if ( ducksCount < maxSizeDucks )
       {
          duck = ct.image( "rubber-duck.png", xStart, yStart, 5 );
          duck.xSpeed = xSpeed;

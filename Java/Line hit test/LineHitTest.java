@@ -11,8 +11,9 @@ class LineHitTest extends Code12Program
    GameObj[] movingObjs;
    GameObj clickedObj;
    double speed;
-   double dx, dy;
-   
+   double dx = 0;
+   double dy = 0;
+
    public void start()
    {
       speed = 1 / ct.getPixelsPerUnit();
@@ -29,7 +30,7 @@ class LineHitTest extends Code12Program
       staticLines[4] = ct.line(30, 30, 70, 70, "blue");  // diagonal line top left to bottom right
       staticLines[5] = ct.line(30, 70, 70, 30, "blue");  // diagonal line bottom left to top right
       staticLines[6] = ct.line(50, 25, 50, 75, "blue");  // vertical line in center
-      staticLines[7] = ct.line(25, 50, 75, 50, "blue");  // horizontal line in center      
+      staticLines[7] = ct.line(25, 50, 75, 50, "blue");  // horizontal line in center
 
       movingObjs = new GameObj[11];
       movingObjs[0] = ct.rect(25, 90, 15, 10, "green");  // rect
@@ -65,7 +66,7 @@ class LineHitTest extends Code12Program
          boolean lineHitAnObj = false;
          for (GameObj obj : movingObjs)
          {
-            if (line.hit(obj))
+            if (obj.hit(line))
             {
                obj.xSpeed = 0;
                obj.ySpeed = 0;
@@ -110,7 +111,7 @@ class LineHitTest extends Code12Program
          clickedObj.setFillColor("green");
 		}
 	}
-   
+
    public void onKeyPress( String keyName )
    {
       if (keyName.equals("up"))
@@ -121,6 +122,6 @@ class LineHitTest extends Code12Program
          }
       }
    }
-   
+
 
 }

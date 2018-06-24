@@ -120,7 +120,10 @@ public abstract class GameObj implements GameObjInterface
 
    public boolean hit(GameObj obj)
    {
-      // Just do a rectangle intersection test on the bounding rects.
+   	if (obj.isLine())
+   		return obj.hit(this);
+
+   	// Just do a rectangle intersection test on the bounding rects.
       // TODO: line objects?
       double left = x - (width * xAlignFactor);
       double right = left + width;
