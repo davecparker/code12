@@ -22,7 +22,7 @@ class UserCode extends Code12Program
 		boolean done;
 
 		// Try some console output
-		for (int i = 0; i < 10; i++)
+		for (int i = 1; i <= 10; i++)
 		{
 			ct.println("Line " + i);
 		}
@@ -62,6 +62,8 @@ class UserCode extends Code12Program
 		double factor = 2;
 		String name;
 		boolean tooFast, tooSlow;
+
+		// ct.println(ct.getTimer());
 
 		// Move ball
 		int xNew = moveBall( true );

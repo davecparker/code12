@@ -22,7 +22,7 @@ require('Code12.api')
         local done = false; 
         
         -- Try some console output
-        local i = 0; while i < 10 do
+        local i = 1; while i <= 10 do
             
             ct.println("Line " .. i)
         i = i + 1; end
@@ -62,6 +62,8 @@ require('Code12.api')
         local factor = 2
         local name = nil; 
         local tooFast = false; local tooSlow = false; 
+        
+        -- ct.println(ct.getTimer());
         
         -- Move ball
         local xNew = _fn.moveBall(true)

@@ -23,6 +23,11 @@ local function clickEvent(event, gameObj)
 	local y = yP / g.scale
 
 	if event.phase == "began" then
+		-- Ignore click if not in the game area
+		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
+			return
+		end
+
 		-- Set last click state
 		g.clicked = true
 		g.gameObjClicked = gameObj
