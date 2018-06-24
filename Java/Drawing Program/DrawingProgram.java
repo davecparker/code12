@@ -53,6 +53,7 @@ class DrawingProgram extends Code12Program
    
    double xMinColors;
    boolean selectBoxOn;
+   double dxClick, dyClick; // initial displacement between obj.x, obj.y and click.x, click.y 
       
    public void start()
    {  
@@ -179,10 +180,9 @@ class DrawingProgram extends Code12Program
                newObj = ct.line( x, y, x, y );
                newObj.setLineColor( selectedColor );
             }
-            
+            newObj.clickable = true;
             if ( selectedShapeBox != line )
             {
-               newObj.clickable = true;
                newObj.setFillColor( selectedColor );
             }
             // Make newObj the selectedObj
@@ -191,6 +191,8 @@ class DrawingProgram extends Code12Program
          else if ( obj != null )
          {
             selectedObj = obj;
+            dxClick = x - obj.x;
+            dyClick = y - obj.y;
          }
       }
       else if ( obj != null )
@@ -247,8 +249,8 @@ class DrawingProgram extends Code12Program
          }
          else if ( obj != null )
          {
-            obj.x = x;
-            obj.y = y;
+            obj.x = x - dxClick;
+            obj.y = y - dyClick;
             obj.setLayer( 1 );
          }
       }
