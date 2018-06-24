@@ -18,7 +18,39 @@ public class GameLine extends GameObj
    @Override
    public boolean containsPoint(double xPoint, double yPoint)
    {
-      return false;   // lines have no interior
+      // Reject test each side
+      double minSize = 1; // 2 / game.getPixelsPerUnit();
+      double halfW = lineWidthLU() / 2;
+      boolean smallThickness = (halfW < minSize);
+      boolean smallWidth = (smallThickness && width < minSize && width > -minSize);
+      double left = boundingBoxLeft();
+      if (smallWidth)
+         left -= minSize;
+      if (xPoint < left)
+         return false;
+      double right = boundingBoxRight();
+      if (smallWidth)
+         right += minSize;
+      if (xPoint > right)
+         return false;
+      boolean smallHeight = (smallThickness && height < minSize && height > -minSize);
+      double top =  boundingBoxTop();
+      if (smallHeight)
+         top -= minSize;
+      if (yPoint < top)
+         return false;
+      double bottom = boundingBoxBottom();
+      if (smallHeight)
+         bottom += minSize;
+      if (yPoint > bottom)
+         return false;
+      // Compare squared distance from point to line to squared halfwidth of line
+      double d2 = squaredDistance(xPoint, yPoint);
+     	if (halfW < minSize)
+     		halfW = minSize;
+      if (d2 > halfW * halfW)
+      	return false;
+      return true;
    }
 
    // Update the object as necessary for a window resize from oldHeight to newHeight.
@@ -56,58 +88,47 @@ public class GameLine extends GameObj
    @Override
    protected double boundingBoxLeft()
    {
+   	if ( width > 0)
+   		return x;
    	if ( width < 0)
 			return x + width;
-		return x;
+		return x - lineWidthLU() / 2;
    }
 
    @Override
    protected double boundingBoxRight()
    {
+   	if ( width > 0)
+   		return x + width;
    	if ( width < 0)
 			return x;
-		return x + width;
-
+		return x + lineWidthLU() / 2;
    }
 
    @Override
    protected double boundingBoxTop()
    {
+   	if ( height > 0)
+   		return y;
    	if ( height < 0)
    		return y + height;
-   	return y;
+   	return y - lineWidthLU() / 2;
    }
 
    @Override
    protected double boundingBoxBottom()
    {
+   	if ( height > 0)
+			return y + height;
    	if ( height < 0)
 			return y;
-		return y + height;
+		return y + lineWidthLU() / 2;
    }
 
    //@Override
    protected boolean isLine()
    {
    	return true;
-   }
-
-   // Determines if this line intersects a vertical line from (x2, yTop) to (x1, yBottom)
-   // Assumes yTop < yBottom and this line is not vertical
-   protected boolean hitVertLine(double x2, double yTop, double yBottom)
-   {
-   	double yIntersect = height / width * (x2 - x) + y;
-   	return yTop <= yIntersect && yIntersect <= yBottom;
-
-   }
-
-   // Determines if this line intersects a horizontal line from (xLeft, y2) to (xRight, y2)
-   // Assumes xLeft < xRight and this line is not horizontal
-   protected boolean hitHorizLine(double y2, double xLeft, double xRight)
-   {
-   	double xIntersect = width / height * (y2 - y) + x;
-   	return xLeft <= xIntersect && xIntersect <= xRight;
-
    }
 
    // Determine if the line has hit another GameObj
@@ -119,51 +140,34 @@ public class GameLine extends GameObj
       double objRight = obj.boundingBoxRight();
       if (objRight < left)
          return false;
-
    	double right = boundingBoxRight();
    	double objLeft = obj.boundingBoxLeft();
       if (objLeft > right)
          return false;
-
       double top = boundingBoxTop();
       double objBottom = obj.boundingBoxBottom();
       if (objBottom < top)
          return false;
-
       double bottom = boundingBoxBottom();
       double objTop = obj.boundingBoxTop();
       if (objTop > bottom)
          return false;
-
-      // Line and obj's bounding rectangels are intersecting
-      // Case this line is vertical or horizontal
-      if (width == 0 || height == 0)
-      {
-      	if (obj.isLine())
-      	{
+      // Line and obj's bounding rectangles are intersecting
+      // Treat obj is line case different
+  		if (obj.isLine())
+  		{
+  			// Check if both this line and obj are vertical or horizontal
+			if (width == 0 || height == 0 )
       		if (obj.width == 0 || obj.height == 0)
       			return true;
 
-      		if (width == 0)
-      			return objLeft <= x && x <= objRight;
-      		else // isHorizontalLine() == true
-      			return objTop <= y && y <= objBottom;
-      	}
-      	else
-      		return true;
-      }
-
-  		if (obj.isLine())
-  		{
-  			double x1 = x;
-   		double y1 = y;
-   		double x2 = x + width;
-   		double y2 = y + height;
-
-			// Calculate the intersection point
+      	// Calculate the intersection point
 	   	double det = obj.height * width - obj.width * height;
 	  		if (det == 0) // parallel lines and bounding boxes intersect
-	  			return true;
+	  		{
+	  			double minDist = (lineWidthLU() + obj.lineWidthLU()) / 2;
+	  			return squaredDistance(obj.x, obj.y) <= minDist * minDist;
+	  		}
 
 			double t = ( obj.width * (y - obj.y) - obj.height * (x - obj.x) ) / det;
 			if (t < 0 || t > 1)
@@ -175,23 +179,55 @@ public class GameLine extends GameObj
 
 			return true;
   		}
-  		else
+  		else // obj is not a line
   		{
-  			// If line hits left side of bounding rect return true
-  			if (hitVertLine(objLeft, objTop, objBottom))
+  			// Check if this line is vertical or horizontal
+			if (width == 0 || height == 0 )
+				return true;
+  			// Check for line hitting each side of obj
+  			if (hitVertLine(left, right, objLeft, objTop, objBottom)) // left side
   				return true;
-  			// If line hits right side of bounding rect return true
-  			if (hitVertLine(objRight, objTop, objBottom))
+  			if (hitVertLine(left, right, objRight, objTop, objBottom)) // right side
   				return true;
-  			// If line hits top of bounding rect return true
-  			if (hitHorizLine(objTop, objLeft, objRight))
+  			if (hitHorizLine(top, bottom, objTop, objLeft, objRight)) // top side
   				return true;
-  			// If line hits bottom of bounding rect return true
-  			if (hitHorizLine(objBottom, objLeft, objRight))
+  			if (hitHorizLine(top, bottom, objBottom, objLeft, objRight)) // bottom side
   				return true;
-
   			return false;
   		}
    }
 
+   // Returns the squared distance from line to (xPoint, yPoint)
+   protected double squaredDistance(double xPoint, double yPoint)
+   {
+      // Get squared distance from point to line (as squared length of normal vector from line to point)
+      double ax = xPoint - x;
+      double ay = yPoint - y;
+      double bx = width;
+      double by = height;
+      double compAB = (ax * bx + ay * by)/(bx * bx + by * by);
+      double nx = ax - bx * compAB;
+      double ny = ay - by * compAB;
+      return nx * nx + ny * ny;
+   }
+
+   // Determines if this line (from left to right) intersects a vertical line from (x2, top2) to (x1, bottom2)
+   // Assumes top2 < bottom2 and this line is not vertical
+   protected boolean hitVertLine(double left, double right, double x2, double top2, double bottom2)
+   {
+   	if (left > x2 || right < x2)
+   		return false;
+   	double yIntersect = height / width * (x2 - x) + y;
+   	return top2 <= yIntersect && yIntersect <= bottom2;
+   }
+
+   // Determines if this line (from top to bottom) intersects a horizontal line from (left2, y2) to (right2, y2)
+   // Assumes left2 < right2 and this line is not horizontal
+   protected boolean hitHorizLine(double top, double bottom, double y2, double left2, double right2)
+   {
+   	if (top > y2 || bottom < y2)
+   		return false;
+   	double xIntersect = width / height * (y2 - y) + x;
+   	return left2 <= xIntersect && xIntersect <= right2;
+   }
 }

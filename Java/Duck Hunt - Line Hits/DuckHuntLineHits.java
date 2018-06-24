@@ -64,7 +64,7 @@ public class DuckHuntLineHits extends Code12Program
 
       // Initialize arrays
       maxSize = 500;
-      bulletsArr = new GameObj[10];
+      bulletsArr = new GameObj[maxSize];
       ducksArr = new GameObj[maxSize];
       duckYStartsArr = new double[maxSize];
 
@@ -177,7 +177,7 @@ public class DuckHuntLineHits extends Code12Program
          //GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
          bullet = ct.line( xStart, yStart, xStart, yStart + 2, "blue" );
          bullet.lineWidth = 5;
-         bullet.ySpeed = -3;
+         bullet.ySpeed = -4;
          bulletsArr[bulletsCount] = bullet;
          bulletsCount++;
       }

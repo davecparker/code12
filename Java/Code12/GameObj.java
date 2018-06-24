@@ -162,6 +162,12 @@ public abstract class GameObj implements GameObjInterface
    	return false;
    }
 
+   // Returns the lineWidth of the GameObj in logical units
+   protected double lineWidthLU()
+   {
+		return lineWidth / game.getPixelsPerUnit();
+   }
+
    //======================= Internal Methods =========================
 
    // Return value pinned to the range min to max
