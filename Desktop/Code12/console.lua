@@ -79,34 +79,40 @@ local function onScroll( newPos )
 	changed = true
 end
 
-
---- Module Functions ---------------------------------------------------------
-
--- Add text to the last line in the console
-function console.print( text )
+-- Add raw text to the console. The text should not contain any newlines.
+local function addText( text )
 	-- Ignore this if the current line is really long and will clip anyway
 	if text and currentLineLength < maxLineLength then
 		currentLineStrings[#currentLineStrings + 1] = text
 		currentLineLength = currentLineLength + string.len( text )
 		changed = true
-	else
-		print("console.print ignored")
 	end
 end
 
--- Print a line to the console
-function console.println( text )
-	-- Is there a line in progress to complete?
+-- End the current line in the console
+local function endLine()
 	if #currentLineStrings > 0 then	
-		console.print( text )
 		completedLines[#completedLines + 1] = table.concat( currentLineStrings )
 		currentLineStrings = {}
-		currentLineLength = 0
 	else
-		-- TODO: Don't allow this to grow unbounded?
-		completedLines[#completedLines + 1] = text
+		completedLines[#completedLines + 1] = ""
 	end
+	currentLineLength = 0
 	changed = true
+end
+
+
+--- Module Functions ---------------------------------------------------------
+
+-- Print text to the console
+function console.print( text )
+	addText( text )
+end
+
+-- Print text plus a newline to the console
+function console.println( text )
+	addText( text )
+	endLine()
 end
 
 -- Clear the console data and view
