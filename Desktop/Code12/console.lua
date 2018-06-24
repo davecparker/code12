@@ -7,13 +7,15 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
--- App globals
+-- Code12 modules
 local app = require( "app" )
+local Scrollbar = require( "Scrollbar" )
 
 
 -- The console module
 local console = {
 	group = nil,             -- the console display group
+	scrollbar = nil,         -- the console scrollbar (a Scrollbar)
 }
 
 -- Layout metrics
@@ -50,10 +52,8 @@ local function onNewFrame()
 		end
 
 		-- Find scroll position so that the end is showing
-		local start = 1
-		if numLines > numDisplayLines then
-			start = numLines - numDisplayLines + 1
-		end
+		local start = math.max( numLines - numDisplayLines + 1, 1 )
+		console.scrollbar:adjust( 1, start, start, numDisplayLines / numLines )
 
 		-- Assemble the text and update the text object
 		textObj.text = table.concat( lines, "\n", start )
@@ -109,6 +109,7 @@ end
 function console.resize( width, height )
 	bg.width = width
 	bg.height = height
+	console.scrollbar:setPosition( width - Scrollbar.width, 0, height )
 	numDisplayLines = math.floor( (height - textMargin ) / fontHeight )
 	changed = true
 end
@@ -116,6 +117,9 @@ end
 -- Create the console display group and store it in console.group
 function console.create( parent, x, y, width, height )
 	local group = app.makeGroup( parent, x, y )
+	console.group = group
+
+	-- White background and multi-line text box
 	bg = app.uiItem( display.newRect( group, 0, 0, width, height ), 1, app.borderShade )
 	textObj = app.uiBlack ( display.newText{
 		parent = group,
@@ -127,7 +131,10 @@ function console.create( parent, x, y, width, height )
 		fontSize = app.consoleFontSize,
 		align = "left",
 	} )
-	console.group = group
+
+	-- Scrollbar
+	console.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height )
+	console.scrollbar:adjust( 0, 100, 10, 25 )
 end
 
 -- Init the console
