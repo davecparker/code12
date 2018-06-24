@@ -24,6 +24,8 @@ local g = require("Code12.globals")
 --             widthP = number,          -- pixel width of output area
 --             heightP = number,         -- pixel height of output area
 --             setClipSize = function,   -- called by runtime to specify output size
+--             print = function,         -- called by runtime for console output
+--             println = function,       -- called by runtime for console output
 
 --             -- These field are added by the runtime for use by the app
 --             initRun = fnInitRun,      -- init and start a new run
@@ -51,8 +53,8 @@ end
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame(event)
 	-- Call the client's update function if any
-	if type(update) == "function" then
-		update()
+	if type(_fn.update) == "function" then
+		_fn.update()
 	end
 
 	-- Clear the polled input state for this frame
@@ -91,8 +93,8 @@ local function onFirstFrame(event)
 	g.startTime = system.getTimer()
 
 	-- Call client's start method if any
-	if type(start) == "function" then
-		start()
+	if type(_fn.start) == "function" then
+		_fn.start()
 	end
 
 	-- Sync the drawing objects for the first draw
@@ -133,6 +135,11 @@ local function onResize()
 		for i = 1, objs.numChildren do
 			objs[i].code12GameObj:adjustForWindowResize(oldHeight, g.height)
 		end
+	end
+
+	-- Send user event if necessary
+	if type(_fn.onResize) == "function" then
+		_fn.onResize()
 	end
 	g.window.resized = true
 end

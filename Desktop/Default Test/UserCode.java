@@ -15,10 +15,22 @@ class UserCode extends Code12Program
 	{
 		// int oops = count;
 		// double nope = ball.x;
+		// ct.circle(50, 50, LIMIT);
 		double x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0;
 		int xInt = ct.toInt( x );
 		String name = "Dave" + " " + "Parker";
 		boolean done;
+
+		// Try some console output
+		for (int i = 0; i < 10; i++)
+		{
+			ct.println("Line " + i);
+		}
+		ct.println("This is the default Code12 test app");
+		ct.println("This is console output");
+		ct.print("Beginning of line");
+		ct.print(" Middle ");
+		ct.println("End");
 
 		// Draw some circles
 		ball = ct.circle(x + 6, 15, 5);
@@ -67,7 +79,7 @@ class UserCode extends Code12Program
 			speed = -speed;
 		}
 		else if (bigBall.x < 0)
-			speed = -this.speed;
+			speed = -speed;
 		else
 		{
 			int localX = 3;
@@ -147,6 +159,11 @@ class UserCode extends Code12Program
 
 		int [] aTest;
 		aTest = new int[10];
+		GameObj[] as, bs, cs;
+
+		as = new GameObj[10];
+		double myX = as[4].x;
+		as[sum - 1].y = myX;
 	}
 
 	public void onKeyPress( String key )

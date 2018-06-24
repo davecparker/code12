@@ -30,8 +30,8 @@ local function clickEvent(event, gameObj)
 		g.clickY = y
 
 		-- Call client event
-		if type(onMousePress) == "function" then
-			onMousePress(gameObj, x, y)
+		if type(_fn.onMousePress) == "function" then
+			_fn.onMousePress(gameObj, x, y)
 		end
 
 		-- Automatically take the touch focus on an object.
@@ -40,13 +40,13 @@ local function clickEvent(event, gameObj)
 		end
 	elseif event.phase == "moved" then
 		-- Call client event
-		if type(onMouseDrag) == "function" then
-			onMouseDrag(gameObj, x, y)
+		if type(_fn.onMouseDrag) == "function" then
+			_fn.onMouseDrag(gameObj, x, y)
 		end
 	else  -- (ended or cancelled)
 		-- Call client event
-		if type(onMouseRelease) == "function" then
-			onMouseRelease(gameObj, x, y)
+		if type(_fn.onMouseRelease) == "function" then
+			_fn.onMouseRelease(gameObj, x, y)
 		end
 
 		-- Release touch focus if any
@@ -140,8 +140,8 @@ function g.onKey(event)
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
-		if type(onKeyPress) == "function" then
-			onKeyPress(keyName)
+		if type(_fn.onKeyPress) == "function" then
+			_fn.onKeyPress(keyName)
 			returnValue = true    -- Always? Means client has to handle all keys
 		end
 
@@ -149,15 +149,15 @@ function g.onKey(event)
 		local ch = charTypedFromKeyEvent(event)
 		if ch then
 			g.charTyped = ch    -- remember for ct.charTyped()
-			if type(onCharTyped) == "function" then
-				onCharTyped(ch)
+			if type(_fn.onCharTyped) == "function" then
+				_fn.onCharTyped(ch)
 			end
 		end
 	elseif event.phase == "up" then
 		-- keyRelease
 		keysDown[event.keyName] = nil
-		if type(onKeyRelease) == "function" then
-			onKeyRelease(keyName)
+		if type(_fn.onKeyRelease) == "function" then
+			_fn.onKeyRelease(keyName)
 		end
 	end
 	return returnValue
