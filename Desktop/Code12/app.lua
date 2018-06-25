@@ -19,20 +19,13 @@ local app =  {
 	consoleFont = "Consolas",
 	consoleFontSize = 16,
 
-	-- Display state
-	width = 0,                   -- window width
-	height = 0,                  -- window height
-	bg = nil,                    -- white background rect
-	toolbarGroup = nil,          -- display group for toolbar
-	statusBarGroup = nil,        -- display group for status bar
-	outputGroup = nil,           -- display group for program output area
-	outputWidth = 0,             -- width for the output area
-	outputHeight = 0,            -- height for the output area
-	lowerGroup = nil,            -- display area under the outputGroup
+	-- Measured metrics
 	consoleFontHeight = 0,       -- pixel height of console text line
 	consoleFontCharWidth = 0,    -- pixel width of console text (fixed width font) 
-	gameGroup = nil,             -- display group for game output
-	errGroup = nil,              -- display group for error display
+	width = 0,                   -- app window width
+	height = 0,                  -- app window height
+	outputWidth = 0,             -- width for the output area
+	outputHeight = 0,            -- height for the output area
 }
 
 

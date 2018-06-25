@@ -127,6 +127,11 @@ local function endLine()
 	changed = true
 end
 
+-- Handle touch events on the console
+local function onTouchConsole( event )
+	return true
+end
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -201,7 +206,8 @@ function console.create( parent, x, y, width, height )
 	console.group = group
 
 	-- White background
-	bg = app.uiItem( display.newRect( group, 0, 0, width, height ), 1, app.borderShade )
+	bg = app.uiWhite( display.newRect( group, 0, 0, width, height ) )
+	bg:addEventListener( "touch", onTouchConsole )
 
 	-- Scrollbar
 	console.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )

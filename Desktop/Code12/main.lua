@@ -23,13 +23,28 @@ local console = require( "console" )
 local margin = 10        -- generic margin to leave between many UI items
 local dyToolbar = 40
 local dyStatusBar = 30
+local dyPaneSplit = 10
 local fontSizeUI = 12
+local defaultConsoleLines = 10
 
 -- Misc constants
 local numSyntaxLevels = 12
 
+-- Display objects and groups
+local appBg                    -- white background rect
+local toolbarGroup             -- display group for toolbar
+local statusBarGroup           -- display group for status bar
+local outputGroup              -- display group for program output area
+local rightBar                 -- clipping bar to the right of the output area
+local paneSplit                -- pane split area
+local lowerGroup               -- display area below the pane split
+local gameGroup                -- display group for game output
+local errGroup                 -- display group for error display
+
 -- Program state
 local syntaxLevel = numSyntaxLevels   -- programming syntax level
+local minConsoleHeight                -- min height of the console window (from pane split)
+local paneDragOffset                  -- when dragging the pane split
 
 -- The user source file
 local sourceFile = {
@@ -62,6 +77,11 @@ local appContext = ct._appContext
 
 --- Internal Functions ------------------------------------------------
 
+-- Return the available height for the output area
+local function outputAreaHeight()
+	return app.height - dyToolbar - dyStatusBar - minConsoleHeight - dyPaneSplit
+end
+
 -- Update status bar based on data in sourceFile
 local function updateStatusBar()
 	if sourceFile.path then
@@ -89,10 +109,10 @@ local function updateStatusBar()
 		end
 
 		-- Update the status bar UI
-		app.statusBarGroup.message.text = filename .. " -- Updated: " .. updateStr
-		app.statusBarGroup.openFileBtn.isVisible = true
+		statusBarGroup.message.text = filename .. " -- Updated: " .. updateStr
+		statusBarGroup.openFileBtn.isVisible = true
 	else
-		app.statusBarGroup.openFileBtn.isVisible = false
+		statusBarGroup.openFileBtn.isVisible = false
 	end
 end
 
@@ -108,7 +128,7 @@ local function runLuaCode( luaCode )
  		appContext.initRun()
 
  		-- Show the game output
-		app.gameGroup.isVisible = true
+		gameGroup.isVisible = true
  	else
  	 	print( "*** Lua code failed to load" )
  	end
@@ -223,18 +243,17 @@ end
 
 -- Make the status bar UI
 local function makeStatusBar()
-	local group = app.makeGroup( nil, 0, app.height - dyStatusBar )
-	app.statusBarGroup = group
+	statusBarGroup = app.makeGroup( nil, 0, app.height - dyStatusBar )
 
 	-- Background color
-	group.bg = app.uiItem( display.newRect( group, 0, 0, app.width, dyStatusBar ),
+	statusBarGroup.bg = app.uiItem( display.newRect( statusBarGroup, 0, 0, app.width, dyStatusBar ),
 							app.toolbarShade, app.borderShade )
 
 	-- Status message
 	local yCenter = dyStatusBar / 2
-	group.message = display.newText( group, "", app.width / 2, yCenter, 
+	statusBarGroup.message = display.newText( statusBarGroup, "", app.width / 2, yCenter, 
 									native.systemFont, fontSizeUI )
-	group.message:setFillColor( 0 )
+	statusBarGroup.message:setFillColor( 0 )
 
 	-- Open in Editor button
 	local btn = widget.newButton{
@@ -246,16 +265,16 @@ local function makeStatusBar()
 		font = native.systemFontBold,
 		fontSize = fontSizeUI,
 	}
-	group:insert( btn )
+	statusBarGroup:insert( btn )
 	btn.anchorX = 0
-	group.openFileBtn = btn
+	statusBarGroup.openFileBtn = btn
 
 	updateStatusBar()
 end
 
 -- Make and return a highlight rectangle, in the reference color if ref
 local function makeHilightRect( x, y, width, height, ref )
-	local r = app.uiItem( display.newRect( app.errGroup.highlightGroup, x, y, width, height ) )
+	local r = app.uiItem( display.newRect( errGroup.highlightGroup, x, y, width, height ) )
 	if ref then
 		r:setFillColor( 1, 1, 0.6 )
 	else
@@ -265,50 +284,45 @@ local function makeHilightRect( x, y, width, height, ref )
 end
 
 -- Position the display panes
-local function resizePanes()
+local function layoutPanes()
+	-- Determine size of the top area (game or error output)
 	local width = app.outputWidth
 	local height = app.outputHeight
-	local err = err.hasErr()
-	if err then
-		-- Use more of the window for error displays
+	if err.hasErr() then
 		width = app.width
-		height = app.height / 2   -- TODO
+		height = app.consoleFontHeight * 12   -- TODO
 	end
 
 	-- Position the right bar
-	local obj = app.rightBar
-	obj.x = width + 1
-	obj.width = app.width    -- more than enough
-	obj.height = app.height  -- more than enough
+	rightBar.x = width + 1
+	rightBar.width = app.width    -- more than enough
+	rightBar.height = app.height  -- more than enough
 
-	-- Position the lower group
-	app.lowerGroup.y = dyToolbar + height + 1
-	obj = app.lowerGroup.bg
-	obj.width = app.width
-	obj.height = app.height  -- more than enough
-
-	-- Fill most of the lower group with the console window
-	-- but show it only if there is no error display.
-	local consoleHeight = app.height - app.lowerGroup.y - margin - dyStatusBar - 1
+	-- Position the pane split and lower group
+	paneSplit.y = dyToolbar + height
+	paneSplit.width = app.width
+	lowerGroup.y = paneSplit.y + dyPaneSplit + 1
+	local consoleHeight = app.height - lowerGroup.y - dyStatusBar
 	console.resize( app.width, consoleHeight )
-	console.group.isVisible = not err
+
+	-- Hide console if there is an error display.
+	console.group.isVisible = not err.hasErr()
 end
 
 -- Remove the error display if it exists
 local function removeErrorDisplay()
-	if app.errGroup then
-		app.errGroup:removeSelf()
-		app.errGroup = nil
+	if errGroup then
+		errGroup:removeSelf()
+		errGroup = nil
 	end
-	resizePanes()
+	layoutPanes()
 end
 
 -- Make the error display, or destroy and remake it if it exists
 local function makeErrDisplay()
 	-- Make group to hold all err display items
 	removeErrorDisplay()
-	local group = app.makeGroup( app.outputGroup )
-	app.errGroup = group
+	errGroup = app.makeGroup( outputGroup )
 	local numSourceLines = 7
 
 	-- Layout metrics
@@ -319,20 +333,20 @@ local function makeErrDisplay()
 	local dySource = numSourceLines * dyLine
 
 	-- Make background rect for the source display
-	app.uiItem( display.newRect( group, 0, 0, app.width, dySource + margin ), 1, app.borderShade )
+	app.uiItem( display.newRect( errGroup, 0, 0, app.width, dySource + margin ), 1, app.borderShade )
 
 	-- Make the highlight rectangles
-	local highlightGroup = app.makeGroup( group, xText, margin )
-	group.highlightGroup = highlightGroup
+	local highlightGroup = app.makeGroup( errGroup, xText, margin )
+	errGroup.highlightGroup = highlightGroup
 	local y = ((numSourceLines - 1) / 2) * dyLine - 1
-	group.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
-	group.refRect = makeHilightRect( dxChar * 5, y, 
+	errGroup.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
+	errGroup.refRect = makeHilightRect( dxChar * 5, y, 
 							dxChar * 6, dyLine, true )
-	group.sourceRect = makeHilightRect( 0, y, dxChar * 4, dyLine )
+	errGroup.sourceRect = makeHilightRect( 0, y, dxChar * 4, dyLine )
 
 	-- Make the lines numbers
-	local lineNumGroup = app.makeGroup( group, 0, margin )
-	group.lineNumGroup = lineNumGroup
+	local lineNumGroup = app.makeGroup( errGroup, 0, margin )
+	errGroup.lineNumGroup = lineNumGroup
 	for i = 1, numSourceLines do
 		local t = display.newText{
 			parent = lineNumGroup,
@@ -349,8 +363,8 @@ local function makeErrDisplay()
 	end
 
 	-- Make the source lines
-	local sourceGroup = app.makeGroup( group, xText, margin )
-	group.sourceGroup = sourceGroup
+	local sourceGroup = app.makeGroup( errGroup, xText, margin )
+	errGroup.sourceGroup = sourceGroup
 	for i = 1, numSourceLines do
 		app.uiBlack( display.newText{
 			parent = sourceGroup,
@@ -364,8 +378,8 @@ local function makeErrDisplay()
 	end
 
 	-- Make the error text
-	group.errText = app.uiBlack( display.newText{
-		parent = group,
+	errGroup.errText = app.uiBlack( display.newText{
+		parent = errGroup,
 		text = "", 
 		x = margin * 2, 
 		y = dySource + margin * 2,
@@ -386,7 +400,7 @@ local function showError()
 
 	-- Make the error display elements
 	makeErrDisplay()
-	resizePanes()
+	layoutPanes()
 
 	-- Set the error text
 	local errRecord = err.getErrRecord()
@@ -396,12 +410,12 @@ local function showError()
 		print( errRecord.strLevel )
 		strDisplay = strDisplay .. "\n" .. errRecord.strLevel
 	end
-	app.errGroup.errText.text = strDisplay
+	errGroup.errText.text = strDisplay
 
 	-- Load the source lines around the error
 	local iLine = errRecord.loc.first.iLine   -- main error location
-	local sourceGroup = app.errGroup.sourceGroup
-	local lineNumGroup = app.errGroup.lineNumGroup
+	local sourceGroup = errGroup.sourceGroup
+	local lineNumGroup = errGroup.lineNumGroup
 	local numLines = lineNumGroup.numChildren
 	local before = (numLines - 1) / 2
 	local lineNumFirst = iLine - before
@@ -421,13 +435,13 @@ local function showError()
 	-- Position the main highlight  TODO: handle multi-line
 	local dxChar = app.consoleFontCharWidth
 	local dxExtra = 2   -- extra pixels of highlight horizontally
-	local r = app.errGroup.sourceRect
+	local r = errGroup.sourceRect
 	r.x = (errRecord.loc.first.iChar - 1) * dxChar - dxExtra
 	local numChars = errRecord.loc.last.iChar - errRecord.loc.first.iChar + 1 
 	r.width = numChars * dxChar + dxExtra * 2
 
 	-- Position the ref highlight if it's showing  TODO: two line groups if necc
-	r = app.errGroup.refRect
+	r = errGroup.refRect
 	r.isVisible = false
 	if errRecord.refLoc then
 		local iLineRef = errRecord.refLoc.first.iLine
@@ -441,36 +455,23 @@ local function showError()
 	end
 end
 
--- Make the lower display group
-local function makeLowerGroup()
-	app.lowerGroup = app.makeGroup( nil, 0, dyToolbar + app.outputHeight + 1 )
-
-	-- Gray background
-	app.lowerGroup.bg = app.uiItem( display.newRect( app.lowerGroup, 0, 0, app.width, 0 ), 
-								app.extraShade, app.borderShade )
-	-- Console window
-	console.create( app.lowerGroup, 0, margin, app.width, 0 )
-end
-
 -- Handle resize event for the window
-local function onResizeWindow( event )
+local function onResizeWindow()
 	-- Get new window size
 	getDeviceMetrics()
 
 	-- Window background
-	app.bg.width = app.width
-	app.bg.height = app.height
+	appBg.width = app.width
+	appBg.height = app.height
 
 	-- Toolbar
-	local group = app.toolbarGroup
-	group.bg.width = app.width
-	group.levelPicker.x = app.width - margin
+	toolbarGroup.bg.width = app.width
+	toolbarGroup.levelPicker.x = app.width - margin
 
 	-- Status bar
-	group = app.statusBarGroup
-	group.y = app.height - dyStatusBar
-	group.bg.width = app.width
-	group.message.x = app.width / 2
+	statusBarGroup.y = app.height - dyStatusBar
+	statusBarGroup.bg.width = app.width
+	statusBarGroup.message.x = app.width / 2
 
 	-- Remake the error display, if any
 	if err.hasErr() then
@@ -481,7 +482,7 @@ local function onResizeWindow( event )
 	-- This will result in a call to ct.setHeight() internally, 
 	-- which will then call us back at setClipSize().
 	appContext.widthP = math.max( app.width, 1 )
-	appContext.heightP = math.max( app.height - dyToolbar - dyStatusBar, 1 )
+	appContext.heightP = math.max( outputAreaHeight(), 1 )
 	if appContext.onResize then
 		appContext.onResize()
 	end
@@ -489,12 +490,30 @@ end
 
 -- Runtime callback to set the output size being used
 local function setClipSize( widthP, heightP )
-	-- Store the new output size
 	app.outputWidth = widthP
-	app.outputHeight = heightP
+	app.outputHeight = math.floor( heightP )
+	layoutPanes()
+end
 
-	-- Re-layout the clip areas
-	resizePanes()
+-- Handle touch events on the pane split area.
+-- Moving the split pane changes the minimum console height
+local function onTouchPaneSplit( event )
+	if event.phase == "began" then
+		display.getCurrentStage():setFocus( paneSplit )
+		paneDragOffset = event.y - lowerGroup.y
+	else
+		if event.phase ~= "cancelled" then
+			-- Compute new console size below pane split
+			local y = event.y - paneDragOffset
+			minConsoleHeight = app.pinValue( 
+					app.height - y - dyStatusBar,
+					0, app.height - dyStatusBar )
+			onResizeWindow()
+		end
+		if event.phase ~= "moved" then
+			display.getCurrentStage():setFocus( nil )
+		end
+	end
 end
 
 -- Prepare for a new run of the user program
@@ -525,11 +544,11 @@ local function initNewProgram()
 	console.clear()
 
 	-- Init new runtime display state for this run
-	if app.gameGroup then
-		app.gameGroup:removeSelf()
+	if gameGroup then
+		gameGroup:removeSelf()
 	end
-	app.gameGroup = app.makeGroup( app.outputGroup )
-	app.gameGroup.isVisible = false
+	gameGroup = app.makeGroup( outputGroup )
+	gameGroup.isVisible = false
 	removeErrorDisplay()
 end
 
@@ -595,11 +614,10 @@ end
 
 -- Make the toolbar UI
 local function makeToolbar()
-	local group = app.makeGroup()
-	app.toolbarGroup = group
+	toolbarGroup = app.makeGroup()
 
 	-- Background
-	group.bg = app.uiItem( display.newRect( group, 0, 0, app.width, dyToolbar ),
+	toolbarGroup.bg = app.uiItem( display.newRect( toolbarGroup, 0, 0, app.width, dyToolbar ),
 							app.toolbarShade, app.borderShade )
 
 	-- Choose File Button
@@ -613,9 +631,9 @@ local function makeToolbar()
 		font = native.systemFontBold,
 		fontSize = fontSizeUI,
 	}
-	group:insert( btn )
+	toolbarGroup:insert( btn )
 	btn.anchorX = 0
-	group.chooseFileBtn = btn
+	toolbarGroup.chooseFileBtn = btn
 
 		-- Level picker
 	local segmentNames = {}
@@ -624,7 +642,7 @@ local function makeToolbar()
 	end
 	local segWidth = 25
 	local controlWidth = segWidth * numSyntaxLevels
-	group.levelPicker = widget.newSegmentedControl{
+	toolbarGroup.levelPicker = widget.newSegmentedControl{
 		x = app.width - margin,
 		y = yCenter,
 		segmentWidth = segWidth,
@@ -636,34 +654,42 @@ local function makeToolbar()
 				processUserFile()
 			end
 	}
-	group.levelPicker.anchorX = 1
+	toolbarGroup.levelPicker.anchorX = 1
 end
 
 -- Init the app
 local function initApp()
 	-- Get initial device info and metrics
 	getDeviceMetrics()
-	app.outputWidth = app.width
-	app.outputHeight = app.height - dyToolbar - dyStatusBar
 	console.init()
+	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines
+	app.outputWidth = app.width
+	app.outputHeight = outputAreaHeight()
 
 	-- Make a default window title
 	native.setProperty("windowTitleText", "Code12")
 	display.setStatusBar( display.HiddenStatusBar )
 
-	-- White bg
-	app.bg = app.uiWhite( display.newRect( 0, 0, app.width, app.height ) )
+	-- White background
+	appBg = app.uiWhite( display.newRect( 0, 0, app.width, app.height ) )
 
-	-- UI and display elements
-	app.outputGroup = app.makeGroup( nil, 0, dyToolbar )
-	app.rightBar = app.uiItem( display.newRect( app.width + 1, dyToolbar, 0, app.height ), 
-							app.extraShade, app.borderShade )
-	makeLowerGroup()
+	-- Main display areas
+	outputGroup = app.makeGroup( nil, 0, dyToolbar )
+	rightBar = app.uiItem( display.newRect( 0, dyToolbar, 0, 0 ), 
+						app.extraShade, app.borderShade )
+	paneSplit = app.uiItem( display.newRect( 0, 0, 0, dyPaneSplit ), 
+						app.toolbarShade, app.borderShade )
+	paneSplit:addEventListener( "touch", onTouchPaneSplit )
+	lowerGroup = app.makeGroup()
+	console.create( lowerGroup, 0, 0, 0, 0 )
+	layoutPanes()
+
+	-- UI bars
 	makeStatusBar()
 	makeToolbar()
 
 	-- Fill in the appContext for the runtime
-	appContext.outputGroup = app.outputGroup
+	appContext.outputGroup = outputGroup
 	appContext.widthP = app.outputWidth
 	appContext.heightP = app.outputHeight
 	appContext.setClipSize = setClipSize
