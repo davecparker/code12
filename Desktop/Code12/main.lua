@@ -324,7 +324,7 @@ local function makeErrDisplay()
 	-- Make the highlight rectangles
 	local highlightGroup = app.makeGroup( group, xText, margin )
 	group.highlightGroup = highlightGroup
-	local y = ((numSourceLines - 1) / 2) * dyLine
+	local y = ((numSourceLines - 1) / 2) * dyLine - 1
 	group.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
 	group.refRect = makeHilightRect( dxChar * 5, y, 
 							dxChar * 6, dyLine, true )

@@ -220,6 +220,10 @@ function Scrollbar:setPosition( x, y, height )
 	self:adjust( self.rangeMin, self.rangeMax, self.pos, self.ratio )
 end
 
+-- Hide the scrollbar
+function Scrollbar:hide()
+	self.group.isVisible = false
+end
 
 
 ------------------------------------------------------------------------------

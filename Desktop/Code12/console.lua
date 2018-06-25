@@ -24,10 +24,10 @@ local maxLineLength = 500    -- max line length (since we clip and don't wrap)
 
 -- Display state
 local bg                     -- background rect
-local textObj                -- text display object
+local textObjs = {}          -- array of text display objects
+local numDisplayLines = 0    -- number of lines we can display
 local fontHeight             -- measured font height
 local fontCharWidth          -- measured font char width
-local numDisplayLines        -- number of lines we can display
 
 -- Console data
 local completedLines         -- array of strings for completed text lines
@@ -41,35 +41,57 @@ local changed = false        -- true when contents have changed since last updat
 
 -- Update the console if needed
 local function onNewFrame()
-	-- Do we need to update and is the display ready?
-	if changed and textObj and numDisplayLines then
-		local lines = completedLines
-		local numLines = #lines
+	-- Do we need to update?
+	if not changed then
+		return
+	end
+	changed = false
 
-		-- Add the current line if any
-		if #currentLineStrings > 0 then
-			numLines = numLines + 1
-			lines[numLines] = table.concat( currentLineStrings )
-		end
+	-- Determine number of lines we have to display
+	local numCompletedLines = #completedLines
+	local hasIncompleteLine = (#currentLineStrings > 0)
+	local numLines = numCompletedLines
+	if hasIncompleteLine then
+		numLines = numLines + 1
+	end
 
-		-- Use scrollStartLine if any, otherwise use scroll position 
-		-- so that the end is showing.
+	-- Load text lines into the text objects
+	local iText = 1
+	if numLines == 0 then
+		console.scrollbar:hide()
+	else
+		-- Use scrollStartLine if any, otherwise use the scroll position 
+		-- that shows the end of the output.
 		local lastStartLine = math.max( numLines - numDisplayLines + 1, 1 )
 		local startLine = scrollStartLine or lastStartLine
 		local ratio = numDisplayLines / numLines
 		console.scrollbar:adjust( 1, lastStartLine, startLine, ratio )
 
-		-- Assemble the text and update the text object
-		local endLine = math.min( startLine + numDisplayLines, numLines )
-		textObj.text = table.concat( lines, "\n", startLine, endLine )
-
-		-- Take the current line back out if we added it
-		if #currentLineStrings > 0 then
-			lines[numLines] = nil
+		-- Load the completed lines
+		local iLine = startLine
+		while true do
+			if iText > numDisplayLines then
+				return   -- no more display lines, so done
+			end
+			if iLine > numCompletedLines then
+				break    -- end of completed lines
+			end
+			textObjs[iText].text = completedLines[iLine]
+			iText = iText + 1
+			iLine = iLine + 1
 		end
 
-		-- Done until the next change
-		changed = false
+		-- Add the incomplete line if any
+		if hasIncompleteLine and iText <= numDisplayLines then
+			textObjs[iText].text = table.concat( currentLineStrings )
+			iText = iText + 1
+		end
+	end
+
+	-- Clear any remaining display lines
+	while iText <= numDisplayLines do
+		textObjs[iText].text = ""
+		iText = iText + 1
 	end
 end
 
@@ -121,12 +143,12 @@ function console.print( text )
 				if iNewline > iStart then
 					console.println( string.sub( text, iStart, iNewline - 1 ) )
 				else
-					endLine()
+					endLine()  -- blank line 
 				end
-				iStart = iNewline + 1
+				iStart = iNewline + 1   -- pass the newline
 				iNewline = string.find( text, "\n", iStart, true )
 			until iNewline == nil	
-			addText( string.sub( text, iStart ) )
+			addText( string.sub( text, iStart ) )  -- last incomplete line if any
 		end
 	end
 end
@@ -148,11 +170,29 @@ end
 
 -- Resize the console to fit the given size
 function console.resize( width, height )
+	-- Size the background rect
 	bg.width = width
 	bg.height = height
-	console.scrollbar:setPosition( width - Scrollbar.width, 0, height )
+
+	-- Determine number of display lines and adjust the scrollbar
 	numDisplayLines = math.floor( (height - textMargin ) / fontHeight )
-	changed = true
+	console.scrollbar:setPosition( width - Scrollbar.width, 0, height )
+
+	-- Make sure we have enough text objects
+	local n = #textObjs 
+	while n < numDisplayLines do
+		n = n + 1
+		textObjs[n] = app.uiBlack ( display.newText{
+			parent = console.group,
+			text = "",
+			x = textMargin,
+			y = textMargin + (n - 1) * fontHeight,   -- TODO: make sure pixel aligned
+			font = app.consoleFont,
+			fontSize = app.consoleFontSize,
+			align = "left",
+		} )
+	end
+	changed = true  -- may need to display additional lines
 end
 
 -- Create the console display group and store it in console.group
@@ -160,44 +200,25 @@ function console.create( parent, x, y, width, height )
 	local group = app.makeGroup( parent, x, y )
 	console.group = group
 
-	-- White background and multi-line text box
+	-- White background
 	bg = app.uiItem( display.newRect( group, 0, 0, width, height ), 1, app.borderShade )
-	textObj = app.uiBlack ( display.newText{
-		parent = group,
-		text = "",
-		x = textMargin,
-		y = textMargin,
-		-- width = ui.width - textMargin * 2,   -- no wrapping for now
-		font = app.consoleFont,
-		fontSize = app.consoleFontSize,
-		align = "left",
-	} )
 
 	-- Scrollbar
-	console.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, 
-								height, onScroll )
+	console.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )
 	console.scrollbar:adjust( 0, 100, 10, 25 )
+
+	-- Set the initial size
+	console.resize( width, height )
 end
 
 -- Init the console
 function console.init()
-	-- Get actual font metrics by measuring text objects
-	local str1 = "1234567890"
-	local str2 = "1\n2"
-	local str10 = "1\n2\n3\n4\n5\n6\n7\n8\n9\n0"
-	local temp1 = display.newText( str1, 0, 0, 
-						app.consoleFont, app.consoleFontSize )
-	fontCharWidth = temp1.contentWidth / string.len( str1 )
-	local temp2 = display.newText( str2, 0, 0, 1000, 0, 
-						app.consoleFont, app.consoleFontSize )
-	local temp10 = display.newText( str10, 0, 0, 1000, 0, 
-						app.consoleFont, app.consoleFontSize )
-	fontHeight = (temp10.contentHeight - temp2.contentHeight) / 8
-	temp1:removeSelf()
-	temp2:removeSelf()
-	temp10:removeSelf()
-
-	-- TODO
+	-- Get actual font metrics by measuring a text object (font metrics seem unreliable)
+	local str = "1234567890"
+	local temp = display.newText( str, 0, 0, app.consoleFont, app.consoleFontSize )
+	fontCharWidth = temp.contentWidth / string.len( str )
+	fontHeight = math.ceil( temp.contentHeight )   -- try to keep text pixel-aligned
+	temp:removeSelf()
 	app.consoleFontCharWidth = fontCharWidth
 	app.consoleFontHeight = fontHeight
 
