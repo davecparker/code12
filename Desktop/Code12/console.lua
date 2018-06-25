@@ -81,8 +81,8 @@ end
 
 -- Add raw text to the console. The text should not contain any newlines.
 local function addText( text )
-	-- Ignore this if the current line is really long and will clip anyway
-	if text and currentLineLength < maxLineLength then
+	-- Ignore if the current line is really long and will clip anyway
+	if currentLineLength < maxLineLength then
 		currentLineStrings[#currentLineStrings + 1] = text
 		currentLineLength = currentLineLength + string.len( text )
 		changed = true
@@ -91,11 +91,15 @@ end
 
 -- End the current line in the console
 local function endLine()
-	if #currentLineStrings > 0 then	
+	local n = #currentLineStrings
+	if n == 1 then
+		completedLines[#completedLines + 1] = currentLineStrings[1]
+		currentLineStrings[1] = nil
+	elseif n == 0 then	
+		completedLines[#completedLines + 1] = ""
+	else
 		completedLines[#completedLines + 1] = table.concat( currentLineStrings )
 		currentLineStrings = {}
-	else
-		completedLines[#completedLines + 1] = ""
 	end
 	currentLineLength = 0
 	changed = true
@@ -106,12 +110,30 @@ end
 
 -- Print text to the console
 function console.print( text )
-	addText( text )
+	if text then
+		-- Check for newlines and break up if necessary
+		local iNewline = string.find( text, "\n", 1, true )
+		if iNewline == nil then
+			addText( text )
+		else
+			local iStart = 1
+			repeat
+				if iNewline > iStart then
+					console.println( string.sub( text, iStart, iNewline - 1 ) )
+				else
+					endLine()
+				end
+				iStart = iNewline + 1
+				iNewline = string.find( text, "\n", iStart, true )
+			until iNewline == nil	
+			addText( string.sub( text, iStart ) )
+		end
+	end
 end
 
 -- Print text plus a newline to the console
-function console.println( text )
-	addText( text )
+function console.println( text )		
+	console.print( text )
 	endLine()
 end
 
