@@ -34,22 +34,22 @@ local function clickEvent(event, gameObj)
 		g.clickX = x
 		g.clickY = y
 
-		-- Call client event
-		g.callUserFunction(_fn.onMousePress, gameObj, x, y)
-
 		-- Automatically take the touch focus on an object.
 		if gameObj then
 			display.getCurrentStage():setFocus(event.target)
 		end
+
+		-- Call client event
+		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
 	elseif event.phase == "moved" then
 		-- Call client event
-		g.callUserFunction(_fn.onMouseDrag, gameObj, x, y)
+		g.eventFunctionYielded(_fn.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
-		-- Call client event
-		g.callUserFunction(_fn.onMouseRelease, gameObj, x, y)
-
 		-- Release touch focus if any
 		display.getCurrentStage():setFocus(nil)
+
+		-- Call client event
+		g.eventFunctionYielded(_fn.onMouseRelease, gameObj, x, y)
 	end
 end
 
@@ -139,19 +139,19 @@ function g.onKey(event)
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
-		g.callUserFunction(_fn.onKeyPress, keyName)
+		g.eventFunctionYielded(_fn.onKeyPress, keyName)  -- TODO: if yielded
 		returnValue = true    -- Always? Means client has to handle all keys
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)
 		if ch then
 			g.charTyped = ch    -- remember for ct.charTyped()
-			g.callUserFunction(_fn.onCharTyped, ch)
+			g.eventFunctionYielded(_fn.onCharTyped, ch)
 		end
 	elseif event.phase == "up" then
 		-- keyRelease
 		keysDown[event.keyName] = nil
-		g.callUserFunction(_fn.onKeyRelease, keyName)
+		g.eventFunctionYielded(_fn.onKeyRelease, keyName)
 	end
 	return returnValue
 end
