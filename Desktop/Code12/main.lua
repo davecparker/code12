@@ -695,6 +695,7 @@ local function initApp()
 	appContext.setClipSize = setClipSize
 	appContext.print = console.print
 	appContext.println = console.println
+	appContext.inputString = console.inputString
 
 	-- Load the Code12 API and runtime.
 	-- This defines the Code12 APIs in the global ct table

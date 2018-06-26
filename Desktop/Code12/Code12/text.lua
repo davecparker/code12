@@ -33,7 +33,8 @@ function ct.print(value, ...)
 end
 
 -- API
--- Note that ct.println() in the API must translate to ct.println("") in Lua
+-- Note that ct.println() in the API must translate to ct.println("") in Lua,
+-- otherwise nil will be printed.
 function ct.println(value, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.println") then
@@ -54,13 +55,13 @@ end
 -- Print a value as it should appear in ct.log output
 local function logValue(value)
 	if type(value) == "string" then
-		io.write("\"")
-		io.write(value)
-		io.write("\"")
+		ct.print("\"")
+		ct.print(value)
+		ct.print("\"")
 	elseif GameObj.isGameObj(value) then
-		io.write(value:toString())
+		ct.print(value:toString())
 	else
-		io.write(tostring(value))
+		ct.print(tostring(value))
 	end
 end
 
@@ -78,17 +79,16 @@ function ct.log(value, ...)
 	local args = {...}
 	local n = #args
 	if n > 0 then
-		io.write(", ")   -- comma after first value
+		ct.print(", ")   -- comma after first value
 		for i = 1, n - 1 do
 			logValue(args[i])
-			io.write(", ")
+			ct.print(", ")
 		end
 		logValue(args[n])  -- last arg without comma
 	end
 
 	-- End with a newline no matter what
-	io.write("\n")  
-	io.flush()
+	ct.print("\n")  
 end
 
 -- API
@@ -99,8 +99,8 @@ function ct.logm(message, value, ...)
 	end
 
 	-- Print the message and log the values
-	io.write(message)
-	io.write(" ")
+	ct.print(message)
+	ct.print(" ")
 	ct.log(value, ...)
 end
 
@@ -121,13 +121,15 @@ local function inputLine(message, ...)
 
 	-- Print the message followed by a space
 	if message then
-		io.write(message)
-		io.write(" ")
-		io.flush()
+		ct.print(message)
+		ct.print(" ")
 	end
 
 	-- Input a string and return it
-	return io.read() or ""    -- read to end of line
+	if appContext then
+		return appContext.inputString()
+	end
+	return ""    -- Text input not supported when running standalone
 end
 
 -- API

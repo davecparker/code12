@@ -32,7 +32,7 @@ function GameObj:getText(...)
 		g.checkNoParams(...)
 	end
 
-	-- Return the type name
+	-- Return the text
 	return self._code12.text
 end
 

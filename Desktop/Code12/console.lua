@@ -69,13 +69,7 @@ local function onNewFrame()
 
 		-- Load the completed lines
 		local iLine = startLine
-		while true do
-			if iText > numDisplayLines then
-				return   -- no more display lines, so done
-			end
-			if iLine > numCompletedLines then
-				break    -- end of completed lines
-			end
+		while iText <= numDisplayLines and iLine <= numCompletedLines do
 			textObjs[iText].text = completedLines[iLine]
 			iText = iText + 1
 			iLine = iLine + 1
@@ -88,8 +82,8 @@ local function onNewFrame()
 		end
 	end
 
-	-- Clear any remaining display lines
-	while iText <= numDisplayLines do
+	-- Clear any remaining text objects
+	while iText <= #textObjs do
 		textObjs[iText].text = ""
 		iText = iText + 1
 	end
@@ -173,6 +167,12 @@ function console.clear()
 	changed = true
 end
 
+-- Input a string from the console and return the string. 
+-- This call will effectively block until the input is received, although
+-- it will yield to the caller of the runtime coroutine while waiting.
+function console.inputString()
+end
+
 -- Resize the console to fit the given size
 function console.resize( width, height )
 	-- Size the background rect
@@ -191,7 +191,7 @@ function console.resize( width, height )
 			parent = console.group,
 			text = "",
 			x = textMargin,
-			y = textMargin + (n - 1) * fontHeight,   -- TODO: make sure pixel aligned
+			y = textMargin + (n - 1) * fontHeight,
 			font = app.consoleFont,
 			fontSize = app.consoleFontSize,
 			align = "left",

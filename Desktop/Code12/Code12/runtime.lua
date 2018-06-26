@@ -26,6 +26,7 @@ local g = require("Code12.globals")
 --             setClipSize = function,   -- called by runtime to specify output size
 --             print = function,         -- called by runtime for console output
 --             println = function,       -- called by runtime for console output
+--             inputString = function,   -- called by runtime for console input
 
 --             -- These field are added by the runtime for use by the app
 --             initRun = fnInitRun,      -- init and start a new run
