@@ -225,6 +225,11 @@ function Scrollbar:hide()
 	self.group.isVisible = false
 end
 
+-- Move the scrollbar to the front of its parent group
+function Scrollbar:toFront()
+	self.group:toFront()
+end
+
 
 ------------------------------------------------------------------------------
 return Scrollbar

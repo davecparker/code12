@@ -54,9 +54,7 @@ end
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame(event)
 	-- Call the client's update function if any
-	if type(_fn.update) == "function" then
-		_fn.update()
-	end
+	g.callUserFunction( _fn.update )
 
 	-- Clear the polled input state for this frame
 	g.clicked = false
@@ -94,9 +92,7 @@ local function onFirstFrame(event)
 	g.startTime = system.getTimer()
 
 	-- Call client's start method if any
-	if type(_fn.start) == "function" then
-		_fn.start()
-	end
+	g.callUserFunction( _fn.start )
 
 	-- Sync the drawing objects for the first draw
 	local objs = g.screen.objs
@@ -139,9 +135,7 @@ local function onResize()
 	end
 
 	-- Send user event if necessary
-	if type(_fn.onResize) == "function" then
-		_fn.onResize()
-	end
+	g.callUserFunction( _fn.onResize )
 	g.window.resized = true
 end
 
@@ -203,6 +197,34 @@ local function initRun()
 	Runtime:addEventListener("key", g.onKey)
 	if appContext == nil and not g.isMobile then
 		Runtime:addEventListener("resize", onResize)  -- for standalone window resize
+	end
+end
+
+
+---------------- Public Functions --------------------------------------------
+
+-- Call the given user-defined function if it exists.
+-- Run the function in a coroutine so it can yield to wait for console input
+-- if necessary.
+function g.callUserFunction( func, ... )
+	if type(func) == "function" then
+		assert( not coroutine.running() )
+		if not coroutine.running() then
+			local co = coroutine.create( func )
+			if co then
+				local success, result = coroutine.resume(co, ...)
+				if success then
+					if coroutine.status(co) == "dead" then
+						return result   -- User function completed normally
+					end
+				else
+					-- TODO: Handle runtime error
+					print("*** Runtime Error: " .. result)
+					ct.print("*** Runtime Error: ")
+					ct.println(result)
+				end
+			end
+		end
 	end
 end
 

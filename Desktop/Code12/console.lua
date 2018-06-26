@@ -197,6 +197,7 @@ function console.resize( width, height )
 			align = "left",
 		} )
 	end
+	console.scrollbar:toFront()
 	changed = true  -- may need to display additional lines
 end
 
