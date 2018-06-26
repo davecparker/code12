@@ -195,6 +195,11 @@ function fnCallCode( tree )
 				err.setErrNode( fnValue, "Code12 API functions cannot be called before start()" )
 				return nil
 			end
+			-- Check special case: ct.println() with no params needs to generate ct.println("")
+			if fnName == "ct.println" and #exprs == 0 then
+				return "ct.println( \"\" )"
+			end
+			-- Start the call with the function name
 			parts = { fnName, "(" }            -- e.g. ct.circle(
 		else
 			-- User-defined function call

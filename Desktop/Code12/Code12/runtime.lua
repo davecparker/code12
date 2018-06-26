@@ -26,6 +26,7 @@ local g = require("Code12.globals")
 --             setClipSize = function,   -- called by runtime to specify output size
 --             print = function,         -- called by runtime for console output
 --             println = function,       -- called by runtime for console output
+--             inputString = function,   -- called by runtime for console input
 
 --             -- These field are added by the runtime for use by the app
 --             initRun = fnInitRun,      -- init and start a new run
@@ -47,14 +48,17 @@ else
 	appContext= nil
 end
 
+-- File local state
+local coRoutineUser = nil    -- coroutine running an event or nil if none
 
----------------- Internal Functions ------------------------------------------
+
+---------------- Runtime Functions ------------------------------------------
 
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame(event)
 	-- Call the client's update function if any
-	if type(_fn.update) == "function" then
-		_fn.update()
+	if g.eventFunctionYielded(_fn.update) then
+		return
 	end
 
 	-- Clear the polled input state for this frame
@@ -89,12 +93,9 @@ end
 
 -- The enterFrame listener for the first update only
 local function onFirstFrame(event)
-	-- Start the game timer
-	g.startTime = system.getTimer()
-
 	-- Call client's start method if any
-	if type(_fn.start) == "function" then
-		_fn.start()
+	if g.eventFunctionYielded(_fn.start) then
+		return
 	end
 
 	-- Sync the drawing objects for the first draw
@@ -136,12 +137,53 @@ local function onResize()
 			objs[i].code12GameObj:adjustForWindowResize(oldHeight, g.height)
 		end
 	end
+	g.window.resized = true
 
 	-- Send user event if necessary
-	if type(_fn.onResize) == "function" then
-		_fn.onResize()
+	g.eventFunctionYielded(_fn.onResize)
+end
+
+-- Handle the result of the two return values from a coroutine.resume call,
+-- and check the status of the coroutine to adjust the running state,
+-- and return true if the coroutine yielded or false if it completed.
+local function coroutineYielded(success, strErr)
+	if success then
+		if coroutine.status(coRoutineUser) == "dead" then
+			coRoutineUser = nil
+			return false
+		end
+		return true
+	else
+		-- TODO: Handle runtime error
+		print("*** Runtime Error: " .. strErr)
+		ct.print("*** Runtime Error: ")
+		ct.println(strErr)
+		return false
 	end
-	g.window.resized = true
+end
+
+-- If a user event function coroutine is already running then give it another 
+-- time slice and return true if it yielded again or false it if completed. 
+-- If no coroutine is already running, then start a coroutine to run the
+-- given function (it not nil), passing the additional parameters passed, 
+-- and return true if the coroutine yielded or false if it completed.
+function g.eventFunctionYielded( func, ... )
+	-- Is a coroutine already running?
+	if coRoutineUser then
+		local success, strErr = coroutine.resume(coRoutineUser)
+		return coroutineYielded(success, strErr)
+	end
+
+	-- Is there a valid function to start?
+	if type(func) == "function" then
+		coRoutineUser = coroutine.create(func)
+		if coRoutineUser then
+			-- Start the user function, passing its parameters
+			local success, strErr = coroutine.resume(coRoutineUser, ...)
+			return coroutineYielded(success, strErr)
+		end
+	end
+	return false
 end
 
 -- Stop a run
@@ -203,6 +245,9 @@ local function initRun()
 	if appContext == nil and not g.isMobile then
 		Runtime:addEventListener("resize", onResize)  -- for standalone window resize
 	end
+
+	-- Start the game timer
+	g.startTime = system.getTimer()
 end
 
 -- Init the Code 12 runtime system.

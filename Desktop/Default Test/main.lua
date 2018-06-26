@@ -10,6 +10,7 @@ require('Code12.api')
     this.LIMIT = 120
     -- int count = 5;
     this.speed = 0.3
+    this.frameCount = 0
     
     function _fn.start()
         
@@ -22,15 +23,23 @@ require('Code12.api')
         local done = false; 
         
         -- Try some console output
-        local i = 0; while i < 10 do
+        local i = 1; while i <= 10 do
             
             ct.println("Line " .. i)
         i = i + 1; end
         ct.println("This is the default Code12 test app")
         ct.println("This is console output")
         ct.print("Beginning of line")
-        ct.print(" Middle ")
+        ct.print(" - Middle - ")
         ct.println("End")
+        ct.print("This\nis\nmultiple\nlines")
+        ct.print(" of text")
+        ct.println( "" )
+        ct.println("Here's a blank line:")
+        ct.print("\n")
+        ct.print("And another:")
+        ct.println("\n")
+        ct.println("Done")
         
         -- Draw some circles
         this.ball = ct.circle(x + 6, 15, 5)
@@ -63,8 +72,13 @@ require('Code12.api')
         local name = nil; 
         local tooFast = false; local tooSlow = false; 
         
+        this.frameCount = this.frameCount + 1
+        if this.frameCount < 100 then
+            ct.println(ct.getTimer()); end
+        
         -- Move ball
         local xNew = _fn.moveBall(true)
+        xNew = xNew + 1
         _fn.moveBall(false)
         
         -- Move bigBall

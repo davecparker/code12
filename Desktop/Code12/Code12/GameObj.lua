@@ -146,6 +146,7 @@ function GameObj:newText(group, text, x, y, height, colorName)
 	gameObj:setObj(obj)
 	gameObj.width = obj.width / g.scale  -- Corona measured when obj created
 	gameObj.updateSize = GameObj.updateSizeText   -- override sizing method
+	gameObj._code12.text = text
 	gameObj:setFillColorFromName(colorName or "black")
 	return gameObj
 end
