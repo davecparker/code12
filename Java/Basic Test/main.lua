@@ -9,7 +9,7 @@ require('Code12.api')
         
     
     
-    function start()
+    function _fn.start()
         
         ct.setTitle("Fish and Shapes Test")
         ct.setHeight(178)
@@ -19,7 +19,7 @@ require('Code12.api')
         ct.logm("Scale factor:", ct.getPixelsPerUnit())
         ct.print("Testing the ")
         ct.print("API")
-        ct.println()
+        ct.println( "" )
         ct.log(ct.intDiv(9, 2))
         ct.log(ct.canParseInt("-3"), ct.canParseInt(" -3"), ct.canParseInt("-3 e2"))
         ct.log(ct.parseInt("-3"), ct.parseInt(" -3"), ct.parseInt("-3 e2"))
@@ -77,7 +77,7 @@ require('Code12.api')
         ct.setSoundVolume(0.7)
     end
     
-    function update()
+    function _fn.update()
         
         if this.fish.x < -30 then
             this.fish.x = 130; 

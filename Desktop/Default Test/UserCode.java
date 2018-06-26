@@ -10,6 +10,7 @@ class UserCode extends Code12Program
 	final int LIMIT = 120;
 	// int count = 5;
 	double speed = 0.3;
+	int frameCount = 0;
 
 	public void start()
 	{
@@ -22,15 +23,23 @@ class UserCode extends Code12Program
 		boolean done;
 
 		// Try some console output
-		for (int i = 0; i < 10; i++)
+		for (int i = 1; i <= 10; i++)
 		{
 			ct.println("Line " + i);
 		}
 		ct.println("This is the default Code12 test app");
 		ct.println("This is console output");
 		ct.print("Beginning of line");
-		ct.print(" Middle ");
+		ct.print(" - Middle - ");
 		ct.println("End");
+		ct.print("This\nis\nmultiple\nlines");
+		ct.print(" of text");
+		ct.println();
+		ct.println("Here's a blank line:");
+		ct.print("\n");
+		ct.print("And another:");
+		ct.println("\n");
+		ct.println("Done");
 
 		// Draw some circles
 		ball = ct.circle(x + 6, 15, 5);
@@ -63,8 +72,13 @@ class UserCode extends Code12Program
 		String name;
 		boolean tooFast, tooSlow;
 
+		frameCount++;
+		if (frameCount < 100)
+			ct.println(ct.getTimer());
+
 		// Move ball
 		int xNew = moveBall( true );
+		xNew++;
 		moveBall( false );
 
 		// Move bigBall
