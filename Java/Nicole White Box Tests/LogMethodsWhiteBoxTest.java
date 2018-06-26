@@ -76,7 +76,7 @@ public class LogMethodsWhiteBoxTest extends Code12Program
 
    public void update()
    {
-      stationaryCircle.delete(); // A GameObj is still logged even if it has been deleted ( since .delete()
+      //stationaryCircle.delete(); // A GameObj is still logged even if it has been deleted ( since .delete()
                                  // only clears the screen of the object.
       movingCircle.xSpeed = 1;
       movingImage.ySpeed = -2;
@@ -132,7 +132,6 @@ public class LogMethodsWhiteBoxTest extends Code12Program
          // Makeshift collsion detection for line
          if ( movingCircle.containsPoint(xValue,ct.getHeight()/2) )
             ct.println("There is a " + movingCircle.toString() + " moving along a " + line.toString() );
-            // Issue? Logs only the most recent position of the circle, even if it continues to move
       }
    }
 

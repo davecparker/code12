@@ -7,7 +7,7 @@ require('Code12.api')
     this.expCircle = nil; 
     this.movingCircle = nil; 
     this.stationaryRect = nil; 
-    this.rectangles = nil
+    this.rectangles = nil; 
     this.line = nil; 
     this.t = nil; 
     this.image = nil; 
@@ -25,7 +25,7 @@ require('Code12.api')
         
     
     
-    function start()
+    function _fn.start()
         
         ct.setTitle("LogMethods, not to be confused with logarithms")
         
@@ -74,9 +74,9 @@ require('Code12.api')
         until not (this.count <= 5)
     end
     
-    function update()
+    function _fn.update()
         
-        this.stationaryCircle:delete()
+        --stationaryCircle.delete(); // A GameObj is still logged even if it has been deleted ( since .delete()
         -- only clears the screen of the object.
         this.movingCircle.xSpeed = 1
         this.movingImage.ySpeed = -2
@@ -132,7 +132,6 @@ require('Code12.api')
             -- Makeshift collsion detection for line
             if this.movingCircle:containsPoint(xValue, ct.getHeight() / 2) then
                 ct.println("There is a " .. this.movingCircle:toString() .. " moving along a " .. this.line:toString()); end
-            -- Issue? Logs only the most recent position of the circle, even if it continues to move
         xValue = xValue + 1; end
     end
     
