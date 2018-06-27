@@ -100,15 +100,15 @@ local function buildTables()
 			class = classes[#classes]
 		elseif p == "func" then
 			-- Get the method name and return type
-			if nodes[2].tt ~= "ID" then
+			if nodes[3].tt ~= "ID" then
 				print( "*** Invalid function on line ", i )
 				return false
 			end
-			local methodName = nodes[2].str
-			local vtReturn = javaTypes.vtFromRetType( nodes[1] )
+			local methodName = nodes[3].str
+			local vtReturn = javaTypes.vtFromRetType( nodes[2] )
 			-- Build the parameter table
 			local paramTable = {}
-			local params = nodes[4].nodes
+			local params = nodes[5].nodes
 			for j = 1, #params do
 				local param = params[j]
 				local vtParam, name = javaTypes.vtAndNameFromParam( param )
@@ -253,7 +253,7 @@ local function makeLuaFile()
 			for j = 1, #method.params do
 				local param = method.params[j]
 
-				outFile:write( "{ name = " .. param.name .. ", vt = " .. vtStr(param.vt) .. "}")
+				outFile:write( "{ name = \"" .. param.name .. "\", vt = " .. vtStr(param.vt) .. "}")
 				if j < #method.params then
 					outFile:write( "," )
 				end

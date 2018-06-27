@@ -55,7 +55,7 @@ local coRoutineUser = nil    -- coroutine running an event or nil if none
 ---------------- Runtime Functions ------------------------------------------
 
 -- The enterFrame listener for each frame update after the first
-local function onNewFrame(event)
+local function onNewFrame()
 	-- Call the client's update function if any
 	if g.eventFunctionYielded(_fn.update) then
 		return
@@ -92,7 +92,7 @@ local function onNewFrame(event)
 end
 
 -- The enterFrame listener for the first update only
-local function onFirstFrame(event)
+local function onFirstFrame()
 	-- Call client's start method if any
 	if g.eventFunctionYielded(_fn.start) then
 		return

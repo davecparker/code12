@@ -32,7 +32,7 @@ function env.relativePath( fromDir, destDir )
 	-- TODO: This is annoying and doesn't feel very reliable
 
 	-- Count the chDirSeperators in fromDir and create upDirs to go up to root
-	local str, count = string.gsub( fromDir, chDirSeperator, "." )
+	local _, count = string.gsub( fromDir, chDirSeperator, "." )
 	local up = ".." .. chDirSeperator
 	local upDirs = string.rep( up, count )
 

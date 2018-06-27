@@ -122,7 +122,7 @@ local function endLine()
 end
 
 -- Handle touch events on the console
-local function onTouchConsole( event )
+local function onTouchConsole()
 	return true
 end
 

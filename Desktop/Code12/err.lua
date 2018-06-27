@@ -66,7 +66,7 @@ end
 
 -- Make and return an errLoc (see err.makeErrLoc) using the extent of the given
 -- parse tree node for the location.
-function errLocFromNode( node )
+local function errLocFromNode( node )
 	local errLoc = { first = {}, last = {} }
 	findNodeLoc( node, errLoc )
 	return errLoc

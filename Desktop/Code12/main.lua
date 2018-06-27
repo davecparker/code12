@@ -56,8 +56,8 @@ local sourceFile = {
 
 -- Force the initial file to the standard test file for faster dev testing
 if env.isSimulator then
---	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
-	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
@@ -68,8 +68,8 @@ ct = {
 	checkParams = true,    -- set to false to disable runtime API parameter checks
 	-- The ct.xxx API functions are added here by the Lua runtime when loaded
 }
-this = {}      -- generated code uses this.varName for class/global variables
-_fn = {}       -- generated code uses _fn.start(), _fn.update(), _fn.userFn(), etc.
+_G.this = {}      -- generated code uses this.varName for class/global variables
+_G._fn = {}       -- generated code uses _fn.start(), _fn.update(), _fn.userFn(), etc.
 
 -- Cached state
 local appContext = ct._appContext
@@ -86,7 +86,7 @@ end
 local function updateStatusBar()
 	if sourceFile.path then
 		-- Get just the filename with extension from the path
-		local dir, filename = env.dirAndFilenameOfPath( sourceFile.path )
+		local _, filename = env.dirAndFilenameOfPath( sourceFile.path )
 
 		-- Get the update time to display
 		local updateStr = "Never"
@@ -120,18 +120,18 @@ end
 local function runLuaCode( luaCode )
 	-- Load the code dynamically and execute it
 	local codeFunction = loadstring( luaCode )
- 	if type(codeFunction) == "function" then
- 		-- Run user code main chunk, which defines the functions
- 		codeFunction()
+	if type(codeFunction) == "function" then
+		-- Run user code main chunk, which defines the functions
+		codeFunction()
 
- 		-- Tell the runtime to init and start a new run
- 		appContext.initRun()
+		-- Tell the runtime to init and start a new run
+		appContext.initRun()
 
- 		-- Show the game output
+		-- Show the game output
 		gameGroup.isVisible = true
- 	else
- 	 	print( "*** Lua code failed to load" )
- 	end
+	else
+		print( "*** Lua code failed to load" )
+	end
 end
 
 -- Return a detabbed version of str using the given tabWidth
@@ -180,7 +180,7 @@ local function writeLuaCode( codeStr )
 	end
 
 	-- Write the Lua file
-	local outFile = io.open( outPath, "w" )
+	outFile = io.open( outPath, "w" )
 	if outFile then
 		-- Start with our 3-line header to enable standalone runs with the Lua runtime
 		-- from test app folders in the Lua folder or one subfolder lower.
@@ -536,8 +536,8 @@ local function initNewProgram()
 	print( "sourceFile.path: " .. sourceFile.path )
 
 	-- Clear class variables and user functions
-	this = {}
-	_fn = {}
+	_G.this = {}
+	_G._fn = {}
 
 	-- Clear the error state, console, and other state
 	err.initProgram()
@@ -641,7 +641,6 @@ local function makeToolbar()
 		segmentNames[i] = tostring( i )
 	end
 	local segWidth = 25
-	local controlWidth = segWidth * numSyntaxLevels
 	toolbarGroup.levelPicker = widget.newSegmentedControl{
 		x = app.width - margin,
 		y = yCenter,
