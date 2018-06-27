@@ -490,7 +490,7 @@ end
 
 -- Runtime callback to set the output size being used
 local function setClipSize( widthP, heightP )
-	app.outputWidth = widthP
+	app.outputWidth = math.floor( widthP )
 	app.outputHeight = math.floor( heightP )
 	layoutPanes()
 end

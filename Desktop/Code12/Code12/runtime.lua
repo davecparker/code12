@@ -155,9 +155,10 @@ local function coroutineYielded(success, strErr)
 		return true
 	else
 		-- TODO: Handle runtime error
-		print("*** Runtime Error: " .. strErr)
-		ct.print("*** Runtime Error: ")
+		print("\n*** Runtime Error: " .. strErr)
+		ct.print("\n*** Runtime Error: ")
 		ct.println(strErr)
+		coRoutineUser = nil
 		return false
 	end
 end

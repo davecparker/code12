@@ -354,7 +354,7 @@ local function generateVarDecl( tree, isInstanceVar )
 			local exprs = arrayInit.nodes[2].nodes
 			for i = 1, #exprs do
 				local expr = exprs[i]
-				if expr.info.vt ~= vt then
+				if not javaTypes.vtCanAcceptVtExpr( vt, expr.info.vt ) then
 					err.setErrNodeAndRef( expr, nodes[1], 
 							"Array element type does not match the array type" )
 				end

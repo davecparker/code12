@@ -91,7 +91,8 @@ end
 -- Return the value type (vt) for a retType node
 -- or return nil and set the error state if the type is invalid.
 function javaTypes.vtFromRetType( retType )
-	if retType.p == "void" then
+	local p = retType.p
+	if p == "void" then
 		return false
 	end
 	local vt = javaTypes.vtFromVarType( retType.nodes[1] )

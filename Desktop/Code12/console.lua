@@ -147,7 +147,10 @@ function console.print( text )
 				iStart = iNewline + 1   -- pass the newline
 				iNewline = string.find( text, "\n", iStart, true )
 			until iNewline == nil	
-			addText( string.sub( text, iStart ) )  -- last incomplete line if any
+			local ending = string.sub( text, iStart )
+			if ending then
+				addText( ending )  -- last incomplete line
+			end
 		end
 	end
 end
