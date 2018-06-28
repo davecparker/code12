@@ -24,16 +24,16 @@ class TextSort extends Code12Program
    
    public void start()
    {
-      row0 = "***\n";
-      row1 = "*******\n";
-      row2 = "**\n";
-      row3 = "***********\n";
-      row4 = "*\n";
-      row5 = "****\n";
-      row6 = "****************\n";
-      row7 = "******\n";
-      row8 = "***\n";
-      row9 = "*********\n";
+      row0 = "***";
+      row1 = "*******";
+      row2 = "**";
+      row3 = "***********";
+      row4 = "*";
+      row5 = "****";
+      row6 = "****************";
+      row7 = "******";
+      row8 = "***";
+      row9 = "*********";
            
       rows = new String[10];
       
@@ -50,44 +50,54 @@ class TextSort extends Code12Program
       rows[9] = row9;
       
       ct.println("-------------------");
-      // Initial positions; unsorted
-      for ( int i = 0; i < rows.length; i++ )
-      {
-         ct.print( rows[i] );
-      }
+      // Print the initial array, unsorted
+      printArray( rows );
       
-      ct.println("-------------------");
-      
-      BubbleSort( rows );
-
-   // Helper function to find index of longest String element
-   public void sort(String[] array, int n)
+      // Uncomment each one seperately
+      //bubbleSort( rows );
+      //insertionSort( rows );
+      selectionSort( rows );
+   }
+   
+   // Helper function to print array and the number of asterisks in each row
+   public void printArray( String[] arr )
    {
-      for (int i=1 ;i<n; i++)
-      {
-         String temp = array[i];
- 
-         // Insert s[j] at its correct position
-         int j = i - 1;
-         while (j >= 0 && temp.length() < array[j].length())
+         for ( int i = 0; i < arr.length; i++ )
          {
-               array[j+1] = array[j];
-               j--;
+            ct.println( arr[i] + " [" + arr[i].length() + "]"  );
          }
-         
-         array[j+1] = temp;
+   }
+   
+   public void insertionSort( String[] arr )
+   {
+      String key;
+      
+      for ( int j = 1; j < arr.length; j++ )
+      {
+         key = arr[j];
+         int i = j - 1;
+         while (i >= 0)
+         {
+            ct.println("----------------------------");
+            if (key.compareTo(arr[i]) > 0) 
+               break;
+            arr[i + 1] = arr[i];
+            i--;
+            printArray( rows );
+         }
+         arr[i + 1] = key;
       }
    }
    
-   public void BubbleSort( String[] arr )
+   public void bubbleSort( String[] arr )
    {
       int j;
       boolean needsSorting = true;     // this is true to begin first pass through the array
-      String temp;                     // placeholder variable
-
-      while ( flag )
+      String temp;                     // placeholder variable in order to swap positions
+      
+      while ( needsSorting )
       {
-         ct.println("---------------------");
+         ct.println("----------------------------");
          needsSorting = false;                  // set bool to false in case of a possible adjacent swap
                                                 // this will exit the loop after the final pass
          for( j=0;  j < arr.length - 1;  j++ )
@@ -101,18 +111,38 @@ class TextSort extends Code12Program
             }
          }
             
-         // print array each "generation"
-         for ( int i = 0; i < arr.length; i++ )
-         {
-            ct.print( arr[i] );
-         }
+         printArray( arr );
       }
    } 
    
-   // TODO
-   // add functions for:
-   //    selection sort
-   //    sequential search
-   //    binary search as an example of more efficient searches
-   
+   public void selectionSort( String[] arr )
+   {
+      int min;
+      String temp;
+      //  The beginning of the array ( arr[0] ) to arr.length - 1
+      for ( int i = 0; i < arr.length -1; i++)
+      {
+         // assume the shortest string is the first element 
+         min = arr[i].length();
+         // test against elements after j to find the shortest 
+         // index out of bounds
+         for (int j = i + 1; j <= arr.length; j++)
+         {
+            // if this string element is shorter, then it is the new minimum
+            if ( arr[j].compareTo(arr[min]) < 0 )
+               min = j;
+         }
+         if ( arr[min].length() != arr[i].length() ) 
+         {
+            // swap(a[i], a[iMin]) to go from shortest to longest
+            temp = arr[ i ];    
+            arr[ i ] = arr[ min ];
+            arr[ min ] = temp;
+         }
+         
+         printArray( arr );
+      }
+   }
+
+  
 }
