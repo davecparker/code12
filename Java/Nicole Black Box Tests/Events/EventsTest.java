@@ -24,7 +24,7 @@ class EventsTest extends Code12Program
    GameObj sprite;
    GameObj dialogue;
    GameObj[] obstacles = new GameObj[4];
-   int seconds;
+   int seconds = 0;
    double gravity = 1.0;
 
    public static void main(String[] args)

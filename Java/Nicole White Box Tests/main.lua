@@ -137,7 +137,7 @@ require('Code12.api')
     
     function _fn.logRects()
         
-        ct.log(this.stationaryRect)
+        ct.logm("stationary rect", this.stationaryRect)
     end
     
     function _fn.logRectArray()

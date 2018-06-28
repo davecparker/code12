@@ -137,7 +137,7 @@ public class LogMethodsWhiteBoxTest extends Code12Program
 
    void logRects()
    {
-      ct.log(stationaryRect);
+      ct.logm("stationary rect",stationaryRect);
    }
    
    void logRectArray()
