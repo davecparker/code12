@@ -168,6 +168,7 @@ local function stopRun()
 	g.clickY = 0
 	g.charTyped = nil
 	g.stopped = true
+	coRoutineUser = nil
 end	
 
 -- Handle the result of the two return values from a coroutine.resume call,
@@ -186,7 +187,6 @@ local function coroutineYielded(success, strErr)
 		ct.print("\n*** Runtime Error: ")
 		ct.println(strErr)
 		native.showAlert( "Runtime Error", strErr, { "OK" } )
-		coRoutineUser = nil
 		stopRun()
 		return false
 	end

@@ -179,6 +179,16 @@ class UserCode extends Code12Program
 		as = new GameObj[10];
 		double myX = as[4].x;
 		as[sum - 1].y = myX;
+		as = makeCircles();
+
+		// int [] ai = { 1, 2, 3.3 };
+		double[] ad = { 1.1, 2.2, 0 };
+	}
+
+	GameObj[] makeCircles()
+	{
+		GameObj[] circles = new GameObj[10];
+		return circles;
 	}
 
 	public void onKeyPress( String key )

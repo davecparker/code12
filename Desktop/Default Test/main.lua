@@ -179,6 +179,16 @@ require('Code12.api')
         as = { length = 10 }
         local myX = as[1+(4)].x
         as[1+(sum - 1)].y = myX
+        as = _fn.makeCircles()
+        
+        -- int [] ai = { 1, 2, 3.3 };
+        local ad = { 1.1, 2.2, 0, length = 3 }
+    end
+    
+    function _fn.makeCircles()
+        
+        local circles = { length = 10 }
+        return circles
     end
     
     function _fn.onKeyPress(key)

@@ -180,6 +180,11 @@ function console.clear()
 	currentLineStrings = {}
 	currentLineLength = 0
 	scrollStartLine = nil
+	if textField then
+		textField:removeSelf()
+		textField = nil
+	end
+	textFieldText = nil
 	changed = true
 end
 
