@@ -9,7 +9,8 @@ require('Code12.api')
     
     function _fn.start()
         
-        ct.rect(50, 50, 75, 25)
+        local r = ct.rect(50, 50, 75, 25)
+        ct.logm("I created", r)
     end
     
     function _fn.update()

@@ -9,7 +9,6 @@
 
 local g = require("Code12.globals")
 require("Code12.runtime")
-local GameObj = require("Code12.GameObjAPI")
 
 
 ---------------- Touch Tracking ----------------------------------------------

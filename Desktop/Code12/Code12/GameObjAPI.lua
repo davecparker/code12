@@ -161,7 +161,7 @@ function GameObj:setLayer(layer, ...)
 	-- Re-insert the display object at the top the layer
 	local obj = self._code12.obj
 	local objs = obj.parent
-	i = objs.numChildren
+	local i = objs.numChildren
 	while i > 0 do
 		local gameObj = objs[i].code12GameObj
 		if gameObj and gameObj ~= self and gameObj._code12.layer <= layer then

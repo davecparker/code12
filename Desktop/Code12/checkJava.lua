@@ -79,8 +79,8 @@ end
 -- Find user-defined methods in parseTrees and put them in the userMethods table.
 -- Return true if successful, false if an error occured.
 local function getMethods( parseTrees )
-	for i = 1, #parseTrees do
-		local tree = parseTrees[i]
+	for iTree = 1, #parseTrees do
+		local tree = parseTrees[iTree]
 		assert( tree.t == "line" )
 		local p = tree.p
 		local nodes = tree.nodes
@@ -245,9 +245,6 @@ end
 
 --- Type Analysis of expressions  --------------------------------------------
 
--- Forward decl for mutual recursion
-local vtExprNode
-
 -- The following local functions are all hashed into from the fnVtExprPatterns
 -- table below. They all return the vt of a particular pattern of an expr node
 -- (primaryExpr or expr with binary op) given the children nodes array.
@@ -259,17 +256,17 @@ local function vtExprNUM( nodes )
 end
 
 -- primaryExpr pattern: BOOL
-local function vtExprBOOL( nodes )
+local function vtExprBOOL()
 	return true
 end
 
 -- primaryExpr pattern: NULL
-local function vtExprNULL( nodes )
+local function vtExprNULL()
 	return "null"
 end
 
 -- primaryExpr pattern: STR
-local function vtExprSTR( nodes )
+local function vtExprSTR()
 	return "String"
 end
 
@@ -467,8 +464,8 @@ local fnVtExprPatterns = {
 -- Return the value type (vt) for an expr, primaryExpr, or lValue node.
 -- Also store the vt into node.info.vt for future use.
 -- If an error is found, set the error state and return nil.
-function vtSetExprNode( node )
-	local vt = nil
+local function vtSetExprNode( node )
+	local vt
 	if node.t == "lValue" then
 		vt = vtLValueNode( node )
 	else
@@ -764,7 +761,7 @@ local function findAPIMethod( fnValue )
 	local class = apiTables[className]
 
 	-- Look up the method
-	method = lookupID( fnNode, class.methods )
+	local method = lookupID( fnNode, class.methods )
 	if method == nil then
 		err.setErrNodeAndRef( fnNode, object, 
 				"Unknown method \"%s\" for class %s",
@@ -874,10 +871,10 @@ end
 function checkJava.initProgram( parseTrees )
 	variables = {}
 	userMethods = {}
- 	isInstanceVar = {}
- 	localNameStack = {}
+	isInstanceVar = {}
+	localNameStack = {}
 
- 	err.initProgram()
+	err.initProgram()
 
 	-- Get method types first, since vars can forward reference them
 	return getMethods( parseTrees )

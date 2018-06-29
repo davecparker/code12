@@ -237,7 +237,7 @@ function exprCode( expr )
 	elseif p == "exprParens" then
 		return "(" .. exprCode( nodes[2] ) .. ")"
 	elseif p == "newArray" then
-		local vt = javaTypes.vtFromVarType( nodes[2] )
+		javaTypes.vtFromVarType( nodes[2] )   -- check for valid type
 		return "{ length = " .. exprCode( nodes[4] ) .. " }"
 	end
 
@@ -333,7 +333,6 @@ local function generateVarDecl( tree, isInstanceVar )
 		addLua( varName )
 		addLua( " = " )
 		local arrayInit = nodes[6]
-		local length = nil
 		if arrayInit.p == "new" then
 			-- type [ ] id = new type [ expr ] ;
 			local vtNew = javaTypes.vtFromVarType( arrayInit.nodes[2] )
@@ -354,7 +353,7 @@ local function generateVarDecl( tree, isInstanceVar )
 			local exprs = arrayInit.nodes[2].nodes
 			for i = 1, #exprs do
 				local expr = exprs[i]
-				if expr.info.vt ~= vt then
+				if not javaTypes.vtCanAcceptVtExpr( vt, expr.info.vt ) then
 					err.setErrNodeAndRef( expr, nodes[1], 
 							"Array element type does not match the array type" )
 				end
@@ -560,12 +559,14 @@ local function generateBlockLine( tree )
 		generateStmt( nodes[1] )
 	elseif p == "blank" then
 		-- blank
+		return
 	elseif enableComments and p == "comment" then
 		-- Full line comment
 		beginLuaLine( "--" )
 		addLua( nodes[1].str )
 	elseif generateVarDecl( tree, false ) then
 		-- Processed a local varInit, constInit, or varDecl
+		return
 	elseif p == "if" then
 		-- if (expr)
 		local expr = nodes[3]
@@ -623,8 +624,7 @@ local function generateBlockLine( tree )
 	elseif p == "return" then
 		-- return expr ;
 		local expr = nodes[2]
-		local vt = expr.info.vt
-		-- TDOO: Check correct return type
+		-- TDOO: Check correct return type (expr.info.vt must match function signature)
 		beginLuaLine( "return " )
 		addLua( exprCode( expr ) )
 	else
@@ -748,20 +748,20 @@ function codeGenJava.getLuaCode( parseTrees )
 		local p = tree.p
 		local nodes = tree.nodes
 
-		if generateVarDecl( tree, true ) then
-			-- Processed a varInit, constInit, varDecl, or arrayInit
-		elseif enableComments and p == "comment" then
-			-- Full line comment
-			beginLuaLine( "--" )
-			addLua( nodes[1].str )
-		elseif p == "begin" then          -- {  in boilerplate code
-			blockLevel = blockLevel + 1
-		elseif p == "end" then            -- }  in boilerplate code
-			blockLevel = blockLevel - 1
-		elseif p == "func" then
-			-- User-defined function
-			generateFunction( nodes[3].str, nodes[5].nodes )
-		end			
+		if not generateVarDecl( tree, true ) then
+			if enableComments and p == "comment" then
+				-- Full line comment
+				beginLuaLine( "--" )
+				addLua( nodes[1].str )
+			elseif p == "begin" then          -- {  in boilerplate code
+				blockLevel = blockLevel + 1
+			elseif p == "end" then            -- }  in boilerplate code
+				blockLevel = blockLevel - 1
+			elseif p == "func" then
+				-- User-defined function
+				generateFunction( nodes[3].str, nodes[5].nodes )
+			end
+		end		
 		iTree = iTree + 1
 	end
 
