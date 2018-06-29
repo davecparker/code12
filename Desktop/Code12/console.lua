@@ -187,7 +187,7 @@ end
 -- This call will effectively block until the input is received, although
 -- it will yield to the caller of the runtime coroutine while waiting.
 function console.inputString()
-	-- If we are scrolled back then scroll to the end
+	-- If we are scrolled back, then scroll to the end so the input will be visible
 	if scrollStartLine then
 		scrollStartLine = nil
 		updateConsole()
@@ -206,7 +206,8 @@ function console.inputString()
 
 	-- Make a native text field to do the input
 	assert( textField == nil )
-	textField = native.newTextField( x, y, 200, fontHeight )
+	local width = math.max( bg.width - x - textMargin - Scrollbar.width, fontCharWidth * 3 )
+	textField = native.newTextField( x, y, width, fontHeight )
 	textField.anchorX = 0
 	textField.anchorY = 0
 	textField.font = native.newFont( app.consoleFont )
