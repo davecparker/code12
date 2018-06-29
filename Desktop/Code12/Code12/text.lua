@@ -123,6 +123,8 @@ local function inputLine(message, ...)
 	if message then
 		ct.print(message)
 		ct.print(" ")
+	else
+		ct.print("")  -- force start of new incomplete line if needed
 	end
 
 	-- Input a string and return it

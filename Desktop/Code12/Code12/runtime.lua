@@ -158,6 +158,7 @@ local function coroutineYielded(success, strErr)
 		print("\n*** Runtime Error: " .. strErr)
 		ct.print("\n*** Runtime Error: ")
 		ct.println(strErr)
+		native.showAlert( "Runtime Error", strErr, { "OK" } )
 		coRoutineUser = nil
 		return false
 	end

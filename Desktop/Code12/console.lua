@@ -28,6 +28,8 @@ local textObjs = {}          -- array of text display objects
 local numDisplayLines = 0    -- number of lines we can display
 local fontHeight             -- measured font height
 local fontCharWidth          -- measured font char width
+local textField              -- active native text field or nil if none
+local textFieldText          -- text in the textField, updated when changes
 
 -- Console data
 local completedLines         -- array of strings for completed text lines
@@ -39,14 +41,8 @@ local changed = false        -- true when contents have changed since last updat
 
 --- Internal Functions ---------------------------------------------------------
 
--- Update the console if needed
-local function onNewFrame()
-	-- Do we need to update?
-	if not changed then
-		return
-	end
-	changed = false
-
+-- Update the console
+local function updateConsole()
 	-- Determine number of lines we have to display
 	local numCompletedLines = #completedLines
 	local hasIncompleteLine = (#currentLineStrings > 0)
@@ -89,6 +85,14 @@ local function onNewFrame()
 	end
 end
 
+-- Update the console if needed
+local function onNewFrame()
+	if changed then
+		updateConsole()
+		changed = false
+	end
+end
+
 -- Scroll callback for the console scrollbar
 local function onScroll( newPos )
 	scrollStartLine = newPos
@@ -124,6 +128,15 @@ end
 -- Handle touch events on the console
 local function onTouchConsole()
 	return true
+end
+
+-- Handle user input in the textField for console input
+local function onTextUserInput( event )
+	textFieldText = textField.text
+	if event.phase == "ended" or event.phase == "submitted" then
+		textField:removeSelf()
+		textField = nil
+	end
 end
 
 
@@ -174,6 +187,47 @@ end
 -- This call will effectively block until the input is received, although
 -- it will yield to the caller of the runtime coroutine while waiting.
 function console.inputString()
+	-- If we are scrolled back then scroll to the end
+	if scrollStartLine then
+		scrollStartLine = nil
+		updateConsole()
+	end
+
+	-- Determine where to position the text field
+	local numCompletedLines = #completedLines
+	local hasIncompleteLine = (#currentLineStrings > 0)
+	local numLines = numCompletedLines
+	if hasIncompleteLine then
+		numLines = numLines + 1
+	end
+	local iLine = math.min( numLines, numDisplayLines )
+	local y = textMargin + (iLine - 1) * fontHeight
+	local x = textMargin + currentLineLength * fontCharWidth
+
+	-- Make a native text field to do the input
+	assert( textField == nil )
+	textField = native.newTextField( x, y, 200, fontHeight )
+	textField.anchorX = 0
+	textField.anchorY = 0
+	textField.font = native.newFont( app.consoleFont )
+	textField.size = app.consoleFontSize
+	textField:resizeHeightToFitFont()
+	textField.text = ""
+	console.group:insert( textField )
+	textField:addEventListener( "userInput", onTextUserInput )
+
+	-- It doesn't work to set keyboard focus right away, so delay it a bit
+	timer.performWithDelay( 50, function () native.setKeyboardFocus( textField ) end )
+
+	-- Block and yield until the text input finishes
+	while textField do
+		coroutine.yield()
+	end
+
+	-- Print and return the result
+	ct.println( textFieldText )
+	ct.print( "" )    -- force a new line to start so it looks like the newline happened
+	return textFieldText
 end
 
 -- Resize the console to fit the given size
