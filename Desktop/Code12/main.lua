@@ -2,7 +2,7 @@
 --
 -- main.lua
 --
--- Main program for the Code 12 Desktop app!
+-- Main program for the Code 12 Desktop app
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
