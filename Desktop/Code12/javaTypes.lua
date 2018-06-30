@@ -173,6 +173,16 @@ function javaTypes.canCompareVts( vt1, vt2 )
 	return false
 end
 
+-- Return the default (if unitialized) value for a vt.
+function javaTypes.defaultValueForVt( vt )
+	if type(vt) == "number" then
+		return 0
+	elseif vt == true then
+		return false
+	end
+	return nil
+end
+
 -- Return true if name is the name of a supported class with public static members
 function javaTypes.isClassWithStaticMembers( name )
 	return name == "ct" or name == "Math"

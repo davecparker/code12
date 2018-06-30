@@ -110,7 +110,7 @@ function ct.getVersion(...)
 end
 
 
--------------- String API Support Functions (not public) --------------
+-------------- String API Support Functions (not published) --------------
 
 -- Compare strings s1 and s2 as per Java's s1.compareTo( s2 )
 function ct.stringCompare( s1, s2 )
@@ -143,4 +143,20 @@ function ct.trimString( s )
 end
 
 
+-------------- Array Support Functions (not published) --------------
+
+-- Check the index of the array and generate a runtime error if invalid.
+-- Use errLevel (or default 2) for the Lua stack error level. 
+function ct.checkArrayIndex( array, index, errLevel )
+	if index < 0 or index >= array.length then 
+		error( "Array index [" .. index .. "] is out of bounds", errLevel or 2)
+	end
+end
+
+-- Return the array element at the given index, generating a runtime error
+-- if the index is invalid.
+function ct.indexArray( array, index )
+	ct.checkArrayIndex( array, index, 3 )
+	return array[index + 1] or array.default
+end
 

@@ -23,7 +23,12 @@ function ct.print(value, ...)
 	end
 
 	-- Print the value
-	local text = tostring(value)
+	local text
+	if value == nil then
+		text = "null"
+	else
+		text = tostring(value)
+	end
 	if appContext then
 		appContext.print(text)
 	else
@@ -34,7 +39,7 @@ end
 
 -- API
 -- Note that ct.println() in the API must translate to ct.println("") in Lua,
--- otherwise nil will be printed.
+-- otherwise null will be printed.
 function ct.println(value, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.println") then
@@ -42,7 +47,12 @@ function ct.println(value, ...)
 	end
 
 	-- Print the value and a newline
-	local text = tostring(value)
+	local text
+	if value == nil then
+		text = "null"
+	else
+		text = tostring(value)
+	end
 	if appContext then
 		appContext.println(text)
 	else
@@ -54,7 +64,9 @@ end
 
 -- Print a value as it should appear in ct.log output
 local function logValue(value)
-	if type(value) == "string" then
+	if value == nil then
+		ct.print("null")
+	elseif type(value) == "string" then
 		ct.print("\"")
 		ct.print(value)
 		ct.print("\"")
