@@ -9,7 +9,7 @@ require('Code12.api')
         
     
     
-    function start()
+    function _fn.start()
         
         --This is a comment, it does not effect how the code runs
         --The purpose of a comment is to help people reading the code to understand how it works
@@ -39,15 +39,14 @@ require('Code12.api')
         
         --Creates a cyan line from the point ( 77 , 15 ) to the point ( 87, 15 )
         ct.line(77, 15, 87, 15, "cyan")
-        
         --Creates a purple line from the point
-        ct.line(82, 20, 90, 28, "purple")
+        ct.line(82, 20, 90, 28, "Magenta")
         
         --Creates text at ( 33, 30 ) with a height 10
         ct.text("Hello world!", 33, 30, 10)
         
         --Creates green text at ( 73, 30 ) with a height 10
-        ct.text("Test", 73, 30, 10, "green")
+        ct.text("Test", 73, 30, 10, "Magenta")
         
         --Creates a fish at ( 20, 45 ) with a width of 20
         ct.image("goldfish.png", 20, 45, 20)
@@ -58,15 +57,12 @@ require('Code12.api')
         
         -- Screen Management
         --------------------
-        --Sets the title of the window
-        ct.setTitle("Test 1")
         
         --Sets the background color of the screen
         ct.setBackColor("white")
         
         --Sets the height of the screen (to match the size of the background)
         ct.setHeight(150)
-        
         --Sets the background image
         ct.setBackImage("underwater.jpg")
         --------------------
