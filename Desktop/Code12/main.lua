@@ -586,7 +586,7 @@ local function processUserFile()
 	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
 	-- Do Semantic Analysis on the parse trees
-	if not checkJava.initProgram( parseTrees ) then
+	if not checkJava.initProgram( parseTrees, syntaxLevel ) then
 		showError()
 	else
 		-- Make and run the Lua code
