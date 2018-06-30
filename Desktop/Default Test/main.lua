@@ -4,6 +4,7 @@ require('Code12.api')
     
     -- instance variables
     this.ball = nil; this.bigBall = nil; 
+    this.moreBalls = { length = 10, default = nil }
     -- GameObj tooSoon = ct.circle(50, 50, 50);
     this.count = 0; this.total = 0; 
     this.gameOver = false
@@ -39,6 +40,8 @@ require('Code12.api')
         ct.print("\n")
         ct.print("And another:")
         ct.println("\n")
+        ct.print("Here's an unitialized GameObj: ")
+        ct.println(ct.indexArray(this.moreBalls, 3))
         ct.println("Done")
         local test = ct.inputBoolean("Would you like to print some lines?")
         if test then

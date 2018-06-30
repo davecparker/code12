@@ -128,20 +128,20 @@ end
 -- Return Lua code for a variable idNode with an optional array index indexNode. 
 -- If assigned then the lValue is being assigned to, otherwise it is being read.  
 local function varIndexCode( idNode, indexNode, assigned )
-	local varName = idNode.str
+	local varCode = varNameCode( idNode.str )
 	if indexNode.p == "empty" then
-		return varNameCode( varName )   -- Simple variable
+		return varCode   -- Simple variable
 	end
 
 	-- Array and index: Generate code to check array index at runtime
 	local indexStr = exprCode( indexNode.nodes[2] )
 	if assigned then
 		return table.concat{
-			"ct.checkArrayIndex(", varName, ", ", indexStr, "); ",
-			varName, "[1+(", indexStr, ")]"
+			"ct.checkArrayIndex(", varCode, ", ", indexStr, "); ",
+			varCode, "[1+(", indexStr, ")]"
 		}
 	end
-	return "ct.indexArray(" .. varName .. ", " .. indexStr .. ")"
+	return "ct.indexArray(" .. varCode .. ", " .. indexStr .. ")"
 end
 
 -- Return Lua code for an lValue. 

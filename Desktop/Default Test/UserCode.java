@@ -4,6 +4,7 @@ class UserCode extends Code12Program
 {
 	// instance variables
 	GameObj ball, bigBall;
+	GameObj[] moreBalls = new GameObj[10];
 	// GameObj tooSoon = ct.circle(50, 50, 50);
 	int count, total;
 	boolean gameOver = false;
@@ -39,6 +40,8 @@ class UserCode extends Code12Program
 		ct.print("\n");
 		ct.print("And another:");
 		ct.println("\n");
+		ct.print("Here's an unitialized GameObj: "); 
+		ct.println(moreBalls[3]);
 		ct.println("Done");
 		boolean test = ct.inputBoolean("Would you like to print some lines?");
 		if (test)
