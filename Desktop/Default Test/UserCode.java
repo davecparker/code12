@@ -36,10 +36,14 @@ class UserCode extends Code12Program
 		ct.print("And another:");
 		ct.println("\n");
 		ct.println("Done");
-		count = ct.inputInt("Enter count:");
-		for (int i = 1; i <= count; i++)
+		boolean test = ct.inputBoolean("Would you like to print some lines?");
+		if (test)
 		{
-			ct.println("Line " + i);
+			count = ct.inputInt("Enter count:");
+			for (int i = 1; i <= count; i++)
+			{
+				ct.println("Line " + i);
+			}
 		}
 
 		// Draw some circles
