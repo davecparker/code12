@@ -131,36 +131,6 @@ local function expr()
 	return parseOpExpr( leftSide, 0 )  -- include binary operators
 end
 
--- Parse a function value (an expression that can be called as a function).
--- This is either just an ID, or ID.ID, and if the object ID is "ct" then
--- the "ct." is added to the front of the method name to make a single name.
--- This is done for both performance and more intuitive error reporting.
--- Return an ID token for a simple name (or ct.name), a method pattern node
--- for other object.method names, or nil if failure.
-local function fnValue()
-	local token = tokens[iToken]
-	if token.tt ~= "ID" then
-		return nil    -- not an ID
-	end
-	iToken = iToken + 1
-	if tokens[iToken].tt ~= "." then
-		return token   -- simple name token
-	end
-	iToken = iToken + 1
-	local token2 = tokens[iToken]
-	if token2.tt ~= "ID" then
-		return nil   -- expected ID after .
-	end
-	iToken = iToken + 1	
-	if token.str == "ct" then
-		token2.str = "ct." .. token2.str
-		token2.iChar = token.iChar
-		return token2   -- ct.name token
-	end
-	-- Return a method pattern node
-	return makeParseTreeNode( "fnValue", "method", { token, token2 } )
-end
-
 
 ----- Grammar Tables ---------------------------------------------------------
 
@@ -179,6 +149,17 @@ local field = { t = "field",
 -- An lValue (var or expr that can be assigned to)
 local lValue = { t = "lValue",
 	{ 3, 12, "lValue",			"ID", index, field		},
+}
+
+-- A method reference or empty
+local method = { t = "method",
+	{ 1, 12, "method",			".", "ID"				},
+	{ 1, 12, "empty",									},
+}
+
+-- A function value
+local fnValue = { t = "fnValue",
+	{ 1, 12, "fnValue",			"ID", index, method,	},
 }
 
 -- A return type for a procedure/function definition
@@ -285,8 +266,8 @@ local forControl = { t = "forControl",
 
 -- An array initializer
 local arrayInit = { t = "arrayInit",
-	{ 12, 12, "new", 			"new", "ID", "[", expr, "]"					},
 	{ 12, 12, "list", 			"{", exprList, "}"							},
+	{ 12, 12, "expr", 			expr										},
 }
 
 -- A line of code
@@ -297,7 +278,7 @@ local line = { t = "line",
 	{ 3, 12, "varInit",			"ID", "ID", "=", expr, ";",						"END" },
 	{ 3, 12, "varDecl",			"ID", idList, ";",								"END" },
 	{ 3, 12, "constInit", 		"final", "ID", "ID", "=", expr, ";",			"END" },
-	{ 1, 12, "func",			access, retType, fnValue, "(", paramList, ")",	"END" },
+	{ 1, 12, "func",			access, retType, "ID", "(", paramList, ")",	"END" },
 	{ 1, 12, "begin",			"{",											"END" },
 	{ 1, 12, "end",				"}",											"END" },
 	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },

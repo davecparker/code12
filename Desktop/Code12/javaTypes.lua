@@ -57,6 +57,9 @@ local substituteType = {
 	["float"]  = "double",
 	["long"]  = "int",
 	["short"]  = "int",
+	["Integer"] = "int",
+	["Double"] = "double",
+	["Boolean"] = "boolean",
 }
 
 
@@ -66,7 +69,8 @@ local substituteType = {
 -- or return nil and set the error state if the type is invalid.
 function javaTypes.vtFromVarType( node )
 	assert( node.tt == "ID" )     -- varType nodes should be IDs
-	local vt = mapTypeNameToVt[node.str]
+	local typeName = node.str
+	local vt = mapTypeNameToVt[typeName]
 	if vt then
 		return vt  -- known valid type
 	end
@@ -77,12 +81,21 @@ function javaTypes.vtFromVarType( node )
 		err.setErrNode( node, "Variables cannot have void type" )
 	else
 		-- Unknown or unsupported type
-		local subType = substituteType[node.str]
+		local subType = substituteType[typeName]
 		if subType then
 			err.setErrNode( node, "The %s type is not supported by Code12. Use %s instead.",
-					node.str, subType )
+					typeName, subType )
 		else
-			err.setErrNode( node, "Unknown variable type \"%s\"", node.str )
+			-- Unknown type. See if the case is wrong.
+			local typeNameLower = string.lower( typeName )
+			for name, vt in pairs( mapTypeNameToVt ) do
+				if string.lower( name ) == typeNameLower then
+					err.setErrNode( node, 
+						"Names are case-sensitive, known name is \"%s\"", name )
+					return nil
+				end
+			end
+			err.setErrNode( node, "Unknown variable type \"%s\"", typeName )
 		end
 	end
 	return nil
@@ -160,10 +173,9 @@ function javaTypes.canCompareVts( vt1, vt2 )
 	return false
 end
 
--- Return true if name is the name of a class with public static fields
-function javaTypes.isClassWithStaticFields( name )
-	-- The only static fields supported are Math.PI and Math.E
-	return name == "Math"
+-- Return true if name is the name of a supported class with public static members
+function javaTypes.isClassWithStaticMembers( name )
+	return name == "ct" or name == "Math"
 end
 
 
