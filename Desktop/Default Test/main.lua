@@ -36,11 +36,15 @@ require('Code12.api')
         ct.print("And another:")
         ct.println("\n")
         ct.println("Done")
-        this.count = ct.inputInt("Enter count:")
-        local i = 1; while i <= this.count do
+        local test = ct.inputBoolean("Would you like to print some lines?")
+        if test then
             
-            ct.println("Line " .. i)
-        i = i + 1; end
+            this.count = ct.inputInt("Enter count:")
+            local i = 1; while i <= this.count do
+                
+                ct.println("Line " .. i)
+            i = i + 1; end
+        end
         
         -- Draw some circles
         this.ball = ct.circle(x + 6, 15, 5)

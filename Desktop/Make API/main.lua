@@ -84,9 +84,9 @@ end
 
 -- Make the Lua output file from the parseTrees. Return true if successful.
 local function buildTables()
-	-- Init the table state for the beginning of the ct methods
-	classes = { { name = "ct", fields = {}, methods = {} } }
-	local class = classes[1]
+	-- Init the table state for the classes
+	classes = {}
+	local class = nil
 
 	-- Process all the Code12 main functions
 	for i = 1, #parseTrees do
@@ -158,9 +158,11 @@ local function fixOverloads()
 			local method = class.methods[i]
 
 			-- The special functions ct.log and ct.logm are variadic.
-			if method.name == "ct.log" or method.name == "ct.logm" then 
-				print( string.format( "%s is variadic", method.name ) )
-				method.variadic = true
+			if class.name == "ct" then
+				if method.name == "log" or method.name == "logm" then 
+					print( string.format( "ct.%s is variadic", method.name ) )
+					method.variadic = true
+				end
 			end
 
 			-- Does this method have the same name as the previous one?
@@ -212,7 +214,12 @@ local function makeLuaFile()
 	for iClass = 1, #classes do
 		local class = classes[iClass]
 
-		outFile:write( "\n[\"" .. class.name .. "\"] = {\n" )
+		-- Write class header also lowercase version if different
+		local classNameLower = string.lower( class.name )
+		if classNameLower ~= class.name then
+			outFile:write( "\n[\"" .. classNameLower .. "\"] = \"" .. class.name .. "\",\n" )
+		end
+		outFile:write( "\n[\"" .. class.name .. "\"] = {\n    name = \"" .. class.name .. "\",\n" )
 
 		-- Write the fields
 		outFile:write( "    fields = {\n")
