@@ -30,7 +30,7 @@ local function loadSound( filename )
 		path = filename
 		baseDir = system.ResourceDirectory
 	end
-	return audio.loadSound(path)
+	return audio.loadSound(path, baseDir)
 end
 
 

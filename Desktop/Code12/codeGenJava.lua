@@ -147,9 +147,19 @@ function lValueCode( lValue )
 	return code
 end
 
+-- Return code for an idNode with an optional indexNode
+local function varIndexCode( idNode, indexNode )
+	local str = varNameCode( idNode.str )
+	if indexNode.p == "empty" then
+		return str
+	end
+	return str .. "[1+(" .. exprCode( indexNode.nodes[2] ) .. ")]"
+end
+
 -- Return Lua code for a function or method call, e.g:
 --     ct.circle( x, y, d )
 --     bird.setFillColor( "red" )
+--     stars[i].delete()
 --	   foo()
 function fnCallCode( tree )
 	local nodes = tree.nodes
@@ -157,53 +167,55 @@ function fnCallCode( tree )
 
 	-- Function name/value
 	local fnValue = nodes[1]
+	local idNode = fnValue.nodes[1]
+	local indexNode = fnValue.nodes[2]
+	local methodNode = fnValue.nodes[3]
 	local exprs = nodes[3].nodes
-	if fnValue.p == "method" then
-		-- Method call
-		local objNode = fnValue.nodes[1]
-		assert( objNode.tt == "ID" )   -- TODO: arrays
-		local objName = objNode.str
-		local methodNode = fnValue.nodes[2]
-		assert( methodNode.tt == "ID" )
-		local methodName = methodNode.str
 
-		if objName == "Math" then 
-			-- Lua math.xxx is the same as Java Math.xxx for all supported methods :)
-			parts = { "math.", methodName, "(" }
-		elseif checkJava.vtVar( objNode ) == "String" then
-			-- Supported String class methods
-			if methodName == "equals" then
-				-- Lua does string value comparison directly with ==
-				return "(" .. varNameCode( objName ) .. " == " .. exprCode( exprs[1] ) .. ")"
-			else
-				-- Map to corresponding global Lua function, passing the object.  
-				parts = { luaFnFromJavaStringMethod[methodName], "(", varNameCode( objName ) }
-				if #exprs > 0 then
-					parts[4] = ", "
-				end
-			end
-		else
-			-- GameObj method, e.g. obj:delete(
-			parts = { varNameCode( objName ), ":", methodName, "(" }
-		end
+	if methodNode.p == "empty"  then
+		-- User-defined function call
+		parts = { fnPrefix, idNode.str, "(" }   -- e.g. _fn.updateScore(
 	else
-		-- Function call
-		local fnName = fnValue.str
-		if string.starts( fnName, ctPrefix ) then
+		-- Method call
+		local objName = idNode.str
+		local methodName = methodNode.nodes[2].str
+
+		if objName == "ct" then
 			-- ct API call
 			if not ctDefined then
 				err.setErrNode( fnValue, "Code12 API functions cannot be called before start()" )
 				return nil
 			end
 			-- Check special case: ct.println() with no params needs to generate ct.println("")
-			if fnName == "ct.println" and #exprs == 0 then
+			if methodName == "println" and #exprs == 0 then
 				return "ct.println( \"\" )"
 			end
-			-- Start the call with the function name
-			parts = { fnName, "(" }            -- e.g. ct.circle(
+			parts = { ctPrefix, methodName, "(" }         -- e.g. ct.circle(
+		elseif objName == "Math" then 
+			-- Lua math.xxx is the same as Java Math.xxx for all supported methods :)
+			parts = { "math.", methodName, "(" }
 		else
-			-- User-defined function call
-			parts = { fnPrefix, fnName, "(" }   -- e.g. _fn.updateScore(
+			-- Check the object type
+			local vt = checkJava.vtVar( idNode )
+			if type(vt) == "table" and indexNode.p == "index" then
+				vt = vt.vt
+			end
+			if vt == "String" then
+				-- Supported String class methods
+				if methodName == "equals" then
+					-- Lua does string value comparison directly with ==
+					return "(" .. varIndexCode( idNode, indexNode ) .. " == " .. exprCode( exprs[1] ) .. ")"
+				else
+					-- Map to corresponding global Lua function, passing the object.  
+					parts = { luaFnFromJavaStringMethod[methodName], "(", varIndexCode( idNode, indexNode ) }
+					if #exprs > 0 then
+						parts[4] = ", "
+					end
+				end
+			else
+				-- GameObj method, e.g. obj:delete(
+				parts = { varIndexCode( idNode, indexNode ), ":", methodName, "(" }
+			end
 		end
 	end
 
@@ -237,7 +249,7 @@ function exprCode( expr )
 	elseif p == "exprParens" then
 		return "(" .. exprCode( nodes[2] ) .. ")"
 	elseif p == "newArray" then
-		local vt = javaTypes.vtFromVarType( nodes[2] )
+		javaTypes.vtFromVarType( nodes[2] )   -- check for valid type
 		return "{ length = " .. exprCode( nodes[4] ) .. " }"
 	end
 
@@ -333,28 +345,13 @@ local function generateVarDecl( tree, isInstanceVar )
 		addLua( varName )
 		addLua( " = " )
 		local arrayInit = nodes[6]
-		local length = nil
-		if arrayInit.p == "new" then
-			-- type [ ] id = new type [ expr ] ;
-			local vtNew = javaTypes.vtFromVarType( arrayInit.nodes[2] )
-			if vtNew ~= vt then
-				err.setErrNodeAndRef( arrayInit.nodes[2], nodes[1],
-						"New array type does not match variable type" )
-			end
-			local countExpr = arrayInit.nodes[4]
-			if countExpr.info.vt ~= 0 then
-				err.setErrNode( countExpr, "Array count must be an integer" )
-			end
-			addLua( "{ length = " )
-			addLua( exprCode( countExpr ) )
-			addLua( " }" )
-		else
+		if arrayInit.p == "list" then
 			-- type [ ] id = { exprList } ;
 			addLua( "{ " )
 			local exprs = arrayInit.nodes[2].nodes
 			for i = 1, #exprs do
 				local expr = exprs[i]
-				if expr.info.vt ~= vt then
+				if not javaTypes.vtCanAcceptVtExpr( vt, expr.info.vt ) then
 					err.setErrNodeAndRef( expr, nodes[1], 
 							"Array element type does not match the array type" )
 				end
@@ -364,6 +361,16 @@ local function generateVarDecl( tree, isInstanceVar )
 			addLua( "length = " )
 			addLua( #exprs )
 			addLua( " }" )
+		else
+			-- type [ ] id = expr
+			local expr = arrayInit.nodes[1]
+			local vtExpr = expr.info.vt
+			if type(vtExpr) ~= "table" or vtExpr.vt ~= vt then
+				err.setErrNode( expr, "Cannot initialize array of %s with type %s",
+						javaTypes.typeNameFromVt( vt ),
+						javaTypes.typeNameFromVt( vtExpr ) )
+			end
+			addLua( exprCode( expr ) )
 		end
 		return true
 	elseif p == "arrayDecl" then
@@ -560,12 +567,14 @@ local function generateBlockLine( tree )
 		generateStmt( nodes[1] )
 	elseif p == "blank" then
 		-- blank
+		return
 	elseif enableComments and p == "comment" then
 		-- Full line comment
 		beginLuaLine( "--" )
 		addLua( nodes[1].str )
 	elseif generateVarDecl( tree, false ) then
 		-- Processed a local varInit, constInit, or varDecl
+		return
 	elseif p == "if" then
 		-- if (expr)
 		local expr = nodes[3]
@@ -623,8 +632,7 @@ local function generateBlockLine( tree )
 	elseif p == "return" then
 		-- return expr ;
 		local expr = nodes[2]
-		local vt = expr.info.vt
-		-- TDOO: Check correct return type
+		-- TDOO: Check correct return type (expr.info.vt must match function signature)
 		beginLuaLine( "return " )
 		addLua( exprCode( expr ) )
 	else
@@ -748,20 +756,20 @@ function codeGenJava.getLuaCode( parseTrees )
 		local p = tree.p
 		local nodes = tree.nodes
 
-		if generateVarDecl( tree, true ) then
-			-- Processed a varInit, constInit, varDecl, or arrayInit
-		elseif enableComments and p == "comment" then
-			-- Full line comment
-			beginLuaLine( "--" )
-			addLua( nodes[1].str )
-		elseif p == "begin" then          -- {  in boilerplate code
-			blockLevel = blockLevel + 1
-		elseif p == "end" then            -- }  in boilerplate code
-			blockLevel = blockLevel - 1
-		elseif p == "func" then
-			-- User-defined function
-			generateFunction( nodes[3].str, nodes[5].nodes )
-		end			
+		if not generateVarDecl( tree, true ) then
+			if enableComments and p == "comment" then
+				-- Full line comment
+				beginLuaLine( "--" )
+				addLua( nodes[1].str )
+			elseif p == "begin" then          -- {  in boilerplate code
+				blockLevel = blockLevel + 1
+			elseif p == "end" then            -- }  in boilerplate code
+				blockLevel = blockLevel - 1
+			elseif p == "func" then
+				-- User-defined function
+				generateFunction( nodes[3].str, nodes[5].nodes )
+			end
+		end		
 		iTree = iTree + 1
 	end
 

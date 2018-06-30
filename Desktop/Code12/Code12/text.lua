@@ -123,6 +123,8 @@ local function inputLine(message, ...)
 	if message then
 		ct.print(message)
 		ct.print(" ")
+	else
+		ct.print("")  -- force start of new incomplete line if needed
 	end
 
 	-- Input a string and return it
@@ -160,7 +162,7 @@ function ct.inputBoolean(message, ...)
 	g.checkAPIParams("ct.inputBoolean", 1)
 
 	-- Input a string and check the first non-black char to determine value
-	local s = ct.inputLine(message)
+	local s = inputLine(message, ...)
 	for i = 1, string.len(s) do    -- look for first non-whitespace char
 		local ch = string.lower(string.sub(s, i, i))
 		if ch == "y" or ch == "t" or ch == "1" then    -- yes, true, 1, etc.
