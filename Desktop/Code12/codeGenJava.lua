@@ -125,15 +125,32 @@ local function varNameCode( varName )
 	return varName
 end
 
--- Return Lua code for an lValue node
-function lValueCode( lValue )
-	local nodes = lValue.nodes
-	local varName = nodes[1].str
-	local code = varNameCode( varName ) 
-	if nodes[2].p == "index" then
-		code = code .. "[1+(" .. exprCode( nodes[2].nodes[2] ) .. ")]"
+-- Return Lua code for a variable idNode with an optional array index indexNode. 
+-- If assigned then the lValue is being assigned to, otherwise it is being read.  
+local function varIndexCode( idNode, indexNode, assigned )
+	local varName = idNode.str
+	if indexNode.p == "empty" then
+		return varNameCode( varName )   -- Simple variable
 	end
+
+	-- Array and index: Generate code to check array index at runtime
+	local indexStr = exprCode( indexNode.nodes[2] )
+	if assigned then
+		return table.concat{
+			"ct.checkArrayIndex(", varName, ", ", indexStr, "); ",
+			varName, "[1+(", indexStr, ")]"
+		}
+	end
+	return "ct.indexArray(" .. varName .. ", " .. indexStr .. ")"
+end
+
+-- Return Lua code for an lValue. 
+-- If assigned then the lValue is being assigned to, otherwise it is being read. 
+function lValueCode( lValue, assigned )
+	local nodes = lValue.nodes
+	local code = varIndexCode( nodes[1], nodes[2], assigned )
 	if nodes[3].p == "field" then
+		local varName = nodes[1].str
 		local fieldName = nodes[3].nodes[2].str
 		if varName == "Math" then
 			if fieldName == "PI" then
@@ -145,15 +162,6 @@ function lValueCode( lValue )
 		code = code .. "." .. fieldName
 	end
 	return code
-end
-
--- Return code for an idNode with an optional indexNode
-local function varIndexCode( idNode, indexNode )
-	local str = varNameCode( idNode.str )
-	if indexNode.p == "empty" then
-		return str
-	end
-	return str .. "[1+(" .. exprCode( indexNode.nodes[2] ) .. ")]"
 end
 
 -- Return Lua code for a function or method call, e.g:
@@ -249,8 +257,9 @@ function exprCode( expr )
 	elseif p == "exprParens" then
 		return "(" .. exprCode( nodes[2] ) .. ")"
 	elseif p == "newArray" then
-		javaTypes.vtFromVarType( nodes[2] )   -- check for valid type
-		return "{ length = " .. exprCode( nodes[4] ) .. " }"
+		local vt = javaTypes.vtFromVarType( nodes[2] )
+		return "{ length = " .. exprCode( nodes[4] ) .. ", default = "
+				  .. tostring( javaTypes.defaultValueForVt( vt ) ) .. " }"
 	end
 
 	-- Is this a Binary operator?
@@ -360,6 +369,8 @@ local function generateVarDecl( tree, isInstanceVar )
 			end
 			addLua( "length = " )
 			addLua( #exprs )
+			addLua( ", default = " )
+			addLua( tostring( javaTypes.defaultValueForVt( vt ) ) )
 			addLua( " }" )
 		else
 			-- type [ ] id = expr
@@ -406,10 +417,9 @@ local function generateIncOrDecStmt( lValue, opToken )
 		err.setErrNodeAndRef( opToken, lValue, "Can only apply \"%s\" to numeric types", tt )
 		return
 	end
-	local lValueStr = lValueCode( lValue )
-	addLua( lValueStr )
+	addLua( lValueCode( lValue, true ) )
 	addLua( " = " )
-	addLua( lValueStr )
+	addLua( lValueCode( lValue ) )
 	if tt == "++" then
 		addLua( " + 1" )
 	else
@@ -442,7 +452,7 @@ local function generateStmt( tree )
 		local lValue = nodes[1]
 		local expr = nodes[3]
 		if checkJava.canAssignToLValue( lValue, expr ) then
-			addLua( lValueCode( lValue ) )
+			addLua( lValueCode( lValue, true ) )
 			addLua( " = " )
 			addLua( exprCode( expr ) )
 		end
@@ -452,10 +462,9 @@ local function generateStmt( tree )
 		local op = nodes[2]
 		local expr = nodes[3]
 		if checkJava.canOpAssignToLValue( lValue, op, expr ) then
-			local lValueStr = lValueCode( lValue )
-			addLua( lValueStr )
+			addLua( lValueCode( lValue, true ) )
 			addLua( " = " )
-			addLua( lValueStr )
+			addLua( lValueCode( lValue ) )
 			addLua( luaOpFromJavaOp[op.p] )
 			addLua( "(" )
 			addLua( exprCode( expr ) )

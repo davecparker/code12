@@ -22,6 +22,10 @@ class UserCode extends Code12Program
 		String name = "Dave" + " " + "Parker";
 		boolean done;
 
+		int[] nums = new int[10];
+		// nums[10] = 4;
+		// ct.println( nums[10] );
+
 		// Try some console output
 		ct.println("This is the default Code12 test app");
 		ct.println("This is console output");
@@ -155,6 +159,8 @@ class UserCode extends Code12Program
 		while (speed < 2) ;
 
 		double[] scores = new double[10];
+		boolean[] questions = new boolean[20];
+		String[] strings = new String[5];
 
 		int[] counts = { 2, 4, 5 + 6, 3 };
 		int c = counts[0];

@@ -437,7 +437,10 @@ local function showError()
 	local dxExtra = 2   -- extra pixels of highlight horizontally
 	local r = errGroup.sourceRect
 	r.x = (errRecord.loc.first.iChar - 1) * dxChar - dxExtra
-	local numChars = errRecord.loc.last.iChar - errRecord.loc.first.iChar + 1 
+	local numChars = string.len( sourceFile.strLines[errRecord.loc.first.iLine] or "" )
+	if errRecord.loc.last then
+		numChars = errRecord.loc.last.iChar - errRecord.loc.first.iChar + 1 
+	end
 	r.width = numChars * dxChar + dxExtra * 2
 
 	-- Position the ref highlight if it's showing  TODO: two line groups if necc
@@ -453,6 +456,12 @@ local function showError()
 			r.isVisible = true
 		end
 	end
+end
+
+-- Show a runtime error with the given line number and message
+local function showRuntimeError( lineNum, message )
+	err.setErrLineNum( lineNum, "Runtime error: " .. message )
+	showError();
 end
 
 -- Handle resize event for the window
@@ -695,6 +704,7 @@ local function initApp()
 	appContext.print = console.print
 	appContext.println = console.println
 	appContext.inputString = console.inputString
+	appContext.runtimeErr = showRuntimeError
 
 	-- Load the Code12 API and runtime.
 	-- This defines the Code12 APIs in the global ct table

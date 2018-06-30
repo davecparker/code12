@@ -112,6 +112,12 @@ local function invalidCharToken()
 	return nil
 end
 
+-- Set the error state for invalid use of ? or :, and return nil.
+local function invalidTernaryToken()
+	setTokenErr( iChar, iChar, "Invalid character (The \"? :\" operator is not supported by Code12)")
+	return nil
+end
+
 -- Return string for token starting with =  (=  ==)
 local function equalsToken()
 	iChar = iChar + 1
@@ -514,8 +520,8 @@ local function initCharTypes()
 	charTypes[91] = "["
 	charTypes[93] = "]"
 	charTypes[126] = "~"
-	charTypes[63] = "?"
 	charTypes[58] = ":"
+	charTypes[63] = invalidTernaryToken   -- (?)  ?: is not supported
 
 	-- Chars that may lead to multi-char tokens use scanning functions
 	charTypes[61] = equalsToken

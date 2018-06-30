@@ -27,7 +27,8 @@ local g = require("Code12.globals")
 --             print = function,         -- called by runtime for console output
 --             println = function,       -- called by runtime for console output
 --             inputString = function,   -- called by runtime for console input
-
+--             runtimeErr = function,    -- called by runtime on runtime error
+--
 --             -- These field are added by the runtime for use by the app
 --             initRun = fnInitRun,      -- init and start a new run
 --             stopRun = fnStopRun,      -- stop a run
@@ -182,12 +183,19 @@ local function coroutineYielded(success, strErr)
 		end
 		return true
 	else
-		-- TODO: Handle runtime error better
-		print("\n*** Runtime Error: " .. strErr)
-		ct.print("\n*** Runtime Error: ")
-		ct.println(strErr)
-		native.showAlert( "Runtime Error", strErr, { "OK" } )
+		-- Runtime error
 		stopRun()
+		print("\n*** Runtime Error: " .. strErr)
+		local strLineNum, strMessage = string.match( strErr, "[^:]+:(%d+):(.*)" )
+		if strLineNum then 
+			local lineNum = tonumber( strLineNum ) 
+			if lineNum and appContext.runtimeErr then
+				appContext.runtimeErr( lineNum, strMessage )
+				return
+			end
+			strErr = "Line " .. strLineNum .. ": " .. strMessage
+		end
+		native.showAlert( "Runtime Error", strErr, { "OK" } )
 		return false
 	end
 end
