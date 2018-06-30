@@ -65,13 +65,12 @@ function Scrollbar:setPos( pos )
 	end
 end
 
--- Handle touch events on the shuttle given phase and x, y within the scrollbar
-function Scrollbar:touchShuttle( phase, x, y )
-	local yTop = self.shuttleTop.y
+-- Handle touch events on the shuttle given phase and y within the scrollbar
+function Scrollbar:touchShuttle( phase, y )
 	if phase == "began" then
 		display.getCurrentStage():setFocus( self.shuttleTop )
 		self.dragging = true
-		self.yDragOffset = y - yTop
+		self.yDragOffset = y - self.shuttleTop.y
 	else
 		if phase ~= "cancelled" and self.dragging then
 			-- Compute new shuttle top
@@ -99,7 +98,7 @@ function Scrollbar:touchShuttle( phase, x, y )
 end
 
 -- Handle touch events on the shuttle given phase and x, y within the scrollbar
-function Scrollbar:touchTrack( phase, x, y )
+function Scrollbar:touchTrack( phase, y )
 	-- Touch on track. Go up or down down one "page" on a click
 	if phase == "began" then
 		local pageSize = math.round( self.ratio * (self.rangeMax - self.rangeMin) )
@@ -116,12 +115,12 @@ end
 -- Handle touch events on a scrollbar
 function Scrollbar:touch( event )
 	-- Which part got touched?
-	local x, y = self.group:contentToLocal( event.x, event.y )
+	local _, y = self.group:contentToLocal( event.x, event.y )
 	local yTop = self.shuttleTop.y
 	if self.dragging or (y >= yTop and y <= self.shuttleBottom.y + diameter) then
-		return self:touchShuttle( event.phase, x, y )
+		return self:touchShuttle( event.phase, y )
 	end
-	return self:touchTrack( event.phase, x, y )
+	return self:touchTrack( event.phase, y )
 end
 
 

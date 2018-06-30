@@ -9,7 +9,8 @@ public class MainProgram extends Code12Program
    
    public void start()
    {
-      ct.rect(50, 50, 75, 25);  
+      GameObj r = ct.rect(50, 50, 75, 25);  
+      ct.logm("I created", r);
    }
    
    public void update()

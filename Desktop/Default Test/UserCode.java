@@ -23,10 +23,6 @@ class UserCode extends Code12Program
 		boolean done;
 
 		// Try some console output
-		for (int i = 1; i <= 10; i++)
-		{
-			ct.println("Line " + i);
-		}
 		ct.println("This is the default Code12 test app");
 		ct.println("This is console output");
 		ct.print("Beginning of line");
@@ -40,6 +36,11 @@ class UserCode extends Code12Program
 		ct.print("And another:");
 		ct.println("\n");
 		ct.println("Done");
+		count = ct.inputInt("Enter count:");
+		for (int i = 1; i <= count; i++)
+		{
+			ct.println("Line " + i);
+		}
 
 		// Draw some circles
 		ball = ct.circle(x + 6, 15, 5);
@@ -72,9 +73,9 @@ class UserCode extends Code12Program
 		String name;
 		boolean tooFast, tooSlow;
 
-		frameCount++;
-		if (frameCount < 100)
-			ct.println(ct.getTimer());
+		// frameCount++;
+		// if (frameCount < 100)
+		// 	ct.println(ct.getTimer());
 
 		// Move ball
 		int xNew = moveBall( true );
@@ -178,6 +179,16 @@ class UserCode extends Code12Program
 		as = new GameObj[10];
 		double myX = as[4].x;
 		as[sum - 1].y = myX;
+		as = makeCircles();
+
+		// int [] ai = { 1, 2, 3.3 };
+		double[] ad = { 1.1, 2.2, 0 };
+	}
+
+	GameObj[] makeCircles()
+	{
+		GameObj[] circles = new GameObj[10];
+		return circles;
 	}
 
 	public void onKeyPress( String key )

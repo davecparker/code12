@@ -206,7 +206,7 @@ function ct.setBackColor(colorName, ...)
 
 	-- Make a rect big enough to cover the screen without needing to scale it
 	backObj = GameObj:newRect(g.screen.group, 0, 0, 100000, 100000, colorName)
-	backObj.updateBackObj = function (gameObj, scale) end
+	backObj.updateBackObj = function () end
 
 	-- Put the rect behind the objs layer in the screen group
 	backObj._code12.obj:toBack()
@@ -260,7 +260,7 @@ function ct.setBackImage(filename, ...)
 				obj.y = (g.height / 2) * scale
 
 				-- Use as much of the image as possible while filling 
-            	-- the window and retaining the image aspect ratio.
+				-- the window and retaining the image aspect ratio.
 				local aspect = obj.width / obj.height
 				if aspect > (g.WIDTH / g.height) then
 					obj.width = g.height * aspect * scale

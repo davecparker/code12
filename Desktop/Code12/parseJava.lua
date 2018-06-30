@@ -490,7 +490,7 @@ local function parseCurrentLine( level )
 		parseTree = parseLineGrammar( tryLevel )
 		if parseTree then
 			-- Reparse at the requested level to restore the error state
-			parseTree = parseLineGrammar( level )
+			parseLineGrammar( level )
 			-- Add level info to the error state
 			local str = string.format( "(Use of %s requires syntax level %d)",
 								syntaxFeatures[tryLevel], tryLevel )
@@ -532,13 +532,13 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		-- There should be at least one real token and an END in startTokens
 		assert( #startTokens > 1 )
 		assert( startTokens[#startTokens].tt == "END" )
-		local iToken = #startTokens   -- overwrite the END
+		local j = #startTokens   -- overwrite the END
 		for i = 1, #tokens do
-			startTokens[iToken] = tokens[i]
-			iToken = iToken + 1
+			startTokens[j] = tokens[i]
+			j = j + 1
 		end
 		tokens = startTokens
-		startTokens = nil
+		-- startTokens = nil
 	end
 
 	-- Discard comment tokens, except if the entire line is a comment
@@ -600,7 +600,7 @@ function parseJava.printParseTree( node, indentLevel, file )
 
 		-- Recursively print children at next indent level, if any
 		if node.nodes then
-			for i, child in ipairs(node.nodes) do
+			for _, child in ipairs(node.nodes) do
 				parseJava.printParseTree( child, indentLevel + 1, file )
 			end
 		end

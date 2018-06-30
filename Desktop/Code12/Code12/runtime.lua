@@ -55,9 +55,9 @@ local coRoutineUser = nil    -- coroutine running an event or nil if none
 ---------------- Runtime Functions ------------------------------------------
 
 -- The enterFrame listener for each frame update after the first
-local function onNewFrame(event)
+local function onNewFrame()
 	-- Call the client's update function if any
-	if g.eventFunctionYielded(_fn.update) then
+	if g.eventFunctionYielded(_fn.update) or g.stopped then
 		return
 	end
 
@@ -92,9 +92,9 @@ local function onNewFrame(event)
 end
 
 -- The enterFrame listener for the first update only
-local function onFirstFrame(event)
+local function onFirstFrame()
 	-- Call client's start method if any
-	if g.eventFunctionYielded(_fn.start) then
+	if g.eventFunctionYielded(_fn.start) or g.stopped then
 		return
 	end
 
@@ -143,6 +143,34 @@ local function onResize()
 	g.eventFunctionYielded(_fn.onResize)
 end
 
+-- Stop a run
+local function stopRun()
+	-- Remove the event listeners (only some may be installed)
+	Runtime:removeEventListener("enterFrame", onFirstFrame)
+	Runtime:removeEventListener("enterFrame", onNewFrame)
+	Runtime:removeEventListener("touch", g.onTouchRuntime)
+	Runtime:removeEventListener("key", g.onKey)
+	Runtime:removeEventListener("resize", onResize)
+
+	-- Destroy the main display group, screens, and display objects
+	if g.mainGroup then
+		g.mainGroup:removeSelf()  -- deletes contained screen and object groups
+		g.mainGroup = nil
+	end
+	g.screens = {}
+	g.screen = nil
+
+	-- Clear misc global game state and mark run as stopped
+	g.startTime = nil
+	g.clicked = false
+	g.gameObjClicked = nil
+	g.clickX = 0
+	g.clickY = 0
+	g.charTyped = nil
+	g.stopped = true
+	coRoutineUser = nil
+end	
+
 -- Handle the result of the two return values from a coroutine.resume call,
 -- and check the status of the coroutine to adjust the running state,
 -- and return true if the coroutine yielded or false if it completed.
@@ -154,10 +182,12 @@ local function coroutineYielded(success, strErr)
 		end
 		return true
 	else
-		-- TODO: Handle runtime error
-		print("*** Runtime Error: " .. strErr)
-		ct.print("*** Runtime Error: ")
+		-- TODO: Handle runtime error better
+		print("\n*** Runtime Error: " .. strErr)
+		ct.print("\n*** Runtime Error: ")
 		ct.println(strErr)
+		native.showAlert( "Runtime Error", strErr, { "OK" } )
+		stopRun()
 		return false
 	end
 end
@@ -165,7 +195,7 @@ end
 -- If a user event function coroutine is already running then give it another 
 -- time slice and return true if it yielded again or false it if completed. 
 -- If no coroutine is already running, then start a coroutine to run the
--- given function (it not nil), passing the additional parameters passed, 
+-- given function (if not nil), passing the additional parameters given, 
 -- and return true if the coroutine yielded or false if it completed.
 function g.eventFunctionYielded( func, ... )
 	-- Is a coroutine already running?
@@ -185,32 +215,6 @@ function g.eventFunctionYielded( func, ... )
 	end
 	return false
 end
-
--- Stop a run
-local function stopRun()
-	-- Remove the event listeners (only some may be installed)
-	Runtime:removeEventListener("enterFrame", onFirstFrame)
-	Runtime:removeEventListener("enterFrame", onNewFrame)
-	Runtime:removeEventListener("touch", g.onTouchRuntime)
-	Runtime:removeEventListener("key", g.onKey)
-	Runtime:removeEventListener("resize", onResize)
-
-	-- Destroy the main display group, screens, and display objects
-	if g.mainGroup then
-		g.mainGroup:removeSelf()  -- deletes contained screen and object groups
-		g.mainGroup = nil
-	end
-	g.screens = {}
-	g.screen = nil
-
-	-- Clear misc global game state
-	g.startTime = nil
-	g.clicked = false
-	g.gameObjClicked = nil
-	g.clickX = 0
-	g.clickY = 0
-	g.charTyped = nil
-end	
 
 -- Init for a new run of the user program after the user's code has been loaded
 local function initRun()
@@ -246,7 +250,8 @@ local function initRun()
 		Runtime:addEventListener("resize", onResize)  -- for standalone window resize
 	end
 
-	-- Start the game timer
+	-- Start the game and the game timer
+	g.stopped = false
 	g.startTime = system.getTimer()
 end
 

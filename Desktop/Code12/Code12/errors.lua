@@ -124,8 +124,8 @@ function g.checkType(position, tExpected, param)
 			strErr = strErr .. " is missing or nil"
 		else
 		    strErr = strErr .. " should be a " .. tExpected .. " not a " .. tParam
-    	end
-    	apiError(strErr)
+		end
+		apiError(strErr)
 	end
 end
 
@@ -145,10 +145,10 @@ function g.checkTypes(types, ...)
 					strErr = strErr .. " is missing or nil (expected " .. tExpected .. ")"
 				else
 				    strErr = strErr .. " should be a " .. tExpected .. " not a " .. tGot
-	        	end
-	        	apiError(strErr)
-        	end
-    	end
+				end
+				apiError(strErr)
+			end
+		end
 	end
 end 
 
