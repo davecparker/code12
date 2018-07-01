@@ -27,17 +27,22 @@ public class GameImage extends GameObj
       
       // If the file can't be found, warn the user
       text = filename;     // Store filename in text field by default
-      String path = filename;
-      if (path == null || !(new File(path)).isFile())
+      if (filename == null)
+         rawImage = null;
+      else
       {
-         game.logError("Cannot find image file", filename);
+         String path = filename;
+         if (!(new File(path)).isFile())
+         {
+            game.logError("Cannot find image file", filename);
+         }
+            
+         // Try to load the raw image and set the initial size as full pixel size
+         ImageIcon icon = new ImageIcon(path);  // loads asynchronously unfortunately 
+         width = icon.getIconWidth() / game.scaleLToP;
+         height = icon.getIconHeight() / game.scaleLToP;
+         rawImage = icon.getImage();  // blank image until loaded or if not found
       }
-         
-      // Try to load the raw image and set the initial size as full pixel size
-      ImageIcon icon = new ImageIcon(path);  // loads asynchronously unfortunately 
-      width = icon.getIconWidth() / game.scaleLToP;
-      height = icon.getIconHeight() / game.scaleLToP;
-      rawImage = icon.getImage();  // blank image until loaded or if not found
       
       // No cached scaled image yet (will lazy init when drawn)
       scaledImage = null;
@@ -58,9 +63,14 @@ public class GameImage extends GameObj
       // Make scaledImage if doesn't exist or if obj resized since last draw
       if (scaledImage == null || widthP != widthPImg || heightP != heightPImg)
       {
-         scaledImage = rawImage.getScaledInstance(widthP, heightP, Image.SCALE_SMOOTH);
-         widthPImg = widthP;
-         heightPImg = heightP;
+         if (rawImage == null)
+            scaledImage = null;
+         else
+         {
+            scaledImage = rawImage.getScaledInstance(widthP, heightP, Image.SCALE_SMOOTH);
+            widthPImg = widthP;
+            heightPImg = heightP;
+         }
       }
       
       // Draw the image if success
