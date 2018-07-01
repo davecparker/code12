@@ -30,6 +30,11 @@ local function initGameObjClass()
 	local obj = display.newRect(-1000, -1000, 1, 1)
 	obj.visible = false
 	GameObj.dummyObj = obj
+
+	-- Print available fonts
+	-- for _, fontName in ipairs(native.getFontNames()) do
+	-- 	print(fontName)
+	-- end
 end
 
 
@@ -140,7 +145,7 @@ end
 -- Text constructor
 function GameObj:newText(group, text, x, y, height, colorName)
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
-	local obj = display.newText(group, text, x, y, native.systemFontBold,
+	local obj = display.newText(group, text, x, y, "Verdana-Bold",
 						fontSizeFromHeight(height))
 	-- print("newText height vs obj height:", height, obj.height / g.scale)
 	gameObj:setObj(obj)
