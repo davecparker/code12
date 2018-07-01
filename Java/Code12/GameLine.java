@@ -14,43 +14,51 @@ public class GameLine extends GameObj
       type = "line";
    }
 
-   // Determine if point is inside the object
+   // Returns true if xPoint, yPoint is inside the line (for thick lines)
+   // or within 2 pixels of the line (for thin lines)
    @Override
    public boolean containsPoint(double xPoint, double yPoint)
    {
       // Reject test each side
-      double minSize = 1; // 2 / game.getPixelsPerUnit();
-      double halfW = lineWidthLU() / 2;
-      boolean smallThickness = (halfW < minSize);
-      boolean smallWidth = (smallThickness && width < minSize && width > -minSize);
-      double left = boundingBoxLeft();
-      if (smallWidth)
-         left -= minSize;
-      if (xPoint < left)
+      double halfW;
+      if (lineWidth <= 4)
+         halfW = 2 / game.getPixelsPerUnit();
+      else
+         halfW = (lineWidth / game.getPixelsPerUnit()) / 2;
+      // left and right sides
+      double left = x;
+      double right = left + width;
+      if (left > right)
+      {
+         double temp = left;
+         left = right;
+         right = left;
+      }
+      else if (left == right)
+      {
+         left = x - halfW;
+         right = x + halfW;
+      }
+      if (xPoint < left || xPoint > right)
          return false;
-      double right = boundingBoxRight();
-      if (smallWidth)
-         right += minSize;
-      if (xPoint > right)
-         return false;
-      boolean smallHeight = (smallThickness && height < minSize && height > -minSize);
-      double top =  boundingBoxTop();
-      if (smallHeight)
-         top -= minSize;
-      if (yPoint < top)
-         return false;
-      double bottom = boundingBoxBottom();
-      if (smallHeight)
-         bottom += minSize;
-      if (yPoint > bottom)
+      // top and bottom sides
+      double top = y;
+      double bottom = top + height;
+      if (top > bottom)
+      {
+         double temp = top;
+         top = bottom;
+         bottom = top;
+      }
+      else if (top == bottom)
+      {
+         top = y - halfW;
+         bottom = y + halfW;
+      }
+      if (yPoint < top || yPoint > bottom)
          return false;
       // Compare squared distance from point to line to squared halfwidth of line
-      double d2 = squaredDistance(xPoint, yPoint);
-     	if (halfW < minSize)
-     		halfW = minSize;
-      if (d2 > halfW * halfW)
-      	return false;
-      return true;
+      return squaredDistance(xPoint, yPoint) <= halfW * halfW;
    }
 
    // Update the object as necessary for a window resize from oldHeight to newHeight.
@@ -195,6 +203,9 @@ public class GameLine extends GameObj
   				return true;
   			if (hitHorizLine(top, bottom, objBottom, objLeft, objRight)) // bottom side
   				return true;
+         // Check if this line is inside the obj's bounds
+         if (left >= objLeft && right <= objRight && top >= objTop && bottom <= objBottom)
+            return true;
   			return false;
   		}
    }
@@ -219,8 +230,8 @@ public class GameLine extends GameObj
    {
    	if (left > x2 || right < x2)
    		return false;
-   	double yIntersect = height / width * (x2 - x) + y;
-   	return top2 <= yIntersect && yIntersect <= bottom2;
+   	double yIntercept = height / width * (x2 - x) + y;
+   	return top2 <= yIntercept && yIntercept <= bottom2;
    }
 
    // Determines if this line (from top to bottom) intersects a horizontal line from (left2, y2) to (right2, y2)
@@ -229,7 +240,7 @@ public class GameLine extends GameObj
    {
    	if (top > y2 || bottom < y2)
    		return false;
-   	double xIntersect = width / height * (y2 - y) + x;
-   	return left2 <= xIntersect && xIntersect <= right2;
+   	double xIntercept = width / height * (y2 - y) + x;
+   	return left2 <= xIntercept && xIntercept <= right2;
    }
 }

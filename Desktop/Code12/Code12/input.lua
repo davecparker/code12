@@ -9,6 +9,7 @@
 
 local g = require("Code12.globals")
 require("Code12.runtime")
+local GameObj = require("Code12.GameObjAPI")
 
 
 ---------------- Touch Tracking ----------------------------------------------
@@ -22,10 +23,20 @@ local function clickEvent(event, gameObj)
 	local y = yP / g.scale
 
 	if event.phase == "began" then
-		-- Ignore click if not in the game area
-		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
-			return
-		end
+      -- If gameObj is nil, check if a line was clicked
+      if gameObj == nil then
+         local objs = g.screen.objs
+         for i = 1, objs.numChildren do
+            local gObj = objs[i].code12GameObj
+            if gObj.clickable and gObj._code12.typeName == "line" then
+               if gObj:lineContainsPoint( x, y ) then
+                  gameObj = gObj
+                  break
+               end
+            end
+         end
+      end
+      -- end lines hit test
 
 		-- Set last click state
 		g.clicked = true
@@ -33,31 +44,29 @@ local function clickEvent(event, gameObj)
 		g.clickX = x
 		g.clickY = y
 
+		-- Call client event
+		if type(_fn.onMousePress) == "function" then
+			_fn.onMousePress(gameObj, x, y)
+		end
+
 		-- Automatically take the touch focus on an object.
 		if gameObj then
-			display.getCurrentStage():setFocus(event.target)
+         display.getCurrentStage():setFocus(gameObj._code12.obj)
 		end
 
-		-- Call client event
-		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
 	elseif event.phase == "moved" then
-		-- Ignore this drag point if not in the game area
-		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
-			return
+		-- Call client event
+		if type(_fn.onMouseDrag) == "function" then
+			_fn.onMouseDrag(gameObj, x, y)
+		end
+	else  -- (ended or cancelled)
+		-- Call client event
+		if type(_fn.onMouseRelease) == "function" then
+			_fn.onMouseRelease(gameObj, x, y)
 		end
 
-		-- Set last drag location
-		g.clickX = x
-		g.clickY = y
-
-		-- Call client event
-		g.eventFunctionYielded(_fn.onMouseDrag, gameObj, x, y)
-	else  -- (ended or cancelled)
 		-- Release touch focus if any
 		display.getCurrentStage():setFocus(nil)
-
-		-- Call client event
-		g.eventFunctionYielded(_fn.onMouseRelease, gameObj, x, y)
 	end
 end
 
@@ -147,19 +156,25 @@ function g.onKey(event)
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
-		g.eventFunctionYielded(_fn.onKeyPress, keyName)  -- TODO: if yielded
-		returnValue = true    -- Always? Means client has to handle all keys
+		if type(_fn.onKeyPress) == "function" then
+			_fn.onKeyPress(keyName)
+			returnValue = true    -- Always? Means client has to handle all keys
+		end
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)
 		if ch then
 			g.charTyped = ch    -- remember for ct.charTyped()
-			g.eventFunctionYielded(_fn.onCharTyped, ch)
+			if type(_fn.onCharTyped) == "function" then
+				_fn.onCharTyped(ch)
+			end
 		end
 	elseif event.phase == "up" then
 		-- keyRelease
 		keysDown[event.keyName] = nil
-		g.eventFunctionYielded(_fn.onKeyRelease, keyName)
+		if type(_fn.onKeyRelease) == "function" then
+			_fn.onKeyRelease(keyName)
+		end
 	end
 	return returnValue
 end

@@ -42,7 +42,7 @@ class DrawingProgram extends Code12Program
    GameObj green;
    GameObj blue;
    GameObj cyan;
-   GameObj majenta;
+   GameObj magenta;
    GameObj yellow;
    GameObj gray;
    GameObj orange;
@@ -102,13 +102,13 @@ class DrawingProgram extends Code12Program
       orange = ct.rect( pink.x - boxSize, yBoxes, boxSize, boxSize, "orange" );
       gray = ct.rect( orange.x - boxSize, yBoxes, boxSize, boxSize, "gray" );
       yellow = ct.rect( gray.x - boxSize, yBoxes, boxSize, boxSize, "yellow" );
-      majenta = ct.rect( yellow.x - boxSize, yBoxes, boxSize, boxSize, "majenta" );
-      cyan = ct.rect( majenta.x - boxSize, yBoxes, boxSize, boxSize, "cyan" );
+      magenta = ct.rect( yellow.x - boxSize, yBoxes, boxSize, boxSize, "magenta" );
+      cyan = ct.rect( magenta.x - boxSize, yBoxes, boxSize, boxSize, "cyan" );
       blue = ct.rect( cyan.x - boxSize, yBoxes, boxSize, boxSize, "blue" );
       green = ct.rect( blue.x - boxSize, yBoxes, boxSize, boxSize, "green" );
       red = ct.rect( green.x - boxSize, yBoxes, boxSize, boxSize, "red" );
-      white = ct.rect( red.x - boxSize, yBoxes, boxSize, boxSize, "white" );
-      black = ct.rect( white.x - boxSize, yBoxes, boxSize, boxSize, "black" );
+      black = ct.rect( red.x - boxSize, yBoxes, boxSize, boxSize, "black" );
+      white = ct.rect( black.x - boxSize, yBoxes, boxSize, boxSize, "white" );
       
       black.setLayer( 2 );
       white.setLayer( 2 );
@@ -116,7 +116,7 @@ class DrawingProgram extends Code12Program
       green.setLayer( 2 );
       blue.setLayer( 2 );
       cyan.setLayer( 2 );
-      majenta.setLayer( 2 );
+      magenta.setLayer( 2 );
       yellow.setLayer( 2 );
       gray.setLayer( 2 );
       orange.setLayer( 2 );
@@ -129,7 +129,7 @@ class DrawingProgram extends Code12Program
       green.clickable = true;
       blue.clickable = true;
       cyan.clickable = true;
-      majenta.clickable = true;
+      magenta.clickable = true;
       yellow.clickable = true;
       gray.clickable = true;
       orange.clickable = true;
@@ -142,7 +142,7 @@ class DrawingProgram extends Code12Program
       green.setText("green");
       blue.setText("blue");
       cyan.setText("cyan");
-      majenta.setText("majenta");
+      magenta.setText("magenta");
       yellow.setText("yellow");
       gray.setText("gray");
       orange.setText("orange");
@@ -150,7 +150,7 @@ class DrawingProgram extends Code12Program
       purple.setText("purple");
       
       // Set xMinColors 
-      xMinColors = black.x - boxSize / 2;
+      xMinColors = white.x - boxSize / 2;
       
       // Set selected shape
       selectedShapeBox = circle;
@@ -158,14 +158,14 @@ class DrawingProgram extends Code12Program
       selectBoxOn = false;
       
       // Set selected color
-      selectedColor = "black";
-      selectedColorSwatch = black;
+      selectedColor = "white";
+      selectedColorSwatch = white;
       selectedColorSwatch.lineWidth = 3;
    }
       
    public void onMousePress( GameObj obj, double x, double y )
    {
-      if ( y > boxSize ) 
+      if ( y > boxSize + 1 ) 
       {
          // click is in the drawing area below the toolbox row
          if ( !selectBoxOn )
@@ -260,6 +260,7 @@ class DrawingProgram extends Code12Program
    {
       if ( keyName.equals( "backspace" ) )
       {
+         ct.println("backspace key pressed");
          if ( selectedObj != null )
             selectedObj.delete();
       }
