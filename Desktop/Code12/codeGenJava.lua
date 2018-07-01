@@ -502,10 +502,10 @@ local function generateForLoop( tree )
 					nodes[4].str, javaTypes.typeNameFromVt( vtArray.vt ) );
 		else
 			checkJava.defineLocalVar( nodes[2], vtVar, false, true )
-			beginLuaLine( "for " )
+			beginLuaLine( "for _, " )
 			addLua( nodes[2].str )
 			addLua( " in ipairs(" )
-			addLua( nodes[4].str )
+			addLua( varNameCode(nodes[4].str) )
 			addLua( ") do" )
 			generateControlledStmt()
 		end

@@ -9,7 +9,7 @@ require('Code12.api')
         
     
     
-    function start()
+    function _fn.start()
         
         
         -- GameObj Creation
