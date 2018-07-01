@@ -28,7 +28,7 @@ public class GameImage extends GameObj
       // If the file can't be found, warn the user
       text = filename;     // Store filename in text field by default
       String path = filename;
-      if (!(new File(path)).isFile())
+      if (path == null || !(new File(path)).isFile())
       {
          game.logError("Cannot find image file", filename);
       }

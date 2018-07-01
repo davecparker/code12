@@ -132,6 +132,8 @@ public class Game implements GameInterface
 
    public void setHeight(double height)
    {
+      height = pinValue(height, 1, 10000);
+      
       // New aspect requested, so adjust window accordingly
       heightP = (int) (height * scaleLToP);
       window.setPixelSize(widthP, heightP);
@@ -145,6 +147,9 @@ public class Game implements GameInterface
 
    public void setScreen(String name)
    {
+      if (name == null)
+         name = "";
+         
       // Does this screen name already exist?
       GameScreen newScreen = screens.get(name);
       if (newScreen != null)
@@ -179,9 +184,14 @@ public class Game implements GameInterface
 
    public void setBackImage(String filename)
    {
-      GameObj img = new GameImage(this, filename, WIDTH_L / 2, heightL / 2);
-      screen.setBackObj(img);
-      screen.setSize(WIDTH_L, heightL);   // make image fill the screen
+      if (filename == null)
+         screen.setBackObj(null);
+      else
+      {
+         GameObj img = new GameImage(this, filename, WIDTH_L / 2, heightL / 2);
+         screen.setBackObj(img);
+         screen.setSize(WIDTH_L, heightL);   // make image fill the screen
+      }
    }
 
 
@@ -233,6 +243,9 @@ public class Game implements GameInterface
    
    public GameObj text(String text, double x, double y, double height, String color)
    {
+      if (text == null)
+         text = "";
+         
       GameObj obj = new GameText(this, text, x, y, height);
       obj.setFillColor(color);
       screen.addObj(obj);
@@ -257,11 +270,15 @@ public class Game implements GameInterface
    
    public boolean keyPressed(String key)
    {
+      if (key == null)
+         return false;
       return input.keysDown.get(input.keyNameToCode.get(key));
    }
    
    public boolean charTyped(String ch)
    {
+      if (ch == null)
+         return false;
       return (input.keyTyped != null) && (input.keyTyped.equals(ch));
    }      
 
@@ -419,6 +436,26 @@ public class Game implements GameInterface
    //                      Internal Methods 
    //===============================================================
          
+   // Return value pinned to the given range
+   double pinValue(double value, double min, double max)
+   {
+      if (value < min)
+         return min;
+      if (value > max)
+         return max;
+      return value;
+   }
+   
+   // Return value pinned to the given range
+   int pinValue(int value, int min, int max)
+   {
+      if (value < min)
+         return min;
+      if (value > max)
+         return max;
+      return value;
+   }
+
    // Start the game timer
    void startTimer()
    {
