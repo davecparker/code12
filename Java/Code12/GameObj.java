@@ -27,6 +27,7 @@ public abstract class GameObj implements GameObjInterface
    protected int layer;             // stacking layer, default 1
    protected String text;           // text to draw or use for log name, or null
    protected boolean onScreenPrev;  // true if object was on-screen last time we checked
+   protected boolean deleted;       // true when object is deleted from screen
 
 
    // Construct a default object at the given location and size
@@ -54,6 +55,7 @@ public abstract class GameObj implements GameObjInterface
       layer = 1;
       text = null;
       onScreenPrev = false;
+      deleted = false;
    }
 
 
@@ -120,11 +122,13 @@ public abstract class GameObj implements GameObjInterface
 
    public boolean hit(GameObj obj)
    {
+      if (obj == null || obj.deleted)
+         return false;
+          
    	if (obj.isLine())
    		return obj.hit(this);
 
    	// Just do a rectangle intersection test on the bounding rects.
-      // TODO: line objects?
       double left = x - (width * xAlignFactor);
       double right = left + width;
       double left2 = obj.x - (obj.width * obj.xAlignFactor);
@@ -305,5 +309,13 @@ public abstract class GameObj implements GameObjInterface
          wentOff = !onScreenNow;
       onScreenPrev = onScreenNow;
       return wentOff;
+   }
+   
+   // Mark the object as deleted
+   protected void markDeleted()
+   {
+      deleted = true;
+      visible = false;
+      clickable = false;
    }
 }

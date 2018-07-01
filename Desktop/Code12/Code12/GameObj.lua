@@ -66,6 +66,7 @@ function GameObj:new(typeName, x, y, width, height)
 			lineColor = nil,
 			layer = 1,
 			adjustY = false,
+			deleted = false,
 
 			-- Stored previous values so we can detect changes on the fly
 			widthPrev = 0,
@@ -108,6 +109,7 @@ function GameObj:removeAndDelete()
 	obj.code12GameObj = nil    -- remove display object's reference to the GameObj
 	obj:removeSelf()	       -- remove and destroy the display object
 	self._code12.obj = GameObj.dummyObj    -- dummy display object to help client avoid crashes
+	self._code12.deleted = true
 	self.visible = false       -- to reduce impact of any stale references
 	self.clickable = false
 end

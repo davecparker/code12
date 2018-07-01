@@ -439,6 +439,7 @@ public class Game implements GameInterface
    // Remove a GameObj from the game. 
    void deleteObj(GameObj obj)
    {
+      obj.markDeleted();
       input.invalObj(obj);
       screen.removeObj(obj);
    }

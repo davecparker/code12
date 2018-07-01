@@ -214,6 +214,9 @@ function GameObj:hit(gameObj, ...)
 	end
 
 	-- Do hit test
+	if gameObj == nil or gameObj._code12.deleted then
+		return false
+	end
 	return self:hitObj(gameObj)
 end
 
