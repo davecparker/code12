@@ -63,7 +63,7 @@ public class GameImage extends GameObj
       // Make scaledImage if doesn't exist or if obj resized since last draw
       if (scaledImage == null || widthP != widthPImg || heightP != heightPImg)
       {
-         if (rawImage == null)
+         if (rawImage == null || widthP <= 0 || heightP <= 0)
             scaledImage = null;
          else
          {
