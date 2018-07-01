@@ -221,11 +221,15 @@ GameObj ct.text( String s, double x, double y, double height, String color )
 <h3 id="ct-random-">ct.random()</h3>
 <pre><code>int ct.random( int min, int max )
 </code></pre><p>Return a random integer from <code>min</code> to <code>max</code> (inclusive).</p>
+
 <h3 id="ct-round-">ct.round()</h3>
 <pre><code>int ct.round( double d )
-double ct.round( double d, int numPlaces )
-</code></pre><p>If <code>numPlaces</code> is included, then return the number <code>d</code> rounded to that number of decimal places.</p>
-<p>If <code>numPlaces</code> is not included, then return the number <code>d</code> rounded to the nearest integer.</p>
+</code></pre><p>Return the number <code>d</code> rounded to the nearest integer.</p>
+
+<h3 id="ct-rounddecimal-">ct.roundDecimal()</h3>
+<pre><code>double ct.roundDecimal( double d, int numPlaces )
+</code></pre><p>Return the number <code>d</code> rounded to <code>numPlaces</code> decimal places.</p>
+
 <h3 id="ct-intdiv-">ct.intDiv()</h3>
 <pre><code>int ct.intDiv( int n, int d )
 </code></pre><p>Return the result of an integer divide of n / d. If n / d is not an integer, the result is rounded down to the next smaller integer. If d is 0 then the result is a large positive integer if n &gt; 0, a large negative integer if n &lt; 0, and 0 if n is 0. </p>

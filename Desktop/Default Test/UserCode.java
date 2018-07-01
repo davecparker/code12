@@ -4,6 +4,7 @@ class UserCode extends Code12Program
 {
 	// instance variables
 	GameObj ball, bigBall;
+	GameObj[] moreBalls = new GameObj[10];
 	// GameObj tooSoon = ct.circle(50, 50, 50);
 	int count, total;
 	boolean gameOver = false;
@@ -22,6 +23,10 @@ class UserCode extends Code12Program
 		String name = "Dave" + " " + "Parker";
 		boolean done;
 
+		int[] nums = new int[10];
+		// nums[10] = 4;
+		// ct.println( nums[10] );
+
 		// Try some console output
 		ct.println("This is the default Code12 test app");
 		ct.println("This is console output");
@@ -35,6 +40,8 @@ class UserCode extends Code12Program
 		ct.print("\n");
 		ct.print("And another:");
 		ct.println("\n");
+		ct.print("Here's an unitialized GameObj: "); 
+		ct.println(moreBalls[3]);
 		ct.println("Done");
 		boolean test = ct.inputBoolean("Would you like to print some lines?");
 		if (test)
@@ -155,6 +162,8 @@ class UserCode extends Code12Program
 		while (speed < 2) ;
 
 		double[] scores = new double[10];
+		boolean[] questions = new boolean[20];
+		String[] strings = new String[5];
 
 		int[] counts = { 2, 4, 5 + 6, 3 };
 		int c = counts[0];

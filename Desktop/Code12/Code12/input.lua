@@ -41,6 +41,15 @@ local function clickEvent(event, gameObj)
 		-- Call client event
 		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
 	elseif event.phase == "moved" then
+		-- Ignore this drag point if not in the game area
+		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
+			return
+		end
+
+		-- Set last drag location
+		g.clickX = x
+		g.clickY = y
+
 		-- Call client event
 		g.eventFunctionYielded(_fn.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)

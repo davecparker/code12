@@ -4,6 +4,7 @@ require('Code12.api')
     
     -- instance variables
     this.ball = nil; this.bigBall = nil; 
+    this.moreBalls = { length = 10, default = nil }
     -- GameObj tooSoon = ct.circle(50, 50, 50);
     this.count = 0; this.total = 0; 
     this.gameOver = false
@@ -22,6 +23,10 @@ require('Code12.api')
         local name = "Dave" .. " " .. "Parker"
         local done = false; 
         
+        local nums = { length = 10, default = 0 }
+        -- nums[10] = 4;
+        -- ct.println( nums[10] );
+        
         -- Try some console output
         ct.println("This is the default Code12 test app")
         ct.println("This is console output")
@@ -35,6 +40,8 @@ require('Code12.api')
         ct.print("\n")
         ct.print("And another:")
         ct.println("\n")
+        ct.print("Here's an unitialized GameObj: ")
+        ct.println(ct.indexArray(this.moreBalls, 3))
         ct.println("Done")
         local test = ct.inputBoolean("Would you like to print some lines?")
         if test then
@@ -154,10 +161,12 @@ require('Code12.api')
         
         until not (this.speed < 2)
         
-        local scores = { length = 10 }
+        local scores = { length = 10, default = 0 }
+        local questions = { length = 20, default = false }
+        local strings = { length = 5, default = nil }
         
-        local counts = { 2, 4, 5 + 6, 3, length = 4 }
-        local c = counts[1+(0)]
+        local counts = { 2, 4, 5 + 6, 3, length = 4, default = 0 }
+        local c = ct.indexArray(counts, 0)
         
         local sum = 0
         for cnt in ipairs(counts) do
@@ -170,28 +179,28 @@ require('Code12.api')
         
         while true do
             
-            sum = sum + (counts[1+(c)])
+            sum = sum + (ct.indexArray(counts, c))
         end
         
         local i = 0; while i < counts.length do
-            sum = sum + (counts[1+(i)]); i = i + 1; end
+            sum = sum + (ct.indexArray(counts, i)); i = i + 1; end
         
         local aTest = nil; 
-        aTest = { length = 10 }
+        aTest = { length = 10, default = 0 }
         local as = nil; local bs = nil; local cs = nil; 
         
-        as = { length = 10 }
-        local myX = as[1+(4)].x
-        as[1+(sum - 1)].y = myX
+        as = { length = 10, default = nil }
+        local myX = ct.indexArray(as, 4).x
+        ct.checkArrayIndex(as, sum - 1); as[1+(sum - 1)].y = myX
         as = _fn.makeCircles()
         
         -- int [] ai = { 1, 2, 3.3 };
-        local ad = { 1.1, 2.2, 0, length = 3 }
+        local ad = { 1.1, 2.2, 0, length = 3, default = 0 }
     end
     
     function _fn.makeCircles()
         
-        local circles = { length = 10 }
+        local circles = { length = 10, default = nil }
         return circles
     end
     

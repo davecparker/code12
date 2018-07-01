@@ -447,13 +447,14 @@ Return a random integer from `min` to `max` (inclusive).
 ### ct.round()
 ```
 int ct.round( double d )
-double ct.round( double d, int numPlaces )
 ```
-If `numPlaces` is included, then return the number `d` rounded to
-that number of decimal places.
+Return the number `d` rounded to the nearest integer.
 
-If `numPlaces` is not included, then return the number `d` rounded to
-the nearest integer.
+### ct.roundDecimal()
+```
+double ct.roundDecimal( double d, int numPlaces )
+```
+Return the number `d` rounded to `numPlaces` decimal places.
 
 ### ct.intDiv()
 ```
