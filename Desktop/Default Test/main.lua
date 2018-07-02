@@ -118,6 +118,12 @@ require('Code12.api')
             
             local localX = 3
         end
+        
+        -- Check for keys
+        if ct.keyPressed("enter") then
+            ct.println("Enter key pressed"); 
+        elseif ct.keyPressed("backspace") then
+            ct.println("Backspace key pressed"); end
     end
     
     -- Move the ball

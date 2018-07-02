@@ -118,6 +118,12 @@ class UserCode extends Code12Program
 		{
 			int localX = 3;
 		}
+
+		// Check for keys
+		if (ct.keyPressed("enter"))
+			ct.println("Enter key pressed");
+		else if (ct.keyPressed("backspace"))
+			ct.println("Backspace key pressed");
 	}
 
 	// Move the ball
