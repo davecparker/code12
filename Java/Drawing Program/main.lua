@@ -42,7 +42,7 @@ require('Code12.api')
     this.green = nil; 
     this.blue = nil; 
     this.cyan = nil; 
-    this.majenta = nil; 
+    this.magenta = nil; 
     this.yellow = nil; 
     this.gray = nil; 
     this.orange = nil; 
@@ -53,6 +53,7 @@ require('Code12.api')
     
     this.xMinColors = 0; 
     this.selectBoxOn = false; 
+    this.dxClick = 0; this.dyClick = 0; 
     
     function _fn.start()
         
@@ -101,13 +102,13 @@ require('Code12.api')
         this.orange = ct.rect(this.pink.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "orange")
         this.gray = ct.rect(this.orange.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "gray")
         this.yellow = ct.rect(this.gray.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "yellow")
-        this.majenta = ct.rect(this.yellow.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "majenta")
-        this.cyan = ct.rect(this.majenta.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "cyan")
+        this.magenta = ct.rect(this.yellow.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "magenta")
+        this.cyan = ct.rect(this.magenta.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "cyan")
         this.blue = ct.rect(this.cyan.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "blue")
         this.green = ct.rect(this.blue.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "green")
         this.red = ct.rect(this.green.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "red")
-        this.white = ct.rect(this.red.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "white")
-        this.black = ct.rect(this.white.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "black")
+        this.black = ct.rect(this.red.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "black")
+        this.white = ct.rect(this.black.x - this.boxSize, yBoxes, this.boxSize, this.boxSize, "white")
         
         this.black:setLayer(2)
         this.white:setLayer(2)
@@ -115,7 +116,7 @@ require('Code12.api')
         this.green:setLayer(2)
         this.blue:setLayer(2)
         this.cyan:setLayer(2)
-        this.majenta:setLayer(2)
+        this.magenta:setLayer(2)
         this.yellow:setLayer(2)
         this.gray:setLayer(2)
         this.orange:setLayer(2)
@@ -128,7 +129,7 @@ require('Code12.api')
         this.green.clickable = true
         this.blue.clickable = true
         this.cyan.clickable = true
-        this.majenta.clickable = true
+        this.magenta.clickable = true
         this.yellow.clickable = true
         this.gray.clickable = true
         this.orange.clickable = true
@@ -141,7 +142,7 @@ require('Code12.api')
         this.green:setText("green")
         this.blue:setText("blue")
         this.cyan:setText("cyan")
-        this.majenta:setText("majenta")
+        this.magenta:setText("magenta")
         this.yellow:setText("yellow")
         this.gray:setText("gray")
         this.orange:setText("orange")
@@ -149,7 +150,7 @@ require('Code12.api')
         this.purple:setText("purple")
         
         -- Set xMinColors 
-        this.xMinColors = this.black.x - this.boxSize / 2
+        this.xMinColors = this.white.x - this.boxSize / 2
         
         -- Set selected shape
         this.selectedShapeBox = this.circle
@@ -157,14 +158,14 @@ require('Code12.api')
         this.selectBoxOn = false
         
         -- Set selected color
-        this.selectedColor = "black"
-        this.selectedColorSwatch = this.black
+        this.selectedColor = "white"
+        this.selectedColorSwatch = this.white
         this.selectedColorSwatch.lineWidth = 3
     end
     
     function _fn.onMousePress(obj, x, y)
         
-        if y > this.boxSize then
+        if y > this.boxSize + 1 then
             
             -- click is in the drawing area below the toolbox row
             if not this.selectBoxOn then
@@ -179,10 +180,9 @@ require('Code12.api')
                     this.newObj = ct.line(x, y, x, y)
                     this.newObj:setLineColor(this.selectedColor)
                 end
-                
+                this.newObj.clickable = true
                 if this.selectedShapeBox ~= this.line then
                     
-                    this.newObj.clickable = true
                     this.newObj:setFillColor(this.selectedColor)
                 end
                 -- Make newObj the selectedObj
@@ -191,6 +191,8 @@ require('Code12.api')
             elseif obj ~= nil then
                 
                 this.selectedObj = obj
+                this.dxClick = x - obj.x
+                this.dyClick = y - obj.y
             end
         
         elseif obj ~= nil then
@@ -247,8 +249,8 @@ require('Code12.api')
             
             elseif obj ~= nil then
                 
-                obj.x = x
-                obj.y = y
+                obj.x = x - this.dxClick
+                obj.y = y - this.dyClick
                 obj:setLayer(1)
             end
         end
@@ -258,6 +260,7 @@ require('Code12.api')
         
         if (keyName == "backspace") then
             
+            ct.println("backspace key pressed")
             if this.selectedObj ~= nil then
                 this.selectedObj:delete(); end
         
