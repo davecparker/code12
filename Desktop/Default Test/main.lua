@@ -124,6 +124,16 @@ require('Code12.api')
             ct.println("Enter key pressed"); 
         elseif ct.keyPressed("backspace") then
             ct.println("Backspace key pressed"); end
+        
+        -- Some keys trigger sounds
+        if ct.charTyped("L") and ct.loadSound("launch.wav") then
+            ct.println("Launch sound loaded"); end
+        if ct.charTyped("l") then
+            ct.sound("launch.wav"); end
+        if ct.charTyped("P") and ct.loadSound("pop.wav") then
+            ct.println("Pop sound loaded"); end
+        if ct.charTyped("p") then
+            ct.sound("pop.wav"); end
     end
     
     -- Move the ball
@@ -232,8 +242,8 @@ require('Code12.api')
             ct.println("Long key"); end
         
         local s = "  Dave "
-        ct.println(ct.stringCompare(s, "Parker"))
-        ct.log(s, ct.trimString(s), string.upper(s), ct.substring(s, 2), ct.substring(s, 2, 6), ct.indexOfString(s, "D"))
+        -- ct.println(s.compareTo("Parker"));
+        -- ct.log(s, s.trim(), s.toUpperCase(), s.substring(2), s.substring(2, 6), s.indexOf("D"));
         
         -- Some common errors:
         -- if (speed = 0)

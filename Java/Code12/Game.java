@@ -285,8 +285,9 @@ public class Game implements GameInterface
 
    //========================= Audio API ===============================
 
-   public void sound(String filename)       { audio.play(filename); }
-   public void setSoundVolume(double d)     { audio.setVolume(d); }
+   public boolean loadSound(String filename)   { return audio.load(filename); }
+   public void sound(String filename)          { audio.play(filename); }
+   public void setSoundVolume(double d)        { audio.setVolume(d); }
  
 
    //====================== Math and Misc. API ==========================

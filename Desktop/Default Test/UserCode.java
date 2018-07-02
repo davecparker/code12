@@ -124,6 +124,16 @@ class UserCode extends Code12Program
 			ct.println("Enter key pressed");
 		else if (ct.keyPressed("backspace"))
 			ct.println("Backspace key pressed");
+
+		// Some keys trigger sounds
+		if (ct.charTyped("L") && ct.loadSound("launch.wav"))
+			ct.println("Launch sound loaded");
+		if (ct.charTyped("l"))
+			ct.sound("launch.wav");
+		if (ct.charTyped("P") && ct.loadSound("pop.wav"))
+			ct.println("Pop sound loaded");
+		if (ct.charTyped("p"))
+			ct.sound("pop.wav");
 	}
 
 	// Move the ball
@@ -232,8 +242,8 @@ class UserCode extends Code12Program
 			ct.println( "Long key" );
 
 		String s = "  Dave ";
-		ct.println(s.compareTo("Parker"));
-		ct.log(s, s.trim(), s.toUpperCase(), s.substring(2), s.substring(2, 6), s.indexOf("D"));
+		// ct.println(s.compareTo("Parker"));
+		// ct.log(s, s.trim(), s.toUpperCase(), s.substring(2), s.substring(2, 6), s.indexOf("D"));
 
 		// Some common errors:
 		// if (speed = 0)

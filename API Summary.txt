@@ -55,6 +55,7 @@ class ct
 
 	// Audio
 	//------
+	boolean loadSound( String filename )
 	void sound( String filename )
 	void setSoundVolume( double volume )
 
