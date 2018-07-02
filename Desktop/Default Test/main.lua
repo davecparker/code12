@@ -12,6 +12,7 @@ require('Code12.api')
     -- int count = 5;
     this.speed = 0.3
     this.frameCount = 0
+    this._function = "Test"
     
     function _fn.start()
         
@@ -21,13 +22,17 @@ require('Code12.api')
         local x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0
         local xInt = ct.toInt(x)
         local name = "Dave" .. " " .. "Parker"
-        local done = false; 
+        local done = false; local _end = false; 
+        -- boolean _end = false;
+        -- int $java = 5;
+        _end = true
         
         local nums = { length = 10, default = 0 }
         -- nums[10] = 4;
         -- ct.println( nums[10] );
         
         -- Try some console output
+        ct.println(this._function)
         ct.println("This is the default Code12 test app")
         ct.println("This is console output")
         ct.print("Beginning of line")
@@ -43,7 +48,7 @@ require('Code12.api')
         ct.print("Here's an unitialized GameObj: ")
         ct.println(ct.indexArray(this.moreBalls, 3))
         ct.println("Done")
-        local test = ct.inputBoolean("Would you like to print some lines?")
+        local test = false
         if test then
             
             this.count = ct.inputInt("Enter count:")
@@ -57,11 +62,14 @@ require('Code12.api')
         this.ball = ct.circle(x + 6, 15, 5)
         ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5)
         this.bigBall = ct.circle(x, 80, 40)
-        this.bigBall:setFillColorRGB(400, 127, -50)
+        -- bigBall.setFillColorRGB(400, 127, -50);
+        this.bigBall:setFillColor(nil)
         this.bigBall.clickable = true
         
         -- Add a fish
         ct.image("goldfish.png", 50, 50, 15)
+        local filename = nil
+        -- ct.image(filename, 50, 20, 15);
         
         -- Make a line
         local line1 = ct.line(20, 80, 80, 80, "red")
@@ -196,6 +204,12 @@ require('Code12.api')
         
         -- int [] ai = { 1, 2, 3.3 };
         local ad = { 1.1, 2.2, 0, length = 3, default = 0 }
+        
+        _fn._local()
+    end
+    
+    function _fn._local()
+        
     end
     
     function _fn.makeCircles()

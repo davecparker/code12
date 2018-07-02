@@ -12,6 +12,7 @@ class UserCode extends Code12Program
 	// int count = 5;
 	double speed = 0.3;
 	int frameCount = 0;
+	String function = "Test";
 
 	public void start()
 	{
@@ -21,13 +22,17 @@ class UserCode extends Code12Program
 		double x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0;
 		int xInt = ct.toInt( x );
 		String name = "Dave" + " " + "Parker";
-		boolean done;
+		boolean done, end;
+		// boolean _end = false;
+		// int $java = 5;
+		end = true;
 
 		int[] nums = new int[10];
 		// nums[10] = 4;
 		// ct.println( nums[10] );
 
 		// Try some console output
+		ct.println(function);
 		ct.println("This is the default Code12 test app");
 		ct.println("This is console output");
 		ct.print("Beginning of line");
@@ -43,7 +48,7 @@ class UserCode extends Code12Program
 		ct.print("Here's an unitialized GameObj: "); 
 		ct.println(moreBalls[3]);
 		ct.println("Done");
-		boolean test = ct.inputBoolean("Would you like to print some lines?");
+		boolean test = false; // ct.inputBoolean("Would you like to print some lines?");
 		if (test)
 		{
 			count = ct.inputInt("Enter count:");
@@ -57,11 +62,14 @@ class UserCode extends Code12Program
 		ball = ct.circle(x + 6, 15, 5);
 		ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5);
 		bigBall = ct.circle(x, 80, 40);
-		bigBall.setFillColorRGB(400, 127, -50);
+		// bigBall.setFillColorRGB(400, 127, -50);
+		bigBall.setFillColor(null);
 		bigBall.clickable = true;
 
 		// Add a fish
 		ct.image("goldfish.png", 50, 50, 15);
+		String filename = null;
+		// ct.image(filename, 50, 20, 15);
 
 		// Make a line
 		GameObj line1 = ct.line(20, 80, 80, 80, "red");
@@ -196,6 +204,12 @@ class UserCode extends Code12Program
 
 		// int [] ai = { 1, 2, 3.3 };
 		double[] ad = { 1.1, 2.2, 0 };
+
+		local();
+	}
+
+	void local()
+	{
 	}
 
 	GameObj[] makeCircles()

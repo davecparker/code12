@@ -181,7 +181,7 @@ function GameObj:newImage(group, filename, x, y, width)
 	if not obj then
 		-- Can't open image, substitute a text object with a red X
 		g.warning("Cannot find image file", filename)
-		return GameObj:newText(group, "[X]", x, y, width, "red")
+		return GameObj:newText(group, "[x]", x, y, width, "red")
 	end
 
 	-- Create the GameObj at the right size, preserving the original aspect

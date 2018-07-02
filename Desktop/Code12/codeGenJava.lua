@@ -79,6 +79,22 @@ local luaFnFromJavaStringMethod = {
     ["trim"]         =  "ct.trimString",
 }
 
+-- Substitutes for Lua reserved words that are not reserved in Java
+local nameFromLuaReservedWord = {
+	["and"]       = "_and",
+	["elseif"]    = "_elseif",
+	["end"]       = "_end",
+	["function"]  = "_function",
+	["in"]        = "_in",
+	["local"]     = "_local",
+	["nil"]       = "_nil",
+	["not"]       = "_not",
+	["or"]        = "_or",
+	["repeat"]    = "_repeat",
+	["then"]      = "_then",
+	["until"]     = "_until",
+}
+
 
 --- Utility Functions --------------------------------------------------------
 
@@ -119,10 +135,11 @@ local generateControlledStmt
 
 -- Return Lua code for a variable name
 local function varNameCode( varName )
+	local luaName = nameFromLuaReservedWord[varName] or varName
 	if checkJava.isInstanceVarName( varName ) then
-		return thisPrefix .. varName    -- instance var, so use this.name
+		return thisPrefix .. luaName    -- instance var, so use this.name
 	end
-	return varName
+	return luaName
 end
 
 -- Return Lua code for a variable idNode with an optional array index indexNode. 
@@ -164,6 +181,11 @@ function lValueCode( lValue, assigned )
 	return code
 end
 
+-- Return Lua code for a function name
+local function fnNameCode( fnName )
+	return fnPrefix .. (nameFromLuaReservedWord[fnName] or fnName)
+end
+
 -- Return Lua code for a function or method call, e.g:
 --     ct.circle( x, y, d )
 --     bird.setFillColor( "red" )
@@ -182,7 +204,7 @@ function fnCallCode( tree )
 
 	if methodNode.p == "empty"  then
 		-- User-defined function call
-		parts = { fnPrefix, idNode.str, "(" }   -- e.g. _fn.updateScore(
+		parts = { fnNameCode( idNode.str ), "(" }   -- e.g. _fn.updateScore(
 	else
 		-- Method call
 		local objName = idNode.str
@@ -302,13 +324,13 @@ local function generateVarDecl( tree, isInstanceVar )
 		local varName = nameNode.str
 		if isInstanceVar then
 			checkJava.defineInstanceVar( nameNode, vt, false, true )
-			beginLuaLine( thisPrefix )     -- use this.name
+			beginLuaLine( varNameCode( varName ) )
 		else
 			checkJava.defineLocalVar( nameNode, vt, false, true )
 			beginLuaLine( "local " )
+			addLua( varNameCode( varName ) )
 		end
 		checkJava.canAssignToVarNode( nameNode, expr, true )
-		addLua( varName )
 		addLua( " = " )
 		addLua( exprCode( expr ) )
 		return true
@@ -319,14 +341,14 @@ local function generateVarDecl( tree, isInstanceVar )
 		beginLuaLine( "" )   -- we may have multiple statements on this line
 		for i = 1, #idList do
 			local nameNode = idList[i]
+			local varName = nameNode.str
 			if isInstanceVar then
 				checkJava.defineInstanceVar( nameNode, vt, false )
-				addLua( thisPrefix )            -- use this.name
 			else
 				checkJava.defineLocalVar( nameNode, vt, false )
 				addLua( "local " )
 			end
-			addLua( nameNode.str )
+			addLua( varNameCode( varName ) )
 			addLua( " = " )
 			-- Need to init primitives so they don't start as nil.
 			-- We will go ahead and init all types for completeness.
@@ -346,12 +368,12 @@ local function generateVarDecl( tree, isInstanceVar )
 		local varName = nameNode.str
 		if isInstanceVar then
 			checkJava.defineInstanceVar( nameNode, vt, true, true )
-			beginLuaLine( thisPrefix )     -- use this.name
+			beginLuaLine( varNameCode( varName ) )
 		else
 			checkJava.defineLocalVar( nameNode, vt, true, true )
 			beginLuaLine( "local " )
+			addLua( varNameCode( varName ) )
 		end
-		addLua( varName )
 		addLua( " = " )
 		local arrayInit = nodes[6]
 		if arrayInit.p == "list" then
@@ -391,14 +413,14 @@ local function generateVarDecl( tree, isInstanceVar )
 		beginLuaLine( "" )   -- we may have multiple statements on this line
 		for i = 1, #idList do
 			local nameNode = idList[i]
+			local varName = nameNode.str
 			if isInstanceVar then
 				checkJava.defineInstanceVar( nameNode, vt, true )
-				addLua( thisPrefix )            -- use this.name
 			else
 				checkJava.defineLocalVar( nameNode, vt, true )
 				addLua( "local " )
 			end
-			addLua( nameNode.str )
+			addLua( varNameCode( varName ) )
 			addLua( " = nil; " )
 		end
 		return true
@@ -721,8 +743,7 @@ end
 -- Return true if successful.
 local function generateFunction( fnName, paramList )
 	beginLuaLine( "function " )
-	addLua( fnPrefix )
-	addLua( fnName )
+	addLua( fnNameCode( fnName ) )
 	generateFnParamList( paramList )
 	iTree = iTree + 1 
 

@@ -56,8 +56,8 @@ local sourceFile = {
 
 -- Force the initial file to the standard test file for faster dev testing
 if env.isSimulator then
---	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
-	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
