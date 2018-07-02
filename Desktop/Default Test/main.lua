@@ -169,10 +169,10 @@ require('Code12.api')
         local c = ct.indexArray(counts, 0)
         
         local sum = 0
-        for cnt in ipairs(counts) do
+        for _, cnt in ipairs(counts) do
             sum = sum + (cnt); end
         
-        for score in ipairs(scores) do
+        for _, score in ipairs(scores) do
             
             sum = sum + (ct.toInt(score))
         end

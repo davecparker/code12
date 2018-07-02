@@ -57,7 +57,7 @@ local coRoutineUser = nil    -- coroutine running an event or nil if none
 
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame()
-	-- Call the client's update function if any
+	-- Call or resume the client's update function if any
 	if g.eventFunctionYielded(_fn.update) or g.stopped then
 		return
 	end
@@ -94,7 +94,7 @@ end
 
 -- The enterFrame listener for the first update only
 local function onFirstFrame()
-	-- Call client's start method if any
+	-- Call or resume the client's start method if any
 	if g.eventFunctionYielded(_fn.start) or g.stopped then
 		return
 	end
@@ -161,15 +161,18 @@ local function stopRun()
 	g.screens = {}
 	g.screen = nil
 
-	-- Clear misc global game state and mark run as stopped
-	g.startTime = nil
+	-- Clear global input state
 	g.clicked = false
 	g.gameObjClicked = nil
 	g.clickX = 0
 	g.clickY = 0
 	g.charTyped = nil
+
+	-- Set game state for a stopped run
+	g.startTime = nil
 	g.stopped = true
-	coRoutineUser = nil
+	g.blocked = false
+	coRoutineUser = nil  -- TODO: explicitly kill and delete coroutine somehow?
 end	
 
 -- Handle the result of the two return values from a coroutine.resume call,
@@ -178,23 +181,31 @@ end
 local function coroutineYielded(success, strErr)
 	if success then
 		if coroutine.status(coRoutineUser) == "dead" then
+			-- The user code finished
 			coRoutineUser = nil
+			g.blocked = false
 			return false
 		end
+		-- The user code blocked and yielded
+		g.blocked = true
 		return true
 	else
 		-- Runtime error
 		stopRun()
 		print("\n*** Runtime Error: " .. strErr)
-		local strLineNum, strMessage = string.match( strErr, "[^:]+:(%d+):(.*)" )
-		if strLineNum then 
+		-- Did the error occur in user code or Code12?
+		local strLineNum, strMessage = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
+		if strLineNum then
+			-- Error was in user code, report to the appContext if any 
 			local lineNum = tonumber( strLineNum ) 
 			if lineNum and appContext.runtimeErr then
 				appContext.runtimeErr( lineNum, strMessage )
 				return
 			end
-			strErr = "Line " .. strLineNum .. ": " .. strMessage
+			strErr = "Line " .. strLineNum .. ": " .. strMessage  -- for standalone runs
 		end
+		-- Looks like a runtime error in Code12. Report the full message in an alert.
+		-- TODO: For production, report "unknown runtime error" or something.
 		native.showAlert( "Runtime Error", strErr, { "OK" } )
 		return false
 	end

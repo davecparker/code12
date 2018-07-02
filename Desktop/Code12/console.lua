@@ -133,7 +133,11 @@ end
 -- Handle user input in the textField for console input
 local function onTextUserInput( event )
 	textFieldText = textField.text
-	if event.phase == "ended" or event.phase == "submitted" then
+	if event.phase == "ended" then
+		-- User clicked off, which removes the input focus, so put it back
+		native.setKeyboardFocus( textField )
+	elseif event.phase == "submitted" then
+		-- User pressed enter to end the input
 		textField:removeSelf()
 		textField = nil
 	end

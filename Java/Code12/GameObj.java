@@ -27,6 +27,7 @@ public abstract class GameObj implements GameObjInterface
    protected int layer;             // stacking layer, default 1
    protected String text;           // text to draw or use for log name, or null
    protected boolean onScreenPrev;  // true if object was on-screen last time we checked
+   protected boolean deleted;       // true when object is deleted from screen
 
 
    // Construct a default object at the given location and size
@@ -54,6 +55,7 @@ public abstract class GameObj implements GameObjInterface
       layer = 1;
       text = null;
       onScreenPrev = false;
+      deleted = false;
    }
 
 
@@ -120,11 +122,13 @@ public abstract class GameObj implements GameObjInterface
 
    public boolean hit(GameObj obj)
    {
+      if (obj == null || obj.deleted)
+         return false;
+          
    	if (obj.isLine())
    		return obj.hit(this);
 
    	// Just do a rectangle intersection test on the bounding rects.
-      // TODO: line objects?
       double left = x - (width * xAlignFactor);
       double right = left + width;
       double left2 = obj.x - (obj.width * obj.xAlignFactor);
@@ -139,6 +143,8 @@ public abstract class GameObj implements GameObjInterface
          return false;
       return true;
    }
+
+   //======================= Internal Methods =========================
 
    protected double boundingBoxLeft()
    {
@@ -171,22 +177,12 @@ public abstract class GameObj implements GameObjInterface
 		return lineWidth / game.getPixelsPerUnit();
    }
 
-   //======================= Internal Methods =========================
-
-   // Return value pinned to the range min to max
-   private int pinInt(int value, int min, int max)
-   {
-      if (value < min)
-         return min;
-      if (value > max)
-         return max;
-      return value;
-   }
-
    // Return a valid Color given r, g, b components forced into range.
    private Color makeColor(int r, int g, int b)
    {
-      return new Color(pinInt(r, 0, 255), pinInt(g, 0, 255), pinInt(b, 0, 255));
+      return new Color(game.pinValue(r, 0, 255), 
+                       game.pinValue(g, 0, 255), 
+                       game.pinValue(b, 0, 255));
    }
 
    // Return true if the object is at least partially within the screen area
@@ -211,6 +207,9 @@ public abstract class GameObj implements GameObjInterface
    // Set xAlignFactor and yAlignFactor given alignment string
    private void setAlignFromString(String a)
    {
+      if (a == null)
+         a = "center";
+         
       switch (a.toLowerCase())
       {
          case "top left":       xAlignFactor = 0;    yAlignFactor = 0;    break;
@@ -305,5 +304,13 @@ public abstract class GameObj implements GameObjInterface
          wentOff = !onScreenNow;
       onScreenPrev = onScreenNow;
       return wentOff;
+   }
+   
+   // Mark the object as deleted
+   protected void markDeleted()
+   {
+      deleted = true;
+      visible = false;
+      clickable = false;
    }
 }
