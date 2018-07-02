@@ -212,6 +212,9 @@ end
 -- API
 function ct.keyPressed(keyName, ...)
 	-- Check parameters
+	if keyName == nil then
+		return false
+	end
 	if g.checkAPIParams("ct.keyPressed") then
 		g.check1Param("string", keyName, ...)
 	end
@@ -223,6 +226,9 @@ end
 -- API
 function ct.charTyped(ch, ...)
 	-- Check parameters
+	if ch == nil  then
+		return false
+	end
 	if g.checkAPIParams("ct.charTyped") then
 		g.check1Param("string", ch, ...)
 	end

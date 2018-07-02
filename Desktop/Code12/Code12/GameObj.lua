@@ -95,11 +95,11 @@ end
 function GameObj:setObj(obj)
 	-- Both objects have a reference to each other
 	self._code12.obj = obj
-	obj.code12GameObj = self
-
-	-- Install the touch listener and set the correct stacking order
-	obj:addEventListener("touch", g.onTouchGameObj)
-	self:setLayer(self._code12.layer)
+	if obj ~= nil then
+		obj.code12GameObj = self
+		obj:addEventListener("touch", g.onTouchGameObj)
+		self:setLayer(self._code12.layer)
+	end
 end
 
 -- Remove a GameObj and delete the display object.
@@ -146,6 +146,7 @@ end
 
 -- Text constructor
 function GameObj:newText(group, text, x, y, height, colorName)
+	text = text or ""
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
 	local obj = display.newText(group, text, x, y, "Verdana-Bold",
 						fontSizeFromHeight(height))
@@ -160,19 +161,22 @@ end
 
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
-	-- If an app context tells us the media directory then use it, else current dir.
-	local baseDir, path
-	local appContext = ct._appContext
-	if appContext and appContext.mediaDir then
-		path = appContext.mediaDir .. filename
-		baseDir = appContext.mediaBaseDir
-	else
-		path = filename
-		baseDir = system.ResourceDirectory
-	end
+	local obj = nil
+	if filename ~= nil then
+		-- If an app context tells us the media directory then use it, else current dir.
+		local baseDir, path
+		local appContext = ct._appContext
+		if appContext and appContext.mediaDir then
+			path = appContext.mediaDir .. filename
+			baseDir = appContext.mediaBaseDir
+		else
+			path = filename
+			baseDir = system.ResourceDirectory
+		end
 
-	-- Try to open the image at native resolution
-	local obj = display.newImage(group, path, baseDir, x, y)
+		-- Try to open the image at native resolution
+		obj = display.newImage(group, path, baseDir, x, y)
+	end
 	if not obj then
 		-- Can't open image, substitute a text object with a red X
 		g.warning("Cannot find image file", filename)
@@ -272,7 +276,7 @@ function GameObj:updateSizeLine(scale)
 				self:setObj(newObj)
 				group:insert(i, newObj)   -- insert at same z-order as old line
 				self:setLineColorFromColor(p.lineColor)
-				newObj.srokeWidth = obj.strokeWidth
+				newObj.strokeWidth = obj.strokeWidth
 				obj:removeSelf()          -- remove old line
 				break
 			end
@@ -470,7 +474,11 @@ local colors = {
 }
 
 -- Return the color for the given color name, or gray if name not known.
+-- Return nil if colorName is nil.
 local function colorFromName(colorName)
+	if colorName == nil then
+		return nil
+	end
 	local color = colors[string.lower(colorName)]
 	if color then
 		return color

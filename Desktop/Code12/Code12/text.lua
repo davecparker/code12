@@ -82,8 +82,8 @@ function ct.log(value, ...)
 	-- Parameters can be any types or count, and the first value can be nil,
 	-- so there's no parameter checking we can do.
 
-	-- Treat the first value specially, so at least we can get "nil" output
-	-- if the client calls with an undefined variable.
+	-- Treat the first value specially, so at least we can get "null" output
+	-- if the client calls with an uninitialized object.
 	-- Unfortunately, this can't work with multiple nils passed.
 	logValue(value)
 
@@ -148,7 +148,7 @@ end
 
 -- API
 function ct.inputInt(message, ...)
-	-- Set API so inputString can check the params
+	-- Set API so inputLine can check the params
 	g.checkAPIParams("ct.inputInt", 1)
 
 	-- Input a string and try to convert to an int
@@ -161,7 +161,7 @@ end
 
 -- API
 function ct.inputNumber(message, ...)
-	-- Set API so inputString can check the params
+	-- Set API so inputLine can check the params
 	g.checkAPIParams("ct.inputNumber", 1)
 
 	-- Input a string and try to convert to a number
@@ -170,10 +170,10 @@ end
 
 -- API
 function ct.inputBoolean(message, ...)
-	-- Set API so inputString can check the params
+	-- Set API so inputLine can check the params
 	g.checkAPIParams("ct.inputBoolean", 1)
 
-	-- Input a string and check the first non-black char to determine value
+	-- Input a string and check the first non-blank char to determine value
 	local s = inputLine(message, ...)
 	for i = 1, string.len(s) do    -- look for first non-whitespace char
 		local ch = string.lower(string.sub(s, i, i))
@@ -188,7 +188,7 @@ end
 
 -- API
 function ct.inputString(message, ...)
-	-- Set API so inputString can check the params
+	-- Set API so inputLine can check the params
 	g.checkAPIParams("ct.inputString", 1)
 
 	-- Input the string

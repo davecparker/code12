@@ -39,8 +39,10 @@ end
 -- API
 function GameObj:setText(text, ...)
 	-- Check parameters
-	if g.checkGameObjMethodParams(self, "setText") then
-		g.check1Param("string", text, ...)
+	if text ~= nil then
+		if g.checkGameObjMethodParams(self, "setText") then
+			g.check1Param("string", text, ...)
+		end
 	end
 
 	-- Set the text
@@ -80,6 +82,7 @@ end
 -- API
 function GameObj:align(alignment, adjustY, ...)
 	-- Check parameters
+	alignment = alignment or "center"
 	if g.checkGameObjMethodParams(self, "align") then
 		g.checkType(1, "string", alignment)
 		if adjustY then
@@ -96,8 +99,10 @@ end
 -- API
 function GameObj:setFillColor(colorName, ...)
 	-- Check parameters
-	if g.checkGameObjMethodParams(self, "setFillColor") then
-		g.check1Param("string", colorName, ...)
+	if colorName ~= nil then
+		if g.checkGameObjMethodParams(self, "setFillColor") then
+			g.check1Param("string", colorName, ...)
+		end
 	end
 
 	-- Set the color
@@ -118,8 +123,10 @@ end
 -- API
 function GameObj:setLineColor(colorName, ...)
 	-- Check parameters
-	if g.checkGameObjMethodParams(self, "setLineColor") then
-		g.check1Param("string", colorName, ...)
+	if colorName ~= nil then
+		if g.checkGameObjMethodParams(self, "setLineColor") then
+			g.check1Param("string", colorName, ...)
+		end
 	end
 
 	-- Set the color
@@ -207,16 +214,17 @@ end
 
 -- API
 function GameObj:hit(gameObj, ...)
+	if gameObj == nil or gameObj._code12.deleted or self._code12.deleted then
+		return false
+	end
+
 	-- Check parameters
-	-- TODO: If called as obj.hit, not detected due to gameObj---
+	-- Note: If called as obj.hit, not detected due to gameObj (bummer)
 	if g.checkGameObjMethodParams(self, "hit") then
 		g.check1Param("GameObj", gameObj, ...)
 	end
 
 	-- Do hit test
-	if gameObj == nil or gameObj._code12.deleted then
-		return false
-	end
 	return self:hitObj(gameObj)
 end
 
