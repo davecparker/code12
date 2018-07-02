@@ -7,9 +7,9 @@ class LineHitTest extends Code12Program
    {
       Code12.run(new LineHitTest());
    }
-   GameObj[] staticLines;
-   GameObj[] movingObjs;
-   GameObj clickedObj;
+   GameObj[] objs;
+   GameObj clickedObj = null;
+   double startSpeed;
    double speed;
    double dx = 0;
    double dy = 0;
@@ -17,70 +17,108 @@ class LineHitTest extends Code12Program
    public void start()
    {
       speed = 1 / ct.getPixelsPerUnit();
+      startSpeed = speed; 
+      
+      objs = new GameObj[19];
 
-      staticLines = new GameObj[8];
+      objs[0] = ct.rect(25, 90, 15, 10, "gray");  // rect
+      objs[1] = ct.circle(75, 90, 10, "gray");    // circle
 
-   	staticLines[0] = ct.line(0, 0, 100, 0, "blue");     // top wall
-   	staticLines[1] = ct.line(0, 100, 100, 100, "blue");   // bottom wall
-   	staticLines[2] = ct.line(0, 0, 0, 100, "blue");     // left wall
-      staticLines[3] = ct.line(100, 0, 100, 100, "blue");   // right wall
-      for (int i = 0; i <= 3; i++)
-         staticLines[i].lineWidth = 5;
+   	objs[2] = ct.line(2, 0, 98, 0, "blue");     // top wall
+   	objs[3] = ct.line(2, 100, 98, 100, "blue");   // bottom wall
+   	objs[4] = ct.line(0, 2, 0, 98, "blue");     // left wall
+      objs[5] = ct.line(100, 2, 100, 98, "blue");   // right wall
+      for (int i = 2; i <= 5; i++)
+         objs[i].lineWidth = 5;
+      // static lines in center cross
+      objs[6] = ct.line(30, 30, 70, 70, "blue");  // diagonal line top left to bottom right
+      objs[7] = ct.line(30, 70, 70, 30, "blue");  // diagonal line bottom left to top right
+      objs[8] = ct.line(50, 25, 50, 75, "blue");  // vertical line in center
+      objs[9] = ct.line(25, 50, 75, 50, "blue");  // horizontal line in center
+      // moving lines
+      objs[10] = ct.line(40, 5, 60, 5);    // horizontal lines at top
+      objs[11] = ct.line(20, 5, 35, 5);
+      objs[12] = ct.line(65, 5, 80, 5);
+      for (int i = 10; i <= 12; i++)
+         objs[i].ySpeed = startSpeed;
+      objs[13] = ct.line(5, 40, 5, 60);    // vertical lines at left
+      objs[14] = ct.line(5, 20, 5, 35);
+      objs[15] = ct.line(5, 65, 5, 80);
+      for (int i = 13; i <= 15; i++)
+         objs[i].xSpeed = startSpeed;
+      objs[16] = ct.line(40, 90, 60, 90);    // horizontal line at bottom
+      objs[16].ySpeed = startSpeed;
+      objs[17] = ct.line(90, 40, 90, 60);    // vertical line at right
+      objs[17].xSpeed = startSpeed;
+      objs[18] = ct.line(95, 95, 90, 90);    // diagonal line lower right corner
+      objs[18].xSpeed = -startSpeed;
+      objs[18].ySpeed = -startSpeed;
 
-      staticLines[4] = ct.line(30, 30, 70, 70, "blue");  // diagonal line top left to bottom right
-      staticLines[5] = ct.line(30, 70, 70, 30, "blue");  // diagonal line bottom left to top right
-      staticLines[6] = ct.line(50, 25, 50, 75, "blue");  // vertical line in center
-      staticLines[7] = ct.line(25, 50, 75, 50, "blue");  // horizontal line in center
+      for (int i = 0; i < objs.length; i++)
+      {
+         objs[i].clickable = true;
+         if (i > 1)
+            objs[i].group = "line";
+      }
 
-      movingObjs = new GameObj[11];
-      movingObjs[0] = ct.rect(25, 90, 15, 10, "green");  // rect
-      movingObjs[1] = ct.circle(75, 90, 10, "green");    // circle
-
-      movingObjs[2] = ct.line(40, 5, 60, 5);    // horizontal lines at top
-      movingObjs[3] = ct.line(20, 5, 35, 5);
-      movingObjs[4] = ct.line(65, 5, 80, 5);
-      for (int i = 2; i <= 4; i++)
-         movingObjs[i].ySpeed = speed;
-
-      movingObjs[5] = ct.line(5, 40, 5, 60);    // vertical lines at left
-      movingObjs[6] = ct.line(5, 20, 5, 35);
-      movingObjs[7] = ct.line(5, 65, 5, 80);
-      for (int i = 5; i <= 7; i++)
-         movingObjs[i].xSpeed = speed;
-
-      movingObjs[8] = ct.line(40, 90, 60, 90);    // horizontal line at bottom
-      movingObjs[8].ySpeed = speed;
-      movingObjs[9] = ct.line(90, 40, 90, 60);    // vertical line at right
-      movingObjs[9].xSpeed = speed;
-      movingObjs[10] = ct.line(1, 99, 21, 79);    // diagonal line lower left corner
-
-
-      for (GameObj obj : movingObjs)
-         obj.clickable = true;
    }
 
    public void update()
    {
-      for (GameObj line : staticLines)
+      // Reset obj colors
+      for (int i = 0; i < objs.length; i++)
       {
-         boolean lineHitAnObj = false;
-         for (GameObj obj : movingObjs)
+         GameObj obj = objs[i];
+         String group = obj.group;
+         if (group.equals("line"))
+            obj.setLineColor("black");
+         else
+            obj.setFillColor("gray");
+      }
+      // Check if any objects hit each other and change their color if so
+      for (int i = 0; i < objs.length; i++)
+      {
+         GameObj obj1 = objs[i];
+         String group1 = obj1.group;
+         boolean obj1HitNothing = true;
+         for (int j = i + 1; j < objs.length; j++)
          {
-            if (obj.hit(line))
+            GameObj obj2 = objs[j];
+            String group2 = obj2.group;
+            if (obj1.hit(obj2))
             {
-               obj.xSpeed = 0;
-               obj.ySpeed = 0;
-               obj.setFillColor("red");
-               obj.setLineColor("red");
-
-               line.setLineColor("red");
-               lineHitAnObj = true;
+               obj1HitNothing = false;
+               obj1.xSpeed = 0;
+               obj1.ySpeed = 0;
+               obj2.xSpeed = 0;
+               obj2.ySpeed = 0;
+               if (group1.equals("line"))
+                  obj1.setLineColor("red");
+               else
+                  obj1.setFillColor("red");
+               if (group2.equals("line"))
+                  obj2.setLineColor("red");
+               else
+                  obj2.setFillColor("red");
             }
          }
-         if (!lineHitAnObj)
-            line.setLineColor("blue");
       }
    }
+
+	public void onMousePress( GameObj obj, double x, double y )
+	{
+		if ( obj == null )
+      {
+         clickedObj = null;
+      }
+      else
+		{
+			clickedObj = obj;
+         dx = x - obj.x;
+         dy = y - obj.y;
+         ct.println(obj.toString() + " clicked");
+		}
+	}
 
 	public void onMouseDrag( GameObj obj, double x, double y )
 	{
@@ -88,40 +126,48 @@ class LineHitTest extends Code12Program
 		{
 			obj.x = x - dx;
 			obj.y = y - dy;
-         obj.setFillColor("green");
-         clickedObj.setLineColor("black");
 		}
 	}
 
-	public void onMousePress( GameObj obj, double x, double y )
-	{
-		if ( obj != null )
-		{
-			clickedObj = obj;
-         dx = x - obj.x;
-         dy = y - obj.y;
-		}
-		else if (clickedObj != null)
-		{
-			double vx = x - clickedObj.x;
-			double vy = y - clickedObj.y;
-			double v = Math.sqrt(vx*vx + vy*vy);
-			clickedObj.xSpeed = vx / v * speed;
-			clickedObj.ySpeed = vy / v * speed;
-         clickedObj.setFillColor("green");
-		}
-	}
 
    public void onKeyPress( String keyName )
    {
-      if (keyName.equals("up"))
+      if (keyName.equals("t"))
       {
          if (clickedObj != null)
          {
             clickedObj.lineWidth++;
          }
       }
-   }
+      else if (clickedObj != null)
+      {
+         if (keyName.equals("up"))
+         {
+            clickedObj.ySpeed = -speed;
+            clickedObj.xSpeed = 0;
+         }
+         else if (keyName.equals("down"))
+         {
+            clickedObj.ySpeed = speed;
+            clickedObj.xSpeed = 0;
 
+         }
+         else if (keyName.equals("left"))
+         {
+            clickedObj.xSpeed = -speed;
+            clickedObj.ySpeed = 0;
+         }
+         else if (keyName.equals("right"))
+         {
+            clickedObj.xSpeed = speed;
+            clickedObj.ySpeed = 0;
+         }
+         else if (keyName.equals("space"))
+         {
+            clickedObj.xSpeed = 0;
+            clickedObj.ySpeed = 0;         
+         }
+      }
+   }
 
 }
