@@ -39,6 +39,9 @@ end
 -- API
 function ct.sound(filename, ...)
 	-- Check parameters
+	if filename == nil then
+		return
+	end
 	if g.checkAPIParams("ct.sound") then
 		g.check1Param("string", filename, ...)
 	end

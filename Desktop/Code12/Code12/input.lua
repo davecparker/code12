@@ -63,12 +63,18 @@ end
 
 -- Handle a Corona touch event on the Runtime
 function g.onTouchRuntime(event)
+	if g.blocked or g.stopped then
+		return false
+	end
 	clickEvent(event, nil)
 	return true
 end
 
 -- Handle a Corona touch event on a GameObj
 function g.onTouchGameObj(event)
+	if g.blocked or g.stopped then
+		return false
+	end
 	local gameObj = event.target.code12GameObj
 	if gameObj.clickable then
 		clickEvent(event, event.target.code12GameObj)
@@ -142,6 +148,9 @@ end
 -- Handle a Corona key event.
 -- Track which keys are down and typed, and call client event handler(s).
 function g.onKey(event)
+	if g.blocked or g.stopped then
+		return false
+	end
 	local returnValue = false
 	local keyName = event.keyName
 	if event.phase == "down" then
@@ -203,6 +212,9 @@ end
 -- API
 function ct.keyPressed(keyName, ...)
 	-- Check parameters
+	if keyName == nil then
+		return false
+	end
 	if g.checkAPIParams("ct.keyPressed") then
 		g.check1Param("string", keyName, ...)
 	end
@@ -214,6 +226,9 @@ end
 -- API
 function ct.charTyped(ch, ...)
 	-- Check parameters
+	if ch == nil  then
+		return false
+	end
 	if g.checkAPIParams("ct.charTyped") then
 		g.check1Param("string", ch, ...)
 	end

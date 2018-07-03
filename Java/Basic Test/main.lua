@@ -100,7 +100,7 @@ require('Code12.api')
         
         elseif ct.clicked() then
             
-            ct.log("Click at " .. ct.clickX(), ct.clickY())
+            ct.logm("Click at", ct.clickX(), ct.clickY())
             ct.sound("bubble.wav")
         end
         
