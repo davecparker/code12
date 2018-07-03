@@ -27,6 +27,20 @@ local function clickEvent(event, gameObj)
 			return
 		end
 
+		-- If gameObj is nil, check if a line was clicked
+		if gameObj == nil then
+			local objs = g.screen.objs
+			for i = 1, objs.numChildren do
+				local gObj = objs[i].code12GameObj
+				if gObj.clickable and gObj._code12.typeName == "line" then
+					if gObj:lineContainsPoint( x, y ) then
+						gameObj = gObj
+						break
+					end
+				end
+			end
+		end
+
 		-- Set last click state
 		g.clicked = true
 		g.gameObjClicked = gameObj
@@ -35,12 +49,21 @@ local function clickEvent(event, gameObj)
 
 		-- Automatically take the touch focus on an object.
 		if gameObj then
-			display.getCurrentStage():setFocus(event.target)
+			display.getCurrentStage():setFocus(gameObj._code12.obj)
 		end
 
 		-- Call client event
 		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
 	elseif event.phase == "moved" then
+		-- Ignore this drag point if not in the game area
+		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
+			return
+		end
+
+		-- Set last drag location
+		g.clickX = x
+		g.clickY = y
+
 		-- Call client event
 		g.eventFunctionYielded(_fn.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
@@ -54,12 +77,18 @@ end
 
 -- Handle a Corona touch event on the Runtime
 function g.onTouchRuntime(event)
+	if g.blocked or g.stopped then
+		return false
+	end
 	clickEvent(event, nil)
 	return true
 end
 
 -- Handle a Corona touch event on a GameObj
 function g.onTouchGameObj(event)
+	if g.blocked or g.stopped then
+		return false
+	end
 	local gameObj = event.target.code12GameObj
 	if gameObj.clickable then
 		clickEvent(event, event.target.code12GameObj)
@@ -105,6 +134,8 @@ local function charTypedFromKeyEvent(event)
 		return "\n"
 	elseif keyName == "tab" then
 		return "\t"
+	elseif keyName == "deleteBack" then
+		return "\b"
 	end
 
 	-- Ignore other special keys with keyName longer than one char
@@ -133,8 +164,18 @@ end
 -- Handle a Corona key event.
 -- Track which keys are down and typed, and call client event handler(s).
 function g.onKey(event)
+	if g.blocked or g.stopped then
+		return false
+	end
 	local returnValue = false
+
+	-- Get the key name and change it as necessary to match the Code12 spec
 	local keyName = event.keyName
+	if keyName == "deleteBack" then
+		keyName = "backspace"
+	end
+
+	-- Process the key
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
@@ -149,7 +190,7 @@ function g.onKey(event)
 		end
 	elseif event.phase == "up" then
 		-- keyRelease
-		keysDown[event.keyName] = nil
+		keysDown[keyName] = nil
 		g.eventFunctionYielded(_fn.onKeyRelease, keyName)
 	end
 	return returnValue
@@ -194,6 +235,9 @@ end
 -- API
 function ct.keyPressed(keyName, ...)
 	-- Check parameters
+	if keyName == nil then
+		return false
+	end
 	if g.checkAPIParams("ct.keyPressed") then
 		g.check1Param("string", keyName, ...)
 	end
@@ -205,6 +249,9 @@ end
 -- API
 function ct.charTyped(ch, ...)
 	-- Check parameters
+	if ch == nil  then
+		return false
+	end
 	if g.checkAPIParams("ct.charTyped") then
 		g.check1Param("string", ch, ...)
 	end

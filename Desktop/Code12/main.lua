@@ -56,8 +56,8 @@ local sourceFile = {
 
 -- Force the initial file to the standard test file for faster dev testing
 if env.isSimulator then
-	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
---	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
@@ -338,7 +338,7 @@ local function makeErrDisplay()
 	-- Make the highlight rectangles
 	local highlightGroup = app.makeGroup( errGroup, xText, margin )
 	errGroup.highlightGroup = highlightGroup
-	local y = ((numSourceLines - 1) / 2) * dyLine - 1
+	local y = ((numSourceLines - 1) / 2) * dyLine
 	errGroup.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
 	errGroup.refRect = makeHilightRect( dxChar * 5, y, 
 							dxChar * 6, dyLine, true )
@@ -385,7 +385,7 @@ local function makeErrDisplay()
 		y = dySource + margin * 2,
 		width = app.width - xText - 20,   -- wrap near end of window
 		font = native.systemFontBold, 
-		fontSize = app.consoleFontSize,
+		fontSize = app.consoleFontSize + 2,
 		align = "left",
 	} )
 end
@@ -437,7 +437,10 @@ local function showError()
 	local dxExtra = 2   -- extra pixels of highlight horizontally
 	local r = errGroup.sourceRect
 	r.x = (errRecord.loc.first.iChar - 1) * dxChar - dxExtra
-	local numChars = errRecord.loc.last.iChar - errRecord.loc.first.iChar + 1 
+	local numChars = string.len( sourceFile.strLines[errRecord.loc.first.iLine] or "" )
+	if errRecord.loc.last then
+		numChars = errRecord.loc.last.iChar - errRecord.loc.first.iChar + 1 
+	end
 	r.width = numChars * dxChar + dxExtra * 2
 
 	-- Position the ref highlight if it's showing  TODO: two line groups if necc
@@ -453,6 +456,12 @@ local function showError()
 			r.isVisible = true
 		end
 	end
+end
+
+-- Show a runtime error with the given line number and message
+local function showRuntimeError( lineNum, message )
+	err.setErrLineNum( lineNum, "Runtime error: " .. message )
+	showError();
 end
 
 -- Handle resize event for the window
@@ -695,6 +704,7 @@ local function initApp()
 	appContext.print = console.print
 	appContext.println = console.println
 	appContext.inputString = console.inputString
+	appContext.runtimeErr = showRuntimeError
 
 	-- Load the Code12 API and runtime.
 	-- This defines the Code12 APIs in the global ct table

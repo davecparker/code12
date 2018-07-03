@@ -112,6 +112,18 @@ local function invalidCharToken()
 	return nil
 end
 
+-- Set the error state for an invalid $ char, and return nil.
+local function invalidDollarSign()
+	setTokenErr( iChar, iChar, "The $ character is not allowed in Code12" )
+	return nil
+end
+
+-- Set the error state for invalid use of ? or :, and return nil.
+local function invalidTernaryToken()
+	setTokenErr( iChar, iChar, "Invalid character (The \"? :\" operator is not supported by Code12)")
+	return nil
+end
+
 -- Return string for token starting with =  (=  ==)
 local function equalsToken()
 	iChar = iChar + 1
@@ -414,7 +426,7 @@ function javalex.getTokens( sourceStr, lineNum )
 			charType = charTypes[chars[iChar]]
 		end
 
-		-- Make a token table  TODO: get from pool
+		-- Make a token record  TODO: get from pool
 		local token = { tt = "", str = "", iLine = lineNum, iChar = iChar }
 
 		-- Determine what token type to build next
@@ -429,13 +441,19 @@ function javalex.getTokens( sourceStr, lineNum )
 			local str = string.sub( source, iCharStart, iCharEnd )
 			local tt = reservedWordTokens[str]
 			if tt == nil then
-				token.tt = "ID"   -- not a reserved word
+				-- Not a reserved word, so user-defined ID
+				token.tt = "ID"
+				-- Code12 does not allow IDs to start with an understore
+				if chars[iCharStart] == 95 then   -- _
+					setTokenErr( iCharStart, iCharEnd, "Names cannot start with an underscore in Code12")
+					return nil
+				end
 			elseif tt == false then
 				-- Unsupported reserved word
 				setTokenErr( iCharStart, iCharEnd, "Unsupported reserved word \"%s\"", str )
 				return nil
 			else
-				token.tt = tt
+				token.tt = tt   -- reserved word
 			end
 			token.str = str
 		elseif charType == false then   -- numeric 0-9
@@ -496,8 +514,8 @@ local function initCharTypes()
 	for ch = 97, 122 do    -- a-z
 		charTypes[ch] = true
 	end
-	charTypes[36] = true   -- $
-	charTypes[95] = true   -- _
+	charTypes[36] = invalidDollarSign   -- $  (not allowed in Code12)
+	charTypes[95] = true                -- _  (will be allowed only if not start char)
 
 	-- Quotes
 	charTypes[39] = charLiteralToken      -- '
@@ -514,8 +532,8 @@ local function initCharTypes()
 	charTypes[91] = "["
 	charTypes[93] = "]"
 	charTypes[126] = "~"
-	charTypes[63] = "?"
 	charTypes[58] = ":"
+	charTypes[63] = invalidTernaryToken   -- (?)  ?: is not supported
 
 	-- Chars that may lead to multi-char tokens use scanning functions
 	charTypes[61] = equalsToken

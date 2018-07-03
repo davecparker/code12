@@ -110,12 +110,16 @@ function ct.getVersion(...)
 end
 
 
--------------- String API Support Functions (not public) --------------
+-------------- String API Support Functions (not published) --------------
 
 -- Compare strings s1 and s2 as per Java's s1.compareTo( s2 )
 function ct.stringCompare( s1, s2 )
 	if s1 == s2 then
 		return 0
+	elseif s1 == nil then
+		return -1
+	elseif s2 == nil then
+		return 1
 	elseif s1 < s2 then
 		return -1
 	else
@@ -126,21 +130,45 @@ end
 -- Return the 0-based index for substring search or -1 if not found,
 -- as per Java's s1.indexOf( s2 )
 function ct.indexOfString( s1, s2 )
-	return (string.find( s1, s2, 1, true ) or 0) - 1
+	return ((s1 and s2 and string.find( s1, s2, 1, true )) or 0) - 1
 end
 
 -- Return a substring per Java's s:substring( iBegin, iEnd )
 -- iEnd is optional, the indexes are 0-based, and the substring ends before iEnd.
 function ct.substring( s, iBegin, iEnd )
+	if s == nil then
+		return nil
+	end
 	return string.sub( s, iBegin + 1, iEnd )
 end
 
 -- Return string with leading and trailing whitespace removed,
 -- as per Java's s:trim()
 function ct.trimString( s )
+	if s == nil then
+		return nil
+	end
 	-- This is trim6 from http://lua-users.org/wiki/StringTrim
 	return s:match'^()%s*$' and '' or s:match'^%s*(.*%S)'
 end
 
 
+-------------- Array Support Functions (not published) --------------
+
+-- Check the index of the array and generate a runtime error if invalid.
+-- Use errLevel (or default 2) for the Lua stack error level. 
+function ct.checkArrayIndex( array, index, errLevel )
+	if array == nil then
+		error( "Array is null", errLevel or 2)
+	elseif index < 0 or index >= array.length then 
+		error( "Array index [" .. index .. "] is out of bounds", errLevel or 2)
+	end
+end
+
+-- Return the array element at the given index, generating a runtime error
+-- if the index is invalid.
+function ct.indexArray( array, index )
+	ct.checkArrayIndex( array, index, 3 )
+	return array[index + 1] or array.default
+end
 

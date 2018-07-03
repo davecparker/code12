@@ -41,13 +41,16 @@ local g = {
 	screens = {},       -- Table of screens indexed by: name = { name = n, group = g }
 	screen = nil,       -- current screen in screens table
 
-	-- Game state
-	startTime = nil,       -- System time in ms when start function began, or nil before
+	-- Input state
 	clicked = false,       -- true if something was clicked during this update frame
 	gameObjClicked = nil,  -- Object clicked during this update frame, nil if none
 	clickX = 0,            -- Last click x location 
 	clickY = 0,            -- Last click x location 
 	charTyped = nil,       -- char typed during this update frame (string), nil if none
+
+	-- Run state
+	startTime = nil,       -- System time in ms when start function began, or nil before
+	blocked = false,       -- true if user code is blocked on user input
 	stopped = false,       -- true if run was stopped or failed
 }
 

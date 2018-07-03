@@ -16,8 +16,8 @@ local app =  {
 	borderShade = 0.5,
 
 	-- Fonts
-	consoleFont = "Consolas",
-	consoleFontSize = 16,
+	consoleFont = "NotoMono-Regular.ttf",
+	consoleFontSize = 14,
 
 	-- Measured metrics
 	consoleFontHeight = 0,       -- pixel height of console text line

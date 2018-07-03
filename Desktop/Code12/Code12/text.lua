@@ -23,7 +23,12 @@ function ct.print(value, ...)
 	end
 
 	-- Print the value
-	local text = tostring(value)
+	local text
+	if value == nil then
+		text = "null"
+	else
+		text = tostring(value)
+	end
 	if appContext then
 		appContext.print(text)
 	else
@@ -34,7 +39,7 @@ end
 
 -- API
 -- Note that ct.println() in the API must translate to ct.println("") in Lua,
--- otherwise nil will be printed.
+-- otherwise null will be printed.
 function ct.println(value, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.println") then
@@ -42,7 +47,12 @@ function ct.println(value, ...)
 	end
 
 	-- Print the value and a newline
-	local text = tostring(value)
+	local text
+	if value == nil then
+		text = "null"
+	else
+		text = tostring(value)
+	end
 	if appContext then
 		appContext.println(text)
 	else
@@ -54,7 +64,9 @@ end
 
 -- Print a value as it should appear in ct.log output
 local function logValue(value)
-	if type(value) == "string" then
+	if value == nil then
+		ct.print("null")
+	elseif type(value) == "string" then
 		ct.print("\"")
 		ct.print(value)
 		ct.print("\"")
@@ -70,8 +82,8 @@ function ct.log(value, ...)
 	-- Parameters can be any types or count, and the first value can be nil,
 	-- so there's no parameter checking we can do.
 
-	-- Treat the first value specially, so at least we can get "nil" output
-	-- if the client calls with an undefined variable.
+	-- Treat the first value specially, so at least we can get "null" output
+	-- if the client calls with an uninitialized object.
 	-- Unfortunately, this can't work with multiple nils passed.
 	logValue(value)
 
@@ -136,7 +148,7 @@ end
 
 -- API
 function ct.inputInt(message, ...)
-	-- Set API so inputString can check the params
+	-- Set API so inputLine can check the params
 	g.checkAPIParams("ct.inputInt", 1)
 
 	-- Input a string and try to convert to an int
@@ -149,7 +161,7 @@ end
 
 -- API
 function ct.inputNumber(message, ...)
-	-- Set API so inputString can check the params
+	-- Set API so inputLine can check the params
 	g.checkAPIParams("ct.inputNumber", 1)
 
 	-- Input a string and try to convert to a number
@@ -158,10 +170,10 @@ end
 
 -- API
 function ct.inputBoolean(message, ...)
-	-- Set API so inputString can check the params
+	-- Set API so inputLine can check the params
 	g.checkAPIParams("ct.inputBoolean", 1)
 
-	-- Input a string and check the first non-black char to determine value
+	-- Input a string and check the first non-blank char to determine value
 	local s = inputLine(message, ...)
 	for i = 1, string.len(s) do    -- look for first non-whitespace char
 		local ch = string.lower(string.sub(s, i, i))
@@ -176,7 +188,7 @@ end
 
 -- API
 function ct.inputString(message, ...)
-	-- Set API so inputString can check the params
+	-- Set API so inputLine can check the params
 	g.checkAPIParams("ct.inputString", 1)
 
 	-- Input the string

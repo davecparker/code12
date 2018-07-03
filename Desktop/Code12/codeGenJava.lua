@@ -79,6 +79,22 @@ local luaFnFromJavaStringMethod = {
     ["trim"]         =  "ct.trimString",
 }
 
+-- Substitutes for Lua reserved words that are not reserved in Java
+local nameFromLuaReservedWord = {
+	["and"]       = "_and",
+	["elseif"]    = "_elseif",
+	["end"]       = "_end",
+	["function"]  = "_function",
+	["in"]        = "_in",
+	["local"]     = "_local",
+	["nil"]       = "_nil",
+	["not"]       = "_not",
+	["or"]        = "_or",
+	["repeat"]    = "_repeat",
+	["then"]      = "_then",
+	["until"]     = "_until",
+}
+
 
 --- Utility Functions --------------------------------------------------------
 
@@ -119,21 +135,39 @@ local generateControlledStmt
 
 -- Return Lua code for a variable name
 local function varNameCode( varName )
+	local luaName = nameFromLuaReservedWord[varName] or varName
 	if checkJava.isInstanceVarName( varName ) then
-		return thisPrefix .. varName    -- instance var, so use this.name
+		return thisPrefix .. luaName    -- instance var, so use this.name
 	end
-	return varName
+	return luaName
 end
 
--- Return Lua code for an lValue node
-function lValueCode( lValue )
-	local nodes = lValue.nodes
-	local varName = nodes[1].str
-	local code = varNameCode( varName ) 
-	if nodes[2].p == "index" then
-		code = code .. "[1+(" .. exprCode( nodes[2].nodes[2] ) .. ")]"
+-- Return Lua code for a variable idNode with an optional array index indexNode. 
+-- If assigned then the lValue is being assigned to, otherwise it is being read.  
+local function varIndexCode( idNode, indexNode, assigned )
+	local varCode = varNameCode( idNode.str )
+	if indexNode.p == "empty" then
+		return varCode   -- Simple variable
 	end
+
+	-- Array and index: Generate code to check array index at runtime
+	local indexStr = exprCode( indexNode.nodes[2] )
+	if assigned then
+		return table.concat{
+			"ct.checkArrayIndex(", varCode, ", ", indexStr, "); ",
+			varCode, "[1+(", indexStr, ")]"
+		}
+	end
+	return "ct.indexArray(" .. varCode .. ", " .. indexStr .. ")"
+end
+
+-- Return Lua code for an lValue. 
+-- If assigned then the lValue is being assigned to, otherwise it is being read. 
+function lValueCode( lValue, assigned )
+	local nodes = lValue.nodes
+	local code = varIndexCode( nodes[1], nodes[2], assigned )
 	if nodes[3].p == "field" then
+		local varName = nodes[1].str
 		local fieldName = nodes[3].nodes[2].str
 		if varName == "Math" then
 			if fieldName == "PI" then
@@ -147,13 +181,9 @@ function lValueCode( lValue )
 	return code
 end
 
--- Return code for an idNode with an optional indexNode
-local function varIndexCode( idNode, indexNode )
-	local str = varNameCode( idNode.str )
-	if indexNode.p == "empty" then
-		return str
-	end
-	return str .. "[1+(" .. exprCode( indexNode.nodes[2] ) .. ")]"
+-- Return Lua code for a function name
+local function fnNameCode( fnName )
+	return fnPrefix .. (nameFromLuaReservedWord[fnName] or fnName)
 end
 
 -- Return Lua code for a function or method call, e.g:
@@ -174,7 +204,7 @@ function fnCallCode( tree )
 
 	if methodNode.p == "empty"  then
 		-- User-defined function call
-		parts = { fnPrefix, idNode.str, "(" }   -- e.g. _fn.updateScore(
+		parts = { fnNameCode( idNode.str ), "(" }   -- e.g. _fn.updateScore(
 	else
 		-- Method call
 		local objName = idNode.str
@@ -249,8 +279,9 @@ function exprCode( expr )
 	elseif p == "exprParens" then
 		return "(" .. exprCode( nodes[2] ) .. ")"
 	elseif p == "newArray" then
-		javaTypes.vtFromVarType( nodes[2] )   -- check for valid type
-		return "{ length = " .. exprCode( nodes[4] ) .. " }"
+		local vt = javaTypes.vtFromVarType( nodes[2] )
+		return "{ length = " .. exprCode( nodes[4] ) .. ", default = "
+				  .. tostring( javaTypes.defaultValueForVt( vt ) ) .. " }"
 	end
 
 	-- Is this a Binary operator?
@@ -293,13 +324,13 @@ local function generateVarDecl( tree, isInstanceVar )
 		local varName = nameNode.str
 		if isInstanceVar then
 			checkJava.defineInstanceVar( nameNode, vt, false, true )
-			beginLuaLine( thisPrefix )     -- use this.name
+			beginLuaLine( varNameCode( varName ) )
 		else
 			checkJava.defineLocalVar( nameNode, vt, false, true )
 			beginLuaLine( "local " )
+			addLua( varNameCode( varName ) )
 		end
 		checkJava.canAssignToVarNode( nameNode, expr, true )
-		addLua( varName )
 		addLua( " = " )
 		addLua( exprCode( expr ) )
 		return true
@@ -310,14 +341,14 @@ local function generateVarDecl( tree, isInstanceVar )
 		beginLuaLine( "" )   -- we may have multiple statements on this line
 		for i = 1, #idList do
 			local nameNode = idList[i]
+			local varName = nameNode.str
 			if isInstanceVar then
 				checkJava.defineInstanceVar( nameNode, vt, false )
-				addLua( thisPrefix )            -- use this.name
 			else
 				checkJava.defineLocalVar( nameNode, vt, false )
 				addLua( "local " )
 			end
-			addLua( nameNode.str )
+			addLua( varNameCode( varName ) )
 			addLua( " = " )
 			-- Need to init primitives so they don't start as nil.
 			-- We will go ahead and init all types for completeness.
@@ -337,12 +368,12 @@ local function generateVarDecl( tree, isInstanceVar )
 		local varName = nameNode.str
 		if isInstanceVar then
 			checkJava.defineInstanceVar( nameNode, vt, true, true )
-			beginLuaLine( thisPrefix )     -- use this.name
+			beginLuaLine( varNameCode( varName ) )
 		else
 			checkJava.defineLocalVar( nameNode, vt, true, true )
 			beginLuaLine( "local " )
+			addLua( varNameCode( varName ) )
 		end
-		addLua( varName )
 		addLua( " = " )
 		local arrayInit = nodes[6]
 		if arrayInit.p == "list" then
@@ -360,6 +391,8 @@ local function generateVarDecl( tree, isInstanceVar )
 			end
 			addLua( "length = " )
 			addLua( #exprs )
+			addLua( ", default = " )
+			addLua( tostring( javaTypes.defaultValueForVt( vt ) ) )
 			addLua( " }" )
 		else
 			-- type [ ] id = expr
@@ -380,14 +413,14 @@ local function generateVarDecl( tree, isInstanceVar )
 		beginLuaLine( "" )   -- we may have multiple statements on this line
 		for i = 1, #idList do
 			local nameNode = idList[i]
+			local varName = nameNode.str
 			if isInstanceVar then
 				checkJava.defineInstanceVar( nameNode, vt, true )
-				addLua( thisPrefix )            -- use this.name
 			else
 				checkJava.defineLocalVar( nameNode, vt, true )
 				addLua( "local " )
 			end
-			addLua( nameNode.str )
+			addLua( varNameCode( varName ) )
 			addLua( " = nil; " )
 		end
 		return true
@@ -406,10 +439,9 @@ local function generateIncOrDecStmt( lValue, opToken )
 		err.setErrNodeAndRef( opToken, lValue, "Can only apply \"%s\" to numeric types", tt )
 		return
 	end
-	local lValueStr = lValueCode( lValue )
-	addLua( lValueStr )
+	addLua( lValueCode( lValue, true ) )
 	addLua( " = " )
-	addLua( lValueStr )
+	addLua( lValueCode( lValue ) )
 	if tt == "++" then
 		addLua( " + 1" )
 	else
@@ -442,7 +474,7 @@ local function generateStmt( tree )
 		local lValue = nodes[1]
 		local expr = nodes[3]
 		if checkJava.canAssignToLValue( lValue, expr ) then
-			addLua( lValueCode( lValue ) )
+			addLua( lValueCode( lValue, true ) )
 			addLua( " = " )
 			addLua( exprCode( expr ) )
 		end
@@ -452,10 +484,9 @@ local function generateStmt( tree )
 		local op = nodes[2]
 		local expr = nodes[3]
 		if checkJava.canOpAssignToLValue( lValue, op, expr ) then
-			local lValueStr = lValueCode( lValue )
-			addLua( lValueStr )
+			addLua( lValueCode( lValue, true ) )
 			addLua( " = " )
-			addLua( lValueStr )
+			addLua( lValueCode( lValue ) )
 			addLua( luaOpFromJavaOp[op.p] )
 			addLua( "(" )
 			addLua( exprCode( expr ) )
@@ -712,8 +743,7 @@ end
 -- Return true if successful.
 local function generateFunction( fnName, paramList )
 	beginLuaLine( "function " )
-	addLua( fnPrefix )
-	addLua( fnName )
+	addLua( fnNameCode( fnName ) )
 	generateFnParamList( paramList )
 	iTree = iTree + 1 
 

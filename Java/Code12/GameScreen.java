@@ -13,7 +13,7 @@ public class GameScreen
    
    // Private instance data
    private GameObj backObj;                // background rect or image or null if none
-   private ArrayList<GameObj> objects;     // The objects in the game
+   private ArrayList<GameObj> objects;     // The objects in this screen
 
 
    // Construct a new screen with the given name and initial size
@@ -46,25 +46,24 @@ public class GameScreen
       objects.add(i + 1, obj); 
    }
 
-   // Remove an object from the screen but don't delete it
+   // Remove an object from the screen but don't delete it. 
+   // Return true if the object was found and removed.
    boolean removeObj(GameObj obj)
    { 
       return objects.remove(obj); 
    }
    
-   // Remove objects with the given group name, or all objects if group is null 
+   // Delete objects with the given group name, or all objects if group is null 
    void clear(String group)                           
    {
-      if (group == null) 
-         objects.clear();
-      else
+      // Delete matching objects from the ArrayList in reverse order
+      for (int i = objects.size() - 1; i >= 0; i--)
       {
-         // Delete matching objects from the ArrayList in reverse order
-         for (int i = objects.size() - 1; i >= 0; i--)
+         GameObj obj = objects.get(i);
+         if (group == null || obj.group.equals(group))
          {
-            GameObj obj = objects.get(i);
-            if (obj.group.equals(group))
-               objects.remove(i);
+            obj.markDeleted();
+            objects.remove(i);
          }
       }
    }

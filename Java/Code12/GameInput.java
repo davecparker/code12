@@ -113,6 +113,12 @@ public class GameInput implements MouseListener, KeyListener
    // Do any processing necessary before a game frame update
    void preUpdate()
    {
+      // Check if a tracking object was deleted
+      if (mouseObj != null && mouseObj.deleted)
+         mouseObj = null;
+      if (clickedObj != null && clickedObj.deleted)
+         clickedObj = null;
+         
       // Check for and send mouseDrag event if necessary
       if (mouseDown)
       {
