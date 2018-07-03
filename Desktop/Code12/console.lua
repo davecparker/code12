@@ -78,6 +78,11 @@ local function updateConsole()
 		end
 	end
 
+	-- Hide text input field, if any, if scrolled back
+	if textField then
+		textField.isVisible = (scrollStartLine == nil)
+	end
+
 	-- Clear any remaining text objects
 	while iText <= #textObjs do
 		textObjs[iText].text = ""
@@ -97,6 +102,14 @@ end
 local function onScroll( newPos )
 	scrollStartLine = newPos
 	changed = true
+end
+
+-- Scroll to the end of the text in the console
+local function scrollToEnd()
+	if scrollStartLine then
+		scrollStartLine = nil
+		updateConsole()
+	end
 end
 
 -- Add raw text to the console. The text should not contain any newlines.
@@ -132,11 +145,15 @@ end
 
 -- Handle user input in the textField for console input
 local function onTextUserInput( event )
-	textFieldText = textField.text
-	if event.phase == "ended" then
+	textFieldText = textField.text     -- Update the known text
+	local phase = event.phase
+	
+	if phase == "editing" then
+		scrollToEnd()	-- try to keep input visible	
+	elseif phase == "ended" then
 		-- User clicked off, which removes the input focus, so put it back
 		native.setKeyboardFocus( textField )
-	elseif event.phase == "submitted" then
+	elseif phase == "submitted" then
 		-- User pressed enter to end the input
 		textField:removeSelf()
 		textField = nil
@@ -197,10 +214,7 @@ end
 -- it will yield to the caller of the runtime coroutine while waiting.
 function console.inputString()
 	-- If we are scrolled back, then scroll to the end so the input will be visible
-	if scrollStartLine then
-		scrollStartLine = nil
-		updateConsole()
-	end
+	scrollToEnd()
 
 	-- Determine where to position the text field
 	local numCompletedLines = #completedLines

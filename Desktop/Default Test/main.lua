@@ -48,7 +48,7 @@ require('Code12.api')
         ct.print("Here's an unitialized GameObj: ")
         ct.println(ct.indexArray(this.moreBalls, 3))
         ct.println("Done")
-        local test = false
+        local test = ct.inputBoolean("Would you like to print some lines?")
         if test then
             
             this.count = ct.inputInt("Enter count:")
