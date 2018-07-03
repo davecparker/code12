@@ -9,8 +9,8 @@ public class MainProgram extends Code12Program
    GameObj clearBack;
    String[] operatorButtons = { "+", "-", "*", "/", ".", "=", "(", ")", "%"};
    String[] errorMessages = { "Cannot divide by zero!" };
-   String equation;
    String compare; //used to compare substrings to set values
+   String equation; //holds the current equation being evaluated
    //Instance Variables for the calculate method
    double[] values =  new double[12]; //value stack
    String[] operators = new String[12]; //operator stack
@@ -73,8 +73,7 @@ public class MainProgram extends Code12Program
          buttons[num] = ct.rect( x, 31, 15, 10, "gray");         
          int y = 31;
          int buttonId = num%10;
-         compare = operatorButtons[buttonId];
-         if ( compare.equals("(") || compare.equals(")") )
+         if ( operatorButtons[buttonId].equals("(") || operatorButtons[buttonId].equals(")") )
             y = 30;
          ct.text( operatorButtons[num%10] , x, y, 10, "black" );
          num++;
@@ -88,24 +87,41 @@ public class MainProgram extends Code12Program
       //Initializes the display
       ct.setTitle("Calculator");
       displayText = "";
-      display = ct.text( displayText, 56, 18, 12, "black" ); 
+      display = ct.text( displayText, 78, 18, 12, "black" );
+      display.align("right"); 
       
       // ct.clearScreen();
       
    /////////////////////////////////////////////////////////////////////////////////
    // Equation Solver
    
-     // equation = ct.inputString("Enter an equation");
-     // ct.println( Test( 2 ) );
+      equation = ct.inputString("Enter an equation");
+      ct.println( Test ( 3 ) );
+      ct.println( findIntRoot() );
    }
    
-   /*
-   public String Test( int x )
+   public String findIntRoot ()
+   {
+      for ( int x = 0; x < 1000; x++ )
+      {
+         if( Test( x ) )
+         {
+            return ct.formatInt( x );
+         }
+         if( Test( -x ) )
+         {
+            return ct.formatInt( -x );
+         }
+      }
+     return "Cannot find integar root";
+   }   
+
+   public boolean Test( int x )
    {
       for( int i = 0; i < equation.length(); i++ )
       {  
-         String temp = equation.substring(i,i+1);
-         if( temp.equals("x") )
+         String temporary = equation.substring(i,i+1);
+         if( temporary.equals("x") )
          {
             String temp1 = equation.substring(0,i);
             String temp2 = equation.substring(i+1,equation.length() );
@@ -113,9 +129,9 @@ public class MainProgram extends Code12Program
          }
       } 
       
-      return equation;
+      return ct.parseNumber( calculate( equation ) ) == 0;
    }
-   */
+
       
    /////////////////////////////////////////////////////////////////////////////////   
       
@@ -161,9 +177,8 @@ public class MainProgram extends Code12Program
          if( i < 10 )
          {  
             //clears the display text if you enter a number while displaying a previously calculated answer          
-            if( displayingAnswer)
+            if( displayingAnswer )
             {
-               updateDisplay();
                displayText = "";
                displayingAnswer = false;
                clearBack.setText("AC");
@@ -174,10 +189,16 @@ public class MainProgram extends Code12Program
            
          else
          {
+            if( displayingAnswer )
+            {
+               displayingAnswer = false;
+               clearBack.setText("AC");
+            }
+
             displayText = displayText + operatorButtons[i%10];
          }
          
-         updateDisplay();
+         display.setText(displayText);
       }
               
       if ( i == 14 ) //decimal ( "." key )
@@ -201,12 +222,12 @@ public class MainProgram extends Code12Program
                if( !currentNumber.equals("") )
                {
                   displayText = displayText + operatorButtons[i%10];
-                  updateDisplay();
+                  display.setText(displayText);
                }
                else
                {
                   displayText = displayText + "0" + operatorButtons[i%10];
-                  updateDisplay();
+                  display.setText(displayText);
                }
             } 
          }        
@@ -217,7 +238,7 @@ public class MainProgram extends Code12Program
          {
             String result = displayText;
             displayText = calculate(result);
-            updateDisplay();
+            display.setText(displayText);
             displayingAnswer = true;
             clearBack.setText("C");
          }
@@ -230,31 +251,20 @@ public class MainProgram extends Code12Program
             if(displayingAnswer)
             {
                displayText = "";
-               updateDisplay();
+               display.setText(displayText);
                displayingAnswer = false;
                clearBack.setText("AC");
             }
             else
             {
             displayText = displayText.substring( 0, displayText.length()-1 );
-            updateDisplay();
+            display.setText(displayText);
             }
          }
       }   
      } 
    }           
    
-   
-   
-   //Method that takes a newDisplay value and redraws the display to properly display the new value
-   public void updateDisplay()
-   {
-      display.setText(displayText);
-      double newX = 77 - (display.width / 2.0);
-      display.delete();
-      display = ct.text( displayText, newX, 18, 12, "black" );
-   }
-
 
    // Method that takes the currently displayed function and calculates the value
    // Takes a string representing the displayed value (composed of numbers and math operators)
@@ -272,8 +282,7 @@ public class MainProgram extends Code12Program
          {
             return i;
          }
-      }
-      
+      } 
       return -1;
    }
    
@@ -338,7 +347,7 @@ public class MainProgram extends Code12Program
                else
                {
                   //Compares the precedence of the operators
-                  if(  findIndex(operatorButtons, toCalculate.substring(i,i+1) )  <= findIndex( operatorButtons, operators[operatorCount -1]) )
+                  if(  findIndex(operatorButtons, toCalculate.substring(i,i+1) ) < findIndex( operatorButtons, operators[operatorCount -1]) )
                   {
                      String operator = operators[operatorCount - 1];//Takes the top operator
                      double num1 = values[valueCount - 2]; //Takes the value one from the top

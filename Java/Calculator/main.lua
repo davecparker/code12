@@ -73,8 +73,7 @@ require('Code12.api')
             this.buttons[1+(num)] = ct.rect(x, 31, 15, 10, "gray")
             local y = 31
             local buttonId = num % 10
-            this.compare = this.operatorButtons[1+(buttonId)]
-            if (this.compare == "(") or (this.compare == ")") then
+            if (this.operatorButtons[1+(buttonId)] == "(") or (this.operatorButtons[1+(buttonId)] == ")") then
                 y = 30; end
             ct.text(this.operatorButtons[1+(num % 10)], x, y, 10, "black")
             num = num + 1
@@ -88,33 +87,34 @@ require('Code12.api')
         --Initializes the display
         ct.setTitle("Calculator")
         this.displayText = ""
-        this.display = ct.text(this.displayText, 56, 18, 12, "black")
+        this.display = ct.text(this.displayText, 78, 18, 12, "black")
+        this.display:align("right")
         
         -- ct.clearScreen();
         
         --///////////////////////////////////////////////////////////////////////////////
         -- Equation Solver
         
-        -- equation = ct.inputString("Enter an equation");
-        -- ct.println( Test( 2 ) );
+        this.equation = ct.inputString("Enter an equation")
+        ct.println(_fn.calculate(_fn.Test(2)))
     end
     
-    --
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    function _fn.Test(x)
+        
+        local i = 0; while i < string.len(this.equation) do
+            
+            local temporary = ct.substring(this.equation, i, i + 1)
+            if (temporary == "x") then
+                
+                local temp1 = ct.substring(this.equation, 0, i)
+                local temp2 = ct.substring(this.equation, i + 1, string.len(this.equation))
+                this.equation = temp1 .. x .. temp2
+            end
+        i = i + 1; end
+        
+        return this.equation
+    end
     
     
     --///////////////////////////////////////////////////////////////////////////////   
@@ -163,7 +163,6 @@ require('Code12.api')
                     --clears the display text if you enter a number while displaying a previously calculated answer          
                     if this.displayingAnswer then
                         
-                        _fn.updateDisplay()
                         this.displayText = ""
                         this.displayingAnswer = false
                         this.clearBack:setText("AC")
@@ -173,10 +172,16 @@ require('Code12.api')
                 
                 else 
                     
+                    if this.displayingAnswer then
+                        
+                        this.displayingAnswer = false
+                        this.clearBack:setText("AC")
+                    end
+                    
                     this.displayText = this.displayText .. this.operatorButtons[1+(i % 10)]
                 end
                 
-                _fn.updateDisplay()
+                this.display:setText(this.displayText)
             end
             
             if i == 14 then
@@ -200,12 +205,12 @@ require('Code12.api')
                     if not (currentNumber == "") then
                         
                         this.displayText = this.displayText .. this.operatorButtons[1+(i % 10)]
-                        _fn.updateDisplay()
+                        this.display:setText(this.displayText)
                     
                     else 
                         
                         this.displayText = this.displayText .. "0" .. this.operatorButtons[1+(i % 10)]
-                        _fn.updateDisplay()
+                        this.display:setText(this.displayText)
                     end
                 end
             end
@@ -216,7 +221,7 @@ require('Code12.api')
                     
                     local result = this.displayText
                     this.displayText = _fn.calculate(result)
-                    _fn.updateDisplay()
+                    this.display:setText(this.displayText)
                     this.displayingAnswer = true
                     this.clearBack:setText("C")
                 end
@@ -229,29 +234,18 @@ require('Code12.api')
                     if this.displayingAnswer then
                         
                         this.displayText = ""
-                        _fn.updateDisplay()
+                        this.display:setText(this.displayText)
                         this.displayingAnswer = false
                         this.clearBack:setText("AC")
                     
                     else 
                         
                         this.displayText = ct.substring(this.displayText, 0, string.len(this.displayText) - 1)
-                        _fn.updateDisplay()
+                        this.display:setText(this.displayText)
                     end
                 end
             end
         end
-    end
-    
-    
-    
-    --Method that takes a newDisplay value and redraws the display to properly display the new value
-    function _fn.updateDisplay()
-        
-        this.display:setText(this.displayText)
-        local newX = 77 - (this.display.width / 2.0)
-        this.display:delete()
-        this.display = ct.text(this.displayText, newX, 18, 12, "black")
     end
     
     
@@ -272,7 +266,6 @@ require('Code12.api')
                 return i
             end
         i = i + 1; end
-        
         return -1
     end
     
@@ -336,7 +329,7 @@ require('Code12.api')
                     else 
                         
                         --Compares the precedence of the operators
-                        if _fn.findIndex(this.operatorButtons, ct.substring(toCalculate, i, i + 1)) <= _fn.findIndex(this.operatorButtons, this.operators[1+(operatorCount - 1)]) then
+                        if _fn.findIndex(this.operatorButtons, ct.substring(toCalculate, i, i + 1)) < _fn.findIndex(this.operatorButtons, this.operators[1+(operatorCount - 1)]) then
                             
                             local operator = this.operators[1+(operatorCount - 1)]
                             local num1 = this.values[1+(valueCount - 2)]
