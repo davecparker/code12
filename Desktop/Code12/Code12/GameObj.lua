@@ -30,6 +30,11 @@ local function initGameObjClass()
 	local obj = display.newRect(-1000, -1000, 1, 1)
 	obj.visible = false
 	GameObj.dummyObj = obj
+
+	-- Print available fonts
+	-- for _, fontName in ipairs(native.getFontNames()) do
+	-- 	print(fontName)
+	-- end
 end
 
 
@@ -61,6 +66,7 @@ function GameObj:new(typeName, x, y, width, height)
 			lineColor = nil,
 			layer = 1,
 			adjustY = false,
+			deleted = false,
 
 			-- Stored previous values so we can detect changes on the fly
 			widthPrev = 0,
@@ -89,11 +95,11 @@ end
 function GameObj:setObj(obj)
 	-- Both objects have a reference to each other
 	self._code12.obj = obj
-	obj.code12GameObj = self
-
-	-- Install the touch listener and set the correct stacking order
-	obj:addEventListener("touch", g.onTouchGameObj)
-	self:setLayer(self._code12.layer)
+	if obj ~= nil then
+		obj.code12GameObj = self
+		obj:addEventListener("touch", g.onTouchGameObj)
+		self:setLayer(self._code12.layer)
+	end
 end
 
 -- Remove a GameObj and delete the display object.
@@ -103,6 +109,7 @@ function GameObj:removeAndDelete()
 	obj.code12GameObj = nil    -- remove display object's reference to the GameObj
 	obj:removeSelf()	       -- remove and destroy the display object
 	self._code12.obj = GameObj.dummyObj    -- dummy display object to help client avoid crashes
+	self._code12.deleted = true
 	self.visible = false       -- to reduce impact of any stale references
 	self.clickable = false
 end
@@ -140,8 +147,9 @@ end
 
 -- Text constructor
 function GameObj:newText(group, text, x, y, height, colorName)
+	text = text or ""
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
-	local obj = display.newText(group, text, x, y, native.systemFontBold,
+	local obj = display.newText(group, text, x, y, "Verdana-Bold",
 						fontSizeFromHeight(height))
 	-- print("newText height vs obj height:", height, obj.height / g.scale)
 	gameObj:setObj(obj)
@@ -154,19 +162,22 @@ end
 
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
-	-- If an app context tells us the media directory then use it, else current dir.
-	local baseDir, path
-	local appContext = ct._appContext
-	if appContext and appContext.mediaDir then
-		path = appContext.mediaDir .. filename
-		baseDir = appContext.mediaBaseDir
-	else
-		path = filename
-		baseDir = system.ResourceDirectory
-	end
+	local obj = nil
+	if filename ~= nil then
+		-- If an app context tells us the media directory then use it, else current dir.
+		local baseDir, path
+		local appContext = ct._appContext
+		if appContext and appContext.mediaDir then
+			path = appContext.mediaDir .. filename
+			baseDir = appContext.mediaBaseDir
+		else
+			path = filename
+			baseDir = system.ResourceDirectory
+		end
 
-	-- Try to open the image at native resolution
-	local obj = display.newImage(group, path, baseDir, x, y)
+		-- Try to open the image at native resolution
+		obj = display.newImage(group, path, baseDir, x, y)
+	end
 	if not obj then
 		-- Can't open image, substitute a text object with a red X
 		g.warning("Cannot find image file", filename)
@@ -677,7 +688,11 @@ local colors = {
 }
 
 -- Return the color for the given color name, or gray if name not known.
+-- Return nil if colorName is nil.
 local function colorFromName(colorName)
+	if colorName == nil then
+		return nil
+	end
 	local color = colors[string.lower(colorName)]
 	if color then
 		return color

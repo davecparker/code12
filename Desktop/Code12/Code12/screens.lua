@@ -191,17 +191,19 @@ end
 
 -- API
 function ct.setBackColor(colorName, ...)
-	-- Check parameters
-	colorName = colorName or ""
-	if g.checkAPIParams("ct.setBackColor") then
-		g.check1Param("string", colorName, ...)
-	end
-
 	-- Delete previous background object if any
 	local backObj = g.screen.backObj
 	if backObj then
 		backObj:delete()
 		g.screen.backObj = nil
+	end
+
+	-- Check parameters
+	if colorName == nil then
+		return
+	end
+	if g.checkAPIParams("ct.setBackColor") then
+		g.check1Param("string", colorName, ...)
 	end
 
 	-- Make a rect big enough to cover the screen without needing to scale it
@@ -230,20 +232,19 @@ end
 
 -- API
 function ct.setBackImage(filename, ...)
-	-- Check parameters
-	filename = filename or ""
-	if g.checkAPIParams("ct.setBackImage") then
-		g.check1Param("string", filename, ...)
-	end
-
 	-- Delete previous background object if any
 	local backObj = g.screen.backObj
 	if backObj then
 		backObj:delete()
 		g.screen.backObj = nil
 	end
-	if filename == "" then
+
+	-- Check parameters
+	if filename == nil or filename == "" then
 		return
+	end
+	if g.checkAPIParams("ct.setBackImage") then
+		g.check1Param("string", filename, ...)
 	end
 
 	-- Make an image object with temporary position and size for now

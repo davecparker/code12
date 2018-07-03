@@ -62,6 +62,7 @@ end
 -- API
 function ct.text(text, x, y, height, color, ...)
 	-- Check parameters
+	text = text or ""
 	if g.checkAPIParams("ct.text") then
 		g.checkTypes({"string", "number", "number", "number"}, text, x, y, height)
 		if color then
@@ -78,7 +79,7 @@ end
 function ct.image(filename, x, y, width, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.image") then
-		g.checkTypes({"string", "number", "number", "number"}, filename, x, y, width, ...)
+		g.checkTypes({"string", "number", "number", "number"}, filename or "", x, y, width, ...)
 	end
 	
 	-- Make the text

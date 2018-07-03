@@ -8,6 +8,7 @@ import java.awt.*;
 public class GameText extends GameObj
 {
    // Protected instance data
+   protected final String faceName = "Verdana";   // font face name to use
    protected Font font;           // the cached font to draw in 
    protected int fontSize;        // size of cached font in points
 
@@ -37,7 +38,7 @@ public class GameText extends GameObj
    protected void makeFont(int pointSize)
    {
       fontSize = pointSize;   // remember size last used
-      font = new Font(Font.SANS_SERIF, Font.BOLD, fontSize);
+      font = new Font(faceName, Font.BOLD, fontSize);
    }
       
    // Draw the text into the given graphics surface
