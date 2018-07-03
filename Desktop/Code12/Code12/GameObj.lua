@@ -11,6 +11,8 @@ local g = require("Code12.globals")
 require("Code12.runtime")
 
 
+-- Constants
+local textObjectFont = "Roboto-Bold.ttf"
 -- The GameObj class
 local GameObj = {}
 
@@ -149,7 +151,7 @@ end
 function GameObj:newText(group, text, x, y, height, colorName)
 	text = text or ""
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
-	local obj = display.newText(group, text, x, y, "Verdana-Bold",
+	local obj = display.newText(group, text, x, y, textObjectFont,
 						fontSizeFromHeight(height))
 	-- print("newText height vs obj height:", height, obj.height / g.scale)
 	gameObj:setObj(obj)
@@ -181,7 +183,7 @@ function GameObj:newImage(group, filename, x, y, width)
 	if not obj then
 		-- Can't open image, substitute a text object with a red X
 		g.warning("Cannot find image file", filename)
-		return GameObj:newText(group, "[X]", x, y, width, "red")
+		return GameObj:newText(group, "[x]", x, y, width, "red")
 	end
 
 	-- Create the GameObj at the right size, preserving the original aspect

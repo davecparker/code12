@@ -410,6 +410,22 @@ will detect any time that the given character is typed.
 _____________________________________________________________________
 Audio
 -----
+### ct.loadSound()
+```
+boolean ct.loadSound( String filename )
+```
+You can call `ct.loadSound` to pre-load the sound effect in the sound file 
+`filename`, so that it will play quickly when `ct.sound( filename )` is 
+called. Loading sounds before playing them is optional, but it reduces the
+slight delay that occurs the first time a certain sound is played. 
+
+This function returns `true` if the sound was successfully loaded,
+or `false` if the filename could not be found or is not a supported 
+sound format.
+
+> You will typically want to call `ct.loadSound` in your `start` function
+> once for each sound that you want pre-loaded.
+
 ### ct.sound()
 ```
 ct.sound( String filename )
@@ -417,14 +433,10 @@ ct.sound( String filename )
 Play the sound effect in the sound file `filename`.
 
 > Only standard formats of WAV sounds are reliable on all platforms,
-> although other platforms may support MP3 and others.
+> although most platforms will support MP3 also.
 
-> The sound starts playing, `ct.sound()` returns immediately,
-> then the sound continues to play in another thread.
-> Playing another sound while the first sound is still playing
-> may result in mixing the two sounds. However, some platforms
-> may not implement sound mixing, in which case attempting to play
-> a sound while another sound is playing will be ignored.
+> You can use `ct.loadSound` to reduce the short delay that might occur
+> the first time a certain sound is played.
 
 ### ct.setSoundVolume()
 ```

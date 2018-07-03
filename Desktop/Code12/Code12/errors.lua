@@ -105,7 +105,7 @@ function g.check1Param(typeName, param, ...)
 	if #{...} > 0 then
 		apiError("only takes one parameter (a " .. typeName .. ")")
 	elseif not param then
-		apiError("- missing or nil parameter (expected " .. typeName .. ")")
+		apiError("- missing or null parameter (expected " .. typeName .. ")")
 	else
 		local t = typeOrClass(param)
 		if t ~= typeName then
@@ -121,7 +121,7 @@ function g.checkType(position, tExpected, param)
 	if tParam ~= tExpected then
 		local strErr = "- parameter #" .. position
 		if tParam == "nil" then
-			strErr = strErr .. " is missing or nil"
+			strErr = strErr .. " is missing or null"
 		else
 		    strErr = strErr .. " should be a " .. tExpected .. " not a " .. tParam
 		end
@@ -142,7 +142,7 @@ function g.checkTypes(types, ...)
 			if tGot ~= tExpected then
 				local strErr = "- parameter #" .. i
 				if tGot == "nil" then
-					strErr = strErr .. " is missing or nil (expected " .. tExpected .. ")"
+					strErr = strErr .. " is missing or null (expected " .. tExpected .. ")"
 				else
 				    strErr = strErr .. " should be a " .. tExpected .. " not a " .. tGot
 				end
