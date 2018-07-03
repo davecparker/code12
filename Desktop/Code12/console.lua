@@ -306,6 +306,10 @@ function console.init()
 	local temp = display.newText( str, 0, 0, app.consoleFont, app.consoleFontSize )
 	fontCharWidth = temp.contentWidth / string.len( str )
 	fontHeight = math.floor( temp.contentHeight )   -- try to keep text pixel-aligned
+	local m = graphics.getFontMetrics( app.consoleFont, app.consoleFontSize )
+	print("fontHeight = " .. fontHeight)
+	print(string.format("ascent = %f, descent = %f, leading = %f, height = %f", 
+			m.ascent, m.descent, m.leading, m.height))
 	temp:removeSelf()
 	app.consoleFontCharWidth = fontCharWidth
 	app.consoleFontHeight = fontHeight
