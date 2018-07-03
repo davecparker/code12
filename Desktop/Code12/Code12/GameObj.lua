@@ -11,6 +11,8 @@ local g = require("Code12.globals")
 require("Code12.runtime")
 
 
+-- Constants
+local textObjectFont = "Roboto-Medium.ttf"
 -- The GameObj class
 local GameObj = {}
 
@@ -149,7 +151,7 @@ end
 function GameObj:newText(group, text, x, y, height, colorName)
 	text = text or ""
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
-	local obj = display.newText(group, text, x, y, "Verdana-Bold",
+	local obj = display.newText(group, text, x, y, textObjectFont,
 						fontSizeFromHeight(height))
 	-- print("newText height vs obj height:", height, obj.height / g.scale)
 	gameObj:setObj(obj)

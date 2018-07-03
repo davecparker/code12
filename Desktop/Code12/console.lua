@@ -305,7 +305,7 @@ function console.init()
 	local str = "1234567890"
 	local temp = display.newText( str, 0, 0, app.consoleFont, app.consoleFontSize )
 	fontCharWidth = temp.contentWidth / string.len( str )
-	fontHeight = math.ceil( temp.contentHeight )   -- try to keep text pixel-aligned
+	fontHeight = math.floor( temp.contentHeight )   -- try to keep text pixel-aligned
 	temp:removeSelf()
 	app.consoleFontCharWidth = fontCharWidth
 	app.consoleFontHeight = fontHeight
