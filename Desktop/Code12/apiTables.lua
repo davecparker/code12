@@ -58,6 +58,8 @@ return {
         ["keypressed"] = "keyPressed",
         ["charTyped"] = { vt = true, params = {{ name = "ch", vt = "String"}} },
         ["chartyped"] = "charTyped",
+        ["loadSound"] = { vt = true, params = {{ name = "filename", vt = "String"}} },
+        ["loadsound"] = "loadSound",
         ["sound"] = { vt = false, params = {{ name = "filename", vt = "String"}} },
         ["setSoundVolume"] = { vt = false, params = {{ name = "volume", vt = 1}} },
         ["setsoundvolume"] = "setSoundVolume",

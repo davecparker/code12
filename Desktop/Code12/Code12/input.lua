@@ -27,6 +27,20 @@ local function clickEvent(event, gameObj)
 			return
 		end
 
+		-- If gameObj is nil, check if a line was clicked
+		if gameObj == nil then
+			local objs = g.screen.objs
+			for i = 1, objs.numChildren do
+				local gObj = objs[i].code12GameObj
+				if gObj.clickable and gObj._code12.typeName == "line" then
+					if gObj:lineContainsPoint( x, y ) then
+						gameObj = gObj
+						break
+					end
+				end
+			end
+		end
+
 		-- Set last click state
 		g.clicked = true
 		g.gameObjClicked = gameObj
@@ -35,7 +49,7 @@ local function clickEvent(event, gameObj)
 
 		-- Automatically take the touch focus on an object.
 		if gameObj then
-			display.getCurrentStage():setFocus(event.target)
+			display.getCurrentStage():setFocus(gameObj._code12.obj)
 		end
 
 		-- Call client event
@@ -120,6 +134,8 @@ local function charTypedFromKeyEvent(event)
 		return "\n"
 	elseif keyName == "tab" then
 		return "\t"
+	elseif keyName == "deleteBack" then
+		return "\b"
 	end
 
 	-- Ignore other special keys with keyName longer than one char
@@ -152,7 +168,14 @@ function g.onKey(event)
 		return false
 	end
 	local returnValue = false
+
+	-- Get the key name and change it as necessary to match the Code12 spec
 	local keyName = event.keyName
+	if keyName == "deleteBack" then
+		keyName = "backspace"
+	end
+
+	-- Process the key
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
@@ -167,7 +190,7 @@ function g.onKey(event)
 		end
 	elseif event.phase == "up" then
 		-- keyRelease
-		keysDown[event.keyName] = nil
+		keysDown[keyName] = nil
 		g.eventFunctionYielded(_fn.onKeyRelease, keyName)
 	end
 	return returnValue
