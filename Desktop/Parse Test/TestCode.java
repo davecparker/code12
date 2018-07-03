@@ -27,6 +27,17 @@ class BubblePop extends Code12Program
                               size);
          bubble.ySpeed = -1; 
          bubble.clickable = true;
+         int z; // declaration without initialization - primitive type
+         z = -1;
+         double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
+         // Strings
+         String greeting; //  declaration without initialization - String type
+         greeting = "hello";
+         String greeting2 = "hello there"; // declaration with initialization - String type
+         String greeting3 = greeting1; // declaration with initialization from another variable's value
+         String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
+         String greeting5 = greeting2.substring(0, 6); // declaration with String method
+
       }
    }
    

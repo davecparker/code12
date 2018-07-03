@@ -219,16 +219,131 @@ line (stmt)
         expr (BOOL)
             BOOL (true)
 
-30. }
-line (end)
+30. int z; // declaration without initialization - primitive type
+line (varDecl)
+    ID (int)
+    idList (list)
+        ID (z)
 
-31. }
-line (end)
+31. z = -1;
+line (stmt)
+    stmt (varAssign)
+        ID (z)
+        expr (neg)
+            expr (NUM)
+                NUM (1)
 
-32. 
+32. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
+line (varInit)
+    ID (double)
+    ID (xyz)
+    expr (+)
+        expr (/)
+            expr (exprParens)
+                expr (-)
+                    expr (+)
+                        expr (*)
+                            expr (NUM)
+                                NUM (2)
+                            expr (lValue)
+                                lValue (lValue)
+                                    ID (x)
+                                    index (empty)
+                                    field (empty)
+                        expr (lValue)
+                            lValue (lValue)
+                                ID (y)
+                                index (empty)
+                                field (empty)
+                    expr (NUM)
+                        NUM (3.14)
+            expr (lValue)
+                lValue (lValue)
+                    ID (z)
+                    index (empty)
+                    field (empty)
+        expr (NUM)
+            NUM (1.414)
+
+33. // Strings
+line (comment)
+    COMMENT ( Strings)
+
+34. String greeting; //  declaration without initialization - String type
+line (varDecl)
+    ID (String)
+    idList (list)
+        ID (greeting)
+
+35. greeting = "hello";
+line (stmt)
+    stmt (varAssign)
+        ID (greeting)
+        expr (STR)
+            STR ("hello")
+
+36. String greeting2 = "hello there"; // declaration with initialization - String type
+line (varInit)
+    ID (String)
+    ID (greeting2)
+    expr (STR)
+        STR ("hello there")
+
+37. String greeting3 = greeting1; // declaration with initialization from another variable's value
+line (varInit)
+    ID (String)
+    ID (greeting3)
+    expr (lValue)
+        lValue (lValue)
+            ID (greeting1)
+            index (empty)
+            field (empty)
+
+38. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
+line (varInit)
+    ID (String)
+    ID (greeting4)
+    expr (+)
+        expr (+)
+            expr (lValue)
+                lValue (lValue)
+                    ID (greeting1)
+                    index (empty)
+                    field (empty)
+            expr (STR)
+                STR (" ")
+        expr (STR)
+            STR ("world")
+
+39. String greeting5 = greeting2.substring(0, 6); // declaration with String method
+line (varInit)
+    ID (String)
+    ID (greeting5)
+    expr (call)
+        fnValue (fnValue)
+            ID (greeting2)
+            index (empty)
+            method (method)
+                ID (substring)
+        exprList (list)
+            expr (NUM)
+                NUM (0)
+            expr (NUM)
+                NUM (6)
+
+40. 
 line (blank)
 
-33. public void onMousePress(GameObj obj, double x, double y)
+41. }
+line (end)
+
+42. }
+line (end)
+
+43. 
+line (blank)
+
+44. public void onMousePress(GameObj obj, double x, double y)
 line (func)
     access (public)
     retType (void)
@@ -244,14 +359,14 @@ line (func)
             ID (double)
             ID (y)
 
-34. {
+45. {
 line (begin)
 
-35. // Pop bubbles that get clicked
+46. // Pop bubbles that get clicked
 line (comment)
     COMMENT ( Pop bubbles that get clicked)
 
-36. if (obj != null)
+47. if (obj != null)
 line (if)
     expr (!=)
         expr (lValue)
@@ -262,10 +377,10 @@ line (if)
         expr (NULL)
             NULL (null)
 
-37. {
+48. {
 line (begin)
 
-38. obj.delete();
+49. obj.delete();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -275,7 +390,7 @@ line (stmt)
                 ID (delete)
         exprList (empty)
 
-39. ct.sound("pop.wav");
+50. ct.sound("pop.wav");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -287,89 +402,89 @@ line (stmt)
             expr (STR)
                 STR ("pop.wav")
 
-40. }
+51. }
 line (end)
 
-41. }
+52. }
 line (end)
 
-42. }
+53. }
 line (end)
 
-43. 
+54. 
 line (blank)
 
-44. ////////////////////////////////////////////////////////////////////
+55. ////////////////////////////////////////////////////////////////////
 line (comment)
     COMMENT (//////////////////////////////////////////////////////////////////)
 
-45. ERRORS
+56. ERRORS
 ************** Beginning of Expected Errors Section **************
 
-46. 
+57. 
 line (blank)
 
-47. // Lexical errors
+58. // Lexical errors
 line (comment)
     COMMENT ( Lexical errors)
 
-48. @               // invalid character
-*** Location 48.1 to 48.1: Invalid character
+59. @               // invalid character
+*** Location 59.1 to 59.1: Invalid character
 
-49. foo('a');       // char literals not supported
-*** Location 49.5 to 49.5: char type not supported, use double quotes
+60. foo('a');       // char literals not supported
+*** Location 60.5 to 60.5: char type not supported, use double quotes
 
-50. foo(" );        // unclosed string literal
-*** Location 50.5 to 50.43: Unclosed string literal
+61. foo(" );        // unclosed string literal
+*** Location 61.5 to 61.43: Unclosed string literal
 
-51. interface foo   // unsupported reserved word
-*** Location 51.1 to 51.9: Unsupported reserved word "interface"
+62. interface foo   // unsupported reserved word
+*** Location 62.1 to 62.9: Unsupported reserved word "interface"
 
-52. 
+63. 
 line (blank)
 
-53. // Syntax errors
+64. // Syntax errors
 line (comment)
     COMMENT ( Syntax errors)
 
-54. x = 10          // missing ;
-*** Location 54.1 to 54.6: Syntax Error
+65. x = 10          // missing ;
+*** Location 65.1 to 65.6: Syntax Error
 
-55. foo(x, );       // missing expr in exprList
-*** Location 55.1 to 55.9: Syntax Error
+66. foo(x, );       // missing expr in exprList
+*** Location 66.1 to 66.9: Syntax Error
 
-56. x = a + ;       // missing expr after binary op
-*** Location 56.1 to 56.9: Syntax Error
+67. x = a + ;       // missing expr after binary op
+*** Location 67.1 to 67.9: Syntax Error
 
-57. x = a + b * ;   // missing expr after higher precedence binary op
-*** Location 57.1 to 57.13: Syntax Error
+68. x = a + b * ;   // missing expr after higher precedence binary op
+*** Location 68.1 to 68.13: Syntax Error
 
-58. x = a * b + ;   // missing expr after lower precedence binary op
-*** Location 58.1 to 58.13: Syntax Error
+69. x = a * b + ;   // missing expr after lower precedence binary op
+*** Location 69.1 to 69.13: Syntax Error
 
-59. x = ();         // missing expr in parentheses
-*** Location 59.1 to 59.7: Syntax Error
+70. x = ();         // missing expr in parentheses
+*** Location 70.1 to 70.7: Syntax Error
 
-60. x = 10 + ! ;    // missing expr after unary op
-*** Location 60.1 to 60.12: Syntax Error
+71. x = 10 + ! ;    // missing expr after unary op
+*** Location 71.1 to 71.12: Syntax Error
 
-61. x = obj.3;      // expected ID after .
-*** Location 61.1 to 61.10: Syntax Error
+72. x = obj.3;      // expected ID after .
+*** Location 72.1 to 72.10: Syntax Error
 
-62. if x == 3       // required next token in pattern doesn't match
-*** Location 62.1 to 62.9: Syntax Error
+73. if x == 3       // required next token in pattern doesn't match
+*** Location 73.1 to 73.9: Syntax Error
 
-63. x + 3;          // no matching pattern
-*** Location 63.1 to 63.6: Syntax Error
+74. x + 3;          // no matching pattern
+*** Location 74.1 to 74.6: Syntax Error
 
-64. foo(x,          // (incomplete line continued below)
+75. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
-65. y)              // missing ;
-*** Location 64.1 to 65.2: Syntax Error
+76. y)              // missing ;
+*** Location 75.1 to 76.2: Syntax Error
 ======= Test Complete =========================================
 
-65 lines processed in 5 ms
+76 lines processed in 20 ms
 
 0 unexpected errors
 0 uncaught errors (15 expected errors)
