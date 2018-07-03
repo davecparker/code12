@@ -204,14 +204,25 @@ GameObj ct.text( String s, double x, double y, double height, String color )
 </blockquote>
 <hr>
 <h2 id="audio">Audio</h2>
+<h3 id="ct-loadsound-">ct.loadSound()</h3>
+<pre><code>boolean ct.loadSound( String filename )</code></pre>
+<p>You can call <code>ct.loadSound</code> to pre-load the sound effect in the sound file 
+<code>filename</code>, so that it will play quickly when <code>ct.sound( filename )</code> is 
+called. Loading sounds before playing them is optional, but it reduces the
+slight delay that occurs the first time a certain sound is played.</p> 
+<p>This function returns <code>true</code> if the sound was successfully loaded,
+or <code>false</code> if the filename could not be found or is not a supported sound format.</p>
+<blockquote>
+<p>You will typically want to call <code>ct.loadSound</code> in your <code>start</code> function once for each sound that you want pre-loaded.</p>
+</blockquote>
 <h3 id="ct-sound-">ct.sound()</h3>
 <pre><code>ct.sound( String filename )
 </code></pre><p>Play the sound effect in the sound file <code>filename</code>.</p>
 <blockquote>
-<p>Only standard formats of WAV sounds are reliable on all platforms, although other platforms may support MP3 and others.</p>
+<p>Only standard formats of WAV sounds are reliable on all platforms, although most platforms will support MP3 also.</p>
 </blockquote>
 <blockquote>
-<p>The sound starts playing, <code>ct.sound()</code> returns immediately, then the sound continues to play in another thread. Playing another sound while the first sound is still playing may result in mixing the two sounds. However, some platforms may not implement sound mixing, in which case attempting to play a sound while another sound is playing will be ignored.</p>
+<p>You can use <code>ct.loadSound()</code> to reduce the short delay that might occur the first time a certain sound is played.</p>
 </blockquote>
 <h3 id="ct-setsoundvolume-">ct.setSoundVolume()</h3>
 <pre><code>ct.setSoundVolume( double volume )
