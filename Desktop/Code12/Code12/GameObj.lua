@@ -12,7 +12,7 @@ require("Code12.runtime")
 
 
 -- Constants
-local textObjectFont = "Roboto-Medium.ttf"
+local textObjectFont = "Roboto-Bold.ttf"
 -- The GameObj class
 local GameObj = {}
 
