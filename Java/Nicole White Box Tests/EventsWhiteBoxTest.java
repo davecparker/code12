@@ -65,15 +65,17 @@ public class EventsWhiteBoxTest extends Code12Program
                   {
                      squares[i][j].setFillColor("red");
                      selected = true;
-                     ct.println("A tile located at: [" + ct.toInt(squares[i][j].x) + "," + ct.toInt(squares[i][j].y)
-                                  + "] was clicked. Selected == " + selected);
                      count++;
                      // If clicked again, revert to original color
                      // Selected(highlighted in red) is false
+                     // check if *that* square is clicked again
                      if ( count % 2 != 0 )
                      {
+                        selected = false;
                         squares[i][j].setFillColor("yellow");
                      }
+                     ct.println("A tile located at: [" + ct.toInt(squares[i][j].x) + "," + ct.toInt(squares[i][j].y)
+                                  + "] was clicked. Selected == " + selected);
     
                   }
                   

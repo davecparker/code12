@@ -13,8 +13,7 @@ class TextSort extends Code12Program
    String row7;
    String row8;
    String row9;
-   
-   String temp;
+ 
    int max;    //index of max value in subarray
 
    public static void main(String[] args)
@@ -55,8 +54,8 @@ class TextSort extends Code12Program
       
       // Uncomment each one seperately
       //bubbleSort( rows );
-      //insertionSort( rows );
-      selectionSort( rows );
+      insertionSort( rows );
+      //selectionSort( rows );
    }
    
    // Helper function to print array and the number of asterisks in each row
@@ -70,22 +69,22 @@ class TextSort extends Code12Program
    
    public void insertionSort( String[] arr )
    {
-      String key;
+      String temp;
       
       for ( int j = 1; j < arr.length; j++ )
       {
-         key = arr[j];
+         temp = arr[j];
          int i = j - 1;
          while (i >= 0)
          {
-            ct.println("----------------------------");
-            if (key.compareTo(arr[i]) > 0) 
+            if (temp.compareTo(arr[i]) > 0) 
                break;
             arr[i + 1] = arr[i];
             i--;
+            ct.println("----------------------------");
             printArray( rows );
          }
-         arr[i + 1] = key;
+         arr[i + 1] = temp;
       }
    }
    
@@ -120,7 +119,7 @@ class TextSort extends Code12Program
       int min;
       String temp;
       //  The beginning of the array ( arr[0] ) to arr.length - 1
-      for ( int i = 0; i < arr.length -1; i++)
+      for ( int i = 0; i < arr.length - 1; i++)
       {
          // assume the shortest string is the first element 
          min = arr[i].length();

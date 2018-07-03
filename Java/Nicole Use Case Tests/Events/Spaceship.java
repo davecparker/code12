@@ -55,6 +55,9 @@ public class Spaceship extends Code12Program
       spaceship.clickable = true;
       spaceship.visible = true;
       
+      flame = ct.image("transparent-flame.png", spaceship.x, spaceship.y + spaceship.height/2, 5 );
+      flame.visible = false;
+      
       rayGun = ct.circle( spaceship.x, spaceship.y - 2, 1, "red");
 
    }
@@ -125,7 +128,7 @@ public class Spaceship extends Code12Program
             spaceship.ySpeed = 0;
             asteroid.delete();         
             traveledText.delete();
-            ct.text("Game over! You traveled: " + lightYears + " light years.", ct.getWidth() /2, ct.getHeight() - 10, 5,"white" );
+            //ct.text("Game over! You traveled: " + lightYears + " light years.", ct.getWidth() /2, ct.getHeight() - 10, 5,"white" );
         }
       
       //Enter the black hole after 1 minute
@@ -150,14 +153,14 @@ public class Spaceship extends Code12Program
    
    public void onKeyPress( String keyName )
    { 
-      if ( keyName == "right" && spaceship.x < ct.getWidth() )
+      if ( keyName.equals("right") && spaceship.x < ct.getWidth() )
       {
          spaceship.x += 5;
          rayGun.x += 5;
          if ( spaceship.ySpeed != 0 )
             flame.x += 5;
       }
-      else if ( keyName == "left" && spaceship.x > 0 )
+      else if ( keyName.equals("left") && spaceship.x > 0 )
       {
          spaceship.x -= 5;
          rayGun.x -= 5;
@@ -170,7 +173,7 @@ public class Spaceship extends Code12Program
    public void onKeyRelease(String keyName) 
    {
       // Shoot from spaceship
-      if ( keyName == "up" )
+      if ( keyName.equals("up") )
       {
          rayGun.ySpeed = - 2;
          ct.sound("raygun.wav");
@@ -184,6 +187,7 @@ public class Spaceship extends Code12Program
       {
          spaceship.ySpeed -= 0.075;
          flame = ct.image("transparent-flame.png", spaceship.x, spaceship.y + spaceship.height/2, 5 );
+         flame.visible = true;
          flame.ySpeed = spaceship.ySpeed;
          ct.sound("spaceship-engine-short.wav");
          beginText.delete();

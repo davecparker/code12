@@ -20,7 +20,7 @@ public class Paint extends Code12Program
    GameObj blueRect;
    GameObj indigoRect;
    GameObj purpleRect;
-   GameObj majentaRect;
+   GameObj magentaRect;
    GameObj eraseRect;
    
    // Objects to be used to change brush size
@@ -55,7 +55,7 @@ public class Paint extends Code12Program
       blueRect = ct.rect(spacing,spacing*5 - offset, BOX_WIDTH, spacing, "blue");
       indigoRect = ct.rect(spacing,spacing*6 - offset, BOX_WIDTH, spacing, "dark blue");
       purpleRect = ct.rect(spacing,spacing*7 - offset, BOX_WIDTH, spacing, "purple");
-      majentaRect = ct.rect(spacing,spacing*8 - offset, BOX_WIDTH, spacing, "dark majenta");
+      magentaRect = ct.rect(spacing,spacing*8 - offset, BOX_WIDTH, spacing, "dark magenta");
          
       // This will be pressed to activate the eraser
       eraseRect = ct.rect(spacing,spacing*9 - offset, BOX_WIDTH, spacing, "pink"); 
@@ -81,7 +81,7 @@ public class Paint extends Code12Program
       indigoRect.visible = true;
       indigoRect.clickable = true;
       purpleRect.clickable = true;
-      majentaRect.clickable = true;
+      magentaRect.clickable = true;
       eraseRect.clickable = true;
 
       small.clickable = true;
@@ -107,8 +107,8 @@ public class Paint extends Code12Program
                currentColor = "dark blue";
             else if ( obj == purpleRect )
                currentColor = "purple";
-            else if ( obj == majentaRect )
-               currentColor = "dark majenta";
+            else if ( obj == magentaRect )
+               currentColor = "dark magenta";
             else if ( obj == eraseRect )
                currentColor =  "white";
             
@@ -141,22 +141,22 @@ public class Paint extends Code12Program
    
    public void onMouseDrag( GameObj obj, double x, double y )
    {
-   // TODO draw line segments
-       
-      // Player can only draw on canvas, not on other game objects
-      if ( ct.clickX() > palette.width + 1 )
+      // saves the last known click position coordinates (ct.clickX, ct.clickY)
+      // then draw a line between that last point and the current  
+      // user can only draw on canvas, not on other game objects
+      if ( ct.clickX() > palette.width + 2 )
       {
-          brush = ct.line(ct.clickX(),ct.clickY(),x+2,y);
-          brush.setLineColor(currentColor);
-          brush.setFillColor(currentColor);
-          brush.lineWidth = size;
+         double lastX = ct.clickX();
+         double lastY = ct.clickY();
+         brush = ct.line(lastX, lastY,x,y);
+         // update previous point
+         lastX = x;
+         lastY = y;
+         brush.setLineColor(currentColor);
+         brush.setFillColor(currentColor);
+         brush.lineWidth = size;
+
       }
 
-   }
-   
-   public void onMouseRelease( GameObj obj, double x, double y )
-   {
-      if ( ct.clickX() > palette.width + 1 )
-         brush = ct.line(x,y,ct.clickX(),ct.clickY() );
    }
 }

@@ -1,8 +1,6 @@
 // Black box test of:
 // Text Output
 // Text Input
-// You can press the enter key the whole way through in order to bypass manual user input.
-// ( It will be filled in with defaults )
 
 import Code12.*;
 
@@ -44,8 +42,6 @@ public class TextTest extends Code12Program
       ct.println(concat + " concatenation");
       
       int LIMIT = ct.inputInt("Enter # of times to start logging stationary game objects");
-      if ( LIMIT == 0 )
-         LIMIT = 2;
          
        for ( int i = 0; i < LIMIT; i++ )
        {
@@ -78,8 +74,7 @@ public class TextTest extends Code12Program
        ct.println();
        String input = ct.inputString("Enter a test string to be used "
                                     + "with Java's string methods: " );
-       if ( input.equals("") )
-         input = "garbage";
+
        ct.println("The length of " + input + " is " + input.length() );
        ct.println( input + " to upper case is " + input.toUpperCase() );
        ct.println( input + " to lower case is " + input.toLowerCase() );
@@ -88,8 +83,6 @@ public class TextTest extends Code12Program
        
        if ( index >= 0 && index < input.length() )
          ct.println("The char at index " + index + " is " + input.charAt( index ) );
-       else
-         index = 0;  // default
       
        int i = 0;
        int j = input.length()-1;
@@ -98,8 +91,6 @@ public class TextTest extends Code12Program
        ct.println (i >= j?"Yes, it is!":"No, it isn't.");
        
        String anotherInput = ct.inputString("Enter a second string: ");
-       if ( anotherInput.equals("") )
-         anotherInput = "garbageagain";   // Default
          
        int comparing = input.compareTo(anotherInput);
   
@@ -116,16 +107,12 @@ public class TextTest extends Code12Program
        
        String alphabet = "abcdefghijklmnopqrstuvwxyz";
        String letter = ct.inputString("Enter an alphabet letter: ");
-       if ( letter.equals("") )
-            letter = "z";
        ct.println( alphabet.indexOf(letter) + 1 + " is the index of " + letter );
        
        // substring methods
        String s = ct.inputString("Enter another string: ");
-       if ( s.equals("") )
-            s = "DefaultCase";
+
        int start = ct.inputInt("Enter starting index: ");
-         // defaults to 0
             
        if ( start >= 0 )
          ct.println( s.substring(start) ); 
@@ -133,8 +120,7 @@ public class TextTest extends Code12Program
          ct.println("Index cannot be negative!");
        
        int end = ct.inputInt("Enter ending index: " );
-       if ( end == 0 )
-         end = 10;
+   
          
        if ( end < s.length() )
          ct.println( s.substring( start, end ) );
@@ -186,11 +172,8 @@ public class TextTest extends Code12Program
       }
       
       int rows = ct.inputInt("Enter # of rows for a 2D array: " );
-      if ( rows == 0 )
-         rows = 2;
       int columns = ct.inputInt("Enter # of columns: " );
-      if ( columns == 0 )
-         columns = 2;
+
       
       // string2DArray = new String[rows][columns];
 //       
