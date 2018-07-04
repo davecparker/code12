@@ -29,10 +29,14 @@ local dyButton = 20             -- dialog button height
 local dxButton = 40             -- dialog button width
 
 -- File local state
-local dialogRunning = false     -- true when the dialog is running
+local dialogGroup               -- display group for running dialog or nil if none
+local dialogFrame
+local dragBar                   -- dialog's drag bar
+local dragOffsetX, dragOffsetY  -- offset when dragging a dialog
 local inputType                 -- "int", "double", "string" or "boolean"
 local inputField                -- active native text field if any
 local inputResult               -- result from input dialog
+local onKey                     -- key listener for dialogs
 
 
 ---------------- Internal Functions ------------------------------------------
@@ -44,9 +48,9 @@ local function uiItem(obj)
 	return obj
 end
 
--- Make and return a button on the dialog with the given text and listener, 
+-- Make and return a button on dialogGroup with the given text and listener, 
 -- top-left aligned at x, y
-local function makeButton(dialog, text, x, y, listener)
+local function makeButton(text, x, y, listener)
 	local btn = uiItem( widget.newButton{
 		x = x,
 		y = y,
@@ -56,7 +60,7 @@ local function makeButton(dialog, text, x, y, listener)
 		fontSize = inputFontSize,
 		textOnly = true,
 	} )
-	dialog:insert(btn)
+	dialogGroup:insert(btn)
 	return btn
 end
 
@@ -73,6 +77,21 @@ local function textInputResult()
 	return inputField.text or ""  -- string input type accepts anything
 end
 
+-- End the running dialog
+local function endDialog()
+	-- Destroy the dialog
+	if inputField then
+		native.setKeyboardFocus(nil)
+		inputField:removeSelf()
+		inputField = nil
+	else
+		Runtime:removeEventListener("key", onKey)
+	end
+	dialogGroup:removeSelf()
+	dialogGroup = nil
+	dragBar = nil
+end
+
 -- Text field input handler
 local function onUserInput(event)
 	local phase = event.phase
@@ -83,7 +102,7 @@ local function onUserInput(event)
 		-- User pressed enter. End the dialog if the input is valid.
 		inputResult = textInputResult()
 		if inputResult then
-			dialogRunning = false
+			endDialog()
 		end
 	end
 end
@@ -91,41 +110,54 @@ end
 -- Handle click on the Yes button
 local function onYes()
 	inputResult = true
-	dialogRunning = false
+	endDialog()
 end
 
 -- Handle click on the No button
 local function onNo()
 	inputResult = false
-	dialogRunning = false
-end
-
--- Handle click on the OK button of a simple alert
-local function onAlertOK()
-	dialogRunning = false
+	endDialog()
 end
 
 -- Handle a key event when a dialog is up
-local function onKey(event)
-	if dialogRunning and event.phase == "down" then
+function onKey(event)
+	if dialogGroup and event.phase == "down" then
 		local key = event.keyName
 		if inputType == "boolean" then
-			if key == "y" then
-				inputResult = true
-				dialogRunning = false
-				return true
-			elseif key == "n" then
-				inputResult = false
-				dialogRunning = false
+			if key == "y" or key == "n" then
+				inputResult = (key == "y")
+				endDialog()
 				return true
 			end
 		elseif inputType == nil then
 			-- Simple alert dismisses on Enter key
 			if key == "enter" then
-				dialogRunning = false
+				endDialog()
+				return true
 			end
 		end				
 	end
+end
+
+-- Handle touch events on a dialog's drag bar
+local function onTouchDragBar(event)
+	if event.phase == "began" then
+		display.getCurrentStage():setFocus(dragBar)
+		dragOffsetX = event.x - dialogGroup.x
+		dragOffsetY = event.y - dialogGroup.y
+	else
+		if event.phase ~= "cancelled" then
+			-- Move dialog then make sure it's fully visbile in the app window
+			local xMax = display.actualContentWidth - dialogFrame.width
+			local yMax = display.actualContentHeight - dialogFrame.height
+			dialogGroup.x = g.pinValue(event.x - dragOffsetX, 0, xMax)
+			dialogGroup.y = g.pinValue(event.y - dragOffsetY, 0, yMax)
+		end
+		if event.phase ~= "moved" then
+			display.getCurrentStage():setFocus( nil )
+		end
+	end
+	return true
 end
 
 -- Show a modal input dialog with the given message and return the value input.
@@ -167,21 +199,22 @@ local function inputValue(message, valueType)
 		timer.performWithDelay( 50, function () native.setKeyboardFocus( inputField ) end )
 	end
 
-	-- Make a group for the dialog box, and add the frame, drag bar, and message
-	local dialog = display.newGroup()
-	local frame = uiItem( display.newRect(dialog, 0, 0, dialogWidth, dialogHeight))
-	frame:setFillColor(1)
-	frame:setStrokeColor(0)
-	frame.strokeWidth = 1
-	local dragBar = uiItem(display.newRect(dialog, 0, 0, dialogWidth, dyDragBar))
+	-- Make the group for the dialog box, and add the frame, drag bar, and message
+	dialogGroup = display.newGroup()
+	dialogFrame = uiItem( display.newRect(dialogGroup, 0, 0, dialogWidth, dialogHeight))
+	dialogFrame:setFillColor(1)
+	dialogFrame:setStrokeColor(0)
+	dialogFrame.strokeWidth = 1
+	dragBar = uiItem(display.newRect(dialogGroup, 0, 0, dialogWidth, dyDragBar))
 	dragBar:setFillColor(dragBarShade)
 	dragBar:setStrokeColor(0)
 	dragBar.strokeWidth = 1
-	dialog:insert(messageText)
+	dragBar:addEventListener("touch", onTouchDragBar)
+	dialogGroup:insert(messageText)
 
 	-- Add the input field or key listener
 	if inputField then
-		dialog:insert(inputField)
+		dialogGroup:insert(inputField)
 	else
 		Runtime:addEventListener("key", onKey)
 	end
@@ -189,37 +222,27 @@ local function inputValue(message, valueType)
 	-- Make and add the button(s) if necessary
 	local x = dialogWidth - margin - dxButton
 	if valueType == "boolean" then
-		local noBtn = makeButton(dialog, "No", x, y, onNo)
+		local noBtn = makeButton("No", x, y, onNo)
 		x = x - dxButton - margin
-		makeButton(dialog, "Yes", x, y, onYes)
+		makeButton("Yes", x, y, onYes)
 	elseif valueType == nil then
-		makeButton(dialog, "OK", x, y, onAlertOK)
+		makeButton("OK", x, y, onNo)
 	end
 
 	-- Position the dialog centered on the output area if room,
 	-- otherwise centered on the entire app area.  TODO
 	local width = g.window.width
 	local height = g.window.height
-	dialog.x = width / 2 - dialogWidth / 2
-	dialog.y = height / 2 - dialogHeight / 2
+	dialogGroup.x = width / 2 - dialogWidth / 2
+	dialogGroup.y = height / 2 - dialogHeight / 2
 
 	-- Init the input state, then block and yield until the dialog finishes
 	inputType = valueType
-	dialogRunning = true
 	g.blocked = true
-	while dialogRunning do
+	while dialogGroup do
 		coroutine.yield()
 	end
 	g.blocked = false
-
-	-- Destroy the dialog
-	if inputField then
-		native.setKeyboardFocus(nil)
-		inputField:removeSelf()
-	else
-		Runtime:removeEventListener("key", onKey)
-	end
-	dialog:removeSelf()
 
 	-- Return the result
 	return inputResult
