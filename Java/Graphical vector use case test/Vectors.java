@@ -39,10 +39,10 @@ public class Vectors extends Code12Program
 
             for (int j = i + 1; j < vectors.length; j++)
             {
-                int x1 = (int) vectors[i].x;
-                int y1 = (int) vectors[i].y;
-                int x2 = (int) vectors[j].x;
-                int y2 = (int) vectors[j].y;
+                double x1 = vectors[i].x;
+                double y1 = vectors[i].y;
+                double x2 = vectors[j].x;
+                double y2 = vectors[j].y;
                 if (ct.distance(x1, y1, x2, y2) <= 20)
                     defineLine(i, j, x1, y1, x2, y2);
             }
@@ -69,7 +69,7 @@ public class Vectors extends Code12Program
         shades[index] = 127;
     }
 
-    public void defineLine(int index1, int index2, int x1, int y1, int x2, int y2)
+    public void defineLine(int index1, int index2, double x1, double y1, double x2, double y2)
     {
         GameObj line = ct.line(x1, y1, x2, y2);
         int minShade = Math.min(shades[index1], shades[index2]);
