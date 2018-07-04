@@ -48,10 +48,13 @@ class UserCode extends Code12Program
 		ct.print("Here's an unitialized GameObj: "); 
 		ct.println(moreBalls[3]);
 		ct.println("Done");
-		boolean test = ct.inputBoolean("Would you like to print some lines?");
+		ct.showAlert("Hey, this is an alert.\nThis is the second line.");
+		String userName = ct.inputString("Enter your name");
+		ct.println("Hello " + userName);
+		boolean test = ct.inputYesNo("Would you like to print some lines?");
 		if (test)
 		{
-			count = ct.inputInt("Enter count:");
+			count = ct.inputInt("Enter number of lines to print");
 			for (int i = 1; i <= count; i++)
 			{
 				ct.println("Line " + i);

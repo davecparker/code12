@@ -48,10 +48,13 @@ require('Code12.api')
         ct.print("Here's an unitialized GameObj: ")
         ct.println(ct.indexArray(this.moreBalls, 3))
         ct.println("Done")
-        local test = ct.inputBoolean("Would you like to print some lines?")
+        ct.showAlert("Hey, this is an alert.\nThis is the second line.")
+        local userName = ct.inputString("Enter your name")
+        ct.println("Hello " .. userName)
+        local test = ct.inputYesNo("Would you like to print some lines?")
         if test then
             
-            this.count = ct.inputInt("Enter count:")
+            this.count = ct.inputInt("Enter number of lines to print")
             local i = 1; while i <= this.count do
                 
                 ct.println("Line " .. i)
