@@ -219,21 +219,55 @@ line (stmt)
         expr (BOOL)
             BOOL (true)
 
-30. int z; // declaration without initialization - primitive type
+30. GameObj bubbleCopy = bubble; // initialization of GameObj from another GameObj
+line (varInit)
+    ID (GameObj)
+    ID (bubbleCopy)
+    expr (lValue)
+        lValue (lValue)
+            ID (bubble)
+            index (empty)
+            field (empty)
+
+31. int z; // declaration without initialization - primitive type
 line (varDecl)
     ID (int)
     idList (list)
         ID (z)
 
-31. z = -1;
+32. int x, y, z; // declaring multiple variables
+line (varDecl)
+    ID (int)
+    idList (list)
+        ID (x)
+        ID (y)
+        ID (z)
+
+33. z = -1 + 2; // assigning value with int and unary minus
 line (stmt)
     stmt (varAssign)
         ID (z)
-        expr (neg)
+        expr (+)
+            expr (neg)
+                expr (NUM)
+                    NUM (1)
             expr (NUM)
-                NUM (1)
+                NUM (2)
 
-32. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
+34. z = 0.707; // assigning value with double
+line (stmt)
+    stmt (varAssign)
+        ID (z)
+        expr (NUM)
+            NUM (0.707)
+
+35. z = .707; // no leading zero
+*** Location 35.10 to 35.18: Syntax Error
+
+36. z = -.707; // negative with no leading zero
+*** Location 36.10 to 36.19: Syntax Error
+
+37. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
 line (varInit)
     ID (double)
     ID (xyz)
@@ -265,31 +299,44 @@ line (varInit)
         expr (NUM)
             NUM (1.414)
 
-33. // Strings
+38. double z2 = z * 2.0; // initialization from another variable
+line (varInit)
+    ID (double)
+    ID (z2)
+    expr (*)
+        expr (lValue)
+            lValue (lValue)
+                ID (z)
+                index (empty)
+                field (empty)
+        expr (NUM)
+            NUM (2.0)
+
+39. // Strings
 line (comment)
     COMMENT ( Strings)
 
-34. String greeting; //  declaration without initialization - String type
+40. String greeting; //  declaration without initialization - String type
 line (varDecl)
     ID (String)
     idList (list)
         ID (greeting)
 
-35. greeting = "hello";
+41. greeting = "hello"; // assigning value to a string
 line (stmt)
     stmt (varAssign)
         ID (greeting)
         expr (STR)
             STR ("hello")
 
-36. String greeting2 = "hello there"; // declaration with initialization - String type
+42. String greeting2 = "hello there"; // declaration with initialization - String type
 line (varInit)
     ID (String)
     ID (greeting2)
     expr (STR)
         STR ("hello there")
 
-37. String greeting3 = greeting1; // declaration with initialization from another variable's value
+43. String greeting3 = greeting1; // declaration with initialization from another variable's value
 line (varInit)
     ID (String)
     ID (greeting3)
@@ -299,7 +346,7 @@ line (varInit)
             index (empty)
             field (empty)
 
-38. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
+44. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
 line (varInit)
     ID (String)
     ID (greeting4)
@@ -315,7 +362,7 @@ line (varInit)
         expr (STR)
             STR ("world")
 
-39. String greeting5 = greeting2.substring(0, 6); // declaration with String method
+45. String greeting5 = greeting2.substring(0, 6); // declaration with String method
 line (varInit)
     ID (String)
     ID (greeting5)
@@ -331,19 +378,372 @@ line (varInit)
             expr (NUM)
                 NUM (6)
 
-40. 
+46. // loops
+line (comment)
+    COMMENT ( loops)
+
+47. for (int i = 0; i < 10; i++)
+line (for)
+    forControl (three)
+        forInit (varInit)
+            ID (int)
+            ID (i)
+            expr (NUM)
+                NUM (0)
+        forExpr (expr)
+            expr (<)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (i)
+                        index (empty)
+                        field (empty)
+                expr (NUM)
+                    NUM (10)
+        forNext (stmt)
+            stmt (postInc)
+                lValue (lValue)
+                    ID (i)
+                    index (empty)
+                    field (empty)
+
+48. for (i = 0; i < 10; i = i + 2)
+line (for)
+    forControl (three)
+        forInit (stmt)
+            stmt (varAssign)
+                ID (i)
+                expr (NUM)
+                    NUM (0)
+        forExpr (expr)
+            expr (<)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (i)
+                        index (empty)
+                        field (empty)
+                expr (NUM)
+                    NUM (10)
+        forNext (stmt)
+            stmt (varAssign)
+                ID (i)
+                expr (+)
+                    expr (lValue)
+                        lValue (lValue)
+                            ID (i)
+                            index (empty)
+                            field (empty)
+                    expr (NUM)
+                        NUM (2)
+
+49. for (int i = 0; i < 100 && 2 * i < 50; i = i * 2)
+line (for)
+    forControl (three)
+        forInit (varInit)
+            ID (int)
+            ID (i)
+            expr (NUM)
+                NUM (0)
+        forExpr (expr)
+            expr (&&)
+                expr (<)
+                    expr (lValue)
+                        lValue (lValue)
+                            ID (i)
+                            index (empty)
+                            field (empty)
+                    expr (NUM)
+                        NUM (100)
+                expr (<)
+                    expr (*)
+                        expr (NUM)
+                            NUM (2)
+                        expr (lValue)
+                            lValue (lValue)
+                                ID (i)
+                                index (empty)
+                                field (empty)
+                    expr (NUM)
+                        NUM (50)
+        forNext (stmt)
+            stmt (varAssign)
+                ID (i)
+                expr (*)
+                    expr (lValue)
+                        lValue (lValue)
+                            ID (i)
+                            index (empty)
+                            field (empty)
+                    expr (NUM)
+                        NUM (2)
+
+50. for (int i = 100; i > 0; i--)
+line (for)
+    forControl (three)
+        forInit (varInit)
+            ID (int)
+            ID (i)
+            expr (NUM)
+                NUM (100)
+        forExpr (expr)
+            expr (>)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (i)
+                        index (empty)
+                        field (empty)
+                expr (NUM)
+                    NUM (0)
+        forNext (stmt)
+            stmt (postDec)
+                lValue (lValue)
+                    ID (i)
+                    index (empty)
+                    field (empty)
+
+51. for (int i = 10; i > 0; i = i - 2)
+line (for)
+    forControl (three)
+        forInit (varInit)
+            ID (int)
+            ID (i)
+            expr (NUM)
+                NUM (10)
+        forExpr (expr)
+            expr (>)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (i)
+                        index (empty)
+                        field (empty)
+                expr (NUM)
+                    NUM (0)
+        forNext (stmt)
+            stmt (varAssign)
+                ID (i)
+                expr (-)
+                    expr (lValue)
+                        lValue (lValue)
+                            ID (i)
+                            index (empty)
+                            field (empty)
+                    expr (NUM)
+                        NUM (2)
+
+52. for (int i = 0; i < len; i++)
+line (for)
+    forControl (three)
+        forInit (varInit)
+            ID (int)
+            ID (i)
+            expr (NUM)
+                NUM (0)
+        forExpr (expr)
+            expr (<)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (i)
+                        index (empty)
+                        field (empty)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (len)
+                        index (empty)
+                        field (empty)
+        forNext (stmt)
+            stmt (postInc)
+                lValue (lValue)
+                    ID (i)
+                    index (empty)
+                    field (empty)
+
+53. for (int i = 0; i < arr.length; i++)
+line (for)
+    forControl (three)
+        forInit (varInit)
+            ID (int)
+            ID (i)
+            expr (NUM)
+                NUM (0)
+        forExpr (expr)
+            expr (<)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (i)
+                        index (empty)
+                        field (empty)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (arr)
+                        index (empty)
+                        field (field)
+                            ID (length)
+        forNext (stmt)
+            stmt (postInc)
+                lValue (lValue)
+                    ID (i)
+                    index (empty)
+                    field (empty)
+
+54. while (j < 100)
+line (while)
+    expr (<)
+        expr (lValue)
+            lValue (lValue)
+                ID (j)
+                index (empty)
+                field (empty)
+        expr (NUM)
+            NUM (100)
+    whileEnd (while)
+
+55. do
+line (do)
+
+56. while (j < 100);
+line (while)
+    expr (<)
+        expr (lValue)
+            lValue (lValue)
+                ID (j)
+                index (empty)
+                field (empty)
+        expr (NUM)
+            NUM (100)
+    whileEnd (do-while)
+
+57. while (j < foo && i != bar);
+line (while)
+    expr (&&)
+        expr (<)
+            expr (lValue)
+                lValue (lValue)
+                    ID (j)
+                    index (empty)
+                    field (empty)
+            expr (lValue)
+                lValue (lValue)
+                    ID (foo)
+                    index (empty)
+                    field (empty)
+        expr (!=)
+            expr (lValue)
+                lValue (lValue)
+                    ID (i)
+                    index (empty)
+                    field (empty)
+            expr (lValue)
+                lValue (lValue)
+                    ID (bar)
+                    index (empty)
+                    field (empty)
+    whileEnd (do-while)
+
+58. // arrays
+line (comment)
+    COMMENT ( arrays)
+
+59. int[] a;
+line (arrayDecl)
+    ID (int)
+    idList (list)
+        ID (a)
+
+60. int[] a = new int[100];
+line (arrayInit)
+    ID (int)
+    ID (a)
+    arrayInit (expr)
+        expr (newArray)
+            ID (int)
+            expr (NUM)
+                NUM (100)
+
+61. int[] a = new int[foo];
+line (arrayInit)
+    ID (int)
+    ID (a)
+    arrayInit (expr)
+        expr (newArray)
+            ID (int)
+            expr (lValue)
+                lValue (lValue)
+                    ID (foo)
+                    index (empty)
+                    field (empty)
+
+62. int[] a = new int[b.length * 2];
+line (arrayInit)
+    ID (int)
+    ID (a)
+    arrayInit (expr)
+        expr (newArray)
+            ID (int)
+            expr (*)
+                expr (lValue)
+                    lValue (lValue)
+                        ID (b)
+                        index (empty)
+                        field (field)
+                            ID (length)
+                expr (NUM)
+                    NUM (2)
+
+63. int[] a = {1, 2, 3};
+line (arrayInit)
+    ID (int)
+    ID (a)
+    arrayInit (list)
+        exprList (list)
+            expr (NUM)
+                NUM (1)
+            expr (NUM)
+                NUM (2)
+            expr (NUM)
+                NUM (3)
+
+64. int[] a = { 1,
+-- Incomplete line carried forward
+
+65. 2,
+-- Incomplete line carried forward
+
+66. 3};
+line (arrayInit)
+    ID (int)
+    ID (a)
+    arrayInit (list)
+        exprList (list)
+            expr (NUM)
+                NUM (1)
+            expr (NUM)
+                NUM (2)
+            expr (NUM)
+                NUM (3)
+
+67. int[] a = b;
+line (arrayInit)
+    ID (int)
+    ID (a)
+    arrayInit (expr)
+        expr (lValue)
+            lValue (lValue)
+                ID (b)
+                index (empty)
+                field (empty)
+
+68. 
 line (blank)
 
-41. }
+69. }
 line (end)
 
-42. }
+70. }
 line (end)
 
-43. 
+71. 
 line (blank)
 
-44. public void onMousePress(GameObj obj, double x, double y)
+72. public void onMousePress(GameObj obj, double x, double y)
 line (func)
     access (public)
     retType (void)
@@ -359,14 +759,14 @@ line (func)
             ID (double)
             ID (y)
 
-45. {
+73. {
 line (begin)
 
-46. // Pop bubbles that get clicked
+74. // Pop bubbles that get clicked
 line (comment)
     COMMENT ( Pop bubbles that get clicked)
 
-47. if (obj != null)
+75. if (obj != null)
 line (if)
     expr (!=)
         expr (lValue)
@@ -377,10 +777,10 @@ line (if)
         expr (NULL)
             NULL (null)
 
-48. {
+76. {
 line (begin)
 
-49. obj.delete();
+77. obj.delete();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -390,7 +790,7 @@ line (stmt)
                 ID (delete)
         exprList (empty)
 
-50. ct.sound("pop.wav");
+78. ct.sound("pop.wav");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -402,91 +802,101 @@ line (stmt)
             expr (STR)
                 STR ("pop.wav")
 
-51. }
+79. }
 line (end)
 
-52. }
+80. }
 line (end)
 
-53. }
+81. }
 line (end)
 
-54. 
+82. 
 line (blank)
 
-55. ////////////////////////////////////////////////////////////////////
+83. ////////////////////////////////////////////////////////////////////
 line (comment)
     COMMENT (//////////////////////////////////////////////////////////////////)
 
-56. ERRORS
+84. ERRORS
 ************** Beginning of Expected Errors Section **************
 
-57. 
+85. 
 line (blank)
 
-58. // Lexical errors
+86. // Lexical errors
 line (comment)
     COMMENT ( Lexical errors)
 
-59. @               // invalid character
-*** Location 59.1 to 59.1: Invalid character
+87. @               // invalid character
+*** Location 87.1 to 87.1: Invalid character
 
-60. foo('a');       // char literals not supported
-*** Location 60.5 to 60.5: char type not supported, use double quotes
+88. foo('a');       // char literals not supported
+*** Location 88.5 to 88.5: char type not supported, use double quotes
 
-61. foo(" );        // unclosed string literal
-*** Location 61.5 to 61.43: Unclosed string literal
+89. foo(" );        // unclosed string literal
+*** Location 89.5 to 89.43: Unclosed string literal
 
-62. interface foo   // unsupported reserved word
-*** Location 62.1 to 62.9: Unsupported reserved word "interface"
+90. interface foo   // unsupported reserved word
+*** Location 90.1 to 90.9: Unsupported reserved word "interface"
 
-63. 
+91. 
 line (blank)
 
-64. // Syntax errors
+92. // Syntax errors
 line (comment)
     COMMENT ( Syntax errors)
 
-65. x = 10          // missing ;
-*** Location 65.1 to 65.6: Syntax Error
+93. x = 10          // missing ;
+*** Location 93.1 to 93.6: Syntax Error
 
-66. foo(x, );       // missing expr in exprList
-*** Location 66.1 to 66.9: Syntax Error
+94. foo(x, );       // missing expr in exprList
+*** Location 94.1 to 94.9: Syntax Error
 
-67. x = a + ;       // missing expr after binary op
-*** Location 67.1 to 67.9: Syntax Error
+95. x = a + ;       // missing expr after binary op
+*** Location 95.1 to 95.9: Syntax Error
 
-68. x = a + b * ;   // missing expr after higher precedence binary op
-*** Location 68.1 to 68.13: Syntax Error
+96. x = a + b * ;   // missing expr after higher precedence binary op
+*** Location 96.1 to 96.13: Syntax Error
 
-69. x = a * b + ;   // missing expr after lower precedence binary op
-*** Location 69.1 to 69.13: Syntax Error
+97. x = a * b + ;   // missing expr after lower precedence binary op
+*** Location 97.1 to 97.13: Syntax Error
 
-70. x = ();         // missing expr in parentheses
-*** Location 70.1 to 70.7: Syntax Error
+98. x = ();         // missing expr in parentheses
+*** Location 98.1 to 98.7: Syntax Error
 
-71. x = 10 + ! ;    // missing expr after unary op
-*** Location 71.1 to 71.12: Syntax Error
+99. x = 10 + ! ;    // missing expr after unary op
+*** Location 99.1 to 99.12: Syntax Error
 
-72. x = obj.3;      // expected ID after .
-*** Location 72.1 to 72.10: Syntax Error
+100. x = obj.3;      // expected ID after .
+*** Location 100.1 to 100.10: Syntax Error
 
-73. if x == 3       // required next token in pattern doesn't match
-*** Location 73.1 to 73.9: Syntax Error
+101. if x == 3       // required next token in pattern doesn't match
+*** Location 101.1 to 101.9: Syntax Error
 
-74. x + 3;          // no matching pattern
-*** Location 74.1 to 74.6: Syntax Error
+102. x + 3;          // no matching pattern
+*** Location 102.1 to 102.6: Syntax Error
 
-75. foo(x,          // (incomplete line continued below)
+103. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
-76. y)              // missing ;
-*** Location 75.1 to 76.2: Syntax Error
+104. y)              // missing ;
+*** Location 103.1 to 104.2: Syntax Error
+
+105. 
+line (blank)
+
+106. // Unsupported Java syntax
+line (comment)
+    COMMENT ( Unsupported Java syntax)
+
+107. int x = 1, y = 2, z = 3; // declaring and initializing
+*** Location 107.1 to 107.24: Syntax Error
 ======= Test Complete =========================================
 
-76 lines processed in 20 ms
+107 lines processed in 39 ms
 
-0 unexpected errors
-0 uncaught errors (15 expected errors)
+2 unexpected errors
+0 uncaught errors (16 expected errors)
 
-SUCCESS
+FAILED
