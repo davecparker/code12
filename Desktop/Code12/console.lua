@@ -301,15 +301,13 @@ end
 
 -- Init the console
 function console.init()
-	-- Get actual font metrics by measuring a text object (font metrics seem unreliable)
+	-- Get font metrics of console font
+	local metrics = graphics.getFontMetrics( app.consoleFont, app.consoleFontSize )
+	fontHeight = math.round( metrics.height ) + 2   -- leading is reported as 0 for our font
+	-- Get char width by measuring a text object since not in font metrics
 	local str = "1234567890"
 	local temp = display.newText( str, 0, 0, app.consoleFont, app.consoleFontSize )
 	fontCharWidth = temp.contentWidth / string.len( str )
-	fontHeight = math.floor( temp.contentHeight )   -- try to keep text pixel-aligned
-	local m = graphics.getFontMetrics( app.consoleFont, app.consoleFontSize )
-	print("fontHeight = " .. fontHeight)
-	print(string.format("ascent = %f, descent = %f, leading = %f, height = %f", 
-			m.ascent, m.descent, m.leading, m.height))
 	temp:removeSelf()
 	app.consoleFontCharWidth = fontCharWidth
 	app.consoleFontHeight = fontHeight
