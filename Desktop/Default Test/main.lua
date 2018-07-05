@@ -3,7 +3,7 @@ package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Cod
 require('Code12.api')
     
     -- instance variables
-    this.ball = nil; this.bigBall = nil; 
+    this.fish = nil; this.ball = nil; this.bigBall = nil; 
     this.moreBalls = { length = 10, default = nil }
     -- GameObj tooSoon = ct.circle(50, 50, 50);
     this.count = 0; this.total = 0; 
@@ -70,7 +70,8 @@ require('Code12.api')
         this.bigBall.clickable = true
         
         -- Add a fish
-        ct.image("goldfish.png", 50, 50, 15)
+        this.fish = ct.image("goldfish.png", 50, 50, 15)
+        this.fish.clickable = true
         local filename = nil
         -- ct.image(filename, 50, 20, 15);
         
@@ -137,6 +138,10 @@ require('Code12.api')
             ct.println("Pop sound loaded"); end
         if ct.charTyped("p") then
             ct.sound("pop.wav"); end
+        
+        -- Check for fish click
+        if this.fish:clicked() then
+            ct.inputYesNo("Continue?"); end
     end
     
     -- Move the ball

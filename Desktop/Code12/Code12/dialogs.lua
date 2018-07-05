@@ -256,11 +256,16 @@ local function inputValue(message, valueType)
 
 	-- Init the input state, then block and yield until the dialog finishes
 	inputType = valueType
-	g.blocked = true
+	display.getCurrentStage():setFocus(nil)  -- an object may have focus
+	g.modalDialog = true
 	while dialogGroup do
-		coroutine.yield()
+		if g.blockAndYield() == "abort" then
+			endDialog()
+			g.modalDialog = false
+			error("aborted");
+		end
 	end
-	g.blocked = false
+	g.modalDialog = false
 
 	-- Return the result
 	return inputResult

@@ -3,7 +3,7 @@ import Code12.*;
 class UserCode extends Code12Program
 {
 	// instance variables
-	GameObj ball, bigBall;
+	GameObj fish, ball, bigBall;
 	GameObj[] moreBalls = new GameObj[10];
 	// GameObj tooSoon = ct.circle(50, 50, 50);
 	int count, total;
@@ -70,7 +70,8 @@ class UserCode extends Code12Program
 		bigBall.clickable = true;
 
 		// Add a fish
-		ct.image("goldfish.png", 50, 50, 15);
+		fish = ct.image("goldfish.png", 50, 50, 15);
+		fish.clickable = true;
 		String filename = null;
 		// ct.image(filename, 50, 20, 15);
 
@@ -137,6 +138,10 @@ class UserCode extends Code12Program
 			ct.println("Pop sound loaded");
 		if (ct.charTyped("p"))
 			ct.sound("pop.wav");
+
+		// Check for fish click
+		if (fish.clicked())
+			ct.inputYesNo("Continue?");
 	}
 
 	// Move the ball
