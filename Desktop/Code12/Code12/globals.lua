@@ -50,6 +50,7 @@ local g = {
 
 	-- Run state
 	startTime = nil,       -- System time in ms when start function began, or nil before
+	modalDialog = false,   -- true if a modal dialog is showing
 	blocked = false,       -- true if user code is blocked on user input
 	stopped = false,       -- true if run was stopped or failed
 }
