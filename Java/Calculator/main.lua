@@ -5,15 +5,15 @@ require('Code12.api')
     --Instance Variables
     this.display = nil; 
     this.displayText = ""
-    this.buttons = { length = 20 }
+    this.buttons = { length = 20, default = nil }
     this.clearBack = nil; 
-    this.operatorButtons = { "+", "-", "*", "/", ".", "=", "(", ")", "%", length = 9 }
-    this.errorMessages = { "Cannot divide by zero!", length = 1 }
-    this.equation = nil; 
+    this.operatorButtons = { "+", "-", "*", "/", ".", "=", "(", ")", "%", length = 9, default = nil }
+    this.errorMessages = { "Cannot divide by zero!", length = 1, default = nil }
     this.compare = nil; 
+    this.equation = nil; 
     --Instance Variables for the calculate method
-    this.values = { length = 12 }
-    this.operators = { length = 12 }
+    this.values = { length = 12, default = 0 }
+    this.operators = { length = 12, default = nil }
     this.temp = nil; 
     this.displayingAnswer = false
     
@@ -30,11 +30,11 @@ require('Code12.api')
         
         ct.setScreen("Calculator")
         --Adds the 0 number key
-        this.buttons[1+(0)] = ct.rect(20, 83, 15, 10, "gray")
+        ct.checkArrayIndex(this.buttons, 0); this.buttons[1+(0)] = ct.rect(20, 83, 15, 10, "gray")
         ct.text("0", 20, 83, 10, "black")
         
         --Adds the backspace/clear key
-        this.buttons[1+(19)] = ct.rect(71, 31, 15, 10, "gray")
+        ct.checkArrayIndex(this.buttons, 19); this.buttons[1+(19)] = ct.rect(71, 31, 15, 10, "gray")
         this.clearBack = ct.text("AC", 71, 31, 10, "black")
         
         
@@ -44,8 +44,8 @@ require('Code12.api')
             
             local x = 20; while x <= 54 do
                 
-                this.buttons[1+(num)] = ct.rect(x, y, 15, 10, "gray")
-                ct.text(ct.formatInt(num), x, y - 1, 10, "black")
+                ct.checkArrayIndex(this.buttons, num); this.buttons[1+(num)] = ct.rect(x, y, 15, 10, "gray")
+                ct.text(ct.formatInt(num), x, y, 10, "black")
                 num = num + 1
             x = x + (17); end
         y = y - (13); end
@@ -53,16 +53,16 @@ require('Code12.api')
         --adds basic math operator buttons
         local y = 83; while y >= 44 do
             
-            this.buttons[1+(num)] = ct.rect(71, y, 15, 10, "gray")
-            ct.text(this.operatorButtons[1+(num % 10)], 71, y - 1, 10, "black")
+            ct.checkArrayIndex(this.buttons, num); this.buttons[1+(num)] = ct.rect(71, y, 15, 10, "gray")
+            ct.text(ct.indexArray(this.operatorButtons, num % 10), 71, y - 1, 10, "black")
             num = num + 1
         y = y - (13); end
         
         --adds equals and decimal button
         local x = 37; while x <= 54 do
             
-            this.buttons[1+(num)] = ct.rect(x, 83, 15, 10, "gray")
-            ct.text(this.operatorButtons[1+(num % 10)], x, 83, 10, "black")
+            ct.checkArrayIndex(this.buttons, num); this.buttons[1+(num)] = ct.rect(x, 83, 15, 10, "gray")
+            ct.text(ct.indexArray(this.operatorButtons, num % 10), x, 83, 10, "black")
             num = num + 1
         x = x + (17); end
         
@@ -70,12 +70,12 @@ require('Code12.api')
         -- adds (, ), % and clear button
         local x = 20; while x <= 54 do
             
-            this.buttons[1+(num)] = ct.rect(x, 31, 15, 10, "gray")
+            ct.checkArrayIndex(this.buttons, num); this.buttons[1+(num)] = ct.rect(x, 31, 15, 10, "gray")
             local y = 31
             local buttonId = num % 10
-            if (this.operatorButtons[1+(buttonId)] == "(") or (this.operatorButtons[1+(buttonId)] == ")") then
+            if (ct.indexArray(this.operatorButtons, buttonId) == "(") or (ct.indexArray(this.operatorButtons, buttonId) == ")") then
                 y = 30; end
-            ct.text(this.operatorButtons[1+(num % 10)], x, y, 10, "black")
+            ct.text(ct.indexArray(this.operatorButtons, num % 10), x, y, 10, "black")
             num = num + 1
         x = x + (17); end
         
@@ -95,27 +95,41 @@ require('Code12.api')
         --///////////////////////////////////////////////////////////////////////////////
         -- Equation Solver
         
-        this.equation = ct.inputString("Enter an equation")
-        ct.println(_fn.calculate(_fn.Test(2)))
+        --equation = ct.inputString("Enter an equation");
+        --ct.println( Test ( 3 ) );
+        --ct.println( findIntRoot() );
     end
+    -- public String findIntRoot ()
+    -- {
+    --    for ( int x = 0; x < 1000; x++ )
+    --    {
+    --       if( Test( x ) )
+    --       {
+    --          return ct.formatInt( x );
+    --       }
+    --       if( Test( -x ) )
+    --       {
+    --          return ct.formatInt( -x );
+    --       }
+    --    }
+    --   return "Cannot find integar root";
+    -- }   
     
+    -- public boolean Test( int x )
+    -- {
+    --    for( int i = 0; i < equation.length(); i++ )
+    --    {  
+    --       String temporary = equation.substring(i,i+1);
+    --       if( temporary.equals("x") )
+    --       {
+    --          String temp1 = equation.substring(0,i);
+    --          String temp2 = equation.substring(i+1,equation.length() );
+    --          equation = temp1 + x + temp2;
+    --       }
+    --    } 
     
-    function _fn.Test(x)
-        
-        local i = 0; while i < string.len(this.equation) do
-            
-            local temporary = ct.substring(this.equation, i, i + 1)
-            if (temporary == "x") then
-                
-                local temp1 = ct.substring(this.equation, 0, i)
-                local temp2 = ct.substring(this.equation, i + 1, string.len(this.equation))
-                this.equation = temp1 .. x .. temp2
-            end
-        i = i + 1; end
-        
-        return this.equation
-    end
-    
+    --    return ct.parseNumber( calculate( equation ) ) == 0;
+    -- }
     
     --///////////////////////////////////////////////////////////////////////////////   
     
@@ -126,27 +140,32 @@ require('Code12.api')
     
     function _fn.onKeyPress(keyName)
         
-        if ct.canParseInt(ct.substring(keyName, string.len(keyName) - 1, string.len(keyName))) then
+        if (keyName == "backspace") then
+            
+            _fn.Input(19)
+        
+        elseif ct.canParseInt(ct.substring(keyName, string.len(keyName) - 1, string.len(keyName))) then
             
             local i = ct.parseInt(ct.substring(keyName, string.len(keyName) - 1, string.len(keyName)))
             _fn.Input(i)
         end
+        
     end
     
     
     function _fn.onMousePress(obj, x, y)
         
         local i = -1
-        i = 0; while i < this.buttons.length do
+        local j = 0; while j < this.buttons.length do
             
-            if obj == this.buttons[1+(i)] then
+            if obj == ct.indexArray(this.buttons, j) then
                 
+                i = j
                 break
             end
-        i = i + 1; end
+        j = j + 1; end
         _fn.Input(i)
     end
-    
     
     
     --Handles inputs from mouse and keyboard
@@ -155,8 +174,7 @@ require('Code12.api')
         if i ~= -1 then
             
             
-            if string.len(this.displayText) < 12 and i < 14 then
-                
+            if string.len(this.displayText) < 12 and i < 18 and i ~= 15 then
                 
                 if i < 10 then
                     
@@ -178,7 +196,7 @@ require('Code12.api')
                         this.clearBack:setText("AC")
                     end
                     
-                    this.displayText = this.displayText .. this.operatorButtons[1+(i % 10)]
+                    this.displayText = this.displayText .. ct.indexArray(this.operatorButtons, i % 10)
                 end
                 
                 this.display:setText(this.displayText)
@@ -204,12 +222,12 @@ require('Code12.api')
                     
                     if not (currentNumber == "") then
                         
-                        this.displayText = this.displayText .. this.operatorButtons[1+(i % 10)]
+                        this.displayText = this.displayText .. ct.indexArray(this.operatorButtons, i % 10)
                         this.display:setText(this.displayText)
                     
                     else 
                         
-                        this.displayText = this.displayText .. "0" .. this.operatorButtons[1+(i % 10)]
+                        this.displayText = this.displayText .. "0" .. ct.indexArray(this.operatorButtons, i % 10)
                         this.display:setText(this.displayText)
                     end
                 end
@@ -256,17 +274,27 @@ require('Code12.api')
     
     --Helper methods for Calculate
     
-    --IndexOf for arrays
-    function _fn.findIndex(array, findMe)
+    --Precedence of mathmatical operators
+    function _fn.precedence(operator)
         
-        local i = 0; while i < array.length do
+        if (operator == "+") or (operator == "-") then
             
-            if (findMe == array[1+(i)]) then
-                
-                return i
-            end
-        i = i + 1; end
-        return -1
+            return 5
+        end
+        if (operator == "*") or (operator == "/") then
+            
+            return 4
+        end
+        if (operator == "^") then
+            
+            return 3
+        end
+        if (operator == "!") then
+            
+            return 2
+        end
+        
+        return 0
     end
     
     --Handles simple numerical calculations
@@ -291,6 +319,10 @@ require('Code12.api')
             
             return n1 / n2
         end
+        if (o == "^") then
+            
+            return math.pow(n1, n2)
+        end
         
         return 0
     end
@@ -300,52 +332,94 @@ require('Code12.api')
         local i = 0
         local valueCount = 0
         local operatorCount = 0
+        local returnMe = "math error"
         
-        while string.len(toCalculate) > 0 do
+        while true do
+            
             
             if i == (string.len(toCalculate) - 1) then
                 
-                valueCount = valueCount + (1)
-                this.values[1+(valueCount - 1)] = ct.parseNumber(toCalculate)
-                break
+                --checks for operators at the end of
+                this.compare = ct.substring(toCalculate, i)
+                if (this.compare == "+") or (this.compare == "-") or (this.compare == "*") or (this.compare == "/") or (this.compare == "^") or (this.compare == "(") then
+                    
+                    return returnMe
+                
+                else 
+                    
+                    valueCount = valueCount + (1)
+                    ct.checkArrayIndex(this.values, valueCount - 1); this.values[1+(valueCount - 1)] = ct.parseNumber(toCalculate)
+                    break
+                end
             
             else 
                 
                 this.compare = ct.substring(toCalculate, i, i + 1)
-                if (this.compare == "+") or (this.compare == "-") or (this.compare == "*") or (this.compare == "/") then
+                if (this.compare == "(") or (this.compare == ")") then
+                    
+                    --handles left parenthesis
+                    if (this.compare == "(") then
+                        
+                        operatorCount = operatorCount + (1)
+                        ct.checkArrayIndex(this.operators, operatorCount - 1); this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
+                    
+                    else 
+                        
+                        if ct.indexOfString(toCalculate, "(") == -1 then
+                            return returnMe; end
+                        while not (ct.indexArray(this.operators, operatorCount - 1) == "(") do
+                            
+                            local num1 = ct.indexArray(this.values, valueCount - 2)
+                            local num2 = ct.indexArray(this.values, valueCount - 1)
+                            local operator = ct.indexArray(this.operators, operatorCount - 1)
+                            if num2 == 0 and (operator == "/") then
+                                return "Div by zero no!"; 
+                            else 
+                                ct.checkArrayIndex(this.values, valueCount - 2); this.values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator); end
+                            valueCount = valueCount - (1)
+                            operatorCount = operatorCount - (1)
+                        end
+                        operatorCount = operatorCount - (1)
+                    end
+                    toCalculate = ct.substring(toCalculate, i + 1)
+                    i = 0
+                end
+                if (this.compare == "+") or (this.compare == "-") or (this.compare == "*") or (this.compare == "/") or (this.compare == "^") then
                     
                     --Having found the end of a number pushes it to the values array
                     valueCount = valueCount + (1)
-                    this.values[1+(valueCount - 1)] = ct.parseNumber(ct.substring(toCalculate, 0, i))
+                    ct.checkArrayIndex(this.values, valueCount - 1); this.values[1+(valueCount - 1)] = ct.parseNumber(ct.substring(toCalculate, 0, i))
                     
                     --Checks if the operator array is empty
                     if operatorCount == 0 then
                         
                         operatorCount = operatorCount + (1)
-                        this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
-                        toCalculate = ct.substring(toCalculate, i + 1)
-                        i = 0
+                        ct.checkArrayIndex(this.operators, operatorCount - 1); this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
                     
                     else 
                         
                         --Compares the precedence of the operators
-                        if _fn.findIndex(this.operatorButtons, ct.substring(toCalculate, i, i + 1)) < _fn.findIndex(this.operatorButtons, this.operators[1+(operatorCount - 1)]) then
+                        if _fn.precedence(ct.substring(toCalculate, i, i + 1)) >= _fn.precedence(ct.indexArray(this.operators, operatorCount - 1)) then
                             
-                            local operator = this.operators[1+(operatorCount - 1)]
-                            local num1 = this.values[1+(valueCount - 2)]
-                            local num2 = this.values[1+(valueCount - 1)]
-                            this.values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator)
-                            this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
+                            local operator = ct.indexArray(this.operators, operatorCount - 1)
+                            local num1 = ct.indexArray(this.values, valueCount - 2)
+                            local num2 = ct.indexArray(this.values, valueCount - 1)
+                            if num2 == 0 and (operator == "/") then
+                                return "Div by zero no!"; 
+                            else 
+                                ct.checkArrayIndex(this.values, valueCount - 2); this.values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator); end
+                            ct.checkArrayIndex(this.operators, operatorCount - 1); this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
                             valueCount = valueCount - (1)
-                            toCalculate = ct.substring(toCalculate, i + 1)
-                            i = 0
                         
                         else 
                             
                             operatorCount = operatorCount + (1)
-                            this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
+                            ct.checkArrayIndex(this.operators, operatorCount - 1); this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
                         end
                     end
+                    
+                    toCalculate = ct.substring(toCalculate, i + 1)
+                    i = 0
                 
                 else 
                     
@@ -353,61 +427,77 @@ require('Code12.api')
                 end
             end
         end
-        
         while operatorCount > 0 do
             
-            local num1 = this.values[1+(valueCount - 2)]
-            local num2 = this.values[1+(valueCount - 1)]
-            local operator = this.operators[1+(operatorCount - 1)]
-            this.values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator)
+            local num1 = ct.indexArray(this.values, valueCount - 2)
+            local num2 = ct.indexArray(this.values, valueCount - 1)
+            local operator = ct.indexArray(this.operators, operatorCount - 1)
+            if num2 == 0 and (operator == "/") then
+                return "Div by zero no!"; 
+            else 
+                ct.checkArrayIndex(this.values, valueCount - 2); this.values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator); end
             valueCount = valueCount - (1)
             operatorCount = operatorCount - (1)
         end
         
         
-        --Formating and returning result
-        local result = this.values[1+(0)]
+        --Formating and returning result 
+        local result = ct.indexArray(this.values, 0)
         
-        if result > 999999999 or result < 0.000000001 then
+        if result == 0 then
             
-            local exponant = 0
+            return "0.0"
+        
+        elseif math.abs(result) > 999999 or math.abs(result) < 0.000001 then
+            
+            
+            local exp = 0
             local coefficient = 0
-            local exp = ""
+            local expStr = ""
             
             
             if result > 1 then
                 
-                exp = ct.formatInt(ct.toInt(result))
-                exponant = string.len(exp) - 1
+                expStr = ct.formatInt(ct.toInt(result))
+                exp = string.len(expStr) - 1
                 
-                coefficient = result / math.pow(10, exponant)
-                exp = "+e" .. ct.formatInt(exponant)
+                coefficient = result / math.pow(10, exp)
+                expStr = "e+" .. ct.formatInt(exp)
             end
             
             if result < 1 then
                 
-                exp = ct.formatDecimal(result)
-                exponant = -1 * (string.len(exp) - 1)
+                exp = 0
+                while result < 1 do
+                    
+                    result = result * (10)
+                    exp = exp - 1
+                end
                 
-                coefficient = result * math.pow(10, exponant)
-                exp = "-e" .. ct.formatInt(exponant)
+                coefficient = result
+                expStr = "e" .. ct.formatInt(exp)
             end
             
-            result = ct.roundDecimal(coefficient, 11 - string.len(exp))
-            return ct.formatDecimal(result) .. exp
+            result = ct.roundDecimal(coefficient, 11 - string.len(expStr))
+            
+            return ct.formatDecimal(result) .. expStr
         end
         
-        this.compare = ct.formatDecimal(result)
-        if string.len(this.compare) > 12 then
+        
+        returnMe = ct.formatDecimal(result)
+        if string.len(returnMe) > 12 then
             
-            this.compare = ct.formatInt(ct.toInt(result))
-            local decimalPlaces = 11 - string.len(this.compare)
-            
+            returnMe = ct.formatInt(ct.toInt(result))
+            local decimalPlaces = 11 - string.len(returnMe)
             result = ct.roundDecimal(result, decimalPlaces)
+            returnMe = ct.formatDecimal(result)
         end
         
         if ct.toInt(result) == result then
-            return ct.formatInt(ct.toInt(result)); end
+            
+            returnMe = ct.formatInt(ct.toInt(result))
+            return returnMe
+        end
         
-        return ct.formatDecimal(result)
+        return returnMe
     end
