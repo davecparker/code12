@@ -177,8 +177,8 @@ local function inputValue(message, valueType)
 		messageText = textWrapped
 	end
 	messageText:setFillColor(0)
-	local dialogWidth = math.max(messageText.width + margins, dxDialogMin)
-	y = y + messageText.height + margin
+	local dialogWidth = math.max(math.ceil(messageText.width) + margins, dxDialogMin)
+	y = y + math.ceil(messageText.height) + margin
 
 	-- Make the input field if needed and determine the dialog height
 	local dialogHeight
@@ -188,11 +188,11 @@ local function inputValue(message, valueType)
 		dialogHeight = y + dyButton + margin
 	else
 		-- All other input types have a text input field
-		inputField = uiItem(native.newTextField( margin, y,
-									dialogWidth - margins, messageText.height))
+		inputField = uiItem(native.newTextField(margin, y,
+				dialogWidth - margins, messageText.height))
 		inputField.font = native.newFont(inputFont, inputFontSize)
 		inputField:resizeHeightToFitFont()
-		dialogHeight = y + inputField.height + margin * 2
+		dialogHeight = y + math.ceil(inputField.height) + margin * 2
 
 		-- Doesn't work to set the keyboard focus right away
 		inputField:addEventListener("userInput", onUserInput)
@@ -201,7 +201,7 @@ local function inputValue(message, valueType)
 
 	-- Make the group for the dialog box, and add the frame, drag bar, and message
 	dialogGroup = display.newGroup()
-	dialogFrame = uiItem( display.newRect(dialogGroup, 0, 0, dialogWidth, dialogHeight))
+	dialogFrame = uiItem(display.newRect(dialogGroup, 0, 0, dialogWidth, dialogHeight))
 	dialogFrame:setFillColor(1)
 	dialogFrame:setStrokeColor(0)
 	dialogFrame.strokeWidth = 1
@@ -214,6 +214,12 @@ local function inputValue(message, valueType)
 
 	-- Add the input field or key listener
 	if inputField then
+		-- Add a framed rect under where the input field will be so it's always visible
+		local inputFrame = uiItem(display.newRect(dialogGroup, 
+			inputField.x, inputField.y - 1, inputField.width, inputField.height + 1))
+		inputFrame:setFillColor(1)
+		inputFrame:setStrokeColor(0.7)
+		inputFrame.strokeWidth = 1
 		dialogGroup:insert(inputField)
 	else
 		Runtime:addEventListener("key", onKey)
@@ -230,11 +236,23 @@ local function inputValue(message, valueType)
 	end
 
 	-- Position the dialog centered on the output area if room,
-	-- otherwise centered on the entire app area.  TODO
-	local width = g.window.width
-	local height = g.window.height
-	dialogGroup.x = width / 2 - dialogWidth / 2
-	dialogGroup.y = height / 2 - dialogHeight / 2
+	-- otherwise centered on the entire app area.
+	local xDialog = math.round(g.window.width / 2 - dialogWidth / 2)
+	local yDialog = math.round(g.window.height / 2 - dialogHeight / 2)
+	if xDialog < 0 then 
+		xDialog = math.round(display.actualContentWidth / 2 - dialogWidth / 2)
+		if xDialog < 0 then
+			xDialog = 0
+		end
+	end
+	if yDialog < 0 then 
+		yDialog = math.round(display.actualContentHeight / 2 - dialogHeight / 2)
+		if yDialog < 0 then
+			yDialog = 0
+		end
+	end
+	dialogGroup.x = xDialog
+	dialogGroup.y = yDialog
 
 	-- Init the input state, then block and yield until the dialog finishes
 	inputType = valueType

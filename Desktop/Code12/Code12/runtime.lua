@@ -144,6 +144,37 @@ local function onResize()
 	g.eventFunctionYielded(_fn.onResize)
 end
 
+-- Stop a run
+local function stopRun()
+	-- Remove the event listeners (only some may be installed)
+	Runtime:removeEventListener("enterFrame", onFirstFrame)
+	Runtime:removeEventListener("enterFrame", onNewFrame)
+	Runtime:removeEventListener("touch", g.onTouchRuntime)
+	Runtime:removeEventListener("key", g.onKey)
+	Runtime:removeEventListener("resize", onResize)
+
+	-- Destroy the main display group, screens, and display objects
+	if g.mainGroup then
+		g.mainGroup:removeSelf()  -- deletes contained screen and object groups
+		g.mainGroup = nil
+	end
+	g.screens = {}
+	g.screen = nil
+
+	-- Clear global input state
+	g.clicked = false
+	g.gameObjClicked = nil
+	g.clickX = 0
+	g.clickY = 0
+	g.charTyped = nil
+
+	-- Set game state for a stopped run
+	g.startTime = nil
+	g.stopped = true
+	g.blocked = false
+	coRoutineUser = nil  -- TODO: explicitly kill and delete coroutine somehow?
+end	
+
 -- Handle the result of the two return values from a coroutine.resume call,
 -- and check the status of the coroutine to adjust the running state,
 -- and return true if the coroutine yielded or false if it completed.
@@ -203,38 +234,6 @@ function g.eventFunctionYielded( func, ... )
 	end
 	return false
 end
-
--- Stop a run
-local function stopRun()
-	-- Remove the event listeners (only some may be installed)
-	Runtime:removeEventListener("enterFrame", onFirstFrame)
-	Runtime:removeEventListener("enterFrame", onNewFrame)
-	Runtime:removeEventListener("touch", g.onTouchRuntime)
-	Runtime:removeEventListener("key", g.onKey)
-	Runtime:removeEventListener("resize", onResize)
-
-	-- Destroy the main display group, screens, and display objects
-	if g.mainGroup then
-		g.mainGroup:removeSelf()  -- deletes contained screen and object groups
-		g.mainGroup = nil
-	end
-	g.screens = {}
-	g.screen = nil
-
-	-- Clear global input state
-	g.clicked = false
-	g.gameObjClicked = nil
-	g.clickX = 0
-	g.clickY = 0
-	g.charTyped = nil
-
-	-- Set game state for a stopped run
-	g.startTime = nil
-	g.stopped = true
-	g.blocked = false
-	coRoutineUser = nil  -- TODO: explicitly kill and delete coroutine somehow?
-end	
-
 
 -- Init for a new run of the user program after the user's code has been loaded
 local function initRun()
