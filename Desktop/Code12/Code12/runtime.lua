@@ -146,6 +146,14 @@ end
 
 -- Stop a run
 local function stopRun()
+	-- Abort the user coRoutine if necessary
+	if coRoutineUser then
+		if coroutine.status(coRoutineUser) ~= "dead" then
+			coroutine.resume(coRoutineUser, "abort")
+		end
+		coRoutineUser = nil
+	end
+
 	-- Remove the event listeners (only some may be installed)
 	Runtime:removeEventListener("enterFrame", onFirstFrame)
 	Runtime:removeEventListener("enterFrame", onNewFrame)
@@ -170,9 +178,9 @@ local function stopRun()
 
 	-- Set game state for a stopped run
 	g.startTime = nil
+	g.modalDialog = false
 	g.stopped = true
 	g.blocked = false
-	coRoutineUser = nil  -- TODO: explicitly kill and delete coroutine somehow?
 end	
 
 -- Handle the result of the two return values from a coroutine.resume call,
@@ -233,6 +241,14 @@ function g.eventFunctionYielded( func, ... )
 		end
 	end
 	return false
+end
+
+-- Block and yield the user's code, then return any message from the
+-- main thread, in particular it might be "abort".
+function g.blockAndYield()
+	if coRoutineUser then
+		return coroutine.yield()
+	end
 end
 
 -- Init for a new run of the user program after the user's code has been loaded

@@ -11,12 +11,13 @@ class ct
 	void log( Object values )        // values delimited and strings quoted
 	void logm( String message, Object values)    // log with unquoted message
 
-	// Text Input
-	//-----------
-	int inputInt( String message )            // 0 if not an integer
-	double inputNumber( String message )      // Nan if not a number
-	boolean inputBoolean( String message )    // true iff starts with 'y', 't' or '1'
-	String inputString( String message )      // until end of line
+	// Alerts and Input Dialogs
+	//-------------------------
+	void showAlert( String message ) 
+	int inputInt( String message )
+	double inputNumber( String message )
+	boolean inputYesNo( String message )
+	String inputString( String message )
 
 	// Screen Management
 	//------------------
