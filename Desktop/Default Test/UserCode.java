@@ -3,7 +3,7 @@ import Code12.*;
 class UserCode extends Code12Program
 {
 	// instance variables
-	GameObj ball, bigBall;
+	GameObj fish, ball, bigBall;
 	GameObj[] moreBalls = new GameObj[10];
 	// GameObj tooSoon = ct.circle(50, 50, 50);
 	int count, total;
@@ -48,10 +48,13 @@ class UserCode extends Code12Program
 		ct.print("Here's an unitialized GameObj: "); 
 		ct.println(moreBalls[3]);
 		ct.println("Done");
-		boolean test = ct.inputBoolean("Would you like to print some lines?");
+		ct.showAlert("Hey, this is an alert.\nThis is the second line.");
+		String userName = ct.inputString("Enter your name");
+		ct.println("Hello " + userName);
+		boolean test = ct.inputYesNo("Would you like to print some lines?");
 		if (test)
 		{
-			count = ct.inputInt("Enter count:");
+			count = ct.inputInt("Enter number of lines to print");
 			for (int i = 1; i <= count; i++)
 			{
 				ct.println("Line " + i);
@@ -67,7 +70,8 @@ class UserCode extends Code12Program
 		bigBall.clickable = true;
 
 		// Add a fish
-		ct.image("goldfish.png", 50, 50, 15);
+		fish = ct.image("goldfish.png", 50, 50, 15);
+		fish.clickable = true;
 		String filename = null;
 		// ct.image(filename, 50, 20, 15);
 
@@ -134,6 +138,10 @@ class UserCode extends Code12Program
 			ct.println("Pop sound loaded");
 		if (ct.charTyped("p"))
 			ct.sound("pop.wav");
+
+		// Check for fish click
+		if (fish.clicked())
+			ct.inputYesNo("Continue?");
 	}
 
 	// Move the ball

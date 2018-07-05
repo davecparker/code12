@@ -4,7 +4,7 @@ The design of the Code 12 API is (c)Copyright 2018 by David C. Parker.
 
 ##### Global (ct) APIs
 * [Text Output](#text-output)
-* [Text Input](#text-input)
+* [Alerts and Input Dialogs](#alerts-and-input-dialogs)
 * [Screen Management](#screen-management)
 * [GameObj Creation](#gameobj-creation)
 * [Mouse and Keyboard Input](#mouse-and-keyboard-input)
@@ -72,47 +72,60 @@ then print any number of values to the console.
 The values are output in the same way as `ct.logm()` (see above).
 
 _____________________________________________________________________
-Text Input
-----------
+Alerts and Input Dialogs
+------------------------
+
+### ct.showAlert()
+```
+ct.showAlert( String message )
+```
+Display `message` in a popup alert dialog. 
+Execution of the program will pause and wait for the user to press
+the OK button on the dialog or press the Enter key on the keyboard.
+
+> The `message` can contain line breaks by embedding 
+> newline (`\n`) characters in the string.
 
 ### ct.inputInt()
 ```
 int ct.inputInt( String message )
 ```
-If `message` is not null then print it to the console followed by a space.
-Then, accept input from the console until a newline is entered.
-Attempt to parse the input as an integer.
-If a valid integer is input then return the integer,
-otherwise return 0.
+Display `message` in a popup dialog box that allows the user to
+enter a number.
+Execution of the program will pause and wait until the user
+enters a valid integer. The resulting integer value is returned.
 
 ### ct.inputNumber()
 ```
 double ct.inputNumber( String message )
 ```
-If `message` is not null then print it to the console followed by a space.
-Then, accept input from the console until a newline is entered.
-Attempt to parse the input as a number.
-If a valid number is input then return the number,
-otherwise return an error value (NaN).
-You can test for an error value using `ct.isError()`.
+Display `message` in a popup dialog box that allows the user to
+enter a number.
+Execution of the program will pause and wait until the user
+enters a valid number. The resulting numeric value is returned.
 
-### ct.inputBoolean()
+### ct.inputYesNo()
 ```
-boolean ct.inputBoolean( String message )
+boolean ct.inputYesNo( String message )
 ```
-If `message` is not null then print it to the console followed by a space.
-Then, accept input from the console until a newline is entered.
-If the first non-blank character of the input is
-'y', 'Y', 't', 'T', or 1 (yes, true, or 1), then return true,
-otherwise return false.
+Display `message` in a popup dialog box that has two buttons
+labelled Yes and No.
+Execution of the program will pause and wait until the user
+presses one of the buttons. The function returns `true` if the
+user presses Yes and `false` if they press No.
 
 ### ct.inputString()
 ```
 String ct.inputString( String message )
 ```
-If `message` is not null then print it to the console followed by a space.
-Then, accept input from the console until a newline is entered.
-Return the entire input as a String.
+Display `message` in a popup dialog box that allows the user to
+enter a text string.
+Execution of the program will pause and wait until the user
+presses the Enter key to end the text input. 
+The resulting String value is returned.
+
+> If the user presses the Enter key without entering any other
+> characters, then an empty string (`""`) will be returned.
 
 _____________________________________________________________________
 Screen Management

@@ -15,6 +15,7 @@ require("Code12.runtime")
 -- Submodule API files that add functions to the runtime object
 require("Code12.errors")
 require("Code12.text")
+require("Code12.dialogs")
 require("Code12.screens")
 require("Code12.objects")
 require("Code12.input")

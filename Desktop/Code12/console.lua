@@ -28,8 +28,6 @@ local textObjs = {}          -- array of text display objects
 local numDisplayLines = 0    -- number of lines we can display
 local fontHeight             -- measured font height
 local fontCharWidth          -- measured font char width
-local textField              -- active native text field or nil if none
-local textFieldText          -- text in the textField, updated when changes
 
 -- Console data
 local completedLines         -- array of strings for completed text lines
@@ -76,11 +74,6 @@ local function updateConsole()
 			textObjs[iText].text = table.concat( currentLineStrings )
 			iText = iText + 1
 		end
-	end
-
-	-- Hide text input field, if any, if scrolled back
-	if textField then
-		textField.isVisible = (scrollStartLine == nil)
 	end
 
 	-- Clear any remaining text objects
@@ -143,23 +136,6 @@ local function onTouchConsole()
 	return true
 end
 
--- Handle user input in the textField for console input
-local function onTextUserInput( event )
-	textFieldText = textField.text     -- Update the known text
-	local phase = event.phase
-	
-	if phase == "editing" then
-		scrollToEnd()	-- try to keep input visible	
-	elseif phase == "ended" then
-		-- User clicked off, which removes the input focus, so put it back
-		native.setKeyboardFocus( textField )
-	elseif phase == "submitted" then
-		-- User pressed enter to end the input
-		textField:removeSelf()
-		textField = nil
-	end
-end
-
 
 --- Module Functions ---------------------------------------------------------
 
@@ -201,57 +177,7 @@ function console.clear()
 	currentLineStrings = {}
 	currentLineLength = 0
 	scrollStartLine = nil
-	if textField then
-		textField:removeSelf()
-		textField = nil
-	end
-	textFieldText = nil
 	changed = true
-end
-
--- Input a string from the console and return the string. 
--- This call will effectively block until the input is received, although
--- it will yield to the caller of the runtime coroutine while waiting.
-function console.inputString()
-	-- If we are scrolled back, then scroll to the end so the input will be visible
-	scrollToEnd()
-
-	-- Determine where to position the text field
-	local numCompletedLines = #completedLines
-	local hasIncompleteLine = (#currentLineStrings > 0)
-	local numLines = numCompletedLines
-	if hasIncompleteLine then
-		numLines = numLines + 1
-	end
-	local iLine = math.min( numLines, numDisplayLines )
-	local y = textMargin + (iLine - 1) * fontHeight
-	local x = textMargin + currentLineLength * fontCharWidth
-
-	-- Make a native text field to do the input
-	assert( textField == nil )
-	local width = math.max( bg.width - x - textMargin - Scrollbar.width, fontCharWidth * 3 )
-	textField = native.newTextField( x, y, width, fontHeight )
-	textField.anchorX = 0
-	textField.anchorY = 0
-	textField.font = native.newFont( app.consoleFont )
-	textField.size = app.consoleFontSize
-	textField:resizeHeightToFitFont()
-	textField.text = ""
-	console.group:insert( textField )
-	textField:addEventListener( "userInput", onTextUserInput )
-
-	-- It doesn't work to set keyboard focus right away, so delay it a bit
-	timer.performWithDelay( 50, function () native.setKeyboardFocus( textField ) end )
-
-	-- Block and yield until the text input finishes
-	while textField do
-		coroutine.yield()
-	end
-
-	-- Print and return the result
-	ct.println( textFieldText )
-	ct.print( "" )    -- force a new line to start so it looks like the newline happened
-	return textFieldText
 end
 
 -- Resize the console to fit the given size
@@ -301,11 +227,13 @@ end
 
 -- Init the console
 function console.init()
-	-- Get actual font metrics by measuring a text object (font metrics seem unreliable)
+	-- Get font metrics of console font
+	local metrics = graphics.getFontMetrics( app.consoleFont, app.consoleFontSize )
+	fontHeight = math.round( metrics.height ) + 2   -- leading is reported as 0 for our font
+	-- Get char width by measuring a text object since not in font metrics
 	local str = "1234567890"
 	local temp = display.newText( str, 0, 0, app.consoleFont, app.consoleFontSize )
 	fontCharWidth = temp.contentWidth / string.len( str )
-	fontHeight = math.floor( temp.contentHeight )   -- try to keep text pixel-aligned
 	temp:removeSelf()
 	app.consoleFontCharWidth = fontCharWidth
 	app.consoleFontHeight = fontHeight
