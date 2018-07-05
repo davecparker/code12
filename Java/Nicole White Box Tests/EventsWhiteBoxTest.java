@@ -2,13 +2,12 @@ import Code12.*;
 
 public class EventsWhiteBoxTest extends Code12Program
 {
-   
-   GameObj[][] squares;
+   GameObj[] boxes;
    final int PAD = 20;
    final int ROWS = 10;
    final int COLS = 10;
-   
-   int count = 1;
+
+   double lastX, lastY;
    boolean selected = false;
    
    public static void main(String[] args)
@@ -18,72 +17,87 @@ public class EventsWhiteBoxTest extends Code12Program
 
    public void start()
    {
-      squares = new GameObj[ROWS][COLS];
+      // instantiate the array
+      boxes  = new GameObj[100];
+      
       double gameWidth = ct.getWidth();
       double gameHeight = ct.getHeight();
       
-      double xInc = (double)(gameWidth - 2*PAD)/COLS;
-      double yInc = (double)(gameHeight - 2*PAD)/ROWS;
+      double xInc = (gameWidth - 2*PAD)/COLS;
+      double yInc = (gameHeight - 2*PAD)/ROWS;
       
-      
-      for ( int i = 0; i < ROWS; i++)
+      // draw boxes(game rects)
+      for ( int i = 0; i < ROWS; i++ )
       {
-         double y = PAD + i*yInc;
-         for ( int j = 0; j < COLS; j++)
+         double y = PAD + i * yInc; // y value is always changing
+         for ( int j = 0; j < COLS; j++ )
          {
-            double x = PAD + j*xInc;
-            squares[i][j] = ct.rect(x,y,xInc, yInc );  
+            double x = PAD + j * xInc;
+            boxes[i*j] = ct.rect(x,y,xInc,yInc);
          }
+         
       }
+    //   squares = new GameObj[ROWS][COLS];
+// 
+//       for ( int i = 0; i < ROWS; i++)
+//       {
+//          double y = PAD + i*yInc;
+//          for ( int j = 0; j < COLS; j++)
+//          {
+//             double x = PAD + j*xInc;
+//             squares[i][j] = ct.rect(x,y,xInc, yInc );  
+//          }
+//       }
+      
+    // GameObj newArray[] = new GameObj[squares.length*squares[0].length];
+//     for ( int i = 0; i < squares.length; i++ )
+//     {
+//         GameObj[] row = squares[i];
+//         for ( int j = 0; j < row.length; j++ )
+//         {
+//             GameObj number = squares[i][j];
+//             newArray[i*row.length+j] = number;
+//         }
+//     }
+    
       
    }
    
    public void update()
    {
       // Allow tiles to be clicked
-      for ( int i = 0; i < squares.length; i++ )
+      for ( int i = 0; i < ROWS; i++ )
       {
-         for ( int j = 0; j < squares[i].length; j++ )
+         for ( int j = 0; j < COLS; j++ )
          {
-            squares[i][j].clickable = true;
+            boxes[i*j].clickable = true;
          }
       }
-            
-     
+
    }
    
    public void onMousePress( GameObj obj, double x, double y )
    {
+      lastX = x;
+      lastY = y;
       
       if ( obj != null )
       {
-         for ( int i = 0; i < squares.length; i++ )
+         for ( int i = 0; i < ROWS; i++ )
          {
-            for ( int j = 0; j < squares[i].length; j++ )
-            {
-                  if ( squares[i][j].containsPoint(x,y) )
+               for ( int j = 0; j < COLS; j++ )
+               {
+                  if ( boxes[i*j].containsPoint(x,y) )
                   {
-                     squares[i][j].setFillColor("red");
-                     selected = true;
-                     count++;
-                     // If clicked again, revert to original color
-                     // Selected(highlighted in red) is false
-                     // check if *that* square is clicked again
-                     if ( count % 2 != 0 )
-                     {
-                        selected = false;
-                        squares[i][j].setFillColor("yellow");
-                     }
-                     ct.println("A tile located at: [" + ct.toInt(squares[i][j].x) + "," + ct.toInt(squares[i][j].y)
-                                  + "] was clicked. Selected == " + selected);
-    
+                     boxes[i*j].setFillColor("red");
+                     ct.println("A tile located at: [" + ct.toInt(boxes[i*j].x) + "," + ct.toInt(boxes[i*j].y) + " ] was clicked.");
                   }
-                  
-            }
-          }
-         
+               }
+            
+         }
       }
-   }
+         
+ }
 
    
 }

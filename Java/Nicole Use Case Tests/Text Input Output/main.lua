@@ -34,19 +34,19 @@ require('Code12.api')
         this.row8 = "***"
         this.row9 = "*********"
         
-        this.rows = { length = 10 }
+        this.rows = { length = 10, default = nil }
         
         -- Assign elements to array
-        this.rows[1+(0)] = this.row0
-        this.rows[1+(1)] = this.row1
-        this.rows[1+(2)] = this.row2
-        this.rows[1+(3)] = this.row3
-        this.rows[1+(4)] = this.row4
-        this.rows[1+(5)] = this.row5
-        this.rows[1+(6)] = this.row6
-        this.rows[1+(7)] = this.row7
-        this.rows[1+(8)] = this.row8
-        this.rows[1+(9)] = this.row9
+        ct.checkArrayIndex(this.rows, 0); this.rows[1+(0)] = this.row0
+        ct.checkArrayIndex(this.rows, 1); this.rows[1+(1)] = this.row1
+        ct.checkArrayIndex(this.rows, 2); this.rows[1+(2)] = this.row2
+        ct.checkArrayIndex(this.rows, 3); this.rows[1+(3)] = this.row3
+        ct.checkArrayIndex(this.rows, 4); this.rows[1+(4)] = this.row4
+        ct.checkArrayIndex(this.rows, 5); this.rows[1+(5)] = this.row5
+        ct.checkArrayIndex(this.rows, 6); this.rows[1+(6)] = this.row6
+        ct.checkArrayIndex(this.rows, 7); this.rows[1+(7)] = this.row7
+        ct.checkArrayIndex(this.rows, 8); this.rows[1+(8)] = this.row8
+        ct.checkArrayIndex(this.rows, 9); this.rows[1+(9)] = this.row9
         
         ct.println("-------------------")
         -- Print the initial array, unsorted
@@ -63,7 +63,7 @@ require('Code12.api')
         
         local i = 0; while i < arr.length do
             
-            ct.println(arr[1+(i)] .. " [" .. string.len(arr[1+(i)]) .. "]")
+            ct.println(ct.indexArray(arr, i) .. " [" .. string.len(ct.indexArray(arr, i)) .. "]")
         i = i + 1; end
     end
     
@@ -73,18 +73,18 @@ require('Code12.api')
         
         local j = 1; while j < arr.length do
             
-            temp = arr[1+(j)]
+            temp = ct.indexArray(arr, j)
             local i = j - 1
             while i >= 0 do
                 
-                if ct.stringCompare(temp, arr[1+(i)]) > 0 then
+                if ct.stringCompare(temp, ct.indexArray(arr, i)) > 0 then
                     break; end
-                arr[1+(i + 1)] = arr[1+(i)]
+                ct.checkArrayIndex(arr, i + 1); arr[1+(i + 1)] = ct.indexArray(arr, i)
                 i = i - 1
                 ct.println("----------------------------")
                 _fn.printArray(this.rows)
             end
-            arr[1+(i + 1)] = temp
+            ct.checkArrayIndex(arr, i + 1); arr[1+(i + 1)] = temp
         j = j + 1; end
     end
     
@@ -101,11 +101,11 @@ require('Code12.api')
             -- this will exit the loop after the final pass
             j = 0; while j < arr.length - 1 do
                 
-                if string.len(arr[1+(j)]) > string.len(arr[1+(j + 1)]) then
+                if string.len(ct.indexArray(arr, j)) > string.len(ct.indexArray(arr, j + 1)) then
                     
-                    temp = arr[1+(j)]
-                    arr[1+(j)] = arr[1+(j + 1)]
-                    arr[1+(j + 1)] = temp
+                    temp = ct.indexArray(arr, j)
+                    ct.checkArrayIndex(arr, j); arr[1+(j)] = ct.indexArray(arr, j + 1)
+                    ct.checkArrayIndex(arr, j + 1); arr[1+(j + 1)] = temp
                     needsSorting = true
                 end
             j = j + 1; end
@@ -122,21 +122,21 @@ require('Code12.api')
         local i = 0; while i < arr.length - 1 do
             
             -- assume the shortest string is the first element 
-            min = string.len(arr[1+(i)])
+            min = string.len(ct.indexArray(arr, i))
             -- test against elements after j to find the shortest 
             -- index out of bounds
             local j = i + 1; while j <= arr.length do
                 
                 -- if this string element is shorter, then it is the new minimum
-                if ct.stringCompare(arr[1+(j)], arr[1+(min)]) < 0 then
+                if ct.stringCompare(ct.indexArray(arr, j), ct.indexArray(arr, min)) < 0 then
                     min = j; end
             j = j + 1; end
-            if string.len(arr[1+(min)]) ~= string.len(arr[1+(i)]) then
+            if string.len(ct.indexArray(arr, min)) ~= string.len(ct.indexArray(arr, i)) then
                 
                 -- swap(a[i], a[iMin]) to go from shortest to longest
-                temp = arr[1+(i)]
-                arr[1+(i)] = arr[1+(min)]
-                arr[1+(min)] = temp
+                temp = ct.indexArray(arr, i)
+                ct.checkArrayIndex(arr, i); arr[1+(i)] = ct.indexArray(arr, min)
+                ct.checkArrayIndex(arr, min); arr[1+(min)] = temp
             end
             
             _fn.printArray(arr)

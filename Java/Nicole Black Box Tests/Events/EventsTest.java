@@ -56,6 +56,12 @@ class EventsTest extends Code12Program
             {
                sprite.xSpeed *= -1;
                sprite.ySpeed *= -1;
+               // testing garbage collection
+               // delete object
+               obstacles[i].delete();
+               // Should return false if object was deleted
+               if ( sprite.hit(obstacles[i]) == false )
+                  ct.println( obstacles[i].toString() + " has been deleted.");
             }
          }
          

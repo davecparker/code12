@@ -1,16 +1,18 @@
 // Events Use Case of:
 // onMousePress()
 // onMouseDrag()
-// Level 8. If-else   
-
+// Level 10: User-defined Functions
 
 import Code12.*;
 
 public class Paint extends Code12Program
 {
    String currentColor = "blue";    // Default color
+   String highlite = "yellow";
    GameObj brush;
-   
+   // circle to bound lines
+   GameObj c;
+   double lastX, lastY;
    // Rectangles to contain the colors
    GameObj palette;
    GameObj redRect;
@@ -27,7 +29,7 @@ public class Paint extends Code12Program
    GameObj small;
    GameObj medium;
    GameObj large;
-   int size = 6;     // Default size is small
+   double size = 6;     // Default size is small
    
    public static void main(String[] args)
    { 
@@ -40,14 +42,14 @@ public class Paint extends Code12Program
       double gameHeight = ct.getHeight();
       ct.setTitle("Cheesy MS Paint");
       
-      double offset = 3;       // For a pro-looking bezel
+      double offset = 3;      
       double spacing = gameHeight / 10;
       
       final double BOX_WIDTH = 17; // 20 minus offset
       
       palette = ct.rect(10,gameHeight/2,20,gameHeight,"black");
       ct.rect(10,gameHeight/2,BOX_WIDTH,gameHeight-offset,"gray");
-         
+      
       redRect = ct.rect(spacing, spacing - offset, BOX_WIDTH, spacing, "red");
       orangeRect = ct.rect(spacing,spacing*2 - offset, BOX_WIDTH, spacing, "orange");
       yellowRect = ct.rect(spacing,spacing*3 - offset, BOX_WIDTH, spacing, "yellow");
@@ -78,7 +80,6 @@ public class Paint extends Code12Program
       yellowRect.clickable = true;
       greenRect.clickable = true;
       blueRect.clickable = true;
-      indigoRect.visible = true;
       indigoRect.clickable = true;
       purpleRect.clickable = true;
       magentaRect.clickable = true;
@@ -89,8 +90,15 @@ public class Paint extends Code12Program
       large.clickable = true;
    }
    
+  
+    // have all except selected (null) for obj.setLineColor
+    // selected obj.setLineColor("yellow"
+   
    public void onMousePress( GameObj obj, double x, double y )
    {
+      lastX = x;
+      lastY = y;
+      
       if ( obj != null )
       {
             if ( obj == redRect )
@@ -111,7 +119,6 @@ public class Paint extends Code12Program
                currentColor = "dark magenta";
             else if ( obj == eraseRect )
                currentColor =  "white";
-            
             
             // Whichever brush size selected gets highlighted
             if ( obj == small )
@@ -141,21 +148,24 @@ public class Paint extends Code12Program
    
    public void onMouseDrag( GameObj obj, double x, double y )
    {
-      // saves the last known click position coordinates (ct.clickX, ct.clickY)
-      // then draw a line between that last point and the current  
+      
+      // saves the last known click position coordinates (lastX, lastY from onMousePress() )
+      // then draw a line between those coordinates and the current 
       // user can only draw on canvas, not on other game objects
       if ( ct.clickX() > palette.width + 2 )
       {
-         double lastX = ct.clickX();
-         double lastY = ct.clickY();
-         brush = ct.line(lastX, lastY,x,y);
-         // update previous point
+         brush = ct.line( lastX, lastY, x, y ,currentColor);
+         brush.lineWidth = ct.toInt(size);
+         // draw a bounding circle between lines (endpoints)
+         if ( size == 6 || size == 8 )
+            c = ct.circle(x, y, size / 10, currentColor);
+         else if ( size == 16 )
+            c = ct.circle(x, y, size / 5, currentColor); 
+            
+         c.setLineColor( currentColor );
+         // update previous position
          lastX = x;
          lastY = y;
-         brush.setLineColor(currentColor);
-         brush.setFillColor(currentColor);
-         brush.lineWidth = size;
-
       }
 
    }

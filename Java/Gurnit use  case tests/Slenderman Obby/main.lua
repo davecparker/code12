@@ -9,7 +9,7 @@ require('Code12.api')
         
         
     
-    function start()
+    function _fn.start()
         
         this.width = ct.getWidth()
         this.height = ct.getHeight()
@@ -49,23 +49,25 @@ require('Code12.api')
         this.redRect:setLineColor("red")
         this.pinkRect:setLineColor("pink")
         
-        this.slider1.xSpeed = -1
-        this.slider2.xSpeed = 1
+        this.slider1.xSpeed = -0.5
+        this.slider2.xSpeed = 0.5
         this.blueRect.xSpeed = 2
         this.redRect.xSpeed = -1.5
         this.pinkRect.xSpeed = 1
         
         --player
-        this.slenderman = ct.image("slender.png", this.width / 15, this.height / 10, 10)
+        this.slenderman = ct.image("slender.png", this.width / 15, this.height / 10, 4)
         --checkpoint
         this.checkpoint = ct.image("flag.png", this.width / 10 * 8, this.height / 10 * 2, 20)
     end
-    function update()
+    function _fn.update()
         
         -- moving slenderman   
         if ct.keyPressed("up") then
             
             this.slenderman.y = this.slenderman.y - (1)
+            if this.slenderman.y <= 10 then
+                this.slenderman.y = 10; end
         end
         if ct.keyPressed("down") then
             
@@ -78,6 +80,8 @@ require('Code12.api')
         if ct.keyPressed("left") then
             
             this.slenderman.x = this.slenderman.x - (1)
+            if this.slenderman.x <= 0 then
+                this.slenderman.x = 0; end
         end
         -- moving blue, pink, and red tiles
         if this.blueRect.x < 65 then

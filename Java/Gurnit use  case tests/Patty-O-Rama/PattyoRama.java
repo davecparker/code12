@@ -3,7 +3,7 @@ import Code12.*;
 public class PattyoRama extends Code12Program
 {
 GameObj krabbyPatty, roguePatty, pipe, play, playText, scoreText;
-int score;
+int score = 0;
 
    public static void main(String[] args)
    { 
@@ -45,7 +45,7 @@ int score;
         if(play.clicked())
            ct.setScreen("game");          
                      
-        if (ct.getScreen() == "game" && ct.random(1, 20) == 1)
+        if (ct.getScreen().equals("game") && ct.random(1, 20) == 1)
         {   
            // random position for krabby patties
            int X = ct.random(40, 80);

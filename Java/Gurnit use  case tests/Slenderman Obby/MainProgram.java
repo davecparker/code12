@@ -49,14 +49,14 @@ double width, height;
       redRect.setLineColor( "red");
       pinkRect.setLineColor("pink");    
       
-      slider1.xSpeed = -1;
-      slider2.xSpeed = 1;
+      slider1.xSpeed = -0.5;
+      slider2.xSpeed = 0.5;
       blueRect.xSpeed = 2;
       redRect.xSpeed = -1.5;
       pinkRect.xSpeed = 1;
       
       //player
-      slenderman = ct.image("slender.png", width/15, height/10, 10);
+      slenderman = ct.image("slender.png", width/15, height/10, 4);
       //checkpoint
       checkpoint = ct.image("flag.png", width/10*8, height/10 *2, 20);    
    }  
@@ -66,6 +66,8 @@ double width, height;
        if(ct.keyPressed("up"))
        {
          slenderman.y -= 1;
+         if ( slenderman.y <= 10)
+            slenderman.y = 10;
        }
        if(ct.keyPressed("down"))
        {
@@ -78,6 +80,8 @@ double width, height;
         if(ct.keyPressed("left"))
        {
           slenderman.x -= 1;
+          if ( slenderman.x <= 0 )
+              slenderman.x = 0;
        }   
       // moving blue, pink, and red tiles
        if(blueRect.x < 65)

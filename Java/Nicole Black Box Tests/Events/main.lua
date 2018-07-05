@@ -23,7 +23,7 @@ require('Code12.api')
     this.text2 = nil; 
     this.sprite = nil; 
     this.dialogue = nil; 
-    this.obstacles = { length = 4 }
+    this.obstacles = { length = 4, default = nil }
     this.seconds = 0
     this.gravity = 1.0
     
@@ -35,10 +35,10 @@ require('Code12.api')
     function _fn.start()
         
         this.sprite = ct.image("sprite.png", 50, 50, 10)
-        this.obstacles[1+(0)] = ct.circle(10, ct.getHeight() - 10, 10)
-        this.obstacles[1+(1)] = ct.circle(ct.getWidth() - 10, 10, 10, "green")
-        this.obstacles[1+(2)] = ct.circle(10, 10, 20, "purple")
-        this.obstacles[1+(3)] = ct.circle(ct.getWidth() - 10, ct.getHeight() - 10, 15, "blue")
+        ct.checkArrayIndex(this.obstacles, 0); this.obstacles[1+(0)] = ct.circle(10, ct.getHeight() - 10, 10)
+        ct.checkArrayIndex(this.obstacles, 1); this.obstacles[1+(1)] = ct.circle(ct.getWidth() - 10, 10, 10, "green")
+        ct.checkArrayIndex(this.obstacles, 2); this.obstacles[1+(2)] = ct.circle(10, 10, 20, "purple")
+        ct.checkArrayIndex(this.obstacles, 3); this.obstacles[1+(3)] = ct.circle(ct.getWidth() - 10, ct.getHeight() - 10, 15, "blue")
         
     end
     
@@ -49,13 +49,19 @@ require('Code12.api')
         -- reverseDirection method keeps objects on screen
         local i = 0; while i < this.obstacles.length do
             
-            _fn.reverseDirection(this.obstacles[1+(i)])
+            _fn.reverseDirection(ct.indexArray(this.obstacles, i))
             
             -- if the sprite hits an obstacle, deflect
-            if this.sprite:hit(this.obstacles[1+(i)]) then
+            if this.sprite:hit(ct.indexArray(this.obstacles, i)) then
                 
                 this.sprite.xSpeed = this.sprite.xSpeed * (-1)
                 this.sprite.ySpeed = this.sprite.ySpeed * (-1)
+                -- testing garbage collection
+                -- delete object
+                ct.indexArray(this.obstacles, i):delete()
+                -- Should return false if object was deleted
+                if this.sprite:hit(ct.indexArray(this.obstacles, i)) == false then
+                    ct.println(ct.indexArray(this.obstacles, i):toString() .. " has been deleted."); end
             end
         i = i + 1; end
         
@@ -153,21 +159,21 @@ require('Code12.api')
     function _fn.onKeyPress(keyName)
         
         if (keyName == "right") then
-            this.obstacles[1+(0)].xSpeed = 0.5; 
+            ct.checkArrayIndex(this.obstacles, 0); this.obstacles[1+(0)].xSpeed = 0.5; 
         elseif (keyName == "left") then
-            this.obstacles[1+(0)].xSpeed = -0.5; 
+            ct.checkArrayIndex(this.obstacles, 0); this.obstacles[1+(0)].xSpeed = -0.5; 
         elseif (keyName == "up") then
-            this.obstacles[1+(1)].ySpeed = -2; 
+            ct.checkArrayIndex(this.obstacles, 1); this.obstacles[1+(1)].ySpeed = -2; 
         elseif (keyName == "down") then
-            this.obstacles[1+(1)].ySpeed = 2; 
+            ct.checkArrayIndex(this.obstacles, 1); this.obstacles[1+(1)].ySpeed = 2; 
         elseif (keyName == "w") then
-            this.obstacles[1+(2)].ySpeed = -1; 
+            ct.checkArrayIndex(this.obstacles, 2); this.obstacles[1+(2)].ySpeed = -1; 
         elseif (keyName == "s") then
-            this.obstacles[1+(2)].ySpeed = 1; 
+            ct.checkArrayIndex(this.obstacles, 2); this.obstacles[1+(2)].ySpeed = 1; 
         elseif (keyName == "d") then
-            this.obstacles[1+(3)].xSpeed = 0.25; 
+            ct.checkArrayIndex(this.obstacles, 3); this.obstacles[1+(3)].xSpeed = 0.25; 
         elseif (keyName == "a") then
-            this.obstacles[1+(3)].xSpeed = -0.25; end
+            ct.checkArrayIndex(this.obstacles, 3); this.obstacles[1+(3)].xSpeed = -0.25; end
         
     end
     
@@ -185,21 +191,21 @@ require('Code12.api')
     function _fn.onKeyRelease(keyName)
         
         if (keyName == "right") then
-            this.obstacles[1+(0)].xSpeed = 0; 
+            ct.checkArrayIndex(this.obstacles, 0); this.obstacles[1+(0)].xSpeed = 0; 
         elseif (keyName == "left") then
-            this.obstacles[1+(0)].xSpeed = 0; 
+            ct.checkArrayIndex(this.obstacles, 0); this.obstacles[1+(0)].xSpeed = 0; 
         elseif (keyName == "up") then
-            this.obstacles[1+(1)].ySpeed = 0; 
+            ct.checkArrayIndex(this.obstacles, 1); this.obstacles[1+(1)].ySpeed = 0; 
         elseif (keyName == "down") then
-            this.obstacles[1+(1)].ySpeed = 0; 
+            ct.checkArrayIndex(this.obstacles, 1); this.obstacles[1+(1)].ySpeed = 0; 
         elseif (keyName == "w") then
-            this.obstacles[1+(2)].ySpeed = 0; 
+            ct.checkArrayIndex(this.obstacles, 2); this.obstacles[1+(2)].ySpeed = 0; 
         elseif (keyName == "s") then
-            this.obstacles[1+(2)].ySpeed = 0; 
+            ct.checkArrayIndex(this.obstacles, 2); this.obstacles[1+(2)].ySpeed = 0; 
         elseif (keyName == "d") then
-            this.obstacles[1+(3)].xSpeed = 0; 
+            ct.checkArrayIndex(this.obstacles, 3); this.obstacles[1+(3)].xSpeed = 0; 
         elseif (keyName == "a") then
-            this.obstacles[1+(3)].xSpeed = 0; end
+            ct.checkArrayIndex(this.obstacles, 3); this.obstacles[1+(3)].xSpeed = 0; end
     end
     
     function _fn.onCharTyped(ch)
