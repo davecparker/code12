@@ -151,7 +151,8 @@ public class Paint extends Code12Program
       
       // saves the last known click position coordinates (lastX, lastY from onMousePress() )
       // then draw a line between those coordinates and the current 
-      // user can only draw on canvas, not on other game objects
+
+      // user can only draw on canvas(null space), not on other game objects
       if ( ct.clickX() > palette.width + 2 )
       {
          brush = ct.line( lastX, lastY, x, y ,currentColor);
