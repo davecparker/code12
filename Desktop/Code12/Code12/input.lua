@@ -35,6 +35,22 @@ local function clickEvent(event, gameObj)
 			return false
 		end
 
+		-- If gameObj is nil, check if a line was clicked
+		local focusObj = event.target
+		if gameObj == nil then
+			local objs = g.screen.objs
+			for i = 1, objs.numChildren do
+				local gObj = objs[i].code12GameObj
+				if gObj.clickable and gObj._code12.typeName == "line" then
+					if gObj:lineContainsPoint( x, y ) then
+						gameObj = gObj
+						focusObj = objs[i]
+						break
+					end
+				end
+			end
+		end
+
 		-- Set last click state
 		g.clicked = true
 		g.gameObjClicked = gameObj
@@ -42,7 +58,7 @@ local function clickEvent(event, gameObj)
 		g.clickY = y
 
 		-- Automatically take the touch focus.
-		g.setFocusObj(event.target)
+		g.setFocusObj(focusObj)
 
 		-- Call client event
 		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
