@@ -9,7 +9,6 @@
 
 local g = require("Code12.globals")
 require("Code12.runtime")
-local appContext = ct._appContext
 
 local widget = require("widget")
 
@@ -41,17 +40,10 @@ local onKey                     -- key listener for dialogs
 
 ---------------- Internal Functions ------------------------------------------
 
--- Set obj's anchor to (0, 0) and return it
-local function uiItem(obj)
-	obj.anchorX = 0
-	obj.anchorY = 0
-	return obj
-end
-
 -- Make and return a button on dialogGroup with the given text and listener, 
 -- top-left aligned at x, y
 local function makeButton(text, x, y, listener)
-	local btn = uiItem( widget.newButton{
+	local btn = widget.newButton{
 		x = x,
 		y = y,
 		onRelease = listener,
@@ -59,7 +51,9 @@ local function makeButton(text, x, y, listener)
 		font = native.systemFontBold,
 		fontSize = inputFontSize,
 		textOnly = true,
-	} )
+	}
+	btn.anchorX = 0
+	btn.anchorY = 0
 	dialogGroup:insert(btn)
 	return btn
 end
@@ -141,21 +135,20 @@ end
 
 -- Handle touch events on a dialog's drag bar
 local function onTouchDragBar(event)
-	if event.phase == "began" then
-		display.getCurrentStage():setFocus(dragBar)
+	local phase = event.phase
+	if phase == "began" then
+		g.setFocusObj(dragBar)
 		dragOffsetX = event.x - dialogGroup.x
 		dragOffsetY = event.y - dialogGroup.y
-	else
-		if event.phase ~= "cancelled" then
-			-- Move dialog then make sure it's fully visbile in the app window
-			local xMax = display.actualContentWidth - dialogFrame.width
-			local yMax = display.actualContentHeight - dialogFrame.height
-			dialogGroup.x = g.pinValue(event.x - dragOffsetX, 0, xMax)
-			dialogGroup.y = g.pinValue(event.y - dragOffsetY, 0, yMax)
-		end
-		if event.phase ~= "moved" then
-			display.getCurrentStage():setFocus( nil )
-		end
+	elseif g.getFocusObj() == dragBar and phase ~= "cancelled" then
+		-- Move dialog then make sure it's fully visible in the app window
+		local xMax = display.actualContentWidth - dialogFrame.width
+		local yMax = display.actualContentHeight - dialogFrame.height
+		dialogGroup.x = g.pinValue(event.x - dragOffsetX, 0, xMax)
+		dialogGroup.y = g.pinValue(event.y - dragOffsetY, 0, yMax)
+	end
+	if phase == "ended" or phase == "cancelled" then
+		g.setFocusObj(nil)
 	end
 	return true
 end
@@ -166,17 +159,16 @@ local function inputValue(message, valueType)
 	-- Make the message text and determine the dialog width
 	local y = dyDragBar + margin
 	local wrapWidth = math.min(dxDialogMax, display.actualContentWidth) - margins * 2
-	local messageText = uiItem(display.newText(message, margin, y, 0, 0,
-									native.systemFontBold, inputFontSize))
-	local textWrapped = uiItem(display.newText(message, margin, y, wrapWidth, 0,
-									native.systemFontBold, inputFontSize))
+	local messageText = g.uiItem(display.newText(message, margin, y, 0, 0,
+									native.systemFontBold, inputFontSize), 0)
+	local textWrapped = g.uiItem(display.newText(message, margin, y, wrapWidth, 0,
+									native.systemFontBold, inputFontSize), 0)
 	if textWrapped.height == messageText.height then
 		textWrapped:removeSelf()   -- message fit on one line
 	else
 		messageText:removeSelf()   -- use the wrapped version
 		messageText = textWrapped
 	end
-	messageText:setFillColor(0)
 	local dialogWidth = math.max(math.ceil(messageText.width) + margins, dxDialogMin)
 	y = y + math.ceil(messageText.height) + margin
 
@@ -188,8 +180,10 @@ local function inputValue(message, valueType)
 		dialogHeight = y + dyButton + margin
 	else
 		-- All other input types have a text input field
-		inputField = uiItem(native.newTextField(margin, y,
-				dialogWidth - margins, messageText.height))
+		inputField = native.newTextField(margin, y,
+							dialogWidth - margins, messageText.height)
+		inputField.anchorX = 0
+		inputField.anchorY = 0
 		inputField.font = native.newFont(inputFont, inputFontSize)
 		inputField:resizeHeightToFitFont()
 		dialogHeight = y + math.ceil(inputField.height) + margin * 2
@@ -201,25 +195,18 @@ local function inputValue(message, valueType)
 
 	-- Make the group for the dialog box, and add the frame, drag bar, and message
 	dialogGroup = display.newGroup()
-	dialogFrame = uiItem(display.newRect(dialogGroup, 0, 0, dialogWidth, dialogHeight))
-	dialogFrame:setFillColor(1)
-	dialogFrame:setStrokeColor(0)
-	dialogFrame.strokeWidth = 1
-	dragBar = uiItem(display.newRect(dialogGroup, 0, 0, dialogWidth, dyDragBar))
-	dragBar:setFillColor(dragBarShade)
-	dragBar:setStrokeColor(0)
-	dragBar.strokeWidth = 1
+	dialogFrame = g.uiItem(display.newRect(dialogGroup, 0, 0, dialogWidth, dialogHeight), 1, 0)
+	dragBar = g.uiItem(display.newRect(dialogGroup, 0, 0, dialogWidth, dyDragBar), dragBarShade, 0)
 	dragBar:addEventListener("touch", onTouchDragBar)
 	dialogGroup:insert(messageText)
 
 	-- Add the input field or key listener
 	if inputField then
-		-- Add a framed rect under where the input field will be so it's always visible
-		local inputFrame = uiItem(display.newRect(dialogGroup, 
-			inputField.x, inputField.y - 1, inputField.width, inputField.height + 1))
-		inputFrame:setFillColor(1)
-		inputFrame:setStrokeColor(0.7)
-		inputFrame.strokeWidth = 1
+		-- Add a framed rect under the input field on Mac so it's always visible
+		if g.isMac then
+			g.uiItem(display.newRect(dialogGroup, inputField.x, inputField.y, 
+							inputField.width, inputField.height), 0, 0.7)
+		end
 		dialogGroup:insert(inputField)
 	else
 		Runtime:addEventListener("key", onKey)
@@ -228,7 +215,7 @@ local function inputValue(message, valueType)
 	-- Make and add the button(s) if necessary
 	local x = dialogWidth - margin - dxButton
 	if valueType == "boolean" then
-		local noBtn = makeButton("No", x, y, onNo)
+		makeButton("No", x, y, onNo)
 		x = x - dxButton - margin
 		makeButton("Yes", x, y, onYes)
 	elseif valueType == nil then
@@ -256,7 +243,7 @@ local function inputValue(message, valueType)
 
 	-- Init the input state, then block and yield until the dialog finishes
 	inputType = valueType
-	display.getCurrentStage():setFocus(nil)  -- an object may have focus
+	g.setFocusObj(nil)   -- a GameObj may have focus if it was just clicked on
 	g.modalDialog = true
 	while dialogGroup do
 		if g.blockAndYield() == "abort" then

@@ -6,6 +6,7 @@ import java.util.*;
 import java.awt.font.FontRenderContext;
 import java.awt.event.*;
 import java.io.*;
+import javax.swing.JOptionPane;
 
 
 // A game where objects can be created and modified
@@ -94,35 +95,56 @@ public class Game implements GameInterface
 
    //================ Text Input API ===================
 
+   public void showAlert(String message)
+   {
+      JOptionPane.showMessageDialog(window, message,
+            window.getTitle(), JOptionPane.INFORMATION_MESSAGE);
+   }
+   
    public int inputInt(String message)
    {
-      String s = inputString(message);
-      Scanner scan = new Scanner(s);
-      return scan.hasNextInt() ? scan.nextInt() : 0;
+      while (true)
+      {
+         String s = inputString(message);
+         try
+         {
+            return Integer.parseInt(s.trim()); 
+         }
+         catch (Exception e)
+         {
+         }
+      }
    }
    
    public double inputNumber(String message)
    {
-      String s = inputString(message);
-      Scanner scan = new Scanner(s);
-      return scan.hasNextDouble() ? scan.nextDouble() : Double.NaN;
+      while (true)
+      {
+         String s = inputString(message);
+         try
+         {
+            return Double.parseDouble(s.trim()); 
+         }
+         catch (Exception e)
+         {
+         }
+      }
    }
    
-   public boolean inputBoolean(String message)
+   public boolean inputYesNo(String message)
    {
-      String s = inputString(message);
-      s = s.trim().toLowerCase();
-      if (s.length() < 1)
-         return false;
-      char ch = s.charAt(0);
-      return (ch == 'y' || ch == 't' || ch == '1');   // yes, true, 1, etc.
+      int answer = JOptionPane.showConfirmDialog(window, message,
+                        window.getTitle(), JOptionPane.YES_NO_OPTION);
+      return answer == JOptionPane.YES_OPTION;
    }
    
    public String inputString(String message)
    {
-      if (message != null)
-         System.out.print(message + " ");
-      return consoleScanner.nextLine();
+      String answer = JOptionPane.showInputDialog(window, message, 
+            window.getTitle(), JOptionPane.QUESTION_MESSAGE);
+      if (answer == null)
+         return "";    // user cancelled
+      return answer;
    }
 
 
