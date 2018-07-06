@@ -8,6 +8,6 @@ public class Code12
    public static void run(Code12Program program) 
    {
       // Start a game window with default name and pixel size
-      GameWindow.start(program, "Code 12 Program", 500);
+      GameWindow.start(program, "Code12 Program", 500);
    }
 }
