@@ -7,8 +7,8 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
--- Code12 app modules
-local app = require( "app" )
+-- Code12 modules
+local g = require( "Code12.globals" )
 
 
 -- Layout constants
@@ -53,7 +53,7 @@ end
 -- Set a new scroll pos and notify the app
 function Scrollbar:setPos( pos )
 	-- Force pos in range and adjust the scrollbar
-	pos = app.pinValue( pos, self.rangeMin, self.rangeMax ) 
+	pos = g.pinValue( pos, self.rangeMin, self.rangeMax ) 
 	self:adjust( self.rangeMin, self.rangeMax, pos, self.ratio )
 
 	-- Notify the app, using nil if at the end of scroll range
@@ -68,31 +68,27 @@ end
 -- Handle touch events on the shuttle given phase and y within the scrollbar
 function Scrollbar:touchShuttle( phase, y )
 	if phase == "began" then
-		display.getCurrentStage():setFocus( self.shuttleTop )
-		self.dragging = true
 		self.yDragOffset = y - self.shuttleTop.y
-	else
-		if phase ~= "cancelled" and self.dragging then
-			-- Compute new shuttle top
-			local yTop = y - self.yDragOffset
-			yTop = app.pinValue( yTop, self.yMinShuttle , self.yMaxShuttle )
+		g.setFocusObj( self.shuttleTop )
+	elseif g.getFocusObj() == self.shuttleTop and phase ~= "cancelled" then
+		-- Compute new shuttle top
+		local yTop = y - self.yDragOffset
+		yTop = g.pinValue( yTop, self.yMinShuttle , self.yMaxShuttle )
 
-			-- Move the graphics
-			self.shuttleTop.y = yTop
-			self.shuttleMiddle.y = yTop + radius
-			self.shuttleBottom.y = yTop + self.shuttleMiddle.height
+		-- Move the graphics
+		self.shuttleTop.y = yTop
+		self.shuttleMiddle.y = yTop + radius
+		self.shuttleBottom.y = yTop + self.shuttleMiddle.height
 
-			-- Compute new pos and set it
-			local range = self.rangeMax - self.rangeMin
-			local yRange = self.yMaxShuttle - self.yMinShuttle
-			local newPos = self.rangeMin + math.round( 
-					(yTop - self.yMinShuttle) * range / yRange )
-			self:setPos( newPos )
-		end
-		if phase ~= "moved" then
-			self.dragging = false
-			display.getCurrentStage():setFocus( nil )
-		end
+		-- Compute new pos and set it
+		local range = self.rangeMax - self.rangeMin
+		local yRange = self.yMaxShuttle - self.yMinShuttle
+		local newPos = self.rangeMin + math.round( 
+				(yTop - self.yMinShuttle) * range / yRange )
+		self:setPos( newPos )
+	end
+	if phase == "ended" or phase == "cancelled" then
+		g.setFocusObj(nil)
 	end
 	return true
 end
@@ -108,6 +104,9 @@ function Scrollbar:touchTrack( phase, y )
 		else
 			self:setPos( self.pos + pageSize )
 		end
+		g.setFocusObj( self.trackTop )
+	elseif phase ~= "moved" then
+		g.setFocusObj( nil )
 	end
 	return true
 end
@@ -117,7 +116,8 @@ function Scrollbar:touch( event )
 	-- Which part got touched?
 	local _, y = self.group:contentToLocal( event.x, event.y )
 	local yTop = self.shuttleTop.y
-	if self.dragging or (y >= yTop and y <= self.shuttleBottom.y + diameter) then
+	if g.getFocusObj() == self.shuttleTop 
+			or (y >= yTop and y <= self.shuttleBottom.y + diameter) then
 		return self:touchShuttle( event.phase, y )
 	end
 	return self:touchTrack( event.phase, y )
@@ -131,7 +131,7 @@ end
 -- user changes the scroll position.
 function Scrollbar:new( parent, x, y, height, onChangePos )
 	-- Make a group for the scrollbar
-	local group = app.makeGroup( parent, x, y )
+	local group = g.makeGroup( parent, x, y )
 
 	-- Create a new instance
 	local sb = {
@@ -143,18 +143,17 @@ function Scrollbar:new( parent, x, y, height, onChangePos )
 		height = height,     -- pixel height of scrollbar
 		yMinShuttle = 0,     -- min pixel pos for shuttle
 		yMaxShuttle = 0,     -- max pixel pos for shuttle
-		dragging = false,    -- true when dragging the shuttle
 		yDragOffset = 0,     -- y offset when dragging shuttle
 
 		-- Display parts (finished in layout)
 		group = group,    -- display group for the scrollbar
-		bg = app.uiWhite( display.newRect( group, 0, 0, width, height ) ),
-		trackTop = app.uiItem( display.newCircle( group, 0, margin, radius ), bgShade ),
-		trackMiddle = app.uiItem( display.newRect( group, 0, radius, width - margin, 0 ), bgShade ),
-		trackBottom = app.uiItem( display.newCircle( group, 0, 0, radius ), bgShade ),
-		shuttleTop = app.uiItem( display.newCircle( group, 0, 0, radius ), shuttleShade ),
-		shuttleMiddle = app.uiItem( display.newRect( group, 0, 0, width - margin, 0 ), shuttleShade ),
-		shuttleBottom = app.uiItem( display.newCircle( group, 0, 0, radius ), shuttleShade ),
+		bg = g.uiWhite( display.newRect( group, 0, 0, width, height ) ),
+		trackTop = g.uiItem( display.newCircle( group, 0, margin, radius ), bgShade ),
+		trackMiddle = g.uiItem( display.newRect( group, 0, radius, width - margin, 0 ), bgShade ),
+		trackBottom = g.uiItem( display.newCircle( group, 0, 0, radius ), bgShade ),
+		shuttleTop = g.uiItem( display.newCircle( group, 0, 0, radius ), shuttleShade ),
+		shuttleMiddle = g.uiItem( display.newRect( group, 0, 0, width - margin, 0 ), shuttleShade ),
+		shuttleBottom = g.uiItem( display.newCircle( group, 0, 0, radius ), shuttleShade ),
 
 		-- Change callback function
 		onChangePos = onChangePos,
@@ -183,7 +182,7 @@ end
 -- If ratio is >= 1 then the scrollbar is hidden.
 function Scrollbar:adjust( rangeMin, rangeMax, pos, ratio )
 	-- Store the metrics
-	pos = app.pinValue( pos, rangeMin, rangeMax )  -- force pos inside range
+	pos = g.pinValue( pos, rangeMin, rangeMax )  -- force pos inside range
 	self.rangeMin = rangeMin
 	self.rangeMax = rangeMax
 	self.pos = pos

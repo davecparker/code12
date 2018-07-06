@@ -777,13 +777,13 @@ local function findMethod( fnValue )
 	if className == nil then
 		if vtObj == "String" or vtObj == "GameObj" then
 			className = vtObj
+			class = apiTables[className]
 		else
 			err.setErrNode( fnValue, "Method call on invalid type (%s)",
 					javaTypes.typeNameFromVt( vtObj ))
 			return nil
 		end
 	end
-	local class = apiTables[className]
 
 	-- Look up the method
 	local methodNameNode = methodNode.nodes[2]

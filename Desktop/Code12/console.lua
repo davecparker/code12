@@ -8,6 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
+local g = require( "Code12.globals" )
 local app = require( "app" )
 local Scrollbar = require( "Scrollbar" )
 
@@ -98,12 +99,12 @@ local function onScroll( newPos )
 end
 
 -- Scroll to the end of the text in the console
-local function scrollToEnd()
-	if scrollStartLine then
-		scrollStartLine = nil
-		updateConsole()
-	end
-end
+-- local function scrollToEnd()
+-- 	if scrollStartLine then
+-- 		scrollStartLine = nil
+-- 		updateConsole()
+-- 	end
+-- end
 
 -- Add raw text to the console. The text should not contain any newlines.
 local function addText( text )
@@ -194,7 +195,7 @@ function console.resize( width, height )
 	local n = #textObjs 
 	while n < numDisplayLines do
 		n = n + 1
-		textObjs[n] = app.uiBlack ( display.newText{
+		textObjs[n] = g.uiBlack ( display.newText{
 			parent = console.group,
 			text = "",
 			x = textMargin,
@@ -210,11 +211,11 @@ end
 
 -- Create the console display group and store it in console.group
 function console.create( parent, x, y, width, height )
-	local group = app.makeGroup( parent, x, y )
+	local group = g.makeGroup( parent, x, y )
 	console.group = group
 
 	-- White background
-	bg = app.uiWhite( display.newRect( group, 0, 0, width, height ) )
+	bg = g.uiWhite( display.newRect( group, 0, 0, width, height ) )
 	bg:addEventListener( "touch", onTouchConsole )
 
 	-- Scrollbar

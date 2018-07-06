@@ -14,17 +14,25 @@ require("Code12.runtime")
 ---------------- Touch Tracking ----------------------------------------------
 
 -- Set the last click state, then call the client event function (if any) 
--- for the given touch event and gameObj.
+-- for the given touch event. The gameObj is the corresponding GameObj 
+-- or nil if the event was sent to the background object. 
+-- Return true if the event was handled.
 local function clickEvent(event, gameObj)
+	-- Ignore events if the game is not supposed to be getting them now
+	if g.modalDialog or g.blocked or g.stopped then
+		return false
+	end
+
 	-- Get logical click location 
 	local xP, yP = g.mainGroup:contentToLocal( event.x, event.y )
 	local x = xP / g.scale
 	local y = yP / g.scale
 
-	if event.phase == "began" then
+	local phase = event.phase
+	if phase == "began" then
 		-- Ignore click if not in the game area
 		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
-			return
+			return false
 		end
 
 		-- Set last click state
@@ -33,17 +41,17 @@ local function clickEvent(event, gameObj)
 		g.clickX = x
 		g.clickY = y
 
-		-- Automatically take the touch focus on an object.
-		if gameObj then
-			display.getCurrentStage():setFocus(event.target)
-		end
+		-- Automatically take the touch focus.
+		g.setFocusObj(event.target)
 
 		-- Call client event
 		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
-	elseif event.phase == "moved" then
+	elseif event.target ~= g.getFocusObj() then
+		return false    -- click did not begin on this object
+	elseif phase == "moved" then
 		-- Ignore this drag point if not in the game area
 		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
-			return
+			return false
 		end
 
 		-- Set last drag location
@@ -54,31 +62,30 @@ local function clickEvent(event, gameObj)
 		g.eventFunctionYielded(_fn.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
 		-- Release touch focus if any
-		display.getCurrentStage():setFocus(nil)
+		g.setFocusObj(nil)
 
-		-- Call client event
+		-- Call client event, forcing the final point inside the game area
+		x = g.pinValue(x, 0, g.WIDTH)
+		y = g.pinValue(y, 0, g.height)
 		g.eventFunctionYielded(_fn.onMouseRelease, gameObj, x, y)
 	end
+	return true
 end
 
--- Handle a Corona touch event on the Runtime
-function g.onTouchRuntime(event)
-	if g.modalDialog or g.blocked or g.stopped then
-		return false
+-- Handle a Corona touch event on the background object
+function g.onTouchBackObj(event)
+	local backObj = event.target.code12GameObj
+	if backObj then
+		return clickEvent(event, nil)
 	end
-	clickEvent(event, nil)
-	return true
+	return false
 end
 
 -- Handle a Corona touch event on a GameObj
 function g.onTouchGameObj(event)
-	if g.modalDialog or g.blocked or g.stopped then
-		return false
-	end
 	local gameObj = event.target.code12GameObj
-	if gameObj.clickable then
-		clickEvent(event, event.target.code12GameObj)
-		return true
+	if gameObj and gameObj.clickable then
+		return clickEvent(event, gameObj)
 	end
 	return false
 end
