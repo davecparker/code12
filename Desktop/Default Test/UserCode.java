@@ -14,6 +14,11 @@ class UserCode extends Code12Program
 	int frameCount = 0;
 	String function = "Test";
 
+   public static void main(String[] args)
+   { 
+      Code12.run(new UserCode()); 
+   }
+   
 	public void start()
 	{
 		// int oops = count;
@@ -26,6 +31,7 @@ class UserCode extends Code12Program
 		// boolean _end = false;
 		// int $java = 5;
 		end = true;
+      
 
 		int[] nums = new int[10];
 		// nums[10] = 4;
@@ -160,7 +166,7 @@ class UserCode extends Code12Program
 
 		--ball.x;
 		++ball.x;
-		return ball.x;
+		return ct.round(ball.x);
 	}
 
 	public void onMousePress( GameObj obj, double x, double y )
@@ -209,10 +215,10 @@ class UserCode extends Code12Program
 			sum += ct.toInt( score );
 		}
 
-		for (;;)
-		{
-			sum += counts[c];
-		}
+// 		for (;;)
+// 		{
+// 			sum += counts[c];
+// 		}
 
 		for (int i = 0; i < counts.length; i++)
 			sum += counts[i];
