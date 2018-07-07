@@ -23,8 +23,8 @@ public class Game implements GameInterface
    double heightL;                       // logical height
    double scaleLToP;                     // scale factor for logical to pixel
    long startTimeMs;                     // system millisecond count at start of game
-   Scanner consoleScanner;               // for inputXXX methods
    Random randomGenerator;               // for random method
+   PrintWriter printWriter;              // file to echo text output to or null if none
    GameInput input;                      // helper class to implement mouse and key input
    GameAudio audio;                      // helper class to implement audio
    HashMap<String, GameScreen> screens;  // set of named screens
@@ -40,7 +40,7 @@ public class Game implements GameInterface
       this.window = window;
       setPixelSize(widthP, heightP);   // calculates heightL and scaleLToP
       startTimeMs = 0;                 // set for real when game timer starts
-      consoleScanner = new Scanner(System.in);
+      printWriter = null;
       randomGenerator = new Random(System.currentTimeMillis());
       input = new GameInput(this);
       audio = new GameAudio(this);
@@ -64,9 +64,26 @@ public class Game implements GameInterface
 
    //================ Text Output API ===================
 
-   public void print(Object obj)      { System.out.print(obj); }
-   public void println(Object obj)    { System.out.println(obj); }
-   public void println()              { System.out.println(); }
+   public void print(Object obj)
+   { 
+      System.out.print(obj);
+      if (printWriter != null)
+         printWriter.print(obj);
+   }
+   
+   public void println(Object obj)
+   { 
+      System.out.println(obj);
+      if (printWriter != null)
+         printWriter.println(obj);
+   }
+   
+   public void println()
+   {
+      System.out.println();
+      if (printWriter != null)
+         printWriter.println();
+   }
 
    public void log(Object... objs)     
    {
@@ -77,19 +94,42 @@ public class Game implements GameInterface
          while (i < objs.length - 1)   // not including last one
          {
             logValue(objs[i]);
-            System.out.print(", ");
+            print(", ");
             i++;
          }
          logValue(objs[i]);   // last one without comma
       }  
-      System.out.println();   // newline at the very end
+      println();   // newline at the very end
    }
    
    public void logm(String message, Object... objs)     
    {
-      System.out.print(message);
-      System.out.print(" ");
+      print(message);
+      print(" ");
       log(objs);
+   }
+   
+   public void setOutputFile(String filename)
+   {
+      // Close existing file, if any
+      if (printWriter != null)
+      {
+         printWriter.close();
+         printWriter = null;
+      }
+      
+      // Open the new file
+      if (filename != null)
+      {
+         try
+         {
+            printWriter = new PrintWriter(filename);
+         }
+         catch (Exception ex)
+         {
+            logError("Cannot open output file", filename);
+         }
+      }
    }
 
 
@@ -556,25 +596,32 @@ public class Game implements GameInterface
    {
       if (value instanceof String)
       {
-         System.out.print("\"");
-         System.out.print(value);
-         System.out.print("\"");
+         print("\"");
+         print(value);
+         print("\"");
       }
       else
       {
-         System.out.print(value.toString());
+         print(value.toString());
       }
    }
 
    // Log an error message
    void logError(String message)
    {
-      System.out.println("ERROR: " + message);
+      println("ERROR: " + message);
    }
 
    // Log an error message plus a quoted string
    void logError(String message, String s)
    {
-      System.out.println("ERROR: " + message + " \"" + s + "\"");
+      println("ERROR: " + message + " \"" + s + "\"");
+   }
+   
+   // Flush the output file, if any
+   void flushOutput()
+   {
+      if (printWriter != null)
+         printWriter.flush();
    }
 }

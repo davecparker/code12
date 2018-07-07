@@ -53,9 +53,7 @@ local coRoutineUser = nil    -- coroutine running an event or nil if none
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame()
 	-- Call or resume the client's update function if any
-	if g.eventFunctionYielded(_fn.update) or g.stopped then
-		return
-	end
+	g.eventFunctionYielded(_fn.update)
 
 	-- Clear the polled input state for this frame
 	g.clicked = false
@@ -90,19 +88,26 @@ end
 -- The enterFrame listener for the first update only
 local function onFirstFrame()
 	-- Call or resume the client's start method if any
-	if g.eventFunctionYielded(_fn.start) or g.stopped then
-		return
+	local yielded = g.eventFunctionYielded(_fn.start)
+
+	-- Flush the output file if any, to make sure at least 
+	-- output done in start() gets written, in case we abort later.
+	if g.outputFile then
+		g.outputFile:flush()
 	end
 
-	-- Sync the drawing objects for the first draw
+	-- Sync the drawing objects for the draw
 	local objs = g.screen.objs
 	for i = 1, objs.numChildren do
 		objs[i].code12GameObj:sync()
 	end
 
-	-- Switch to the normal frame update handler for subsequent frames
-	Runtime:removeEventListener("enterFrame", onFirstFrame)
-	Runtime:addEventListener("enterFrame", onNewFrame)
+	-- If start() finished then switch to the normal frame update 
+	-- handler for subsequent frames
+	if not yielded then
+		Runtime:removeEventListener("enterFrame", onFirstFrame)
+		Runtime:addEventListener("enterFrame", onNewFrame)
+	end
 end
 
 -- Get the device/output metrics in native units
