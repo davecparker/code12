@@ -52,7 +52,7 @@ public class DuckHuntLineHits extends Code12Program
 
       // Make ducksHitDisplay
       double scoreHeight = 5;
-      String scoreColor = "dark majenta";
+      String scoreColor = "dark magenta";
       ducksHitDisplay = ct.text( "Ducks hit: ", 0, yMax, scoreHeight, scoreColor );
       ducksHitDisplay.align( "bottom left", true );
 
@@ -79,8 +79,8 @@ public class DuckHuntLineHits extends Code12Program
       leftWall = ct.line(0, 0, 0, ct.getHeight(), "red");
       topWall = ct.line(0, 0, 100, 0, "red");
 
-      // Start the game paused and in normal mode
-      paused = true;
+      // Start the game unpaused and with turbo mode off
+      paused = false;
       turboMode = false;
    }
 
@@ -101,7 +101,9 @@ public class DuckHuntLineHits extends Code12Program
       // Make ducks at random times and positions
       if (!paused && frameCount % 180 == 1)
       {
-         int numberOfDucks = (turboMode ? 100 : 1);
+			int numberOfDucks = 1;
+			if (turboMode)
+				numberOfDucks = 100;
          for (int i = 1; i <= numberOfDucks; i++)
          {
             double x = 95;
@@ -269,12 +271,19 @@ public class DuckHuntLineHits extends Code12Program
       if ( keyName.equals("space") )
       {
          paused = !paused;
-         ct.println( "paused = " + paused );
+			if (paused)
+	         ct.println( "paused" );
+			else
+	         ct.println( "unpaused" );
       }
       if ( keyName.equals("t") )
       {
          turboMode = !turboMode;
-         ct.println( "turboMode = " + turboMode );
+			if (turboMode)
+	         ct.println( "turboMode on" );
+			else
+				ct.println( "turboMode off" );
+			
       }
    }
 }

@@ -267,7 +267,25 @@ line (stmt)
 36. z = -.707; // negative with no leading zero
 *** Location 36.10 to 36.19: Syntax Error
 
-37. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
+37. bigNum = 1.23456E10; // exponential notation
+*** Location 37.10 to 37.29: Syntax Error
+
+38. bigNum = 1.23456e10; // exponential notation
+*** Location 38.10 to 38.29: Syntax Error
+
+39. bigNum = -1.23456E10; // exponential notation
+*** Location 39.10 to 39.30: Syntax Error
+
+40. littleNum = 1.23456E-9; // exponential notation
+*** Location 40.10 to 40.32: Syntax Error
+
+41. littleNum = -1.23456E-9; // exponential notation
+*** Location 41.10 to 41.33: Syntax Error
+
+42. littleNum = 1.23456e-9; // exponential notation
+*** Location 42.10 to 42.32: Syntax Error
+
+43. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
 line (varInit)
     ID (double)
     ID (xyz)
@@ -299,7 +317,7 @@ line (varInit)
         expr (NUM)
             NUM (1.414)
 
-38. double z2 = z * 2.0; // initialization from another variable
+44. double z2 = z * 2.0; // initialization from another variable
 line (varInit)
     ID (double)
     ID (z2)
@@ -312,31 +330,31 @@ line (varInit)
         expr (NUM)
             NUM (2.0)
 
-39. // Strings
+45. // Strings
 line (comment)
     COMMENT ( Strings)
 
-40. String greeting; //  declaration without initialization - String type
+46. String greeting; //  declaration without initialization - String type
 line (varDecl)
     ID (String)
     idList (list)
         ID (greeting)
 
-41. greeting = "hello"; // assigning value to a string
+47. greeting = "hello"; // assigning value to a string
 line (stmt)
     stmt (varAssign)
         ID (greeting)
         expr (STR)
             STR ("hello")
 
-42. String greeting2 = "hello there"; // declaration with initialization - String type
+48. String greeting2 = "hello there"; // declaration with initialization - String type
 line (varInit)
     ID (String)
     ID (greeting2)
     expr (STR)
         STR ("hello there")
 
-43. String greeting3 = greeting1; // declaration with initialization from another variable's value
+49. String greeting3 = greeting1; // declaration with initialization from another variable's value
 line (varInit)
     ID (String)
     ID (greeting3)
@@ -346,7 +364,7 @@ line (varInit)
             index (empty)
             field (empty)
 
-44. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
+50. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
 line (varInit)
     ID (String)
     ID (greeting4)
@@ -362,7 +380,7 @@ line (varInit)
         expr (STR)
             STR ("world")
 
-45. String greeting5 = greeting2.substring(0, 6); // declaration with String method
+51. String greeting5 = greeting2.substring(0, 6); // declaration with String method
 line (varInit)
     ID (String)
     ID (greeting5)
@@ -378,11 +396,11 @@ line (varInit)
             expr (NUM)
                 NUM (6)
 
-46. // loops
+52. // loops
 line (comment)
     COMMENT ( loops)
 
-47. for (int i = 0; i < 10; i++)
+53. for (int i = 0; i < 10; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -406,7 +424,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-48. for (i = 0; i < 10; i = i + 2)
+54. for (i = 0; i < 10; i = i + 2)
 line (for)
     forControl (three)
         forInit (stmt)
@@ -435,7 +453,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-49. for (int i = 0; i < 100 && 2 * i < 50; i = i * 2)
+55. for (int i = 0; i < 100 && 2 * i < 50; i = i * 2)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -476,7 +494,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-50. for (int i = 100; i > 0; i--)
+56. for (int i = 100; i > 0; i--)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -500,7 +518,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-51. for (int i = 10; i > 0; i = i - 2)
+57. for (int i = 10; i > 0; i = i - 2)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -529,7 +547,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-52. for (int i = 0; i < len; i++)
+58. for (int i = 0; i < len; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -556,7 +574,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-53. for (int i = 0; i < arr.length; i++)
+59. for (int i = 0; i < arr.length; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -584,7 +602,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-54. while (j < 100)
+60. while (j < 100)
 line (while)
     expr (<)
         expr (lValue)
@@ -596,10 +614,10 @@ line (while)
             NUM (100)
     whileEnd (while)
 
-55. do
+61. do
 line (do)
 
-56. while (j < 100);
+62. while (j < 100);
 line (while)
     expr (<)
         expr (lValue)
@@ -611,7 +629,7 @@ line (while)
             NUM (100)
     whileEnd (do-while)
 
-57. while (j < foo && i != bar);
+63. while (j < foo && i != bar);
 line (while)
     expr (&&)
         expr (<)
@@ -638,17 +656,17 @@ line (while)
                     field (empty)
     whileEnd (do-while)
 
-58. // arrays
+64. // arrays
 line (comment)
     COMMENT ( arrays)
 
-59. int[] a;
+65. int[] a;
 line (arrayDecl)
     ID (int)
     idList (list)
         ID (a)
 
-60. int[] a = new int[100];
+66. int[] a = new int[100];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -658,7 +676,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (100)
 
-61. int[] a = new int[foo];
+67. int[] a = new int[foo];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -671,7 +689,7 @@ line (arrayInit)
                     index (empty)
                     field (empty)
 
-62. int[] a = new int[b.length * 2];
+68. int[] a = new int[b.length * 2];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -688,7 +706,7 @@ line (arrayInit)
                 expr (NUM)
                     NUM (2)
 
-63. int[] a = {1, 2, 3};
+69. int[] a = {1, 2, 3};
 line (arrayInit)
     ID (int)
     ID (a)
@@ -701,13 +719,13 @@ line (arrayInit)
             expr (NUM)
                 NUM (3)
 
-64. int[] a = { 1,
+70. int[] a = { 1,
 -- Incomplete line carried forward
 
-65. 2,
+71. 2,
 -- Incomplete line carried forward
 
-66. 3};
+72. 3};
 line (arrayInit)
     ID (int)
     ID (a)
@@ -720,7 +738,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (3)
 
-67. int[] a = b;
+73. int[] a = b;
 line (arrayInit)
     ID (int)
     ID (a)
@@ -731,19 +749,19 @@ line (arrayInit)
                 index (empty)
                 field (empty)
 
-68. 
+74. 
 line (blank)
 
-69. }
+75. }
 line (end)
 
-70. }
+76. }
 line (end)
 
-71. 
+77. 
 line (blank)
 
-72. public void onMousePress(GameObj obj, double x, double y)
+78. public void onMousePress(GameObj obj, double x, double y)
 line (func)
     access (public)
     retType (void)
@@ -759,14 +777,14 @@ line (func)
             ID (double)
             ID (y)
 
-73. {
+79. {
 line (begin)
 
-74. // Pop bubbles that get clicked
+80. // Pop bubbles that get clicked
 line (comment)
     COMMENT ( Pop bubbles that get clicked)
 
-75. if (obj != null)
+81. if (obj != null)
 line (if)
     expr (!=)
         expr (lValue)
@@ -777,10 +795,10 @@ line (if)
         expr (NULL)
             NULL (null)
 
-76. {
+82. {
 line (begin)
 
-77. obj.delete();
+83. obj.delete();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -790,7 +808,7 @@ line (stmt)
                 ID (delete)
         exprList (empty)
 
-78. ct.sound("pop.wav");
+84. ct.sound("pop.wav");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -802,101 +820,110 @@ line (stmt)
             expr (STR)
                 STR ("pop.wav")
 
-79. }
+85. }
 line (end)
 
-80. }
+86. }
 line (end)
 
-81. }
+87. }
 line (end)
 
-82. 
+88. 
 line (blank)
 
-83. ////////////////////////////////////////////////////////////////////
+89. ////////////////////////////////////////////////////////////////////
 line (comment)
     COMMENT (//////////////////////////////////////////////////////////////////)
 
-84. ERRORS
+90. ERRORS
 ************** Beginning of Expected Errors Section **************
-
-85. 
-line (blank)
-
-86. // Lexical errors
-line (comment)
-    COMMENT ( Lexical errors)
-
-87. @               // invalid character
-*** Location 87.1 to 87.1: Invalid character
-
-88. foo('a');       // char literals not supported
-*** Location 88.5 to 88.5: char type not supported, use double quotes
-
-89. foo(" );        // unclosed string literal
-*** Location 89.5 to 89.43: Unclosed string literal
-
-90. interface foo   // unsupported reserved word
-*** Location 90.1 to 90.9: Unsupported reserved word "interface"
 
 91. 
 line (blank)
 
-92. // Syntax errors
+92. // Lexical errors
+line (comment)
+    COMMENT ( Lexical errors)
+
+93. @               // invalid character
+*** Location 93.1 to 93.1: Invalid character
+
+94. foo('a');       // char literals not supported
+*** Location 94.5 to 94.5: char type not supported, use double quotes
+
+95. foo(" );        // unclosed string literal
+*** Location 95.5 to 95.43: Unclosed string literal
+
+96. interface foo   // unsupported reserved word
+*** Location 96.1 to 96.9: Unsupported reserved word "interface"
+
+97. 
+line (blank)
+
+98. // Syntax errors
 line (comment)
     COMMENT ( Syntax errors)
 
-93. x = 10          // missing ;
-*** Location 93.1 to 93.6: Syntax Error
+99. x = 10          // missing ;
+*** Location 99.1 to 99.6: Syntax Error
 
-94. foo(x, );       // missing expr in exprList
-*** Location 94.1 to 94.9: Syntax Error
+100. foo(x, );       // missing expr in exprList
+*** Location 100.1 to 100.9: Syntax Error
 
-95. x = a + ;       // missing expr after binary op
-*** Location 95.1 to 95.9: Syntax Error
-
-96. x = a + b * ;   // missing expr after higher precedence binary op
-*** Location 96.1 to 96.13: Syntax Error
-
-97. x = a * b + ;   // missing expr after lower precedence binary op
-*** Location 97.1 to 97.13: Syntax Error
-
-98. x = ();         // missing expr in parentheses
-*** Location 98.1 to 98.7: Syntax Error
-
-99. x = 10 + ! ;    // missing expr after unary op
-*** Location 99.1 to 99.12: Syntax Error
-
-100. x = obj.3;      // expected ID after .
-*** Location 100.1 to 100.10: Syntax Error
-
-101. if x == 3       // required next token in pattern doesn't match
+101. x = a + ;       // missing expr after binary op
 *** Location 101.1 to 101.9: Syntax Error
 
-102. x + 3;          // no matching pattern
-*** Location 102.1 to 102.6: Syntax Error
+102. x = a + b * ;   // missing expr after higher precedence binary op
+*** Location 102.1 to 102.13: Syntax Error
 
-103. foo(x,          // (incomplete line continued below)
+103. x = a * b + ;   // missing expr after lower precedence binary op
+*** Location 103.1 to 103.13: Syntax Error
+
+104. x = ();         // missing expr in parentheses
+*** Location 104.1 to 104.7: Syntax Error
+
+105. x = 10 + ! ;    // missing expr after unary op
+*** Location 105.1 to 105.12: Syntax Error
+
+106. x = obj.3;      // expected ID after .
+*** Location 106.1 to 106.10: Syntax Error
+
+107. if x == 3       // required next token in pattern doesn't match
+*** Location 107.1 to 107.9: Syntax Error
+
+108. x + 3;          // no matching pattern
+*** Location 108.1 to 108.6: Syntax Error
+
+109. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
-104. y)              // missing ;
-*** Location 103.1 to 104.2: Syntax Error
+110. y)              // missing ;
+*** Location 109.1 to 110.2: Syntax Error
 
-105. 
+111. 
 line (blank)
 
-106. // Unsupported Java syntax
+112. // Unsupported Java syntax
 line (comment)
     COMMENT ( Unsupported Java syntax)
 
-107. int x = 1, y = 2, z = 3; // declaring and initializing
-*** Location 107.1 to 107.24: Syntax Error
+113. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+*** Location 113.1 to 113.24: Syntax Error
+
+114. import java.io.PrintWriter;   // import other than Code12.*
+*** Location 114.1 to 114.27: Syntax Error
+
+115. int time = (int)( sec );      // type casting
+*** Location 115.1 to 115.24: Syntax Error
+
+116. time %= 3600;
+*** Location 116.1 to 116.13: Syntax Error
 ======= Test Complete =========================================
 
-107 lines processed in 39 ms
+116 lines processed in 48 ms
 
-2 unexpected errors
-0 uncaught errors (16 expected errors)
+8 unexpected errors
+0 uncaught errors (19 expected errors)
 
 FAILED

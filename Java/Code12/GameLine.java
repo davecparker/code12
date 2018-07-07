@@ -32,7 +32,7 @@ public class GameLine extends GameObj
       {
          double temp = left;
          left = right;
-         right = left;
+         right = temp;
       }
       else if (left == right)
       {
@@ -48,7 +48,7 @@ public class GameLine extends GameObj
       {
          double temp = top;
          top = bottom;
-         bottom = top;
+         bottom = temp;
       }
       else if (top == bottom)
       {

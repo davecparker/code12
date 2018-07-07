@@ -34,6 +34,12 @@ class BubblePop extends Code12Program
          z = 0.707; // assigning value with double
          z = .707; // no leading zero
          z = -.707; // negative with no leading zero
+         bigNum = 1.23456E10; // exponential notation
+         bigNum = 1.23456e10; // exponential notation
+         bigNum = -1.23456E10; // exponential notation
+         littleNum = 1.23456E-9; // exponential notation
+         littleNum = -1.23456E-9; // exponential notation
+         littleNum = 1.23456e-9; // exponential notation
          double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
          double z2 = z * 2.0; // initialization from another variable 
          // Strings
@@ -104,4 +110,10 @@ foo(x,          // (incomplete line continued below)
 y)              // missing ;
 
 // Unsupported Java syntax
-int x = 1, y = 2, z = 3; // declaring and initializing
+int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+import java.io.PrintWriter;   // import other than Code12.*
+int time = (int)( sec );      // type casting
+time %= 3600;                 // %=
+int hrs = time / 3600;        // integer division
+int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+String s = "boolean variable b = " + true; // String concatenation with boolean
