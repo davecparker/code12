@@ -12,9 +12,10 @@ public interface GameInterface
    public void logm(String message, Object... objs);     
    
    // Text Input
+   public void showAlert(String message);
    public int inputInt(String message);
    public double inputNumber(String message);
-   public boolean inputBoolean(String message);
+   public boolean inputYesNo(String message);
    public String inputString(String message);
    
    // Screen Management

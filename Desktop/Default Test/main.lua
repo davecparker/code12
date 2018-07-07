@@ -14,6 +14,11 @@ require('Code12.api')
     this.frameCount = 0
     this._function = "Test"
     
+    
+        
+        
+    
+    
     function _fn.start()
         
         -- int oops = count;
@@ -26,6 +31,7 @@ require('Code12.api')
         -- boolean _end = false;
         -- int $java = 5;
         _end = true
+        
         
         local nums = { length = 10, default = 0 }
         -- nums[10] = 4;
@@ -160,7 +166,7 @@ require('Code12.api')
         
         this.ball.x = this.ball.x - 1
         this.ball.x = this.ball.x + 1
-        return this.ball.x
+        return ct.round(this.ball.x)
     end
     
     function _fn.onMousePress(obj, x, y)
@@ -209,10 +215,10 @@ require('Code12.api')
             sum = sum + (ct.toInt(score))
         end
         
-        while true do
-            
-            sum = sum + (ct.indexArray(counts, c))
-        end
+        --         for (;;)
+        --         {
+        --             sum += counts[c];
+        --         }
         
         local i = 0; while i < counts.length do
             sum = sum + (ct.indexArray(counts, i)); i = i + 1; end

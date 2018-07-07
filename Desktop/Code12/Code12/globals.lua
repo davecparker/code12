@@ -2,7 +2,7 @@
 --
 -- globals.lua
 --
--- The global state for the Code 12 Lua Runtime.
+-- The global state and utility functions for the Code 12 Lua Runtime.
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
@@ -11,10 +11,11 @@
 -- The global state table
 local g = {
 	-- The runtime version number
-	version = 0.1,
+	version = 0.5,
 
 	-- Platform info
 	platform = nil,        -- e.g. "android", "macos"
+	isMac = false,         -- true if MacOS
 	isMobile = false,      -- true if iOS or Android
 	isSimulator = false,   -- true if running on Corona Simulator
 
@@ -50,6 +51,7 @@ local g = {
 
 	-- Run state
 	startTime = nil,       -- System time in ms when start function began, or nil before
+	focusObj = nil,        -- object with the touch focus or nil if none
 	modalDialog = false,   -- true if a modal dialog is showing
 	blocked = false,       -- true if user code is blocked on user input
 	stopped = false,       -- true if run was stopped or failed
@@ -66,6 +68,57 @@ function g.pinValue(value, min, max)
 		return max
 	end
 	return value
+end
+
+-- Create and return a display group in parent, optionally located at x, y
+function g.makeGroup(parent, x, y)
+	local group = display.newGroup()
+	if parent then
+		parent:insert(group)
+	end
+	group.x = x or 0
+	group.y = y or 0
+	return group
+end
+
+-- Change the given display object to be top-left anchored 
+-- with the given grayscale shades for the fill (default black) 
+-- and stroke (default none)
+function g.uiItem(obj, fillShade, lineShade)
+	if obj then
+		obj.anchorX = 0
+		obj.anchorY = 0
+		obj:setFillColor(fillShade or 0) 
+		if lineShade then
+			obj.strokeWidth = 1
+			obj:setStrokeColor(lineShade)
+		end
+	end
+	return obj
+end
+
+-- Change the given display object to be top-left anchored and white
+function g.uiWhite(obj)
+	return g.uiItem(obj, 1)
+end
+
+-- Change the given display object to be top-left anchored and black
+function g.uiBlack(obj)
+	return g.uiItem(obj, 0)
+end
+
+
+---------------- Runtime State Functions--------------------------------------
+
+-- Set the touch focus to the given object or nil to release
+function g.setFocusObj(obj)
+	display.getCurrentStage():setFocus(obj)
+	g.focusObj = obj
+end
+
+-- Return the object with the touch focus or nil if none
+function g.getFocusObj()
+	return g.focusObj
 end
 
 
