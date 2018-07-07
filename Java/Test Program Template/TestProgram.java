@@ -1,12 +1,13 @@
 import Code12.*;
 
-public class TextIOWhiteBoxTest extends Code12Program
+class TestProgram extends Code12Program
 {
-   public static void main(String[] args)
-   {
-      Code12.run(new TextIOWhiteBoxTest());
-   }
 
+   public static void main(String[] args)
+   { 
+      Code12.run(new TestProgram()); 
+   }
+   
    public void start()
    {
    }
@@ -14,4 +15,5 @@ public class TextIOWhiteBoxTest extends Code12Program
    public void update()
    {
    }
+   
 }
