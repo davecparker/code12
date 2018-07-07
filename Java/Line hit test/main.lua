@@ -19,46 +19,46 @@ require('Code12.api')
         this.speed = 1 / ct.getPixelsPerUnit()
         this.startSpeed = this.speed
         
-        this.objs = { length = 19 }
+        this.objs = { length = 19, default = nil }
         
-        this.objs[1+(0)] = ct.rect(25, 90, 15, 10, "gray")
-        this.objs[1+(1)] = ct.circle(75, 90, 10, "gray")
+        ct.checkArrayIndex(this.objs, 0); this.objs[1+(0)] = ct.rect(25, 90, 15, 10, "gray")
+        ct.checkArrayIndex(this.objs, 1); this.objs[1+(1)] = ct.circle(75, 90, 10, "gray")
         
-        this.objs[1+(2)] = ct.line(2, 0, 98, 0, "blue")
-        this.objs[1+(3)] = ct.line(2, 100, 98, 100, "blue")
-        this.objs[1+(4)] = ct.line(0, 2, 0, 98, "blue")
-        this.objs[1+(5)] = ct.line(100, 2, 100, 98, "blue")
+        ct.checkArrayIndex(this.objs, 2); this.objs[1+(2)] = ct.line(2, 0, 98, 0, "blue")
+        ct.checkArrayIndex(this.objs, 3); this.objs[1+(3)] = ct.line(2, 100, 98, 100, "blue")
+        ct.checkArrayIndex(this.objs, 4); this.objs[1+(4)] = ct.line(0, 2, 0, 98, "blue")
+        ct.checkArrayIndex(this.objs, 5); this.objs[1+(5)] = ct.line(100, 2, 100, 98, "blue")
         local i = 2; while i <= 5 do
-            this.objs[1+(i)].lineWidth = 5; i = i + 1; end
+            ct.checkArrayIndex(this.objs, i); this.objs[1+(i)].lineWidth = 5; i = i + 1; end
         -- static lines in center cross
-        this.objs[1+(6)] = ct.line(30, 30, 70, 70, "blue")
-        this.objs[1+(7)] = ct.line(30, 70, 70, 30, "blue")
-        this.objs[1+(8)] = ct.line(50, 25, 50, 75, "blue")
-        this.objs[1+(9)] = ct.line(25, 50, 75, 50, "blue")
+        ct.checkArrayIndex(this.objs, 6); this.objs[1+(6)] = ct.line(30, 30, 70, 70, "blue")
+        ct.checkArrayIndex(this.objs, 7); this.objs[1+(7)] = ct.line(30, 70, 70, 30, "blue")
+        ct.checkArrayIndex(this.objs, 8); this.objs[1+(8)] = ct.line(50, 25, 50, 75, "blue")
+        ct.checkArrayIndex(this.objs, 9); this.objs[1+(9)] = ct.line(25, 50, 75, 50, "blue")
         -- moving lines
-        this.objs[1+(10)] = ct.line(40, 5, 60, 5)
-        this.objs[1+(11)] = ct.line(20, 5, 35, 5)
-        this.objs[1+(12)] = ct.line(65, 5, 80, 5)
+        ct.checkArrayIndex(this.objs, 10); this.objs[1+(10)] = ct.line(40, 5, 60, 5)
+        ct.checkArrayIndex(this.objs, 11); this.objs[1+(11)] = ct.line(20, 5, 35, 5)
+        ct.checkArrayIndex(this.objs, 12); this.objs[1+(12)] = ct.line(65, 5, 80, 5)
         local i = 10; while i <= 12 do
-            this.objs[1+(i)].ySpeed = this.startSpeed; i = i + 1; end
-        this.objs[1+(13)] = ct.line(5, 40, 5, 60)
-        this.objs[1+(14)] = ct.line(5, 20, 5, 35)
-        this.objs[1+(15)] = ct.line(5, 65, 5, 80)
+            ct.checkArrayIndex(this.objs, i); this.objs[1+(i)].ySpeed = this.startSpeed; i = i + 1; end
+        ct.checkArrayIndex(this.objs, 13); this.objs[1+(13)] = ct.line(5, 40, 5, 60)
+        ct.checkArrayIndex(this.objs, 14); this.objs[1+(14)] = ct.line(5, 20, 5, 35)
+        ct.checkArrayIndex(this.objs, 15); this.objs[1+(15)] = ct.line(5, 65, 5, 80)
         local i = 13; while i <= 15 do
-            this.objs[1+(i)].xSpeed = this.startSpeed; i = i + 1; end
-        this.objs[1+(16)] = ct.line(40, 90, 60, 90)
-        this.objs[1+(16)].ySpeed = this.startSpeed
-        this.objs[1+(17)] = ct.line(90, 40, 90, 60)
-        this.objs[1+(17)].xSpeed = this.startSpeed
-        this.objs[1+(18)] = ct.line(95, 95, 90, 90)
-        this.objs[1+(18)].xSpeed = -this.startSpeed
-        this.objs[1+(18)].ySpeed = -this.startSpeed
+            ct.checkArrayIndex(this.objs, i); this.objs[1+(i)].xSpeed = this.startSpeed; i = i + 1; end
+        ct.checkArrayIndex(this.objs, 16); this.objs[1+(16)] = ct.line(40, 90, 60, 90)
+        ct.checkArrayIndex(this.objs, 16); this.objs[1+(16)].ySpeed = this.startSpeed
+        ct.checkArrayIndex(this.objs, 17); this.objs[1+(17)] = ct.line(90, 40, 90, 60)
+        ct.checkArrayIndex(this.objs, 17); this.objs[1+(17)].xSpeed = this.startSpeed
+        ct.checkArrayIndex(this.objs, 18); this.objs[1+(18)] = ct.line(95, 95, 90, 90)
+        ct.checkArrayIndex(this.objs, 18); this.objs[1+(18)].xSpeed = -this.startSpeed
+        ct.checkArrayIndex(this.objs, 18); this.objs[1+(18)].ySpeed = -this.startSpeed
         
         local i = 0; while i < this.objs.length do
             
-            this.objs[1+(i)].clickable = true
+            ct.checkArrayIndex(this.objs, i); this.objs[1+(i)].clickable = true
             if i > 1 then
-                this.objs[1+(i)].group = "line"; end
+                ct.checkArrayIndex(this.objs, i); this.objs[1+(i)].group = "line"; end
         i = i + 1; end
         
     end
@@ -68,7 +68,7 @@ require('Code12.api')
         -- Reset obj colors
         local i = 0; while i < this.objs.length do
             
-            local obj = this.objs[1+(i)]
+            local obj = ct.indexArray(this.objs, i)
             local group = obj.group
             if (group == "line") then
                 obj:setLineColor("black"); 
@@ -78,12 +78,12 @@ require('Code12.api')
         -- Check if any objects hit each other and change their color if so
         local i = 0; while i < this.objs.length do
             
-            local obj1 = this.objs[1+(i)]
+            local obj1 = ct.indexArray(this.objs, i)
             local group1 = obj1.group
             local obj1HitNothing = true
             local j = i + 1; while j < this.objs.length do
                 
-                local obj2 = this.objs[1+(j)]
+                local obj2 = ct.indexArray(this.objs, j)
                 local group2 = obj2.group
                 if obj1:hit(obj2) then
                     

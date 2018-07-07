@@ -27,6 +27,51 @@ class BubblePop extends Code12Program
                               size);
          bubble.ySpeed = -1; 
          bubble.clickable = true;
+         GameObj bubbleCopy = bubble; // initialization of GameObj from another GameObj
+         int z; // declaration without initialization - primitive type
+         int x, y, z; // declaring multiple variables
+         z = -1 + 2; // assigning value with int and unary minus
+         z = 0.707; // assigning value with double
+         z = .707; // no leading zero
+         z = -.707; // negative with no leading zero
+         bigNum = 1.23456E10; // exponential notation
+         bigNum = 1.23456e10; // exponential notation
+         bigNum = -1.23456E10; // exponential notation
+         littleNum = 1.23456E-9; // exponential notation
+         littleNum = -1.23456E-9; // exponential notation
+         littleNum = 1.23456e-9; // exponential notation
+         double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
+         double z2 = z * 2.0; // initialization from another variable 
+         // Strings
+         String greeting; //  declaration without initialization - String type
+         greeting = "hello"; // assigning value to a string
+         String greeting2 = "hello there"; // declaration with initialization - String type
+         String greeting3 = greeting1; // declaration with initialization from another variable's value
+         String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
+         String greeting5 = greeting2.substring(0, 6); // declaration with String method
+         // loops
+         for (int i = 0; i < 10; i++)
+         for (i = 0; i < 10; i = i + 2)
+         for (int i = 0; i < 100 && 2 * i < 50; i = i * 2)
+         for (int i = 100; i > 0; i--)
+         for (int i = 10; i > 0; i = i - 2)
+         for (int i = 0; i < len; i++)
+         for (int i = 0; i < arr.length; i++)
+         while (j < 100)
+         do
+         while (j < 100);
+         while (j < foo && i != bar);
+         // arrays
+         int[] a;
+         int[] a = new int[100];
+         int[] a = new int[foo];
+         int[] a = new int[b.length * 2];
+         int[] a = {1, 2, 3};
+         int[] a = { 1,
+                     2,
+                     3};
+         int[] a = b;
+
       }
    }
    
@@ -63,3 +108,12 @@ if x == 3       // required next token in pattern doesn't match
 x + 3;          // no matching pattern
 foo(x,          // (incomplete line continued below)
 y)              // missing ;
+
+// Unsupported Java syntax
+int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+import java.io.PrintWriter;   // import other than Code12.*
+int time = (int)( sec );      // type casting
+time %= 3600;                 // %=
+int hrs = time / 3600;        // integer division
+int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+String s = "boolean variable b = " + true; // String concatenation with boolean
