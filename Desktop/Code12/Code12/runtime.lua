@@ -163,6 +163,12 @@ function g.stopRun()
 	g.screens = {}
 	g.screen = nil
 
+	-- Close output file if any
+	if g.outputFile then
+		g.outputFile:close()
+		g.outputFile = nil
+	end
+
 	-- Clear global input state
 	g.clicked = false
 	g.gameObjClicked = nil

@@ -42,6 +42,9 @@ local g = {
 	screens = {},       -- Table of screens indexed by: name = { name = n, group = g }
 	screen = nil,       -- current screen in screens table
 
+	-- Text output state
+	outputFile = nil,      -- file handle for text output or nil for none
+
 	-- Input state
 	clicked = false,       -- true if something was clicked during this update frame
 	gameObjClicked = nil,  -- Object clicked during this update frame, nil if none

@@ -10,6 +10,7 @@ class ct
 	void println( )                  // just a newline
 	void log( Object values )        // values delimited and strings quoted
 	void logm( String message, Object values)    // log with unquoted message
+	void setOutputFile( String filename )        // where to echo print and log output 
 
 	// Alerts and Input Dialogs
 	//-------------------------
