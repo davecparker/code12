@@ -64,16 +64,19 @@ public class LogMethodsWhiteBoxTest extends Code12Program
       
       // Testing logging until a certain event happens
       // count-controlled:
-      do{
-         ct.logm("This object will be logged 5 times " + tempObj);
+      do
+      {
+         ct.logm("This object will be logged 5 times ", tempObj);
+         // java : this will compile + run concatenating
+         // ct.logm("message " + obj )
          count++;
-        }
-        while ( count <= 5 );
+      }
+      while ( count <= 5 );
    }
 
    public void update()
    {
-      stationaryCircle.delete(); // A GameObj is still logged even if it has been deleted ( since .delete()
+      //stationaryCircle.delete(); // A GameObj is still logged even if it has been deleted ( since .delete()
                                  // only clears the screen of the object.
       movingCircle.xSpeed = 1;
       movingImage.ySpeed = -2;
@@ -101,7 +104,7 @@ public class LogMethodsWhiteBoxTest extends Code12Program
 
    }
 
-   public void logCircles()
+   void logCircles()
    {
       ct.println("Circle one: ");
       ct.log(stationaryCircle);
@@ -110,35 +113,34 @@ public class LogMethodsWhiteBoxTest extends Code12Program
       ct.println("Circle three: ");
       ct.log(expCircle);
       
-      // Logging with a message
-      ct.logm("There is a moving " + movingCircle );
+      // Printing with a message using the .toString() method
+      ct.println("There is a moving " + movingCircle.toString() );
       
-      // Test with public data fields in ct.log()
-      ct.logm("The moving circle's yPos is " + movingCircle.y );
-      ct.logm("The moving circle's xPos is " + movingCircle.x );
-      ct.logm("The moving circle's height is " + movingCircle.height );
-      ct.logm("The moving circle's width is " + movingCircle.width );
-      ct.logm("The circle is moving " + movingCircle.xSpeed + " pixels to the right." );
+      // Test with public data fields in ct.println()
+      ct.println("The moving circle's yPos is " + movingCircle.y );
+      ct.println("The moving circle's xPos is " + movingCircle.x );
+      ct.println("The moving circle's height is " + movingCircle.height );
+      ct.println("The moving circle's width is " + movingCircle.width );
+      ct.println("The circle is moving " + movingCircle.xSpeed + " pixels to the right." );
       
    }
    
-   public void logCircleAlongLine()
+   void logCircleAlongLine()
    {
       for ( int xValue = 0; xValue < ct.getWidth(); xValue++ )
       {
          // Makeshift collsion detection for line
          if ( movingCircle.containsPoint(xValue,ct.getHeight()/2) )
-            ct.logm("There is a " + movingCircle + " moving along a " + line );
-            // Issue? Logs only the most recent position of the circle, even if it continues to move
+            ct.println("There is a " + movingCircle.toString() + " moving along a " + line.toString() );
       }
    }
 
-   public void logRects()
+   void logRects()
    {
-      ct.log(stationaryRect);
+      ct.logm("stationary rect",stationaryRect);
    }
    
-   public void logRectArray()
+   void logRectArray()
    {
       for ( int i = 0; i < rectangles.length;i++)
       {
@@ -146,25 +148,25 @@ public class LogMethodsWhiteBoxTest extends Code12Program
       }
    }
 
-   public void logLines()
+   void logLines()
    {
       ct.log(line);
    }
 
-   public void logMultiple()
+   void logMultiple()
    {
       int one = 1;
       int two = 2;
       int three = 3;
       
       ct.log( stationaryCircle, stationaryRect, line );
-      ct.logm(" one " + stationaryCircle, "two " + stationaryRect, " three " + line );
-      // The first one is logged as a message (which it should be)
-      // With the following arguments - 
-      //    when adding other strings alongside the String representation of a gameObj
-      //    both those and the gameObj are printed as String literals
-
-      ct.logm( "one", "two", "three");
+      // ct.logm(" one " + stationaryCircle, "two " + stationaryRect, " three " + line );
+//       // The first one is logged as a message (which it should be)
+//       // With the following arguments - 
+//       //    when adding other strings alongside the String representation of a gameObj
+//       //    both those and the gameObj are printed as String literals
+// 
+//       ct.logm( "one", "two", "three");
       // Again, when using ct.logm to print, only the first argument is converted internally
       // rest are represented as String literals
       
@@ -172,16 +174,16 @@ public class LogMethodsWhiteBoxTest extends Code12Program
       // ct.logm( one + stationaryCircle, two + stationaryRect, three + line );
    }
    
-   public void logOverlapping()
+   void logOverlapping()
    {
       // Test with two overlapping circles ( both conditions are true )
       if ( circleOne.containsPoint(circleTwo.x, circleTwo.y) )
-         ct.logm("Logging the first circle " + circleOne );
+         ct.println("Logging the first circle " + circleOne.toString() );
       if ( circleOne.hit(circleTwo) )
-         ct.logm("Logging the second circle " + circleTwo );
+         ct.println("Logging the second circle " + circleTwo.toString() );
    }
 
-   public void genText()
+   void genText()
    {
       for ( int row = 0; row < ct.getWidth(); row += 30 )
       {
@@ -193,16 +195,16 @@ public class LogMethodsWhiteBoxTest extends Code12Program
    }
    
    // Logging text objects created in the function above
-   public void logText()
+   void logText()
    {
       ct.log(t);
       // Logs the most recently generated text, since there is no reference to the others
    }
 
-   public void logImage()
+   void logImage()
    {
       ct.log(image);
-      ct.logm("There is a moving " + movingImage);
+      ct.logm("There is a moving ", movingImage);
    }
 
 }

@@ -3,7 +3,7 @@ import Code12.*;
 public class GottaCatchEmAll extends Code12Program
 {
 GameObj pokeball, arena, eevee, charmander, charm, charizard, mewtwo, gastly, bar, powerBar, powerText, evolve, evolveText;
-int count;
+int count = 0;
    public static void main(String[] args)
    { 
       Code12.run(new GottaCatchEmAll()); 
@@ -44,7 +44,7 @@ int count;
       
       //power up bar
       bar = ct.rect(80,20,30,2,"white");      
-      powerBar = ct.rect(65, 20, .1, 2,"green");
+      powerBar = ct.rect(65, 20, 0.1, 2,"green");
       powerBar.align("left");      
       powerText = ct.text("POWER UP", 85, 15, 5, "black");       
    }   
@@ -81,27 +81,27 @@ int count;
        // "catching" the pokemon 
        if(pokeball.hit(charmander) && powerBar.width <= 30  )       
        {     
-         System.out.println("charmander");
+         ct.println("charmander");
          charmander.visible = false;
          powerBar.width += 0.1;         
        }         
        if(pokeball.hit(eevee) && powerBar.width <= 30 )  
        {          
-         System.out.println("eevee");
+         ct.println("eevee");
          eevee.visible = false;
          powerBar.width += 0.1;
        }
        if(pokeball.hit(mewtwo)  && powerBar.width <= 30 )  
        {          
-         System.out.println("eevee");
+         ct.println("eevee");
          mewtwo.visible = false;
-         powerBar.width += .5;
+         powerBar.width += 0.5;
        } 
       // hitting gastly        
       if(pokeball.hit(gastly))
       {      
-         powerBar.width -= .5;
-         System.out.println("gastly");
+         powerBar.width -= 0.5;
+         ct.println("gastly");
       }
        //switches screen to show instructions
        if(ct.charTyped("i"))

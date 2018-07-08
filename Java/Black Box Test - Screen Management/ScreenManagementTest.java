@@ -43,7 +43,7 @@ class ScreenManagementTest extends Code12Program
 							      "green", 
 							      "blue", 
 							      "cyan", 
-							      "majenta", 
+							      "magenta", 
 							      "yellow", 
 							      "gray", 
 							      "orange", 
@@ -54,14 +54,14 @@ class ScreenManagementTest extends Code12Program
 							      "light green", 
 							      "light blue", 
 							      "light cyan", 
-							      "light majenta",
+							      "light magenta",
 							      "light yellow",
 							      "dark gray",
 							      "dark red",
 							      "dark green",
 							      "dark blue",
 							      "dark cyan",
-							      "dark majenta",
+							      "dark magenta",
 							      "dark yellow" };
 
    public void start()
