@@ -41,6 +41,8 @@ require('Code12.api')
         ct.println(this._function)
         ct.println("This is the default Code12 test app")
         ct.println("This is console output")
+        ct.setOutputFile("output.txt")
+        ct.println("This is file output also")
         ct.print("Beginning of line")
         ct.print(" - Middle - ")
         ct.println("End")
@@ -66,6 +68,7 @@ require('Code12.api')
                 ct.println("Line " .. i)
             i = i + 1; end
         end
+        -- ct.setOutputFile(null);
         
         -- Draw some circles
         this.ball = ct.circle(x + 6, 15, 5)

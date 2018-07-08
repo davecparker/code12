@@ -25,7 +25,7 @@ function g.warning(message, name)
 	if name then
 		s = s .. " \"" .. name .. "\""
 	end
-	print(s)
+	ct.println(s)
 end
 
 -- Generate a runtime error for the current function and stack level, with the given message.

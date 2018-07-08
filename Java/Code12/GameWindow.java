@@ -50,6 +50,15 @@ public class GameWindow extends JFrame
       canvas.createBufferStrategy(2);  // use double buffering for smooth draws
       canvas.requestFocus();
       canvas.startFrameTimer();
+
+      // Detect when the user quits
+      addWindowListener(new java.awt.event.WindowAdapter() {
+         @Override
+         public void windowClosing(java.awt.event.WindowEvent windowEvent) 
+         {
+            canvas.prepareToQuit();
+         }
+      });
    }
    
    // Set the pixel size of the content area of the window
@@ -57,6 +66,8 @@ public class GameWindow extends JFrame
    {
       canvas.setSize(width, height);
       pack();    // set overall window size with room for title bar, etc.
-   }   
+   }
+   
+      
 }
 
