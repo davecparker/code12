@@ -143,6 +143,7 @@ local function parseTestCode()
 						-- Ignore blank lines
 						if tree.p ~= "blank" and tree.p ~= "comment" then
 							numUncaughtErrors = numUncaughtErrors + 1
+                     outFile:write( "Uncaught Error "..numUncaughtErrors.."\n" )
 						end
 					end
 				end
