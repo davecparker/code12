@@ -237,6 +237,10 @@ ERRORS
 @               // invalid character
 foo('a');       // char literals not supported
 foo(" );        // unclosed string literal 
+foo("\);        // unclosed string literal ending in backslash
+s = "\          // unclosed string literal ending in backslash
+s = "\";        // unclosed string literal from escaped double quote
+s = "\ ";       // illegal escape character
 interface foo   // unsupported reserved word
 double 1stNumber; // variable name starting with a number
 x = obj.1stNumber; // field name starting with a number

@@ -3052,88 +3052,105 @@ line (comment)
 239. foo(" );        // unclosed string literal
 *** Location 239.5 to 239.43: Unclosed string literal
 
-240. interface foo   // unsupported reserved word
-*** Location 240.1 to 240.9: Unsupported reserved word "interface"
+240. foo("\);        // unclosed string literal ending in backslash
+*** Location 240.5 to 240.62: Unclosed string literal
 
-241. double 1stNumber; // variable name starting with a number
-*** Location 241.1 to 241.17: Syntax Error
+241. s = "\          // unclosed string literal ending in backslash
+*** Location 241.5 to 241.62: Unclosed string literal
 
-242. x = obj.1stNumber; // field name starting with a number
-*** Location 242.1 to 242.18: Syntax Error
+242. s = "\";        // unclosed string literal from escaped double quote
+*** Location 242.5 to 242.68: Unclosed string literal
 
-243. 
+243. s = "\ ";       // illegal escape character
+line (stmt)
+    stmt (varAssign)
+        ID (s)
+        expr (STR)
+            STR ("\ ")
+Uncaught Error 1
+
+244. interface foo   // unsupported reserved word
+*** Location 244.1 to 244.9: Unsupported reserved word "interface"
+
+245. double 1stNumber; // variable name starting with a number
+*** Location 245.1 to 245.17: Syntax Error
+
+246. x = obj.1stNumber; // field name starting with a number
+*** Location 246.1 to 246.18: Syntax Error
+
+247. 
 line (blank)
 
-244. // Syntax errors
+248. // Syntax errors
 line (comment)
     COMMENT ( Syntax errors)
 
-245. x = 10          // missing ;
-*** Location 245.1 to 245.6: Syntax Error
+249. x = 10          // missing ;
+*** Location 249.1 to 249.6: Syntax Error
 
-246. foo(x, );       // missing expr in exprList
-*** Location 246.1 to 246.9: Syntax Error
+250. foo(x, );       // missing expr in exprList
+*** Location 250.1 to 250.9: Syntax Error
 
-247. x = a + ;       // missing expr after binary op
-*** Location 247.1 to 247.9: Syntax Error
+251. x = a + ;       // missing expr after binary op
+*** Location 251.1 to 251.9: Syntax Error
 
-248. x = a ++ b;     // unexpected token after unary op
-*** Location 248.1 to 248.11: Syntax Error
+252. x = a ++ b;     // unexpected token after unary op
+*** Location 252.1 to 252.11: Syntax Error
 
-249. x = a ** b;     // missing expression between binary ops
-*** Location 249.1 to 249.11: Syntax Error
+253. x = a ** b;     // missing expression between binary ops
+*** Location 253.1 to 253.11: Syntax Error
 
-250. x = a + b * ;   // missing expr after higher precedence binary op
-*** Location 250.1 to 250.13: Syntax Error
+254. x = a + b * ;   // missing expr after higher precedence binary op
+*** Location 254.1 to 254.13: Syntax Error
 
-251. x = a * b + ;   // missing expr after lower precedence binary op
-*** Location 251.1 to 251.13: Syntax Error
+255. x = a * b + ;   // missing expr after lower precedence binary op
+*** Location 255.1 to 255.13: Syntax Error
 
-252. x = ();         // missing expr in parentheses
-*** Location 252.1 to 252.7: Syntax Error
+256. x = ();         // missing expr in parentheses
+*** Location 256.1 to 256.7: Syntax Error
 
-253. x = 10 + ! ;    // missing expr after unary op
-*** Location 253.1 to 253.12: Syntax Error
+257. x = 10 + ! ;    // missing expr after unary op
+*** Location 257.1 to 257.12: Syntax Error
 
-254. x = obj.3;      // expected ID after .
-*** Location 254.1 to 254.10: Syntax Error
+258. x = obj.3;      // expected ID after .
+*** Location 258.1 to 258.10: Syntax Error
 
-255. x = 3.obj;      // ID expected before .
-*** Location 255.1 to 255.10: Syntax Error
+259. x = 3.obj;      // ID expected before .
+*** Location 259.1 to 259.10: Syntax Error
 
-256. if x == 3       // required next token in pattern doesn't match
-*** Location 256.1 to 256.9: Syntax Error
+260. if x == 3       // required next token in pattern doesn't match
+*** Location 260.1 to 260.9: Syntax Error
 
-257. while i < max   // required next token in pattern doesn't match
-*** Location 257.1 to 257.13: Syntax Error
+261. while i < max   // required next token in pattern doesn't match
+*** Location 261.1 to 261.13: Syntax Error
 
-258. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
-*** Location 258.1 to 258.21: Syntax Error
+262. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
+*** Location 262.1 to 262.21: Syntax Error
 
-259. x + 3;          // no matching pattern
-*** Location 259.1 to 259.6: Syntax Error
+263. x + 3;          // no matching pattern
+*** Location 263.1 to 263.6: Syntax Error
 
-260. x = 1,000;      // commas in numbers
-*** Location 260.1 to 260.10: Syntax Error
+264. x = 1,000;      // commas in numbers
+*** Location 264.1 to 264.10: Syntax Error
 
-261. x = 1.23.45;    // too many decimal points
-*** Location 261.1 to 261.12: Syntax Error
+265. x = 1.23.45;    // too many decimal points
+*** Location 265.1 to 265.12: Syntax Error
 
-262. foo(x,          // (incomplete line continued below)
+266. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
-263. y)              // missing ;
-*** Location 262.1 to 263.2: Syntax Error
+267. y)              // missing ;
+*** Location 266.1 to 267.2: Syntax Error
 
-264. int i = 3.14;   // incompatible types: possible lossy conversion from double to int
+268. int i = 3.14;   // incompatible types: possible lossy conversion from double to int
 line (varInit)
     ID (int)
     ID (i)
     expr (NUM)
         NUM (3.14)
-Uncaught Error 1
+Uncaught Error 2
 
-265. double x = a < 100; // incompatible types: double/boolean
+269. double x = a < 100; // incompatible types: double/boolean
 line (varInit)
     ID (double)
     ID (x)
@@ -3145,33 +3162,33 @@ line (varInit)
                 field (empty)
         expr (NUM)
             NUM (100)
-Uncaught Error 2
+Uncaught Error 3
 
-266. x = (a + b + c / 3; // missing closing parenthesis
-*** Location 266.1 to 266.19: Syntax Error
+270. x = (a + b + c / 3; // missing closing parenthesis
+*** Location 270.1 to 270.19: Syntax Error
 
-267. x = foo(y, bar(z, w); // missing closing parenthesis w/ nested parentheses
-*** Location 267.1 to 267.21: Syntax Error
-
-268. x = a + b + c ) / 3; // missing openning parenthesis
-*** Location 268.1 to 268.20: Syntax Error
-
-269. if ( i == 1 // missing closing parenthesis with if
-*** Location 269.1 to 269.11: Syntax Error
-
-270. if ( i == 1 ); // if followed directly by ;
-*** Location 270.1 to 270.14: Syntax Error
-
-271. for ( i=0; i<n; i++); // for() followed directly by ;
+271. x = foo(y, bar(z, w); // missing closing parenthesis w/ nested parentheses
 *** Location 271.1 to 271.21: Syntax Error
 
-272. x + 1 = x; // confusing left hand side an right hand side of assignment
-*** Location 272.1 to 272.10: Syntax Error
+272. x = a + b + c ) / 3; // missing openning parenthesis
+*** Location 272.1 to 272.20: Syntax Error
 
-273. 1000 = count; // confusing left hand side an right hand side of assignment
-*** Location 273.1 to 273.13: Syntax Error
+273. if ( i == 1 // missing closing parenthesis with if
+*** Location 273.1 to 273.11: Syntax Error
 
-274. if ( x = 3 ) // = instead of ==
+274. if ( i == 1 ); // if followed directly by ;
+*** Location 274.1 to 274.14: Syntax Error
+
+275. for ( i=0; i<n; i++); // for() followed directly by ;
+*** Location 275.1 to 275.21: Syntax Error
+
+276. x + 1 = x; // confusing left hand side an right hand side of assignment
+*** Location 276.1 to 276.10: Syntax Error
+
+277. 1000 = count; // confusing left hand side an right hand side of assignment
+*** Location 277.1 to 277.13: Syntax Error
+
+278. if ( x = 3 ) // = instead of ==
 line (if)
     expr (=)
         expr (lValue)
@@ -3181,58 +3198,58 @@ line (if)
                 field (empty)
         expr (NUM)
             NUM (3)
-Uncaught Error 3
+Uncaught Error 4
 
-275. if ( x => 3 ) // => instead of <=
-*** Location 275.1 to 275.13: Syntax Error
+279. if ( x => 3 ) // => instead of <=
+*** Location 279.1 to 279.13: Syntax Error
 
-276. for(int i=0, i<n, i++) // commas in place of semicolons
-*** Location 276.1 to 276.22: Syntax Error
+280. for(int i=0, i<n, i++) // commas in place of semicolons
+*** Location 280.1 to 280.22: Syntax Error
 
-277. for(int i=0: i<n: i++) // colons in place of semicolons
-*** Location 277.1 to 277.22: Syntax Error
+281. for(int i=0: i<n: i++) // colons in place of semicolons
+*** Location 281.1 to 281.22: Syntax Error
 
-278. for{int i=0; i<n; i++} // {} in place of ()
-*** Location 278.1 to 278.22: Syntax Error
+282. for{int i=0; i<n; i++} // {} in place of ()
+*** Location 282.1 to 282.22: Syntax Error
 
-279. 
+283. 
 line (blank)
 
-280. double foo(x, y, z) // missing varibale types for arguments in function definition
-*** Location 280.1 to 280.19: Syntax Error
+284. double foo(x, y, z) // missing varibale types for arguments in function definition
+*** Location 284.1 to 284.19: Syntax Error
 
-281. ct.println; // missing parenteses for function call without arguments
-*** Location 281.1 to 281.11: Syntax Error
+285. ct.println; // missing parenteses for function call without arguments
+*** Location 285.1 to 285.11: Syntax Error
 
-282. foo(int x, double y, GameObj z) // missing return type in function definition
-*** Location 282.1 to 282.31: Syntax Error
+286. foo(int x, double y, GameObj z) // missing return type in function definition
+*** Location 286.1 to 286.31: Syntax Error
 
-283. foo(int x, double y, GameObj z); // su
-*** Location 283.1 to 283.32: Syntax Error
+287. foo(int x, double y, GameObj z); // su
+*** Location 287.1 to 287.32: Syntax Error
 
-284. pplying variable types in function call
-*** Location 284.1 to 284.39: Syntax Error
+288. pplying variable types in function call
+*** Location 288.1 to 288.39: Syntax Error
 
-285. String s = 'Hello'; // '' in place of "" for strings
-*** Location 285.12 to 285.12: char type not supported, use double quotes
+289. String s = 'Hello'; // '' in place of "" for strings
+*** Location 289.12 to 289.12: char type not supported, use double quotes
 
-286. String s = "A long string
-*** Location 286.12 to 286.25: Unclosed string literal
+290. String s = "A long string
+*** Location 290.12 to 290.25: Unclosed string literal
 
-287. on more than one line";
-*** Location 287.34 to 287.35: Unclosed string literal
+291. on more than one line";
+*** Location 291.34 to 291.35: Unclosed string literal
 
-288. ct.println("He said "Hello""); // not escaping quotes in a string literal
-*** Location 288.1 to 288.30: Syntax Error
+292. ct.println("He said "Hello""); // not escaping quotes in a string literal
+*** Location 292.1 to 292.30: Syntax Error
 
-289. 
+293. 
 line (blank)
 
-290. // Code12 api
+294. // Code12 api
 line (comment)
     COMMENT ( Code12 api)
 
-291. gameObj circle = ct.circle(x, y, diameter); // GameObj miss-spelled
+295. gameObj circle = ct.circle(x, y, diameter); // GameObj miss-spelled
 line (varInit)
     ID (gameObj)
     ID (circle)
@@ -3258,9 +3275,9 @@ line (varInit)
                     ID (diameter)
                     index (empty)
                     field (empty)
-Uncaught Error 4
+Uncaught Error 5
 
-292. GameObj circle = ct.circle(x, y, width, height); // too many arguments
+296. GameObj circle = ct.circle(x, y, width, height); // too many arguments
 line (varInit)
     ID (GameObj)
     ID (circle)
@@ -3291,9 +3308,9 @@ line (varInit)
                     ID (height)
                     index (empty)
                     field (empty)
-Uncaught Error 5
+Uncaught Error 6
 
-293. GameObj rect = ct.rect(x, y, width); // not enough arguments
+297. GameObj rect = ct.rect(x, y, width); // not enough arguments
 line (varInit)
     ID (GameObj)
     ID (rect)
@@ -3319,42 +3336,42 @@ line (varInit)
                     ID (width)
                     index (empty)
                     field (empty)
-Uncaught Error 6
+Uncaught Error 7
 
-294. 
+298. 
 line (blank)
 
-295. // Unsupported Java syntax
+299. // Unsupported Java syntax
 line (comment)
     COMMENT ( Unsupported Java syntax)
 
-296. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Location 296.1 to 296.24: Syntax Error
+300. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+*** Location 300.1 to 300.24: Syntax Error
 
-297. import java.io.PrintWriter;   // import other than Code12.*
-*** Location 297.1 to 297.27: Syntax Error
+301. import java.io.PrintWriter;   // import other than Code12.*
+*** Location 301.1 to 301.27: Syntax Error
 
-298. int time = (int)( sec );      // type casting
-*** Location 298.1 to 298.24: Syntax Error
+302. int time = (int)( sec );      // type casting
+*** Location 302.1 to 302.24: Syntax Error
 
-299. time %= 3600;                 // %=
-*** Location 299.1 to 299.13: Syntax Error
+303. time %= 3600;                 // %=
+*** Location 303.1 to 303.13: Syntax Error
 
-300. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-*** Location 300.32 to 300.32: Invalid character (The "? :" operator is not supported by Code12)
+304. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+*** Location 304.32 to 304.32: Invalid character (The "? :" operator is not supported by Code12)
 
-301. System.out.println("Hello world"); // classes other than GameObj and String
-*** Location 301.1 to 301.34: Syntax Error
+305. System.out.println("Hello world"); // classes other than GameObj and String
+*** Location 305.1 to 305.34: Syntax Error
 
-302. float x = 1.234; // float type
+306. float x = 1.234; // float type
 line (varInit)
     ID (float)
     ID (x)
     expr (NUM)
         NUM (1.234)
-Uncaught Error 7
+Uncaught Error 8
 
-303. long i = bigNumber; // long type
+307. long i = bigNumber; // long type
 line (varInit)
     ID (long)
     ID (i)
@@ -3363,39 +3380,39 @@ line (varInit)
             ID (bigNumber)
             index (empty)
             field (empty)
-Uncaught Error 8
+Uncaught Error 9
 
-304. char ch = 'a'; // char type
-*** Location 304.11 to 304.11: char type not supported, use double quotes
+308. char ch = 'a'; // char type
+*** Location 308.11 to 308.11: char type not supported, use double quotes
 
-305. while(foo) { // opening { in control structure not on it's own line
-*** Location 305.1 to 305.12: Syntax Error
+309. while(foo) { // opening { in control structure not on it's own line
+*** Location 309.1 to 309.12: Syntax Error
 
-306. i++; } // closing } not on it's own line
-*** Location 306.1 to 306.6: Syntax Error
+310. i++; } // closing } not on it's own line
+*** Location 310.1 to 310.6: Syntax Error
 
-307. String s = "A long string" +
-*** Location 307.1 to 307.28: Syntax Error
+311. String s = "A long string" +
+*** Location 311.1 to 311.28: Syntax Error
 
-308. "on more than one line using concatenation";
-*** Location 308.12 to 308.55: Syntax Error
+312. "on more than one line using concatenation";
+*** Location 312.12 to 312.55: Syntax Error
 
-309. x = a; y = b; // more than one statment on a single line not supported
-*** Location 309.1 to 309.13: Syntax Error
+313. x = a; y = b; // more than one statment on a single line not supported
+*** Location 313.1 to 313.13: Syntax Error
 
-310. if (x == 0) ct.println("x is zero"); // control structure must be on their own lines
-*** Location 310.1 to 310.36: Syntax Error
+314. if (x == 0) ct.println("x is zero"); // control structure must be on their own lines
+*** Location 314.1 to 314.36: Syntax Error
 
-311. double getVariable() { return variable; } // blocks must start and end on their own lines
-*** Location 311.1 to 311.41: Syntax Error
+315. double getVariable() { return variable; } // blocks must start and end on their own lines
+*** Location 315.1 to 315.41: Syntax Error
 
-312. switch (choice) // switch not supported
-*** Location 312.1 to 312.6: Unsupported reserved word "switch"
+316. switch (choice) // switch not supported
+*** Location 316.1 to 316.6: Unsupported reserved word "switch"
 
-313. continue;   // continue not supported
-*** Location 313.1 to 313.8: Unsupported reserved word "continue"
+317. continue;   // continue not supported
+*** Location 317.1 to 317.8: Unsupported reserved word "continue"
 
-314. x = y = 0; // using the output of an assignment in another assignment
+318. x = y = 0; // using the output of an assignment in another assignment
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3407,27 +3424,27 @@ line (stmt)
                     field (empty)
             expr (NUM)
                 NUM (0)
-Uncaught Error 9
+Uncaught Error 10
 
-315. max = a[i++]; // complex expressions not supported
-*** Location 315.1 to 315.13: Syntax Error
+319. max = a[i++]; // complex expressions not supported
+*** Location 319.1 to 319.13: Syntax Error
 
-316. x = ++i; // prefix increment not supported
-*** Location 316.1 to 316.8: Syntax Error
+320. x = ++i; // prefix increment not supported
+*** Location 320.1 to 320.8: Syntax Error
 
-317. x = --i; // prefix decrement not supported
-*** Location 317.1 to 317.8: Syntax Error
+321. x = --i; // prefix decrement not supported
+*** Location 321.1 to 321.8: Syntax Error
 
-318. obj.group.equals("targets"); // indexing more than one level at a time not supported
-*** Location 318.1 to 318.28: Syntax Error
+322. obj.group.equals("targets"); // indexing more than one level at a time not supported
+*** Location 322.1 to 322.28: Syntax Error
 
-319. input.toLowerCase().equals("quit"); // indexing after function call not supported
-*** Location 319.1 to 319.35: Syntax Error
+323. input.toLowerCase().equals("quit"); // indexing after function call not supported
+*** Location 323.1 to 323.35: Syntax Error
 ======= Test Complete =========================================
 
-319 lines processed in 56 ms
+323 lines processed in 57 ms
 
 0 unexpected errors
-9 uncaught errors (66 expected errors)
+10 uncaught errors (69 expected errors)
 
 FAILED

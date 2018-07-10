@@ -10,7 +10,7 @@ class TestProgram extends Code12Program
    
    public void start()
    {
-		ct.println("He said "Hello"");
+		ct.println("\ ");
 
    }
    
