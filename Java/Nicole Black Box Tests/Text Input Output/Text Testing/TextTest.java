@@ -22,6 +22,7 @@ public class TextTest extends Code12Program
    
    public void start() 
    {
+      ct.setOutputFile("TextTestOutput.txt");
    
       // Printing to console
       // ct.print()
@@ -63,8 +64,7 @@ public class TextTest extends Code12Program
        if ( ct.isError(d) )
          ct.println("NaN or infinity");
        ct.println( d );
-       boolean bool = ct.inputBoolean("Enter a boolean: ");
-      //  bool = false;   //bug; this should default to false if user skips it
+       boolean bool = ct.inputYesNo("Enter a boolean: ");
        if ( bool )
          ct.println("Boolean is true");
        else
