@@ -9,7 +9,8 @@ public interface GameInterface
    public void println(Object obj);
    public void println();
    public void log(Object... objs);
-   public void logm(String message, Object... objs);     
+   public void logm(String message, Object... objs);
+   public void setOutputFile(String filename);     
    
    // Text Input
    public void showAlert(String message);

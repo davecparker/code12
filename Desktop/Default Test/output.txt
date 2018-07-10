@@ -1,0 +1,26 @@
+This is file output also
+Beginning of line - Middle - End
+This
+is
+multiple
+lines of text
+Here's a blank line:
+
+And another:
+
+Here's an unitialized GameObj: null
+Done
+Hello Flush test 2
+Line 1
+Line 2
+Line 3
+Line 4
+Line 5
+Line 6
+Line 7
+Line 8
+Line 9
+Line 10
+Line 11
+Line 12
+Mouse was pressed at (54, 30.5)

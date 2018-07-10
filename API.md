@@ -71,6 +71,26 @@ Print the `message` followed by a space,
 then print any number of values to the console.
 The values are output in the same way as `ct.logm()` (see above).
 
+### ct.setOutputFile()
+```
+ct.setOutputFile( String filename )
+```
+If you call `ct.setOutputFile()`, then any subsequent text output
+from `ct.print()`, `ct.println()`, `ct.log()`, and `ct.logm()` will be 
+written to a text file named `filename` in addition to being displayed
+in the console window. Call `ct.setOutputFile( null )` to restore output
+to appearing in the console only.
+
+The `filename` should be a simple filename such as `"output.txt"`,
+which will be written to the same folder as the source code file, or a
+relative path starting from the source code folder, such as
+`"output/nameList.txt"`.
+
+> If there is an existing file named `filename` then it will be deleted
+> and written over. Note that each time you run your program and call 
+> `ct.setOutputFile()` to a certain filename, it will overwrite the
+> previous file. 
+
 _____________________________________________________________________
 Alerts and Input Dialogs
 ------------------------
