@@ -36,9 +36,10 @@ local syntaxFeatures = {
 local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
-local tokens     	-- array of tokens
-local iToken        -- index of current token in tokens
-local syntaxLevel	-- the syntax level for parsing
+local tokens     	    -- array of tokens
+local iToken            -- index of current token in tokens
+local syntaxLevel	    -- the syntax level for parsing
+local maxSyntaxLevel    -- max syntax level or 0 to match common errors
 
 -- Forward function declarations necessary due to mutual recursion or 
 -- use in the grammar tables below
@@ -278,7 +279,7 @@ local line = { t = "line",
 	{ 3, 12, "varInit",			"ID", "ID", "=", expr, ";",						"END" },
 	{ 3, 12, "varDecl",			"ID", idList, ";",								"END" },
 	{ 3, 12, "constInit", 		"final", "ID", "ID", "=", expr, ";",			"END" },
-	{ 1, 12, "func",			access, retType, "ID", "(", paramList, ")",	"END" },
+	{ 1, 12, "func",			access, retType, "ID", "(", paramList, ")",		"END" },
 	{ 1, 12, "begin",			"{",											"END" },
 	{ 1, 12, "end",				"}",											"END" },
 	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },
@@ -299,6 +300,17 @@ local line = { t = "line",
 									"(", "ID", "[", "]", "ID", ")",				"END" },
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
 									"ID", "(", ")", ")", ";",					"END" },
+	-- Common errors
+	{ 1, 0, "stmt", 			stmt, "END", 
+			iErr = 2, strErr = "Statement should end with a semicolon (;)" },
+	{ 3, 0, "varInit",			"ID", "ID", "=", expr, "END",
+			iErr = 5, strErr = "Variable initialization should end with a semicolon (;)" },
+	{ 3, 0, "varDecl",			"ID", idList, "END",
+			iErr = 3, strErr = "Variable declaration should end with a semicolon (;)" },
+	{ 3, 0, "constInit", 		"final", "ID", "ID", "=", expr, "END",
+			iErr = 3, strErr = "Variable declaration should end with a semicolon (;)" },
+	{ 8, 0, "if",				"if", "(", expr, ")", ";", "END",
+			iErr = 5, strErr = "if statement should not end with a semicolon" },
 
 }
 
@@ -347,15 +359,22 @@ end
 -- Attempt to parse the given grammar table. 
 -- Return the parseTree if sucessful or nil if failure.
 function parseGrammar( grammar )
-	-- Consider each pattern in the grammar table that includes the syntaxLevel
+	-- Consider each pattern in the grammar table that includes the syntaxLevel range.
 	local iStart = iToken
 	for i = 1, #grammar do
 		local pattern = grammar[i]
-		if syntaxLevel >= pattern[1] and syntaxLevel <= pattern[2] then
+		local patternMinLevel = pattern[1]
+		local patternMaxLevel = pattern[2]
+		if syntaxLevel >= patternMinLevel and maxSyntaxLevel <= patternMaxLevel then
 			-- Try to match this pattern within the grammer table
 			trace("Trying " .. grammar.t .. "[" .. i .. "] (" .. pattern[3] .. ")")
 			local nodes = parsePattern( pattern )
 			if nodes then
+				-- If this matched a common error then set the error state
+				if patternMaxLevel == 0 then
+					err.setErrNode( nodes[pattern.iErr], pattern.strErr )
+				end
+
 				-- This pattern matches, so make a grammar node and return it
 				local parseTree = makeParseTreeNode( grammar.t, pattern[3], nodes )
 				trace("== Returning " .. grammar.t .. "[" .. i .. "] (" .. pattern[3] .. ")")
@@ -427,17 +446,53 @@ end
 
 -- Try to parse the current token stream as a line of code at the given
 -- syntax level. If successful then return the parseTree. 
+-- To match common errors specified in the grammar pass true for
+-- matchCommonErrors, otherwise leave it nil for normal parsing.
 -- If a parse cannot be made then return nil with the error state as set by
 -- the parser or a generic syntax error if the specific error is not known.
-local function parseLineGrammar( level )
+local function parseLineGrammar( level, matchCommonErrors )
 	-- Reset the parse state and parse the current token stream at level
 	err.clearErr()
 	syntaxLevel = level
+	maxSyntaxLevel = (matchCommonErrors and 0) or level
 	iToken = 1
-	local parseTree = parseGrammar( line )
+	return parseGrammar( line )
+end
+
+-- Try to parse the current token stream as a line of code at the given
+-- syntax level. If successful then return the parseTree, otherwise
+-- return nil and set the error state. 
+-- If parsing failed at this level but would succeed at a higher level, 
+-- then set the error state to indicate this.
+local function parseCurrentLine( level )
+	-- Try at the requested syntax level first
+	local parseTree = parseLineGrammar( level )
 	if parseTree then
 		return parseTree  -- success
 	end
+
+	-- Try common errors at the given syntax level
+	parseTree = parseLineGrammar( level, true )
+	if parseTree then
+		assert( err.hasErr() )
+		return nil  -- matched common error
+	end	
+
+	-- Try parsing at higher levels
+	for tryLevel = level + 1, numSyntaxLevels do
+		parseTree = parseLineGrammar( tryLevel, true )
+		if parseTree then
+			-- Report error with minimum level required
+			err.clearErr()   -- in case we matched a common error
+			local lastToken = tokens[#tokens - 1]  -- not counting the END
+			err.setErrTokenSpan( tokens[1], lastToken,
+					"Use of %s requires syntax level %d",
+					syntaxFeatures[tryLevel], tryLevel )
+			return nil
+		end
+	end
+
+	-- TODO: Try modified patterns to isolate the error
 
 	-- Make a generic syntax error if the error is unknown
 	if not err.hasErr() then
@@ -445,41 +500,6 @@ local function parseLineGrammar( level )
 		err.setErrTokenSpan( tokens[1], lastToken, "Syntax Error" )
 	end
 	return nil
-end
-
--- Try to parse the current token stream as a line of code at the given
--- syntax level. If successful then return the parseTree. 
--- If a parse cannot be made then return nil with the error state as set by
--- the parser or a generic syntax error if the specific error is not known.
--- If parsing failed at this level but would succeed at a higher level, 
--- then set the level info in the error state.
-local function parseCurrentLine( level )
-	-- Try at the requested syntax level first
-	local parseTree = parseLineGrammar( level )
-	if parseTree or level >= numSyntaxLevels then
-		return parseTree  -- success or no higher level to try
-	end
-
-	-- Try again at the highest level
-	parseTree = parseLineGrammar( numSyntaxLevels )
-	if parseTree == nil then
-		return nil   -- not parseable at all
-	end
-
-	-- Find the minimum successful syntax level
-	for tryLevel = level + 1, numSyntaxLevels do
-		parseTree = parseLineGrammar( tryLevel )
-		if parseTree then
-			-- Reparse at the requested level to restore the error state
-			parseLineGrammar( level )
-			-- Add level info to the error state
-			local str = string.format( "(Use of %s requires syntax level %d)",
-								syntaxFeatures[tryLevel], tryLevel )
-			err.setLevelInfo( tryLevel, str )
-			return nil
-		end
-	end
-	assert( false )  -- loop should have succeeded by the last level
 end
 
 

@@ -462,7 +462,7 @@ function javalex.getTokens( sourceStr, lineNum )
 		elseif charType == nil then
 			-- End of source string
 			token.tt = "END"
-			token.str = ""
+			token.str = " "
 			 -- We're done, so add this last token and return tokens array
 			tokens[#tokens + 1] = token
 			return tokens 

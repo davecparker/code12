@@ -24,8 +24,6 @@ local err = {}
 --         first = { iLine = lineNumber, iChar = charIndex },
 --         last  = { iLine = lineNumber, iChar = charIndex },
 --     },
---     minlevel = level,    -- if a higher syntax level would eliminate the err, else nil
---     strLevel = feature,  -- name of feature needed at minLevel
 -- }
 local errRecord
 
@@ -163,14 +161,6 @@ function err.setErrTokenSpan( firstToken, lastToken, strErr, ... )
 	local iCharLast = lastToken.iChar + string.len( lastToken.str ) - 1
 	local locEnd = err.makeSrcLoc( lastToken.iLine, iCharLast )
 	err.setErr( err.makeErrLoc( locStart, locEnd ), nil, strErr, ... )
-end
-
--- Set the minLevel and strLevel fields in the current error record
-function err.setLevelInfo( minLevel, strLevel )
-	if errRecord then
-		errRecord.minLevel = minLevel
-		errRecord.strLevel = strLevel
-	end
 end
 
 -- Return true if there is an error in the error state.

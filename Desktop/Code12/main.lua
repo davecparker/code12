@@ -406,12 +406,7 @@ local function showError()
 	-- Set the error text
 	local errRecord = err.getErrRecord()
 	print( "\n" .. errRecord.strErr )
-	local strDisplay = errRecord.strErr
-	if errRecord.strLevel then
-		print( errRecord.strLevel )
-		strDisplay = strDisplay .. "\n" .. errRecord.strLevel
-	end
-	errGroup.errText.text = strDisplay
+	errGroup.errText.text = errRecord.strErr
 
 	-- Load the source lines around the error
 	local iLine = errRecord.loc.first.iLine   -- main error location

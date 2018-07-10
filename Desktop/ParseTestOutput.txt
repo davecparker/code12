@@ -866,7 +866,7 @@ line (comment)
     COMMENT ( Syntax errors)
 
 99. x = 10          // missing ;
-*** Location 99.1 to 99.6: Syntax Error
+*** Location 99.29 to 99.29: Statement should end with a semicolon (;)
 
 100. foo(x, );       // missing expr in exprList
 *** Location 100.1 to 100.9: Syntax Error
@@ -899,7 +899,7 @@ line (comment)
 -- Incomplete line carried forward
 
 110. y)              // missing ;
-*** Location 109.1 to 110.2: Syntax Error
+*** Location 110.29 to 110.29: Statement should end with a semicolon (;)
 
 111. 
 line (blank)
@@ -917,13 +917,39 @@ line (comment)
 115. int time = (int)( sec );      // type casting
 *** Location 115.1 to 115.24: Syntax Error
 
-116. time %= 3600;
+116. time %= 3600;                 // %=
 *** Location 116.1 to 116.13: Syntax Error
+
+117. int hrs = time / 3600;        // integer division
+line (varInit)
+    ID (int)
+    ID (hrs)
+    expr (/)
+        expr (lValue)
+            lValue (lValue)
+                ID (time)
+                index (empty)
+                field (empty)
+        expr (NUM)
+            NUM (3600)
+
+118. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+*** Location 118.32 to 118.32: Invalid character (The "? :" operator is not supported by Code12)
+
+119. String s = "boolean variable b = " + true; // String concatenation with boolean
+line (varInit)
+    ID (String)
+    ID (s)
+    expr (+)
+        expr (STR)
+            STR ("boolean variable b = ")
+        expr (BOOL)
+            BOOL (true)
 ======= Test Complete =========================================
 
-116 lines processed in 48 ms
+119 lines processed in 15 ms
 
 8 unexpected errors
-0 uncaught errors (19 expected errors)
+2 uncaught errors (20 expected errors)
 
 FAILED
