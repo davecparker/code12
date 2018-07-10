@@ -345,12 +345,15 @@ local function stringLiteralToken()
 	iChar = iChar + 1
 	local charNext = chars[iChar]
 	while charNext ~= 34 do   -- "
-		-- TODO: if charText == 92 then   -- \
-		if charNext == nil then
+      if charNext == nil then
 			setTokenErr( iCharStart, iChar - 1, "Unclosed string literal" )
 			return nil
 		end
-		iChar = iChar + 1
+      if charNext == 92 then   -- \
+         iChar = iChar + 2 -- skip escaped char in case it's a double quote
+      else
+   		iChar = iChar + 1
+      end
 		charNext = chars[iChar]
 	end
 	local str = string.sub(source, iCharStart, iChar)
@@ -359,25 +362,47 @@ local function stringLiteralToken()
 end
 
 -- Return ("NUM", str) for a numeric literal token starting with a digit
-local function numericLiteralToken()
-	local iCharStart = iChar   -- the first digit char
+local function numericLiteralToken(hasDot)
+	local iCharStart = iChar   -- the first digit char or . if hasDot == true
 	iChar = iChar + 1
 	local charType = charTypes[chars[iChar]]
 	while charType == false do   -- digit chars 
 		iChar = iChar + 1
 		charType = charTypes[chars[iChar]]
 	end
-	if charType == "." then
+	if not hasDot and chars[iChar] == 46 then  -- .
 		repeat
 			iChar = iChar + 1
 			charType = charTypes[chars[iChar]]
 		until charType ~= false    -- digit chars past decimal point
 	end
-	-- TODO: Handle E notation
+	-- Handle E notation
+   local ch = chars[iChar]
+   if ch == 69 or ch == 101 then -- E or e
+      iChar = iChar + 1
+      ch = chars[iChar]
+      if ch == 43 or ch == 45 then -- + or -
+         iChar = iChar + 1
+      end
+      local charType = charTypes[chars[iChar]]
+      while charType == false do   -- digit chars of exponent
+         iChar = iChar + 1
+         charType = charTypes[chars[iChar]]
+      end
+   end
 	local str = string.sub(source, iCharStart, iChar - 1)
 	return "NUM", str
 end
 
+-- Return string for token starting with .  (. or numeric literal token starting with a dot)
+local function  dotToken()
+   local charType = charTypes[chars[iChar + 1]]
+   if charType == false then   -- digit char
+      return numericLiteralToken(true)
+   end
+   iChar = iChar + 1
+   return "."
+end
 
 ----- Module functions -------------------------------------------------------
 
@@ -524,7 +549,6 @@ local function initCharTypes()
 	-- Chars that are always single-char tokens
 	charTypes[59] = ";"
 	charTypes[44] = ","
-	charTypes[46] = "."   -- TODO: Support double constant starting with .
 	charTypes[40] = "("
 	charTypes[41] = ")"
 	charTypes[123] = "{"
@@ -548,6 +572,7 @@ local function initCharTypes()
     charTypes[47] = slashToken
     charTypes[94] = caretToken
     charTypes[37] = percentToken
+    charTypes[46] = dotToken
 end
 
 -- Init the module

@@ -262,30 +262,88 @@ line (stmt)
             NUM (0.707)
 
 35. z = .707; // no leading zero
-*** Location 35.10 to 35.18: Syntax Error
+line (stmt)
+    stmt (varAssign)
+        ID (z)
+        expr (NUM)
+            NUM (.707)
 
 36. z = -.707; // negative with no leading zero
-*** Location 36.10 to 36.19: Syntax Error
+line (stmt)
+    stmt (varAssign)
+        ID (z)
+        expr (neg)
+            expr (NUM)
+                NUM (.707)
 
-37. bigNum = 1.23456E10; // exponential notation
-*** Location 37.10 to 37.29: Syntax Error
+37. bigNum = 1.23456E10; // exponential notation E
+line (stmt)
+    stmt (varAssign)
+        ID (bigNum)
+        expr (NUM)
+            NUM (1.23456E10)
 
-38. bigNum = 1.23456e10; // exponential notation
-*** Location 38.10 to 38.29: Syntax Error
+38. bigNum = 1.23456e10; // exponential notation e
+line (stmt)
+    stmt (varAssign)
+        ID (bigNum)
+        expr (NUM)
+            NUM (1.23456e10)
 
-39. bigNum = -1.23456E10; // exponential notation
-*** Location 39.10 to 39.30: Syntax Error
+39. bigNum = 1.23456e+123; // exponential notation e+
+line (stmt)
+    stmt (varAssign)
+        ID (bigNum)
+        expr (NUM)
+            NUM (1.23456e+123)
 
-40. littleNum = 1.23456E-9; // exponential notation
-*** Location 40.10 to 40.32: Syntax Error
+40. bigNum = -1.23456E103; // exponential notation -E
+line (stmt)
+    stmt (varAssign)
+        ID (bigNum)
+        expr (neg)
+            expr (NUM)
+                NUM (1.23456E103)
 
-41. littleNum = -1.23456E-9; // exponential notation
-*** Location 41.10 to 41.33: Syntax Error
+41. bigNum = -1.23456E+103; // exponential notation -E+
+line (stmt)
+    stmt (varAssign)
+        ID (bigNum)
+        expr (neg)
+            expr (NUM)
+                NUM (1.23456E+103)
 
-42. littleNum = 1.23456e-9; // exponential notation
-*** Location 42.10 to 42.32: Syntax Error
+42. littleNum = 1.23456E-9; // exponential notation E-
+line (stmt)
+    stmt (varAssign)
+        ID (littleNum)
+        expr (NUM)
+            NUM (1.23456E-9)
 
-43. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
+43. littleNum = -1.23456E-98; // exponential notation -E-
+line (stmt)
+    stmt (varAssign)
+        ID (littleNum)
+        expr (neg)
+            expr (NUM)
+                NUM (1.23456E-98)
+
+44. littleNum = 1.23456e-987; // exponential notation e-
+line (stmt)
+    stmt (varAssign)
+        ID (littleNum)
+        expr (NUM)
+            NUM (1.23456e-987)
+
+45. littleNum = -1.23456e-9876; // exponential notation -e-
+line (stmt)
+    stmt (varAssign)
+        ID (littleNum)
+        expr (neg)
+            expr (NUM)
+                NUM (1.23456e-9876)
+
+46. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
 line (varInit)
     ID (double)
     ID (xyz)
@@ -317,7 +375,7 @@ line (varInit)
         expr (NUM)
             NUM (1.414)
 
-44. double mean = (a + b + c) / 3;
+47. double mean = (a + b + c) / 3;
 line (varInit)
     ID (double)
     ID (mean)
@@ -343,7 +401,7 @@ line (varInit)
         expr (NUM)
             NUM (3)
 
-45. double y = m * x + b;
+48. double y = m * x + b;
 line (varInit)
     ID (double)
     ID (y)
@@ -365,7 +423,7 @@ line (varInit)
                 index (empty)
                 field (empty)
 
-46. z = p * r % q + w / x - y;
+49. z = p * r % q + w / x - y;
 line (stmt)
     stmt (varAssign)
         ID (z)
@@ -405,7 +463,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-47. y = a * x * x + b * x + c;
+50. y = a * x * x + b * x + c;
 line (stmt)
     stmt (varAssign)
         ID (y)
@@ -445,7 +503,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-48. y = (a * x * x) + (b * x) + c;
+51. y = (a * x * x) + (b * x) + c;
 line (stmt)
     stmt (varAssign)
         ID (y)
@@ -487,7 +545,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-49. double z2 = z * 2.0; // initialization from another variable
+52. double z2 = z * 2.0; // initialization from another variable
 line (varInit)
     ID (double)
     ID (z2)
@@ -500,7 +558,7 @@ line (varInit)
         expr (NUM)
             NUM (2.0)
 
-50. x = (a + b) / 2 + (c - d) / 2; // multiple parentheses
+53. x = (a + b) / 2 + (c - d) / 2; // multiple parentheses
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -536,7 +594,7 @@ line (stmt)
                 expr (NUM)
                     NUM (2)
 
-51. x = ( ( a + b ) / c ) / 2; // nested parentheses
+54. x = ( ( a + b ) / c ) / 2; // nested parentheses
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -563,7 +621,7 @@ line (stmt)
             expr (NUM)
                 NUM (2)
 
-52. x = y % 12; // mod operator
+55. x = y % 12; // mod operator
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -576,14 +634,14 @@ line (stmt)
             expr (NUM)
                 NUM (12)
 
-53. 
+56. 
 line (blank)
 
-54. // relational operators and if/else
+57. // relational operators and if/else
 line (comment)
     COMMENT ( relational operators and if/else)
 
-55. if (count == 0)
+58. if (count == 0)
 line (if)
     expr (==)
         expr (lValue)
@@ -594,7 +652,7 @@ line (if)
         expr (NUM)
             NUM (0)
 
-56. if (x != 10)
+59. if (x != 10)
 line (if)
     expr (!=)
         expr (lValue)
@@ -605,7 +663,7 @@ line (if)
         expr (NUM)
             NUM (10)
 
-57. if (temp > 98.6)
+60. if (temp > 98.6)
 line (if)
     expr (>)
         expr (lValue)
@@ -616,7 +674,7 @@ line (if)
         expr (NUM)
             NUM (98.6)
 
-58. if ( temp <= 100 )
+61. if ( temp <= 100 )
 line (if)
     expr (<=)
         expr (lValue)
@@ -627,7 +685,7 @@ line (if)
         expr (NUM)
             NUM (100)
 
-59. else if (x >= 42)
+62. else if (x >= 42)
 line (elseif)
     expr (>=)
         expr (lValue)
@@ -638,10 +696,10 @@ line (elseif)
         expr (NUM)
             NUM (42)
 
-60. else
+63. else
 line (else)
 
-61. boolean differenceIsSmall = Math.abs(x - a) < eps;
+64. boolean differenceIsSmall = Math.abs(x - a) < eps;
 line (varInit)
     ID (boolean)
     ID (differenceIsSmall)
@@ -670,34 +728,34 @@ line (varInit)
                 index (empty)
                 field (empty)
 
-62. 
+65. 
 line (blank)
 
-63. // Strings
+66. // Strings
 line (comment)
     COMMENT ( Strings)
 
-64. String greeting; //  declaration without initialization - String type
+67. String greeting; //  declaration without initialization - String type
 line (varDecl)
     ID (String)
     idList (list)
         ID (greeting)
 
-65. greeting = "hello"; // assigning value to a string
+68. greeting = "hello"; // assigning value to a string
 line (stmt)
     stmt (varAssign)
         ID (greeting)
         expr (STR)
             STR ("hello")
 
-66. String greeting2 = "hello there"; // declaration with initialization - String type
+69. String greeting2 = "hello there"; // declaration with initialization - String type
 line (varInit)
     ID (String)
     ID (greeting2)
     expr (STR)
         STR ("hello there")
 
-67. String greeting3 = greeting1; // declaration with initialization from another variable's value
+70. String greeting3 = greeting1; // declaration with initialization from another variable's value
 line (varInit)
     ID (String)
     ID (greeting3)
@@ -707,7 +765,7 @@ line (varInit)
             index (empty)
             field (empty)
 
-68. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
+71. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
 line (varInit)
     ID (String)
     ID (greeting4)
@@ -723,7 +781,7 @@ line (varInit)
         expr (STR)
             STR ("world")
 
-69. String greeting5 = greeting2.substring(0, 6); // declaration with String method
+72. String greeting5 = greeting2.substring(0, 6); // declaration with String method
 line (varInit)
     ID (String)
     ID (greeting5)
@@ -739,7 +797,7 @@ line (varInit)
             expr (NUM)
                 NUM (6)
 
-70. s = "boolean variable b = " + true; // String concatenation with boolean
+73. s = "boolean variable b = " + true; // String concatenation with boolean
 line (stmt)
     stmt (varAssign)
         ID (s)
@@ -749,17 +807,21 @@ line (stmt)
             expr (BOOL)
                 BOOL (true)
 
-71. s = "line1\nline2"; // String with newline
+74. s = "line1\nline2"; // String with newline
 line (stmt)
     stmt (varAssign)
         ID (s)
         expr (STR)
             STR ("line1\nline2")
 
-72. s = "\"Hello,\" he said."; // String with escaped quotes
-*** Location 72.23 to 72.23: Invalid character
+75. s = "\"Hello,\" he said."; // String with escaped quotes
+line (stmt)
+    stmt (varAssign)
+        ID (s)
+        expr (STR)
+            STR ("\"Hello,\" he said.")
 
-73. ct.println("He said 'Hello'"); // String with single quotes
+76. ct.println("He said 'Hello'"); // String with single quotes
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -771,14 +833,14 @@ line (stmt)
             expr (STR)
                 STR ("He said 'Hello'")
 
-74. docsDir = "C:\\Users\\Ben\\Documents\\"; // String with escaped backslash
+77. docsDir = "C:\\Users\\Ben\\Documents\\"; // String with escaped backslash
 line (stmt)
     stmt (varAssign)
         ID (docsDir)
         expr (STR)
             STR ("C:\\Users\\Ben\\Documents\\")
 
-75. input = input.toUpperCase();
+78. input = input.toUpperCase();
 line (stmt)
     stmt (varAssign)
         ID (input)
@@ -790,21 +852,21 @@ line (stmt)
                     ID (toUpperCase)
             exprList (empty)
 
-76. i_dont_like_camel_case = "former c programmer";
+79. i_dont_like_camel_case = "former c programmer";
 line (stmt)
     stmt (varAssign)
         ID (i_dont_like_camel_case)
         expr (STR)
             STR ("former c programmer")
 
-77. 
+80. 
 line (blank)
 
-78. // loops
+81. // loops
 line (comment)
     COMMENT ( loops)
 
-79. for (int i = 0; i < 10; i++)
+82. for (int i = 0; i < 10; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -828,7 +890,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-80. for (i = 0; i < 10; i = i + 2)
+83. for (i = 0; i < 10; i = i + 2)
 line (for)
     forControl (three)
         forInit (stmt)
@@ -857,7 +919,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-81. for (int i = 0; i < 100 && 2 * i < 50; i = i * 2)
+84. for (int i = 0; i < 100 && 2 * i < 50; i = i * 2)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -898,7 +960,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-82. for (int i = 100; i > 0; i--)
+85. for (int i = 100; i > 0; i--)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -922,7 +984,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-83. for (int i = 10; i > 0; i = i - 2)
+86. for (int i = 10; i > 0; i = i - 2)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -951,7 +1013,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-84. for (int i = 0; i < len; i++)
+87. for (int i = 0; i < len; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -978,7 +1040,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-85. for (int i = 0; i < arr.length; i++)
+88. for (int i = 0; i < arr.length; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -1006,7 +1068,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-86. while (j < 100)
+89. while (j < 100)
 line (while)
     expr (<)
         expr (lValue)
@@ -1018,10 +1080,10 @@ line (while)
             NUM (100)
     whileEnd (while)
 
-87. do
+90. do
 line (do)
 
-88. while (j < 100);
+91. while (j < 100);
 line (while)
     expr (<)
         expr (lValue)
@@ -1033,7 +1095,7 @@ line (while)
             NUM (100)
     whileEnd (do-while)
 
-89. while (j < foo && i != bar);
+92. while (j < foo && i != bar);
 line (while)
     expr (&&)
         expr (<)
@@ -1060,7 +1122,7 @@ line (while)
                     field (empty)
     whileEnd (do-while)
 
-90. while (j >= 100);
+93. while (j >= 100);
 line (while)
     expr (>=)
         expr (lValue)
@@ -1072,7 +1134,7 @@ line (while)
             NUM (100)
     whileEnd (do-while)
 
-91. while (j <= foo && i != bar);
+94. while (j <= foo && i != bar);
 line (while)
     expr (&&)
         expr (<=)
@@ -1099,7 +1161,7 @@ line (while)
                     field (empty)
     whileEnd (do-while)
 
-92. while (i < max && notFound)
+95. while (i < max && notFound)
 line (while)
     expr (&&)
         expr (<)
@@ -1120,20 +1182,20 @@ line (while)
                 field (empty)
     whileEnd (while)
 
-93. 
+96. 
 line (blank)
 
-94. // arrays
+97. // arrays
 line (comment)
     COMMENT ( arrays)
 
-95. int[] a;
+98. int[] a;
 line (arrayDecl)
     ID (int)
     idList (list)
         ID (a)
 
-96. int[] a = new int[100];
+99. int[] a = new int[100];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1143,7 +1205,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (100)
 
-97. int[] a = new int[foo];
+100. int[] a = new int[foo];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1156,7 +1218,7 @@ line (arrayInit)
                     index (empty)
                     field (empty)
 
-98. int[] a = new int[b.length * 2];
+101. int[] a = new int[b.length * 2];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1173,7 +1235,7 @@ line (arrayInit)
                 expr (NUM)
                     NUM (2)
 
-99. int[] a = {1, 2, 3};
+102. int[] a = {1, 2, 3};
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1186,13 +1248,13 @@ line (arrayInit)
             expr (NUM)
                 NUM (3)
 
-100. int[] a = { 1,
+103. int[] a = { 1,
 -- Incomplete line carried forward
 
-101. 2,
+104. 2,
 -- Incomplete line carried forward
 
-102. 3};
+105. 3};
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1205,7 +1267,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (3)
 
-103. int[] a = b;
+106. int[] a = b;
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1216,7 +1278,7 @@ line (arrayInit)
                 index (empty)
                 field (empty)
 
-104. double[] data = new double[1000];
+107. double[] data = new double[1000];
 line (arrayInit)
     ID (double)
     ID (data)
@@ -1226,7 +1288,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (1000)
 
-105. String[] greetings = {"hello", "hola", "bonjour"};
+108. String[] greetings = {"hello", "hola", "bonjour"};
 line (arrayInit)
     ID (String)
     ID (greetings)
@@ -1239,13 +1301,13 @@ line (arrayInit)
             expr (STR)
                 STR ("bonjour")
 
-106. GameObj[] targets;
+109. GameObj[] targets;
 line (arrayDecl)
     ID (GameObj)
     idList (list)
         ID (targets)
 
-107. GameObj[] targets = new GameObj[100];
+110. GameObj[] targets = new GameObj[100];
 line (arrayInit)
     ID (GameObj)
     ID (targets)
@@ -1255,7 +1317,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (100)
 
-108. GameObj[] targets = new GameObj[numTargets];
+111. GameObj[] targets = new GameObj[numTargets];
 line (arrayInit)
     ID (GameObj)
     ID (targets)
@@ -1268,7 +1330,7 @@ line (arrayInit)
                     index (empty)
                     field (empty)
 
-109. foo = bar[i];
+112. foo = bar[i];
 line (stmt)
     stmt (varAssign)
         ID (foo)
@@ -1283,7 +1345,7 @@ line (stmt)
                             field (empty)
                 field (empty)
 
-110. foo = bar[0];
+113. foo = bar[0];
 line (stmt)
     stmt (varAssign)
         ID (foo)
@@ -1295,21 +1357,21 @@ line (stmt)
                         NUM (0)
                 field (empty)
 
-111. 
+114. 
 line (blank)
 
-112. // function definitions
+115. // function definitions
 line (comment)
     COMMENT ( function definitions)
 
-113. void foo()
+116. void foo()
 line (func)
     access (empty)
     retType (void)
     ID (foo)
     paramList (empty)
 
-114. void fooBar(int aParameter)
+117. void fooBar(int aParameter)
 line (func)
     access (empty)
     retType (void)
@@ -1319,7 +1381,7 @@ line (func)
             ID (int)
             ID (aParameter)
 
-115. int foo(double x)
+118. int foo(double x)
 line (func)
     access (empty)
     retType (value)
@@ -1330,7 +1392,7 @@ line (func)
             ID (double)
             ID (x)
 
-116. String bar(String[] a, int length)
+119. String bar(String[] a, int length)
 line (func)
     access (empty)
     retType (value)
@@ -1344,7 +1406,7 @@ line (func)
             ID (int)
             ID (length)
 
-117. String[] split(String s, String delim)
+120. String[] split(String s, String delim)
 line (func)
     access (empty)
     retType (array)
@@ -1358,7 +1420,7 @@ line (func)
             ID (String)
             ID (delim)
 
-118. public double add(double x, double y, double z)
+121. public double add(double x, double y, double z)
 line (func)
     access (public)
     retType (value)
@@ -1375,14 +1437,14 @@ line (func)
             ID (double)
             ID (z)
 
-119. 
+122. 
 line (blank)
 
-120. // function calls
+123. // function calls
 line (comment)
     COMMENT ( function calls)
 
-121. ct.println("Hello world");
+124. ct.println("Hello world");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1394,7 +1456,7 @@ line (stmt)
             expr (STR)
                 STR ("Hello world")
 
-122. ct.println("Hello " + name);
+125. ct.println("Hello " + name);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1412,7 +1474,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-123. ct.println("Hello\nWorld");
+126. ct.println("Hello\nWorld");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1424,7 +1486,7 @@ line (stmt)
             expr (STR)
                 STR ("Hello\nWorld")
 
-124. x = add(3, 4);
+127. x = add(3, 4);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -1439,7 +1501,7 @@ line (stmt)
                 expr (NUM)
                     NUM (4)
 
-125. m = mean(1.2, 3.4, 5.67);
+128. m = mean(1.2, 3.4, 5.67);
 line (stmt)
     stmt (varAssign)
         ID (m)
@@ -1456,13 +1518,13 @@ line (stmt)
                 expr (NUM)
                     NUM (5.67)
 
-126. foo(x,
+129. foo(x,
 -- Incomplete line carried forward
 
-127. y,
+130. y,
 -- Incomplete line carried forward
 
-128. z);
+131. z);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1486,34 +1548,34 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-129. 
+132. 
 line (blank)
 
-130. // multiline comments
+133. // multiline comments
 line (comment)
     COMMENT ( multiline comments)
 
-131. /* this is a multiline comment
+134. /* this is a multiline comment
 line (comment)
     COMMENT ( this is a multiline comment)
 
-132. * this is the second line
+135. * this is the second line
 line (blank)
 
-133. * this is the third line
+136. * this is the third line
 line (blank)
 
-134. */
+137. */
 line (blank)
 
-135. 
+138. 
 line (blank)
 
-136. // Code12 api
+139. // Code12 api
 line (comment)
     COMMENT ( Code12 api)
 
-137. ct.print("Hello world");
+140. ct.print("Hello world");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1525,7 +1587,7 @@ line (stmt)
             expr (STR)
                 STR ("Hello world")
 
-138. ct.print("Hello world\n");
+141. ct.print("Hello world\n");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1537,7 +1599,7 @@ line (stmt)
             expr (STR)
                 STR ("Hello world\n")
 
-139. ct.print("Hello "+name);
+142. ct.print("Hello "+name);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1555,7 +1617,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-140. ct.print(myObj);
+143. ct.print(myObj);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1570,7 +1632,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-141. ct.println("Hello world");
+144. ct.println("Hello world");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1582,7 +1644,7 @@ line (stmt)
             expr (STR)
                 STR ("Hello world")
 
-142. ct.println("Hello world\n");
+145. ct.println("Hello world\n");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1594,7 +1656,7 @@ line (stmt)
             expr (STR)
                 STR ("Hello world\n")
 
-143. ct.println("Hello "+name);
+146. ct.println("Hello "+name);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1612,7 +1674,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-144. ct.println(myObj);
+147. ct.println(myObj);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1627,7 +1689,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-145. ct.log(obj);
+148. ct.log(obj);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1642,7 +1704,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-146. ct.log("obj1 = ", obj1, "obj2 = ", obj2, "obj3=", obj3, 3.14, Math.PI, 42);
+149. ct.log("obj1 = ", obj1, "obj2 = ", obj2, "obj3=", obj3, 3.14, Math.PI, 42);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1683,7 +1745,7 @@ line (stmt)
             expr (NUM)
                 NUM (42)
 
-147. ct.logm("message");
+150. ct.logm("message");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1695,7 +1757,7 @@ line (stmt)
             expr (STR)
                 STR ("message")
 
-148. ct.logm("message", obj1, obj2);
+151. ct.logm("message", obj1, obj2);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1717,7 +1779,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-149. ct.showAlert("alert message");
+152. ct.showAlert("alert message");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1729,7 +1791,7 @@ line (stmt)
             expr (STR)
                 STR ("alert message")
 
-150. ct.showAlert(alertMessage);
+153. ct.showAlert(alertMessage);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1744,7 +1806,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-151. int n = ct.inputInt("enter a number: ");
+154. int n = ct.inputInt("enter a number: ");
 line (varInit)
     ID (int)
     ID (n)
@@ -1758,7 +1820,7 @@ line (varInit)
             expr (STR)
                 STR ("enter a number: ")
 
-152. n = ct.inputInt("enter a number: ");
+155. n = ct.inputInt("enter a number: ");
 line (stmt)
     stmt (varAssign)
         ID (n)
@@ -1772,7 +1834,7 @@ line (stmt)
                 expr (STR)
                     STR ("enter a number: ")
 
-153. double x = ct.inputNumber("enter a number: ");
+156. double x = ct.inputNumber("enter a number: ");
 line (varInit)
     ID (double)
     ID (x)
@@ -1786,7 +1848,7 @@ line (varInit)
             expr (STR)
                 STR ("enter a number: ")
 
-154. x = ct.inputNumber("enter a number: ");
+157. x = ct.inputNumber("enter a number: ");
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -1800,7 +1862,7 @@ line (stmt)
                 expr (STR)
                     STR ("enter a number: ")
 
-155. boolean quit = ct.inputString("Quit?");
+158. boolean quit = ct.inputString("Quit?");
 line (varInit)
     ID (boolean)
     ID (quit)
@@ -1814,7 +1876,7 @@ line (varInit)
             expr (STR)
                 STR ("Quit?")
 
-156. quit = ct.inputString("Quit?");
+159. quit = ct.inputString("Quit?");
 line (stmt)
     stmt (varAssign)
         ID (quit)
@@ -1828,7 +1890,7 @@ line (stmt)
                 expr (STR)
                     STR ("Quit?")
 
-157. ct.setTitle("Title");
+160. ct.setTitle("Title");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1840,7 +1902,7 @@ line (stmt)
             expr (STR)
                 STR ("Title")
 
-158. ct.setHeight(100.0 * 9 / 16);
+161. ct.setHeight(100.0 * 9 / 16);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1858,7 +1920,7 @@ line (stmt)
                 expr (NUM)
                     NUM (16)
 
-159. double height = ct.getHeight();
+162. double height = ct.getHeight();
 line (varInit)
     ID (double)
     ID (height)
@@ -1870,7 +1932,7 @@ line (varInit)
                 ID (getHeight)
         exprList (empty)
 
-160. height = ct.getHeight();
+163. height = ct.getHeight();
 line (stmt)
     stmt (varAssign)
         ID (height)
@@ -1882,7 +1944,7 @@ line (stmt)
                     ID (getHeight)
             exprList (empty)
 
-161. double width = ct.getWidth();
+164. double width = ct.getWidth();
 line (varInit)
     ID (double)
     ID (width)
@@ -1894,7 +1956,7 @@ line (varInit)
                 ID (getWidth)
         exprList (empty)
 
-162. width = ct.getWidth();
+165. width = ct.getWidth();
 line (stmt)
     stmt (varAssign)
         ID (width)
@@ -1906,7 +1968,7 @@ line (stmt)
                     ID (getWidth)
             exprList (empty)
 
-163. double pxPerUnit = ct.getPixelsPerUnit();
+166. double pxPerUnit = ct.getPixelsPerUnit();
 line (varInit)
     ID (double)
     ID (pxPerUnit)
@@ -1918,7 +1980,7 @@ line (varInit)
                 ID (getPixelsPerUnit)
         exprList (empty)
 
-164. pxPerUnit = ct.getPixelsPerUnit();
+167. pxPerUnit = ct.getPixelsPerUnit();
 line (stmt)
     stmt (varAssign)
         ID (pxPerUnit)
@@ -1930,7 +1992,7 @@ line (stmt)
                     ID (getPixelsPerUnit)
             exprList (empty)
 
-165. int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
+168. int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
 line (varInit)
     ID (int)
     ID (pixelWidth)
@@ -1957,7 +2019,7 @@ line (varInit)
                             ID (getPixelsPerUnit)
                     exprList (empty)
 
-166. int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
+169. int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 line (varInit)
     ID (int)
     ID (pixelHeight)
@@ -1984,7 +2046,7 @@ line (varInit)
                             ID (getPixelsPerUnit)
                     exprList (empty)
 
-167. String currentScreen = ct.getScreen( );
+170. String currentScreen = ct.getScreen( );
 line (varInit)
     ID (String)
     ID (currentScreen)
@@ -1996,7 +2058,7 @@ line (varInit)
                 ID (getScreen)
         exprList (empty)
 
-168. currentScreen = ct.getScreen( );
+171. currentScreen = ct.getScreen( );
 line (stmt)
     stmt (varAssign)
         ID (currentScreen)
@@ -2008,7 +2070,7 @@ line (stmt)
                     ID (getScreen)
             exprList (empty)
 
-169. ct.clearScreen();
+172. ct.clearScreen();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2018,7 +2080,7 @@ line (stmt)
                 ID (clearScreen)
         exprList (empty)
 
-170. ct.clearGroup("targets");
+173. ct.clearGroup("targets");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2030,7 +2092,7 @@ line (stmt)
             expr (STR)
                 STR ("targets")
 
-171. ct.setBackColor("orange");
+174. ct.setBackColor("orange");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2042,7 +2104,7 @@ line (stmt)
             expr (STR)
                 STR ("orange")
 
-172. ct.setBackColor(backColor);
+175. ct.setBackColor(backColor);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2057,7 +2119,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-173. ct.setBackColor(colors[i]);
+176. ct.setBackColor(colors[i]);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2077,7 +2139,7 @@ line (stmt)
                                 field (empty)
                     field (empty)
 
-174. ct.setBackColor(255, 0, 0);
+177. ct.setBackColor(255, 0, 0);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2093,7 +2155,7 @@ line (stmt)
             expr (NUM)
                 NUM (0)
 
-175. ct.setBackImage("background.png");
+178. ct.setBackImage("background.png");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2105,7 +2167,7 @@ line (stmt)
             expr (STR)
                 STR ("background.png")
 
-176. ct.setBackImage("C:\\Users\\ben\\Pictures\\landscape.jpg");
+179. ct.setBackImage("C:\\Users\\ben\\Pictures\\landscape.jpg");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2117,7 +2179,7 @@ line (stmt)
             expr (STR)
                 STR ("C:\\Users\\ben\\Pictures\\landscape.jpg")
 
-177. ct.setBackImage(filename);
+180. ct.setBackImage(filename);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2132,7 +2194,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-178. GameObj circle = ct.circle(x, y, diameter);
+181. GameObj circle = ct.circle(x, y, diameter);
 line (varInit)
     ID (GameObj)
     ID (circle)
@@ -2159,7 +2221,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-179. GameObj circle = ct.circle(x, y, diameter, color);
+182. GameObj circle = ct.circle(x, y, diameter, color);
 line (varInit)
     ID (GameObj)
     ID (circle)
@@ -2191,7 +2253,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-180. circle = ct.circle(50, 20, 10.5);
+183. circle = ct.circle(50, 20, 10.5);
 line (stmt)
     stmt (varAssign)
         ID (circle)
@@ -2209,7 +2271,7 @@ line (stmt)
                 expr (NUM)
                     NUM (10.5)
 
-181. circle = ct.circle(50, 20, 10.5, "blue");
+184. circle = ct.circle(50, 20, 10.5, "blue");
 line (stmt)
     stmt (varAssign)
         ID (circle)
@@ -2229,7 +2291,7 @@ line (stmt)
                 expr (STR)
                     STR ("blue")
 
-182. GameObj rect = ct.rect(x, y, width, height);
+185. GameObj rect = ct.rect(x, y, width, height);
 line (varInit)
     ID (GameObj)
     ID (rect)
@@ -2261,7 +2323,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-183. GameObj rect = ct.rect(x, y, width, height, color);
+186. GameObj rect = ct.rect(x, y, width, height, color);
 line (varInit)
     ID (GameObj)
     ID (rect)
@@ -2298,7 +2360,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-184. rect = ct.rect(50, 33.3, 11.2, 23.890);
+187. rect = ct.rect(50, 33.3, 11.2, 23.890);
 line (stmt)
     stmt (varAssign)
         ID (rect)
@@ -2318,7 +2380,7 @@ line (stmt)
                 expr (NUM)
                     NUM (23.890)
 
-185. rect = ct.rect(50, 33.3, 11.2, 23.890, "green");
+188. rect = ct.rect(50, 33.3, 11.2, 23.890, "green");
 line (stmt)
     stmt (varAssign)
         ID (rect)
@@ -2340,7 +2402,7 @@ line (stmt)
                 expr (STR)
                     STR ("green")
 
-186. GameObj line = ct.line( x1, y1, x2, y2 );
+189. GameObj line = ct.line( x1, y1, x2, y2 );
 line (varInit)
     ID (GameObj)
     ID (line)
@@ -2372,7 +2434,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-187. GameObj line = ct.line( x1, y1, x2, y2, color );
+190. GameObj line = ct.line( x1, y1, x2, y2, color );
 line (varInit)
     ID (GameObj)
     ID (line)
@@ -2409,7 +2471,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-188. line = ct.line( 0, 0, 100, 95 );
+191. line = ct.line( 0, 0, 100, 95 );
 line (stmt)
     stmt (varAssign)
         ID (line)
@@ -2429,7 +2491,7 @@ line (stmt)
                 expr (NUM)
                     NUM (95)
 
-189. line = ct.line( 0, 0, 100, 95, "red" );
+192. line = ct.line( 0, 0, 100, 95, "red" );
 line (stmt)
     stmt (varAssign)
         ID (line)
@@ -2451,7 +2513,7 @@ line (stmt)
                 expr (STR)
                     STR ("red")
 
-190. GameObj text = ct.text( s, x, y, height );
+193. GameObj text = ct.text( s, x, y, height );
 line (varInit)
     ID (GameObj)
     ID (text)
@@ -2483,7 +2545,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-191. GameObj text = ct.text( s, x, y, height, color );
+194. GameObj text = ct.text( s, x, y, height, color );
 line (varInit)
     ID (GameObj)
     ID (text)
@@ -2520,7 +2582,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-192. text = ct.text( "Score: " + score, 20, 90, 10 );
+195. text = ct.text( "Score: " + score, 20, 90, 10 );
 line (stmt)
     stmt (varAssign)
         ID (text)
@@ -2546,7 +2608,7 @@ line (stmt)
                 expr (NUM)
                     NUM (10)
 
-193. text = ct.text( "Score: " + score, 20, 90, 10, "purple" );
+196. text = ct.text( "Score: " + score, 20, 90, 10, "purple" );
 line (stmt)
     stmt (varAssign)
         ID (text)
@@ -2574,7 +2636,7 @@ line (stmt)
                 expr (STR)
                     STR ("purple")
 
-194. GameObj car = ct.image( filename, x, y, width );
+197. GameObj car = ct.image( filename, x, y, width );
 line (varInit)
     ID (GameObj)
     ID (car)
@@ -2606,7 +2668,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-195. car = ct.image( "car.png", 42, 25, 38.7 );
+198. car = ct.image( "car.png", 42, 25, 38.7 );
 line (stmt)
     stmt (varAssign)
         ID (car)
@@ -2626,7 +2688,7 @@ line (stmt)
                 expr (NUM)
                     NUM (38.7)
 
-196. car = ct.image( "C:\\Users\\john\\Pictures\\car.jpg", 42, 25, 38.7 );
+199. car = ct.image( "C:\\Users\\john\\Pictures\\car.jpg", 42, 25, 38.7 );
 line (stmt)
     stmt (varAssign)
         ID (car)
@@ -2646,7 +2708,7 @@ line (stmt)
                 expr (NUM)
                     NUM (38.7)
 
-197. if (ct.clicked())
+200. if (ct.clicked())
 line (if)
     expr (call)
         fnValue (fnValue)
@@ -2656,7 +2718,7 @@ line (if)
                 ID (clicked)
         exprList (empty)
 
-198. boolean mouseClicked = ct.clicked();
+201. boolean mouseClicked = ct.clicked();
 line (varInit)
     ID (boolean)
     ID (mouseClicked)
@@ -2668,7 +2730,7 @@ line (varInit)
                 ID (clicked)
         exprList (empty)
 
-199. mouseClicked = ct.clicked();
+202. mouseClicked = ct.clicked();
 line (stmt)
     stmt (varAssign)
         ID (mouseClicked)
@@ -2680,7 +2742,7 @@ line (stmt)
                     ID (clicked)
             exprList (empty)
 
-200. if ( ct.clickX() > 50 )
+203. if ( ct.clickX() > 50 )
 line (if)
     expr (>)
         expr (call)
@@ -2693,7 +2755,7 @@ line (if)
         expr (NUM)
             NUM (50)
 
-201. double x = ct.clickX();
+204. double x = ct.clickX();
 line (varInit)
     ID (double)
     ID (x)
@@ -2705,7 +2767,7 @@ line (varInit)
                 ID (clickX)
         exprList (empty)
 
-202. x = ct.clickX();
+205. x = ct.clickX();
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2717,7 +2779,7 @@ line (stmt)
                     ID (clickX)
             exprList (empty)
 
-203. if ( ct.clickY() <= bottomMargin )
+206. if ( ct.clickY() <= bottomMargin )
 line (if)
     expr (<=)
         expr (call)
@@ -2733,7 +2795,7 @@ line (if)
                 index (empty)
                 field (empty)
 
-204. double y = ct.clickY();
+207. double y = ct.clickY();
 line (varInit)
     ID (double)
     ID (y)
@@ -2745,7 +2807,7 @@ line (varInit)
                 ID (clickY)
         exprList (empty)
 
-205. y = ct.clickY();
+208. y = ct.clickY();
 line (stmt)
     stmt (varAssign)
         ID (y)
@@ -2757,7 +2819,7 @@ line (stmt)
                     ID (clickY)
             exprList (empty)
 
-206. if (ct.keyPressed(keyName))
+209. if (ct.keyPressed(keyName))
 line (if)
     expr (call)
         fnValue (fnValue)
@@ -2772,7 +2834,7 @@ line (if)
                     index (empty)
                     field (empty)
 
-207. if (ct.keyPressed("up"))
+210. if (ct.keyPressed("up"))
 line (if)
     expr (call)
         fnValue (fnValue)
@@ -2784,7 +2846,7 @@ line (if)
             expr (STR)
                 STR ("up")
 
-208. boolean upKeyPressed = ct.keyPressed("up");
+211. boolean upKeyPressed = ct.keyPressed("up");
 line (varInit)
     ID (boolean)
     ID (upKeyPressed)
@@ -2798,7 +2860,7 @@ line (varInit)
             expr (STR)
                 STR ("up")
 
-209. keyPressed = ct.keyPressed(keyName);
+212. keyPressed = ct.keyPressed(keyName);
 line (stmt)
     stmt (varAssign)
         ID (keyPressed)
@@ -2815,7 +2877,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-210. if ( ct.charTyped("+") )
+213. if ( ct.charTyped("+") )
 line (if)
     expr (call)
         fnValue (fnValue)
@@ -2827,7 +2889,7 @@ line (if)
             expr (STR)
                 STR ("+")
 
-211. if ( ct.charTyped(keyName) )
+214. if ( ct.charTyped(keyName) )
 line (if)
     expr (call)
         fnValue (fnValue)
@@ -2842,7 +2904,7 @@ line (if)
                     index (empty)
                     field (empty)
 
-212. boolean plusCharTyped = ct.charTyped("+");
+215. boolean plusCharTyped = ct.charTyped("+");
 line (varInit)
     ID (boolean)
     ID (plusCharTyped)
@@ -2856,7 +2918,7 @@ line (varInit)
             expr (STR)
                 STR ("+")
 
-213. plusCharTyped = ct.charTyped(plusKeyName);
+216. plusCharTyped = ct.charTyped(plusKeyName);
 line (stmt)
     stmt (varAssign)
         ID (plusCharTyped)
@@ -2873,10 +2935,10 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-214. 
+217. 
 line (blank)
 
-215. rect.width = 10;
+218. rect.width = 10;
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -2887,16 +2949,16 @@ line (stmt)
         expr (NUM)
             NUM (10)
 
-216. }
+219. }
 line (end)
 
-217. }
+220. }
 line (end)
 
-218. 
+221. 
 line (blank)
 
-219. public void onMousePress(GameObj obj, double x, double y)
+222. public void onMousePress(GameObj obj, double x, double y)
 line (func)
     access (public)
     retType (void)
@@ -2912,14 +2974,14 @@ line (func)
             ID (double)
             ID (y)
 
-220. {
+223. {
 line (begin)
 
-221. // Pop bubbles that get clicked
+224. // Pop bubbles that get clicked
 line (comment)
     COMMENT ( Pop bubbles that get clicked)
 
-222. if (obj != null)
+225. if (obj != null)
 line (if)
     expr (!=)
         expr (lValue)
@@ -2930,10 +2992,10 @@ line (if)
         expr (NULL)
             NULL (null)
 
-223. {
+226. {
 line (begin)
 
-224. obj.delete();
+227. obj.delete();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2943,7 +3005,7 @@ line (stmt)
                 ID (delete)
         exprList (empty)
 
-225. ct.sound("pop.wav");
+228. ct.sound("pop.wav");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2955,103 +3017,115 @@ line (stmt)
             expr (STR)
                 STR ("pop.wav")
 
-226. }
+229. }
 line (end)
 
-227. }
+230. }
 line (end)
 
-228. }
+231. }
 line (end)
-
-229. 
-line (blank)
-
-230. ////////////////////////////////////////////////////////////////////
-line (comment)
-    COMMENT (//////////////////////////////////////////////////////////////////)
-
-231. ERRORS
-************** Beginning of Expected Errors Section **************
 
 232. 
 line (blank)
 
-233. // Lexical errors
+233. ////////////////////////////////////////////////////////////////////
+line (comment)
+    COMMENT (//////////////////////////////////////////////////////////////////)
+
+234. ERRORS
+************** Beginning of Expected Errors Section **************
+
+235. 
+line (blank)
+
+236. // Lexical errors
 line (comment)
     COMMENT ( Lexical errors)
 
-234. @               // invalid character
-*** Location 234.1 to 234.1: Invalid character
+237. @               // invalid character
+*** Location 237.1 to 237.1: Invalid character
 
-235. foo('a');       // char literals not supported
-*** Location 235.5 to 235.5: char type not supported, use double quotes
+238. foo('a');       // char literals not supported
+*** Location 238.5 to 238.5: char type not supported, use double quotes
 
-236. foo(" );        // unclosed string literal
-*** Location 236.5 to 236.43: Unclosed string literal
+239. foo(" );        // unclosed string literal
+*** Location 239.5 to 239.43: Unclosed string literal
 
-237. interface foo   // unsupported reserved word
-*** Location 237.1 to 237.9: Unsupported reserved word "interface"
+240. interface foo   // unsupported reserved word
+*** Location 240.1 to 240.9: Unsupported reserved word "interface"
 
-238. double 1stNumber; // variable name starting with a number
-*** Location 238.1 to 238.17: Syntax Error
+241. double 1stNumber; // variable name starting with a number
+*** Location 241.1 to 241.17: Syntax Error
 
-239. 
+242. x = obj.1stNumber; // field name starting with a number
+*** Location 242.1 to 242.18: Syntax Error
+
+243. 
 line (blank)
 
-240. // Syntax errors
+244. // Syntax errors
 line (comment)
     COMMENT ( Syntax errors)
 
-241. x = 10          // missing ;
-*** Location 241.1 to 241.6: Syntax Error
+245. x = 10          // missing ;
+*** Location 245.1 to 245.6: Syntax Error
 
-242. foo(x, );       // missing expr in exprList
-*** Location 242.1 to 242.9: Syntax Error
+246. foo(x, );       // missing expr in exprList
+*** Location 246.1 to 246.9: Syntax Error
 
-243. x = a + ;       // missing expr after binary op
-*** Location 243.1 to 243.9: Syntax Error
+247. x = a + ;       // missing expr after binary op
+*** Location 247.1 to 247.9: Syntax Error
 
-244. x = a + b * ;   // missing expr after higher precedence binary op
-*** Location 244.1 to 244.13: Syntax Error
+248. x = a ++ b;     // unexpected token after unary op
+*** Location 248.1 to 248.11: Syntax Error
 
-245. x = a * b + ;   // missing expr after lower precedence binary op
-*** Location 245.1 to 245.13: Syntax Error
+249. x = a ** b;     // missing expression between binary ops
+*** Location 249.1 to 249.11: Syntax Error
 
-246. x = ();         // missing expr in parentheses
-*** Location 246.1 to 246.7: Syntax Error
-
-247. x = 10 + ! ;    // missing expr after unary op
-*** Location 247.1 to 247.12: Syntax Error
-
-248. x = obj.3;      // expected ID after .
-*** Location 248.1 to 248.10: Syntax Error
-
-249. if x == 3       // required next token in pattern doesn't match
-*** Location 249.1 to 249.9: Syntax Error
-
-250. while i < max   // required next token in pattern doesn't match
+250. x = a + b * ;   // missing expr after higher precedence binary op
 *** Location 250.1 to 250.13: Syntax Error
 
-251. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
-*** Location 251.1 to 251.21: Syntax Error
+251. x = a * b + ;   // missing expr after lower precedence binary op
+*** Location 251.1 to 251.13: Syntax Error
 
-252. x + 3;          // no matching pattern
-*** Location 252.1 to 252.6: Syntax Error
+252. x = ();         // missing expr in parentheses
+*** Location 252.1 to 252.7: Syntax Error
 
-253. x = 1,000;      // commas in numbers
-*** Location 253.1 to 253.10: Syntax Error
+253. x = 10 + ! ;    // missing expr after unary op
+*** Location 253.1 to 253.12: Syntax Error
 
-254. x = 1.23.45;    // too many decimal points
-*** Location 254.1 to 254.12: Syntax Error
+254. x = obj.3;      // expected ID after .
+*** Location 254.1 to 254.10: Syntax Error
 
-255. foo(x,          // (incomplete line continued below)
+255. x = 3.obj;      // ID expected before .
+*** Location 255.1 to 255.10: Syntax Error
+
+256. if x == 3       // required next token in pattern doesn't match
+*** Location 256.1 to 256.9: Syntax Error
+
+257. while i < max   // required next token in pattern doesn't match
+*** Location 257.1 to 257.13: Syntax Error
+
+258. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
+*** Location 258.1 to 258.21: Syntax Error
+
+259. x + 3;          // no matching pattern
+*** Location 259.1 to 259.6: Syntax Error
+
+260. x = 1,000;      // commas in numbers
+*** Location 260.1 to 260.10: Syntax Error
+
+261. x = 1.23.45;    // too many decimal points
+*** Location 261.1 to 261.12: Syntax Error
+
+262. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
-256. y)              // missing ;
-*** Location 255.1 to 256.2: Syntax Error
+263. y)              // missing ;
+*** Location 262.1 to 263.2: Syntax Error
 
-257. int i = 3.14;   // incompatible types: possible lossy conversion from double to int
+264. int i = 3.14;   // incompatible types: possible lossy conversion from double to int
 line (varInit)
     ID (int)
     ID (i)
@@ -3059,7 +3133,7 @@ line (varInit)
         NUM (3.14)
 Uncaught Error 1
 
-258. double x = a < 100; // incompatible types: double/boolean
+265. double x = a < 100; // incompatible types: double/boolean
 line (varInit)
     ID (double)
     ID (x)
@@ -3073,71 +3147,92 @@ line (varInit)
             NUM (100)
 Uncaught Error 2
 
-259. x = (a + b + c / 3; // missing closing parenthesis
-*** Location 259.1 to 259.19: Syntax Error
+266. x = (a + b + c / 3; // missing closing parenthesis
+*** Location 266.1 to 266.19: Syntax Error
 
-260. x = foo(y, bar(z, w); // missing closing parenthesis w/ nested parentheses
-*** Location 260.1 to 260.21: Syntax Error
+267. x = foo(y, bar(z, w); // missing closing parenthesis w/ nested parentheses
+*** Location 267.1 to 267.21: Syntax Error
 
-261. x = a + b + c ) / 3; // missing openning parenthesis
-*** Location 261.1 to 261.20: Syntax Error
+268. x = a + b + c ) / 3; // missing openning parenthesis
+*** Location 268.1 to 268.20: Syntax Error
 
-262. if ( i == 1 // missing closing parenthesis with if
-*** Location 262.1 to 262.11: Syntax Error
+269. if ( i == 1 // missing closing parenthesis with if
+*** Location 269.1 to 269.11: Syntax Error
 
-263. x + 1 = x; // confusing left hand side an right hand side of assignment
-*** Location 263.1 to 263.10: Syntax Error
+270. if ( i == 1 ); // if followed directly by ;
+*** Location 270.1 to 270.14: Syntax Error
 
-264. if ( x = 3 ); // = instead of ==
-*** Location 264.1 to 264.13: Syntax Error
+271. for ( i=0; i<n; i++); // for() followed directly by ;
+*** Location 271.1 to 271.21: Syntax Error
 
-265. if ( x => 3 ); // => instead of <=
-*** Location 265.1 to 265.14: Syntax Error
+272. x + 1 = x; // confusing left hand side an right hand side of assignment
+*** Location 272.1 to 272.10: Syntax Error
 
-266. for(int i=0, i<n, i++) // commas in place of semicolons
-*** Location 266.1 to 266.22: Syntax Error
+273. 1000 = count; // confusing left hand side an right hand side of assignment
+*** Location 273.1 to 273.13: Syntax Error
 
-267. for(int i=0: i<n: i++) // colons in place of semicolons
-*** Location 267.1 to 267.22: Syntax Error
+274. if ( x = 3 ) // = instead of ==
+line (if)
+    expr (=)
+        expr (lValue)
+            lValue (lValue)
+                ID (x)
+                index (empty)
+                field (empty)
+        expr (NUM)
+            NUM (3)
+Uncaught Error 3
 
-268. for{int i=0; i<n; i++} // {} in place of ()
-*** Location 268.1 to 268.22: Syntax Error
+275. if ( x => 3 ) // => instead of <=
+*** Location 275.1 to 275.13: Syntax Error
 
-269. 
+276. for(int i=0, i<n, i++) // commas in place of semicolons
+*** Location 276.1 to 276.22: Syntax Error
+
+277. for(int i=0: i<n: i++) // colons in place of semicolons
+*** Location 277.1 to 277.22: Syntax Error
+
+278. for{int i=0; i<n; i++} // {} in place of ()
+*** Location 278.1 to 278.22: Syntax Error
+
+279. 
 line (blank)
 
-270. double foo(x, y, z) // missing varibale types for arguments in function definition
-*** Location 270.1 to 270.19: Syntax Error
+280. double foo(x, y, z) // missing varibale types for arguments in function definition
+*** Location 280.1 to 280.19: Syntax Error
 
-271. ct.println; // missing parenteses for function call without arguments
-*** Location 271.1 to 271.11: Syntax Error
+281. ct.println; // missing parenteses for function call without arguments
+*** Location 281.1 to 281.11: Syntax Error
 
-272. foo(int x, double y, GameObj z) // missing return type in function definition
-*** Location 272.1 to 272.31: Syntax Error
+282. foo(int x, double y, GameObj z) // missing return type in function definition
+*** Location 282.1 to 282.31: Syntax Error
 
-273. foo(int x, double y, GameObj z); // supplying variable types in function call
-*** Location 273.1 to 273.32: Syntax Error
+283. foo(int x, double y, GameObj z); // su
+*** Location 283.1 to 283.32: Syntax Error
 
-274. String s = 'Hello'; // '' in place of "" for strings
-*** Location 274.12 to 274.12: char type not supported, use double quotes
+284. pplying variable types in function call
+*** Location 284.1 to 284.39: Syntax Error
 
-275. String s = "A long string
-*** Location 275.12 to 275.25: Unclosed string literal
+285. String s = 'Hello'; // '' in place of "" for strings
+*** Location 285.12 to 285.12: char type not supported, use double quotes
 
-276. on more than one line";
-*** Location 276.34 to 276.35: Unclosed string literal
+286. String s = "A long string
+*** Location 286.12 to 286.25: Unclosed string literal
 
-277. ct.println("He said "Hello""); // not escaping quotes in a string literal
-*** Location 277.1 to 277.30: Syntax Error
+287. on more than one line";
+*** Location 287.34 to 287.35: Unclosed string literal
 
-278. 
+288. ct.println("He said "Hello""); // not escaping quotes in a string literal
+*** Location 288.1 to 288.30: Syntax Error
+
+289. 
 line (blank)
 
-279. // Code12 api
+290. // Code12 api
 line (comment)
     COMMENT ( Code12 api)
 
-280. gameObj circle = ct.circle(x, y, diameter); // GameObj miss-spelled
+291. gameObj circle = ct.circle(x, y, diameter); // GameObj miss-spelled
 line (varInit)
     ID (gameObj)
     ID (circle)
@@ -3163,9 +3258,9 @@ line (varInit)
                     ID (diameter)
                     index (empty)
                     field (empty)
-Uncaught Error 3
+Uncaught Error 4
 
-281. GameObj circle = ct.circle(x, y, width, height); // too many arguments
+292. GameObj circle = ct.circle(x, y, width, height); // too many arguments
 line (varInit)
     ID (GameObj)
     ID (circle)
@@ -3196,9 +3291,9 @@ line (varInit)
                     ID (height)
                     index (empty)
                     field (empty)
-Uncaught Error 4
+Uncaught Error 5
 
-282. GameObj rect = ct.rect(x, y, width); // not enough arguments
+293. GameObj rect = ct.rect(x, y, width); // not enough arguments
 line (varInit)
     ID (GameObj)
     ID (rect)
@@ -3224,42 +3319,42 @@ line (varInit)
                     ID (width)
                     index (empty)
                     field (empty)
-Uncaught Error 5
+Uncaught Error 6
 
-283. 
+294. 
 line (blank)
 
-284. // Unsupported Java syntax
+295. // Unsupported Java syntax
 line (comment)
     COMMENT ( Unsupported Java syntax)
 
-285. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Location 285.1 to 285.24: Syntax Error
+296. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+*** Location 296.1 to 296.24: Syntax Error
 
-286. import java.io.PrintWriter;   // import other than Code12.*
-*** Location 286.1 to 286.27: Syntax Error
+297. import java.io.PrintWriter;   // import other than Code12.*
+*** Location 297.1 to 297.27: Syntax Error
 
-287. int time = (int)( sec );      // type casting
-*** Location 287.1 to 287.24: Syntax Error
+298. int time = (int)( sec );      // type casting
+*** Location 298.1 to 298.24: Syntax Error
 
-288. time %= 3600;                 // %=
-*** Location 288.1 to 288.13: Syntax Error
+299. time %= 3600;                 // %=
+*** Location 299.1 to 299.13: Syntax Error
 
-289. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-*** Location 289.32 to 289.32: Invalid character (The "? :" operator is not supported by Code12)
+300. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+*** Location 300.32 to 300.32: Invalid character (The "? :" operator is not supported by Code12)
 
-290. System.out.println("Hello world"); // classes other than GameObj and String
-*** Location 290.1 to 290.34: Syntax Error
+301. System.out.println("Hello world"); // classes other than GameObj and String
+*** Location 301.1 to 301.34: Syntax Error
 
-291. float x = 1.234; // float type
+302. float x = 1.234; // float type
 line (varInit)
     ID (float)
     ID (x)
     expr (NUM)
         NUM (1.234)
-Uncaught Error 6
+Uncaught Error 7
 
-292. long i = bigNumber; // long type
+303. long i = bigNumber; // long type
 line (varInit)
     ID (long)
     ID (i)
@@ -3268,39 +3363,39 @@ line (varInit)
             ID (bigNumber)
             index (empty)
             field (empty)
-Uncaught Error 7
+Uncaught Error 8
 
-293. char ch = 'a'; // char type
-*** Location 293.11 to 293.11: char type not supported, use double quotes
+304. char ch = 'a'; // char type
+*** Location 304.11 to 304.11: char type not supported, use double quotes
 
-294. while(foo) { // opening { in control structure not on it's own line
-*** Location 294.1 to 294.12: Syntax Error
+305. while(foo) { // opening { in control structure not on it's own line
+*** Location 305.1 to 305.12: Syntax Error
 
-295. i++; } // closing } not on it's own line
-*** Location 295.1 to 295.6: Syntax Error
+306. i++; } // closing } not on it's own line
+*** Location 306.1 to 306.6: Syntax Error
 
-296. String s = "A long string" +
-*** Location 296.1 to 296.28: Syntax Error
+307. String s = "A long string" +
+*** Location 307.1 to 307.28: Syntax Error
 
-297. "on more than one line using concatenation";
-*** Location 297.12 to 297.55: Syntax Error
+308. "on more than one line using concatenation";
+*** Location 308.12 to 308.55: Syntax Error
 
-298. x = a; y = b; // more than one statment on a single line not supported
-*** Location 298.1 to 298.13: Syntax Error
+309. x = a; y = b; // more than one statment on a single line not supported
+*** Location 309.1 to 309.13: Syntax Error
 
-299. if (x == 0) ct.println("x is zero"); // control structure must be on their own lines
-*** Location 299.1 to 299.36: Syntax Error
+310. if (x == 0) ct.println("x is zero"); // control structure must be on their own lines
+*** Location 310.1 to 310.36: Syntax Error
 
-300. double getVariable() { return variable; } // blocks must start and end on their own lines
-*** Location 300.1 to 300.41: Syntax Error
+311. double getVariable() { return variable; } // blocks must start and end on their own lines
+*** Location 311.1 to 311.41: Syntax Error
 
-301. switch (choice) // switch not supported
-*** Location 301.1 to 301.6: Unsupported reserved word "switch"
+312. switch (choice) // switch not supported
+*** Location 312.1 to 312.6: Unsupported reserved word "switch"
 
-302. continue;   // continue not supported
-*** Location 302.1 to 302.8: Unsupported reserved word "continue"
+313. continue;   // continue not supported
+*** Location 313.1 to 313.8: Unsupported reserved word "continue"
 
-303. x = y = 0; // using the output of an assignment in another assignment
+314. x = y = 0; // using the output of an assignment in another assignment
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3312,27 +3407,27 @@ line (stmt)
                     field (empty)
             expr (NUM)
                 NUM (0)
-Uncaught Error 8
+Uncaught Error 9
 
-304. max = a[i++]; // complex expressions not supported
-*** Location 304.1 to 304.13: Syntax Error
+315. max = a[i++]; // complex expressions not supported
+*** Location 315.1 to 315.13: Syntax Error
 
-305. x = ++i; // prefix increment not supported
-*** Location 305.1 to 305.8: Syntax Error
+316. x = ++i; // prefix increment not supported
+*** Location 316.1 to 316.8: Syntax Error
 
-306. x = --i; // prefix decrement not supported
-*** Location 306.1 to 306.8: Syntax Error
+317. x = --i; // prefix decrement not supported
+*** Location 317.1 to 317.8: Syntax Error
 
-307. obj.group.equals("targets"); // indexing more than one level at a time not supported
-*** Location 307.1 to 307.28: Syntax Error
+318. obj.group.equals("targets"); // indexing more than one level at a time not supported
+*** Location 318.1 to 318.28: Syntax Error
 
-308. input.toLowerCase().equals("quit"); // indexing after function call not supported
-*** Location 308.1 to 308.35: Syntax Error
+319. input.toLowerCase().equals("quit"); // indexing after function call not supported
+*** Location 319.1 to 319.35: Syntax Error
 ======= Test Complete =========================================
 
-308 lines processed in 50 ms
+319 lines processed in 56 ms
 
-9 unexpected errors
-8 uncaught errors (59 expected errors)
+0 unexpected errors
+9 uncaught errors (66 expected errors)
 
 FAILED

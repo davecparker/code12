@@ -34,12 +34,15 @@ class BubblePop extends Code12Program
          z = 0.707; // assigning value with double
          z = .707; // no leading zero
          z = -.707; // negative with no leading zero
-         bigNum = 1.23456E10; // exponential notation
-         bigNum = 1.23456e10; // exponential notation
-         bigNum = -1.23456E10; // exponential notation
-         littleNum = 1.23456E-9; // exponential notation
-         littleNum = -1.23456E-9; // exponential notation
-         littleNum = 1.23456e-9; // exponential notation
+         bigNum = 1.23456E10; // exponential notation E
+         bigNum = 1.23456e10; // exponential notation e
+         bigNum = 1.23456e+123; // exponential notation e+
+         bigNum = -1.23456E103; // exponential notation -E
+         bigNum = -1.23456E+103; // exponential notation -E+
+         littleNum = 1.23456E-9; // exponential notation E-
+         littleNum = -1.23456E-98; // exponential notation -E-
+         littleNum = 1.23456e-987; // exponential notation e-
+         littleNum = -1.23456e-9876; // exponential notation -e-
          double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
          double mean = (a + b + c) / 3;
          double y = m * x + b;
@@ -236,16 +239,20 @@ foo('a');       // char literals not supported
 foo(" );        // unclosed string literal 
 interface foo   // unsupported reserved word
 double 1stNumber; // variable name starting with a number
+x = obj.1stNumber; // field name starting with a number
 
 // Syntax errors
 x = 10          // missing ;
 foo(x, );       // missing expr in exprList
 x = a + ;       // missing expr after binary op
+x = a ++ b;     // unexpected token after unary op
+x = a ** b;     // missing expression between binary ops
 x = a + b * ;   // missing expr after higher precedence binary op
 x = a * b + ;   // missing expr after lower precedence binary op
 x = ();         // missing expr in parentheses
 x = 10 + ! ;    // missing expr after unary op
 x = obj.3;      // expected ID after .
+x = 3.obj;      // ID expected before .
 if x == 3       // required next token in pattern doesn't match
 while i < max   // required next token in pattern doesn't match
 for i=0; i<num; i=i+1 // required next token in pattern doesn't match
@@ -260,9 +267,12 @@ x = (a + b + c / 3; // missing closing parenthesis
 x = foo(y, bar(z, w); // missing closing parenthesis w/ nested parentheses
 x = a + b + c ) / 3; // missing openning parenthesis
 if ( i == 1 // missing closing parenthesis with if
+if ( i == 1 ); // if followed directly by ;
+for ( i=0; i<n; i++); // for() followed directly by ;
 x + 1 = x; // confusing left hand side an right hand side of assignment
-if ( x = 3 ); // = instead of ==
-if ( x => 3 ); // => instead of <=
+1000 = count; // confusing left hand side an right hand side of assignment
+if ( x = 3 ) // = instead of ==
+if ( x => 3 ) // => instead of <=
 for(int i=0, i<n, i++) // commas in place of semicolons
 for(int i=0: i<n: i++) // colons in place of semicolons
 for{int i=0; i<n; i++} // {} in place of ()
@@ -270,7 +280,8 @@ for{int i=0; i<n; i++} // {} in place of ()
 double foo(x, y, z) // missing varibale types for arguments in function definition
 ct.println; // missing parenteses for function call without arguments
 foo(int x, double y, GameObj z) // missing return type in function definition
-foo(int x, double y, GameObj z); // supplying variable types in function call
+foo(int x, double y, GameObj z); // su
+pplying variable types in function call
 String s = 'Hello'; // '' in place of "" for strings
 String s = "A long string
             on more than one line";
