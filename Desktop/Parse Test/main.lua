@@ -135,17 +135,17 @@ local function parseTestCode()
 						numUnexpectedErrors = numUnexpectedErrors + 1
 					end
 				else
-					-- Successful parse. Output parse tree to output file only
-					parseJava.printParseTree( tree, 0, outFile )
-
+					-- Successful parse. 
 					-- Did we expect an error on this line?
 					if errorSection then
 						-- Ignore blank lines
 						if tree.p ~= "blank" and tree.p ~= "comment" then
 							numUncaughtErrors = numUncaughtErrors + 1
-                     outFile:write( "Uncaught Error "..numUncaughtErrors.."\n" )
+                     outFile:write( "*** Uncaught Error "..numUncaughtErrors.."\n" )
 						end
 					end
+               -- Output parse tree to output file only
+               parseJava.printParseTree( tree, 0, outFile )
 				end
 			end
 		end

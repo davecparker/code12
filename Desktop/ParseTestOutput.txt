@@ -3181,149 +3181,155 @@ line (comment)
 276. x = 3.141592EE0; // Invalid exponential notation
 *** Location 276.5 to 276.14: Invalid exponential notation
 
-277. foo(x,          // (incomplete line continued below)
+277. x = 3e; // Invalid exponential notation
+*** Location 277.5 to 277.7: Invalid exponential notation
+
+278. x = .3E; // Invalid exponential notation
+*** Location 278.5 to 278.8: Invalid exponential notation
+
+279. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
-278. y)              // missing ;
-*** Location 277.1 to 278.2: Syntax Error
+280. y)              // missing ;
+*** Location 279.1 to 280.2: Syntax Error
 
-279. x = (a + b + c / 3; // missing closing parenthesis
-*** Location 279.1 to 279.19: Syntax Error
+281. x = (a + b + c / 3; // missing closing parenthesis
+*** Location 281.1 to 281.19: Syntax Error
 
-280. x = foo(y, bar(z, w); // missing closing parenthesis w/ nested parentheses
-*** Location 280.1 to 280.21: Syntax Error
+282. x = foo(y, bar(z, w); // missing closing parenthesis w/ nested parentheses
+*** Location 282.1 to 282.21: Syntax Error
 
-281. x = a + b + c ) / 3; // missing openning parenthesis
-*** Location 281.1 to 281.20: Syntax Error
+283. x = a + b + c ) / 3; // missing openning parenthesis
+*** Location 283.1 to 283.20: Syntax Error
 
-282. if ( i == 1 // missing closing parenthesis with if
-*** Location 282.1 to 282.11: Syntax Error
+284. if ( i == 1 // missing closing parenthesis with if
+*** Location 284.1 to 284.11: Syntax Error
 
-283. if ( i == 1 ); // if followed directly by ;
-*** Location 283.1 to 283.14: Syntax Error
+285. if ( i == 1 ); // if followed directly by ;
+*** Location 285.1 to 285.14: Syntax Error
 
-284. for ( i=0; i<n; i++); // for() followed directly by ;
-*** Location 284.1 to 284.21: Syntax Error
+286. for ( i=0; i<n; i++); // for() followed directly by ;
+*** Location 286.1 to 286.21: Syntax Error
 
-285. x + 1 = x; // confusing left hand side an right hand side of assignment
-*** Location 285.1 to 285.10: Syntax Error
+287. x + 1 = x; // confusing left hand side an right hand side of assignment
+*** Location 287.1 to 287.10: Syntax Error
 
-286. 1000 = count; // confusing left hand side an right hand side of assignment
-*** Location 286.1 to 286.13: Syntax Error
+288. 1000 = count; // confusing left hand side an right hand side of assignment
+*** Location 288.1 to 288.13: Syntax Error
 
-287. if ( x => 3 ) // => instead of <=
-*** Location 287.1 to 287.13: Syntax Error
+289. if ( x => 3 ) // => instead of <=
+*** Location 289.1 to 289.13: Syntax Error
 
-288. for(int i=0, i<n, i++) // commas in place of semicolons
-*** Location 288.1 to 288.22: Syntax Error
-
-289. for(int i=0: i<n: i++) // colons in place of semicolons
-*** Location 289.1 to 289.22: Syntax Error
-
-290. for{int i=0; i<n; i++} // {} in place of ()
+290. for(int i=0, i<n, i++) // commas in place of semicolons
 *** Location 290.1 to 290.22: Syntax Error
 
-291. 
+291. for(int i=0: i<n: i++) // colons in place of semicolons
+*** Location 291.1 to 291.22: Syntax Error
+
+292. for{int i=0; i<n; i++} // {} in place of ()
+*** Location 292.1 to 292.22: Syntax Error
+
+293. 
 line (blank)
 
-292. double foo(x, y, z) // missing variable types for arguments in function definition
-*** Location 292.1 to 292.19: Syntax Error
+294. double foo(x, y, z) // missing variable types for arguments in function definition
+*** Location 294.1 to 294.19: Syntax Error
 
-293. ct.println; // missing parenteses for function call without arguments
-*** Location 293.1 to 293.11: Syntax Error
+295. ct.println; // missing parenteses for function call without arguments
+*** Location 295.1 to 295.11: Syntax Error
 
-294. foo(int x, double y, GameObj z) // missing return type in function definition
-*** Location 294.1 to 294.31: Syntax Error
+296. foo(int x, double y, GameObj z) // missing return type in function definition
+*** Location 296.1 to 296.31: Syntax Error
 
-295. foo(int x, double y, GameObj z); // supplying variable types in function call
-*** Location 295.1 to 295.32: Syntax Error
+297. foo(int x, double y, GameObj z); // supplying variable types in function call
+*** Location 297.1 to 297.32: Syntax Error
 
-296. String s = 'Hello'; // '' in place of "" for strings
-*** Location 296.12 to 296.12: char type not supported, use double quotes
+298. String s = 'Hello'; // '' in place of "" for strings
+*** Location 298.12 to 298.12: char type not supported, use double quotes
 
-297. String s = "A long string
-*** Location 297.12 to 297.25: Unclosed string literal
+299. String s = "A long string
+*** Location 299.12 to 299.25: Unclosed string literal
 
-298. on more than one line";
-*** Location 298.34 to 298.35: Unclosed string literal
+300. on more than one line";
+*** Location 300.34 to 300.35: Unclosed string literal
 
-299. ct.println("He said "Hello""); // not escaping double quotes in a string literal
-*** Location 299.1 to 299.30: Syntax Error
+301. ct.println("He said "Hello""); // not escaping double quotes in a string literal
+*** Location 301.1 to 301.30: Syntax Error
 
-300. 
+302. 
 line (blank)
 
-301. // Unsupported Java syntax
+303. // Unsupported Java syntax
 line (comment)
     COMMENT ( Unsupported Java syntax)
 
-302. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Location 302.1 to 302.24: Syntax Error
-
-303. import java.io.PrintWriter;   // import other than Code12.*
-*** Location 303.1 to 303.27: Syntax Error
-
-304. int time = (int)( sec );      // type casting
+304. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
 *** Location 304.1 to 304.24: Syntax Error
 
-305. time %= 3600;                 // %=
-*** Location 305.1 to 305.13: Syntax Error
+305. import java.io.PrintWriter;   // import other than Code12.*
+*** Location 305.1 to 305.27: Syntax Error
 
-306. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-*** Location 306.32 to 306.32: Invalid character (The "? :" operator is not supported by Code12)
+306. int time = (int)( sec );      // type casting
+*** Location 306.1 to 306.24: Syntax Error
 
-307. System.out.println("Hello world"); // classes other than GameObj and String
-*** Location 307.1 to 307.34: Syntax Error
+307. time %= 3600;                 // %=
+*** Location 307.1 to 307.13: Syntax Error
 
-308. char ch = 'a'; // char type
-*** Location 308.11 to 308.11: char type not supported, use double quotes
+308. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+*** Location 308.32 to 308.32: Invalid character (The "? :" operator is not supported by Code12)
 
-309. while(foo) { // opening { in control structure not on it's own line
-*** Location 309.1 to 309.12: Syntax Error
+309. System.out.println("Hello world"); // classes other than GameObj and String
+*** Location 309.1 to 309.34: Syntax Error
 
-310. i++; } // closing } not on it's own line
-*** Location 310.1 to 310.6: Syntax Error
+310. char ch = 'a'; // char type
+*** Location 310.11 to 310.11: char type not supported, use double quotes
 
-311. String s = "A long string" +
-*** Location 311.1 to 311.28: Syntax Error
+311. while(foo) { // opening { in control structure not on it's own line
+*** Location 311.1 to 311.12: Syntax Error
 
-312. "on more than one line using concatenation";
-*** Location 312.12 to 312.55: Syntax Error
+312. i++; } // closing } not on it's own line
+*** Location 312.1 to 312.6: Syntax Error
 
-313. x = a; y = b; // more than one statement on a single line not supported
-*** Location 313.1 to 313.13: Syntax Error
+313. String s = "A long string" +
+*** Location 313.1 to 313.28: Syntax Error
 
-314. if (x == 0) ct.println("x is zero"); // control structure must be on their own lines
-*** Location 314.1 to 314.36: Syntax Error
+314. "on more than one line using concatenation";
+*** Location 314.12 to 314.55: Syntax Error
 
-315. double getVariable() { return variable; } // blocks must start and end on their own lines
-*** Location 315.1 to 315.41: Syntax Error
+315. x = a; y = b; // more than one statement on a single line not supported
+*** Location 315.1 to 315.13: Syntax Error
 
-316. switch (choice) // switch not supported
-*** Location 316.1 to 316.6: Unsupported reserved word "switch"
+316. if (x == 0) ct.println("x is zero"); // control structure must be on their own lines
+*** Location 316.1 to 316.36: Syntax Error
 
-317. continue;   // continue not supported
-*** Location 317.1 to 317.8: Unsupported reserved word "continue"
+317. double getVariable() { return variable; } // blocks must start and end on their own lines
+*** Location 317.1 to 317.41: Syntax Error
 
-318. max = a[i++]; // complex expressions not supported
-*** Location 318.1 to 318.13: Syntax Error
+318. switch (choice) // switch not supported
+*** Location 318.1 to 318.6: Unsupported reserved word "switch"
 
-319. x = ++i; // prefix increment not supported
-*** Location 319.1 to 319.8: Syntax Error
+319. continue;   // continue not supported
+*** Location 319.1 to 319.8: Unsupported reserved word "continue"
 
-320. x = --i; // prefix decrement not supported
-*** Location 320.1 to 320.8: Syntax Error
+320. max = a[i++]; // complex expressions not supported
+*** Location 320.1 to 320.13: Syntax Error
 
-321. obj.group.equals("targets"); // indexing more than one level at a time not supported
-*** Location 321.1 to 321.28: Syntax Error
+321. x = ++i; // prefix increment not supported
+*** Location 321.1 to 321.8: Syntax Error
 
-322. input.toLowerCase().equals("quit"); // indexing after function call not supported
-*** Location 322.1 to 322.35: Syntax Error
+322. x = --i; // prefix decrement not supported
+*** Location 322.1 to 322.8: Syntax Error
+
+323. obj.group.equals("targets"); // indexing more than one level at a time not supported
+*** Location 323.1 to 323.28: Syntax Error
+
+324. input.toLowerCase().equals("quit"); // indexing after function call not supported
+*** Location 324.1 to 324.35: Syntax Error
 ======= Test Complete =========================================
 
-322 lines processed in 176 ms
+324 lines processed in 101 ms
 
 0 unexpected errors
-0 uncaught errors (77 expected errors)
+0 uncaught errors (79 expected errors)
 
 SUCCESS
