@@ -12,8 +12,6 @@ public class MainProgram extends Code12Program
    String compare; //used to compare substrings to set values
    String equation; //holds the current equation being evaluated
    //Instance Variables for the calculate method
-   double[] values =  new double[12]; //value stack
-   String[] operators = new String[12]; //operator stack
    GameObj temp;
    boolean displayingAnswer = false; //tracks when the display is showing a calculated answer
    
@@ -326,22 +324,73 @@ public class MainProgram extends Code12Program
       
       return 0;
    }
-   
+
+   //Handles precidence of parenthesis by evaluating the inner portion as a seperate expression
+   public double[] paren( String afterParen )
+   {
+      int i;
+      String tempParen;
+      String tempParen1;
+      double[] parenReturn;
+      double result;
+
+      for( i = 0; i < afterParen.length(); i++ )
+      {
+         tempParen = afterParen.substring(i,i+1);
+         if( tempParen.equals(")"))
+            break;
+         if( tempParen.equals("("))
+         {
+            parenReturn = paren(afterParen.substring(i+1) );
+            tempParen = afterParen.substring(0,i); //everything before the (
+            tempParen1 = ct.formatDecimal( parenReturn[0] );
+            result = ct.parseNumber( calculate( tempParen + tempParen1 ) );
+            i += ct.toInt( parenReturn[1] );
+            double[] results = { result, i + 1 };
+            return results;
+         }
+ 
+      }
+      
+      afterParen = afterParen.substring(0,i); //removes the right parenthesis and anything after
+      result = ct.parseNumber (calculate( afterParen ) );
+      double[] results = { result, i + 1 };
+      return results;
+   }
+
    public String calculate(String toCalculate)
    {
       int i = 0; //index of the parser
       int valueCount = 0;
       int operatorCount = 0;
       String returnMe = "math error";
+      String tempCalc;
+      double[] parenReturn; //array to store the values returned from param
+      double[] values =  new double[12]; //value stack
+      String[] operators = new String[12]; //operator stack
       
       while(true) //parses through toCalculate
       {
-      
-         if( i == (toCalculate.length() - 1) ) //handles the parser finding the end of toCalculate
+         tempCalc = toCalculate.substring(i,i+1);
+         if( tempCalc.equals("(") ) 
+         {
+            parenReturn = paren( toCalculate.substring(1) ); //stuffs the array of returned values from paren into a temporary array
+            valueCount += 1;
+            values[valueCount - 1] = parenReturn[0]; //the first return value is the evaluation of what was in the parenthesis
+            int y = ct.toInt( parenReturn[1] ) +1 ;
+
+            if( y >= toCalculate.length() - 1 )
+            {
+               break;
+            }
+
+            toCalculate = toCalculate.substring( y );
+            i=0;
+         } 
+         else if( i == (toCalculate.length() - 1) ) //handles the parser finding the end of toCalculate
          {
             //checks for operators at the end of
-            compare = toCalculate.substring(i); 
-            if( compare.equals("+") || compare.equals("-") || compare.equals("*") || compare.equals("/") || compare.equals("^") || compare.equals("(") )
+            if( tempCalc.equals("+") || tempCalc.equals("-") || tempCalc.equals("*") || tempCalc.equals("/") || tempCalc.equals("^") || tempCalc.equals("(") )
             {
                return returnMe;
             }
@@ -353,45 +402,17 @@ public class MainProgram extends Code12Program
                break;
             }    
          }
-         
-         else //if the parser has not found the end
-         { 
-            compare = toCalculate.substring(i,i+1);
-            if( compare.equals("(") || compare.equals(")"))
+         else //if the parser has not found the end or found a ) at the end
+         {
+            if( tempCalc.equals("+") || tempCalc.equals("-") || tempCalc.equals("*") || tempCalc.equals("/") || tempCalc.equals("^") )
             {
-               //handles left parenthesis
-               if( compare.equals("(") )
-               {
-                  operatorCount += 1;
-                  operators[operatorCount - 1] = toCalculate.substring(i,i+1);
-               }
-               //handles right parenthesis
-               else
-               {
-                  if( toCalculate.indexOf("(") == -1)
-                     return returnMe; //returns math error
-                  while( !operators[operatorCount - 1].equals("(") )
-                  {
-                     double num1 = values[valueCount - 2]; //Takes the value one from the top
-                     double num2 = values[valueCount - 1]; //Takes the top value      
-                     String operator = operators[operatorCount - 1];//Takes the top operator
-                     if( num2 == 0 && operator.equals("/"))
-                        return "Div by zero no!";
-                     else
-                        values[valueCount - 2] = simpleCalculate( num1, num2, operator );
-                     valueCount -= 1; //popped 2 values off and pushed one on
-                     operatorCount -= 1;
-                  }
-                  operatorCount -= 1;
-               }
-               toCalculate = toCalculate.substring(i+1);
-               i = 0;  
-            }
-            if( compare.equals("+") || compare.equals("-") || compare.equals("*") || compare.equals("/") || compare.equals("^") )
-            {
+
                //Having found the end of a number pushes it to the values array
+               if( i != 0 )
+               {
                valueCount += 1;
                values[valueCount - 1] = ct.parseNumber( toCalculate.substring(0,i) ); 
+               }
 
                //Checks if the operator array is empty
                if( operatorCount == 0 )
@@ -432,7 +453,7 @@ public class MainProgram extends Code12Program
          }
       }
       while( operatorCount > 0 ) //Calculates remaining operators and values
-      {        
+      {                
          double num1 = values[valueCount - 2]; //Takes the value one from the top
          double num2 = values[valueCount - 1]; //Takes the top value      
          String operator = operators[operatorCount - 1];//Takes the top operator

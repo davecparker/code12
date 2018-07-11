@@ -12,8 +12,6 @@ require('Code12.api')
     this.compare = nil; 
     this.equation = nil; 
     --Instance Variables for the calculate method
-    this.values = { length = 12, default = 0 }
-    this.operators = { length = 12, default = nil }
     this.temp = nil; 
     this.displayingAnswer = false
     
@@ -327,94 +325,119 @@ require('Code12.api')
         return 0
     end
     
+    --Handles precidence of parenthesis by evaluating the inner portion as a seperate expression
+    function _fn.paren(afterParen)
+        
+        local i = 0; 
+        local tempParen = nil; 
+        local tempParen1 = nil; 
+        local parenReturn = nil; 
+        local result = 0; 
+        
+        i = 0; while i < string.len(afterParen) do
+            
+            tempParen = ct.substring(afterParen, i, i + 1)
+            if (tempParen == ")") then
+                break; end
+            if (tempParen == "(") then
+                
+                parenReturn = _fn.paren(ct.substring(afterParen, i + 1))
+                tempParen = ct.substring(afterParen, 0, i)
+                tempParen1 = ct.formatDecimal(ct.indexArray(parenReturn, 0))
+                result = ct.parseNumber(_fn.calculate(tempParen .. tempParen1))
+                i = i + (ct.toInt(ct.indexArray(parenReturn, 1)))
+                local results = { result, i + 1, length = 2, default = 0 }
+                return results
+            end
+            
+        i = i + 1; end
+        
+        afterParen = ct.substring(afterParen, 0, i)
+        result = ct.parseNumber(_fn.calculate(afterParen))
+        local results = { result, i + 1, length = 2, default = 0 }
+        return results
+    end
+    
     function _fn.calculate(toCalculate)
         
         local i = 0
         local valueCount = 0
         local operatorCount = 0
         local returnMe = "math error"
+        local tempCalc = nil; 
+        local parenReturn = nil; 
+        local values = { length = 12, default = 0 }
+        local operators = { length = 12, default = nil }
         
         while true do
             
+            tempCalc = ct.substring(toCalculate, i, i + 1)
+            if (tempCalc == "(") then
+                
+                parenReturn = _fn.paren(ct.substring(toCalculate, 1))
+                valueCount = valueCount + (1)
+                ct.checkArrayIndex(values, valueCount - 1); values[1+(valueCount - 1)] = ct.indexArray(parenReturn, 0)
+                local y = ct.toInt(ct.indexArray(parenReturn, 1)) + 1
+                
+                if y >= string.len(toCalculate) - 1 then
+                    
+                    break
+                end
+                
+                toCalculate = ct.substring(toCalculate, y)
+                i = 0
             
-            if i == (string.len(toCalculate) - 1) then
+            elseif i == (string.len(toCalculate) - 1) then
                 
                 --checks for operators at the end of
-                this.compare = ct.substring(toCalculate, i)
-                if (this.compare == "+") or (this.compare == "-") or (this.compare == "*") or (this.compare == "/") or (this.compare == "^") or (this.compare == "(") then
+                if (tempCalc == "+") or (tempCalc == "-") or (tempCalc == "*") or (tempCalc == "/") or (tempCalc == "^") or (tempCalc == "(") then
                     
                     return returnMe
                 
                 else 
                     
                     valueCount = valueCount + (1)
-                    ct.checkArrayIndex(this.values, valueCount - 1); this.values[1+(valueCount - 1)] = ct.parseNumber(toCalculate)
+                    ct.checkArrayIndex(values, valueCount - 1); values[1+(valueCount - 1)] = ct.parseNumber(toCalculate)
                     break
                 end
             
             else 
                 
-                this.compare = ct.substring(toCalculate, i, i + 1)
-                if (this.compare == "(") or (this.compare == ")") then
+                if (tempCalc == "+") or (tempCalc == "-") or (tempCalc == "*") or (tempCalc == "/") or (tempCalc == "^") then
                     
-                    --handles left parenthesis
-                    if (this.compare == "(") then
-                        
-                        operatorCount = operatorCount + (1)
-                        ct.checkArrayIndex(this.operators, operatorCount - 1); this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
-                    
-                    else 
-                        
-                        if ct.indexOfString(toCalculate, "(") == -1 then
-                            return returnMe; end
-                        while not (ct.indexArray(this.operators, operatorCount - 1) == "(") do
-                            
-                            local num1 = ct.indexArray(this.values, valueCount - 2)
-                            local num2 = ct.indexArray(this.values, valueCount - 1)
-                            local operator = ct.indexArray(this.operators, operatorCount - 1)
-                            if num2 == 0 and (operator == "/") then
-                                return "Div by zero no!"; 
-                            else 
-                                ct.checkArrayIndex(this.values, valueCount - 2); this.values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator); end
-                            valueCount = valueCount - (1)
-                            operatorCount = operatorCount - (1)
-                        end
-                        operatorCount = operatorCount - (1)
-                    end
-                    toCalculate = ct.substring(toCalculate, i + 1)
-                    i = 0
-                end
-                if (this.compare == "+") or (this.compare == "-") or (this.compare == "*") or (this.compare == "/") or (this.compare == "^") then
                     
                     --Having found the end of a number pushes it to the values array
-                    valueCount = valueCount + (1)
-                    ct.checkArrayIndex(this.values, valueCount - 1); this.values[1+(valueCount - 1)] = ct.parseNumber(ct.substring(toCalculate, 0, i))
+                    if i ~= 0 then
+                        
+                        valueCount = valueCount + (1)
+                        ct.checkArrayIndex(values, valueCount - 1); values[1+(valueCount - 1)] = ct.parseNumber(ct.substring(toCalculate, 0, i))
+                    end
                     
                     --Checks if the operator array is empty
                     if operatorCount == 0 then
                         
                         operatorCount = operatorCount + (1)
-                        ct.checkArrayIndex(this.operators, operatorCount - 1); this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
+                        ct.checkArrayIndex(operators, operatorCount - 1); operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
                     
                     else 
                         
                         --Compares the precedence of the operators
-                        if _fn.precedence(ct.substring(toCalculate, i, i + 1)) >= _fn.precedence(ct.indexArray(this.operators, operatorCount - 1)) then
+                        if _fn.precedence(ct.substring(toCalculate, i, i + 1)) >= _fn.precedence(ct.indexArray(operators, operatorCount - 1)) then
                             
-                            local operator = ct.indexArray(this.operators, operatorCount - 1)
-                            local num1 = ct.indexArray(this.values, valueCount - 2)
-                            local num2 = ct.indexArray(this.values, valueCount - 1)
+                            local operator = ct.indexArray(operators, operatorCount - 1)
+                            local num1 = ct.indexArray(values, valueCount - 2)
+                            local num2 = ct.indexArray(values, valueCount - 1)
                             if num2 == 0 and (operator == "/") then
                                 return "Div by zero no!"; 
                             else 
-                                ct.checkArrayIndex(this.values, valueCount - 2); this.values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator); end
-                            ct.checkArrayIndex(this.operators, operatorCount - 1); this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
+                                ct.checkArrayIndex(values, valueCount - 2); values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator); end
+                            ct.checkArrayIndex(operators, operatorCount - 1); operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
                             valueCount = valueCount - (1)
                         
                         else 
                             
                             operatorCount = operatorCount + (1)
-                            ct.checkArrayIndex(this.operators, operatorCount - 1); this.operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
+                            ct.checkArrayIndex(operators, operatorCount - 1); operators[1+(operatorCount - 1)] = ct.substring(toCalculate, i, i + 1)
                         end
                     end
                     
@@ -429,20 +452,20 @@ require('Code12.api')
         end
         while operatorCount > 0 do
             
-            local num1 = ct.indexArray(this.values, valueCount - 2)
-            local num2 = ct.indexArray(this.values, valueCount - 1)
-            local operator = ct.indexArray(this.operators, operatorCount - 1)
+            local num1 = ct.indexArray(values, valueCount - 2)
+            local num2 = ct.indexArray(values, valueCount - 1)
+            local operator = ct.indexArray(operators, operatorCount - 1)
             if num2 == 0 and (operator == "/") then
                 return "Div by zero no!"; 
             else 
-                ct.checkArrayIndex(this.values, valueCount - 2); this.values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator); end
+                ct.checkArrayIndex(values, valueCount - 2); values[1+(valueCount - 2)] = _fn.simpleCalculate(num1, num2, operator); end
             valueCount = valueCount - (1)
             operatorCount = operatorCount - (1)
         end
         
         
         --Formating and returning result 
-        local result = ct.indexArray(this.values, 0)
+        local result = ct.indexArray(values, 0)
         
         if result == 0 then
             
