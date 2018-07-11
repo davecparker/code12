@@ -57,8 +57,8 @@ local sourceFile = {
 
 -- Force the initial file to the standard test file for faster dev testing
 if env.isSimulator then
-	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
---	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
@@ -428,14 +428,30 @@ local function showError()
 		lineNum = lineNum + 1
 	end
 
-	-- Position the main highlight  TODO: handle multi-line
+	-- Position the main highlight
 	local dxChar = app.consoleFontCharWidth
 	local dxExtra = 2   -- extra pixels of highlight horizontally
 	local r = errGroup.sourceRect
-	r.x = (errRecord.loc.first.iChar - 1) * dxChar - dxExtra
-	local numChars = string.len( sourceFile.strLines[errRecord.loc.first.iLine] or "" )
-	if errRecord.loc.last then
-		numChars = errRecord.loc.last.iChar - errRecord.loc.first.iChar + 1 
+	local loc = errRecord.loc
+	r.x = (loc.first.iChar - 1) * dxChar - dxExtra
+	r.height = app.consoleFontHeight
+	local numChars = string.len( sourceFile.strLines[loc.first.iLine] or "" )
+	if loc.last == nil then
+		-- Entire (single) line
+	elseif loc.first.iLine == loc.last.iLine then
+		-- Portion of a single line
+		numChars = loc.last.iChar - loc.first.iChar + 1
+	else
+		-- Multi-line. Make a rectangle bounding it all. 
+		-- TODO: Is this good enough or do we need multiple rects?
+		r.x = 0
+		for iLineNext = loc.first.iLine + 1, loc.last.iLine do
+			local numCharsNext = string.len( sourceFile.strLines[iLineNext] or "" )
+			if numCharsNext > numChars then
+				numChars = numCharsNext
+			end
+			r.height = r.height + app.consoleFontHeight
+		end
 	end
 	r.width = numChars * dxChar + dxExtra * 2
 

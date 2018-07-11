@@ -263,6 +263,10 @@ local forNext = { t = "forNext",
 local forControl = { t = "forControl",
 	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
 	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
+	-- Common Errors
+	{ 11, 0, "three",			forInit, ",", "(*)", 						iNode = 2 },
+	{ 11, 0, "three",			forInit, ";", forExpr, ",", "(*)",			iNode = 4, 
+			strErr = "for loop parts should be separated by semicolons (;)\nComma not supported" },
 }
 
 -- An array initializer
@@ -301,16 +305,18 @@ local line = { t = "line",
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
 									"ID", "(", ")", ")", ";",					"END" },
 	-- Common errors
-	{ 1, 0, "stmt", 			stmt, "END", 
-			iErr = 2, strErr = "Statement should end with a semicolon (;)" },
-	{ 3, 0, "varInit",			"ID", "ID", "=", expr, "END",
-			iErr = 5, strErr = "Variable initialization should end with a semicolon (;)" },
-	{ 3, 0, "varDecl",			"ID", idList, "END",
-			iErr = 3, strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 3, 0, "constInit", 		"final", "ID", "ID", "=", expr, "END",
-			iErr = 3, strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 8, 0, "if",				"if", "(", expr, ")", ";", "END",
-			iErr = 5, strErr = "if statement should not end with a semicolon" },
+	{ 1, 0, "stmt", 			stmt, "END", 								iNode = 2, 
+			strErr = "Statement should end with a semicolon (;)" },
+	{ 3, 0, "varInit",			"ID", "ID", "=", expr, "END",				iNode = 5, 
+			strErr = "Variable initialization should end with a semicolon (;)" },
+	{ 3, 0, "varDecl",			"ID", idList, "END",						iNode = 3, 
+			strErr = "Variable declaration should end with a semicolon (;)" },
+	{ 3, 0, "constInit", 		"final", "ID", "ID", "=", expr, "END",		iNode = 3, 
+			strErr = "Variable declaration should end with a semicolon (;)" },
+	{ 8, 0, "if",				"if", "(", expr, ")", ";", "END",			iNode = 5, 
+			strErr = "if statement should not end with a semicolon" },
+	{ 8, 0, "if",				"if", expr, "END",							iNode = 2, 
+			strErr = "if statement test must be in parentheses" },
 
 }
 
@@ -335,7 +341,9 @@ function parseOpExpr( leftSide, minPrecedence )
 		iToken = iToken + 1
 		local rightSide = parseGrammar( primaryExpr )
 		if rightSide == nil then
-			return nil  -- expected expression after binary op
+			err.setErrNodeAndRef( tokens[iToken], op,
+					"Expected expression after %s operator", op.str )
+			return nil
 		end
 		-- Check for another op after this op's expr and compare precedence
 		token = tokens[iToken]
@@ -344,7 +352,7 @@ function parseOpExpr( leftSide, minPrecedence )
 			-- Higher precedence op follows, so recurse to the right
 			rightSide = parseOpExpr( rightSide, prec )
 			if rightSide == nil then
-				return nil  -- expected expression after binary op
+				return nil  -- expected expression after binary op, err set above
 			end
 			-- Keep looking for the next op
 			token = tokens[iToken]
@@ -372,7 +380,21 @@ function parseGrammar( grammar )
 			if nodes then
 				-- If this matched a common error then set the error state
 				if patternMaxLevel == 0 then
-					err.setErrNode( nodes[pattern.iErr], pattern.strErr )
+					local iNode = pattern.iNode
+					assert( iNode )
+					if pattern.strErr then
+						err.setErrNode( nodes[iNode], pattern.strErr )
+					else
+						-- This common error pattern doesn't specify the strErr,
+						-- so it should be in a group where the last one does.
+						local j = i
+						local patErr
+						repeat 
+							j = j + 1
+							patErr = grammar[j]
+						until patErr.strErr ~= nil
+						err.setErrNode( nodes[iNode], patErr.strErr )
+					end
 				end
 
 				-- This pattern matches, so make a grammar node and return it
@@ -394,8 +416,12 @@ function parsePattern( pattern )
 	local nodes = {}   -- node array to build
 	local iItem = 4
 	while iItem <= #pattern do
-		-- Is this pattern item a token, grammar table, or parsing function?
 		local item = pattern[iItem]
+		if item == "(*)" then
+			-- Special token matches and ignores anything to end of line
+			return nodes
+		end
+		-- Is this pattern item a token, grammar table, or parsing function?
 		local t = type(item)
 		if t == "string" then
 			-- Token: compare to next token
