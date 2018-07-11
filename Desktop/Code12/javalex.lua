@@ -345,18 +345,18 @@ local function stringLiteralToken()
 	iChar = iChar + 1
 	local charNext = chars[iChar]
 	while charNext ~= 34 do   -- "
-      if charNext == nil then
+		if charNext == nil then
 			setTokenErr( iCharStart, iChar - 1, "Unclosed string literal" )
 			return nil
 		elseif charNext == 92 then   -- \
-         iChar = iChar + 1 -- check next char for supported escape sequence
-         charNext = chars[iChar]
-         if charNext ~= 34 and charNext ~= 92 and charNext ~= 110 and charNext ~= 116 then -- " \ n t
-            setTokenErr( iChar - 1, iChar, "Unsupported or illegal escape sequence" )
-            return nil
-         end
-      end
-      iChar = iChar + 1
+			iChar = iChar + 1 -- check next char for supported escape sequence
+			charNext = chars[iChar]
+			if charNext ~= 34 and charNext ~= 92 and charNext ~= 110 and charNext ~= 116 then -- " \ n t
+				setTokenErr( iChar - 1, iChar, "Unsupported or illegal escape sequence" )
+			return nil
+			end
+		end
+		iChar = iChar + 1
 		charNext = chars[iChar]
 	end
 	local str = string.sub(source, iCharStart, iChar)
@@ -380,36 +380,36 @@ local function numericLiteralToken(startsWithDot)
 		until charType ~= false    -- digit chars past decimal point
 	end
 	-- Handle exponential notation
-   local ch = chars[iChar]
-   if ch == 69 or ch == 101 then -- E or e
-      iChar = iChar + 1
-      ch = chars[iChar]
-      if ch == 43 or ch == 45 then -- + or -
-         iChar = iChar + 1
-         ch = chars[iChar]
-      end
-      charType = charTypes[ch]
-      if charType ~= false then
-         setTokenErr( iCharStart, iChar, "Invalid exponential notation" )
-         return nil
-      end
-      repeat
-         iChar = iChar + 1
-         charType = charTypes[chars[iChar]]
-      until charType ~= false -- digit chars of exponent
-   end
+	local ch = chars[iChar]
+	if ch == 69 or ch == 101 then -- E or e
+		iChar = iChar + 1
+		ch = chars[iChar]
+		if ch == 43 or ch == 45 then -- + or -
+			iChar = iChar + 1
+			ch = chars[iChar]
+		end
+		charType = charTypes[ch]
+		if charType ~= false then
+			setTokenErr( iCharStart, iChar, "Invalid exponential notation" )
+			return nil
+		end
+		repeat
+			iChar = iChar + 1
+			charType = charTypes[chars[iChar]]
+		until charType ~= false -- digit chars of exponent
+	end
 	local str = string.sub(source, iCharStart, iChar - 1)
 	return "NUM", str
 end
 
 -- Return string for token starting with .  (. or numeric literal token starting with a dot)
 local function  dotToken()
-   local charType = charTypes[chars[iChar + 1]]
-   if charType == false then   -- digit char
-      return numericLiteralToken(true)
-   end
-   iChar = iChar + 1
-   return "."
+	local charType = charTypes[chars[iChar + 1]]
+	if charType == false then   -- digit char
+		return numericLiteralToken(true)
+	end
+	iChar = iChar + 1
+	return "."
 end
 
 ----- Module functions -------------------------------------------------------
@@ -492,9 +492,9 @@ function javalex.getTokens( sourceStr, lineNum )
 		elseif charType == false then   -- numeric 0-9
 			-- Number constant
 			token.tt, token.str = numericLiteralToken()
-         if token.tt == nil then
-            return nil
-         end
+			if token.tt == nil then
+				return nil
+			end
 		elseif charType == nil then
 			-- End of source string
 			token.tt = "END"
