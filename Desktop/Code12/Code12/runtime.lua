@@ -28,11 +28,6 @@ local g = require("Code12.globals")
 --             println = function,       -- called by runtime for console output
 --             inputString = function,   -- called by runtime for console input
 --             runtimeErr = function,    -- called by runtime on runtime error
---
---             -- These field are added by the runtime for use by the app
---             initRun = fnInitRun,      -- init and start a new run
---             stopRun = fnStopRun,      -- stop a run
---             onResize = fnOnResize,    -- notify runtime that app window has resized
 --         },
 --         ct.checkParams = true,        -- true to check API params at runtime
 --     }
@@ -124,7 +119,7 @@ local function getDeviceMetrics()
 end
 
 -- Handle a window resize for a standalone resizeable app
-local function onResize()
+function g.onResize()
 	local oldHeight = g.height    -- remember old height if any
 	getDeviceMetrics()            -- get new device metrics
 
@@ -145,13 +140,20 @@ local function onResize()
 end
 
 -- Stop a run
-local function stopRun()
+function g.stopRun()
+	-- Abort the user coRoutine if necessary
+	if coRoutineUser then
+		if coroutine.status(coRoutineUser) ~= "dead" then
+			coroutine.resume(coRoutineUser, "abort")
+		end
+		coRoutineUser = nil
+	end
+
 	-- Remove the event listeners (only some may be installed)
 	Runtime:removeEventListener("enterFrame", onFirstFrame)
 	Runtime:removeEventListener("enterFrame", onNewFrame)
-	Runtime:removeEventListener("touch", g.onTouchRuntime)
 	Runtime:removeEventListener("key", g.onKey)
-	Runtime:removeEventListener("resize", onResize)
+	Runtime:removeEventListener("resize", g.onResize)
 
 	-- Destroy the main display group, screens, and display objects
 	if g.mainGroup then
@@ -170,9 +172,9 @@ local function stopRun()
 
 	-- Set game state for a stopped run
 	g.startTime = nil
+	g.modalDialog = false
 	g.stopped = true
 	g.blocked = false
-	coRoutineUser = nil  -- TODO: explicitly kill and delete coroutine somehow?
 end	
 
 -- Handle the result of the two return values from a coroutine.resume call,
@@ -191,7 +193,7 @@ local function coroutineYielded(success, strErr)
 		return true
 	else
 		-- Runtime error
-		stopRun()
+		g.stopRun()
 		print("\n*** Runtime Error: " .. strErr)
 		-- Did the error occur in user code or Code12?
 		local strLineNum, strMessage = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
@@ -199,7 +201,7 @@ local function coroutineYielded(success, strErr)
 			-- Error was in user code, report to the appContext if any 
 			local lineNum = tonumber( strLineNum ) 
 			if lineNum and appContext.runtimeErr then
-				appContext.runtimeErr( lineNum, strMessage )
+				appContext.runtimeErr(lineNum, strMessage)
 				return
 			end
 			strErr = "Line " .. strLineNum .. ": " .. strMessage  -- for standalone runs
@@ -235,10 +237,18 @@ function g.eventFunctionYielded( func, ... )
 	return false
 end
 
+-- Block and yield the user's code, then return any message from the
+-- main thread, in particular it might be "abort".
+function g.blockAndYield()
+	if coRoutineUser then
+		return coroutine.yield()
+	end
+end
+
 -- Init for a new run of the user program after the user's code has been loaded
-local function initRun()
+function g.initRun()
 	-- Stop any existing run in case it wasn't ended explicitly
-	stopRun()
+	g.stopRun()
 
 	-- Create a main outer display group so that we can rotate and place it 
 	-- to change orientation (portrait to landscape). Also, the origin of this group
@@ -263,10 +273,9 @@ local function initRun()
 
 	-- Install the event listeners
 	Runtime:addEventListener("enterFrame", onFirstFrame)  -- will call user's start()
-	Runtime:addEventListener("touch", g.onTouchRuntime)
 	Runtime:addEventListener("key", g.onKey)
 	if appContext == nil and not g.isMobile then
-		Runtime:addEventListener("resize", onResize)  -- for standalone window resize
+		Runtime:addEventListener("resize", g.onResize)  -- for standalone window resize
 	end
 
 	-- Start the game and the game timer
@@ -274,21 +283,21 @@ local function initRun()
 	g.startTime = system.getTimer()
 end
 
--- Init the Code 12 runtime system.
+
+---------------- Special Runtime Init Function -------------------------------
+
+-- Init the Code12 runtime system.
 -- If running standalone then also start the run, otherwise wait for app to start it.
 function ct.initRuntime()
 	-- Get platform and determine if we are on a desktop vs. mobile device
 	g.platform = system.getInfo("platform")
+	g.isMac = (g.platform == "macos")
 	g.isMobile = (g.platform == "android" or g.platform == "ios")
 	g.isSimulator = (system.getInfo("environment") == "simulator")	
 
-	-- Install app callbacks if in app context, otherwise start a standalone run
-	if appContext then
-		appContext.initRun = initRun
-		appContext.stopRun = stopRun
-		appContext.onResize = onResize
-	else
-		initRun()
+	-- Start the run if running standalone
+	if not appContext then
+		g.initRun()
 	end
 end
 

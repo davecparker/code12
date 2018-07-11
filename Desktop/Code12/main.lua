@@ -11,6 +11,7 @@
 local widget = require( "widget" )
 
 -- Code12 app modules
+local g = require( "Code12.globals" )
 local app = require( "app" )
 local env = require( "env" )
 local parseJava = require( "parseJava" )
@@ -56,8 +57,8 @@ local sourceFile = {
 
 -- Force the initial file to the standard test file for faster dev testing
 if env.isSimulator then
---	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
-	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
@@ -125,7 +126,7 @@ local function runLuaCode( luaCode )
 		codeFunction()
 
 		-- Tell the runtime to init and start a new run
-		appContext.initRun()
+		g.initRun()
 
 		-- Show the game output
 		gameGroup.isVisible = true
@@ -243,10 +244,10 @@ end
 
 -- Make the status bar UI
 local function makeStatusBar()
-	statusBarGroup = app.makeGroup( nil, 0, app.height - dyStatusBar )
+	statusBarGroup = g.makeGroup( nil, 0, app.height - dyStatusBar )
 
 	-- Background color
-	statusBarGroup.bg = app.uiItem( display.newRect( statusBarGroup, 0, 0, app.width, dyStatusBar ),
+	statusBarGroup.bg = g.uiItem( display.newRect( statusBarGroup, 0, 0, app.width, dyStatusBar ),
 							app.toolbarShade, app.borderShade )
 
 	-- Status message
@@ -274,7 +275,7 @@ end
 
 -- Make and return a highlight rectangle, in the reference color if ref
 local function makeHilightRect( x, y, width, height, ref )
-	local r = app.uiItem( display.newRect( errGroup.highlightGroup, x, y, width, height ) )
+	local r = g.uiItem( display.newRect( errGroup.highlightGroup, x, y, width, height ) )
 	if ref then
 		r:setFillColor( 1, 1, 0.6 )
 	else
@@ -322,7 +323,7 @@ end
 local function makeErrDisplay()
 	-- Make group to hold all err display items
 	removeErrorDisplay()
-	errGroup = app.makeGroup( outputGroup )
+	errGroup = g.makeGroup( outputGroup )
 	local numSourceLines = 7
 
 	-- Layout metrics
@@ -333,10 +334,10 @@ local function makeErrDisplay()
 	local dySource = numSourceLines * dyLine
 
 	-- Make background rect for the source display
-	app.uiItem( display.newRect( errGroup, 0, 0, app.width, dySource + margin ), 1, app.borderShade )
+	g.uiItem( display.newRect( errGroup, 0, 0, app.width, dySource + margin ), 1, app.borderShade )
 
 	-- Make the highlight rectangles
-	local highlightGroup = app.makeGroup( errGroup, xText, margin )
+	local highlightGroup = g.makeGroup( errGroup, xText, margin )
 	errGroup.highlightGroup = highlightGroup
 	local y = ((numSourceLines - 1) / 2) * dyLine
 	errGroup.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
@@ -345,7 +346,7 @@ local function makeErrDisplay()
 	errGroup.sourceRect = makeHilightRect( 0, y, dxChar * 4, dyLine )
 
 	-- Make the lines numbers
-	local lineNumGroup = app.makeGroup( errGroup, 0, margin )
+	local lineNumGroup = g.makeGroup( errGroup, 0, margin )
 	errGroup.lineNumGroup = lineNumGroup
 	for i = 1, numSourceLines do
 		local t = display.newText{
@@ -363,10 +364,10 @@ local function makeErrDisplay()
 	end
 
 	-- Make the source lines
-	local sourceGroup = app.makeGroup( errGroup, xText, margin )
+	local sourceGroup = g.makeGroup( errGroup, xText, margin )
 	errGroup.sourceGroup = sourceGroup
 	for i = 1, numSourceLines do
-		app.uiBlack( display.newText{
+		g.uiBlack( display.newText{
 			parent = sourceGroup,
 			text = "", 
 			x = 0, 
@@ -378,7 +379,7 @@ local function makeErrDisplay()
 	end
 
 	-- Make the error text
-	errGroup.errText = app.uiBlack( display.newText{
+	errGroup.errText = g.uiBlack( display.newText{
 		parent = errGroup,
 		text = "", 
 		x = margin * 2, 
@@ -492,8 +493,8 @@ local function onResizeWindow()
 	-- which will then call us back at setClipSize().
 	appContext.widthP = math.max( app.width, 1 )
 	appContext.heightP = math.max( outputAreaHeight(), 1 )
-	if appContext.onResize then
-		appContext.onResize()
+	if g.onResize then
+		g.onResize()
 	end
 end
 
@@ -507,28 +508,27 @@ end
 -- Handle touch events on the pane split area.
 -- Moving the split pane changes the minimum console height
 local function onTouchPaneSplit( event )
-	if event.phase == "began" then
-		display.getCurrentStage():setFocus( paneSplit )
+	local phase = event.phase
+	if phase == "began" then
+		g.setFocusObj( paneSplit )
 		paneDragOffset = event.y - lowerGroup.y
-	else
-		if event.phase ~= "cancelled" then
-			-- Compute new console size below pane split
-			local y = event.y - paneDragOffset
-			minConsoleHeight = app.pinValue( 
-					app.height - y - dyStatusBar,
-					0, app.height - dyStatusBar )
-			onResizeWindow()
-		end
-		if event.phase ~= "moved" then
-			display.getCurrentStage():setFocus( nil )
-		end
+	elseif g.getFocusObj() == paneSplit and phase ~= "cancelled" then
+		-- Compute and set new console size below pane split
+		local y = event.y - paneDragOffset
+		minConsoleHeight = g.pinValue( app.height - y - dyStatusBar,
+									0, app.height - dyStatusBar )
+		onResizeWindow()
 	end
+	if phase == "ended" or phase == "cancelled" then
+		g.setFocusObj(nil)
+	end
+	return true
 end
 
 -- Prepare for a new run of the user program
 local function initNewProgram()
 	-- Stop existing run if any
-	appContext.stopRun()
+	g.stopRun()
 
 	-- Set the source dir and filename
 	appContext.sourceDir, appContext.sourceFilename = 
@@ -556,7 +556,7 @@ local function initNewProgram()
 	if gameGroup then
 		gameGroup:removeSelf()
 	end
-	gameGroup = app.makeGroup( outputGroup )
+	gameGroup = g.makeGroup( outputGroup )
 	gameGroup.isVisible = false
 	removeErrorDisplay()
 end
@@ -623,10 +623,10 @@ end
 
 -- Make the toolbar UI
 local function makeToolbar()
-	toolbarGroup = app.makeGroup()
+	toolbarGroup = g.makeGroup()
 
 	-- Background
-	toolbarGroup.bg = app.uiItem( display.newRect( toolbarGroup, 0, 0, app.width, dyToolbar ),
+	toolbarGroup.bg = g.uiItem( display.newRect( toolbarGroup, 0, 0, app.width, dyToolbar ),
 							app.toolbarShade, app.borderShade )
 
 	-- Choose File Button
@@ -667,6 +667,10 @@ end
 
 -- Init the app
 local function initApp()
+	-- Make a default window title
+	display.setStatusBar( display.HiddenStatusBar )
+	native.setProperty("windowTitleText", "Code12")
+
 	-- Get initial device info and metrics
 	getDeviceMetrics()
 	console.init()
@@ -674,27 +678,31 @@ local function initApp()
 	app.outputWidth = app.width
 	app.outputHeight = outputAreaHeight()
 
-	-- Make a default window title
-	native.setProperty("windowTitleText", "Code12")
-	display.setStatusBar( display.HiddenStatusBar )
-
 	-- White background
-	appBg = app.uiWhite( display.newRect( 0, 0, app.width, app.height ) )
+	appBg = g.uiWhite( display.newRect( 0, 0, app.width, app.height ) )
+
+	-- Make the main output group
+	outputGroup = g.makeGroup(nil, 0, dyToolbar)
 
 	-- Main display areas
-	outputGroup = app.makeGroup( nil, 0, dyToolbar )
-	rightBar = app.uiItem( display.newRect( 0, dyToolbar, 0, 0 ), 
+	rightBar = g.uiItem( display.newRect( 0, dyToolbar, 0, 0 ), 
 						app.extraShade, app.borderShade )
-	paneSplit = app.uiItem( display.newRect( 0, 0, 0, dyPaneSplit ), 
+	paneSplit = g.uiItem( display.newRect( 0, 0, 0, dyPaneSplit ), 
 						app.toolbarShade, app.borderShade )
 	paneSplit:addEventListener( "touch", onTouchPaneSplit )
-	lowerGroup = app.makeGroup()
+	lowerGroup = g.makeGroup()
 	console.create( lowerGroup, 0, 0, 0, 0 )
 	layoutPanes()
 
 	-- UI bars
 	makeStatusBar()
 	makeToolbar()
+
+	-- Install listeners for the app
+	Runtime:addEventListener( "resize", onResizeWindow )
+
+	-- Install timer to check file 4x/sec
+	timer.performWithDelay( 250, checkUserFile, 0 )
 
 	-- Fill in the appContext for the runtime
 	appContext.outputGroup = outputGroup
@@ -703,21 +711,13 @@ local function initApp()
 	appContext.setClipSize = setClipSize
 	appContext.print = console.print
 	appContext.println = console.println
-	appContext.inputString = console.inputString
 	appContext.runtimeErr = showRuntimeError
 
 	-- Load the Code12 API and runtime.
 	-- This defines the Code12 APIs in the global ct table
 	-- and sets the runtime's fields in ct._appContext.
 	require( "Code12.api" )
-
-	-- Install listeners for the app
-	Runtime:addEventListener( "resize", onResizeWindow )
-
-	-- Install timer to check file 4x/sec
-	timer.performWithDelay( 250, checkUserFile, 0 )
 end
-
 
 -- Start the app
 initApp()

@@ -88,7 +88,7 @@ function javaTypes.vtFromVarType( node )
 		else
 			-- Unknown type. See if the case is wrong.
 			local typeNameLower = string.lower( typeName )
-			for name, vt in pairs( mapTypeNameToVt ) do
+			for name, _ in pairs( mapTypeNameToVt ) do
 				if string.lower( name ) == typeNameLower then
 					err.setErrNode( node, 
 						"Names are case-sensitive, known name is \"%s\"", name )
