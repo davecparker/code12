@@ -43,6 +43,8 @@ class BubblePop extends Code12Program
          littleNum = -1.23456E-98; // exponential notation -E-
          littleNum = 1.23456e-987; // exponential notation e-
          littleNum = -1.23456e-9876; // exponential notation -e-
+         x = .5e7; // exponential notation without leading digit before dot
+         x = 3.e8; // exponential notation without digit after dot
          double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
          double mean = (a + b + c) / 3;
          double y = m * x + b;
@@ -75,8 +77,9 @@ class BubblePop extends Code12Program
          s = "\"Hello,\" he said."; // String with escaped quotes
          ct.println("He said 'Hello'"); // String with single quotes
          docsDir = "C:\\Users\\Ben\\Documents\\"; // String with escaped backslash
-         input = input.toUpperCase();
-         i_dont_like_camel_case = "former c programmer";
+         ct.println( "I\tneed\tmy\tspace" ); // String with escaped tab
+         input = input.toUpperCase(); // method call
+         i_dont_like_camel_case = "butItTakesLessKeystrokes"; // variable identifier with underscores
 
          // loops
          for (int i = 0; i < 10; i++)
@@ -241,6 +244,7 @@ foo("\);        // unclosed string literal ending in backslash
 s = "\          // unclosed string literal ending in backslash
 s = "\";        // unclosed string literal from escaped double quote
 s = "\ ";       // illegal escape character
+s = "\r"        // unsupported escape sequence
 interface foo   // unsupported reserved word
 double 1stNumber; // variable name starting with a number
 x = obj.1stNumber; // field name starting with a number
@@ -263,10 +267,17 @@ for i=0; i<num; i=i+1 // required next token in pattern doesn't match
 x + 3;          // no matching pattern
 x = 1,000;      // commas in numbers
 x = 1.23.45;    // too many decimal points
+x = 3.14e1.0;   // exponential notation with decimal point in exponent
+x = 3.14e;      // Invalid exponential notation
+x = 3.141e+;    // Invalid exponential notation
+x = 3.1415e-;   // Invalid exponential notation
+x = 3.14159e+exponent; // Invalid exponential notation
+x = 3.141592ee0; // Invalid exponential notation
+x = 3.141592EE0; // Invalid exponential notation
+x = 3e; // Invalid exponential notation
+x = .3E; // Invalid exponential notation
 foo(x,          // (incomplete line continued below)
 y)              // missing ;
-int i = 3.14;   // incompatible types: possible lossy conversion from double to int
-double x = a < 100; // incompatible types: double/boolean
 x = (a + b + c / 3; // missing closing parenthesis
 x = foo(y, bar(z, w); // missing closing parenthesis w/ nested parentheses
 x = a + b + c ) / 3; // missing openning parenthesis
@@ -275,26 +286,19 @@ if ( i == 1 ); // if followed directly by ;
 for ( i=0; i<n; i++); // for() followed directly by ;
 x + 1 = x; // confusing left hand side an right hand side of assignment
 1000 = count; // confusing left hand side an right hand side of assignment
-if ( x = 3 ) // = instead of ==
 if ( x => 3 ) // => instead of <=
 for(int i=0, i<n, i++) // commas in place of semicolons
 for(int i=0: i<n: i++) // colons in place of semicolons
 for{int i=0; i<n; i++} // {} in place of ()
 
-double foo(x, y, z) // missing varibale types for arguments in function definition
+double foo(x, y, z) // missing variable types for arguments in function definition
 ct.println; // missing parenteses for function call without arguments
 foo(int x, double y, GameObj z) // missing return type in function definition
-foo(int x, double y, GameObj z); // su
-pplying variable types in function call
+foo(int x, double y, GameObj z); // supplying variable types in function call
 String s = 'Hello'; // '' in place of "" for strings
 String s = "A long string
             on more than one line";
-ct.println("He said "Hello""); // not escaping quotes in a string literal
-
-// Code12 api
-gameObj circle = ct.circle(x, y, diameter); // GameObj miss-spelled
-GameObj circle = ct.circle(x, y, width, height); // too many arguments
-GameObj rect = ct.rect(x, y, width); // not enough arguments
+ct.println("He said "Hello""); // not escaping double quotes in a string literal
 
 // Unsupported Java syntax
 int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
@@ -303,19 +307,16 @@ int time = (int)( sec );      // type casting
 time %= 3600;                 // %=
 int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
 System.out.println("Hello world"); // classes other than GameObj and String
-float x = 1.234; // float type
-long i = bigNumber; // long type
 char ch = 'a'; // char type
 while(foo) { // opening { in control structure not on it's own line
 i++; } // closing } not on it's own line
 String s = "A long string" +
            "on more than one line using concatenation";
-x = a; y = b; // more than one statment on a single line not supported
+x = a; y = b; // more than one statement on a single line not supported
 if (x == 0) ct.println("x is zero"); // control structure must be on their own lines
 double getVariable() { return variable; } // blocks must start and end on their own lines
 switch (choice) // switch not supported
 continue;   // continue not supported
-x = y = 0; // using the output of an assignment in another assignment
 max = a[i++]; // complex expressions not supported
 x = ++i; // prefix increment not supported
 x = --i; // prefix decrement not supported
