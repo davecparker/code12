@@ -345,10 +345,16 @@ local function stringLiteralToken()
 	iChar = iChar + 1
 	local charNext = chars[iChar]
 	while charNext ~= 34 do   -- "
-		-- TODO: if charText == 92 then   -- \
 		if charNext == nil then
 			setTokenErr( iCharStart, iChar - 1, "Unclosed string literal" )
 			return nil
+		elseif charNext == 92 then   -- \
+			iChar = iChar + 1 -- check next char for supported escape sequence
+			charNext = chars[iChar]
+			if charNext ~= 34 and charNext ~= 92 and charNext ~= 110 and charNext ~= 116 then -- " \ n t
+				setTokenErr( iChar - 1, iChar, "Unsupported or illegal escape sequence" )
+			return nil
+			end
 		end
 		iChar = iChar + 1
 		charNext = chars[iChar]
@@ -359,25 +365,52 @@ local function stringLiteralToken()
 end
 
 -- Return ("NUM", str) for a numeric literal token starting with a digit
-local function numericLiteralToken()
-	local iCharStart = iChar   -- the first digit char
+local function numericLiteralToken(startsWithDot)
+	local iCharStart = iChar   -- the first digit char or . if startsWithDot == true
 	iChar = iChar + 1
 	local charType = charTypes[chars[iChar]]
 	while charType == false do   -- digit chars 
 		iChar = iChar + 1
 		charType = charTypes[chars[iChar]]
 	end
-	if charType == "." then
+	if not startsWithDot and chars[iChar] == 46 then  -- .
 		repeat
 			iChar = iChar + 1
 			charType = charTypes[chars[iChar]]
 		until charType ~= false    -- digit chars past decimal point
 	end
-	-- TODO: Handle E notation
+	-- Handle exponential notation
+	local ch = chars[iChar]
+	if ch == 69 or ch == 101 then -- E or e
+		iChar = iChar + 1
+		ch = chars[iChar]
+		if ch == 43 or ch == 45 then -- + or -
+			iChar = iChar + 1
+			ch = chars[iChar]
+		end
+		charType = charTypes[ch]
+		if charType ~= false then
+			setTokenErr( iCharStart, iChar, "Invalid exponential notation" )
+			return nil
+		end
+		repeat
+			iChar = iChar + 1
+			charType = charTypes[chars[iChar]]
+		until charType ~= false -- digit chars of exponent
+	end
 	local str = string.sub(source, iCharStart, iChar - 1)
 	return "NUM", str
 end
 
+-- Return string for token starting with .  (. or numeric literal token starting with a dot)
+local function  dotToken()
+	local charType = charTypes[chars[iChar + 1]]
+	if charType == false then   -- digit char
+		return numericLiteralToken(true)
+	end
+	iChar = iChar + 1
+	return "."
+end
 
 ----- Module functions -------------------------------------------------------
 
@@ -459,6 +492,9 @@ function javalex.getTokens( sourceStr, lineNum )
 		elseif charType == false then   -- numeric 0-9
 			-- Number constant
 			token.tt, token.str = numericLiteralToken()
+			if token.tt == nil then
+				return nil
+			end
 		elseif charType == nil then
 			-- End of source string
 			token.tt = "END"
@@ -524,7 +560,6 @@ local function initCharTypes()
 	-- Chars that are always single-char tokens
 	charTypes[59] = ";"
 	charTypes[44] = ","
-	charTypes[46] = "."   -- TODO: Support double constant starting with .
 	charTypes[40] = "("
 	charTypes[41] = ")"
 	charTypes[123] = "{"
@@ -548,6 +583,7 @@ local function initCharTypes()
     charTypes[47] = slashToken
     charTypes[94] = caretToken
     charTypes[37] = percentToken
+    charTypes[46] = dotToken
 end
 
 -- Init the module
