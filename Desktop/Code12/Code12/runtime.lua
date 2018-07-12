@@ -53,7 +53,7 @@ local coRoutineUser = nil    -- coroutine running an event or nil if none
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame()
 	-- Call or resume the client's update function if any
-	g.eventFunctionYielded(_fn.update)
+	local yielded = g.eventFunctionYielded(_fn.update)
 
 	-- Clear the polled input state for this frame
 	g.clicked = false
@@ -65,7 +65,7 @@ local function onNewFrame()
 		g.screen.backObj:updateBackObj()
 	end
 
-	-- Update then sync the drawing objects.
+	-- Update and sync the drawing objects as necessary.
     -- Note that objects may be deleted during the loop. 
 	local objs = g.screen.objs
 	local i = 1
@@ -75,7 +75,9 @@ local function onNewFrame()
 		if gameObj:shouldAutoDelete() then
 			gameObj:removeAndDelete()
 		else
-			gameObj:update()
+			if not yielded then
+				gameObj:update()
+			end
 			gameObj:sync()
 			i = i + 1
 		end

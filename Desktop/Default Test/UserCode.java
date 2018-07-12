@@ -175,7 +175,10 @@ class UserCode extends Code12Program
 	public void onMousePress( GameObj obj, double x, double y )
 	{
 		if (obj != null)
+		{
+			obj.xSpeed = .1;
 			ct.println( obj.toString() + " was clicked" );
+		}
 		else
 			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
 	}
