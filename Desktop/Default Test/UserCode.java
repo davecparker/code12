@@ -41,6 +41,8 @@ class UserCode extends Code12Program
 		ct.println(function);
 		ct.println("This is the default Code12 test app");
 		ct.println("This is console output");
+		ct.setOutputFile("output.txt");
+		ct.println("This is file output also");
 		ct.print("Beginning of line");
 		ct.print(" - Middle - ");
 		ct.println("End");
@@ -66,6 +68,7 @@ class UserCode extends Code12Program
 				ct.println("Line " + i);
 			}
 		}
+      // ct.setOutputFile(null);
 
 		// Draw some circles
 		ball = ct.circle(x + 6, 15, 5);
@@ -172,7 +175,10 @@ class UserCode extends Code12Program
 	public void onMousePress( GameObj obj, double x, double y )
 	{
 		if (obj != null)
+		{
+			obj.xSpeed = .1;
 			ct.println( obj.toString() + " was clicked" );
+		}
 		else
 			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
 	}

@@ -37,7 +37,9 @@ class MathMiscTypeConversionTest extends Code12Program
    
    boolean allTestsPassed = true;
 
-   // PrintWriter writer;
+//    PrintWriter writer;
+// 	boolean fileOutputOn = false;
+// 	boolean testRandomIsUniform = false;
    int frameCount;
    int avgFrameCount;
    int start;
@@ -49,23 +51,18 @@ class MathMiscTypeConversionTest extends Code12Program
          
    public void start()
    {  
-      // ct.random( 100, 0 ); // Throws Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: bound must be positive   
+	   // ct.random( 100, 0 ); // Throws Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: bound must be positive   
                               //    	at java.util.Random.nextInt(Random.java:388)
 	                           //       at Code12.Game.random(Game.java:276)
-//       try
-//       {
-//          writer = new PrintWriter( "output.txt" );
-		ct.setOutputFile( "output.txt" );
-		
+//       if ( fileOutputOn )
+// 			initPrintWriter();
       ct.println( "Tests started" );
-      
       runTests_random( true );
       runTests_round( true );
       runTests_roundDecimal( true );
       runTests_isError( true );
       runTests_distance( true );
       runTests_getVersion( true );
-
       runTests_toInt( true );
       runTests_parseInt( true );
       runTests_canParseInt( true );
@@ -73,22 +70,12 @@ class MathMiscTypeConversionTest extends Code12Program
       runTests_canParseNumber( true );
       runTests_formatDecimal( true );
       runTests_formatInt( true );
-               
       ct.println( "Tests finished" );
-      
       if ( allTestsPassed )
-      {
-         ct.println( "All tests passed" );
-      }
-		ct.setOutputFile( null );
-//          writer.close(); 
-//       }
-//       catch(Exception e)
-//       {
-//          ct.println( "Error writing to output.txt" );
-//          ct.println( e.toString() );
-//       }
-		// init ct.getTimer() test
+      	print( "All tests passed" );
+// 		if ( fileOutputOn )
+//          writer.close();
+
       framesPerSecondText = ct.text( "", 5, 5, 5 );
       framesPerSecondText.align( "left" ); 
       
@@ -99,8 +86,7 @@ class MathMiscTypeConversionTest extends Code12Program
       startButton.align( "left" );
       startButton.clickable = true;
    
-      frameCount = 0;         
-      start = ct.getTimer();
+      initTests_getTimer( true );
    }
    
    public void update()
@@ -121,11 +107,30 @@ class MathMiscTypeConversionTest extends Code12Program
    
    // Utility functions 
    // -------------------------------------------------------------
-      
+//    public void initPrintWriter()
+// 	{
+// 		try
+//       {
+//          writer = new PrintWriter( "output.txt" );
+// 		}
+// 		catch(Exception e)
+//       {
+//          ct.println( "Error writing to output.txt" );
+//          ct.println( e.toString() );
+//       }
+// 	}
+	
+   public void print( String line )
+   {
+// 		if ( fileOutputOn )
+// 			writer.println( line );
+      ct.println( line );
+   }
+   
    public void printError( String error )
    {
       allTestsPassed = false;
-      ct.println( error );
+      print( error );
    }
    
    public void testRound( double d, int expected )
@@ -251,42 +256,45 @@ class MathMiscTypeConversionTest extends Code12Program
             for ( int min = -100; min <= 100; min++ )
             {
                int max = min + range;
-//                int[] observedFreq = new int[range + 1];
+// 	            int[] observedFreq = new int[range + 1];
                
                int randomMaxCount = 500;  // sample size for testing chi square tests
                
                for ( int count = 1; count <= randomMaxCount; count++ )
                {                
                   int rand = ct.random( min, max );
-//                   observedFreq[ rand - min ]++;
+//                  	observedFreq[ rand - min ]++;
    
                   // test if return value is between min and max
                   if ( rand < min || rand > max )
                      printError( "ct.random(" + min + "," + max + ") = " + rand );
                }
-               
-//                // test if return value is uniformly distributed (Chi Square test)
-//                double expectedFreq = (double)(randomMaxCount) / (range + 1);
-//                double chiSqr = 0;
-//                for ( int i = 0; i < range + 1; i++ )
-//                {
-//                   double dev = observedFreq[i] - expectedFreq;
-//                   chiSqr +=  dev * dev / expectedFreq;
-//                }
-//                double dof = randomMaxCount - 1;
-//                double pValue = Gamma.regularizedGammaQ(dof / 2, chiSqr / 2);
-//                chiSqrTestsDone++;
-//                
-//                if ( pValue < alpha )
-//                    chiSqrTestsFailed++;
+//                if ( testRandomIsUniform )
+// 					{
+// 	               // test if return value is uniformly distributed (Chi Square test)
+// 	               double expectedFreq = (double)(randomMaxCount) / (range + 1);
+// 	               double chiSqr = 0;
+// 	               for ( int i = 0; i < range + 1; i++ )
+// 	               {
+// 	                  double dev = observedFreq[i] - expectedFreq;
+// 	                  chiSqr +=  dev * dev / expectedFreq;
+// 	               }
+// 	               double dof = randomMaxCount - 1;
+// 	               double pValue = Gamma.regularizedGammaQ(dof / 2, chiSqr / 2);
+// 	               chiSqrTestsDone++;
+// 	               
+// 	               if ( pValue < alpha )
+// 	                   chiSqrTestsFailed++;
+// 					}
             }
          }
-         
-//          double fractionOfChiSqrTestsFailed = (double)(chiSqrTestsFailed) / chiSqrTestsDone;
-//          if ( fractionOfChiSqrTestsFailed > alpha )
-//             printError( "Fraction of Chi Square Tests Failed = " + fractionOfChiSqrTestsFailed + " (alpha = " + alpha + ")" );
-               
-         ct.println( "ct.random tests done" );
+//          if ( testRandomIsUniform )
+// 			{
+// 	         double fractionOfChiSqrTestsFailed = (double)(chiSqrTestsFailed) / chiSqrTestsDone;
+//          	if ( fractionOfChiSqrTestsFailed > alpha )
+//             	printError( "Fraction of Chi Square Tests Failed = " + fractionOfChiSqrTestsFailed + " (alpha = " + alpha + ")" );
+//          }      
+         print( "ct.random tests done" );
       }
    }
       
@@ -325,7 +333,7 @@ class MathMiscTypeConversionTest extends Code12Program
          testRound( -29979245.8, -29979246 );
          testRound( -299792458.0, -299792458 );
          
-         ct.println( "ct.round tests done" );
+         print( "ct.round tests done" );
       }
    }
 
@@ -333,16 +341,16 @@ class MathMiscTypeConversionTest extends Code12Program
    {
       if ( run )
       {         
-         // if digit in next place is a five, ct.roundDecimal( double d, int numPlaces ) rounds to nearest even digit in Java runtime
-         testRoundDecimal( 0.04, 1, 0.0 );
-         testRoundDecimal( -0.04, 1, 0.0 );
-         testRoundDecimal( -3.14, 1, -3.1 );
-         testRoundDecimal( -3.16, 1, -3.2 );
+         // if digit in next place is a five, ct.roundDecimal( double d, int numPlaces ) rounds to nearest even digit
+         testRoundDecimal( 0.05, 1, 0.0 );
+         testRoundDecimal( -0.05, 1, 0.0 );
+         testRoundDecimal( -3.15, 1, -3.2 );
+         testRoundDecimal( -3.25, 1, -3.2 );
          
          testRoundDecimal( 123.4, 0, 123.0 );
-         testRoundDecimal( 123.6, 0, 124.0 );
+         testRoundDecimal( 123.5, 0, 124.0 );
          testRoundDecimal( -123.4, 0, -123.0 );
-         testRoundDecimal( -123.6, 0, -124.0 );      
+         testRoundDecimal( -123.5, 0, -124.0 );      
          
          testRoundDecimal( 0.049, 1, 0.0 );
          testRoundDecimal( -0.049, 1, -0.0 );
@@ -375,7 +383,7 @@ class MathMiscTypeConversionTest extends Code12Program
          testRoundDecimal( -31.622776601683793319988935444327, 3, -31.623);
          testRoundDecimal( -31.622776601683793319988935444327, 29, -31.62277660168379331998893544433);
          
-         ct.println( "ct.roundDecimal tests done" );
+         print( "ct.roundDecimal tests done" );
       }
    }
 
@@ -390,7 +398,7 @@ class MathMiscTypeConversionTest extends Code12Program
          testIsError( Math.pow(-1, 0.5), "Math.pow(-1, 0.5)" );
          testIsError( Math.pow(-4, 0.25), "Math.pow(-4, 0.25)" );
          
-         ct.println( "ct.isError tests done" );
+         print( "ct.isError tests done" );
       }
    }
       
@@ -408,10 +416,19 @@ class MathMiscTypeConversionTest extends Code12Program
          testDistance( 5, 10, 5.1, 1010, 1000.000005 );
          testDistance( 7, 8, 7.0001, 8.0001, 0.000141421 );
          
-         ct.println( "ct.distance tests done" );
+         print( "ct.distance tests done" );
       }
    }
-      
+   
+   public void initTests_getTimer( boolean run )
+   {
+      if ( run )
+      { 
+         frameCount = 0;         
+         start = ct.getTimer();
+      }
+   }
+   
    public void runTests_getTimer( boolean run )
    {
       if ( run )
@@ -431,9 +448,9 @@ class MathMiscTypeConversionTest extends Code12Program
          {
             double sec = ( ct.getTimer() - timerStartTime ) / 1000.0;          
             int time = ct.toInt( sec );
-            int hrs = ct.intDiv(time, 3600);
+            int hrs = ct.intDiv( time, 3600 );
             time = time % 3600;
-            int min = ct.intDiv(time, 60);
+            int min = ct.intDiv( time, 60 );
             sec = sec - hrs * 3600 - min * 60;
             timeDisplay.setText( hrs + ":" + min + ":" + sec );
          }  
@@ -450,7 +467,7 @@ class MathMiscTypeConversionTest extends Code12Program
             allTestsPassed = false;
             printError( "ct.getVersion() = " + version + "; 0.5 expected" );
          }
-         ct.println( "ct.getVersion tests done" );
+         print( "ct.getVersion tests done" );
       }
    }
       
@@ -458,12 +475,12 @@ class MathMiscTypeConversionTest extends Code12Program
    {
       if ( run )
       {
-         for (int i = 0; i <= 1000; i++)
+         for (int i = 0; i <= 100000; i++)
          {
             testToInt( i, i );
-		     	testToInt( i / 10.0, ct.intDiv(i, 10) );
+		     	testToInt( i / 1000.0, ct.intDiv(i, 1000) );
          }
-         ct.println( "ct.toInt tests done" );
+         print( "ct.toInt tests done" );
       }
    }
       
@@ -488,7 +505,7 @@ class MathMiscTypeConversionTest extends Code12Program
          testParseInt( "8/2", 0 );
          testParseInt( "  + 4567 ", 0 );
                      
-         ct.println( "ct.parseInt tests done" );
+         print( "ct.parseInt tests done" );
       }
    }
       
@@ -515,7 +532,7 @@ class MathMiscTypeConversionTest extends Code12Program
          testCanParseInt( "1 + sqrt(2)", false );
          testCanParseInt( "Math.PI", false );
 
-         ct.println( "ct.canParseInt tests done" );
+         print( "ct.canParseInt tests done" );
       }
    }
    
@@ -537,9 +554,9 @@ class MathMiscTypeConversionTest extends Code12Program
          testParseNumber( "3.14159 ", 3.14159 );
          testParseNumber( "+1.618033989", 1.618033989 );
          testParseNumber( "-0.618033989", -0.618033989 );
-         testParseNumber( ".123456", .123456 );
-         testParseNumber( "+.123456", .123456 );
-         testParseNumber( "-.123456", -.123456 );
+         testParseNumber( ".123456", 0.123456 );
+         testParseNumber( "+.123456", 0.123456 );
+         testParseNumber( "-.123456", -0.123456 );
          testParseNumber( "  987654.321   ", 987654.321 );
          
          // test invalid input
@@ -553,7 +570,7 @@ class MathMiscTypeConversionTest extends Code12Program
          testParseNumberError( "0xFFFF00" );
          testParseNumberError( "" );
          
-         ct.println( "ct.parseNumber tests done" );
+         print( "ct.parseNumber tests done" );
       }
    }
    
@@ -589,7 +606,7 @@ class MathMiscTypeConversionTest extends Code12Program
          testCanParseNumber( "0xFFFF00" , false );
          testCanParseNumber( "" , false );
 
-         ct.println( "ct.canParseNumber tests done" );
+         print( "ct.canParseNumber tests done" );
       }
    }
    
@@ -644,13 +661,12 @@ class MathMiscTypeConversionTest extends Code12Program
 //          testFormatDecimalNumPlaces( -0.618033989, -1, "-1.0" );
 //          testFormatDecimalNumPlaces( 123.123, -2, "123.0" );
 //          testFormatDecimalNumPlaces( 12345.12345, -3, "12345.0" );
-   
          
-         ct.println( "ct.formatDecimal tests done" );
+         print( "ct.formatDecimal tests done" );
       }
    }
    
- public void runTests_formatInt( boolean run )
+   public void runTests_formatInt( boolean run )
    {
       if ( run )
       {
@@ -680,7 +696,7 @@ class MathMiscTypeConversionTest extends Code12Program
 //          testFormatIntNumPlaces( Integer.MIN_VALUE, 10, "-2147483648" ); // Min int value
 //          testFormatIntNumPlaces( Integer.MIN_VALUE, 20, "-0000000002147483648" );
 
-         ct.println( "ct.formatInt tests done" );
+         print( "ct.formatInt tests done" );
       }
    }
 }

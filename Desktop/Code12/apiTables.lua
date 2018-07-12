@@ -12,6 +12,8 @@ return {
         ["println"] = { vt = false, min = 0, params = {{ name = "value", vt = nil}} },
         ["log"] = { vt = false, variadic = true, params = {{ name = "values", vt = nil}} },
         ["logm"] = { vt = false, variadic = true, params = {{ name = "message", vt = "String"},{ name = "values", vt = nil}} },
+        ["setOutputFile"] = { vt = false, params = {{ name = "filename", vt = "String"}} },
+        ["setoutputfile"] = "setOutputFile",
         ["showAlert"] = { vt = false, params = {{ name = "message", vt = "String"}} },
         ["showalert"] = "showAlert",
         ["inputInt"] = { vt = 0, params = {{ name = "message", vt = "String"}} },

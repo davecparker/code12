@@ -47,7 +47,7 @@ public class DuckHunt extends Code12Program
       
       // Make ducksHitDisplay
       double scoreHeight = 5;
-      String scoreColor = "dark majenta";
+      String scoreColor = "dark magenta";
       ducksHitDisplay = ct.text( "Ducks hit: ", 0, yMax, scoreHeight, scoreColor );
       ducksHitDisplay.align( "bottom left", true );
       

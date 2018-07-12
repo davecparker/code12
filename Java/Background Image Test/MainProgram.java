@@ -22,12 +22,12 @@ class MainProgram extends Code12Program
    
    public void update()
    {  
-//       frameCount++;
-//       if ( image.width > 10 && frameCount % 10 == 1)
-//       {
-//          image.width -= 1;
-//          image.height -= 1;
-//       }
+      frameCount++;
+      if ( image.width > 10 && frameCount % 10 == 1)
+      {
+         image.width -= 1;
+         image.height -= 1;
+      }
          if (image.x > 100)
          {
             image.x = 0;

@@ -1,0 +1,18 @@
+This is file output also
+Beginning of line - Middle - End
+This
+is
+multiple
+lines of text
+Here's a blank line:
+
+And another:
+
+Here's an unitialized GameObj: null
+Done
+Hello Dave
+[image at (50, 50) "goldfish.png"] was clicked
+[image at (58, 50) "goldfish.png"] was clicked
+[image at (66, 50) "goldfish.png"] was clicked
+[image at (72, 50) "goldfish.png"] was clicked
+Long key
