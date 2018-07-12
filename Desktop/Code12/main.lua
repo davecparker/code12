@@ -406,12 +406,7 @@ local function showError()
 	-- Set the error text
 	local errRecord = err.getErrRecord()
 	print( "\n" .. errRecord.strErr )
-	local strDisplay = errRecord.strErr
-	if errRecord.strLevel then
-		print( errRecord.strLevel )
-		strDisplay = strDisplay .. "\n" .. errRecord.strLevel
-	end
-	errGroup.errText.text = strDisplay
+	errGroup.errText.text = errRecord.strErr
 
 	-- Load the source lines around the error
 	local iLine = errRecord.loc.first.iLine   -- main error location
@@ -433,14 +428,30 @@ local function showError()
 		lineNum = lineNum + 1
 	end
 
-	-- Position the main highlight  TODO: handle multi-line
+	-- Position the main highlight
 	local dxChar = app.consoleFontCharWidth
 	local dxExtra = 2   -- extra pixels of highlight horizontally
 	local r = errGroup.sourceRect
-	r.x = (errRecord.loc.first.iChar - 1) * dxChar - dxExtra
-	local numChars = string.len( sourceFile.strLines[errRecord.loc.first.iLine] or "" )
-	if errRecord.loc.last then
-		numChars = errRecord.loc.last.iChar - errRecord.loc.first.iChar + 1 
+	local loc = errRecord.loc
+	r.x = (loc.first.iChar - 1) * dxChar - dxExtra
+	r.height = app.consoleFontHeight
+	local numChars = string.len( sourceFile.strLines[loc.first.iLine] or "" )
+	if loc.last == nil then
+		-- Entire (single) line
+	elseif loc.first.iLine == loc.last.iLine then
+		-- Portion of a single line
+		numChars = loc.last.iChar - loc.first.iChar + 1
+	else
+		-- Multi-line. Make a rectangle bounding it all. 
+		-- TODO: Is this good enough or do we need multiple rects?
+		r.x = 0
+		for iLineNext = loc.first.iLine + 1, loc.last.iLine do
+			local numCharsNext = string.len( sourceFile.strLines[iLineNext] or "" )
+			if numCharsNext > numChars then
+				numChars = numCharsNext
+			end
+			r.height = r.height + app.consoleFontHeight
+		end
 	end
 	r.width = numChars * dxChar + dxExtra * 2
 
