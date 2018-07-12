@@ -191,12 +191,6 @@ end
 
 -- API
 function ct.setBackColor(colorName, ...)
-	-- Check parameters
-	colorName = colorName or ""
-	if g.checkAPIParams("ct.setBackColor") then
-		g.check1Param("string", colorName, ...)
-	end
-
 	-- Delete previous background object if any
 	local backObj = g.screen.backObj
 	if backObj then
@@ -204,12 +198,22 @@ function ct.setBackColor(colorName, ...)
 		g.screen.backObj = nil
 	end
 
+	-- Check parameters
+	if colorName == nil then
+		return
+	end
+	if g.checkAPIParams("ct.setBackColor") then
+		g.check1Param("string", colorName, ...)
+	end
+
 	-- Make a rect big enough to cover the screen without needing to scale it
 	backObj = GameObj:newRect(g.screen.group, 0, 0, 100000, 100000, colorName)
-	backObj.updateBackObj = function (gameObj, scale) end
+	backObj.updateBackObj = function () end
+	local obj = backObj._code12.obj
+	obj:addEventListener("touch", g.onTouchBackObj)
 
 	-- Put the rect behind the objs layer in the screen group
-	backObj._code12.obj:toBack()
+	obj:toBack()
 	g.screen.backObj = backObj
 end
 
@@ -230,24 +234,25 @@ end
 
 -- API
 function ct.setBackImage(filename, ...)
-	-- Check parameters
-	filename = filename or ""
-	if g.checkAPIParams("ct.setBackImage") then
-		g.check1Param("string", filename, ...)
-	end
-
 	-- Delete previous background object if any
 	local backObj = g.screen.backObj
 	if backObj then
 		backObj:delete()
 		g.screen.backObj = nil
 	end
-	if filename == "" then
+
+	-- Check parameters
+	if filename == nil or filename == "" then
 		return
+	end
+	if g.checkAPIParams("ct.setBackImage") then
+		g.check1Param("string", filename, ...)
 	end
 
 	-- Make an image object with temporary position and size for now
 	backObj = GameObj:newImage(g.screen.group, filename, 0, 0, g.WIDTH)
+	local img = backObj._code12.obj
+	img:addEventListener("touch", g.onTouchBackObj)
 
 	-- Install special update method to position and crop properly
 	backObj.updateBackObj = 
@@ -260,7 +265,7 @@ function ct.setBackImage(filename, ...)
 				obj.y = (g.height / 2) * scale
 
 				-- Use as much of the image as possible while filling 
-            	-- the window and retaining the image aspect ratio.
+				-- the window and retaining the image aspect ratio.
 				local aspect = obj.width / obj.height
 				if aspect > (g.WIDTH / g.height) then
 					obj.width = g.height * aspect * scale
@@ -272,7 +277,7 @@ function ct.setBackImage(filename, ...)
 			end
 
 	-- Put the image behind the objs layer in the screen group
-	backObj._code12.obj:toBack()
+	img:toBack()
 	g.screen.backObj = backObj
 end
 

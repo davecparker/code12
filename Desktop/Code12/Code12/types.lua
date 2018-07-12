@@ -26,60 +26,68 @@ end
 
 -- API
 function ct.parseInt(s, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.parseInt") then
-		g.check1Param("string", s, ...)
-	end
+	if s ~= nil then
+		-- Check parameters
+		if g.checkAPIParams("ct.parseInt") then
+			g.check1Param("string", s, ...)
+		end
 
-	-- Try to convert string to integer
-	local i = tonumber(s)
-	if i and i == math.round(i) then
-		return i
+		-- Try to convert string to integer
+		local i = tonumber(s)
+		if i and i == math.round(i) then
+			return i
+		end
 	end
 	return 0   -- failure
 end
 
 -- API
 function ct.canParseInt(s, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.canParseInt") then
-		g.check1Param("string", s, ...)
-	end
+	if s ~= nil then
+		-- Check parameters
+		if g.checkAPIParams("ct.canParseInt") then
+			g.check1Param("string", s, ...)
+		end
 
-	-- See if we can convert string to number
-	local i = tonumber(s)
-	if i and i == math.round(i) then
-		return true
+		-- See if we can convert string to number
+		local i = tonumber(s)
+		if i and i == math.round(i) then
+			return true
+		end
 	end
 	return false
 end
 
 -- API
 function ct.parseNumber(s, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.parseNumber") then
-		g.check1Param("string", s, ...)
-	end
+	if s ~= nil then
+		-- Check parameters
+		if g.checkAPIParams("ct.parseNumber") then
+			g.check1Param("string", s, ...)
+		end
 
-	-- Try to convert string to number
-	local x = tonumber(s)
-	if x then
-		return x
+		-- Try to convert string to number
+		local x = tonumber(s)
+		if x then
+			return x
+		end
 	end
 	return (0 / 0)   -- NaN indicates failure
 end
 
 -- API
 function ct.canParseNumber(s, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.canParseNumber") then
-		g.check1Param("string", s, ...)
-	end
+	if s ~= nil then
+		-- Check parameters
+		if g.checkAPIParams("ct.canParseNumber") then
+			g.check1Param("string", s, ...)
+		end
 
-	-- See if we can convert string to number
-	local x = tonumber(s)
-	if x then
-		return true
+		-- See if we can convert string to number
+		local x = tonumber(s)
+		if x then
+			return true
+		end
 	end
 	return false
 end

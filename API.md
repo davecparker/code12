@@ -4,7 +4,7 @@ The design of the Code 12 API is (c)Copyright 2018 by David C. Parker.
 
 ##### Global (ct) APIs
 * [Text Output](#text-output)
-* [Text Input](#text-input)
+* [Alerts and Input Dialogs](#alerts-and-input-dialogs)
 * [Screen Management](#screen-management)
 * [GameObj Creation](#gameobj-creation)
 * [Mouse and Keyboard Input](#mouse-and-keyboard-input)
@@ -71,48 +71,81 @@ Print the `message` followed by a space,
 then print any number of values to the console.
 The values are output in the same way as `ct.logm()` (see above).
 
+### ct.setOutputFile()
+```
+ct.setOutputFile( String filename )
+```
+If you call `ct.setOutputFile()`, then any subsequent text output
+from `ct.print()`, `ct.println()`, `ct.log()`, and `ct.logm()` will be 
+written to a text file named `filename` in addition to being displayed
+in the console window. Call `ct.setOutputFile( null )` to restore output
+to appearing in the console only.
+
+The `filename` should be a simple filename such as `"output.txt"`,
+which will be written to the same folder as the source code file, or a
+relative path starting from the source code folder, such as
+`"output/nameList.txt"`.
+
+> If there is an existing file named `filename` then it will be deleted
+> and written over. Note that each time you run your program and call 
+> `ct.setOutputFile()` to a certain filename, it will overwrite the
+> previous file. 
+
 _____________________________________________________________________
-Text Input
-----------
+Alerts and Input Dialogs
+------------------------
+
+### ct.showAlert()
+```
+ct.showAlert( String message )
+```
+Display `message` in a popup alert dialog. 
+Execution of the program will pause and wait for the user to press
+the OK button on the dialog or press the Enter key on the keyboard.
+
+> The `message` can contain line breaks by embedding 
+> newline (`\n`) characters in the string.
 
 ### ct.inputInt()
 ```
 int ct.inputInt( String message )
 ```
-If `message` is not null then print it to the console followed by a space.
-Then, accept input from the console until a newline is entered.
-Attempt to parse the input as an integer.
-If a valid integer is input then return the integer,
-otherwise return 0.
+Display `message` in a popup dialog box that allows the user to
+enter a number.
+Execution of the program will pause and wait until the user
+enters a valid integer. The resulting integer value is returned.
 
 ### ct.inputNumber()
 ```
 double ct.inputNumber( String message )
 ```
-If `message` is not null then print it to the console followed by a space.
-Then, accept input from the console until a newline is entered.
-Attempt to parse the input as a number.
-If a valid number is input then return the number,
-otherwise return an error value (NaN).
-You can test for an error value using `ct.isError()`.
+Display `message` in a popup dialog box that allows the user to
+enter a number.
+Execution of the program will pause and wait until the user
+enters a valid number. The resulting numeric value is returned.
 
-### ct.inputBoolean()
+### ct.inputYesNo()
 ```
-boolean ct.inputBoolean( String message )
+boolean ct.inputYesNo( String message )
 ```
-If `message` is not null then print it to the console followed by a space.
-Then, accept input from the console until a newline is entered.
-If the first non-blank character of the input is
-'y', 'Y', 't', 'T', or 1 (yes, true, or 1), then return true,
-otherwise return false.
+Display `message` in a popup dialog box that has two buttons
+labelled Yes and No.
+Execution of the program will pause and wait until the user
+presses one of the buttons. The function returns `true` if the
+user presses Yes and `false` if they press No.
 
 ### ct.inputString()
 ```
 String ct.inputString( String message )
 ```
-If `message` is not null then print it to the console followed by a space.
-Then, accept input from the console until a newline is entered.
-Return the entire input as a String.
+Display `message` in a popup dialog box that allows the user to
+enter a text string.
+Execution of the program will pause and wait until the user
+presses the Enter key to end the text input. 
+The resulting String value is returned.
+
+> If the user presses the Enter key without entering any other
+> characters, then an empty string (`""`) will be returned.
 
 _____________________________________________________________________
 Screen Management
@@ -410,6 +443,22 @@ will detect any time that the given character is typed.
 _____________________________________________________________________
 Audio
 -----
+### ct.loadSound()
+```
+boolean ct.loadSound( String filename )
+```
+You can call `ct.loadSound` to pre-load the sound effect in the sound file 
+`filename`, so that it will play quickly when `ct.sound( filename )` is 
+called. Loading sounds before playing them is optional, but it reduces the
+slight delay that occurs the first time a certain sound is played. 
+
+This function returns `true` if the sound was successfully loaded,
+or `false` if the filename could not be found or is not a supported 
+sound format.
+
+> You will typically want to call `ct.loadSound` in your `start` function
+> once for each sound that you want pre-loaded.
+
 ### ct.sound()
 ```
 ct.sound( String filename )
@@ -417,16 +466,12 @@ ct.sound( String filename )
 Play the sound effect in the sound file `filename`.
 
 > Only standard formats of WAV sounds are reliable on all platforms,
-> although other platforms may support MP3 and others.
+> although most platforms will support MP3 also.
 
-> The sound starts playing, `ct.sound()` returns immediately,
-> then the sound continues to play in another thread.
-> Playing another sound while the first sound is still playing
-> may result in mixing the two sounds. However, some platforms
-> may not implement sound mixing, in which case attempting to play
-> a sound while another sound is playing will be ignored.
+> You can use `ct.loadSound` to reduce the short delay that might occur
+> the first time a certain sound is played.
 
-### ct.setVolume()
+### ct.setSoundVolume()
 ```
 ct.setSoundVolume( double volume )
 ```
@@ -447,13 +492,14 @@ Return a random integer from `min` to `max` (inclusive).
 ### ct.round()
 ```
 int ct.round( double d )
-double ct.round( double d, int numPlaces )
 ```
-If `numPlaces` is included, then return the number `d` rounded to
-that number of decimal places.
+Return the number `d` rounded to the nearest integer.
 
-If `numPlaces` is not included, then return the number `d` rounded to
-the nearest integer.
+### ct.roundDecimal()
+```
+double ct.roundDecimal( double d, int numPlaces )
+```
+Return the number `d` rounded to `numPlaces` decimal places.
 
 ### ct.intDiv()
 ```
@@ -468,7 +514,7 @@ a large negative integer if n < 0, and 0 if n is 0.
 ```
 boolean ct.isError( double d )
 ```
-Return `true` if the value of `d` is an error value (NaN or Infinity).
+Return `true` if the value of `d` is an error value (NaN = "Not a Number").
 
 ### ct.distance()
 ```
@@ -706,7 +752,7 @@ then the object will be automatically deleted if it moves off-screen
 String group
 ```
 The `group` field is an optional name that you can assign to an object
-that will cause the function `ct.deleteGroup()` to delete all objects with
+that will cause the function `ct.clearGroup()` to delete all objects with
 the matching group name. The default group name of an object is ""
 (empty string)
 
@@ -773,8 +819,9 @@ obj.setSize( double width, double height )
 ```
 Set the size of the object using `width` and `height`.
 This is just a convenience method that is equivalent to
-setting both the `width` and `height` fields
-(see [width, height](#width-height) above).
+setting both the `width` and `height` fields.
+Note that different types of objects react differently to changes
+in width or height. (see [width, height](#width-height) above).
 
 ### obj.align()
 ```

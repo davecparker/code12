@@ -1,83 +1,89 @@
 // Code 12 API Summary
 //====================
 
-// Text Output
-//------------
-void ct.print( Object value )       // any type, no newline added
-void ct.println( Object value )     // any type (param required), newline at end
-void ct.println( )                  // just a newline
-void ct.log( Object values )        // values delimited and strings quoted
-void ct.logm( String message, Object values)    // log with unquoted message
+class ct
+{
+	// Text Output
+	//------------
+	void print( Object value )       // any type, no newline added
+	void println( Object value )     // any type (param required), newline at end
+	void println( )                  // just a newline
+	void log( Object values )        // values delimited and strings quoted
+	void logm( String message, Object values)    // log with unquoted message
+	void setOutputFile( String filename )        // where to echo print and log output 
 
-// Text Input
-//-----------
-int ct.inputInt( String message )            // 0 if not an integer
-double ct.inputNumber( String message )      // Nan if not a number
-boolean ct.inputBoolean( String message )    // true iff starts with 'y', 't' or '1'
-String ct.inputString( String message )      // until end of line
+	// Alerts and Input Dialogs
+	//-------------------------
+	void showAlert( String message ) 
+	int inputInt( String message )
+	double inputNumber( String message )
+	boolean inputYesNo( String message )
+	String inputString( String message )
 
-// Screen Management
-//------------------
-void ct.setTitle( String title )
-void ct.setHeight( double height )   // on mobile just determines landscape vs. portrait
-double ct.getWidth( )                // always 100.0
-double ct.getHeight( )               // default 100.0
-double ct.getPixelsPerUnit()         // scale factor to convert coordinate units to pixels
-String ct.getScreen( )
-void ct.setScreen( String name )
-void ct.clearScreen( )
-void ct.clearGroup( String group )
-void ct.setBackColor( String color )
-void ct.setBackColorRGB( int red, int green, int blue )
-void ct.setBackImage( String filename )
+	// Screen Management
+	//------------------
+	void setTitle( String title )
+	void setHeight( double height )   // on mobile just determines landscape vs. portrait
+	double getWidth( )                // always 100.0
+	double getHeight( )               // default 100.0
+	double getPixelsPerUnit()         // scale factor to convert coordinate units to pixels
+	String getScreen( )
+	void setScreen( String name )
+	void clearScreen( )
+	void clearGroup( String group )
+	void setBackColor( String color )
+	void setBackColorRGB( int red, int green, int blue )
+	void setBackImage( String filename )
 
-// GameObj Creation
-//-----------------
-GameObj ct.circle( double x, double y, double diameter )
-GameObj ct.circle( double x, double y, double diameter, String color )
-GameObj ct.rect( double x, double y, double width, double height )
-GameObj ct.rect( double x, double y, double width, double height, String color )
-GameObj ct.line( double x1, double y1, double x2, double y2 )
-GameObj ct.line( double x1, double y1, double x2, double y2, String color )
-GameObj ct.text( String s, double x, double y, double height )
-GameObj ct.text( String s, double x, double y, double height, String color )
-GameObj ct.image( String filename, double x, double y, double width )
+	// GameObj Creation
+	//-----------------
+	GameObj circle( double x, double y, double diameter )
+	GameObj circle( double x, double y, double diameter, String color )
+	GameObj rect( double x, double y, double width, double height )
+	GameObj rect( double x, double y, double width, double height, String color )
+	GameObj line( double x1, double y1, double x2, double y2 )
+	GameObj line( double x1, double y1, double x2, double y2, String color )
+	GameObj text( String s, double x, double y, double height )
+	GameObj text( String s, double x, double y, double height, String color )
+	GameObj image( String filename, double x, double y, double width )
 
-// Mouse and Keyboard Input
-//-------------------------
-boolean ct.clicked( )
-double ct.clickX( )
-double ct.clickY( )
-boolean ct.keyPressed( String keyName )
-boolean ct.charTyped( String ch )
+	// Mouse and Keyboard Input
+	//-------------------------
+	boolean clicked( )
+	double clickX( )
+	double clickY( )
+	boolean keyPressed( String keyName )
+	boolean charTyped( String ch )
 
-// Audio
-//------
-void ct.sound( String filename )
-void ct.setSoundVolume( double volume )
+	// Audio
+	//------
+	boolean loadSound( String filename )
+	void sound( String filename )
+	void setSoundVolume( double volume )
 
-// Math and Misc.
-//---------------
-int ct.random( int min, int max )
-int ct.round( double d )
-double ct.roundDecimal( double d, int numPlaces )
-int ct.intDiv( int n, int d )
-boolean ct.isError( double d )
-double ct.distance( double x1, double y1, double x2, double y2 )
-int ct.getTimer( )
-double ct.getVersion( )
+	// Math and Misc.
+	//---------------
+	int random( int min, int max )
+	int round( double d )
+	double roundDecimal( double d, int numPlaces )
+	int intDiv( int n, int d )
+	boolean isError( double d )
+	double distance( double x1, double y1, double x2, double y2 )
+	int getTimer( )
+	double getVersion( )
 
-// Type Conversion
-//----------------
-int ct.toInt( double d )                // truncates
-int ct.parseInt( String s )             // 0 if failure
-boolean ct.canParseInt( String s )
-double ct.parseNumber( String s )       // NaN if failure
-boolean ct.canParseNumber( String s )
-String ct.formatDecimal( double d )
-String ct.formatDecimal( double d, int numPlaces )
-String ct.formatInt( int i )
-String ct.formatInt( int i, int numDigits )    // uses leading 0's
+	// Type Conversion
+	//----------------
+	int toInt( double d )                // truncates
+	int parseInt( String s )             // 0 if failure
+	boolean canParseInt( String s )
+	double parseNumber( String s )       // NaN if failure
+	boolean canParseNumber( String s )
+	String formatDecimal( double d )
+	String formatDecimal( double d, int numPlaces )
+	String formatInt( int i )
+	String formatInt( int i, int numDigits )    // uses leading 0's
+}
 
 class GameObj
 {
@@ -90,7 +96,7 @@ class GameObj
 	boolean visible;
 	boolean clickable;
 	boolean autoDelete;      // auto delete if it goes from on to off-screen
-	String group;            // for ct.deleteGroup(), default ""
+	String group;            // for ct.clearGroup(), default ""
 
 	// GameObj Methods
 	// ---------------

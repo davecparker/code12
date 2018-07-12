@@ -3,32 +3,86 @@ package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Cod
 require('Code12.api')
     
     -- instance variables
-    this.ball = nil; this.bigBall = nil; 
+    this.fish = nil; this.ball = nil; this.bigBall = nil; 
+    this.moreBalls = { length = 10, default = nil }
     -- GameObj tooSoon = ct.circle(50, 50, 50);
     this.count = 0; this.total = 0; 
     this.gameOver = false
     this.LIMIT = 120
     -- int count = 5;
     this.speed = 0.3
+    this.frameCount = 0
+    this._function = "Test"
     
-    function start()
+    
+        
+        
+    
+    
+    function _fn.start()
         
         -- int oops = count;
         -- double nope = ball.x;
+        -- ct.circle(50, 50, LIMIT);
         local x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0
         local xInt = ct.toInt(x)
         local name = "Dave" .. " " .. "Parker"
-        local done = false; 
+        local done = false; local _end = false; 
+        -- boolean _end = false;
+        -- int $java = 5;
+        _end = true
+        
+        
+        local nums = { length = 10, default = 0 }
+        -- nums[10] = 4;
+        -- ct.println( nums[10] );
+        
+        -- Try some console output
+        ct.println(this._function)
+        ct.println("This is the default Code12 test app")
+        ct.println("This is console output")
+        ct.setOutputFile("output.txt")
+        ct.println("This is file output also")
+        ct.print("Beginning of line")
+        ct.print(" - Middle - ")
+        ct.println("End")
+        ct.print("This\nis\nmultiple\nlines")
+        ct.print(" of text")
+        ct.println( "" )
+        ct.println("Here's a blank line:")
+        ct.print("\n")
+        ct.print("And another:")
+        ct.println("\n")
+        ct.print("Here's an unitialized GameObj: ")
+        ct.println(ct.indexArray(this.moreBalls, 3))
+        ct.println("Done")
+        ct.showAlert("Hey, this is an alert.\nThis is the second line.")
+        local userName = ct.inputString("Enter your name")
+        ct.println("Hello " .. userName)
+        local test = ct.inputYesNo("Would you like to print some lines?")
+        if test then
+            
+            this.count = ct.inputInt("Enter number of lines to print")
+            local i = 1; while i <= this.count do
+                
+                ct.println("Line " .. i)
+            i = i + 1; end
+        end
+        -- ct.setOutputFile(null);
         
         -- Draw some circles
         this.ball = ct.circle(x + 6, 15, 5)
         ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5)
         this.bigBall = ct.circle(x, 80, 40)
-        this.bigBall:setFillColorRGB(400, 127, -50)
+        -- bigBall.setFillColorRGB(400, 127, -50);
+        this.bigBall:setFillColor(nil)
         this.bigBall.clickable = true
         
         -- Add a fish
-        ct.image("goldfish.png", 50, 50, 15)
+        this.fish = ct.image("goldfish.png", 50, 50, 15)
+        this.fish.clickable = true
+        local filename = nil
+        -- ct.image(filename, 50, 20, 15);
         
         -- Make a line
         local line1 = ct.line(20, 80, 80, 80, "red")
@@ -45,14 +99,19 @@ require('Code12.api')
         --double notOK2 = x / 3;
     end
     
-    function update()
+    function _fn.update()
         
         local factor = 2
         local name = nil; 
         local tooFast = false; local tooSlow = false; 
         
+        -- frameCount++;
+        -- if (frameCount < 100)
+        --     ct.println(ct.getTimer());
+        
         -- Move ball
         local xNew = _fn.moveBall(true)
+        xNew = xNew + 1
         _fn.moveBall(false)
         
         -- Move bigBall
@@ -72,6 +131,26 @@ require('Code12.api')
             
             local localX = 3
         end
+        
+        -- Check for keys
+        if ct.keyPressed("enter") then
+            ct.println("Enter key pressed"); 
+        elseif ct.keyPressed("backspace") then
+            ct.println("Backspace key pressed"); end
+        
+        -- Some keys trigger sounds
+        if ct.charTyped("L") and ct.loadSound("launch.wav") then
+            ct.println("Launch sound loaded"); end
+        if ct.charTyped("l") then
+            ct.sound("launch.wav"); end
+        if ct.charTyped("P") and ct.loadSound("pop.wav") then
+            ct.println("Pop sound loaded"); end
+        if ct.charTyped("p") then
+            ct.sound("pop.wav"); end
+        
+        -- Check for fish click
+        if this.fish:clicked() then
+            ct.inputYesNo("Continue?"); end
     end
     
     -- Move the ball
@@ -90,13 +169,16 @@ require('Code12.api')
         
         this.ball.x = this.ball.x - 1
         this.ball.x = this.ball.x + 1
-        return this.ball.x
+        return ct.round(this.ball.x)
     end
     
-    function onMousePress(obj, x, y)
+    function _fn.onMousePress(obj, x, y)
         
         if obj ~= nil then
-            ct.println(obj:toString() .. " was clicked"); 
+            
+            obj.xSpeed = .1
+            ct.println(obj:toString() .. " was clicked")
+        
         else 
             ct.println("Mouse was pressed at (" .. x .. ", " .. y .. ")"); end
     end
@@ -123,33 +205,56 @@ require('Code12.api')
         
         until not (this.speed < 2)
         
-        local scores = { length = 10 }
+        local scores = { length = 10, default = 0 }
+        local questions = { length = 20, default = false }
+        local strings = { length = 5, default = nil }
         
-        local counts = { 2, 4, 5 + 6, 3, length = 4 }
-        local c = counts[1+(0)]
+        local counts = { 2, 4, 5 + 6, 3, length = 4, default = 0 }
+        local c = ct.indexArray(counts, 0)
         
         local sum = 0
-        for cnt in ipairs(counts) do
+        for _, cnt in ipairs(counts) do
             sum = sum + (cnt); end
         
-        for score in ipairs(scores) do
+        for _, score in ipairs(scores) do
             
             sum = sum + (ct.toInt(score))
         end
         
-        while true do
-            
-            sum = sum + (counts[1+(c)])
-        end
+        --         for (;;)
+        --         {
+        --             sum += counts[c];
+        --         }
         
         local i = 0; while i < counts.length do
-            sum = sum + (counts[1+(i)]); i = i + 1; end
+            sum = sum + (ct.indexArray(counts, i)); i = i + 1; end
         
-        local aTest = nil
-        aTest = { length = 10 }
+        local aTest = nil; 
+        aTest = { length = 10, default = 0 }
+        local as = nil; local bs = nil; local cs = nil; 
+        
+        as = { length = 10, default = nil }
+        local myX = ct.indexArray(as, 4).x
+        ct.checkArrayIndex(as, sum - 1); as[1+(sum - 1)].y = myX
+        as = _fn.makeCircles()
+        
+        -- int [] ai = { 1, 2, 3.3 };
+        local ad = { 1.1, 2.2, 0, length = 3, default = 0 }
+        
+        _fn._local()
     end
     
-    function onKeyPress(key)
+    function _fn._local()
+        
+    end
+    
+    function _fn.makeCircles()
+        
+        local circles = { length = 10, default = nil }
+        return circles
+    end
+    
+    function _fn.onKeyPress(key)
         
         if (key == "b") then
             ct.println("b was pressed"); 
@@ -157,8 +262,8 @@ require('Code12.api')
             ct.println("Long key"); end
         
         local s = "  Dave "
-        ct.println(ct.stringCompare(s, "Parker"))
-        ct.log(s, ct.trimString(s), string.upper(s), ct.substring(s, 2), ct.substring(s, 2, 6), ct.indexOfString(s, "D"))
+        -- ct.println(s.compareTo("Parker"));
+        -- ct.log(s, s.trim(), s.toUpperCase(), s.substring(2), s.substring(2, 6), s.indexOf("D"));
         
         -- Some common errors:
         -- if (speed = 0)

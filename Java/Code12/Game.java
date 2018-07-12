@@ -6,6 +6,7 @@ import java.util.*;
 import java.awt.font.FontRenderContext;
 import java.awt.event.*;
 import java.io.*;
+import javax.swing.JOptionPane;
 
 
 // A game where objects can be created and modified
@@ -22,8 +23,8 @@ public class Game implements GameInterface
    double heightL;                       // logical height
    double scaleLToP;                     // scale factor for logical to pixel
    long startTimeMs;                     // system millisecond count at start of game
-   Scanner consoleScanner;               // for inputXXX methods
    Random randomGenerator;               // for random method
+   PrintWriter printWriter;              // file to echo text output to or null if none
    GameInput input;                      // helper class to implement mouse and key input
    GameAudio audio;                      // helper class to implement audio
    HashMap<String, GameScreen> screens;  // set of named screens
@@ -39,7 +40,7 @@ public class Game implements GameInterface
       this.window = window;
       setPixelSize(widthP, heightP);   // calculates heightL and scaleLToP
       startTimeMs = 0;                 // set for real when game timer starts
-      consoleScanner = new Scanner(System.in);
+      printWriter = null;
       randomGenerator = new Random(System.currentTimeMillis());
       input = new GameInput(this);
       audio = new GameAudio(this);
@@ -63,9 +64,26 @@ public class Game implements GameInterface
 
    //================ Text Output API ===================
 
-   public void print(Object obj)      { System.out.print(obj); }
-   public void println(Object obj)    { System.out.println(obj); }
-   public void println()              { System.out.println(); }
+   public void print(Object obj)
+   { 
+      System.out.print(obj);
+      if (printWriter != null)
+         printWriter.print(obj);
+   }
+   
+   public void println(Object obj)
+   { 
+      System.out.println(obj);
+      if (printWriter != null)
+         printWriter.println(obj);
+   }
+   
+   public void println()
+   {
+      System.out.println();
+      if (printWriter != null)
+         printWriter.println();
+   }
 
    public void log(Object... objs)     
    {
@@ -76,53 +94,97 @@ public class Game implements GameInterface
          while (i < objs.length - 1)   // not including last one
          {
             logValue(objs[i]);
-            System.out.print(", ");
+            print(", ");
             i++;
          }
          logValue(objs[i]);   // last one without comma
       }  
-      System.out.println();   // newline at the very end
+      println();   // newline at the very end
    }
    
    public void logm(String message, Object... objs)     
    {
-      System.out.print(message);
-      System.out.print(" ");
+      print(message);
+      print(" ");
       log(objs);
+   }
+   
+   public void setOutputFile(String filename)
+   {
+      // Close existing file, if any
+      if (printWriter != null)
+      {
+         printWriter.close();
+         printWriter = null;
+      }
+      
+      // Open the new file
+      if (filename != null)
+      {
+         try
+         {
+            printWriter = new PrintWriter(filename);
+         }
+         catch (Exception ex)
+         {
+            logError("Cannot open output file", filename);
+         }
+      }
    }
 
 
    //================ Text Input API ===================
 
+   public void showAlert(String message)
+   {
+      JOptionPane.showMessageDialog(window, message,
+            window.getTitle(), JOptionPane.INFORMATION_MESSAGE);
+   }
+   
    public int inputInt(String message)
    {
-      String s = inputString(message);
-      Scanner scan = new Scanner(s);
-      return scan.hasNextInt() ? scan.nextInt() : 0;
+      while (true)
+      {
+         String s = inputString(message);
+         try
+         {
+            return Integer.parseInt(s.trim()); 
+         }
+         catch (Exception e)
+         {
+         }
+      }
    }
    
    public double inputNumber(String message)
    {
-      String s = inputString(message);
-      Scanner scan = new Scanner(s);
-      return scan.hasNextDouble() ? scan.nextDouble() : Double.NaN;
+      while (true)
+      {
+         String s = inputString(message);
+         try
+         {
+            return Double.parseDouble(s.trim()); 
+         }
+         catch (Exception e)
+         {
+         }
+      }
    }
    
-   public boolean inputBoolean(String message)
+   public boolean inputYesNo(String message)
    {
-      String s = inputString(message);
-      s = s.trim().toLowerCase();
-      if (s.length() < 1)
-         return false;
-      char ch = s.charAt(0);
-      return (ch == 'y' || ch == 't' || ch == '1');   // yes, true, 1, etc.
+      int answer = JOptionPane.showConfirmDialog(window, message,
+                        window.getTitle(), JOptionPane.YES_NO_OPTION);
+      return answer == JOptionPane.YES_OPTION;
    }
    
    public String inputString(String message)
    {
-      if (message != null)
-         System.out.print(message + " ");
-      return consoleScanner.nextLine();
+      String answer = JOptionPane.showInputDialog(window, message, 
+            window.getTitle(), JOptionPane.QUESTION_MESSAGE);
+      if (answer == null)
+         return "";    // user cancelled
+      return answer;
    }
 
 
@@ -132,6 +194,8 @@ public class Game implements GameInterface
 
    public void setHeight(double height)
    {
+      height = pinValue(height, 1, 10000);
+      
       // New aspect requested, so adjust window accordingly
       heightP = (int) (height * scaleLToP);
       window.setPixelSize(widthP, heightP);
@@ -145,6 +209,9 @@ public class Game implements GameInterface
 
    public void setScreen(String name)
    {
+      if (name == null)
+         name = "";
+         
       // Does this screen name already exist?
       GameScreen newScreen = screens.get(name);
       if (newScreen != null)
@@ -179,9 +246,14 @@ public class Game implements GameInterface
 
    public void setBackImage(String filename)
    {
-      GameObj img = new GameImage(this, filename, WIDTH_L / 2, heightL / 2);
-      screen.setBackObj(img);
-      screen.setSize(WIDTH_L, heightL);   // make image fill the screen
+      if (filename == null)
+         screen.setBackObj(null);
+      else
+      {
+         GameObj img = new GameImage(this, filename, WIDTH_L / 2, heightL / 2);
+         screen.setBackObj(img);
+         screen.setSize(WIDTH_L, heightL);   // make image fill the screen
+      }
    }
 
 
@@ -233,6 +305,9 @@ public class Game implements GameInterface
    
    public GameObj text(String text, double x, double y, double height, String color)
    {
+      if (text == null)
+         text = "";
+         
       GameObj obj = new GameText(this, text, x, y, height);
       obj.setFillColor(color);
       screen.addObj(obj);
@@ -257,19 +332,24 @@ public class Game implements GameInterface
    
    public boolean keyPressed(String key)
    {
+      if (key == null)
+         return false;
       return input.keysDown.get(input.keyNameToCode.get(key));
    }
    
    public boolean charTyped(String ch)
    {
+      if (ch == null)
+         return false;
       return (input.keyTyped != null) && (input.keyTyped.equals(ch));
    }      
 
 
    //========================= Audio API ===============================
 
-   public void sound(String filename)       { audio.play(filename); }
-   public void setSoundVolume(double d)     { audio.setVolume(d); }
+   public boolean loadSound(String filename)   { return audio.load(filename); }
+   public void sound(String filename)          { audio.play(filename); }
+   public void setSoundVolume(double d)        { audio.setVolume(d); }
  
 
    //====================== Math and Misc. API ==========================
@@ -419,6 +499,26 @@ public class Game implements GameInterface
    //                      Internal Methods 
    //===============================================================
          
+   // Return value pinned to the given range
+   double pinValue(double value, double min, double max)
+   {
+      if (value < min)
+         return min;
+      if (value > max)
+         return max;
+      return value;
+   }
+   
+   // Return value pinned to the given range
+   int pinValue(int value, int min, int max)
+   {
+      if (value < min)
+         return min;
+      if (value > max)
+         return max;
+      return value;
+   }
+
    // Start the game timer
    void startTimer()
    {
@@ -439,6 +539,7 @@ public class Game implements GameInterface
    // Remove a GameObj from the game. 
    void deleteObj(GameObj obj)
    {
+      obj.markDeleted();
       input.invalObj(obj);
       screen.removeObj(obj);
    }
@@ -495,25 +596,32 @@ public class Game implements GameInterface
    {
       if (value instanceof String)
       {
-         System.out.print("\"");
-         System.out.print(value);
-         System.out.print("\"");
+         print("\"");
+         print(value);
+         print("\"");
       }
       else
       {
-         System.out.print(value.toString());
+         print(value.toString());
       }
    }
 
    // Log an error message
    void logError(String message)
    {
-      System.out.println("ERROR: " + message);
+      println("ERROR: " + message);
    }
 
    // Log an error message plus a quoted string
    void logError(String message, String s)
    {
-      System.out.println("ERROR: " + message + " \"" + s + "\"");
+      println("ERROR: " + message + " \"" + s + "\"");
+   }
+   
+   // Flush the output file, if any
+   void flushOutput()
+   {
+      if (printWriter != null)
+         printWriter.flush();
    }
 }

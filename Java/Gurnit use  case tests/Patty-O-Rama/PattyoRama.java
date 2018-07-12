@@ -3,7 +3,7 @@ import Code12.*;
 public class PattyoRama extends Code12Program
 {
 GameObj krabbyPatty, roguePatty, pipe, play, playText, scoreText;
-int score;
+int score = 0;
 
    public static void main(String[] args)
    { 
@@ -22,13 +22,15 @@ int score;
       //end screen
       ct.setScreen("end");
       ct.setBackColor("red");
-      GameObj end = ct.text("Your Fired!!!!!", 50, 50 , 10, "black");          
+      GameObj end = ct.text("You're Fired!!!!!", 50, 50 , 10, "black");          
            
-      //Game scren
+      //Game screen
       ct.setScreen("game");
-      ct.setBackImage("kitchen.jpg");
+      GameObj gameScreen = ct.image("kitchen.jpg", ct.getWidth() / 2, ct.getHeight() /2, ct.getWidth() );
+      gameScreen.height = ct.getHeight();
+
       pipe = ct.image("chute.png", 60, 1, 60);    
-      scoreText = ct.text("Order completion: " + score + "/5 Krabby Patties", 40, 95, 5, "yellow" );      
+      scoreText = ct.text("Order completion: 0 / 5 Krabby Patties", 40, 95, 5, "yellow" );      
       
        //Start screen
       ct.setScreen("start");
@@ -36,16 +38,18 @@ int score;
       play = ct.circle(75,15,30,"yellow");
       play.setLineColor("yellow");
       playText = ct.text("PLAY", 75, 15,10 , "black"); 
-      GameObj directions = ct.text("Complete an order of 5 krabby patties,watch out for the spoiled ones!", 50, 96, 3.2, "white");    
+      GameObj directions = ct.text("Complete an order of 5 krabby patties, watch out for the spoiled ones!", 50, 96, 3.2, "white");    
    }
    
    public void update()
-   {          
+   {
+          
        play.clickable = true;      
         if(play.clicked())
-           ct.setScreen("game");          
-                     
-        if (ct.getScreen() == "game" && ct.random(1, 20) == 1)
+           ct.setScreen("game"); 
+
+        String screen = ct.getScreen();
+        if (screen.equals("game") && ct.random(1, 20) == 1)
         {   
            // random position for krabby patties
            int X = ct.random(40, 80);
@@ -55,7 +59,7 @@ int score;
            krabbyPatty.clickable = true; 
            krabbyPatty.ySpeed = 0.7;                         
         }
-        if (ct.getScreen() == "game" && ct.random(1, 30) == 1)
+        if (screen.equals("game") && ct.random(1, 30) == 1)
         {  
            // random position or rogue patties
            int x = ct.random(40, 80);
@@ -80,8 +84,9 @@ int score;
   
     public void onMousePress(GameObj obj, double x, double y)
    {
+      String screen = ct.getScreen();
       //deletes whichever object gets clicked on 
-      if ( obj != null && ct.getScreen() == "game")
+      if ( obj != null && screen.equals("game") )
       {
          obj.delete();
          
@@ -91,8 +96,9 @@ int score;
             scoreText.setText("Order Completion:  " + score + "/5 Krabby Patties");                 
          }
          if(obj == roguePatty)
-         {            
-            score--;          
+         {
+            if ( score > 1)           
+              score--;          
             scoreText.setText((3 + score)+ " away from getting fired!!! " );  
          }      
       }          

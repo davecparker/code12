@@ -24,8 +24,6 @@ local err = {}
 --         first = { iLine = lineNumber, iChar = charIndex },
 --         last  = { iLine = lineNumber, iChar = charIndex },
 --     },
---     minlevel = level,    -- if a higher syntax level would eliminate the err, else nil
---     strLevel = feature,  -- name of feature needed at minLevel
 -- }
 local errRecord
 
@@ -66,7 +64,7 @@ end
 
 -- Make and return an errLoc (see err.makeErrLoc) using the extent of the given
 -- parse tree node for the location.
-function errLocFromNode( node )
+local function errLocFromNode( node )
 	local errLoc = { first = {}, last = {} }
 	findNodeLoc( node, errLoc )
 	return errLoc
@@ -94,7 +92,7 @@ end
 -- Make and return an errLoc with the given fields.
 -- An errLoc (error location) is a table with the following named fields:
 --      first      srcLoc of first part of affected code
---      last       srcLoc of last part of affected code
+--      last       srcLoc of last part of affected code, or nil for whole line
 function err.makeErrLoc( first, last )
 	-- print( string.format( "makeErrLoc  %d.%d  to  %d.%d", first.iLine, first.iChar, last.iLine, last.iChar ) )
 	return { first = first, last = last }
@@ -106,14 +104,22 @@ end
 --      strErr        string message for the error
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErr( loc, refLoc, strErr, ... )
-	assert( type(loc) == "table" and loc.first ~= nil and loc.last ~= nil )
+	assert( type(loc) == "table" and loc.first ~= nil )
 	if refLoc then
-		assert( type(refLoc) == "table" and refLoc.first ~= nil and refLoc.last ~= nil )
+		assert( type(refLoc) == "table" and refLoc.first ~= nil )
 	end
 	assert( type(strErr) == "string" )
 	if errRecord == nil then
 		errRecord = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
 	end
+end
+
+-- If there is not already an error recorded, then set the error state with:
+--      iLine         line number for the error (entire line)
+--      strErr        string message for the error
+--      ...           optional params to send to string.format( strErr, ... )
+function err.setErrLineNum( iLine, strErr, ... )
+	err.setErr( err.makeErrLoc( err.makeSrcLoc( iLine, 1 ) ), nil, strErr, ... )
 end
 
 -- If there is not already an error recorded, then set the error state with:
@@ -155,14 +161,6 @@ function err.setErrTokenSpan( firstToken, lastToken, strErr, ... )
 	local iCharLast = lastToken.iChar + string.len( lastToken.str ) - 1
 	local locEnd = err.makeSrcLoc( lastToken.iLine, iCharLast )
 	err.setErr( err.makeErrLoc( locStart, locEnd ), nil, strErr, ... )
-end
-
--- Set the minLevel and strLevel fields in the current error record
-function err.setLevelInfo( minLevel, strLevel )
-	if errRecord then
-		errRecord.minLevel = minLevel
-		errRecord.strLevel = strLevel
-	end
 end
 
 -- Return true if there is an error in the error state.

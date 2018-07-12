@@ -100,7 +100,7 @@ class BasicTest extends Code12Program
       }
       else if (ct.clicked())
       {
-         ct.log("Click at " + ct.clickX(), ct.clickY());
+         ct.logm("Click at", ct.clickX(), ct.clickY());
          ct.sound("bubble.wav");
       }
       

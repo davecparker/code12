@@ -11,6 +11,8 @@ local g = require("Code12.globals")
 require("Code12.runtime")
 
 
+-- Constants
+local textObjectFont = "Roboto-Bold.ttf"
 -- The GameObj class
 local GameObj = {}
 
@@ -30,6 +32,11 @@ local function initGameObjClass()
 	local obj = display.newRect(-1000, -1000, 1, 1)
 	obj.visible = false
 	GameObj.dummyObj = obj
+
+	-- Print available fonts
+	-- for _, fontName in ipairs(native.getFontNames()) do
+	-- 	print(fontName)
+	-- end
 end
 
 
@@ -61,6 +68,7 @@ function GameObj:new(typeName, x, y, width, height)
 			lineColor = nil,
 			layer = 1,
 			adjustY = false,
+			deleted = false,
 
 			-- Stored previous values so we can detect changes on the fly
 			widthPrev = 0,
@@ -89,11 +97,11 @@ end
 function GameObj:setObj(obj)
 	-- Both objects have a reference to each other
 	self._code12.obj = obj
-	obj.code12GameObj = self
-
-	-- Install the touch listener and set the correct stacking order
-	obj:addEventListener("touch", g.onTouchGameObj)
-	self:setLayer(self._code12.layer)
+	if obj ~= nil then
+		obj.code12GameObj = self
+		obj:addEventListener("touch", g.onTouchGameObj)
+		self:setLayer(self._code12.layer)
+	end
 end
 
 -- Remove a GameObj and delete the display object.
@@ -103,6 +111,7 @@ function GameObj:removeAndDelete()
 	obj.code12GameObj = nil    -- remove display object's reference to the GameObj
 	obj:removeSelf()	       -- remove and destroy the display object
 	self._code12.obj = GameObj.dummyObj    -- dummy display object to help client avoid crashes
+	self._code12.deleted = true
 	self.visible = false       -- to reduce impact of any stale references
 	self.clickable = false
 end
@@ -132,43 +141,49 @@ function GameObj:newLine(group, x1, y1, x2, y2, colorName)
 	local gameObj = GameObj:new("line", x1, y1, x2 - x1, y2 - y1)
 	gameObj:setObj(display.newLine(group, x1, y1, x2, y2))
 	gameObj.updateSize = GameObj.updateSizeLine   -- override sizing method
-	gameObj.objContainsPoint = function () return false end   -- lines have no interior
+	gameObj.objContainsPoint = GameObj.lineContainsPoint   -- override hit test method
+   gameObj.hitObj = GameObj.lineHitObj   -- override collision test method
 	gameObj:setLineColorFromName(colorName or "black")
 	return gameObj
 end
 
 -- Text constructor
 function GameObj:newText(group, text, x, y, height, colorName)
+	text = text or ""
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
-	local obj = display.newText(group, text, x, y, native.systemFontBold,
+	local obj = display.newText(group, text, x, y, textObjectFont,
 						fontSizeFromHeight(height))
 	-- print("newText height vs obj height:", height, obj.height / g.scale)
 	gameObj:setObj(obj)
 	gameObj.width = obj.width / g.scale  -- Corona measured when obj created
 	gameObj.updateSize = GameObj.updateSizeText   -- override sizing method
+	gameObj._code12.text = text
 	gameObj:setFillColorFromName(colorName or "black")
 	return gameObj
 end
 
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
-	-- If an app context tells us the media directory then use it, else current dir.
-	local baseDir, path
-	local appContext = ct._appContext
-	if appContext and appContext.mediaDir then
-		path = appContext.mediaDir .. filename
-		baseDir = appContext.mediaBaseDir
-	else
-		path = filename
-		baseDir = system.ResourceDirectory
-	end
+	local obj = nil
+	if filename ~= nil then
+		-- If an app context tells us the media directory then use it, else current dir.
+		local baseDir, path
+		local appContext = ct._appContext
+		if appContext and appContext.mediaDir then
+			path = appContext.mediaDir .. filename
+			baseDir = appContext.mediaBaseDir
+		else
+			path = filename
+			baseDir = system.ResourceDirectory
+		end
 
-	-- Try to open the image at native resolution
-	local obj = display.newImage(group, path, baseDir, x, y)
+		-- Try to open the image at native resolution
+		obj = display.newImage(group, path, baseDir, x, y)
+	end
 	if not obj then
 		-- Can't open image, substitute a text object with a red X
 		g.warning("Cannot find image file", filename)
-		return GameObj:newText(group, "[X]", x, y, width, "red")
+		return GameObj:newText(group, "[x]", x, y, width, "red")
 	end
 
 	-- Create the GameObj at the right size, preserving the original aspect
@@ -264,7 +279,7 @@ function GameObj:updateSizeLine(scale)
 				self:setObj(newObj)
 				group:insert(i, newObj)   -- insert at same z-order as old line
 				self:setLineColorFromColor(p.lineColor)
-				newObj.srokeWidth = obj.strokeWidth
+				newObj.strokeWidth = obj.strokeWidth
 				obj:removeSelf()          -- remove old line
 				break
 			end
@@ -331,10 +346,61 @@ function GameObj:circleContainsPoint(xPoint, yPoint)
 	return ((dx * dx) / (w * w)) + ((dy * dy) / (h * h)) <= 0.25
 end
 
+-- Returns the squared distance from lineObj to (xPoint, yPoint)
+local function squaredDistanceFromPointToLine(lineObj, xPoint, yPoint)
+   local ax = xPoint - lineObj.x
+   local ay = yPoint - lineObj.y
+   local bx = lineObj.width
+   local by = lineObj.height
+   local compAB = (ax * bx + ay * by) / (bx * bx + by * by)
+   local nx = ax - bx * compAB
+   local ny = ay - by * compAB
+   return nx * nx + ny * ny
+end
+
+-- Return true if xPoint, yPoint is inside the line (for thick lines)
+-- or within 2 pixels of the line (for thin lines)
+function  GameObj:lineContainsPoint(xPoint, yPoint)
+   -- Reject test rectangular bounds first
+   local halfW
+   local lineWidth = self.lineWidth
+   if lineWidth < 4 then
+      halfW = 2 / g.scale
+   else
+      halfW = (lineWidth / g.scale) / 2
+   end
+   local left = self.x
+   local right = left + self.width
+   if left > right then
+      left, right = right, left
+   elseif left == right then
+      left = self.x - halfW
+      right = self.x + halfW
+   end
+   if xPoint < left or xPoint > right then
+      return false
+   end
+   local top = self.y
+   local bottom = top + self.height
+   if top > bottom then
+      top, bottom = bottom, top
+   elseif top == bottom then
+      top = self.y - halfW
+      bottom = self.y + halfW
+   end
+   if yPoint < top or yPoint > bottom then
+      return false
+   end
+   -- Compare squared distance from point to line to squared halfwidth of line
+   return squaredDistanceFromPointToLine(self, xPoint, yPoint) <= halfW * halfW
+end
+
 -- Return true if this object intersects with gameObj2
 function GameObj:hitObj(gameObj2)
 	-- Just do a rectangle intersection test on the bounding rects.
-	-- TODO: line objects?
+	if gameObj2._code12.typeName == "line" then
+      return gameObj2:hitObj(self)
+   end
 	local obj = self._code12.obj
 	local obj2 = gameObj2._code12.obj
 	local left = self.x - (self.width * obj.anchorX)
@@ -352,6 +418,168 @@ function GameObj:hitObj(gameObj2)
 		return false
 	end
 	return true
+end
+
+-- Return true if lineObj (from left to right) intersects a vertical line from (x2, top2) to (x2, bottom2)
+-- Assumes top2 < bottom2 and lineObj is not vertical
+local function slantLineHitVertical(lineObj, left, right, x2, top2, bottom2)
+   if left > x2 or right < x2 then
+      return false
+   end
+   local yIntercept = lineObj.height / lineObj.width * (x2 - lineObj.x) + lineObj.y
+   return top2 <= yIntercept and yIntercept <= bottom2
+end
+
+-- Return true if lineObj (from top to bottom) intersects a horizontal line from (left2, y2) to (right2, y2)
+-- Assumes left2 < right2 and this line is not horizontal
+local function slantLineHitHorizontal(lineObj, top, bottom, y2, left2, right2)
+   if top > y2 or bottom < y2 then
+      return false
+   end
+   local xIntercept = lineObj.width / lineObj.height * (y2 - lineObj.y) + lineObj.x
+   return left2 <= xIntercept and xIntercept <= right2
+end
+
+-- Return true if lineObj intersects a rectangle aligned with the coordinate axes.
+-- Assumes the lineObj's bounding rect is intersecting the rectangle and lineObj is not horizontal or vertical.
+local function slantLineHitRect(lineObj, left, right, top, bottom, rectLeft, rectRight, rectTop, rectBottom)
+   if slantLineHitVertical(lineObj, left, right, rectLeft, rectTop, rectBottom) then -- hit rectLeft
+      return true
+   end
+   if slantLineHitVertical(lineObj, left, right, rectRight, rectTop, rectBottom) then -- hit rectRight
+      return true
+   end
+   if slantLineHitHorizontal(lineObj, top, bottom, rectTop, rectLeft, rectRight) then -- hit rectTop
+      return true
+   end
+   if slantLineHitHorizontal(lineObj, top, bottom, rectBottom, rectLeft, rectRight) then -- hit rectBottom
+      return true
+   end
+   -- Check if this line is inside the rect's bounds
+   if left >= rectLeft and right <= rectRight and top >= rectTop and bottom <= rectBottom then
+      return true
+   end
+   return false
+end
+
+-- Return true if this line intersects with gameObj2
+function GameObj:lineHitObj(gameObj2)
+   if gameObj2._code12.typeName == "line" then
+      -- Do a rectangle intersection test on the bounding rects.
+      local halfW = (self.lineWidth / g.scale) / 2
+      local halfW2 = (gameObj2.lineWidth / g.scale) / 2
+      local x, width = self.x, self.width
+      local left = x
+      local right = left + width
+      if left == right then
+         left = x - halfW
+         right = x + halfW
+      elseif left > right then
+         left, right = right, left
+      end
+      local x2, width2 = gameObj2.x, gameObj2.width
+      local left2 = x2
+      local right2 = left2 + width2
+      if left2 == right2 then
+         left2 = x2 - halfW2
+         right2 = x2 + halfW2
+      elseif left2 > right2 then
+         left2, right2 = right2, left2
+      end
+      if right2 < left or left2 > right then
+         return false
+      end
+      local y, height = self.y, self.height
+      local top = y
+      local bottom = top + height
+      if top == bottom then
+         top = y - halfW
+         bottom = y + halfW
+      elseif top > bottom then
+         top, bottom = bottom, top
+      end
+      local y2, height2 = gameObj2.y, gameObj2.height
+      local top2 = y2
+      local bottom2 = top2 + height2
+      if top2 == bottom2 then
+         top2 = y2 - halfW2
+         bottom2 = y2 + halfW2
+      elseif top2 > bottom2 then
+         top2, bottom2 = bottom2, top2
+      end
+      if bottom2 < top or top2 > bottom then
+         return false
+      end
+      -- Check vertical/horizontal line cases
+      if width == 0 or height == 0 then
+         if width2 == 0 or height2 == 0 then
+            return true
+         else
+            return slantLineHitRect(gameObj2, left2, right2, top2, bottom2, left, right, top, bottom)
+         end
+      elseif width2 == 0 or width2 == 0 then
+         return slantLineHitRect(self, left, right, top, bottom, left2, right2, top2, bottom2)
+      end
+      -- Both lines are slant lines
+      -- Calculate the intersection point
+      local det = height2 * width - width2 * height
+      if det == 0 then 
+         -- parallel lines and bounding boxes intersect
+         -- check if they are close enough for a hit
+         local minDist = halfW + halfW2
+         return squaredDistanceFromPointToLine(self, x2, y2) <= minDist * minDist
+      end
+      local t = ( width2 * (y - y2) - height2 * (x - x2) ) / det
+      if t < 0 or t > 1 then
+         return false
+      end
+      local s = ( width * (y - y2) - height * (x - x2) ) / det
+      if s < 0 or s > 1 then
+         return false
+      end
+      return true
+   else 
+   -- gameObj2 is not a line
+   -- Do a rectangle intersection test on the bounding rects.
+      local halfW = (self.lineWidth / g.scale) / 2
+      local obj2 = gameObj2._code12.obj
+      local x, width = self.x, self.width
+      local left = x
+      local right = left + width
+      if left > right then
+         left, right = right, left
+      elseif left == right then
+         left = x - halfW
+         right = x + halfW
+      end
+      local width2 = gameObj2.width
+      local left2 = gameObj2.x - (width2 * obj2.anchorX)
+      local right2 = left2 + width2
+      if left2 > right or right2 < left then
+         return false
+      end
+      local y, height = self.y, self.height
+      local top = y
+      local bottom = top + height
+      if top > bottom then
+         top, bottom = bottom, top
+      elseif top == bottom then
+         top = y - halfW
+         bottom = y + halfW
+      end
+      local height2 = gameObj2.height
+      local top2 = gameObj2.y - (height2 * obj2.anchorY)
+      local bottom2 = top2 + height2
+      if top2 > bottom or bottom2 < top then
+         return false
+      end
+      -- Bounding rects intersect
+      -- TODO: Circles?
+      if width == 0 or height == 0 then
+         return true
+      end
+      return slantLineHitRect(self, left, right, top, bottom, left2, right2, top2, bottom2)
+   end
 end
 
 -- Return true if the object is at least partially within the screen area
@@ -462,7 +690,11 @@ local colors = {
 }
 
 -- Return the color for the given color name, or gray if name not known.
+-- Return nil if colorName is nil.
 local function colorFromName(colorName)
+	if colorName == nil then
+		return nil
+	end
 	local color = colors[string.lower(colorName)]
 	if color then
 		return color

@@ -3,15 +3,16 @@ package Code12;  // (c)Copyright 2018 by David C. Parker
 import java.io.File;
 import java.io.IOException;
 import javax.sound.sampled.*;
+import java.util.*;
  
 
 // Helper class for playing audio
-public class GameAudio implements LineListener 
+public class GameAudio 
 {
    // Instance data
    Game game;                    // back pointer to the Game
    double volume;                // sound volume from 0.0 to 1.0
-   Clip audioClip;               // current clip being played or null if none
+   HashMap<String, Clip> clips;  // loaded and cached audio clips 
 
 
    // Construct the GameAudio helper with given back pointer to the Game
@@ -19,7 +20,7 @@ public class GameAudio implements LineListener
    {
       this.game = game;
       volume = 1.0;
-      audioClip = null;
+      clips = new HashMap<String, Clip>();
    }
     
    // Set the audio volume between 0.0 and 1.0
@@ -28,61 +29,75 @@ public class GameAudio implements LineListener
       volume = v;
    }
  
+   // Preload and cache an audio file with the given filename
+   boolean load(String filename)
+   {
+      return (getClip(filename) != null);
+   }
+   
    // Play an audio file with the given filename        
    void play(String filename) 
    {
-      // Do nothing if audio is already playing.
-      // Mixing is not supported and stopping audio seems to work poorly.
-      if (audioClip != null)
+      // Get the clip
+      Clip clip = getClip(filename);
+      if (clip == null)
          return;
-    
-      // Look in the project folder first, then in the Code12/sounds subfolder.
-      // Finally, check to see if the Code12 folder is in the parent folder.
-      // If the file can't be found, warn the user just return.
-      File audioFile = new File(filename);
-      if (!audioFile.isFile())
+      
+      // Stop and reset the clip if it is already playing
+      if (clip.isRunning())
       {
-         game.logError("Cannot find audio file", filename);
-         return;
+         clip.stop();
+         clip.flush();
+      }
+      clip.setFramePosition(0);
+
+      // Set the volume
+      FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+      gainControl.setValue((float) (Math.log(volume) / Math.log(10.0) * 20.0));
+
+      // Start the clip
+      clip.start();
+   }
+
+   // Return the audio clip for the given sound filename or null if failure.
+   private Clip getClip(String filename)
+   {
+      // Is this clip already loaded?
+      Clip clip = clips.get(filename);
+      if (clip != null)
+      {
+         return clip;
       }
       
-      try 
-      {         
-         // Open the audio file and get the audioClip for it
-         AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-         DataLine.Info info = new DataLine.Info(Clip.class, audioStream.getFormat());
-         audioClip = (Clip) AudioSystem.getLine(info);
-         audioClip.addLineListener(this);
-         audioClip.open(audioStream);             
-         
-         // Set the volume
-         FloatControl gainControl = (FloatControl) audioClip.getControl(FloatControl.Type.MASTER_GAIN);
-         gainControl.setValue((float) (Math.log(volume) / Math.log(10.0) * 20.0));
-
-         // Play the clip
-         audioClip.start();
-      } 
-      catch (UnsupportedAudioFileException ex) 
+      // Try to find the file
+      if (filename == null)
+         return null;
+      File file = new File(filename);
+      if (!file.isFile())
       {
-         game.logError("Audio file not supported", filename);
+         game.logError("Cannot find audio file", filename);
+         return null;
+      }
+      try 
+      {
+         // Get a Clip and prepare it
+         AudioInputStream stream = AudioSystem.getAudioInputStream(file);
+         clip = AudioSystem.getClip();
+         clip.open(stream);             
+         clips.put(filename, clip);   // cache it
       } 
       catch (LineUnavailableException ex) 
       {
          game.logError("Audio line unavailable for", filename);
       } 
+      catch (UnsupportedAudioFileException ex) 
+      {
+         game.logError("Audio file not supported", filename);
+      } 
       catch (IOException ex) 
       {
          game.logError("Cannot play audio file", filename);
       }
+      return clip;
    }
-        
-   // LineListener method: Listen for the STOP event and close the clip when done.
-   public void update(LineEvent event) 
-   {         
-      if (event.getType() == LineEvent.Type.STOP)
-      {
-         audioClip.close();
-         audioClip = null;
-      }
-   }    
 }

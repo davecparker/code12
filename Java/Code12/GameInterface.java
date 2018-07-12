@@ -9,12 +9,14 @@ public interface GameInterface
    public void println(Object obj);
    public void println();
    public void log(Object... objs);
-   public void logm(String message, Object... objs);     
+   public void logm(String message, Object... objs);
+   public void setOutputFile(String filename);     
    
    // Text Input
+   public void showAlert(String message);
    public int inputInt(String message);
    public double inputNumber(String message);
-   public boolean inputBoolean(String message);
+   public boolean inputYesNo(String message);
    public String inputString(String message);
    
    // Screen Management
@@ -50,6 +52,7 @@ public interface GameInterface
    public boolean charTyped(String ch);
    
    // Audio
+   public boolean loadSound(String filename);
    public void sound(String filename);
    public void setSoundVolume(double d);
    

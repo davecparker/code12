@@ -12,6 +12,9 @@ class BubblePop extends Code12Program
       // Make the background 
       ct.setHeight(150);
       ct.setBackImage("underwater.jpg"); 
+
+      // Pre-load the pop sound
+      ct.loadSound("pop.wav");
    }
    
    public void update()

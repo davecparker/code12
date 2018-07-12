@@ -25,7 +25,7 @@ function g.warning(message, name)
 	if name then
 		s = s .. " \"" .. name .. "\""
 	end
-	print(s)
+	ct.println(s)
 end
 
 -- Generate a runtime error for the current function and stack level, with the given message.
@@ -105,7 +105,7 @@ function g.check1Param(typeName, param, ...)
 	if #{...} > 0 then
 		apiError("only takes one parameter (a " .. typeName .. ")")
 	elseif not param then
-		apiError("- missing or nil parameter (expected " .. typeName .. ")")
+		apiError("- missing or null parameter (expected " .. typeName .. ")")
 	else
 		local t = typeOrClass(param)
 		if t ~= typeName then
@@ -121,11 +121,11 @@ function g.checkType(position, tExpected, param)
 	if tParam ~= tExpected then
 		local strErr = "- parameter #" .. position
 		if tParam == "nil" then
-			strErr = strErr .. " is missing or nil"
+			strErr = strErr .. " is missing or null"
 		else
 		    strErr = strErr .. " should be a " .. tExpected .. " not a " .. tParam
-    	end
-    	apiError(strErr)
+		end
+		apiError(strErr)
 	end
 end
 
@@ -142,13 +142,13 @@ function g.checkTypes(types, ...)
 			if tGot ~= tExpected then
 				local strErr = "- parameter #" .. i
 				if tGot == "nil" then
-					strErr = strErr .. " is missing or nil (expected " .. tExpected .. ")"
+					strErr = strErr .. " is missing or null (expected " .. tExpected .. ")"
 				else
 				    strErr = strErr .. " should be a " .. tExpected .. " not a " .. tGot
-	        	end
-	        	apiError(strErr)
-        	end
-    	end
+				end
+				apiError(strErr)
+			end
+		end
 	end
 end 
 

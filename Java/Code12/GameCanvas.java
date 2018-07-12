@@ -32,7 +32,8 @@ class GameCanvas extends Canvas implements ActionListener
       game = new Game(program, window, width, height);
       program.ct = game;
       game.startTimer();
-      program.start();   // main program creates objects here
+      program.start();     // main program creates objects here
+      game.flushOutput();  // make sure output in start is written
 
       // Add input event listeners, sent to the GameInput helper
       addMouseListener(game.input);
@@ -102,6 +103,13 @@ class GameCanvas extends Canvas implements ActionListener
         
       // Allow the next repaint
       repainting = false;
+   }
+   
+   // Prepare to quit the game
+   void prepareToQuit()
+   {
+      game.flushOutput();
+      game.setOutputFile(null);
    }
 }
 

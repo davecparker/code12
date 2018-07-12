@@ -7,14 +7,17 @@ require('Code12.api')
         
     
     
-    function start()
+    function _fn.start()
         
         -- Make the background 
         ct.setHeight(150)
         ct.setBackImage("underwater.jpg")
+        
+        -- Pre-load the pop sound
+        ct.loadSound("pop.wav")
     end
     
-    function update()
+    function _fn.update()
         
         -- Make bubbles at random times, positions, and sizes
         if ct.random(1, 20) == 1 then
@@ -28,7 +31,7 @@ require('Code12.api')
         end
     end
     
-    function onMousePress(obj, x, y)
+    function _fn.onMousePress(obj, x, y)
         
         -- Pop bubbles that get clicked
         if obj ~= nil then

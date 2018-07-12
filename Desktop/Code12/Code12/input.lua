@@ -9,63 +9,99 @@
 
 local g = require("Code12.globals")
 require("Code12.runtime")
-local GameObj = require("Code12.GameObjAPI")
 
 
 ---------------- Touch Tracking ----------------------------------------------
 
 -- Set the last click state, then call the client event function (if any) 
--- for the given touch event and gameObj.
+-- for the given touch event. The gameObj is the corresponding GameObj 
+-- or nil if the event was sent to the background object. 
+-- Return true if the event was handled.
 local function clickEvent(event, gameObj)
+	-- Ignore events if the game is not supposed to be getting them now
+	if g.modalDialog or g.blocked or g.stopped then
+		return false
+	end
+
 	-- Get logical click location 
 	local xP, yP = g.mainGroup:contentToLocal( event.x, event.y )
 	local x = xP / g.scale
 	local y = yP / g.scale
 
-	if event.phase == "began" then
+	local phase = event.phase
+	if phase == "began" then
+		-- Ignore click if not in the game area
+		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
+			return false
+		end
+
+		-- If gameObj is nil, check if a line was clicked
+		local focusObj = event.target
+		if gameObj == nil then
+			local objs = g.screen.objs
+			for i = 1, objs.numChildren do
+				local gObj = objs[i].code12GameObj
+				if gObj.clickable and gObj._code12.typeName == "line" then
+					if gObj:lineContainsPoint( x, y ) then
+						gameObj = gObj
+						focusObj = objs[i]
+						break
+					end
+				end
+			end
+		end
+
 		-- Set last click state
 		g.clicked = true
 		g.gameObjClicked = gameObj
 		g.clickX = x
 		g.clickY = y
 
+		-- Automatically take the touch focus.
+		g.setFocusObj(focusObj)
+
 		-- Call client event
-		if type(onMousePress) == "function" then
-			onMousePress(gameObj, x, y)
+		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
+	elseif event.target ~= g.getFocusObj() then
+		return false    -- click did not begin on this object
+	elseif phase == "moved" then
+		-- Ignore this drag point if not in the game area
+		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
+			return false
 		end
 
-		-- Automatically take the touch focus on an object.
-		if gameObj then
-			display.getCurrentStage():setFocus(event.target)
-		end
-	elseif event.phase == "moved" then
+		-- Set last drag location
+		g.clickX = x
+		g.clickY = y
+
 		-- Call client event
-		if type(onMouseDrag) == "function" then
-			onMouseDrag(gameObj, x, y)
-		end
+		g.eventFunctionYielded(_fn.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
-		-- Call client event
-		if type(onMouseRelease) == "function" then
-			onMouseRelease(gameObj, x, y)
-		end
-
 		-- Release touch focus if any
-		display.getCurrentStage():setFocus(nil)
+		g.setFocusObj(nil)
+
+		-- Call client event, forcing the final point inside the game area
+		x = g.pinValue(x, 0, g.WIDTH)
+		y = g.pinValue(y, 0, g.height)
+		g.eventFunctionYielded(_fn.onMouseRelease, gameObj, x, y)
 	end
+	return true
 end
 
--- Handle a Corona touch event on the Runtime
-function g.onTouchRuntime(event)
-	clickEvent(event, nil)
-	return true
+-- Handle a Corona touch event on the background object
+function g.onTouchBackObj(event)
+	local backObj = event.target.code12GameObj
+	if backObj then
+		return clickEvent(event, nil)
+	end
+	return false
 end
 
 -- Handle a Corona touch event on a GameObj
 function g.onTouchGameObj(event)
 	local gameObj = event.target.code12GameObj
-	if gameObj.clickable then
-		clickEvent(event, event.target.code12GameObj)
-		return true
+	if gameObj and gameObj.clickable then
+		return clickEvent(event, gameObj)
 	end
 	return false
 end
@@ -107,6 +143,8 @@ local function charTypedFromKeyEvent(event)
 		return "\n"
 	elseif keyName == "tab" then
 		return "\t"
+	elseif keyName == "deleteBack" then
+		return "\b"
 	end
 
 	-- Ignore other special keys with keyName longer than one char
@@ -135,30 +173,34 @@ end
 -- Handle a Corona key event.
 -- Track which keys are down and typed, and call client event handler(s).
 function g.onKey(event)
+	if g.modalDialog or g.blocked or g.stopped then
+		return false
+	end
 	local returnValue = false
+
+	-- Get the key name and change it as necessary to match the Code12 spec
 	local keyName = event.keyName
+	if keyName == "deleteBack" then
+		keyName = "backspace"
+	end
+
+	-- Process the key
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
-		if type(onKeyPress) == "function" then
-			onKeyPress(keyName)
-			returnValue = true    -- Always? Means client has to handle all keys
-		end
+		g.eventFunctionYielded(_fn.onKeyPress, keyName)  -- TODO: if yielded
+		returnValue = true    -- Always? Means client has to handle all keys
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)
 		if ch then
 			g.charTyped = ch    -- remember for ct.charTyped()
-			if type(onCharTyped) == "function" then
-				onCharTyped(ch)
-			end
+			g.eventFunctionYielded(_fn.onCharTyped, ch)
 		end
 	elseif event.phase == "up" then
 		-- keyRelease
-		keysDown[event.keyName] = nil
-		if type(onKeyRelease) == "function" then
-			onKeyRelease(keyName)
-		end
+		keysDown[keyName] = nil
+		g.eventFunctionYielded(_fn.onKeyRelease, keyName)
 	end
 	return returnValue
 end
@@ -202,6 +244,9 @@ end
 -- API
 function ct.keyPressed(keyName, ...)
 	-- Check parameters
+	if keyName == nil then
+		return false
+	end
 	if g.checkAPIParams("ct.keyPressed") then
 		g.check1Param("string", keyName, ...)
 	end
@@ -213,6 +258,9 @@ end
 -- API
 function ct.charTyped(ch, ...)
 	-- Check parameters
+	if ch == nil  then
+		return false
+	end
 	if g.checkAPIParams("ct.charTyped") then
 		g.check1Param("string", ch, ...)
 	end

@@ -57,6 +57,9 @@ local substituteType = {
 	["float"]  = "double",
 	["long"]  = "int",
 	["short"]  = "int",
+	["Integer"] = "int",
+	["Double"] = "double",
+	["Boolean"] = "boolean",
 }
 
 
@@ -66,7 +69,8 @@ local substituteType = {
 -- or return nil and set the error state if the type is invalid.
 function javaTypes.vtFromVarType( node )
 	assert( node.tt == "ID" )     -- varType nodes should be IDs
-	local vt = mapTypeNameToVt[node.str]
+	local typeName = node.str
+	local vt = mapTypeNameToVt[typeName]
 	if vt then
 		return vt  -- known valid type
 	end
@@ -77,12 +81,21 @@ function javaTypes.vtFromVarType( node )
 		err.setErrNode( node, "Variables cannot have void type" )
 	else
 		-- Unknown or unsupported type
-		local subType = substituteType[node.str]
+		local subType = substituteType[typeName]
 		if subType then
 			err.setErrNode( node, "The %s type is not supported by Code12. Use %s instead.",
-					node.str, subType )
+					typeName, subType )
 		else
-			err.setErrNode( node, "Unknown variable type \"%s\"", node.str )
+			-- Unknown type. See if the case is wrong.
+			local typeNameLower = string.lower( typeName )
+			for name, _ in pairs( mapTypeNameToVt ) do
+				if string.lower( name ) == typeNameLower then
+					err.setErrNode( node, 
+						"Names are case-sensitive, known name is \"%s\"", name )
+					return nil
+				end
+			end
+			err.setErrNode( node, "Unknown variable type \"%s\"", typeName )
 		end
 	end
 	return nil
@@ -91,7 +104,8 @@ end
 -- Return the value type (vt) for a retType node
 -- or return nil and set the error state if the type is invalid.
 function javaTypes.vtFromRetType( retType )
-	if retType.p == "void" then
+	local p = retType.p
+	if p == "void" then
 		return false
 	end
 	local vt = javaTypes.vtFromVarType( retType.nodes[1] )
@@ -157,6 +171,21 @@ function javaTypes.canCompareVts( vt1, vt2 )
 		return t1.vt == t2.vt    -- can compare arrays of same type
 	end	
 	return false
+end
+
+-- Return the default (if unitialized) value for a vt.
+function javaTypes.defaultValueForVt( vt )
+	if type(vt) == "number" then
+		return 0
+	elseif vt == true then
+		return false
+	end
+	return nil
+end
+
+-- Return true if name is the name of a supported class with public static members
+function javaTypes.isClassWithStaticMembers( name )
+	return name == "ct" or name == "Math"
 end
 
 
