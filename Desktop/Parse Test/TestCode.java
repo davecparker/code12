@@ -287,6 +287,7 @@ for ( i=0; i<n; i++); // for() followed directly by ;
 x + 1 = x; // confusing left hand side an right hand side of assignment
 1000 = count; // confusing left hand side an right hand side of assignment
 if ( x => 3 ) // => instead of <=
+if ( x =< 5 ) // =< instead of >=.
 for(int i=0, i<n, i++) // commas in place of semicolons
 for(int i=0: i<n: i++) // colons in place of semicolons
 for{int i=0; i<n; i++} // {} in place of ()
