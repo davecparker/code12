@@ -3,9 +3,8 @@ import Code12.*;
 
 public class Vectors extends Code12Program
 {
-    int arrayLength = 20;
-    GameObj[] vectors = new GameObj[arrayLength];
-    int[] shades = new int[arrayLength];
+    GameObj[] vectors = new GameObj[20];
+    int[] shades = new int[20];
 
     public static void main(String[] args)
     {
@@ -15,7 +14,6 @@ public class Vectors extends Code12Program
     public void start()
     {
         ct.setBackColor("gray");
-
         for (int i = 0; i < vectors.length; i++)
             defineVector(i);
     }
@@ -23,71 +21,71 @@ public class Vectors extends Code12Program
     public void update()
     {
         ct.clearGroup("lines");
+        defineVectors();
+        defineLines();
+    }
 
+    public void defineVectors()
+    {
         for (int i = 0; i < vectors.length; i++)
         {
-            if (isOutsideOfBoundary(vectors[i].x, vectors[i].y, vectors[i].width))
+            if (isOutsideOfBoundary(vectors[i]))
                 defineVector(i);
         }
+    }
 
+    public void defineVector(int i)
+    {
+        int x = ct.random(-1, ct.toInt(ct.getWidth()) - 1);
+        int y = ct.random(-1, ct.toInt(ct.getHeight()) - 1);
+        if (vectors[i] == null)
+            vectors[i] = ct.circle(x, y, 3);
+        else
+        {
+            vectors[i].x = x;
+            vectors[i].y = y;
+        }
+        double[] speeds = getRandomSpeeds();
+        vectors[i].xSpeed = speeds[0];
+        vectors[i].ySpeed = speeds[1];
+        shades[i] = 127;
+    }
+
+    public void defineLines()
+    {
         for (int i = 0; i < vectors.length; i++)
         {
-            if (vectors[i] == null)
-                continue;
-
-            updateShade(i);
-
-            for (int j = i + 1; j < vectors.length; j++)
+            if (vectors[i] != null)
             {
-                double x1 = vectors[i].x;
-                double y1 = vectors[i].y;
-                double x2 = vectors[j].x;
-                double y2 = vectors[j].y;
-                if (ct.distance(x1, y1, x2, y2) <= 20)
-                    defineLine(i, j, x1, y1, x2, y2);
+                updateShade(i);
+                for (int j = i + 1; j < vectors.length; j++)
+                {
+                    if (ct.distance(vectors[i].x, vectors[i].y, vectors[j].x, vectors[j].y) <= 20)
+                        defineLine(i, j);
+                }
             }
         }
     }
 
-    public void defineVector(int index)
+    public void defineLine(int i, int j)
     {
-        int x = ct.random(-1, (int) ct.getWidth() - 1);
-        int y = ct.random(-1, (int) ct.getHeight() - 1);
-
-        if (vectors[index] == null)
-            vectors[index] = ct.circle(x, y, 3);
-        else
-        {
-            vectors[index].x = x;
-            vectors[index].y = y;
-        }
-
-        double[] speeds = getRandomSpeeds();
-        vectors[index].xSpeed = speeds[0];
-        vectors[index].ySpeed = speeds[1];
-
-        shades[index] = 127;
-    }
-
-    public void defineLine(int index1, int index2, double x1, double y1, double x2, double y2)
-    {
-        GameObj line = ct.line(x1, y1, x2, y2);
-        int minShade = Math.min(shades[index1], shades[index2]);
+        GameObj line = ct.line(vectors[i].x, vectors[i].y, vectors[j].x, vectors[j].y);
+        int minShade = Math.min(shades[i], shades[j]);
         line.setLineColorRGB(minShade, minShade, minShade);
         line.group = "lines";
         line.setLayer(0);
     }
 
-    public void updateShade(int index)
+    public void updateShade(int i)
     {
-        if (shades[index] < 255)
+        if (shades[i] < 255)
         {
-            shades[index]++;
-            vectors[index].setFillColorRGB(shades[index], shades[index], shades[index]);
-            vectors[index].setLineColorRGB(shades[index], shades[index], shades[index]);
+            shades[i]++;
+            vectors[i].setFillColorRGB(shades[i], shades[i], shades[i]);
+            vectors[i].setLineColorRGB(shades[i], shades[i], shades[i]);
         }
         else
-            vectors[index].setLayer(2);
+            vectors[i].setLayer(2);
     }
 
     public double[] getRandomSpeeds()
@@ -98,18 +96,18 @@ public class Vectors extends Code12Program
         {
             xSpeed = speeds[ct.random(0, 2)];
             ySpeed = speeds[ct.random(0, 2)];
-
             if (xSpeed != 0 || ySpeed != 0)
                 break;
         }
-
         double[] xySpeeds = {xSpeed, ySpeed};
         return xySpeeds;
     }
 
-    public boolean isOutsideOfBoundary(double x, double y, double width)
+    public boolean isOutsideOfBoundary(GameObj object)
     {
-        double radius = width / 2.0;
+        double x = object.x;
+        double y = object.y;
+        double radius = object.width / 2.0;
         return (x + radius < 0) || (x - radius > ct.getWidth()) || (y + radius < 0) || (y - radius > ct.getHeight());
     }
 

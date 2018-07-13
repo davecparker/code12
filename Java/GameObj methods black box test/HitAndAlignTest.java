@@ -18,7 +18,7 @@ public class HitAndAlignTest extends Code12Program
         objArray[0] = ct.circle(10, 10, 5, "red");
         objArray[1] = ct.rect(30, 30, 10, 5, "blue");
         objArray[2] = ct.line(0, 0, 100, 100);
-        objArray[3] = ct.text("code12", 50, 50, 5, "majenta");
+        objArray[3] = ct.text("code12", 50, 50, 5, "magenta");
         objArray[4] = ct.image("goldfish.png", 80, 80, 5);
 
         player = ct.rect(25, 75, 5, 5);
@@ -52,8 +52,10 @@ public class HitAndAlignTest extends Code12Program
             }
 
             // test
-            //if (player.hit(null))                                        // java.lang.NullPointerException
-            //{ }
+            if (player.hit(null))
+            {
+                ct.println("player hit null");
+            }
         }
     }
 

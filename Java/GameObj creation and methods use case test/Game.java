@@ -3,13 +3,9 @@ import Code12.*;
 
 public class Game extends Code12Program
 {
-    GameObj player;
+    GameObj player, goal, score;
     GameObj[] enemies;
-    GameObj goal;
-    GameObj score;
     boolean playerDead = false;
-    double playerSpeed = 2;
-    double enemySpeed = 1;
     double enemyCount = 0;
     int scoreCount = 0;
 
@@ -20,24 +16,22 @@ public class Game extends Code12Program
 
     public void start()
     {
-        // Player
-        player = ct.circle(( ct.toInt(ct.getWidth() / 2)), (3 * ct.toInt(ct.getHeight() / 4)), 5);
-        player.setFillColor("blue");
+        ct.setBackColor("gray");
 
-        // Goal
-        goal = ct.circle(ct.random(0, ct.toInt(ct.getWidth())), ct.random(ct.toInt(ct.getHeight() / 3), ct.toInt(ct.getHeight())), 5);
-        goal.setFillColor("green");
+        player = ct.circle(( ct.toInt(ct.getWidth() / 2)), (3 * ct.toInt(ct.getHeight() / 4)), 5, "white");
+        player.setLineColor("white");
 
-        // Score
-        score = ct.text(null, ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 25), 5);
-        //"Score: " + scoreCount + "    Goal: 10"
+        goal = ct.circle(ct.random(0, ct.toInt(ct.getWidth())), ct.random(ct.toInt(ct.getHeight() / 3), ct.toInt(ct.getHeight())), 3, "light green");
+        goal.setLineColor("light green");
 
-        // Enemies
+        score = ct.text("Score: " + scoreCount + "    Goal: 10", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 25), 5, "dark gray");
+
         enemies = new GameObj[10];
         for (int i = 0; i < enemies.length; i++)
         {
-            enemies[i] = ct.rect(ct.random(0, ct.toInt(ct.getWidth())), -2, 3, 3);
-            enemies[i].setFillColor("red");
+            enemies[i] = ct.rect(ct.random(0, ct.toInt(ct.getWidth())), -2, 3, 3, "dark gray");
+            enemies[i].setLineColor("dark gray");
+            enemies[i].group = "enemies";
         }
     }
 
@@ -45,89 +39,125 @@ public class Game extends Code12Program
     {
         if (!playerDead)
         {
-        //}
-           // If Player reaches outside left or right edge of screen: teleport to other side
-           if ( player.x + (player.width / 2) < 0 )
-               player.x = ct.getWidth();
-           else if ( player.x - (player.width / 2) > ct.getWidth() )
-               player.x = 0;
-   
-           // If Player reaches top or bottom edge of screen: prevent passing
-           if (player.y - (player.height / 2) <= 0)
-           {
-               player.y++;
-               player.ySpeed = 0;
-           }
-           else if (player.y + (player.height / 2) >= ct.getHeight())
-           {
-               player.y--;
-               player.ySpeed = 0;
-           }
-   
-           // If Enemy reaches bottom edge of screen: teleport to top
-           for (int i = 0; i < enemies.length; i++)
-           {
-               if (enemies[i].y + (enemies[i].height / 2) >= ct.getHeight())
-               {
-                   enemies[i].x = ct.random(0, ct.toInt(ct.getWidth()));
-                   enemies[i].y = -2;
-               }
-           }
-   
-           // If Player hits Goal
-           if (player.hit(goal))
-           {
-               goal.x = ct.random(0, ct.toInt(ct.getWidth()));
-               goal.y = ct.random(ct.toInt(ct.getHeight() / 3), ct.toInt(ct.getHeight()));
-               scoreCount++;
-               score.setText("Score: " + scoreCount + "    Goal: 10");
-           }
-   
-           // If Player hits Enemies
-           for (int i = 0; i < enemies.length; i++)
-           {
-               if (player.hit(enemies[i]))
-               {
-                   enemies[i].x = ct.random(0, ct.toInt(ct.getWidth()));
-                   enemies[i].y = 0;
-                   scoreCount--;
-                   score.setText("Score: " + scoreCount + "    Goal: 10");
-               }
-           }
-   
-           // If Player lost
-           if (scoreCount < 0)
-           {
-               ct.text("You Lost", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 2), 10);
-               player.delete();
-               for (int i = 0; i < enemies.length; i++)
-                   enemies[i].delete();
-               playerDead = true;
-           }
-   
-           // If Player won
-           else if (scoreCount == 10)
-           {
-               ct.text("You Won!", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 2), 10);
-               player.delete();
-               for (int i = 0; i < enemies.length; i++)
-                   enemies[i].delete();
-               playerDead = true;
-           }
+            if (isBeyondLeftBoundary(player))
+                player.x = ct.getWidth();
+            else if (isBeyondRightBoundary(player))
+                player.x = 0;
+
+            if (isBeyondUpperBoundary(player))
+                preventPassingUpperBoundary(player);
+            else if (isBeyondLowerBoundary(player))
+                preventPassingLowerBoundary(player);
+
+            for (int i = 0; i < enemies.length; i++)
+            {
+                if (isBeyondLowerBoundary(enemies[i]))
+                    randomizeEnemyPosition(i);
+            }
+
+            if (player.hit(goal))
+            {
+                randomizeGoalPosition();
+                incrementScore("++");
+            }
+
+            for (int i = 0; i < enemies.length; i++)
+            {
+                if (player.hit(enemies[i]))
+                {
+                    randomizeEnemyPosition(i);
+                    incrementScore("--");
+                }
+            }
+
+            if (scoreCount < 0)
+                winningAction();
+            else if (scoreCount == 10)
+                losingAction();
         }
+    }
+
+    public boolean isBeyondLeftBoundary(GameObj object)
+    {
+        return object.x + (object.width / 2) <= 0;
+    }
+
+    public boolean isBeyondRightBoundary(GameObj object)
+    {
+        return object.x - (object.width / 2) >= ct.getWidth();
+    }
+
+    public boolean isBeyondUpperBoundary(GameObj object)
+    {
+        return player.y - (player.height / 2) <= 0;
+    }
+
+    public boolean isBeyondLowerBoundary(GameObj object)
+    {
+        return object.y + (object.height / 2) >= ct.getHeight();
+    }
+
+    public void preventPassingUpperBoundary(GameObj object)
+    {
+        object.y++;
+        object.ySpeed = 0;
+    }
+
+    public void preventPassingLowerBoundary(GameObj object)
+    {
+        object.y--;
+        object.ySpeed = 0;
+    }
+
+    public void randomizeEnemyPosition(int i)
+    {
+        enemies[i].x = ct.random(0, ct.toInt(ct.getWidth()));
+        enemies[i].y = -2;
+    }
+
+    public void randomizeGoalPosition()
+    {
+        goal.x = ct.random(0, ct.toInt(ct.getWidth()));
+        goal.y = ct.random(ct.toInt(ct.getHeight() / 3), ct.toInt(ct.getHeight()));
+    }
+
+    public void incrementScore(String increment)
+    {
+        if (increment.equals("++"))
+            scoreCount++;
+        else
+            scoreCount--;
+        score.setText("Score: " + scoreCount + "    Goal: 10");
+    }
+
+    public void winningAction()
+    {
+        ct.text("You Lost", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 2), 10, "dark gray");
+        player.delete();
+        goal.delete();
+        ct.clearGroup("enemies");
+        playerDead = true;
+    }
+
+    public void losingAction()
+    {
+        ct.text("You Won!", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 2), 10, "dark gray");
+        player.delete();
+        goal.delete();
+        ct.clearGroup("enemies");
+        playerDead = true;
     }
 
     public void onKeyPress(String key)
     {
-        // Start moving on key presses
         if (key.equals("up"))
-            player.ySpeed = playerSpeed * -1;
+            player.ySpeed = -2;
         else if (key.equals("down"))
-            player.ySpeed = playerSpeed;
+            player.ySpeed = 2;
         else if (key.equals("left"))
-            player.xSpeed = playerSpeed * -1;
+            player.xSpeed = -2;
         else if (key.equals("right"))
-            player.xSpeed = playerSpeed;
+            player.xSpeed = 2;
 
         enemyCount++;
         if (enemyCount < enemies.length)
@@ -136,7 +166,6 @@ public class Game extends Code12Program
 
     public void onKeyRelease(String key)
     {
-        // Stop moving on key release
         if (key.equals("up") || key.equals("down"))
             player.ySpeed = 0;
         else if (key.equals("left") || key.equals("right"))
