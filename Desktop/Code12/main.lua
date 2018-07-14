@@ -19,13 +19,12 @@ local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
 local err = require( "err" )
 local console = require( "console" )
+local statusBar = require( "statusBar" )
 
 -- UI metrics
-local margin = 10        -- generic margin to leave between many UI items
+local margin = app.margin
 local dyToolbar = 40
-local dyStatusBar = 30
 local dyPaneSplit = 10
-local fontSizeUI = 12
 local defaultConsoleLines = 10
 
 -- Misc constants
@@ -34,7 +33,6 @@ local numSyntaxLevels = 12
 -- Display objects and groups
 local appBg                    -- white background rect
 local toolbarGroup             -- display group for toolbar
-local statusBarGroup           -- display group for status bar
 local outputGroup              -- display group for program output area
 local rightBar                 -- clipping bar to the right of the output area
 local paneSplit                -- pane split area
@@ -43,22 +41,16 @@ local gameGroup                -- display group for game output
 local errGroup                 -- display group for error display
 
 -- Program state
+local sourceFile = app.sourceFile     -- info about the user's source code file
 local syntaxLevel = numSyntaxLevels   -- programming syntax level
 local minConsoleHeight                -- min height of the console window (from pane split)
 local paneDragOffset                  -- when dragging the pane split
 
--- The user source file
-local sourceFile = {
-	path = nil,              -- full pathname to the file
-	timeLoaded = 0,          -- time this file was loaded
-	timeModLast = 0,         -- last modification time or 0 if never
-	strLines = {},           -- array of source code lines when read
-}
 
 -- Force the initial file to the standard test file for faster dev testing
 if env.isSimulator then
---	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
-	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
 	sourceFile.timeLoaded = os.time()
 end
 
@@ -80,41 +72,7 @@ local appContext = ct._appContext
 
 -- Return the available height for the output area
 local function outputAreaHeight()
-	return app.height - dyToolbar - dyStatusBar - minConsoleHeight - dyPaneSplit
-end
-
--- Update status bar based on data in sourceFile
-local function updateStatusBar()
-	if sourceFile.path then
-		-- Get just the filename with extension from the path
-		local _, filename = env.dirAndFilenameOfPath( sourceFile.path )
-
-		-- Get the update time to display
-		local updateStr = "Never"
-		if sourceFile.timeModLast > sourceFile.timeLoaded then
-			local secs = os.time() - sourceFile.timeModLast
-			if secs < 5 then
-				updateStr = "Just now"
-			elseif secs < 60 then
-				updateStr = "Less than a minute ago"
-			elseif secs < 120 then
-				updateStr = "About a minute ago"
-			else
-				local min = math.floor(secs / 60)
-				if min > 60 then
-					updateStr = "Over an hour ago"
-				else
-					updateStr = min .. " minutes ago"
-				end
-			end
-		end
-
-		-- Update the status bar UI
-		statusBarGroup.message.text = filename .. " -- Updated: " .. updateStr
-		statusBarGroup.openFileBtn.isVisible = true
-	else
-		statusBarGroup.openFileBtn.isVisible = false
-	end
+	return app.height - dyToolbar - app.dyStatusBar - minConsoleHeight - dyPaneSplit
 end
 
 -- Run the given lua code string dynamically, and then call the contained start function.
@@ -242,37 +200,6 @@ local function getDeviceMetrics()
 	app.height = display.actualContentHeight
 end
 
--- Make the status bar UI
-local function makeStatusBar()
-	statusBarGroup = g.makeGroup( nil, 0, app.height - dyStatusBar )
-
-	-- Background color
-	statusBarGroup.bg = g.uiItem( display.newRect( statusBarGroup, 0, 0, app.width, dyStatusBar ),
-							app.toolbarShade, app.borderShade )
-
-	-- Status message
-	local yCenter = dyStatusBar / 2
-	statusBarGroup.message = display.newText( statusBarGroup, "", app.width / 2, yCenter, 
-									native.systemFont, fontSizeUI )
-	statusBarGroup.message:setFillColor( 0 )
-
-	-- Open in Editor button
-	local btn = widget.newButton{
-		x = margin,
-		y = yCenter,
-		onRelease = openFileInEditor,
-		label = "Open in Editor",
-		labelAlign = "left",
-		font = native.systemFontBold,
-		fontSize = fontSizeUI,
-	}
-	statusBarGroup:insert( btn )
-	btn.anchorX = 0
-	statusBarGroup.openFileBtn = btn
-
-	updateStatusBar()
-end
-
 -- Make and return a highlight rectangle, in the reference color if ref
 local function makeHilightRect( x, y, width, height, ref )
 	local r = g.uiItem( display.newRect( errGroup.highlightGroup, x, y, width, height ) )
@@ -303,7 +230,7 @@ local function layoutPanes()
 	paneSplit.y = dyToolbar + height
 	paneSplit.width = app.width
 	lowerGroup.y = paneSplit.y + dyPaneSplit + 1
-	local consoleHeight = app.height - lowerGroup.y - dyStatusBar
+	local consoleHeight = app.height - lowerGroup.y - app.dyStatusBar
 	console.resize( app.width, consoleHeight )
 
 	-- Hide console if there is an error display.
@@ -485,14 +412,10 @@ local function onResizeWindow()
 	appBg.width = app.width
 	appBg.height = app.height
 
-	-- Toolbar
+	-- Toolbar and status bar
 	toolbarGroup.bg.width = app.width
 	toolbarGroup.levelPicker.x = app.width - margin
-
-	-- Status bar
-	statusBarGroup.y = app.height - dyStatusBar
-	statusBarGroup.bg.width = app.width
-	statusBarGroup.message.x = app.width / 2
+	statusBar.resize()
 
 	-- Remake the error display, if any
 	if err.hasErr() then
@@ -526,8 +449,8 @@ local function onTouchPaneSplit( event )
 	elseif g.getFocusObj() == paneSplit and phase ~= "cancelled" then
 		-- Compute and set new console size below pane split
 		local y = event.y - paneDragOffset
-		minConsoleHeight = g.pinValue( app.height - y - dyStatusBar,
-									0, app.height - dyStatusBar )
+		minConsoleHeight = g.pinValue( app.height - y - app.dyStatusBar,
+									0, app.height - app.dyStatusBar )
 		onResizeWindow()
 	end
 	if phase == "ended" or phase == "cancelled" then
@@ -626,8 +549,8 @@ local function checkUserFile()
 		local timeMod = env.fileModTimeFromPath( sourceFile.path )
 		if timeMod and timeMod > sourceFile.timeModLast then
 			sourceFile.timeModLast = timeMod
-			updateStatusBar()
 			processUserFile()
+			statusBar.update()
 		end
 	end
 end
@@ -649,7 +572,7 @@ local function makeToolbar()
 		label = "Choose File",
 		labelAlign = "left",
 		font = native.systemFontBold,
-		fontSize = fontSizeUI,
+		fontSize = app.fontSizeUI,
 	}
 	toolbarGroup:insert( btn )
 	btn.anchorX = 0
@@ -706,14 +629,15 @@ local function initApp()
 	layoutPanes()
 
 	-- UI bars
-	makeStatusBar()
+	statusBar.create()
 	makeToolbar()
 
 	-- Install listeners for the app
 	Runtime:addEventListener( "resize", onResizeWindow )
 
-	-- Install timer to check file 4x/sec
-	timer.performWithDelay( 250, checkUserFile, 0 )
+	-- Install update timers
+	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
+	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
 
 	-- Fill in the appContext for the runtime
 	appContext.outputGroup = outputGroup
