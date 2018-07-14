@@ -411,8 +411,13 @@ local function vtExprEquality( nodes )
 	if javaTypes.canCompareVts( vtLeft, vtRight ) then
 		-- Don't allow comparing Strings with ==
 		if vtLeft == "String" then
-			err.setErrNodeAndRef( nodes[2], nodes[1],
-					"Use str1.equals( str2 ) to compare two String values" )
+			if syntaxLevel >= 7 then
+				err.setErrNodeAndRef( nodes[2], nodes[1],
+						"Use str1.equals( str2 ) to compare two String values" )
+			else
+				err.setErrNodeAndRef( nodes[2], nodes[1],
+						"Strings cannot be compared with ==. You must use the equals method, which requires level 7" )
+			end
 			return nil
 		end
 		return true

@@ -95,7 +95,7 @@ function statusBar.create()
 	-- Filename and update status text
 	local yCenter = app.dyStatusBar / 2
 	fileText = display.newText( statusBarGroup, "", app.margin, yCenter, 
-						native.systemFont, fontSizeUI )
+						native.systemFont, app.fontSizeUI )
 	fileText.anchorX = 0
 	fileText:setFillColor( 0 )
 

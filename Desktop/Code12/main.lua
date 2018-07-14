@@ -7,9 +7,6 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
--- Corona modules and plugins
-local widget = require( "widget" )
-
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
@@ -18,36 +15,9 @@ local parseJava = require( "parseJava" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
 local err = require( "err" )
-local console = require( "console" )
 local statusBar = require( "statusBar" )
 local toolbar = require( "toolbar" )
-
--- UI metrics
-local margin = app.margin
-local dyPaneSplit = 10
-local defaultConsoleLines = 10
-
--- Display objects and groups
-local appBg                    -- white background rect
-local outputGroup              -- display group for program output area
-local rightBar                 -- clipping bar to the right of the output area
-local paneSplit                -- pane split area
-local lowerGroup               -- display area below the pane split
-local gameGroup                -- display group for game output
-local errGroup                 -- display group for error display
-
--- Program state
-local sourceFile = app.sourceFile     -- info about the user's source code file
-local minConsoleHeight                -- min height of the console window (from pane split)
-local paneDragOffset                  -- when dragging the pane split
-
-
--- Force the initial file to the standard test file for faster dev testing
-if env.isSimulator then
-	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
---	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
-	sourceFile.timeLoaded = os.time()
-end
+local runView = require( "runView" )
 
 
 -- The global state tables that the generated Lua code can access (Lua globals)
@@ -59,16 +29,24 @@ ct = {
 _G.this = {}      -- generated code uses this.varName for class/global variables
 _G._fn = {}       -- generated code uses _fn.start(), _fn.update(), _fn.userFn(), etc.
 
+
+-- File local state
+local appBg                    -- white background rect
+
 -- Cached state
+local sourceFile = app.sourceFile     -- info about the user's source code file
 local appContext = ct._appContext
 
 
---- Internal Functions ------------------------------------------------
-
--- Return the available height for the output area
-local function outputAreaHeight()
-	return app.height - app.dyToolbar - app.dyStatusBar - minConsoleHeight - dyPaneSplit
+-- Force the initial file to the standard test file for faster dev testing
+if env.isSimulator then
+	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
+--	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
+	sourceFile.timeLoaded = os.time()
 end
+
+
+--- Functions ----------------------------------------------------------------
 
 -- Run the given lua code string dynamically, and then call the contained start function.
 local function runLuaCode( luaCode )
@@ -81,8 +59,8 @@ local function runLuaCode( luaCode )
 		-- Tell the runtime to init and start a new run
 		g.initRun()
 
-		-- Show the game output
-		gameGroup.isVisible = true
+		-- Show the program output
+		runView.showOutput()
 	else
 		print( "*** Lua code failed to load" )
 	end
@@ -160,273 +138,9 @@ local function writeLuaCode( codeStr )
 		io.close( configFile )
 	end
 
-	-- Print user code to console for debugging
+	-- Print user code for debugging
 	--print( "--- Lua Code: ---\n" ); 
 	--print( codeStr )
-end
-
--- Get device metrics and store them in the global table
-local function getDeviceMetrics()
-	app.width = display.actualContentWidth
-	app.height = display.actualContentHeight
-end
-
--- Make and return a highlight rectangle, in the reference color if ref
-local function makeHilightRect( x, y, width, height, ref )
-	local r = g.uiItem( display.newRect( errGroup.highlightGroup, x, y, width, height ) )
-	if ref then
-		r:setFillColor( 1, 1, 0.6 )
-	else
-		r:setFillColor( 1, 1, 0 )
-	end
-	return r
-end
-
--- Position the display panes
-local function layoutPanes()
-	-- Determine size of the top area (game or error output)
-	local width = app.outputWidth
-	local height = app.outputHeight
-	if err.hasErr() then
-		width = app.width
-		height = app.consoleFontHeight * 12   -- TODO
-	end
-
-	-- Position the right bar
-	rightBar.x = width + 1
-	rightBar.width = app.width    -- more than enough
-	rightBar.height = app.height  -- more than enough
-
-	-- Position the pane split and lower group
-	paneSplit.y = app.dyToolbar + height
-	paneSplit.width = app.width
-	lowerGroup.y = paneSplit.y + dyPaneSplit + 1
-	local consoleHeight = app.height - lowerGroup.y - app.dyStatusBar
-	console.resize( app.width, consoleHeight )
-
-	-- Hide console if there is an error display.
-	console.group.isVisible = not err.hasErr()
-end
-
--- Remove the error display if it exists
-local function removeErrorDisplay()
-	if errGroup then
-		errGroup:removeSelf()
-		errGroup = nil
-	end
-	layoutPanes()
-end
-
--- Make the error display, or destroy and remake it if it exists
-local function makeErrDisplay()
-	-- Make group to hold all err display items
-	removeErrorDisplay()
-	errGroup = g.makeGroup( outputGroup )
-	local numSourceLines = 7
-
-	-- Layout metrics
-	local dxChar = app.consoleFontCharWidth
-	local dxLineNum = math.round( dxChar * 6 )
-	local xText = math.round( dxLineNum + dxChar )
-	local dyLine = app.consoleFontHeight
-	local dySource = numSourceLines * dyLine
-
-	-- Make background rect for the source display
-	g.uiItem( display.newRect( errGroup, 0, 0, app.width, dySource + margin ), 1, app.borderShade )
-
-	-- Make the highlight rectangles
-	local highlightGroup = g.makeGroup( errGroup, xText, margin )
-	errGroup.highlightGroup = highlightGroup
-	local y = ((numSourceLines - 1) / 2) * dyLine
-	errGroup.lineNumRect = makeHilightRect( -xText, y, dxLineNum, dyLine )
-	errGroup.refRect = makeHilightRect( dxChar * 5, y, 
-							dxChar * 6, dyLine, true )
-	errGroup.sourceRect = makeHilightRect( 0, y, dxChar * 4, dyLine )
-
-	-- Make the lines numbers
-	local lineNumGroup = g.makeGroup( errGroup, 0, margin )
-	errGroup.lineNumGroup = lineNumGroup
-	for i = 1, numSourceLines do
-		local t = display.newText{
-			parent = lineNumGroup,
-			text = "", 
-			x = dxLineNum, 
-			y = (i - 1) * dyLine,
-			font = app.consoleFont, 
-			fontSize = app.consoleFontSize,
-			align = "right",
-		}
-		t.anchorX = 1
-		t.anchorY = 0
-		t:setFillColor( 0.3 )
-	end
-
-	-- Make the source lines
-	local sourceGroup = g.makeGroup( errGroup, xText, margin )
-	errGroup.sourceGroup = sourceGroup
-	for i = 1, numSourceLines do
-		g.uiBlack( display.newText{
-			parent = sourceGroup,
-			text = "", 
-			x = 0, 
-			y = (i - 1) * dyLine,
-			font = app.consoleFont, 
-			fontSize = app.consoleFontSize,
-			align = "left",
-		} )
-	end
-
-	-- Make the error text
-	errGroup.errText = g.uiBlack( display.newText{
-		parent = errGroup,
-		text = "", 
-		x = margin * 2, 
-		y = dySource + margin * 2,
-		width = app.width - xText - 20,   -- wrap near end of window
-		font = native.systemFontBold, 
-		fontSize = app.consoleFontSize + 2,
-		align = "left",
-	} )
-end
-
--- Show the error state
-local function showError()
-	-- Make sure there is an error to show
-	if not err.hasErr() then
-		print( "*** Missing error state for failed parse")
-		return
-	end
-
-	-- Make the error display elements
-	makeErrDisplay()
-	layoutPanes()
-
-	-- Set the error text
-	local errRecord = err.getErrRecord()
-	print( "\n" .. errRecord.strErr )
-	errGroup.errText.text = errRecord.strErr
-
-	-- Load the source lines around the error
-	local iLine = errRecord.loc.first.iLine   -- main error location
-	local sourceGroup = errGroup.sourceGroup
-	local lineNumGroup = errGroup.lineNumGroup
-	local numLines = lineNumGroup.numChildren
-	local before = (numLines - 1) / 2
-	local lineNumFirst = iLine - before
-	local lineNumLast = lineNumFirst + numLines
-	local lineNum = lineNumFirst
-	for i = 1, numLines do 
-		if lineNum < 1 or lineNum > #sourceFile.strLines then
-			lineNumGroup[i].text = ""
-			sourceGroup[i].text = ""
-		else
-			lineNumGroup[i].text = tostring( lineNum )
-			sourceGroup[i].text = sourceFile.strLines[lineNum]
-		end
-		lineNum = lineNum + 1
-	end
-
-	-- Position the main highlight
-	local dxChar = app.consoleFontCharWidth
-	local dxExtra = 2   -- extra pixels of highlight horizontally
-	local r = errGroup.sourceRect
-	local loc = errRecord.loc
-	r.x = (loc.first.iChar - 1) * dxChar - dxExtra
-	r.height = app.consoleFontHeight
-	local numChars = string.len( sourceFile.strLines[loc.first.iLine] or "" )
-	if loc.last == nil then
-		-- Entire (single) line
-	elseif loc.first.iLine == loc.last.iLine then
-		-- Portion of a single line
-		numChars = loc.last.iChar - loc.first.iChar + 1
-	else
-		-- Multi-line. Make a rectangle bounding it all. 
-		-- TODO: Is this good enough or do we need multiple rects?
-		r.x = 0
-		for iLineNext = loc.first.iLine + 1, loc.last.iLine do
-			local numCharsNext = string.len( sourceFile.strLines[iLineNext] or "" )
-			if numCharsNext > numChars then
-				numChars = numCharsNext
-			end
-			r.height = r.height + app.consoleFontHeight
-		end
-	end
-	r.width = numChars * dxChar + dxExtra * 2
-
-	-- Position the ref highlight if it's showing  TODO: two line groups if necc
-	r = errGroup.refRect
-	r.isVisible = false
-	if errRecord.refLoc then
-		local iLineRef = errRecord.refLoc.first.iLine
-		if iLineRef >= lineNumFirst and iLineRef <= lineNumLast then
-			r.y = (iLineRef - lineNumFirst) * app.consoleFontHeight
-			r.x = (errRecord.refLoc.first.iChar - 1) * dxChar - dxExtra
-			numChars = errRecord.refLoc.last.iChar - errRecord.refLoc.first.iChar + 1
-			r.width = numChars * dxChar + dxExtra * 2
-			r.isVisible = true
-		end
-	end
-end
-
--- Show a runtime error with the given line number and message
-local function showRuntimeError( lineNum, message )
-	err.setErrLineNum( lineNum, "Runtime error: " .. message )
-	showError();
-end
-
--- Handle resize event for the window
-local function onResizeWindow()
-	-- Get new window size
-	getDeviceMetrics()
-
-	-- Window background
-	appBg.width = app.width
-	appBg.height = app.height
-
-	-- Toolbar and status bar
-	toolbar.resize()
-	statusBar.resize()
-
-	-- Remake the error display, if any
-	if err.hasErr() then
-		showError()
-	end
-
-	-- Calculate the output space and tell the runtime we resized. 
-	-- This will result in a call to ct.setHeight() internally, 
-	-- which will then call us back at setClipSize().
-	appContext.widthP = math.max( app.width, 1 )
-	appContext.heightP = math.max( outputAreaHeight(), 1 )
-	if g.onResize then
-		g.onResize()
-	end
-end
-
--- Runtime callback to set the output size being used
-local function setClipSize( widthP, heightP )
-	app.outputWidth = math.floor( widthP )
-	app.outputHeight = math.floor( heightP )
-	layoutPanes()
-end
-
--- Handle touch events on the pane split area.
--- Moving the split pane changes the minimum console height
-local function onTouchPaneSplit( event )
-	local phase = event.phase
-	if phase == "began" then
-		g.setFocusObj( paneSplit )
-		paneDragOffset = event.y - lowerGroup.y
-	elseif g.getFocusObj() == paneSplit and phase ~= "cancelled" then
-		-- Compute and set new console size below pane split
-		local y = event.y - paneDragOffset
-		minConsoleHeight = g.pinValue( app.height - y - app.dyStatusBar,
-									0, app.height - app.dyStatusBar )
-		onResizeWindow()
-	end
-	if phase == "ended" or phase == "cancelled" then
-		g.setFocusObj(nil)
-	end
-	return true
 end
 
 -- Prepare for a new run of the user program
@@ -452,17 +166,9 @@ local function initNewProgram()
 	_G.this = {}
 	_G._fn = {}
 
-	-- Clear the error state, console, and other state
+	-- Clear the error state and re-init the run view state
 	err.initProgram()
-	console.clear()
-
-	-- Init new runtime display state for this run
-	if gameGroup then
-		gameGroup:removeSelf()
-	end
-	gameGroup = g.makeGroup( outputGroup )
-	gameGroup.isVisible = false
-	removeErrorDisplay()
+	runView.initNewProgram()
 end
 
 -- Process the user file (parse then run or show error)
@@ -490,7 +196,7 @@ function app.processUserFile()
 		else
 			startTokens = nil
 			if tree == nil then
-				showError()
+				runView.showError()
 				return
 			end
 			parseTrees[#parseTrees + 1] = tree
@@ -500,12 +206,12 @@ function app.processUserFile()
 
 	-- Do Semantic Analysis on the parse trees
 	if not checkJava.initProgram( parseTrees, app.syntaxLevel ) then
-		showError()
+		runView.showError()
 	else
 		-- Make and run the Lua code
 		local codeStr = codeGenJava.getLuaCode( parseTrees )
 		if err.hasErr() then
-			showError()
+			runView.showError()
 		else
 			writeLuaCode( codeStr )
 			runLuaCode( codeStr )
@@ -525,6 +231,28 @@ local function checkUserFile()
 	end
 end
 
+-- Get device metrics and store them in the global table
+local function getDeviceMetrics()
+	app.width = display.actualContentWidth
+	app.height = display.actualContentHeight
+end
+
+
+-- Handle resize event for the window
+local function onResizeWindow()
+	-- Get new window size
+	getDeviceMetrics()
+
+	-- App background rect
+	appBg.width = app.width
+	appBg.height = app.height
+
+	-- Resize the component windows
+	toolbar.resize()
+	statusBar.resize()
+	runView.resize()
+end
+
 -- Init the app
 local function initApp()
 	-- Make a default window title
@@ -533,28 +261,12 @@ local function initApp()
 
 	-- Get initial device info and metrics
 	getDeviceMetrics()
-	console.init()
-	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines
-	app.outputWidth = app.width
-	app.outputHeight = outputAreaHeight()
 
-	-- White background
+	-- White background for the whole app
 	appBg = g.uiWhite( display.newRect( 0, 0, app.width, app.height ) )
 
-	-- Make the main output group
-	outputGroup = g.makeGroup(nil, 0, app.dyToolbar)
-
-	-- Main display areas
-	rightBar = g.uiItem( display.newRect( 0, app.dyToolbar, 0, 0 ), 
-						app.extraShade, app.borderShade )
-	paneSplit = g.uiItem( display.newRect( 0, 0, 0, dyPaneSplit ), 
-						app.toolbarShade, app.borderShade )
-	paneSplit:addEventListener( "touch", onTouchPaneSplit )
-	lowerGroup = g.makeGroup()
-	console.create( lowerGroup, 0, 0, 0, 0 )
-	layoutPanes()
-
-	-- UI bars
+	-- Create the component views
+	runView.create()
 	statusBar.create()
 	toolbar.create()
 
@@ -567,20 +279,6 @@ local function initApp()
 	-- Install update timers
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
-
-	-- Fill in the appContext for the runtime
-	appContext.outputGroup = outputGroup
-	appContext.widthP = app.outputWidth
-	appContext.heightP = app.outputHeight
-	appContext.setClipSize = setClipSize
-	appContext.print = console.print
-	appContext.println = console.println
-	appContext.runtimeErr = showRuntimeError
-
-	-- Load the Code12 API and runtime.
-	-- This defines the Code12 APIs in the global ct table
-	-- and sets the runtime's fields in ct._appContext.
-	require( "Code12.api" )
 end
 
 -- Start the app
