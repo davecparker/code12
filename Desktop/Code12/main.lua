@@ -20,19 +20,15 @@ local codeGenJava = require( "codeGenJava" )
 local err = require( "err" )
 local console = require( "console" )
 local statusBar = require( "statusBar" )
+local toolbar = require( "toolbar" )
 
 -- UI metrics
 local margin = app.margin
-local dyToolbar = 40
 local dyPaneSplit = 10
 local defaultConsoleLines = 10
 
--- Misc constants
-local numSyntaxLevels = 12
-
 -- Display objects and groups
 local appBg                    -- white background rect
-local toolbarGroup             -- display group for toolbar
 local outputGroup              -- display group for program output area
 local rightBar                 -- clipping bar to the right of the output area
 local paneSplit                -- pane split area
@@ -42,7 +38,6 @@ local errGroup                 -- display group for error display
 
 -- Program state
 local sourceFile = app.sourceFile     -- info about the user's source code file
-local syntaxLevel = numSyntaxLevels   -- programming syntax level
 local minConsoleHeight                -- min height of the console window (from pane split)
 local paneDragOffset                  -- when dragging the pane split
 
@@ -72,7 +67,7 @@ local appContext = ct._appContext
 
 -- Return the available height for the output area
 local function outputAreaHeight()
-	return app.height - dyToolbar - app.dyStatusBar - minConsoleHeight - dyPaneSplit
+	return app.height - app.dyToolbar - app.dyStatusBar - minConsoleHeight - dyPaneSplit
 end
 
 -- Run the given lua code string dynamically, and then call the contained start function.
@@ -170,30 +165,6 @@ local function writeLuaCode( codeStr )
 	--print( codeStr )
 end
 
--- Show dialog to choose the user source code file
-local function chooseFile()
-	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
-	if path then
-		sourceFile.path = path
-		sourceFile.timeLoaded = os.time()
-		sourceFile.timeModLast = 0
-	end
-	native.setActivityIndicator( false )
-end
-
--- Event handler for the Choose File button
-local function onChooseFile()
-	native.setActivityIndicator( true )
-	timer.performWithDelay( 50, chooseFile )
-end
-
--- Open the source file in the system default text editor for its file type
-local function openFileInEditor()
-	if sourceFile.path then
-		env.openFileInEditor( sourceFile.path )
-	end
-end
-
 -- Get device metrics and store them in the global table
 local function getDeviceMetrics()
 	app.width = display.actualContentWidth
@@ -227,7 +198,7 @@ local function layoutPanes()
 	rightBar.height = app.height  -- more than enough
 
 	-- Position the pane split and lower group
-	paneSplit.y = dyToolbar + height
+	paneSplit.y = app.dyToolbar + height
 	paneSplit.width = app.width
 	lowerGroup.y = paneSplit.y + dyPaneSplit + 1
 	local consoleHeight = app.height - lowerGroup.y - app.dyStatusBar
@@ -413,8 +384,7 @@ local function onResizeWindow()
 	appBg.height = app.height
 
 	-- Toolbar and status bar
-	toolbarGroup.bg.width = app.width
-	toolbarGroup.levelPicker.x = app.width - margin
+	toolbar.resize()
 	statusBar.resize()
 
 	-- Remake the error display, if any
@@ -495,8 +465,8 @@ local function initNewProgram()
 	removeErrorDisplay()
 end
 
--- Function to process the user file (parse then run or show error)
-local function processUserFile()
+-- Process the user file (parse then run or show error)
+function app.processUserFile()
 	-- Read the file
 	if not readSourceFile() then
 		return
@@ -513,7 +483,7 @@ local function processUserFile()
 	for lineNum = 1, #sourceFile.strLines do
 		local strUserCode = sourceFile.strLines[lineNum]
 		local tree, tokens = parseJava.parseLine( strUserCode, 
-									lineNum, startTokens, syntaxLevel )
+									lineNum, startTokens, app.syntaxLevel )
 		if tree == false then
 			-- Line is incomplete, carry tokens forward to next line
 			startTokens = tokens
@@ -529,7 +499,7 @@ local function processUserFile()
 	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
 	-- Do Semantic Analysis on the parse trees
-	if not checkJava.initProgram( parseTrees, syntaxLevel ) then
+	if not checkJava.initProgram( parseTrees, app.syntaxLevel ) then
 		showError()
 	else
 		-- Make and run the Lua code
@@ -549,54 +519,10 @@ local function checkUserFile()
 		local timeMod = env.fileModTimeFromPath( sourceFile.path )
 		if timeMod and timeMod > sourceFile.timeModLast then
 			sourceFile.timeModLast = timeMod
-			processUserFile()
+			app.processUserFile()
 			statusBar.update()
 		end
 	end
-end
-
--- Make the toolbar UI
-local function makeToolbar()
-	toolbarGroup = g.makeGroup()
-
-	-- Background
-	toolbarGroup.bg = g.uiItem( display.newRect( toolbarGroup, 0, 0, app.width, dyToolbar ),
-							app.toolbarShade, app.borderShade )
-
-	-- Choose File Button
-	local yCenter = dyToolbar / 2
-	local btn = widget.newButton{
-		x = margin, 
-		y = yCenter,
-		onRelease = onChooseFile,
-		label = "Choose File",
-		labelAlign = "left",
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-	}
-	toolbarGroup:insert( btn )
-	btn.anchorX = 0
-	toolbarGroup.chooseFileBtn = btn
-
-		-- Level picker
-	local segmentNames = {}
-	for i = 1, numSyntaxLevels do
-		segmentNames[i] = tostring( i )
-	end
-	local segWidth = 25
-	toolbarGroup.levelPicker = widget.newSegmentedControl{
-		x = app.width - margin,
-		y = yCenter,
-		segmentWidth = segWidth,
-		segments = segmentNames,
-		defaultSegment = numSyntaxLevels,
-		onPress = 
-			function (event )
-				syntaxLevel = event.target.segmentNumber
-				processUserFile()
-			end
-	}
-	toolbarGroup.levelPicker.anchorX = 1
 end
 
 -- Init the app
@@ -616,10 +542,10 @@ local function initApp()
 	appBg = g.uiWhite( display.newRect( 0, 0, app.width, app.height ) )
 
 	-- Make the main output group
-	outputGroup = g.makeGroup(nil, 0, dyToolbar)
+	outputGroup = g.makeGroup(nil, 0, app.dyToolbar)
 
 	-- Main display areas
-	rightBar = g.uiItem( display.newRect( 0, dyToolbar, 0, 0 ), 
+	rightBar = g.uiItem( display.newRect( 0, app.dyToolbar, 0, 0 ), 
 						app.extraShade, app.borderShade )
 	paneSplit = g.uiItem( display.newRect( 0, 0, 0, dyPaneSplit ), 
 						app.toolbarShade, app.borderShade )
@@ -630,7 +556,10 @@ local function initApp()
 
 	-- UI bars
 	statusBar.create()
-	makeToolbar()
+	toolbar.create()
+
+	-- Init user settings
+	app.syntaxLevel = app.numSyntaxLevels    -- TODO: load/save
 
 	-- Install listeners for the app
 	Runtime:addEventListener( "resize", onResizeWindow )
