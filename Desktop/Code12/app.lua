@@ -49,5 +49,14 @@ local app =  {
 }
 
 
+--- Global App Functions ----------------------------------------------------------------
+
+-- Get device metrics and store them in the global table
+function app.getWindowSize()
+	app.width = display.actualContentWidth
+	app.height = display.actualContentHeight
+end
+
+
 ------------------------------------------------------------------------------
 return app
