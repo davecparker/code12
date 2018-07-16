@@ -58,6 +58,9 @@ local g = {
 	modalDialog = false,   -- true if a modal dialog is showing
 	blocked = false,       -- true if user code is blocked on user input
 	stopped = false,       -- true if run was stopped or failed
+
+	-- Diagnostic options
+	fnLogErr = nil,        -- if set, call fnLogErr(errRec) instead of stopping on errors
 }
 
 

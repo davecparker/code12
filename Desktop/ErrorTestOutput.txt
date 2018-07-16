@@ -1,0 +1,30 @@
+======= Test Started ==========================================
+18. ct.circle("Oops");
+*** Unexpected error text: Not enough parameters passed to circle (requires 3)
+
+23. i = i + 1;
+*** Unexpected error: Undefined variable i
+
+24. int j = 5 + 3.14;
+*** Unexpected error: Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()
+
+25. int j = 3;
+*** Unexpected error: Variable j was already defined
+
+26. foo();
+*** Unexpected error: Undefined function foo
+
+======= Test Complete =========================================
+
+Semantic Error Test:
+
+    29 lines processed
+    2 ms Parse time
+    0 ms Semantic check time
+    0 ms Code Generation time
+    2 ms Total time
+
+5 unexpected errors
+0 uncaught errors (2 expected errors)
+
+FAILED

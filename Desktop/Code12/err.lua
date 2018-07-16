@@ -7,9 +7,11 @@
 -- (c)Copyright 2018 by David C. Parker 
 -----------------------------------------------------------------------------------------
 
+-- Code12 modules
+local g = require( "Code12.globals" )
+
 -- The err module
 local err = {}
-
 
 
 -- The error state. We only detect and store the first error in the program.
@@ -109,8 +111,17 @@ function err.setErr( loc, refLoc, strErr, ... )
 		assert( type(refLoc) == "table" and refLoc.first ~= nil )
 	end
 	assert( type(strErr) == "string" )
-	if errRecord == nil then
-		errRecord = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
+
+	local errNew = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
+	if g.fnLogErr then
+		-- In diagnostic mode, report every error but don't store the error state 
+		-- in errRecord (force checking to continue). 
+		g.fnLogErr( errNew )
+	else
+		-- Only set the error state if not already set (take the first error only)
+		if errRecord == nil then
+			errRecord = errNew
+		end
 	end
 end
 
