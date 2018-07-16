@@ -10,6 +10,7 @@ class ErrorTest extends Code12Program
 	// ERROR "Return type of start function should be void"
 	public int start()
 	{
+		// These line are all OK
 		int i = 3;
 		int foo = i + 4;
 		ct.setBackColor("light blue"); 
@@ -30,6 +31,13 @@ class ErrorTest extends Code12Program
 		int j = 3;
 		// ERROR "Undefined function"
 		foo();
+
+		// ERROR "test uncaught error"
+		double z = 3.14;
+		// ERROR "test unexpected error text"
+		int k = z;
+		// Test unexpected error
+		ct.circle("Nope", "This", "is", "wrong");
 	}
 }
 
