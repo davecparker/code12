@@ -12,18 +12,19 @@ local g = require( "Code12.globals" )
 
 
 -- Layout constants
-local margin = 2                             -- pixel margin to use
+local xMargin = 2                            -- on either wide of shuttle
+local yMargin = 2                            -- above and below the shuttle
 local width = 12                             -- scrollbar width
 
 -- Computed layout metrics
-local radius = (width - margin) / 2          -- radius of circlular parts
+local radius = width / 2 - xMargin           -- radius of circlular parts
 local diameter = radius * 2                  -- diameter of top circular parts
-local minHeight = margin * 2 + diameter      -- don't show if shorter than this
-local dyMinShuttle = diameter * 3              -- minimum pixel height of shuttle
+local minHeight = yMargin * 2 + diameter     -- don't show if shorter than this
+local dyMinShuttle = diameter * 3            -- minimum pixel height of shuttle
 
 -- Gray shades
-local bgShade = 0.95
-local shuttleShade = 0.8
+local trackShade = 0.94
+local shuttleShade = 0.75
 
 
 -- The scrollbar class
@@ -43,11 +44,7 @@ function Scrollbar:layoutTrack()
 		return
 	end
 	self.group.isVisible = true
-	self.bg.height = height
-
-	-- Layout track parts
-	self.trackMiddle.height = height - margin - margin - diameter
-	self.trackBottom.y = margin + self.trackMiddle.height
+	self.track.height = height
 end
 
 -- Set a new scroll pos and notify the app
@@ -104,7 +101,7 @@ function Scrollbar:touchTrack( phase, y )
 		else
 			self:setPos( self.pos + pageSize )
 		end
-		g.setFocusObj( self.trackTop )
+		g.setFocusObj( self.track )
 	elseif phase ~= "moved" then
 		g.setFocusObj( nil )
 	end
@@ -147,25 +144,20 @@ function Scrollbar:new( parent, x, y, height, onChangePos )
 
 		-- Display parts (finished in layout)
 		group = group,    -- display group for the scrollbar
-		bg = g.uiWhite( display.newRect( group, 0, 0, width, height ) ),
-		trackTop = g.uiItem( display.newCircle( group, 0, margin, radius ), bgShade ),
-		trackMiddle = g.uiItem( display.newRect( group, 0, radius, width - margin, 0 ), bgShade ),
-		trackBottom = g.uiItem( display.newCircle( group, 0, 0, radius ), bgShade ),
-		shuttleTop = g.uiItem( display.newCircle( group, 0, 0, radius ), shuttleShade ),
-		shuttleMiddle = g.uiItem( display.newRect( group, 0, 0, width - margin, 0 ), shuttleShade ),
-		shuttleBottom = g.uiItem( display.newCircle( group, 0, 0, radius ), shuttleShade ),
+		track = g.uiItem( display.newRect( group, 0, 0, width, height ), trackShade ),
+		shuttleTop = g.uiItem( display.newCircle( group, xMargin, 0, radius ), shuttleShade ),
+		shuttleMiddle = g.uiItem( display.newRect( group, xMargin, 0, width - xMargin * 2, 0 ), shuttleShade ),
+		shuttleBottom = g.uiItem( display.newCircle( group, xMargin, 0, radius ), shuttleShade ),
 
 		-- Change callback function
 		onChangePos = onChangePos,
 	}
 
 	-- Set touch listeners for the shuttle and extra space
+	sb.track:addEventListener( "touch", sb )
 	sb.shuttleTop:addEventListener( "touch", sb )
 	sb.shuttleMiddle:addEventListener( "touch", sb )
 	sb.shuttleBottom:addEventListener( "touch", sb )
-	sb.trackTop:addEventListener( "touch", sb )
-	sb.trackMiddle:addEventListener( "touch", sb )
-	sb.trackBottom:addEventListener( "touch", sb )
 
 	-- Set the object's metatable
 	setmetatable( sb, self)
@@ -196,12 +188,12 @@ function Scrollbar:adjust( rangeMin, rangeMax, pos, ratio )
 	self.group.isVisible = true
 	local range = rangeMax - rangeMin
 	local dyShuttle = math.max( ratio * self.height, dyMinShuttle )
-	self.yMinShuttle = margin
-	local dyRangeShuttle = self.height - margin * 2 - dyShuttle
+	self.yMinShuttle = yMargin
+	local dyRangeShuttle = self.height - yMargin * 2 - dyShuttle
 	self.yMaxShuttle = self.yMinShuttle + dyRangeShuttle
 
 	-- Position the parts
-	local yShuttle = (pos - rangeMin) * dyRangeShuttle / range + margin
+	local yShuttle = (pos - rangeMin) * dyRangeShuttle / range + yMargin
 	self.shuttleTop.y = yShuttle
 	self.shuttleMiddle.y = yShuttle + radius
 	self.shuttleMiddle.height = dyShuttle - diameter
