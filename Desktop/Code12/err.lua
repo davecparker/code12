@@ -7,9 +7,6 @@
 -- (c)Copyright 2018 by David C. Parker 
 -----------------------------------------------------------------------------------------
 
--- Code12 modules
-local g = require( "Code12.globals" )
-
 -- The err module
 local err = {}
 
@@ -28,6 +25,10 @@ local err = {}
 --     },
 -- }
 local errRecord
+
+-- Diagnostic error logging function. If set, errors are sent here instead of
+-- being recorded in the errRecord
+local fnLogErr
 
 
 --- Utility Functions -------------------------------------------------------
@@ -113,10 +114,10 @@ function err.setErr( loc, refLoc, strErr, ... )
 	assert( type(strErr) == "string" )
 
 	local errNew = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
-	if g.fnLogErr then
+	if fnLogErr then
 		-- In diagnostic mode, report every error but don't store the error state 
 		-- in errRecord (force checking to continue). 
-		g.fnLogErr( errNew )
+		fnLogErr( errNew )
 	else
 		-- Only set the error state if not already set (take the first error only)
 		if errRecord == nil then
@@ -204,6 +205,16 @@ end
 -- Clear the error state
 function err.clearErr()
 	errRecord = nil
+end
+
+-- Set the error logging function
+function err.setFnLogErr( fn )
+	fnLogErr = fn
+end
+
+-- Return true if we should stop on errors
+function err.stopOnErrors()
+	return fnLogErr == nil
 end
 
 

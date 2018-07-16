@@ -10,7 +10,6 @@
 
 -- Code12 modules
 package.path = package.path .. ';../Code12/?.lua'
-local g = require( "Code12.globals" )
 local err = require( "err" )
 local parseJava = require( "parseJava" )
 local checkJava = require( "checkJava" )
@@ -179,7 +178,7 @@ local function checkTestCode()
 	local startTime = system.getTimer()
 
 	-- Install special Code12 hook to log errors and continue instead of stopping
-	g.fnLogErr = onLogError
+	err.setFnLogErr( onLogError )
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
