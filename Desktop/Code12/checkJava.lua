@@ -140,7 +140,7 @@ local function getMethods( parseTrees )
 				end
 			end
 		end
-		if err.hasErr() then
+		if err.hasErr() and err.stopOnErrors() then 
 			return false
 		end
 	end
@@ -864,7 +864,7 @@ function checkJava.doTypeChecks( tree )
 		for i = 1, #nodes do
 			local node = nodes[i]
 			if node.t then  -- don't recurse down into tokens
-				if not checkJava.doTypeChecks( node ) then
+				if not checkJava.doTypeChecks( node ) and err.stopOnErrors() then
 					return false
 				end
 			end
