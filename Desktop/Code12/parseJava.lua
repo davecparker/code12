@@ -8,8 +8,8 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules used
-local javalex = require( "javalex" )
 local err = require( "err" )
+local javalex = require( "javalex" )
 
 
 -- The parseJava module
