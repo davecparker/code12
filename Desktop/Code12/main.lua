@@ -7,6 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+-- Corona modules
+local composer = require( "composer" )
+
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
@@ -17,7 +20,7 @@ local codeGenJava = require( "codeGenJava" )
 local err = require( "err" )
 local statusBar = require( "statusBar" )
 local toolbar = require( "toolbar" )
-local runView = require( "runView" )
+local console = require( "console" )
 
 
 -- The global state tables that the generated Lua code can access (Lua globals)
@@ -29,9 +32,6 @@ ct = {
 _G.this = {}      -- generated code uses this.varName for class/global variables
 _G._fn = {}       -- generated code uses _fn.start(), _fn.update(), _fn.userFn(), etc.
 
-
--- File local state
-local appBg                    -- white background rect
 
 -- Cached state
 local sourceFile = app.sourceFile     -- info about the user's source code file
@@ -56,11 +56,8 @@ local function runLuaCode( luaCode )
 		-- Run user code main chunk, which defines the functions
 		codeFunction()
 
-		-- Tell the runtime to init and start a new run
-		g.initRun()
-
-		-- Show the program output
-		runView.showOutput()
+		-- Run and show the program output
+		composer.gotoScene( "runView" )
 	else
 		print( "*** Lua code failed to load" )
 	end
@@ -74,20 +71,22 @@ end
 -- Read the sourceFile and store all of its source lines.
 -- Return true if success.
 local function readSourceFile()
-	local file = io.open( sourceFile.path, "r" )
-	if file then
-		sourceFile.strLines = {}   -- delete previous contents if any
-		local lineNum = 1
-		repeat
-			local s = file:read( "*l" )  -- read a line
-			if s == nil then 
-				break  -- end of file
-			end
-			sourceFile.strLines[lineNum] = detabString(s)
-			lineNum = lineNum + 1
-		until false -- breaks internally
-		io.close( file )
-		return true
+	if sourceFile.path then
+		local file = io.open( sourceFile.path, "r" )
+		if file then
+			sourceFile.strLines = {}   -- delete previous contents if any
+			local lineNum = 1
+			repeat
+				local s = file:read( "*l" )  -- read a line
+				if s == nil then 
+					break  -- end of file
+				end
+				sourceFile.strLines[lineNum] = detabString(s)
+				lineNum = lineNum + 1
+			until false -- breaks internally
+			io.close( file )
+			return true
+		end
 	end
 	return false
 end
@@ -168,7 +167,6 @@ local function initNewProgram()
 
 	-- Clear the error state and re-init the run view state
 	err.initProgram()
-	runView.initNewProgram()
 end
 
 -- Process the user file (parse then run or show error)
@@ -196,7 +194,7 @@ function app.processUserFile()
 		else
 			startTokens = nil
 			if tree == nil then
-				runView.showError()
+				composer.gotoScene( "errView" )
 				return
 			end
 			parseTrees[#parseTrees + 1] = tree
@@ -206,12 +204,12 @@ function app.processUserFile()
 
 	-- Do Semantic Analysis on the parse trees
 	if not checkJava.initProgram( parseTrees, app.syntaxLevel ) then
-		runView.showError()
+		composer.gotoScene( "errView" )
 	else
 		-- Make and run the Lua code
 		local codeStr = codeGenJava.getLuaCode( parseTrees )
 		if err.hasErr() then
-			runView.showError()
+			composer.gotoScene( "errView" )
 		else
 			writeLuaCode( codeStr )
 			runLuaCode( codeStr )
@@ -219,7 +217,7 @@ function app.processUserFile()
 	end
 end
 
--- Function to check user file for changes and (re)parse it if modified
+-- Function to check user file for changes and (re)run it if modified
 local function checkUserFile()
 	if sourceFile.path then
 		local timeMod = env.fileModTimeFromPath( sourceFile.path )
@@ -231,26 +229,11 @@ local function checkUserFile()
 	end
 end
 
--- Get device metrics and store them in the global table
-local function getDeviceMetrics()
-	app.width = display.actualContentWidth
-	app.height = display.actualContentHeight
-end
-
-
 -- Handle resize event for the window
 local function onResizeWindow()
-	-- Get new window size
-	getDeviceMetrics()
-
-	-- App background rect
-	appBg.width = app.width
-	appBg.height = app.height
-
-	-- Resize the component windows
+	app.getWindowSize()
 	toolbar.resize()
 	statusBar.resize()
-	runView.resize()
 end
 
 -- Init the app
@@ -259,27 +242,26 @@ local function initApp()
 	display.setStatusBar( display.HiddenStatusBar )
 	native.setProperty("windowTitleText", "Code12")
 
-	-- Get initial device info and metrics
-	getDeviceMetrics()
+	-- Get initial window size and metrics
+	app.getWindowSize()
+	console.init()      -- gets and stores console font metrics
 
-	-- White background for the whole app
-	appBg = g.uiWhite( display.newRect( 0, 0, app.width, app.height ) )
-
-	-- Create the component views
-	runView.create()
+	-- Create the UI bars that live in the global group
 	statusBar.create()
 	toolbar.create()
 
 	-- Init user settings
 	app.syntaxLevel = app.numSyntaxLevels    -- TODO: load/save
 
-	-- Install listeners for the app
+	-- Install listeners and update timers
 	Runtime:addEventListener( "resize", onResizeWindow )
-
-	-- Install update timers
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
+
+	-- Start in the runView for now
+	composer.gotoScene( "runView" )
 end
+
 
 -- Start the app
 initApp()

@@ -14,6 +14,8 @@ local app =  {
 	toolbarShade = 0.8,
 	extraShade = 0.9,
 	borderShade = 0.5,
+	enabledShade = 0.3,
+	disabledShade = 0.7,
 
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
@@ -47,6 +49,15 @@ local app =  {
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
 }
+
+
+--- Global App Functions ----------------------------------------------------------------
+
+-- Get device metrics and store them in the global table
+function app.getWindowSize()
+	app.width = display.actualContentWidth
+	app.height = display.actualContentHeight
+end
 
 
 ------------------------------------------------------------------------------
