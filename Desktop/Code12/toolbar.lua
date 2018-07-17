@@ -7,7 +7,7 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
--- Corona modules and plugins
+-- Corona modules
 local widget = require( "widget" )
 
 -- Code12 app modules

@@ -86,7 +86,7 @@ end
 
 -- Update the console if needed
 local function onNewFrame()
-	if changed then
+	if changed and console.group then
 		updateConsole()
 		changed = false
 	end
