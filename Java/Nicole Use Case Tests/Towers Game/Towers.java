@@ -2,8 +2,6 @@
 *  You may not stack a small disk on top of a larger disk
 */
 
-
-
 import Code12.*;
 
 public class Towers extends Code12Program
@@ -19,6 +17,11 @@ public class Towers extends Code12Program
    GameObj small;
    GameObj medium;
    GameObj large;
+
+   GameObj[] poles;
+
+   int totalDisks = 3;
+   int count = 0;
 
    public static void main(String[] args)
    {
@@ -55,9 +58,27 @@ public class Towers extends Code12Program
          large.lineWidth = 3;
          large.setLineColor("dark red");
 
+         poles = new GameObj[3];
+         poles[0] = small;
+         poles[1] = medium;
+         poles[2] = large;
+
 
    }
 
+
+//three arrays for size
+   // a sub 0 diam of bottom guy
+   // count var ti keep track of amt on each pole
+   // compare diameter
+   // width
+   ///array of gmae obj
+   // find obj in pole, pole is an array
+   //GameObj[] pole. obect trying to find
+   // findObj(GameObj[]pole, a )
+   // findObj( a)
+   //while 0 to null
+   // boolean movetopole( obj, pole)
    public void update()
    {
       small.clickable = true;
@@ -67,21 +88,31 @@ public class Towers extends Code12Program
 
    }
 
-   // Helper function to determine if disk is on top of the others
-   public boolean isOnTopOfAll(GameObj obj, GameObj obj2, GameObj obj3 )
+   public GameObj findObj( GameObj[] arr, GameObj obj)
    {
-      if ( obj.y < obj2.y && obj.y < obj3.y )
-         return true;
-      else
-         return false;
 
    }
 
-   // Helper function to 
 
-   //Helper function to determine is disk is beneath the others
+   //public boolean moveToPole( GameObj obj, GameObj[] p)
+   //{
+
+   //}
+
+   // dont keep track of their y coordinate positions
+   // keep track if theyre on top or not?
+
+   // Helper function to determine if disk is on top of the others
    // The first object passed in parameter is the one being checked
-   public boolean isUnderneath(GameObj obj, GameObj obj2, GameObj obj3 )
+   public boolean isOnTopOfAll(GameObj obj, GameObj obj2, GameObj obj3 )
+   {
+      if ( obj.y <= obj2.y && obj.y <= obj3.y ) 
+         return true;
+      else
+         return false;
+   }
+
+   public boolean isUnderneathAll(GameObj obj, GameObj obj2, GameObj obj3 )
    {
       if ( obj.y > obj2.y && obj.y > obj3.y )
          return true;
@@ -93,6 +124,7 @@ public class Towers extends Code12Program
    // If ( bigger ) can't put on top of smaller
    // If ( smaller ) can put on top of bigger
 
+
    // Helper function to let moved disks fall to the base of a given pole 
    // Once they reach the base of the pole, they stop falling ( ySpeed = 0 )
    public void moveDiskToPole(GameObj obj)
@@ -101,14 +133,14 @@ public class Towers extends Code12Program
          if ( small.hit(pole1box) || small.hit(pole2box) || small.hit(pole3box) )
          {
             small.ySpeed = 1;
-            if ( small.y > pole1.y )
+            if ( small.y > (pole1.y - pole1.height/2) )
                small.ySpeed = 0;
          }
 
          if ( medium.hit(pole1box) || medium.hit(pole2box) || medium.hit(pole3box) )
          {
             medium.ySpeed = 1;
-            if ( medium.y > pole1.y)
+            if ( medium.y > (pole1.y - pole1.height/2) )
                medium.ySpeed = 0;
 
          }
@@ -116,7 +148,7 @@ public class Towers extends Code12Program
          if ( large.hit(pole1box) || large.hit(pole2box) || large.hit(pole3box) )
          {
             large.ySpeed = 1;
-            if ( large.y > pole1.y )
+            if ( large.y > ( pole1.y - pole1.height/2) )
                large.ySpeed = 0;
 
          }
@@ -127,34 +159,48 @@ public class Towers extends Code12Program
 
    public void onMousePress(GameObj obj, double x, double y)
    {
+   		double lastX = x;
+   		double lastY = y;
+
+
       // TODO: save the previous x and y of the disks so that if the user makes an invalid move,
       // the disks go back to their old position
 
    }
+
+   //TODO: add function to check winning conditions
+   // small > medium > large on a different pole than the starting
 
    public void onMouseDrag(GameObj obj, double x, double y)
    {
          if ( obj == small )
          {
             if ( isOnTopOfAll(small,medium,large) )
-            // Can only click on object when it is on top of the stack
-            small.x = x;
-            small.y = y;
-            //moveDiskToPole(small);
+            {
+	            // Can only click on object when it is on top of the stack
+	            small.x = x;
+	            small.y = y;
+	            //moveDiskToPole(small);
+        	   }
          }
 
          if ( obj == medium )
          {
-            medium.x = x;
-            medium.y = y;
+         	if ( isOnTopOfAll(medium,small,large) )
+         	{
+         		medium.x = x;
+            	medium.y = y;
+
+         	}
+            
          }
 
          if ( obj == large )
          {
+         	if ( isOnTopOfAll(large, medium, small) )
             large.x = x;
             large.y = y;
          }
 
    }
-
 }
