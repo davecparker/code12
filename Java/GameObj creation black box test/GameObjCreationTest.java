@@ -3,26 +3,26 @@ import Code12.*;
 
 public class GameObjCreationTest extends Code12Program
 {
-    public GameObj speedRefrence;
-    public GameObj objText;
-    public int objCount = 0;
-    public GameObj fps;
-    public int time;
-    public String[] colors = {"black", "white", "red", "green", "blue", "cyan",
-                              "majenta", "yellow", "gray", "orange", "pink", "purple",
-                              "light gray", "light red", "light green", "light blue", "light cyan", "light majenta",
-                              "light yellow", "dark gray", "dark red", "dark green", "dark blue", "dark cyan",
-                              "dark majenta", "dark yellow", null};
+    GameObj speedRefrence;
+    GameObj objText;
+    int objCount = 0;
+    GameObj fps;
+    int time;
+    String[] colors = {"black", "white", "red", "green", "blue", "cyan",
+                        "majenta", "yellow", "gray", "orange", "pink", "purple",
+                        "light gray", "light red", "light green", "light blue", "light cyan", "light majenta",
+                        "light yellow", "dark gray", "dark red", "dark green", "dark blue", "dark cyan",
+                        "dark majenta", "dark yellow", null};
 
     // RECOMMENDATION: test only one at a time
-    public boolean circleTest = false,      // tests special cases for diameter and color parameters
-                   rectTest = false,        // tests special cases for height and width parameters
-                   lineTest = false,        // tests placements of x and y coordinates for both points
-                   textTest = false,        // tests String escape sequences and special cases for height parameter
-                   imageTest = false,       // tests image parameter and special cases for width parameter
-                   gridTest = false,        // creates a square grid of any object that is true spanning from -200 to 200
-                   colorTest = false,       // tests all colors available
-                   performanceTest = false; // tests fps when constantly adding objects to screen
+    boolean circleTest = false,      // tests special cases for diameter and color parameters
+            rectTest = false,        // tests special cases for height and width parameters
+            lineTest = false,        // tests placements of x and y coordinates for both points
+            textTest = false,        // tests String escape sequences and special cases for height parameter
+            imageTest = false,       // tests image parameter and special cases for width parameter
+            gridTest = false,        // creates a square grid of any object that is true spanning from -200 to 200
+            colorTest = false,       // tests all colors available
+            performanceTest = false; // tests fps when constantly adding objects to screen
 
     public static void main(String[] args)
     {
@@ -32,9 +32,9 @@ public class GameObjCreationTest extends Code12Program
     public void start()
     {
         // test GameCircle parameters
-        if (this.circleTest)
+        if (circleTest)
         {
-            if (this.gridTest)
+            if (gridTest)
             {
                 for (int x = -200; x <= 200; x++)
                 {
@@ -50,9 +50,9 @@ public class GameObjCreationTest extends Code12Program
         }
 
         // test GameRect parameters
-        if (this.rectTest)
+        if (rectTest)
         {
-            if (this.gridTest)
+            if (gridTest)
             {
                 for (int x = -200; x <= 200; x++)
                 {
@@ -68,9 +68,9 @@ public class GameObjCreationTest extends Code12Program
         }
 
         // test GameLine parameters
-        if (this.lineTest)
+        if (lineTest)
         {
-            if (this.gridTest)
+            if (gridTest)
             {
                 for (int x = -200; x <= 200; x++)
                 {
@@ -85,9 +85,9 @@ public class GameObjCreationTest extends Code12Program
         }
 
         // test GameText parameters
-        if (this.textTest)
+        if (textTest)
         {
-            if (this.gridTest)
+            if (gridTest)
             {
                 for (int x = -200; x <= 200; x++)
                 {
@@ -103,9 +103,9 @@ public class GameObjCreationTest extends Code12Program
         }
 
         // test GameImage parameters
-        if (this.imageTest)
+        if (imageTest)
         {
-            if (this.gridTest)
+            if (gridTest)
             {
                 for (int x = -100; x <= 100; x++)
                 {
@@ -121,13 +121,13 @@ public class GameObjCreationTest extends Code12Program
         }
 
         // test colors
-        if (this.colorTest)
+        if (colorTest)
         {
             int x = 15, y = 10;
-            for (int i = 0; i < this.colors.length; i++)
+            for (int i = 0; i < colors.length; i++)
             {
-                ct.circle(x, y, 10, this.colors[i]);
-                ct.text((i == this.colors.length - 1 ? "null" : this.colors[i]), x, y, 2, (i == 0 ? "white" : "black"));
+                ct.circle(x, y, 10, colors[i]);
+                ct.text((i == colors.length - 1 ? "null" : colors[i]), x, y, 2, (i == 0 ? "white" : "black"));
                 x += 15;
                 if (x >= ct.getWidth())
                 {
@@ -138,36 +138,36 @@ public class GameObjCreationTest extends Code12Program
         }
 
         // performance test prep
-        if (this.performanceTest)
+        if (performanceTest)
         {
-            this.speedRefrence = ct.circle(10, 20, 10);
-            this.speedRefrence.xSpeed = 4;
-            this.speedRefrence.setLayer(2);
-            this.objText = ct.text("0", 80, 10, 5, "black");
-            this.objText.setLayer(3);
-            this.fps = ct.text("0.0", 20, 10, 5, "black");
-            this.fps.setLayer(3);
-            this.time = ct.getTimer();
+            speedRefrence = ct.circle(10, 20, 10);
+            speedRefrence.xSpeed = 4;
+            speedRefrence.setLayer(2);
+            objText = ct.text("0", 80, 10, 5, "black");
+            objText.setLayer(3);
+            fps = ct.text("0.0", 20, 10, 5, "black");
+            fps.setLayer(3);
+            time = ct.getTimer();
         }
     }
 
     public void update()
     {
         // performance test
-        if (this.performanceTest)
+        if (performanceTest)
         {
-            int newTime = ct.getTimer() - this.time;
-            this.time = ct.getTimer();
+            int newTime = ct.getTimer() - time;
+            time = ct.getTimer();
 
-            if (this.speedRefrence.x >= ct.getWidth() || this.speedRefrence.x <= 0)
-               this.speedRefrence.xSpeed *= -1;
-            this.objText.setText(ct.formatInt(++this.objCount));
+            if (speedRefrence.x >= ct.getWidth() || speedRefrence.x <= 0)
+               speedRefrence.xSpeed *= -1;
+            objText.setText(ct.formatInt(++objCount));
 
             ct.circle(ct.random(0, 100), ct.random(15, 100), 3, "white");
             ct.rect(ct.random(0, 100), ct.random(15, 100), 3, 3, "white");
             ct.image("goldfish.png", ct.random(0, 100), ct.random(15, 100), 3);
 
-            this.fps.setText(ct.formatInt(1000 / newTime));
+            fps.setText(ct.formatInt(1000 / newTime));
             ct.println(1000 / newTime);
         }
     }

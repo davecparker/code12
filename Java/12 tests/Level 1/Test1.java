@@ -26,13 +26,13 @@ class Test1 extends Code12Program
       ct.circle( 12, 15, 5 ); 
       
       //Creates a black circle with its center at ( 22, 15 ) with a diameter of 5
-      ct.circle(22,15,5,"black");//spaces inside of the method call do not matter   
+      ct.circle(22, 15,5,"black");//spaces inside of the method call do not matter   
       
       //Creates a rectangle with its center at( 35, 15 ) with a width of 10 and height of 5 with default color
       ct.rect( 35, 15, 10, 5 );//I prefer spaces for visual clarity but that is a style choice   
       
       //Creates a blue rectangle with its center at( 52, 15 ) with a width of 10 and height of 5
-      ct.rect( 52, 15, 10, 5, "blue" ); 
+      ct.rect( 52, 15, 10, 5, "red" ); 
       
       //Creates a line from the point ( 62 , 15 ) to the point ( 72, 15 ) with default color 
       ct.line( 62, 15, 72, 15 );
@@ -46,7 +46,7 @@ class Test1 extends Code12Program
       ct.text( "Hello world!", 33, 30, 10 );
 
       //Creates green text at ( 73, 30 ) with a height 10
-      ct.text( "Test", 73, 30, 10, "Magenta" );
+      ct.text( "Test", 73, 30, 10, "Gray" );
       
       //Creates a fish at ( 20, 45 ) with a width of 20
       ct.image( "goldfish.png" , 20, 45, 20 );
