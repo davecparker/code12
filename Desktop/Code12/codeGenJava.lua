@@ -8,9 +8,9 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
+local err = require( "err" )
 local checkJava = require( "checkJava" )
 local javaTypes = require( "javaTypes" )
-local err = require( "err" )
 
 
 -- The codeGen module
@@ -780,7 +780,7 @@ function codeGenJava.getLuaCode( parseTrees )
 		end
 
 		-- print( "getLuaCode line " .. iTree )
-		if not checkJava.doTypeChecks( tree ) then
+		if not checkJava.doTypeChecks( tree ) and err.stopOnErrors() then
 			break
 		end
 		local p = tree.p
