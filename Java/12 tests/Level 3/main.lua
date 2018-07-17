@@ -100,5 +100,4 @@ require('Code12.api')
         --Creates an image of a fish
         ct.image("goldfish.png", x, y, size)
         
-        
     end

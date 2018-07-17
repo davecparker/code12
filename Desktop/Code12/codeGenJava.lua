@@ -527,7 +527,7 @@ local function generateForLoop( tree )
 			beginLuaLine( "for _, " )
 			addLua( nodes[2].str )
 			addLua( " in ipairs(" )
-			addLua( varNameCode(nodes[4].str) )
+			addLua( varNameCode( nodes[4].str ) )
 			addLua( ") do" )
 			generateControlledStmt()
 		end
