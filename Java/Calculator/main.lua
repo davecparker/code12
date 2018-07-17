@@ -7,8 +7,7 @@ require('Code12.api')
     this.displayText = ""
     this.buttons = { length = 20, default = nil }
     this.clearBack = nil; 
-    this.operatorButtons = { "+", "-", "*", "/", ".", "=", "(", ")", "%", length = 9, default = nil }
-    this.errorMessages = { "Cannot divide by zero!", length = 1, default = nil }
+    this.operatorButtons = "+-*/.=()%"
     this.compare = nil; 
     this.equation = nil; 
     --Instance Variables for the calculate method
@@ -52,7 +51,7 @@ require('Code12.api')
         local y = 83; while y >= 44 do
             
             ct.checkArrayIndex(this.buttons, num); this.buttons[1+(num)] = ct.rect(71, y, 15, 10, "gray")
-            ct.text(ct.indexArray(this.operatorButtons, num % 10), 71, y - 1, 10, "black")
+            ct.text(ct.substring(this.operatorButtons, num % 10, num % 10 + 1), 71, y - 1, 10, "black")
             num = num + 1
         y = y - (13); end
         
@@ -60,7 +59,7 @@ require('Code12.api')
         local x = 37; while x <= 54 do
             
             ct.checkArrayIndex(this.buttons, num); this.buttons[1+(num)] = ct.rect(x, 83, 15, 10, "gray")
-            ct.text(ct.indexArray(this.operatorButtons, num % 10), x, 83, 10, "black")
+            ct.text(ct.substring(this.operatorButtons, num % 10, num % 10 + 1), x, 83, 10, "black")
             num = num + 1
         x = x + (17); end
         
@@ -71,9 +70,10 @@ require('Code12.api')
             ct.checkArrayIndex(this.buttons, num); this.buttons[1+(num)] = ct.rect(x, 31, 15, 10, "gray")
             local y = 31
             local buttonId = num % 10
-            if (ct.indexArray(this.operatorButtons, buttonId) == "(") or (ct.indexArray(this.operatorButtons, buttonId) == ")") then
+            this.compare = ct.substring(this.operatorButtons, num % 10, num % 10 + 1)
+            if (this.compare == "(") or (this.compare == ")") then
                 y = 30; end
-            ct.text(ct.indexArray(this.operatorButtons, num % 10), x, y, 10, "black")
+            ct.text(this.compare, x, y, 10, "black")
             num = num + 1
         x = x + (17); end
         
@@ -194,7 +194,7 @@ require('Code12.api')
                         this.clearBack:setText("AC")
                     end
                     
-                    this.displayText = this.displayText .. ct.indexArray(this.operatorButtons, i % 10)
+                    this.displayText = this.displayText .. ct.substring(this.operatorButtons, i % 10, i % 10 + 1)
                 end
                 
                 this.display:setText(this.displayText)
@@ -220,12 +220,12 @@ require('Code12.api')
                     
                     if not (currentNumber == "") then
                         
-                        this.displayText = this.displayText .. ct.indexArray(this.operatorButtons, i % 10)
+                        this.displayText = this.displayText .. ct.substring(this.operatorButtons, i % 10, i % 10 + 1)
                         this.display:setText(this.displayText)
                     
                     else 
                         
-                        this.displayText = this.displayText .. "0" .. ct.indexArray(this.operatorButtons, i % 10)
+                        this.displayText = this.displayText .. "0" .. ct.substring(this.operatorButtons, i % 10, i % 10 + 1)
                         this.display:setText(this.displayText)
                     end
                 end

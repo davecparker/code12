@@ -3,7 +3,6 @@ import Code12.*;
 class Test3 extends Code12Program
 {
 
-   
    public static void main(String[] args)
    { 
       Code12.run( new Test3() ); 

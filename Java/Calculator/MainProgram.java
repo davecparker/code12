@@ -5,10 +5,8 @@ public class MainProgram extends Code12Program
    //Instance Variables
    GameObj display;
    String displayText ="";
-   GameObj[] buttons = new GameObj[20];
    GameObj clearBack;
-   String[] operatorButtons = { "+", "-", "*", "/", ".", "=", "(", ")", "%"};
-   String[] errorMessages = { "Cannot divide by zero!" };
+   String operatorButtons = "+-*/.=()%";
    String compare; //used to compare substrings to set values
    String equation; //holds the current equation being evaluated
    //Instance Variables for the calculate method
@@ -28,13 +26,17 @@ public class MainProgram extends Code12Program
       
       ct.setScreen("Calculator");
       //Adds the 0 number key
-      buttons[0] = ct.rect( 20, 83, 15, 10, "gray" );
-      ct.text( "0" , 20, 83, 10, "black" );
+      GameObj button0 = ct.rect( 20, 83, 15, 10, "gray" );
+      button0.clickable = true;
+      button0.setText( "0" );
+      ct.text( "0", 20, 83, 10, "black" );
       
-      //Adds the backspace/clear key
-      buttons[19] = ct.rect( 71, 31, 15, 10, "gray" );
-      clearBack = ct.text( "AC" , 71, 31, 10, "black" );
-      
+      //Adds the backspace/clear key    
+      GameObj button = ct.rect( 71, 31, 15, 10, "gray" );
+      button.clickable = true;
+      String buttonText = "AC";
+      button.setText( buttonText );
+      ct.text( buttonText, 71, 31, 10, "black" );
       
       int num = 1;
       //Prints the number keys (1-9)
@@ -51,37 +53,34 @@ public class MainProgram extends Code12Program
       //adds basic math operator buttons
       for (int y = 83; y >= 44; y -= 13)
       {
-         buttons[num] = ct.rect( 71, y, 15, 10, "gray");
-         ct.text( operatorButtons[num%10] , 71, y-1, 10, "black" );
+         GameObj button = ct.rect( 71, y, 15, 10, "gray");
+         String buttonText = operatorButtons.substring( num%10,num%10+1 );
+         button.setText( buttonText );
+         ct.text( buttonText, 71, y-1, 10, "black" );
          num++;   
       }
       
       //adds equals and decimal button
       for ( int x = 37; x <= 54; x+=17 )
       {
-         buttons[num] = ct.rect( x, 83, 15, 10, "gray");
-         ct.text( operatorButtons[num%10] , x, 83, 10, "black" );
-         num++;
+         GameObj button = ct.rect( 71, y, 15, 10, "gray");
+         String buttonText = operatorButtons.substring( num%10,num%10+1 );
+         button.setText( buttonText );
+         ct.text( buttonText, 71, y-1, 10, "black" );
+         num++;   
       }
       
       
       // adds (, ), % and clear button
       for ( int x = 20; x <= 54; x+=17 )
       {
-         buttons[num] = ct.rect( x, 31, 15, 10, "gray");         
-         int y = 31;
-         int buttonId = num%10;
-         if ( operatorButtons[buttonId].equals("(") || operatorButtons[buttonId].equals(")") )
-            y = 30;
-         ct.text( operatorButtons[num%10] , x, y, 10, "black" );
-         num++;
+         GameObj button = ct.rect( 71, y, 15, 10, "gray");
+         String buttonText = operatorButtons.substring( num%10,num%10+1 );
+         button.setText( buttonText );
+         ct.text( buttonText, 71, y-1, 10, "black" );
+         num++;   
       } 
-      
-      for( GameObj button : buttons )
-      {
-      button.clickable = true;
-      }
-      
+
       //Initializes the display
       ct.setTitle("Calculator");
       displayText = "";
@@ -194,7 +193,7 @@ public class MainProgram extends Code12Program
                   clearBack.setText("AC");
                }
 
-               displayText = displayText + operatorButtons[i%10];
+               displayText = displayText + operatorButtons.substring( i%10, i%10 + 1 );
             }
             
             display.setText(displayText);
@@ -220,12 +219,12 @@ public class MainProgram extends Code12Program
             {
                if( !currentNumber.equals("") )
                {
-                  displayText = displayText + operatorButtons[i%10];
+                  displayText = displayText + operatorButtons.substring( i%10, i%10 + 1 );
                   display.setText(displayText);
                }
                else
                {
-                  displayText = displayText + "0" + operatorButtons[i%10];
+                  displayText = displayText + "0" + operatorButtons.substring( i%10, i%10 + 1 );
                   display.setText(displayText);
                }
             } 
