@@ -8,6 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 -- Corona modules
+local widget = require( "widget" )
 local composer = require( "composer" )
 
 -- Code12 app modules
@@ -18,6 +19,9 @@ local err = require( "err" )
 -- The runView module and scene
 local errView = composer.newScene()
 
+-- UI metrics
+local dyDocsToolbar = 24       -- height of toolbar for the docsWebView
+
 -- Display objects and groups
 local errGroup                 -- display group for error display
 local highlightGroup           -- display group for highlight rects
@@ -26,13 +30,18 @@ local sourceRect               -- main source highlight
 local lineNumGroup             -- display group for line numbers
 local sourceGroup              -- display group for source lines
 local errText                  -- text object for error message
+local docsToolbarGroup         -- display group for the docs toolbar
+local moreInfoBtn              -- More Info button on docs toolbar
+local backBtn                  -- Back button on docs toolbar
+local forwardBtn               -- Forward button on docs toolbar
+local docsWebView              -- web view for the documentation pane
 
 
 --- Internal Functions ------------------------------------------------
 
 -- Make and return a highlight rectangle, in the reference color if ref
 local function makeHilightRect( x, y, width, height, ref )
-	local r = g.uiItem( display.newRect( highlightGroup, x, y, width, height ) )
+	local r = g.uiItem( display.newRect( highlightGroup, x, y + 1, width, height + 1 ) )
 	if ref then
 		r:setFillColor( 1, 1, 0.6 )
 	else
@@ -59,7 +68,8 @@ local function makeErrDisplay( sceneGroup )
 	local dySource = numSourceLines * dyLine
 
 	-- Make background rect for the source display
-	g.uiItem( display.newRect( errGroup, 0, 0, app.width, dySource + margin ), 1, app.borderShade )
+	g.uiItem( display.newRect( errGroup, 0, 0, app.width, dySource + margin * 2 ), 
+			1, app.borderShade )
 
 	-- Make the highlight rectangles
 	highlightGroup = g.makeGroup( errGroup, xText, margin )
@@ -105,12 +115,23 @@ local function makeErrDisplay( sceneGroup )
 		parent = errGroup,
 		text = "", 
 		x = margin * 2, 
-		y = dySource + margin * 2,
-		width = app.width - xText - 20,   -- wrap near end of window
+		y = sourceGroup.y + dySource + margin * 2,
+		width = app.width - margin * 4,
+		height = 0,
 		font = native.systemFontBold, 
 		fontSize = app.consoleFontSize + 2,
 		align = "left",
 	} )
+
+	-- Position the docs toolbar
+	print(errText.height)
+	docsToolbarGroup.y = errGroup.y + errText.y + errText.height + margin
+	moreInfoBtn.x = app.width - app.margin
+
+	-- Position the docs web view
+	docsWebView.y = docsToolbarGroup.y + dyDocsToolbar + 1
+	docsWebView.width = app.width
+	docsWebView.height = app.height - docsWebView.y - app.dyStatusBar - 1
 end
 
 -- Show the error state
@@ -186,13 +207,117 @@ local function displayError( sceneGroup )
 	showError()
 end
 
+-- Enable or disable the given toolbar button
+local function enableBtn( btn, enable )
+	if enable then
+		btn:setFillColor( app.enabledShade )
+	else
+		btn:setFillColor( app.disabledShade )
+	end
+end
+
+-- Update the docs toolbar
+local function updateToolbar()
+	if docsWebView.isVisible then
+		moreInfoBtn:setLabel( "Close" )
+		backBtn.isVisible = true
+		forwardBtn.isVisible = true
+		enableBtn( backBtn, docsWebView.canGoBack )
+		enableBtn( forwardBtn, docsWebView.canGoForward )
+	else
+		moreInfoBtn:setLabel( "More Info." )
+		backBtn.isVisible = false
+		forwardBtn.isVisible = false
+	end
+end
+
+-- Show the docs if show else hide them, and update the toolbar
+local function showDocs( show )
+	if show then
+		docsWebView.isVisible = true
+
+		-- TODO: Link to specific section if possible
+		docsWebView:request( "API.html", system.ResourceDirectory )
+	else
+		docsWebView:stop()
+		docsWebView.isVisible = false
+	end
+	updateToolbar()
+end
+
+-- Make the toolbar for the docs view
+local function makeDocsToolbar( parent )
+	-- Make the group
+	docsToolbarGroup = g.makeGroup( parent )
+
+	-- Background rect
+	g.uiItem( display.newRect( docsToolbarGroup, 0, 0, 10000, dyDocsToolbar ),
+			app.toolbarShade, app.borderShade )
+	local yCenter = dyDocsToolbar / 2
+
+	-- More Info button 
+	moreInfoBtn = widget.newButton{
+		x = app.width - app.margin, 
+		y = yCenter,
+		label = "More Info.",
+		labelAlign = "right",
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+		onRelease = function ()
+						showDocs( not docsWebView.isVisible )  -- toggle visibility
+					end
+	}
+	docsToolbarGroup:insert( moreInfoBtn )
+	moreInfoBtn.anchorX = 1
+
+	-- Back and forward buttons
+	local size = dyDocsToolbar
+	backBtn = display.newImageRect( docsToolbarGroup, "images/back.png", size, size )
+	backBtn.x = app.margin + size / 2
+	backBtn.y = yCenter
+	backBtn.isVisible = false
+	backBtn:addEventListener( "tap", 
+		function() 
+			docsWebView:back()
+			updateToolbar()
+		end )
+	forwardBtn = display.newImageRect( docsToolbarGroup, "images/back.png", size, size )
+	forwardBtn.rotation = 180
+	forwardBtn.x = backBtn.x + size + app.margin
+	forwardBtn.y = yCenter
+	forwardBtn.isVisible = false
+	forwardBtn:addEventListener( "tap", 
+		function() 
+			docsWebView:forward()
+			updateToolbar()
+		end )
+
+	-- Set the initial state
+	updateToolbar()
+end
+
 
 --- Scene Methods ------------------------------------------------
 
 -- Create the errView scene
 function errView:create()
+	local sceneGroup = self.view
+
 	-- Background rect
-	g.uiWhite( display.newRect( self.view, 0, 0, 10000, 10000 ) ) 
+	g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
+
+	-- Web view for the docs (shown and positioned later) 
+	docsWebView = native.newWebView( 0, 0, app.width, app.height )
+	docsWebView.anchorX = 0
+	docsWebView.anchorY = 0
+	docsWebView.isVisible = false
+	docsWebView:addEventListener( "urlRequest",
+		function ()
+			timer.performWithDelay( 100, updateToolbar )
+		end )
+
+	-- Make the toolbar for the docs view
+	makeDocsToolbar( sceneGroup )
 
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
@@ -202,6 +327,21 @@ end
 function errView:show( event )
 	if event.phase == "will" then
 		displayError( self.view )
+	end
+end
+
+-- Prepare to hide the errView scene
+function errView:hide( event )
+	if event.phase == "will" then
+		showDocs( false )
+	end
+end
+
+-- Destroy the errView scene
+function errView:destroy()
+	if docsWebView then
+		docsWebView:removeSelf()
+		docsWebView = nil
 	end
 end
 
@@ -219,6 +359,8 @@ end
 -- Complete and return the composer scene
 errView:addEventListener( "create", errView )
 errView:addEventListener( "show", errView )
+errView:addEventListener( "hide", errView )
+errView:addEventListener( "destroy", errView )
 return errView
 
 

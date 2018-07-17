@@ -14,6 +14,8 @@ local app =  {
 	toolbarShade = 0.8,
 	extraShade = 0.9,
 	borderShade = 0.5,
+	enabledShade = 0.3,
+	disabledShade = 0.7,
 
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
