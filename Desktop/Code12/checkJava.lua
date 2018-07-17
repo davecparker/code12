@@ -140,7 +140,7 @@ local function getMethods( parseTrees )
 				end
 			end
 		end
-		if err.hasErr() then
+		if err.hasErr() and err.stopOnErrors() then 
 			return false
 		end
 	end
@@ -411,8 +411,13 @@ local function vtExprEquality( nodes )
 	if javaTypes.canCompareVts( vtLeft, vtRight ) then
 		-- Don't allow comparing Strings with ==
 		if vtLeft == "String" then
-			err.setErrNodeAndRef( nodes[2], nodes[1],
-					"Use str1.equals( str2 ) to compare two String values" )
+			if syntaxLevel >= 7 then
+				err.setErrNodeAndRef( nodes[2], nodes[1],
+						"Use str1.equals( str2 ) to compare two String values" )
+			else
+				err.setErrNodeAndRef( nodes[2], nodes[1],
+						"Strings cannot be compared with ==. You must use the equals method, which requires level 7" )
+			end
 			return nil
 		end
 		return true
@@ -864,7 +869,7 @@ function checkJava.doTypeChecks( tree )
 		for i = 1, #nodes do
 			local node = nodes[i]
 			if node.t then  -- don't recurse down into tokens
-				if not checkJava.doTypeChecks( node ) then
+				if not checkJava.doTypeChecks( node ) and err.stopOnErrors() then
 					return false
 				end
 			end

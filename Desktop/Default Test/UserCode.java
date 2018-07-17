@@ -12,7 +12,7 @@ class UserCode extends Code12Program
 	// int count = 5;
 	double speed = 0.3;
 	int frameCount = 0;
-	String function = "Test";
+	String function = "Testing";
 
    public static void main(String[] args)
    { 
@@ -38,8 +38,8 @@ class UserCode extends Code12Program
 		// ct.println( nums[10] );
 
 		// Try some console output
-		ct.println(function);
-		ct.println("This is the default Code12 test app");
+		ct.println(function + " " + 1.23e2);
+		ct.println("This is the default \"Code12\" test app");
 		ct.println("This is console output");
 		ct.setOutputFile("output.txt");
 		ct.println("This is file output also");
@@ -163,7 +163,7 @@ class UserCode extends Code12Program
 		// hack = 6;
 		ball.x++;
 		ball.x--;
-		ball.x += 0.5;
+		ball.x += .5;
 		if (wrap && ball.x >= LIMIT)
 			ball.x = 0;
 
@@ -175,7 +175,10 @@ class UserCode extends Code12Program
 	public void onMousePress( GameObj obj, double x, double y )
 	{
 		if (obj != null)
+		{
+			obj.xSpeed = .1;
 			ct.println( obj.toString() + " was clicked" );
+		}
 		else
 			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
 	}

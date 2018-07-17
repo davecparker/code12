@@ -86,7 +86,7 @@ end
 
 -- Update the console if needed
 local function onNewFrame()
-	if changed then
+	if changed and console.group then
 		updateConsole()
 		changed = false
 	end
@@ -232,10 +232,12 @@ function console.init()
 	local metrics = graphics.getFontMetrics( app.consoleFont, app.consoleFontSize )
 	fontHeight = math.round( metrics.height ) + 2   -- leading is reported as 0 for our font
 	-- Get char width by measuring a text object since not in font metrics
-	local str = "1234567890"
-	local temp = display.newText( str, 0, 0, app.consoleFont, app.consoleFontSize )
-	fontCharWidth = temp.contentWidth / string.len( str )
-	temp:removeSelf()
+	local temp1 = display.newText( "-", 0, 0, app.consoleFont, app.consoleFontSize )
+	local temp11 = display.newText( "-1234567890", 0, 0, app.consoleFont, app.consoleFontSize )
+	fontCharWidth = (temp11.contentWidth - temp1.contentWidth) / 10
+	print(fontCharWidth)
+	temp1:removeSelf()
+	temp11:removeSelf()
 	app.consoleFontCharWidth = fontCharWidth
 	app.consoleFontHeight = fontHeight
 

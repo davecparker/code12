@@ -11,7 +11,6 @@
 local err = {}
 
 
-
 -- The error state. We only detect and store the first error in the program.
 -- The errRecord is a table as follows:
 -- {
@@ -24,10 +23,12 @@ local err = {}
 --         first = { iLine = lineNumber, iChar = charIndex },
 --         last  = { iLine = lineNumber, iChar = charIndex },
 --     },
---     minlevel = level,    -- if a higher syntax level would eliminate the err, else nil
---     strLevel = feature,  -- name of feature needed at minLevel
 -- }
 local errRecord
+
+-- Diagnostic error logging function. If set, errors are sent here instead of
+-- being recorded in the errRecord
+local fnLogErr
 
 
 --- Utility Functions -------------------------------------------------------
@@ -111,8 +112,17 @@ function err.setErr( loc, refLoc, strErr, ... )
 		assert( type(refLoc) == "table" and refLoc.first ~= nil )
 	end
 	assert( type(strErr) == "string" )
-	if errRecord == nil then
-		errRecord = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
+
+	local errNew = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
+	if fnLogErr then
+		-- In diagnostic mode, report every error but don't store the error state 
+		-- in errRecord (force checking to continue). 
+		fnLogErr( errNew )
+	else
+		-- Only set the error state if not already set (take the first error only)
+		if errRecord == nil then
+			errRecord = errNew
+		end
 	end
 end
 
@@ -165,14 +175,6 @@ function err.setErrTokenSpan( firstToken, lastToken, strErr, ... )
 	err.setErr( err.makeErrLoc( locStart, locEnd ), nil, strErr, ... )
 end
 
--- Set the minLevel and strLevel fields in the current error record
-function err.setLevelInfo( minLevel, strLevel )
-	if errRecord then
-		errRecord.minLevel = minLevel
-		errRecord.strLevel = strLevel
-	end
-end
-
 -- Return true if there is an error in the error state.
 function err.hasErr()
 	return (errRecord ~= nil)
@@ -203,6 +205,16 @@ end
 -- Clear the error state
 function err.clearErr()
 	errRecord = nil
+end
+
+-- Set the error logging function
+function err.setFnLogErr( fn )
+	fnLogErr = fn
+end
+
+-- Return true if we should stop on errors
+function err.stopOnErrors()
+	return fnLogErr == nil
 end
 
 

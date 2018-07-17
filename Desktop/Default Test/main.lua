@@ -12,7 +12,7 @@ require('Code12.api')
     -- int count = 5;
     this.speed = 0.3
     this.frameCount = 0
-    this._function = "Test"
+    this._function = "Testing"
     
     
         
@@ -38,8 +38,8 @@ require('Code12.api')
         -- ct.println( nums[10] );
         
         -- Try some console output
-        ct.println(this._function)
-        ct.println("This is the default Code12 test app")
+        ct.println(this._function .. " " .. 1.23e2)
+        ct.println("This is the default \"Code12\" test app")
         ct.println("This is console output")
         ct.setOutputFile("output.txt")
         ct.println("This is file output also")
@@ -163,7 +163,7 @@ require('Code12.api')
         -- hack = 6;
         this.ball.x = this.ball.x + 1
         this.ball.x = this.ball.x - 1
-        this.ball.x = this.ball.x + (0.5)
+        this.ball.x = this.ball.x + (.5)
         if wrap and this.ball.x >= this.LIMIT then
             this.ball.x = 0; end
         
@@ -175,7 +175,10 @@ require('Code12.api')
     function _fn.onMousePress(obj, x, y)
         
         if obj ~= nil then
-            ct.println(obj:toString() .. " was clicked"); 
+            
+            obj.xSpeed = .1
+            ct.println(obj:toString() .. " was clicked")
+        
         else 
             ct.println("Mouse was pressed at (" .. x .. ", " .. y .. ")"); end
     end
