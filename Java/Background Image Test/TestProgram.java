@@ -5,22 +5,14 @@ public class TestProgram extends Code12Program
 	{
 		Code12.run(new TestProgram());
 	}
-	
-	int frameCount = 0;
-	
+		
 	public void start()
 	{
-		ct.setHeight( 150 );
-		String backgroundFile = "background.png";
-		ct.setBackImage(backgroundFile);
-		frameCount = 0;
 	}
 
-	public void update()
+	public void onKeyPress( String keyName )
 	{
-		frameCount++;
-		if (frameCount == 60)
+		if ( keyName.equals("b") )
 			ct.setBackImage("background.png");
-
 	}
 }
