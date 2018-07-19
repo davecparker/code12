@@ -55,7 +55,7 @@ If `obj` is not included, just a newline is printed.
 
 ### ct.log()
 ```
-ct.log( Object… objs )
+ct.log( Object... objs )
 ```
 Print any number of values to the console.
 There can be any number of values passed, of any types.
@@ -65,7 +65,7 @@ and `GameObj` objects are described in `[square brackets]`.
 
 ### ct.logm()
 ```
-ct.logm( String message, Object… objs )
+ct.logm( String message, Object... objs )
 ```
 Print the `message` followed by a space,
 then print any number of values to the console.
@@ -255,6 +255,31 @@ function:
 5. At the end of `start`, call `ct.setScreen()` to set the
 desired starting screen for your application.
 
+### ct.setScreenOrigin()
+```
+ct.setScreenOrigin( double x, double y )
+```
+Offset the entire screen horizontally and/or vertically so that
+the coordinate at the upper-left of the screen is (`x`, `y`).
+Normally the coordinate of the upper-left corner of the screen
+is (0, 0). Using `ct.setScreenOrigin()` allows you to think of
+the screen as a window viewing part of a larger world, and you
+can pan ("scroll") the window where you want, in order to bring 
+objects that would normally be outside the window into view.
+
+> Using `ct.setScreenOrigin()` does not modify the (x, y) position
+> of any objects. Rather it determines which objects are visible
+> within the game window.
+
+> Note that it is always OK to create or position objects outside 
+> of the normal screen bounds. The x-coordinate of the right edge
+> of the screen is normally 100. If you draw a small object at say
+> (150, 50), it will normally not be visible. If you then call
+> `ct.setScreenOrigin( 150, 0 )`, the game will "scroll" horizontally
+> and the object will become visible in the center of the game window.
+> Conversely, another object at (50, 0) will scroll off the screen
+> to the left and no longer be visible.
+
 ### ct.clearScreen()
 ```
 ct.clearScreen( )
@@ -407,6 +432,28 @@ double ct.clickY( )
 ```
 Return the y-coordinate of the last known click, touch, or drag location
 in the application.
+
+### ct.objectClicked()
+```
+GameObj ct.objectClicked( )
+```
+If a clickable `GameObj` object was clicked during the last update cycle, 
+then `ct.objectClicked()` returns a reference to that object, 
+otherwise it returns `null` .
+Calling this function every time in your `update` function will find 
+the topmost clickable object that was clicked, whenever the user clicks
+on one.
+
+> Any objects with the `clickable` field set to `false` will not be considered
+> when determining which object was clicked. See [obj.clickable](#obj-clickable). 
+
+> Note that `ct.objectClicked()` will return `null` if no object was
+> clicked, which is the case for most update cycles in a game 
+> (they occur 60 times per second). So you must check the return value
+> for `null` before using the `GameObj` returned. Attempting to access a field
+> of a `GameObj` (such as `obj.x`) or call a method (such as `obj.delete()`)
+> will generate a runtime error (a "crash") if the `GameObj` is `null`.
+
 
 ### ct.keyPressed()
 ```
@@ -724,17 +771,17 @@ not draw or respond to mouse/touch input.
 ```
 boolean clickable
 ```
-Set the `clickable` field of an object to `true` (default `false`)
-to make it respond to mouse/touch input. If an object with both
-both `visible` and `clickable` is clicked, then mouse events will
-be sent for it (see [Events](#events)), and the `GameObj` method
-'obj.clicked()' can also be used to detect click on the object.
-
-> When a click occurs in the application window, the topmost object
-> `visible` and `clickable` object that intersects the click location
-> is considered to be the target of the click for mouse events.
-> However, the functions `ct.clicked()`, `ct.clickX()`, and `ct.clickY()`
-> can still be used to check for the click as well.
+The `clickable` field defaults to `true`, so by default all `GameObj` objects 
+can be used to respond to click/touch input
+(see [ct.objectClicked](#ct-objectClicked), [obj.clicked](#obj-clicked), and
+[onMousePress](#onMousePress)).
+However, if you set an object's `clickable` field to false, then it will ignore
+clicks and pass them through to the object below, if any. 
+ 
+> If you stack two objects and want to use the bottom object to test for hits
+> (for example a rectangle with a text label on top of it), then you can
+> set the `clickable` field of the top object to `false`, which will cause
+> the click to "pass through" to the object below it.
 
 ### autoDelete
 ```
@@ -958,6 +1005,20 @@ Return `true` if the object currently intersects with another object `obj2`.
 If you call this method every time in your `update` function, it can
 be used to test if/when two objects "hit" each other.
 
+### obj.objectHitInGroup( String group )
+```
+GameObj obj.objectHitInGroup( String groupName )
+```
+If the object currently intersects with another `GameObj` object
+on the current screen that has its `group` field equal to `groupName`,
+then return a reference to the other object, otherwise return `null`.
+If `groupName` is `null` then all objects on the current screen
+will be considered.
+
+> Note that `obj.objectHitInGroup()` will return `null` if no 
+> matching object intersects `obj`, so you must check the return value
+> for `null` before using the `GameObj` returned.
+
 _____________________________________________________________________
 Java Math Class Methods and Fields Supported
 --------------------------------------------
@@ -1075,7 +1136,7 @@ The point (`x`, `y`) is the location of the click in display coordinates
 
 If `obj` is not `null`, then it indicates that the click occured on
 that object. Note that `GameObj` objects must have both their
-`visible` and `clickable` fields set to `true` to receive clicks.
+`visible` and `clickable` fields `true` to receive clicks.
 If `obj` is null, then the click occured outside of any clickable object.
 
 ### onMouseDrag()

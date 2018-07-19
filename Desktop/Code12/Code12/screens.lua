@@ -158,6 +158,21 @@ function ct.setScreen(name, ...)
 end
 
 -- API
+function ct.setScreenOrigin(x, y, ...)
+	-- Check parameters
+	if g.checkAPIParams("ct.setScreenOrigin") then
+		g.checkTypes({"number", "number"}, x, y, ...)
+	end
+
+	-- Offset the screen group
+	if g.screen then
+		local group = g.screen.group
+		group.x = -x
+		group.y = -y
+	end
+end
+
+-- API
 function ct.clearScreen(...)
 	-- Check parameters
 	if g.checkAPIParams("ct.clearScreen") then

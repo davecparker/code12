@@ -228,6 +228,28 @@ function GameObj:hit(gameObj, ...)
 	return self:hitObj(gameObj)
 end
 
+-- API
+function GameObj:objectHitInGroup(groupName, ...)
+	-- Check parameters
+	if groupName ~= nil then
+		if g.checkGameObjMethodParams(self, "objectHitInGroup") then
+			g.check1Param("string", groupName, ...)
+		end
+	end
+
+	-- Hit test the matching objects
+	local objs = g.screen.objs
+	for i = 1, objs.numChildren do
+		local gObj = objs[i].code12GameObj
+		if gObj ~= self and (groupName == nil or gObj.group == groupName) then
+			if self:hit(gObj) then
+				return gObj
+			end
+		end
+	end
+	return nil
+end
+
 
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------

@@ -242,6 +242,17 @@ function ct.clickY(...)
 end
 
 -- API
+function ct.objectClicked(...)
+	-- Check params
+	if g.checkAPIParams("ct.objectClicked") then
+		g.checkNoParams(...)
+	end
+
+	-- Return clicked object if any
+	return g.gameObjClicked
+end
+
+-- API
 function ct.keyPressed(keyName, ...)
 	-- Check parameters
 	if keyName == nil then

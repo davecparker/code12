@@ -38,6 +38,8 @@ return {
         ["getscreen"] = "getScreen",
         ["setScreen"] = { vt = false, params = {{ name = "name", vt = "String"}} },
         ["setscreen"] = "setScreen",
+        ["setScreenOrigin"] = { vt = false, params = {{ name = "x", vt = 1},{ name = "y", vt = 1}} },
+        ["setscreenorigin"] = "setScreenOrigin",
         ["clearScreen"] = { vt = false, params = {} },
         ["clearscreen"] = "clearScreen",
         ["clearGroup"] = { vt = false, params = {{ name = "group", vt = "String"}} },
@@ -58,6 +60,8 @@ return {
         ["clickx"] = "clickX",
         ["clickY"] = { vt = 1, params = {} },
         ["clicky"] = "clickY",
+        ["objectClicked"] = { vt = "GameObj", params = {} },
+        ["objectclicked"] = "objectClicked",
         ["keyPressed"] = { vt = true, params = {{ name = "keyName", vt = "String"}} },
         ["keypressed"] = "keyPressed",
         ["charTyped"] = { vt = true, params = {{ name = "ch", vt = "String"}} },
@@ -147,6 +151,8 @@ return {
         ["containsPoint"] = { vt = true, params = {{ name = "x", vt = 1},{ name = "y", vt = 1}} },
         ["containspoint"] = "containsPoint",
         ["hit"] = { vt = true, params = {{ name = "obj", vt = "GameObj"}} },
+        ["objectHitInGroup"] = { vt = "GameObj", params = {{ name = "group", vt = "String"}} },
+        ["objecthitingroup"] = "objectHitInGroup",
     }
 },
 

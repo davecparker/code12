@@ -55,7 +55,7 @@ function GameObj:new(typeName, x, y, width, height)
 		ySpeed = 0,
 		lineWidth = 1,
 		visible = true,
-		clickable = false,
+		clickable = true,
 		autoDelete = false,
 		group = "",
 
