@@ -445,7 +445,7 @@ the topmost clickable object that was clicked, whenever the user clicks
 on one.
 
 > Any objects with the `clickable` field set to `false` will not be considered
-> when determining which object was clicked. See [obj.clickable](#obj-clickable). 
+> when determining which object was clicked. See [obj.clickable](#objclickable). 
 
 > Note that `ct.objectClicked()` will return `null` if no object was
 > clicked, which is the case for most update cycles in a game 
@@ -773,8 +773,8 @@ boolean clickable
 ```
 The `clickable` field defaults to `true`, so by default all `GameObj` objects 
 can be used to respond to click/touch input
-(see [ct.objectClicked](#ct-objectClicked), [obj.clicked](#obj-clicked), and
-[onMousePress](#onMousePress)).
+(see [ct.objectClicked](#ctobjectclicked), [obj.clicked](#objclicked), and
+[onMousePress](#onmousepress)).
 However, if you set an object's `clickable` field to false, then it will ignore
 clicks and pass them through to the object below, if any. 
  
