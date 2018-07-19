@@ -445,7 +445,7 @@ the topmost clickable object that was clicked, whenever the user clicks
 on one.
 
 > Any objects with the `clickable` field set to `false` will not be considered
-> when determining which object was clicked. See [obj.clickable](#objclickable). 
+> when determining which object was clicked. See [clickable](#clickable). 
 
 > Note that `ct.objectClicked()` will return `null` if no object was
 > clicked, which is the case for most update cycles in a game 
