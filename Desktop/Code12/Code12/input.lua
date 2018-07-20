@@ -25,8 +25,8 @@ local function clickEvent(event, gameObj)
 
 	-- Get logical click location 
 	local xP, yP = g.mainGroup:contentToLocal( event.x, event.y )
-	local x = xP / g.scale
-	local y = yP / g.scale
+	local x = xP / g.scale + g.screen.originX
+	local y = yP / g.scale + g.screen.originY
 
 	local phase = event.phase
 	if phase == "began" then

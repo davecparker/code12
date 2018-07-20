@@ -214,7 +214,8 @@ end
 
 -- API
 function GameObj:hit(gameObj, ...)
-	if gameObj == nil or gameObj._code12.deleted or self._code12.deleted then
+	if gameObj == nil or not gameObj.visible
+			or gameObj._code12.deleted or self._code12.deleted then
 		return false
 	end
 
@@ -229,11 +230,11 @@ function GameObj:hit(gameObj, ...)
 end
 
 -- API
-function GameObj:objectHitInGroup(groupName, ...)
+function GameObj:objectHitInGroup(group, ...)
 	-- Check parameters
-	if groupName ~= nil then
+	if group ~= nil then
 		if g.checkGameObjMethodParams(self, "objectHitInGroup") then
-			g.check1Param("string", groupName, ...)
+			g.check1Param("string", group, ...)
 		end
 	end
 
@@ -241,7 +242,7 @@ function GameObj:objectHitInGroup(groupName, ...)
 	local objs = g.screen.objs
 	for i = 1, objs.numChildren do
 		local gObj = objs[i].code12GameObj
-		if gObj ~= self and (groupName == nil or gObj.group == groupName) then
+		if gObj ~= self and (group == nil or gObj.group == group) then
 			if self:hit(gObj) then
 				return gObj
 			end

@@ -280,6 +280,11 @@ objects that would normally be outside the window into view.
 > Conversely, another object at (50, 0) will scroll off the screen
 > to the left and no longer be visible.
 
+> The screen's background image (see [ct.setBackImage](#ctsetbackimage)),
+> if any, is not affected by the screen origin. If you want a background image
+> that scrolls, you can use [ct.image](#ctimage) to create and display one 
+> that is larger than the normal screen window.
+
 ### ct.clearScreen()
 ```
 ct.clearScreen( )
@@ -1007,12 +1012,12 @@ be used to test if/when two objects "hit" each other.
 
 ### obj.objectHitInGroup( String group )
 ```
-GameObj obj.objectHitInGroup( String groupName )
+GameObj obj.objectHitInGroup( String group )
 ```
 If the object currently intersects with another `GameObj` object
-on the current screen that has its `group` field equal to `groupName`,
+on the current screen that has its [group](#group) field equal to `group`,
 then return a reference to the other object, otherwise return `null`.
-If `groupName` is `null` then all objects on the current screen
+If the specified `group` is `null` then all objects on the current screen
 will be considered.
 
 > Note that `obj.objectHitInGroup()` will return `null` if no 

@@ -72,6 +72,12 @@ function ct.setHeight(height, ...)
 	g.height = g.WIDTH * g.window.height / g.window.width
 	g.scale = g.window.width / g.WIDTH
 	g.window.resized = true
+
+	-- Adjust the screen origin if any
+	local screen = g.screen
+	if screen then
+		ct.setScreenOrigin(screen.originX, screen.originY)
+	end
 end
 
 -- API
@@ -143,6 +149,8 @@ function ct.setScreen(name, ...)
 			group = display.newGroup(),
 			objs = display.newGroup(),   -- layer above background obj
 			backObj = nil,    -- background object, set below
+			originX = 0,
+			originY = 0,
 		}
 		g.mainGroup:insert(screen.group)
 		screen.group:insert(screen.objs)
@@ -164,12 +172,15 @@ function ct.setScreenOrigin(x, y, ...)
 		g.checkTypes({"number", "number"}, x, y, ...)
 	end
 
-	-- Offset the screen group
-	if g.screen then
-		local group = g.screen.group
-		group.x = -x
-		group.y = -y
-	end
+	-- Save the origin in the screen
+	local screen = g.screen
+	screen.originX = x
+	screen.originY = y	
+
+	-- Offset the screen's objects group
+	local group = screen.objs
+	group.x = -x * g.scale
+	group.y = -y * g.scale
 end
 
 -- API

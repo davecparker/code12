@@ -10,6 +10,7 @@ public class GameScreen
    // Instance data that Game can access
    String name;                    // name of the screen
    double width, height;           // logical size of the screen
+   double xOrigin, yOrigin;        // screen origin in logical units
    
    // Private instance data
    private GameObj backObj;                // background rect or image or null if none
@@ -22,6 +23,8 @@ public class GameScreen
       this.name = name;
       this.width = width;
       this.height = height;
+      this.xOrigin = 0;
+      this.yOrigin = 0;
       backObj = null;
       objects = new ArrayList<GameObj>();
    }
@@ -110,13 +113,16 @@ public class GameScreen
       height = heightNew;
    }
 
-   // Draw the screen onto the given graphics surface
-   void draw(Graphics2D g)
+   // Draw the screen onto the given graphics surface at the given scale factor
+   void draw(Graphics2D g, double scale)
    {
       // Draw the background if any
       if (backObj != null)
          backObj.draw(g);
-         
+
+      // Offset the coordinate system by the screen origin
+      g.translate(-xOrigin * scale, -yOrigin * scale);
+               
       // Draw the visible objects
       for (GameObj obj: objects)
       {
@@ -160,5 +166,24 @@ public class GameScreen
          } 
       }
       return null;  // none found
-   } 
+   }
+   
+   // Find and return the first object in group that obj intersects with
+   // (or consider all objects if group is null), or return null if none.
+   GameObj hitTestGroup(GameObj obj, String group)
+   {
+      // Try all matching objects
+      for (GameObj objTry: objects)
+      {
+         if (objTry != obj)
+         {
+            if (group == null || objTry.group.equals(group))
+            {
+               if (obj.hit(objTry))
+                  return objTry;
+            }
+         }
+      }
+      return null;
+   }    
 }
