@@ -45,6 +45,7 @@ class BubblePop extends Code12Program
 		littleNum = -1.23456e-9876; // exponential notation -e-
 		x = .5e7; // exponential notation without leading digit before dot
 		x = 3.e8; // exponential notation without digit after dot
+		double x = 5.; // number with decimal point but no digits after
 		double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
 		double mean = (a + b + c) / 3;
 		double y = m * x + b;
@@ -551,6 +552,52 @@ s = "\r";       // unsupported escape sequence
 interface foo   // unsupported reserved word
 double 1stNumber; // variable name starting with a number
 x = obj.1stNumber; // field name starting with a number
+// Using reserved words as identifiers
+int abstract;
+int break;
+int case;
+int catch;
+double class;
+boolean const;
+boolean continue;
+boolean default;
+String do;
+GameObj else;
+GameObj enum;
+int[] extends;
+double final;
+double finally();
+boolean foo(int for);
+for(int do = 0; do < 10; do++)
+String goto;
+String if;
+GameObj implements;
+int import;
+int instanceof;
+int interface;
+int native;
+int new;
+int package;	
+int private;	
+int protected;
+int public;	
+int return;	
+int static;	
+int strictfp;	
+int super;
+int switch;	
+int synchronized;	
+int this;	
+int throw;	
+int throws;	
+int transient;
+int try;	
+int void;	
+int volatile;	
+int while;
+boolean true;
+boolean false;
+int null;
 
 // Syntax errors
 x = 10          // missing ; in stmt
@@ -600,7 +647,7 @@ for(int i=0; i<n, i++) 	// comma in place of semicolon
 for(int i=0: i<n: i++) 	// colons in place of semicolons
 for{int i=0; i<n; i++} 	// {} in place of ()
 for( x : arr ) 			// forgetting variable type
-for( int x; arr ) 		// using ; instead of :
+for( int x; arr ) 		// using ; instead of : 
 double foo(x, y, z) 	// missing variable types for arguments in function definition
 double foo[i]()			// index on function identifier
 ct.println; 			// missing parenteses for function call without arguments
@@ -612,6 +659,11 @@ String s = "A long string
             on more than one line";
 ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
 newObj() = oldObj; 				// assigning to a function value
+f = void foo()					// mixing assignment and function declaration
+def func(x):					// Python syntax 
+GameObj circle = new ct.circle(0,0,10); // new keyword not needed
+intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
+int intArr = {1, 2, 3}; // missing []
 
 // Unsupported Java syntax
 // --------------------------------------------------------------------------------
@@ -641,3 +693,31 @@ for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
 int _var; // variable indentifiers starting with underscore
 int $var; // $
 double pay$;
+int x[];	// arryas must be declared with [] between type and identifier
+public abstract class Account 
+assert x != null : "x variable is null";
+case 0 :
+catch(Exception e)
+continue;
+default :
+enum WeekDays
+goto
+finally
+public class C implements I
+if (x instanceof y)
+public interface I
+native void foo()
+package P;
+private int x;
+protected int x;
+static int x = 10;
+strictfp void foo()
+super.foo();
+switch (x)
+synchronized(sync_object)
+this.x = x;
+throw e;
+void foo() throws Exception
+transient int x;
+try
+volatile int x = 10;
