@@ -41,10 +41,4 @@ class TestProgram extends Code12Program
 			}
 		}
 	}
-
-	public void onKeyPress( String keyName )
-	{
-		if (keyName.equals("tap"))
-			ct.println("tab key pressed");
-	}
 }
