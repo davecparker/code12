@@ -236,6 +236,7 @@ function ct.setBackColor(colorName, ...)
 	backObj = GameObj:newRect(g.screen.group, 0, 0, 100000, 100000, colorName)
 	backObj.updateBackObj = function () end
 	local obj = backObj._code12.obj
+	obj:removeEventListener("touch", g.onTouchGameObj)
 	obj:addEventListener("touch", g.onTouchBackObj)
 
 	-- Put the rect behind the objs layer in the screen group
@@ -278,6 +279,7 @@ function ct.setBackImage(filename, ...)
 	-- Make an image object with temporary position and size for now
 	backObj = GameObj:newImage(g.screen.group, filename, 0, 0, g.WIDTH)
 	local img = backObj._code12.obj
+	img:removeEventListener("touch", g.onTouchGameObj)
 	img:addEventListener("touch", g.onTouchBackObj)
 
 	-- Install special update method to position and crop properly
@@ -305,5 +307,6 @@ function ct.setBackImage(filename, ...)
 	-- Put the image behind the objs layer in the screen group
 	img:toBack()
 	g.screen.backObj = backObj
+	backObj:updateBackObj()
 end
 

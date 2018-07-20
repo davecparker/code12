@@ -9,6 +9,7 @@
 
 -- Corona modules
 local composer = require( "composer" )
+local json = require( "json" )
 
 -- Code12 app modules
 local g = require( "Code12.globals" )
@@ -33,17 +34,15 @@ _G.this = {}      -- generated code uses this.varName for class/global variables
 _G._fn = {}       -- generated code uses _fn.start(), _fn.update(), _fn.userFn(), etc.
 
 
+-- User settings to load/save
+local userSettings = {
+	recentPath = nil,                       -- path to last source file used
+	syntaxLevel = app.numSyntaxLevels,      -- user's syntax level setting
+}
+
 -- Cached state
 local sourceFile = app.sourceFile     -- info about the user's source code file
 local appContext = ct._appContext
-
-
--- Force the initial file to the standard test file for faster dev testing
-if env.isSimulator then
-	sourceFile.path = "/Users/davecparker/Documents/Git Projects/code12/Desktop/Default Test/UserCode.java"
---	sourceFile.path = "/Users/daveparker/Documents/GitHub/code12/Desktop/Default Test/UserCode.java"
-	sourceFile.timeLoaded = os.time()
-end
 
 
 --- Functions ----------------------------------------------------------------
@@ -74,6 +73,7 @@ local function readSourceFile()
 	if sourceFile.path then
 		local file = io.open( sourceFile.path, "r" )
 		if file then
+			sourceFile.timeLoaded = os.time()
 			sourceFile.strLines = {}   -- delete previous contents if any
 			local lineNum = 1
 			repeat
@@ -217,12 +217,18 @@ function app.processUserFile()
 	end
 end
 
--- Function to check user file for changes and (re)run it if modified
+-- Check user file for changes and (re)run it if modified or never loaded
 local function checkUserFile()
 	if sourceFile.path then
+		-- Get the file modification time
 		local timeMod = env.fileModTimeFromPath( sourceFile.path )
-		if timeMod and timeMod > sourceFile.timeModLast then
-			sourceFile.timeModLast = timeMod
+		if sourceFile.timeModLast == 0 then
+			sourceFile.timeModLast = timeMod or os.time()
+		end
+
+		-- Load file if changed or never loaded
+		if sourceFile.timeLoaded == 0 or timeMod > sourceFile.timeModLast then
+			sourceFile.timeModLast = timeMod 
 			app.processUserFile()
 			statusBar.update()
 		end
@@ -236,11 +242,77 @@ local function onResizeWindow()
 	statusBar.resize()
 end
 
+-- Return the path name for the user settings file
+local function settingsFilePath()
+	return system.pathForFile( "userSettings.txt", system.DocumentsDirectory )
+end
+
+-- Save the user settings
+local function saveSettings()
+	-- Update the userSettings
+	userSettings.recentPath = sourceFile.path
+	userSettings.syntaxLevel = app.syntaxLevel 
+
+	-- Write the settings file
+	local file = io.open( settingsFilePath(), "w" )
+	if file then
+		file:write( json.encode( userSettings ) )
+		io.close( file )
+	end
+end
+
+-- Load the user settings
+local function loadSettings()
+	-- Read the settings file
+	local file = io.open( settingsFilePath(), "r" )
+	if file then
+		local str = file:read( "*a" )	-- Read entile file as a string (JSON encoded)
+		io.close( file )
+		if str then
+			local t = json.decode( str )
+			if t then
+				-- Clear the recentPath if it doesn't exist anymore
+				file = io.open( t.recentPath, "r" )
+				if file then
+					userSettings.recentPath = t.recentPath
+					io.close( file )
+				else
+					userSettings.recentPath = nil
+				end
+				sourceFile.path = userSettings.recentPath
+
+				-- Make sure the syntaxLevel is valid
+				local level = t.syntaxLevel
+				print(type(level), level)
+				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
+					userSettings.syntaxLevel = level
+				else
+					userSettings.syntaxLevel = app.numSyntaxLevels
+				end
+				app.syntaxLevel = userSettings.syntaxLevel
+				print(app.syntaxLevel)
+			end
+		end
+	end
+end
+
+-- Handle system events for the app
+local function onSystemEvent( event )
+	-- Save the user settings if the user switches out of or quits the app
+	if event.type == "applicationSuspend" or event.type == "applicationExit" then
+		saveSettings()
+	end
+end
+
 -- Init the app
 local function initApp()
 	-- Make a default window title
 	display.setStatusBar( display.HiddenStatusBar )
 	native.setProperty("windowTitleText", "Code12")
+
+	-- Load saved user settings if any
+	app.startTime = os.time()
+	loadSettings()
 
 	-- Get initial window size and metrics
 	app.getWindowSize()
@@ -250,10 +322,8 @@ local function initApp()
 	statusBar.create()
 	toolbar.create()
 
-	-- Init user settings
-	app.syntaxLevel = app.numSyntaxLevels    -- TODO: load/save
-
 	-- Install listeners and update timers
+	Runtime:addEventListener( "system", onSystemEvent )
 	Runtime:addEventListener( "resize", onResizeWindow )
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec

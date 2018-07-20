@@ -41,13 +41,16 @@ local app =  {
 	-- The user source file
 	sourceFile = {
 		path = nil,              -- full pathname to the file
-		timeLoaded = 0,          -- time this file was loaded
-		timeModLast = 0,         -- last modification time or 0 if never
+		timeLoaded = 0,          -- time this file was loaded or 0 if not loaded
+		timeModLast = 0,         -- last modification time or 0 if unknown
 		strLines = {},           -- array of source code lines when read
 	},
 
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
+
+	-- Runtime state
+	startTime = 0,               -- system time when app started
 }
 
 
