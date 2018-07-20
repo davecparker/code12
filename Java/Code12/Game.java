@@ -334,6 +334,8 @@ public class Game implements GameInterface
    {
       if (key == null)
          return false;
+      if (!input.keyNameToCode.containsKey(key))
+         return false;
       return input.keysDown.get(input.keyNameToCode.get(key));
    }
    
