@@ -13,10 +13,12 @@ require('Code12.api')
     function _fn.start()
         
         this.dot = ct.circle(50, 50, 10)
-        local r = ct.rect(25, 75, 10, 50)
-        r.group = "walls"
-        r = ct.rect(75, 75, 10, 50)
-        r.group = "walls"
+        local t = ct.rect(25, 75, 10, 50)
+        t.group = "targets"
+        t = ct.rect(75, 75, 10, 50)
+        t.group = "targets"
+        t = ct.text("Hello", 50, 25, 10)
+        t.group = "targets"
     end
     
     function _fn.update()
@@ -41,7 +43,7 @@ require('Code12.api')
         elseif ct.charTyped("s") then
             this.dot.y = this.dot.y + 1; end
         
-        local hit = this.dot:objectHitInGroup("walls")
+        local hit = this.dot:objectHitInGroup("targets")
         if hit ~= nil then
             hit:delete(); end
         

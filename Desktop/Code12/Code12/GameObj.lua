@@ -140,9 +140,11 @@ end
 function GameObj:newLine(group, x1, y1, x2, y2, colorName)
 	local gameObj = GameObj:new("line", x1, y1, x2 - x1, y2 - y1)
 	gameObj:setObj(display.newLine(group, x1, y1, x2, y2))
+	gameObj._code12.widthPrev = gameObj.width
+	gameObj._code12.heightPrev = gameObj.height
 	gameObj.updateSize = GameObj.updateSizeLine   -- override sizing method
 	gameObj.objContainsPoint = GameObj.lineContainsPoint   -- override hit test method
-   gameObj.hitObj = GameObj.lineHitObj   -- override collision test method
+	gameObj.hitObj = GameObj.lineHitObj   -- override collision test method
 	gameObj:setLineColorFromName(colorName or "black")
 	return gameObj
 end
@@ -156,6 +158,8 @@ function GameObj:newText(group, text, x, y, height, colorName)
 	-- print("newText height vs obj height:", height, obj.height / g.scale)
 	gameObj:setObj(obj)
 	gameObj.width = obj.width / g.scale  -- Corona measured when obj created
+	gameObj._code12.widthPrev = gameObj.width
+	gameObj._code12.heightPrev = gameObj.height
 	gameObj.updateSize = GameObj.updateSizeText   -- override sizing method
 	gameObj._code12.text = text
 	gameObj:setFillColorFromName(colorName or "black")

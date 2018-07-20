@@ -13,10 +13,12 @@ class TestProgram extends Code12Program
    public void start()
    {
       dot = ct.circle(50, 50, 10);
-      GameObj r = ct.rect(25, 75, 10, 50);
-      r.group = "walls";
-      r = ct.rect(75, 75, 10, 50);
-      r.group = "walls";
+      GameObj t = ct.rect(25, 75, 10, 50);
+      t.group = "targets";
+      t = ct.rect(75, 75, 10, 50);
+      t.group = "targets";
+      t = ct.text("Hello", 50, 25, 10);
+      t.group = "targets";
    }
    
    public void update()
@@ -41,7 +43,7 @@ class TestProgram extends Code12Program
       else if (ct.charTyped("s"))
          dot.y++;
       
-      GameObj hit = dot.objectHitInGroup("walls");
+      GameObj hit = dot.objectHitInGroup("targets");
       if (hit != null)
          hit.delete();
 
