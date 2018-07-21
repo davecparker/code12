@@ -82,19 +82,25 @@ public class GameInput implements MouseListener, KeyListener
    public void keyPressed(KeyEvent e)
    {
       int keyCode = e.getKeyCode();
-      String keyName = keyCodeToName[keyCode];
-      keysDown.set(keyCode);  // Mark this key as currently down
-      if (keyName != null)    // Send event to client if name is known
-         program.onKeyPress(keyName);
+      if (keyCode < keyCodeToName.length)
+      {
+         String keyName = keyCodeToName[keyCode];
+         keysDown.set(keyCode);  // Mark this key as currently down
+         if (keyName != null)    // Send event to client if name is known
+            program.onKeyPress(keyName);
+      }
    }
    
    public void keyReleased(KeyEvent e)
    {
       int keyCode = e.getKeyCode();
-      String keyName = keyCodeToName[keyCode];
-      keysDown.clear(keyCode);  // Mark this key as no longer down
-      if (keyName != null)      // Send event to client if name is known
-         program.onKeyRelease(keyName);
+      if (keyCode < keyCodeToName.length)
+      {
+         String keyName = keyCodeToName[keyCode];
+         keysDown.clear(keyCode);  // Mark this key as no longer down
+         if (keyName != null)      // Send event to client if name is known
+            program.onKeyRelease(keyName);
+      }
    }
     
    public void keyTyped(KeyEvent e)
