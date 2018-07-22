@@ -47,9 +47,8 @@ public class GameInput implements MouseListener, KeyListener
    {
       xMouseP = e.getX();
       yMouseP = e.getY();
-      double scale = game.scaleLToP;
-      double x = xMouseP / scale;
-      double y = yMouseP / scale;
+      double x = xMouseFromP(xMouseP);
+      double y = yMouseFromP(yMouseP);
       
       // Find clickable object that was hit if any
       mouseObj = game.screen.findHitObject(x, y);
@@ -63,9 +62,8 @@ public class GameInput implements MouseListener, KeyListener
    {
       xMouseP = e.getX();
       yMouseP = e.getY();
-      double scale = game.scaleLToP;
-      double x = xMouseP / scale;
-      double y = yMouseP / scale;
+      double x = xMouseFromP(xMouseP);
+      double y = yMouseFromP(yMouseP);
 
       // Automatic mouse "capture" always sends release to same obj that got press
       program.onMouseRelease(mouseObj, x, y);
@@ -115,6 +113,20 @@ public class GameInput implements MouseListener, KeyListener
 
 
    //===================== Internal Methods ========================
+
+   // Return the logical x-coordinate for the physical mouse position xP 
+   // that is in pixels with respect to the upper-left of the game window.
+   double xMouseFromP(double xP)
+   {
+      return xP / game.scaleLToP + game.screen.xOrigin;
+   }
+
+   // Return the logical y-coordinate for the physical mouse position yP 
+   // that is in pixels with respect to the upper-left of the game window.
+   double yMouseFromP(double yP)
+   {
+      return yP / game.scaleLToP + game.screen.yOrigin; 
+   }
 
    // Do any processing necessary before a game frame update
    void preUpdate()

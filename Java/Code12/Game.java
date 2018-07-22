@@ -227,6 +227,12 @@ public class Game implements GameInterface
       }  
    }
    
+   public void setScreenOrigin(double x, double y)
+   {
+      screen.xOrigin = x;
+      screen.yOrigin = y;
+   }
+   
    public void clearScreen()                { screen.clear(null); }
    public void clearGroup(String group)     { screen.clear(group); }
 
@@ -325,9 +331,10 @@ public class Game implements GameInterface
 
    //=============== Mouse and Keyboard Input API =====================
    
-   public boolean clicked()   { return input.clicked; }  
-   public double clickX()     { return input.xMouseP / scaleLToP; }
-   public double clickY()     { return input.yMouseP / scaleLToP; }
+   public boolean clicked()         { return input.clicked; }  
+   public double clickX()           { return input.xMouseP / scaleLToP; }
+   public double clickY()           { return input.yMouseP / scaleLToP; }
+   public GameObj objectClicked()   { return input.clickedObj; }
 
    
    public boolean keyPressed(String key)
@@ -545,11 +552,11 @@ public class Game implements GameInterface
       input.invalObj(obj);
       screen.removeObj(obj);
    }
-    
+   
    // Draw the game onto the given graphics surface
    void draw(Graphics2D g)
    {
-      screen.draw(g);
+      screen.draw(g, scaleLToP);
    }
    
    // Update the game for the next frame
@@ -593,6 +600,13 @@ public class Game implements GameInterface
       return screen.findHitObject(xP / scaleLToP, yP / scaleLToP);
    }
    
+   // Find and return the first object in group that obj intersects with
+   // (or consider all objects if group is null), or return null if none.
+   GameObj hitTestGroup(GameObj obj, String group)
+   {
+      return screen.hitTestGroup(obj, group);
+   }   
+
    // Print a value as it should appear in ct.log output
    void logValue(Object value)
    {

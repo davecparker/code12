@@ -12,9 +12,9 @@ public abstract class GameObj implements GameObjInterface
    public double xSpeed, ySpeed;    // velocity
    public int lineWidth;            // line/frame thickness in pixels
    public boolean visible;          // true if object is visible
-   public boolean clickable;        // true to make object clickable
+   public boolean clickable;        // true if object is clickable
    public boolean autoDelete;       // true to auto delete object if it goes off-screen
-   public String group;             // group name for ct.deleteGroup(), default ""
+   public String group;             // group name, default ""
 
    // Protected instance variables
    protected Game game;             // back pointer to Game this object lives in
@@ -41,7 +41,7 @@ public abstract class GameObj implements GameObjInterface
       ySpeed = 0;
       lineWidth = 1;
       visible = true;
-      clickable = false;
+      clickable = true;
       autoDelete = false;
       group = "";
 
@@ -122,7 +122,7 @@ public abstract class GameObj implements GameObjInterface
 
    public boolean hit(GameObj obj)
    {
-      if (obj == null || obj.deleted)
+      if (obj == null || obj.deleted || !obj.visible)
          return false;
           
    	if (obj.isLine())
@@ -143,6 +143,12 @@ public abstract class GameObj implements GameObjInterface
          return false;
       return true;
    }
+   
+   public GameObj objectHitInGroup(String group)
+   {
+      return game.hitTestGroup(this, group);
+   }
+
 
    //======================= Internal Methods =========================
 

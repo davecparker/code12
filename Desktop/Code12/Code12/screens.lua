@@ -72,6 +72,12 @@ function ct.setHeight(height, ...)
 	g.height = g.WIDTH * g.window.height / g.window.width
 	g.scale = g.window.width / g.WIDTH
 	g.window.resized = true
+
+	-- Adjust the screen origin if any
+	local screen = g.screen
+	if screen then
+		ct.setScreenOrigin(screen.originX, screen.originY)
+	end
 end
 
 -- API
@@ -143,6 +149,8 @@ function ct.setScreen(name, ...)
 			group = display.newGroup(),
 			objs = display.newGroup(),   -- layer above background obj
 			backObj = nil,    -- background object, set below
+			originX = 0,
+			originY = 0,
 		}
 		g.mainGroup:insert(screen.group)
 		screen.group:insert(screen.objs)
@@ -155,6 +163,24 @@ function ct.setScreen(name, ...)
 
 	-- Show new screen
 	screen.group.isVisible = true;
+end
+
+-- API
+function ct.setScreenOrigin(x, y, ...)
+	-- Check parameters
+	if g.checkAPIParams("ct.setScreenOrigin") then
+		g.checkTypes({"number", "number"}, x, y, ...)
+	end
+
+	-- Save the origin in the screen
+	local screen = g.screen
+	screen.originX = x
+	screen.originY = y	
+
+	-- Offset the screen's objects group
+	local group = screen.objs
+	group.x = -x * g.scale
+	group.y = -y * g.scale
 end
 
 -- API
@@ -210,6 +236,7 @@ function ct.setBackColor(colorName, ...)
 	backObj = GameObj:newRect(g.screen.group, 0, 0, 100000, 100000, colorName)
 	backObj.updateBackObj = function () end
 	local obj = backObj._code12.obj
+	obj:removeEventListener("touch", g.onTouchGameObj)
 	obj:addEventListener("touch", g.onTouchBackObj)
 
 	-- Put the rect behind the objs layer in the screen group
@@ -252,6 +279,7 @@ function ct.setBackImage(filename, ...)
 	-- Make an image object with temporary position and size for now
 	backObj = GameObj:newImage(g.screen.group, filename, 0, 0, g.WIDTH)
 	local img = backObj._code12.obj
+	img:removeEventListener("touch", g.onTouchGameObj)
 	img:addEventListener("touch", g.onTouchBackObj)
 
 	-- Install special update method to position and crop properly
@@ -279,5 +307,6 @@ function ct.setBackImage(filename, ...)
 	-- Put the image behind the objs layer in the screen group
 	img:toBack()
 	g.screen.backObj = backObj
+	backObj:updateBackObj()
 end
 
