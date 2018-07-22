@@ -7735,239 +7735,242 @@ Comma not supported
 648. for{int i=0; i<n; i++} 	// {} in place of ()
 *** Location 648.1 to 648.22: Syntax Error
 
-649. for( x : arr ) 			// forgetting variable type
-*** Location 649.1 to 649.14: Syntax Error
+649. for (int i==0; i<n; i++)// == instead of =
+*** Location 649.1 to 649.24: Syntax Error
 
-650. for( int x; arr ) 		// using ; instead of :
-*** Location 650.1 to 650.17: Syntax Error
+650. for( x : arr ) 			// forgetting variable type
+*** Location 650.1 to 650.14: Syntax Error
 
-651. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Location 651.1 to 651.19: Syntax Error
+651. for( int x; arr ) 		// using ; instead of :
+*** Location 651.1 to 651.17: Syntax Error
 
-652. double foo[i]()			// index on function identifier
-*** Location 652.1 to 652.15: Syntax Error
+652. double foo(x, y, z) 	// missing variable types for arguments in function definition
+*** Location 652.1 to 652.19: Syntax Error
 
-653. ct.println; 			// missing parenteses for function call without arguments
-*** Location 653.1 to 653.11: Syntax Error
+653. double foo[i]()			// index on function identifier
+*** Location 653.1 to 653.15: Syntax Error
 
-654. foo(int x, double y, GameObj z) 	// missing return type in function definition
-*** Location 654.1 to 654.31: Syntax Error
+654. ct.println; 			// missing parenteses for function call without arguments
+*** Location 654.1 to 654.11: Syntax Error
 
-655. foo(int x, double y, GameObj z); 	// supplying variable types in function call
-*** Location 655.1 to 655.32: Syntax Error
+655. foo(int x, double y, GameObj z) 	// missing return type in function definition
+*** Location 655.1 to 655.31: Syntax Error
 
-656. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
-*** Location 656.1 to 656.40: Syntax Error
+656. foo(int x, double y, GameObj z); 	// supplying variable types in function call
+*** Location 656.1 to 656.32: Syntax Error
 
-657. String s = 'Hello'; 	// '' in place of "" for strings
-*** Location 657.12 to 657.12: char type not supported, use double quotes
+657. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
+*** Location 657.1 to 657.40: Syntax Error
 
-658. String s = "A long string
-*** Location 658.12 to 658.25: Unclosed string literal
+658. String s = 'Hello'; 	// '' in place of "" for strings
+*** Location 658.12 to 658.12: char type not supported, use double quotes
 
-659. on more than one line";
-*** Location 659.34 to 659.35: Unclosed string literal
+659. String s = "A long string
+*** Location 659.12 to 659.25: Unclosed string literal
 
-660. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Location 660.1 to 660.30: Syntax Error
+660. on more than one line";
+*** Location 660.34 to 660.35: Unclosed string literal
 
-661. newObj() = oldObj; 				// assigning to a function value
-*** Location 661.1 to 661.18: Syntax Error
+661. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
+*** Location 661.1 to 661.30: Syntax Error
 
-662. f = void foo()					// mixing assignment and function declaration
-*** Location 662.1 to 662.14: Syntax Error
+662. newObj() = oldObj; 				// assigning to a function value
+*** Location 662.1 to 662.18: Syntax Error
 
-663. def func(x):					// Python syntax
-*** Location 663.1 to 663.12: Syntax Error
+663. f = void foo()					// mixing assignment and function declaration
+*** Location 663.1 to 663.14: Syntax Error
 
-664. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
-*** Location 664.1 to 664.39: Syntax Error
+664. def func(x):					// Python syntax
+*** Location 664.1 to 664.12: Syntax Error
 
-665. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
-*** Location 665.1 to 665.19: Syntax Error
+665. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
+*** Location 665.1 to 665.39: Syntax Error
 
-666. int intArr = {1, 2, 3}; // missing []
-*** Location 666.1 to 666.23: Syntax Error
+666. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
+*** Location 666.1 to 666.19: Syntax Error
 
-667. 
+667. int intArr = {1, 2, 3}; // missing []
+*** Location 667.1 to 667.23: Syntax Error
+
+668. 
 line (blank)
 
-668. // Unsupported Java syntax
+669. // Unsupported Java syntax
 line (comment)
     COMMENT ( Unsupported Java syntax)
 
-669. // --------------------------------------------------------------------------------
+670. // --------------------------------------------------------------------------------
 line (comment)
     COMMENT ( --------------------------------------------------------------------------------)
 
-670. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Location 670.1 to 670.24: Syntax Error
+671. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+*** Location 671.1 to 671.24: Syntax Error
 
-671. import java.io.PrintWriter;   // import other than Code12.*
-*** Location 671.1 to 671.27: Syntax Error
+672. import java.io.PrintWriter;   // import other than Code12.*
+*** Location 672.1 to 672.27: Syntax Error
 
-672. int time = (int)( sec );      // type casting
-*** Location 672.1 to 672.24: Syntax Error
+673. int time = (int)( sec );      // type casting
+*** Location 673.1 to 673.24: Syntax Error
 
-673. time %= 3600;                 // %= operator
-*** Location 673.1 to 673.13: Syntax Error
+674. time %= 3600;                 // %= operator
+*** Location 674.1 to 674.13: Syntax Error
 
-674. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-*** Location 674.32 to 674.32: Invalid character (The "? :" operator is not supported by Code12)
+675. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+*** Location 675.32 to 675.32: Invalid character (The "? :" operator is not supported by Code12)
 
-675. System.out.println("Hello world"); // classes other than GameObj and String
-*** Location 675.1 to 675.34: Syntax Error
+676. System.out.println("Hello world"); // classes other than GameObj and String
+*** Location 676.1 to 676.34: Syntax Error
 
-676. char ch = 'a'; 	// char type
-*** Location 676.11 to 676.11: char type not supported, use double quotes
+677. char ch = 'a'; 	// char type
+*** Location 677.11 to 677.11: char type not supported, use double quotes
 
-677. while(foo) { 	// opening { in control structure not on it's own line
-*** Location 677.1 to 677.12: Syntax Error
+678. while(foo) { 	// opening { in control structure not on it's own line
+*** Location 678.1 to 678.12: Syntax Error
 
-678. i++; } 			// closing } not on it's own line
-*** Location 678.1 to 678.6: Syntax Error
+679. i++; } 			// closing } not on it's own line
+*** Location 679.1 to 679.6: Syntax Error
 
-679. String s = "A long string" +
-*** Location 679.29 to 679.29: Expected expression after + operator
-*** Reference 679.28 to 679.28
+680. String s = "A long string" +
+*** Location 680.29 to 680.29: Expected expression after + operator
+*** Reference 680.28 to 680.28
 
-680. "on more than one line using concatenation";
-*** Location 680.12 to 680.55: Syntax Error
+681. "on more than one line using concatenation";
+*** Location 681.12 to 681.55: Syntax Error
 
-681. x = a; y = b; 	// more than one statement on a single line
-*** Location 681.1 to 681.13: Syntax Error
+682. x = a; y = b; 	// more than one statement on a single line
+*** Location 682.1 to 682.13: Syntax Error
 
-682. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
-*** Location 682.1 to 682.36: Syntax Error
+683. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
+*** Location 683.1 to 683.36: Syntax Error
 
-683. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Location 683.1 to 683.41: Syntax Error
+684. double getVariable() { return variable; } // {} must start and end on their own lines
+*** Location 684.1 to 684.41: Syntax Error
 
-684. switch (choice)
-*** Location 684.1 to 684.6: Unsupported reserved word "switch"
+685. switch (choice)
+*** Location 685.1 to 685.6: Unsupported reserved word "switch"
 
-685. continue;
-*** Location 685.1 to 685.8: Unsupported reserved word "continue"
+686. continue;
+*** Location 686.1 to 686.8: Unsupported reserved word "continue"
 
-686. a[i++] = b[i++]; 	// increment/decrement only supported as statements
-*** Location 686.1 to 686.16: Syntax Error
+687. a[i++] = b[i++]; 	// increment/decrement only supported as statements
+*** Location 687.1 to 687.16: Syntax Error
 
-687. obj.group.equals("targets"); 		// indexing more than one level at a time
-*** Location 687.1 to 687.28: Syntax Error
+688. obj.group.equals("targets"); 		// indexing more than one level at a time
+*** Location 688.1 to 688.28: Syntax Error
 
-688. input.toLowerCase().equals("quit"); // indexing after function call
-*** Location 688.1 to 688.35: Syntax Error
+689. input.toLowerCase().equals("quit"); // indexing after function call
+*** Location 689.1 to 689.35: Syntax Error
 
-689. newBullet().ySpeed = 0;
-*** Location 689.1 to 689.23: Syntax Error
+690. newBullet().ySpeed = 0;
+*** Location 690.1 to 690.23: Syntax Error
 
-690. final int N; 	// constant declaration without initialization
-*** Location 690.1 to 690.12: Syntax Error
+691. final int N; 	// constant declaration without initialization
+*** Location 691.1 to 691.12: Syntax Error
 
-691. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
-*** Location 691.15 to 691.15: for loop parts should be separated by semicolons (;)
+692. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
+*** Location 692.15 to 692.15: for loop parts should be separated by semicolons (;)
 Comma not supported
 
-692. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
-*** Location 692.1 to 692.20: Syntax Error
+693. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
+*** Location 693.1 to 693.20: Syntax Error
 
-693. int _var; // variable indentifiers starting with underscore
-*** Location 693.5 to 693.8: Names cannot start with an underscore in Code12
+694. int _var; // variable indentifiers starting with underscore
+*** Location 694.5 to 694.8: Names cannot start with an underscore in Code12
 
-694. int $var; // $
-*** Location 694.5 to 694.5: The $ character is not allowed in Code12
+695. int $var; // $
+*** Location 695.5 to 695.5: The $ character is not allowed in Code12
 
-695. double pay$;
-*** Location 695.11 to 695.11: The $ character is not allowed in Code12
+696. double pay$;
+*** Location 696.11 to 696.11: The $ character is not allowed in Code12
 
-696. int x[];	// arryas must be declared with [] between type and identifier
-*** Location 696.1 to 696.8: Syntax Error
+697. int x[];	// arryas must be declared with [] between type and identifier
+*** Location 697.1 to 697.8: Syntax Error
 
-697. public abstract class Account
-*** Location 697.8 to 697.15: Unsupported reserved word "abstract"
+698. public abstract class Account
+*** Location 698.8 to 698.15: Unsupported reserved word "abstract"
 
-698. assert x != null : "x variable is null";
-*** Location 698.1 to 698.6: Unsupported reserved word "assert"
+699. assert x != null : "x variable is null";
+*** Location 699.1 to 699.6: Unsupported reserved word "assert"
 
-699. case 0 :
-*** Location 699.1 to 699.4: Unsupported reserved word "case"
+700. case 0 :
+*** Location 700.1 to 700.4: Unsupported reserved word "case"
 
-700. catch(Exception e)
-*** Location 700.1 to 700.5: Unsupported reserved word "catch"
+701. catch(Exception e)
+*** Location 701.1 to 701.5: Unsupported reserved word "catch"
 
-701. continue;
-*** Location 701.1 to 701.8: Unsupported reserved word "continue"
+702. continue;
+*** Location 702.1 to 702.8: Unsupported reserved word "continue"
 
-702. default :
-*** Location 702.1 to 702.7: Unsupported reserved word "default"
+703. default :
+*** Location 703.1 to 703.7: Unsupported reserved word "default"
 
-703. enum WeekDays
-*** Location 703.1 to 703.4: Unsupported reserved word "enum"
+704. enum WeekDays
+*** Location 704.1 to 704.4: Unsupported reserved word "enum"
 
-704. goto
-*** Location 704.1 to 704.4: Unsupported reserved word "goto"
+705. goto
+*** Location 705.1 to 705.4: Unsupported reserved word "goto"
 
-705. finally
-*** Location 705.1 to 705.7: Unsupported reserved word "finally"
+706. finally
+*** Location 706.1 to 706.7: Unsupported reserved word "finally"
 
-706. public class C implements I
-*** Location 706.16 to 706.25: Unsupported reserved word "implements"
+707. public class C implements I
+*** Location 707.16 to 707.25: Unsupported reserved word "implements"
 
-707. if (x instanceof y)
-*** Location 707.7 to 707.16: Unsupported reserved word "instanceof"
+708. if (x instanceof y)
+*** Location 708.7 to 708.16: Unsupported reserved word "instanceof"
 
-708. public interface I
-*** Location 708.8 to 708.16: Unsupported reserved word "interface"
+709. public interface I
+*** Location 709.8 to 709.16: Unsupported reserved word "interface"
 
-709. native void foo()
-*** Location 709.1 to 709.6: Unsupported reserved word "native"
+710. native void foo()
+*** Location 710.1 to 710.6: Unsupported reserved word "native"
 
-710. package P;
-*** Location 710.1 to 710.7: Unsupported reserved word "package"
+711. package P;
+*** Location 711.1 to 711.7: Unsupported reserved word "package"
 
-711. private int x;
-*** Location 711.1 to 711.7: Unsupported reserved word "private"
+712. private int x;
+*** Location 712.1 to 712.7: Unsupported reserved word "private"
 
-712. protected int x;
-*** Location 712.1 to 712.9: Unsupported reserved word "protected"
+713. protected int x;
+*** Location 713.1 to 713.9: Unsupported reserved word "protected"
 
-713. static int x = 10;
-*** Location 713.1 to 713.18: Syntax Error
+714. static int x = 10;
+*** Location 714.1 to 714.18: Syntax Error
 
-714. strictfp void foo()
-*** Location 714.1 to 714.8: Unsupported reserved word "strictfp"
+715. strictfp void foo()
+*** Location 715.1 to 715.8: Unsupported reserved word "strictfp"
 
-715. super.foo();
-*** Location 715.1 to 715.5: Unsupported reserved word "super"
+716. super.foo();
+*** Location 716.1 to 716.5: Unsupported reserved word "super"
 
-716. switch (x)
-*** Location 716.1 to 716.6: Unsupported reserved word "switch"
+717. switch (x)
+*** Location 717.1 to 717.6: Unsupported reserved word "switch"
 
-717. synchronized(sync_object)
-*** Location 717.1 to 717.12: Unsupported reserved word "synchronized"
+718. synchronized(sync_object)
+*** Location 718.1 to 718.12: Unsupported reserved word "synchronized"
 
-718. this.x = x;
-*** Location 718.1 to 718.4: Unsupported reserved word "this"
+719. this.x = x;
+*** Location 719.1 to 719.4: Unsupported reserved word "this"
 
-719. throw e;
-*** Location 719.1 to 719.5: Unsupported reserved word "throw"
+720. throw e;
+*** Location 720.1 to 720.5: Unsupported reserved word "throw"
 
-720. void foo() throws Exception
-*** Location 720.12 to 720.17: Unsupported reserved word "throws"
+721. void foo() throws Exception
+*** Location 721.12 to 721.17: Unsupported reserved word "throws"
 
-721. transient int x;
-*** Location 721.1 to 721.9: Unsupported reserved word "transient"
+722. transient int x;
+*** Location 722.1 to 722.9: Unsupported reserved word "transient"
 
-722. try
-*** Location 722.1 to 722.3: Unsupported reserved word "try"
+723. try
+*** Location 723.1 to 723.3: Unsupported reserved word "try"
 
-723. volatile int x = 10;
-*** Location 723.1 to 723.8: Unsupported reserved word "volatile"
+724. volatile int x = 10;
+*** Location 724.1 to 724.8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-723 lines processed in 325 ms
+724 lines processed in 343 ms
 
 0 unexpected errors
-0 uncaught errors (173 expected errors)
+0 uncaught errors (174 expected errors)
 
 SUCCESS

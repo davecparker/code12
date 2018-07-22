@@ -1,21 +1,15 @@
 ======= Test Started ==========================================
-42. int exponentialNumberWithDot = 3.42e2;
-*** Unexpected error: Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()
-
-329. i = Math.abs(i);
-*** Unexpected error: Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()
-
 ======= Test Complete =========================================
 
 Semantic Error Test:
 
-    385 lines processed
-    102 ms Parse time
+    757 lines processed
+    175 ms Parse time
     0 ms Semantic check time
-    12 ms Code Generation time
-    115 ms Total time
+    21 ms Code Generation time
+    197 ms Total time
 
-2 unexpected errors
-0 uncaught errors (22 expected errors)
+0 unexpected errors
+0 uncaught errors (85 expected errors)
 
-FAILED
+SUCCESS

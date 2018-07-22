@@ -646,6 +646,7 @@ for(int i=0, i<n, i++) 	// commas in place of semicolons
 for(int i=0; i<n, i++) 	// comma in place of semicolon
 for(int i=0: i<n: i++) 	// colons in place of semicolons
 for{int i=0; i<n; i++} 	// {} in place of ()
+for (int i==0; i<n; i++)// == instead of =
 for( x : arr ) 			// forgetting variable type
 for( int x; arr ) 		// using ; instead of : 
 double foo(x, y, z) 	// missing variable types for arguments in function definition

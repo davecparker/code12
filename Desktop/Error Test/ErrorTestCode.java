@@ -8,9 +8,37 @@ class ErrorTest extends Code12Program
 	}
 
 	// user defined functions
+	void voidFunc()
+	{
+		int i = 0;
+	}
 	int intFunc()
 	{
-		return 0;
+		int i = 1;
+		return i;
+	}
+	double dblFunc()
+	{
+		double d = 0.0;
+		return d;
+	} 
+	boolean boolFunc()
+	{
+		boolean b = true;
+		return b;
+	}
+	String strFunc()
+	{
+		String s = "";
+		return s;
+	}
+	GameObj gObjFunc()
+	{
+		return ct.circle(0.0, 0.0, 1.0);
+	}
+	int[] intArrFuncInt(int n)
+	{
+		return new int[n];
 	}
 	int intFuncInt(int i)
 	{
@@ -20,13 +48,26 @@ class ErrorTest extends Code12Program
 	{
 		return i + d;
 	}
+	boolean boolFuncBoolStringGameObj(boolean b, String s, GameObj g)
+	{
+		return b && s.equals("") && g.visible;
+	}
+	int recursiveFunc(int i)
+	{
+		if (i <= 0)
+			return 0;
+		return 1 + recursiveFunc(i - 1);
+	}
+
 	
 	// ERROR "Return type of start function should be void"
 	public int start()
 	{
 		// These line are all OK
+
 		// int, double, boolean, and String variable declarations and assignments;
 		int i = 3;
+		i=-5;
 		i++;
 		i = i + 1;
 		i += 1;
@@ -38,10 +79,17 @@ class ErrorTest extends Code12Program
 		int foo = i + 4;
 		int score = 500;
 		int j,k;
-		int exponentialNumberNoDot = 12e10;
-		int exponentialNumberWithDot = 3.42e2;
+		double exponentialNumberNoDot = 12e10;
+		double exponentialNumberWithDot = 3.42e2;
 		double expontialNumberWithDecimalPlaces = 6.62e-34;
 		double d = 3.14;
+		d = 100;
+		d = .5;
+		d = 1.2345e6;
+		d = 1.2345e+67;
+		d = .12e0;
+		d = -.123e-456;
+		d=-.5;
 		d = d / 2;
 		d += 0.5;
 		d -= 7;
@@ -59,18 +107,102 @@ class ErrorTest extends Code12Program
 		boolean b = true;
 		boolean b2 = false;
 		boolean b3 = b || b2;
-		b = b2 && b3;
-		b2 = b2;
 		String s = "A string variable";
+		s = s;
 		s = null;
+
 		// arrays
 		String[] colors = { "black", "white", "red", "green", "blue" };
+		i = 100;
 		String[] strArr = new String[i];
+		strArr = colors;
 		int[] intArr = {1, 2, 3};
 		intArr = new int[100];
+		int[] intArr2 = new int[s.length()];
+		intArr = intArr2;
 		double[] dblArr = {1.1, 2.2, 3.3};
 		double[] dblArr2 = new double[100];
 		dblArr = dblArr2;
+		GameObj[] gObjArr = new GameObj[i * 2];
+
+		// user defined functions
+		voidFunc();
+		i = intFunc();
+		d = dblFunc();
+		b = boolFunc();
+		s = strFunc();
+		GameObj gObj = gObjFunc();
+		intArr = intArrFuncInt(i);
+		i = intFuncInt(i);
+		d = dblFuncIntDbl(i, d);
+		b = boolFuncBoolStringGameObj(b, s, gObj);
+		i = recursiveFunc(2);
+
+		// expressions
+		i = i + i;
+		i = i - i;
+		i = i * i;
+		i = i * i + i - i;
+		i = i * ((i + i) - i);
+		d = i;
+		d = d + i;
+		d = d - i;
+		d = d * i;
+		d = d / i;
+		d = i + d;
+		d = i - d;
+		d = i * d;
+		d = i / d;		
+		d = d + d;
+		d = d - d;
+		d = d * d;
+		d = d / d;
+		d = i - i + i * i;
+		d = d + i * i - i;
+		d = i * i - d * d;
+		d = (i * (i) - d * d);
+		s = s + s;
+		s = s + s + "s";
+		b = b;
+		b = !b;
+		b = (b);
+		b = i == i;
+		b = i == d;
+		b = d == i;
+		b = d == d;
+		b = b == b;
+		b = i != i;
+		b = i != d;
+		b = d != i;
+		b = d != d;
+		b = b != b;
+		b = i < i;
+		b = i > i;
+		b = i <= i;
+		b = i >= i;
+		b = i < d;
+		b = i > d;
+		b = i <= d;
+		b = i >= d;
+		b = d < i;
+		b = d > i;
+		b = d <= i;
+		b = d >= i;
+		b = d < d;
+		b = d > d;
+		b = d <= d;
+		b = d >= d;
+		b = b || b;
+		b = b && b;
+		b = 1 < 2;
+		b = 1.1 <= 2;
+		b = 1 > 2;
+		b = 1 >= 2.2;
+		b2 = b2 || b3 && b == b;
+		b = i % 2 == 0;
+		b = (b || b) && b;
+		b = (1 + 1 == 2) && (Math.PI - 3.14159 < 0.0001);
+
 		// if statements
 		if (i == 0)
 			ct.setBackColor(colors[i]);
@@ -79,16 +211,18 @@ class ErrorTest extends Code12Program
 		else
 			i *= 5;
 
-		if (i > 0)
+		if(i > 0)
 		{
 			j = 0;
 			k = 0;
 		}
-		else if (i <= 10)
+		else if(i<=10)
 		{
 			d = 7;
 			ct.setSoundVolume(1);
 		}
+		else if (b)
+			i++;
 		else
 		{
 			String tempStr = "I'll be ";
@@ -96,8 +230,68 @@ class ErrorTest extends Code12Program
 		}
 		if ( ct.isError(Math.tan(d)) && ct.distance(x1, y1, x2, y2) <= eps)
 			ct.println("oops");
-		
+
 		// for loops
+		for(;false;)
+			for(;;)
+				for(i=0;;)
+					for(;i<10;)
+						for(;;i++)
+							for(;b;)
+								d = 0;
+
+		for (int ii = 0; ii < 10; ii++)
+		{
+			for (int jj = 0; jj != 10; jj+=1)
+				if ( ii == 0 || jj == 0 )
+					break;
+			break;
+		}
+
+		for (int ii = 0; ii < 10; ii++)
+		{
+			for (int jj = 0; jj != 10; jj+=1)
+			{
+				if ( ii == 0 && jj == 0 )
+				{
+					intArr[ii] = 0;
+					break;
+				}
+				break;
+			}
+			break;
+		}
+
+		double xVar = 0;
+		double yVar = 1;
+		for (double dx = .1; xVar < 1; xVar += dx)
+			for(double dy=-.5;yVar>0;yVar+=dy)
+				d = xVar + dx - yVar / dy;
+
+		intArr = new int[1];
+		for (int a : intArr)
+			a = 0;
+
+		// while loops
+		while(b)
+			b = false;
+
+		while ( b )
+		{
+			voidFunc();
+			i++;
+			b = false;
+		}
+
+		do
+			b = false;
+		while (b);
+
+		do
+		{
+			b = false;
+		}
+		while (b);
 
 		// Code12 API -- Text Output
 		ct.print("Hello world");
@@ -105,6 +299,7 @@ class ErrorTest extends Code12Program
 		ct.print("Hello world\n");
 		ct.print(i);
 		ct.print(d);
+		ct.println(b);
 		ct.print("i = " + i);
 		ct.print("d = " + d);
 		ct.print(name);
@@ -116,6 +311,7 @@ class ErrorTest extends Code12Program
 		ct.println("Hello world\n");
 		ct.println(i);
 		ct.println(d);
+		ct.println(b);
 		ct.println("i = " + i);
 		ct.println("d = " + d);
 		ct.println(name);
@@ -131,6 +327,7 @@ class ErrorTest extends Code12Program
 		ct.setOutputFile("output/nameList.txt");
 		String outputFilename = "output.txt";
 		ct.setOutputFile(outputFilename);
+
 		// Code12 API -- Alerts and Input Dialogs
 		ct.showAlert("alert meassage");
 		String message = "alert!";
@@ -146,6 +343,7 @@ class ErrorTest extends Code12Program
 		String inputStr = ct.inputString("Quit?");
 		inputStr = ct.inputString("Quit?");
 		inputStr = ct.inputString(message);
+
 		// Code12 API -- Screen Management
 		ct.setTitle("Title");
 		String title = "Title";
@@ -204,6 +402,8 @@ class ErrorTest extends Code12Program
 		GameObj img = ct.image( filename, x, y, width );
 		img = ct.image( "car.png", 42, 25, 38.7 );
 		img = ct.image( "C:\\Users\\john\\Pictures\\car.jpg", 42, 25, 38 );
+		GameObj[] objs = { circle, rect, line, text, img };
+		img = rect;
 		// Code12 API -- Mouse and Keyboard Input
 		if (ct.clicked())
 			boolean mouseClicked = ct.clicked();
@@ -324,62 +524,234 @@ class ErrorTest extends Code12Program
 			while (img.hit(rect))
 				b = img.hit(rect) == true;
 		// Java Math Class Methods and Fields Supported
-		d = Math.pow(Math.E, Math.PI * i) + 1;
+		double e = Math.E;
+		double pi = Math.PI;
 		if (Math.abs(rect.x - img.x) < eps)
 			i = Math.abs(i);
-		d = Math.acos(-0.5) + Math.asin(Math.sqrt(3)/2) + Math.atan(1/Math.sqrt(2));
+		d = Math.acos(-0.5);
+		d = Math.asin(Math.sqrt(3)/2);
+		d = Math.atan(1/Math.sqrt(2));
 		d = Math.atan2(ct.clickX() - img.x, ct.clickY() - img.y);
-		d = Math.ceil(d) + Math.cos(Math.PI / 2) + Math.sin(Math.PI * 2) + Math.tan(2 * Math.PI + 1);
-		d = Math.cosh(0) + Math.sinh(d) - Math.tanh(3*i);
+		d = Math.ceil(d);
+		d = Math.cos(Math.PI / 2);
+		d = Math.cosh(Math.PI * 2);
+		d = Math.exp(2 * Math.PI + 1);
+		d = Math.floor(-1.67);
+		d = Math.log(32);
+		d = Math.log10(d);
+		d = Math.max(d, d);
+		i = Math.max(i, i);
+		d = Math.min(d, d);
+		i = Math.min(i, i);
+		d = Math.pow(d, d);
+		d = Math.sin(d);
+		d = Math.sinh(d);
+		d = Math.sqrt(d);
+		d = Math.tan(d);
+		d = Math.tanh(d);
+		// Java String Class Methods Supported
+		i = s.compareTo(s);
+		b = s.equals(s);
+		i = s.indexOf(s);
+		i = s.length();
+		s = s.substring(i);
+		s = s.substring(i);
+		s = s.toLowerCase();
+		s = s.toUpperCase();
+		s = s.trim();
 	}
 
-	
 	void expectedErrors()
 	{
-		// ERROR "Not enough parameters"
-		ct.circle("Oops");
+		int intVar = 1;
+		double dblVar = 1.0;
+		boolean boolVar = false;
+		String strVar = "a";
+		GameObj objVar = ct.circle(0,0,10);
+
+		// ERROR "Value of type int cannot be assigned to type boolean" 
+		boolVar = intVar;
+		// ERROR "Value of type int cannot be assigned to type boolean"
+		boolean b = intFuncInt(2);
+		// ERROR "Value of type int cannot be assigned to type boolean"
+		objVar.visible = 0;
+		// ERROR "Integer value cannot be assigned to a String"
+		String s = intVar;
+		// ERROR "Value of type int cannot be assigned to type GameObj"
+		objVar = intVar;
+		
 		// ERROR "Value of type double cannot be assigned to an int"
 		int i = 3.4;
 		// ERROR "Value of type double cannot be assigned to an int"
 		i = 1.2;
+		// ERROR "Value of type double cannot be assigned to an int"
+		i = 10 * 3.4;
+		// ERROR "Value of type double cannot be assigned to an int"
+		int j = 5 + 3.14;
+		// ERROR "Value of type double cannot be assigned to an int"
+		int plancksConst = 6.62e-34;
+		// ERROR "Value of type double cannot be assigned to an int"
+		int exponentialNumberNoDot = 12e10;
+		// ERROR "Value of type double cannot be assigned to an int"
+		int exponentialNumberWithDot = 3.42e2;
+		// ERROR "Value of type double cannot be assigned to type boolean"
+		objVar.autoDelete = dblVar;
+		// ERROR "Value of type double cannot be assigned to a String"
+		strVar = 3.14;
+		// ERROR "Value of type double cannot be assigned to type GameObj"
+		objVar = dblVar;
+
+		// ERROR "Value of type boolean cannot be assigned to type int"
+		intVar = ct.clicked();
+		// ERROR "Value of type boolean cannot be assigned to type double"
+		objVar.x = boolVar;
+		// ERROR "Value of type boolean cannot be assigned to type double"
+		objVar.xSpeed = false;
+		// ERROR "Value of type boolean cannot be assigned to type String"
+		objVar.group = boolVar;
+		// ERROR "Value of type boolean cannot be assigned to type GameObj"
+		objVar = boolVar;
+
+		// ERROR "A String cannot be assigned to an int"
+		intVar = objVar.group;
+		// ERROR "A String cannot be assigned to a double"
+		objVar.ySpeed = "fast";
+		// ERROR "Value of type String cannot be assigned to type boolean"
+		boolVar = strVar;
+		// ERROR "Value of type String cannot be assigned to type GameObj"
+		GameObj score = "100 pts"; 		
+
+		// ERROR "Value of type GameObj cannot be assigned to type int"
+		intVar = objVar;
+		// ERROR "Value of type GameObj cannot be assigned to type double"
+		objVar.width = objVar;
+		// ERROR "Value of type GameObj cannot be assigned to type boolean"
+		boolVar = objVar;
+		// ERROR "A GameObj cannot be assigned to a String"
+		String circle = ct.circle(0,0,10);
+		
+		// ERROR "expects type int, but double was passed"
+		int y = intFuncInt(2.3);
+		// ERROR "expects type int, but double was passed"
+		intVar = ct.random( 0.0, 10 );
+		// ERROR "expects type int, but boolean was passed"
+		intVar = ct.random( 0, false );
+		// ERROR "expects type int, but String was passed" 
+		ct.setBackColorRGB( "red", 0, 0 );
+		// ERROR "expects type int, but String was passed" 
+		objVar.setLayer( "front" );
+		// ERROR "expects type int, but GameObj was passed"
+		ct.roundDecimal( 3.14159, objVar );
+
+		// ERROR "expects type String, but int was passed"
+		objVar.align(intVar);
+		// ERROR "expects type String, but int was passed"
+		intVar = ct.parseInt( 123 );
+		// ERROR "expects type String, but int was passed"
+		ct.circle(0, 0, 1, 1);
+		// ERROR "expects type String, but int was passed"
+		objVar.setText(1);
+		// ERROR "expects type String, but double was passed"
+		boolVar = ct.canParseInt( 1.0 );
+		// ERROR "expects type String, but boolean was passed"
+		boolVar = ct.canParseInt( boolVar );
+
+		// ERROR "Integer divide"
+		int k = i / 2;
 		// ERROR "Undefined variable"
 		x = x + 1;
-		// ERROR "cannot be assigned to an int"
-		int j = 5 + 3.14;
-		// ERROR "cannot be assigned to an int"
-		int plancksConst = 6.62e-34;
-		// ERROR "already defined"
-		int j = 3;
+		// ERROR "Undefined variable"
+		for (x = 0; x < 1; x++) 
 		// ERROR "Undefined function"
 		foo();
-		// ERROR "Function intFuncInt requires 1 parameter"
+		// ERROR "already defined"
+		int j = 3;
+
+		int uninitializedVar;
+		// ERROR "must be assigned before it is used"
+		if (uninitializedVar < 0)
+		GameObj g;
+		// ERROR "must be assigned before it is used"
+		g.xSpeed = 1;
+
+		// ERROR "requires 1 parameter"
 		if (intFuncInt() > 0)
-		// ERROR "Parameter 1 of intFuncInt expects type int, but double was passed"
-		int y = intFuncInt(2.3);
-		// ERROR "Value of type int cannot be assigned to type boolean"
-		boolean a = intFuncInt(2);
-		// ERROR "Too many parameters passed to setBackColor"
+		// ERROR "requires 2 parameters"
+		dblFuncIntDbl();
+		// ERROR "requires 3 parameters"
+		ct.circle();
+		// ERROR "Not enough parameters"
+		ct.rect(0, 0, 10);
+		// ERROR "Not enough parameters"
+		ct.circle(0, 0);
+		// ERROR "Too many parameters passed"
+		voidFunc(1);
+		// ERROR "Too many parameters passed"
 		ct.setBackColor(255, 0, 0);
+		// ERROR "Too many parameters passed"
+		objVar.delete(true);
+		// ERROR "Too many parameters passed"
+		objVar.setText("circle", "green");
+
+		// ERROR "Unknown variable type "integer"
+		integer n = 100;
+		// ERROR "Unknown variable type "bool"
+		bool gameOver = false;
+		// ERROR "Unknown API function"
+		GameObj r = ct.rectangle(0,0,10,10);
+		// ERROR "Unknown field"
+		objVar.isVisible = false;
+		// ERROR "Unknown method"
+		objVar.foo();
+
 		// ERROR "Names are case-sensitive"
 		string ch = "A";
 		// ERROR "Names are case-sensitive"
-		gameObj c = ct.circle(0,0,10);
+		gameObj obj;
 		// ERROR "Names are case-sensitive"
-		GameObj c = ct.Circle(0,0,10);
-		// ERROR "Unknown API function"
-		GameObj r = ct.rectangle(0,0,10,10);
+		ct.Circle(0,0,10);
+		// ERROR "Names are case-sensitive"
+		math.atan2(ct.clickX() - r.x, ct.clickY() - r.y);
+		// ERROR "Names are case-sensitive"
+		voidfunC();
+
+		// ERROR "Undefined variable Null"
+		c = Null;
+		// ERROR "Undefined variable NULL""
+		c = NULL;
+		// ERROR "Undefined variable True"
+		while(True)
+		// ERROR "Undefined variable True"
+		boolVar = True;
+		// ERROR "Undefined variable False"
+		if (False)
 		// ERROR "Use == to compare for equality"
 		if (i = 0)
 		// ERROR "Array element type does not match the array type"
 		int[] intArr = {1, 2, 3.14};
 		// ERROR "Array count must be an integer"
 		intArr = new int[1.5];
-		String str = "";
+
+		// ERROR "The Integer type is not supported by Code12. Use int instead."
+		Integer n = 100;
+		// ERROR "The (+) operator can only apply to numbers or Strings"
+		String str = "Boolean var = " + false;
 		// ERROR "+= can only be applied to numbers"
-		str += "+= not supported for strings";
-		// ERROR "Names are case-sensitive"
-		double d = math.atan2(ct.clickX() - r.x, ct.clickY() - r.y);
-		
+		str += "hello";
+		// ERROR "Use str1.equals( str2 ) to compare two String values"
+		if (str == "s")
+		// ERROR "Unsupported operator"
+		i = i ^ i;
+		// ERROR "Unsupported operator"
+		i = i & i;
+		// ERROR "Unsupported operator"
+		i = i | i;
+		// ERROR "Unsupported operator"
+		i = i >> 2;
+		// ERROR "Unsupported operator"
+		i = i << 2;
+		// ERROR "Unsupported operator"
+		i = i >>> 2;
 	}
 }
 
