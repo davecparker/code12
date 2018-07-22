@@ -204,9 +204,10 @@ function javaTypes.isClassWithStaticMembers( name )
 	return name == "ct" or name == "Math"
 end
 
--- If name is a Java type name ignoring case then return the correct case, else nil. 
-function javaTypes.correctTypeName( name )
-	return knownTypes[string.lower( name )]
+-- If nameLower (which should be all lowercase) is a Java type name ignoring case,
+-- then return the correct case, else nil. 
+function javaTypes.correctTypeName( nameLower )
+	return knownTypes[nameLower]
 end
 
 
