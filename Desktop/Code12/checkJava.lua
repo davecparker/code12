@@ -43,6 +43,35 @@ local localNameStack = {}
 
 --- Misc Analysis Functions --------------------------------------------------
 
+-- If the name is an invalid name for a variable or function, then set the 
+-- error state and return true. Usage should be a description of how the name
+-- is being used (e.g. "variable", "function"). 
+-- Return false if the name is valid.
+local function isInvalidName( nameNode, usage )
+	-- Check special Code12 reserved names
+	local name = nameNode.str
+	if name == "ct" or name == "_fn" then
+		err.setErrNode( nameNode, 
+				"The name \"%s\" is reserved for use by the system", name )
+		return true
+	end
+
+	-- Check for known types
+	local typeName = javaTypes.correctTypeName( name ) 
+	if typeName then
+		if typeName == name then
+			err.setErrNode( nameNode, 
+					"%s is a type name, expected a %s name here", name, usage )
+		else
+			err.setErrNode( nameNode, 
+					"Code12 does not allow names that differ only by upper/lower case from known names (\"%s\" is a type name)", 
+					typeName )
+		end
+		return true
+	end
+	return false
+end
+
 -- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
 -- If the name is found and the entry is a record (table) then return the record.
 -- If an entry has an index (name) differing only in case, then set the error state 
@@ -91,6 +120,9 @@ local function getMethods( parseTrees )
 			-- User-defined function or event function
 			local nameNode = nodes[3]
 			local fnName = nameNode.str
+			if isInvalidName( nameNode, "function" ) then
+				return false
+			end
 
 			-- Build the parameter table
 			local paramTable = {}
@@ -98,6 +130,9 @@ local function getMethods( parseTrees )
 			for i = 1, #params do
 				local param = params[i]
 				local vtParam, name = javaTypes.vtAndNameFromParam( param )
+				if isInvalidName( param.nodes[2], "parameter" ) then
+					return false
+				end
 				paramTable[#paramTable + 1] = { name = name, vt = vtParam }
 			end
 
@@ -251,7 +286,9 @@ end
 
 -- primaryExpr pattern: NUM
 local function vtExprNUM( nodes )
-	return ((nodes[1].str:find("%.") and 1) or 0)   -- double or int
+	-- Imitating Java, a number is double if it has a decimal point or
+	-- is in exponential notation, regardless of its value
+	return ((nodes[1].str:find("[%.eE]") and 1) or 0)   -- double or int
 end
 
 -- primaryExpr pattern: BOOL
@@ -531,6 +568,9 @@ end
 -- variable has been assigned and if not then set the error state and return nil. 
 function checkJava.vtVar( varNode, unassignedOK )
 	assert( varNode.tt == "ID" )
+	if isInvalidName( varNode, "variable" ) then
+		return nil
+	end
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
 		err.setErrNode( varNode,  "Undefined variable %s", varNode.str )
@@ -559,14 +599,12 @@ function checkJava.defineVar( nameNode, vt, isArray, assigned )
 	end
 
 	-- Check for invalid name
-	local varName = nameNode.str
-	if varName == "ct" or varName == "_fn" then
-		err.setErrNode( nameNode, 
-				"The name \"%s\" is reserved for use by the system", varName )
+	if isInvalidName( nameNode, "variable" ) then
 		return false
 	end
 
 	-- Check for existing definition
+	local varName = nameNode.str
 	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
 	if varFound then
 		err.setErrNodeAndRef( nameNode, varFound.node, 
@@ -727,6 +765,9 @@ end
 local function findUserMethod( idNode )
 	assert( idNode.tt == "ID" )
 	local method = lookupID( idNode, userMethods )
+	if isInvalidName( idNode, "function" ) then
+		return nil
+	end
 	if method == nil then
 		-- TODO: Check for missing "ct." and other common errors
 		err.setErrNode( idNode, "Undefined function %s", idNode.str )

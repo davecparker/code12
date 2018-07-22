@@ -328,7 +328,8 @@ local function initApp()
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
 
-	-- Start in the runView for now
+	-- Start in the runView, which inits the runtime
+	timer.performWithDelay( 10, checkUserFile, 0 )       -- first check soon
 	composer.gotoScene( "runView" )
 end
 
