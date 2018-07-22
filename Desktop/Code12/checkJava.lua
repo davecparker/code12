@@ -56,8 +56,16 @@ local function isInvalidName( nameNode, usage )
 		return true
 	end
 
+	-- Check for constants with the wrong case
+	local nameLower = string.lower( name )
+	if nameLower == "true" or nameLower == "false" or nameLower == "null" then
+		err.setErrNode( nameNode, 
+				"Incorrect case for constant, should be \"%s\"", nameLower )
+		return true
+	end		
+
 	-- Check for known types
-	local typeName = javaTypes.correctTypeName( name ) 
+	local typeName = javaTypes.correctTypeName( nameLower ) 
 	if typeName then
 		if typeName == name then
 			err.setErrNode( nameNode, 
@@ -147,7 +155,6 @@ local function getMethod( typeNode, nameNode, paramList )
 		else
 			for i = 1, #paramTable do
 				if paramTable[i].vt ~= event.params[i].vt then
-					print(paramTable[i].vt, event.params[i].vt)
 					err.setErrNodeAndRef( params[i], nameNode,
 							"Wrong type for parameter %d of function %s",
 							i, fnName )
@@ -392,7 +399,7 @@ local function vtExprPlus( nodes )
 	elseif vtLeft == "String" and vtRight == "String" then
 		return "String"
 	elseif vtLeft == "String" or vtRight == "String" then
-		-- Check if the other operand can be promoted to string (numbers only)
+		-- Check if the other operand can be promoted to string
 		local exprOther, vtOther
 		if vtLeft == "String" then
 			exprOther = nodes[3]
@@ -401,15 +408,11 @@ local function vtExprPlus( nodes )
 			exprOther = nodes[1]
 			vtOther = vtLeft
 		end
-		if type(vtOther) == "number" then
-			return "String"   -- the number will promote to a string 
-		elseif vtOther == "GameObj" then
+		if type(vtOther) == "table" then
 			err.setErrNodeAndRef( nodes[2], exprOther, 
-					"The (+) operator cannot be used on GameObj objects directly. Use the toString() method." )
-		else
-			err.setErrNodeAndRef( nodes[2], exprOther, 
-					"The (+) operator can only apply to numbers or Strings" )
+					"The (+) operator cannot be applied to arrays" ) 
 		end
+		return "String"   -- all primitive types can promote to a string 
 	else
 		-- Find the side that is wrong
 		local exprOther
@@ -472,7 +475,7 @@ local function vtExprEquality( nodes )
 	local vtRight = nodes[3].info.vt
 	if javaTypes.canCompareVts( vtLeft, vtRight ) then
 		-- Don't allow comparing Strings with ==
-		if vtLeft == "String" then
+		if vtLeft == "String" and vtRight == "String" then
 			if syntaxLevel >= 7 then
 				err.setErrNodeAndRef( nodes[2], nodes[1],
 						"Use str1.equals( str2 ) to compare two String values" )

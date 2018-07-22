@@ -54,6 +54,9 @@ local coRoutineUser = nil    -- coroutine running an event or nil if none
 local function onNewFrame()
 	-- Call or resume the client's update function if any
 	local yielded = g.eventFunctionYielded(_fn.update)
+	if g.stopped then
+		return
+	end
 
 	-- Clear the polled input state for this frame
 	g.clicked = false
@@ -91,6 +94,9 @@ end
 local function onFirstFrame()
 	-- Call or resume the client's start method if any
 	local yielded = g.eventFunctionYielded(_fn.start)
+	if g.stopped then
+		return
+	end
 
 	-- Flush the output file if any, to make sure at least 
 	-- output done in start() gets written, in case we abort later.
@@ -214,6 +220,11 @@ local function coroutineYielded(success, strErr)
 			-- Error was in user code, report to the appContext if any 
 			local lineNum = tonumber( strLineNum ) 
 			if lineNum and appContext.runtimeErr then
+				-- Recognize Lua's equivalent of a null pointer exception
+				if string.find( strErr, "attempt to index" ) 
+						and string.find( strErr, "a nil value") then
+					strMessage = "object is null, cannot access fields or methods"
+				end
 				appContext.runtimeErr(lineNum, strMessage)
 				return
 			end

@@ -227,7 +227,8 @@ local function checkUserFile()
 		end
 
 		-- Load file if changed or never loaded
-		if sourceFile.timeLoaded == 0 or timeMod > sourceFile.timeModLast then
+		if sourceFile.timeLoaded == 0 
+				or (timeMod and timeMod > sourceFile.timeModLast) then
 			sourceFile.timeModLast = timeMod 
 			app.processUserFile()
 			statusBar.update()
@@ -283,14 +284,12 @@ local function loadSettings()
 
 				-- Make sure the syntaxLevel is valid
 				local level = t.syntaxLevel
-				print(type(level), level)
 				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
 					userSettings.syntaxLevel = level
 				else
 					userSettings.syntaxLevel = app.numSyntaxLevels
 				end
 				app.syntaxLevel = userSettings.syntaxLevel
-				print(app.syntaxLevel)
 			end
 		end
 	end
