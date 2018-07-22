@@ -32,4 +32,5 @@ public interface GameObjInterface
    // Geometry
    public boolean containsPoint(double xPoint, double yPoint);
    public boolean hit(GameObj obj);
+   public GameObj objectHitInGroup(String group);
 }

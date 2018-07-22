@@ -235,7 +235,6 @@ function console.init()
 	local temp1 = display.newText( "-", 0, 0, app.consoleFont, app.consoleFontSize )
 	local temp11 = display.newText( "-1234567890", 0, 0, app.consoleFont, app.consoleFontSize )
 	fontCharWidth = (temp11.contentWidth - temp1.contentWidth) / 10
-	print(fontCharWidth)
 	temp1:removeSelf()
 	temp11:removeSelf()
 	app.consoleFontCharWidth = fontCharWidth
