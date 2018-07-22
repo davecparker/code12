@@ -23,10 +23,14 @@ class TestProgram extends Code12Program
       t.group = "targets";
       ct.setScreenOrigin(xOrigin, 0);
    }
-   
+
    public void update()
    {
-      if (ct.keyPressed("a"))
+      if ( ct.keyPressed("tab") )
+      {
+         ct.println("ct.keyPressed(\"tab\")");
+      }
+      else if (ct.keyPressed("a"))
       {
          xOrigin--;
          ct.setScreenOrigin(xOrigin, yOrigin);

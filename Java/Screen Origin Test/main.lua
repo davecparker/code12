@@ -26,7 +26,11 @@ require('Code12.api')
     
     function _fn.update()
         
-        if ct.keyPressed("a") then
+        if ct.keyPressed("tab") then
+            
+            ct.println("ct.keyPressed(\"tab\")")
+        
+        elseif ct.keyPressed("a") then
             
             this.xOrigin = this.xOrigin - 1
             ct.setScreenOrigin(this.xOrigin, this.yOrigin)
