@@ -260,6 +260,20 @@ function fnCallCode( tree )
 	return table.concat( parts )
 end
 
+-- Return Lua code for expr promoted to a string
+local function stringExprCode( expr )
+	local vt = expr.info.vt
+	if vt == "String" then
+		return exprCode( expr )
+	elseif vt == "GameObj" then
+		return exprCode( expr ) .. ":toString()"
+	elseif vt == "null" then
+		return "\"null\""
+	end  
+	-- Lua can promote int, double, and boolean with tostring()
+	return "tostring(" .. exprCode( expr ) .. ")"
+end
+
 -- Return Lua code for an expr
 function exprCode( expr )
 	local p = expr.p
@@ -293,7 +307,7 @@ function exprCode( expr )
 		-- Look for special cases of binary operators
 		if p == "+" and expr.info.vt == "String" then
 			-- The + operator is concatenating strings, not adding
-			luaOp = " .. "  -- TODO: Lua tables (GameObj) will not do a toString automatically
+			return stringExprCode( left ) .. ".." .. stringExprCode( right )
 		end
 		-- TODO: Verify that we don't need parentheses (Lua precedence is same as Java)
 		return exprCode( left ) .. luaOp .. exprCode( right )
