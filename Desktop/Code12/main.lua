@@ -15,7 +15,7 @@ local json = require( "json" )
 local g = require( "Code12.globals" )
 local app = require( "app" )
 local env = require( "env" )
-local parseJava = require( "parseJava" )
+local parseProgram = require( "parseProgram" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
 local err = require( "err" )
@@ -181,24 +181,11 @@ function app.processUserFile()
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
-	local parseTrees = {}
-	local startTokens = nil
-	parseJava.init()
-	for lineNum = 1, #sourceFile.strLines do
-		local strUserCode = sourceFile.strLines[lineNum]
-		local tree, tokens = parseJava.parseLine( strUserCode, 
-									lineNum, startTokens, app.syntaxLevel )
-		if tree == false then
-			-- Line is incomplete, carry tokens forward to next line
-			startTokens = tokens
-		else
-			startTokens = nil
-			if tree == nil then
-				composer.gotoScene( "errView" )
-				return
-			end
-			parseTrees[#parseTrees + 1] = tree
-		end
+	local parseTrees = parseProgram.getProgramTree( sourceFile.strLines, 
+								app.syntaxLevel )
+	if parseTrees == nil then
+		composer.gotoScene( "errView" )
+		return
 	end
 	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 

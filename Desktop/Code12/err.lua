@@ -14,7 +14,8 @@ local err = {}
 -- The error state. We only detect and store the first error in the program.
 -- The errRecord is a table as follows:
 -- {
--- 	   strErr = "Error text",
+--     strErr = "Error text",
+--     p = "pattern",   -- set if syntax error matched common error pattern
 --     loc = {     -- error location
 --         first = { iLine = lineNumber, iChar = charIndex },
 --         last  = { iLine = lineNumber, iChar = charIndex },
@@ -201,6 +202,19 @@ function err.getErrString()
 	end
 	return nil
 end
+
+-- Set the common error pattern name for the error state
+function err.setErrPattern( pattern )
+	if errRecord then
+		errRecord.p = pattern
+	end
+end
+
+-- Return the common error pattern name for the error state, or nil if none
+function err.getErrPattern()
+	return errRecord and errRecord.p
+end
+
 
 -- Clear the error state
 function err.clearErr()

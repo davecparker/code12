@@ -298,8 +298,7 @@ local line = { t = "line",
 	-- Boilerplate lines
 	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
 	{ 1, 12, "class",			"class", "ID", 									"END" },
-	{ 1, 12, "classUser",		"class", "ID", "extends", "ID",					"END" },
-	{ 1, 12, "classUserPub",	"public", "class", "ID", "extends", "ID",		"END" },
+	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",			"END" },
 	{ 1, 12, "main",			"public", "static", "void", "ID", 
 									"(", "ID", "[", "]", "ID", ")",				"END" },
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
@@ -317,6 +316,8 @@ local line = { t = "line",
 			strErr = "if statement should not end with a semicolon" },
 	{ 8, 0, "if",				"if", expr, "END",							iNode = 2, 
 			strErr = "if statement test must be in parentheses" },
+	{ 1, 0, "import",			"import", "(*)", 
+			strErr = "Code12 programs should import only Code12.*" },
 
 }
 
@@ -381,10 +382,8 @@ function parseGrammar( grammar )
 				-- If this matched a common error then set the error state
 				if patternMaxLevel == 0 then
 					local iNode = pattern.iNode
-					assert( iNode )
-					if pattern.strErr then
-						err.setErrNode( nodes[iNode], pattern.strErr )
-					else
+					local strErr = pattern.strErr
+					if not strErr then
 						-- This common error pattern doesn't specify the strErr,
 						-- so it should be in a group where the last one does.
 						local j = i
@@ -393,8 +392,14 @@ function parseGrammar( grammar )
 							j = j + 1
 							patErr = grammar[j]
 						until patErr.strErr ~= nil
-						err.setErrNode( nodes[iNode], patErr.strErr )
+						strErr = patErr.strErr
 					end
+					if iNode then
+						err.setErrNode( nodes[iNode], strErr )
+					else
+						err.setErrLineNum( nodes[1].iLine, strErr )
+					end
+					err.setErrPattern( pattern[3] )  -- pattern name
 				end
 
 				-- This pattern matches, so make a grammar node and return it
@@ -522,8 +527,7 @@ local function parseCurrentLine( level )
 
 	-- Make a generic syntax error if the error is unknown
 	if not err.hasErr() then
-		local lastToken = tokens[#tokens - 1]  -- not counting the END
-		err.setErrTokenSpan( tokens[1], lastToken, "Syntax Error" )
+		err.setErrLineNum( tokens[1].iLine, "Syntax error (unrecognized code)" )
 	end
 	return nil
 end

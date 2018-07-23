@@ -1,6 +1,12 @@
-import Code12.*;
+// OK
 
+import Code12.*;
+//import java.util.Scanner;
+import Code12.*;
+// int foo = 5;
+// OK
 class TestProgram extends Code12Program
+// int foo = 6;
 {
    double xOrigin = 50;
    double yOrigin = 0;
