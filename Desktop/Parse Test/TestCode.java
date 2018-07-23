@@ -605,6 +605,9 @@ int x = 10		// missing ; in varInit
 int x 			// missing ; in varDecl
 final int x = 10 // missing ; in constInit
 foo(x, );       // missing expr in exprList
+f00()++;		// ++ applied to non-lvalue
+--x.foo();		// -- applied to non-lvalue
+x = / b;		// missing expr before binary op
 x = a + ;       // missing expr after binary op
 x = a ++ b;     // unexpected token after unary op
 x = a ** b;     // missing expression between binary ops

@@ -91,6 +91,7 @@ class ErrorTest extends Code12Program
 		d = -.123e-456;
 		d=-.5;
 		d = d / 2;
+		d ++;
 		d += 0.5;
 		d -= 7;
 		d *= 8;
@@ -163,6 +164,14 @@ class ErrorTest extends Code12Program
 		d = (i * (i) - d * d);
 		s = s + s;
 		s = s + s + "s";
+		s = s + i;
+		s = s + d;
+		s = s + b;
+		s = s + gObj;
+		s = i + s;
+		s = d + s;
+		s = b + s;
+		s = gObj + s;
 		b = b;
 		b = !b;
 		b = (b);
@@ -299,7 +308,7 @@ class ErrorTest extends Code12Program
 		ct.print("Hello world\n");
 		ct.print(i);
 		ct.print(d);
-		ct.println(b);
+		ct.print(b);
 		ct.print("i = " + i);
 		ct.print("d = " + d);
 		ct.print(name);
@@ -561,6 +570,11 @@ class ErrorTest extends Code12Program
 		s = s.trim();
 	}
 
+	// ERROR "Code12 API functions cannot be called before start()"
+	GameObj button = ct.text("START", 0, 0, 10);
+	// ERROR "Code12 API functions cannot be called before start()"
+	double WIDTH = ct.getWidth();
+
 	void expectedErrors()
 	{
 		int intVar = 1;
@@ -568,8 +582,21 @@ class ErrorTest extends Code12Program
 		boolean boolVar = false;
 		String strVar = "a";
 		GameObj objVar = ct.circle(0,0,10);
+		int[] intArr = {1, 2, 3};
+		GameObj[] objArr = { objVar };
 
-		// ERROR "Value of type int cannot be assigned to type boolean" 
+		// ERROR "Value of type void cannot be assigned to type int"
+		intVar = objVar.setText("circle");
+		// ERROR "Value of type void cannot be assigned to type double"
+		double screen = ct.setScreen("menu");
+		// ERROR "Value of type void cannot be assigned to type boolean"
+		boolVar = ct.setHeight(150);
+		// ERROR "Value of type void cannot be assigned to type String"
+		strVar = voidFunc();
+		// ERROR "Value of type void cannot be assigned to type GameObj"
+		GameObj title = ct.setTitle("title");
+
+		// ERROR "Value of type int cannot be assigned to type boolean"
 		boolVar = intVar;
 		// ERROR "Value of type int cannot be assigned to type boolean"
 		boolean b = intFuncInt(2);
@@ -642,6 +669,26 @@ class ErrorTest extends Code12Program
 		objVar.setLayer( "front" );
 		// ERROR "expects type int, but GameObj was passed"
 		ct.roundDecimal( 3.14159, objVar );
+		// ERROR "expects type int, but GameObj was passed"
+		strVar.substring( objVar );
+
+		// ERROR "expects type double, but boolean was passed"
+		Math.pow( boolVar, 3 );
+		// ERROR "expects type double, but String was passed"
+		dblFuncIntDbl( 0, "pi" );
+		// ERROR "expects type double, but String was passed"
+		objVar.containsPoint( strVar, dblVar );
+		// ERROR "expects type double, but GameObj was passed"
+		Math.exp( objVar );
+
+		// ERROR "expects type boolean, but int was passed"
+		objVar.align( "left", 0 );
+		// ERROR "expects type boolean, but double was passed"
+		boolFuncBoolStringGameObj( dblVar, strVar, objVar );
+		// ERROR "expects type boolean, but String was passed"
+		boolFuncBoolStringGameObj( strVar, objVar, boolVar );
+		// ERROR "expects type boolean, but GameObj was passed"
+		boolFuncBoolStringGameObj( objVar, strVar, boolVar );
 
 		// ERROR "expects type String, but int was passed"
 		objVar.align(intVar);
@@ -655,25 +702,20 @@ class ErrorTest extends Code12Program
 		boolVar = ct.canParseInt( 1.0 );
 		// ERROR "expects type String, but boolean was passed"
 		boolVar = ct.canParseInt( boolVar );
+		// ERROR "expects type String, but boolean was passed"
+		objVar.align(true);
+		// ERROR "expects type String, but GameObj was passed"
+		strVar.equals( objVar );
 
-		// ERROR "Integer divide"
-		int k = i / 2;
-		// ERROR "Undefined variable"
-		x = x + 1;
-		// ERROR "Undefined variable"
-		for (x = 0; x < 1; x++) 
-		// ERROR "Undefined function"
-		foo();
-		// ERROR "already defined"
-		int j = 3;
-
-		int uninitializedVar;
-		// ERROR "must be assigned before it is used"
-		if (uninitializedVar < 0)
-		GameObj g;
-		// ERROR "must be assigned before it is used"
-		g.xSpeed = 1;
-
+		// ERROR "expects type GameObj, but int was passed"
+		boolFuncBoolStringGameObj( boolVar, strVar, 42 );
+		// ERROR "expects type GameObj, but double was passed"
+		objVar.hit( 0.0 );
+		// ERROR "expects type GameObj, but boolean was passed"
+		objVar.hit( false );
+		// ERROR "expects type GameObj, but String was passed"
+		objVar.hit( "the wall" );
+		
 		// ERROR "requires 1 parameter"
 		if (intFuncInt() > 0)
 		// ERROR "requires 2 parameters"
@@ -692,6 +734,26 @@ class ErrorTest extends Code12Program
 		objVar.delete(true);
 		// ERROR "Too many parameters passed"
 		objVar.setText("circle", "green");
+
+		// ERROR "Integer divide"
+		int k = i / 2;
+		// ERROR "Integer divide"
+		ct.random( intVar / intVar, intVar );
+		// ERROR "Undefined variable"
+		x = x + 1;
+		// ERROR "Undefined variable"
+		for (x = 0; x < 1; x++) 
+		// ERROR "Undefined function"
+		foo();
+		// ERROR "already defined"
+		int j = 3;
+
+		int uninitializedVar;
+		// ERROR "must be assigned before it is used"
+		if (uninitializedVar < 0)
+		GameObj g;
+		// ERROR "must be assigned before it is used"
+		g.xSpeed = 1;
 
 		// ERROR "Unknown variable type "integer"
 		integer n = 100;
@@ -714,32 +776,112 @@ class ErrorTest extends Code12Program
 		math.atan2(ct.clickX() - r.x, ct.clickY() - r.y);
 		// ERROR "Names are case-sensitive"
 		voidfunC();
+		// ERROR "Names are case-sensitive"
+		intvar = 2;
 
-		// ERROR "Undefined variable Null"
-		c = Null;
-		// ERROR "Undefined variable NULL""
-		c = NULL;
-		// ERROR "Undefined variable True"
+		// ERROR "Incorrect case for constant"
+		strVar = Null;
+		// ERROR "Incorrect case for constant"
+		objVar = NULL;
+		// ERROR "Incorrect case for constant"
 		while(True)
-		// ERROR "Undefined variable True"
-		boolVar = True;
-		// ERROR "Undefined variable False"
+		// ERROR "Incorrect case for constant"
+		boolVar = TRUE;
+		// ERROR "Incorrect case for constant"
 		if (False)
+		// ERROR "Incorrect case for constant"
+		objVar.clickable = FALSE;
+
 		// ERROR "Use == to compare for equality"
 		if (i = 0)
 		// ERROR "Array element type does not match the array type"
-		int[] intArr = {1, 2, 3.14};
+		int[] intArr2 = {1, 2, 3.14};
+		// ERROR "Array element type does not match the array type"
+		double[] dblArr = {1, "two", 3.14};
+		// ERROR "Cannot initialize array of String with type array of GameObj"
+		String[] strArr = new GameObj[100];
+		// ERROR "Cannot initialize array of boolean with type array of int"
+		boolean[] boolArr = intArrFuncInt(10);
 		// ERROR "Array count must be an integer"
 		intArr = new int[1.5];
 
+		// ERROR "Can only apply "++" to numeric types"
+		boolVar++;
+		// ERROR "Can only apply "++" to numeric types"
+		strVar++;
+		// ERROR "Can only apply "++" to numeric types"
+		objVar++;
+		// ERROR "Can only apply "--" to numeric types"
+		boolVar--;
+		// ERROR "Can only apply "--" to numeric types"
+		strVar--;
+		// ERROR "Can only apply "--" to numeric types"
+		objVar--;
+
+		// ERROR "The source variable in a for-each loop must be an array"
+		for (int x : intVar)
+		// ERROR "The source variable in a for-each loop must be an array"
+		for (GameObj x : strVar)
+		// ERROR "Array "intArr" contains elements of type int"
+		for (double x : intArr)
+		// ERROR "Array "objArr" contains elements of type GameObj"
+		for (String x : objArr)
+		
+		// ERROR "Loop test must evaluate to a boolean"
+		for ( ; intVar ; )
+		// ERROR "Loop test must evaluate to a boolean"
+		for ( ; dblVar ; )
+		// ERROR "Loop test must evaluate to a boolean"
+		for ( ; strVar ; )
+		// ERROR "Loop test must evaluate to a boolean"
+		for ( ; objVar ; )
+
+		do
+			voidFunc();
+		// ERROR "Loop test must be boolean"
+		while(intVar);
+		// ERROR "Loop test must be boolean"
+		while(dblVar)
+		// ERROR "Loop test must be boolean"
+		while(strVar)
+		// ERROR "Loop test must be boolean"
+		while(objVar)
+
+		// ERROR "Conditional test must be boolean"
+		if(intVar)
+			voidFunc();
+		// ERROR "Conditional test must be boolean"
+		else if(intVar)
+			voidFunc();
+		// ERROR "Conditional test must be boolean"
+		if(dblVar)
+			voidFunc();
+		// ERROR "Conditional test must be boolean"
+		else if(dblVar)
+			voidFunc();
+		// ERROR "Conditional test must be boolean"
+		if(strVar)
+			voidFunc();
+		// ERROR "Conditional test must be boolean"
+		else if(strVar)
+			voidFunc();
+		// ERROR "Conditional test must be boolean"
+		if(objVar)
+			voidFunc();
+		// ERROR "Conditional test must be boolean"
+		else if(objVar)
+			voidFunc();
+
 		// ERROR "The Integer type is not supported by Code12. Use int instead."
 		Integer n = 100;
-		// ERROR "The (+) operator can only apply to numbers or Strings"
-		String str = "Boolean var = " + false;
+		// ERROR "The Double type is not supported by Code12. Use double instead."
+		Double d = 100.0;
+		// ERROR "The Boolean type is not supported by Code12. Use boolean instead."
+		Boolean b = false;
 		// ERROR "+= can only be applied to numbers"
-		str += "hello";
+		strVar += "hello";
 		// ERROR "Use str1.equals( str2 ) to compare two String values"
-		if (str == "s")
+		if (strVar == "s")
 		// ERROR "Unsupported operator"
 		i = i ^ i;
 		// ERROR "Unsupported operator"
@@ -753,5 +895,6 @@ class ErrorTest extends Code12Program
 		// ERROR "Unsupported operator"
 		i = i >>> 2;
 	}
+
 }
 
