@@ -11,11 +11,9 @@
 local err = {}
 
 
--- The error state. We only detect and store the first error in the program.
--- The errRecord is a table as follows:
+-- The error state in errRecord is a table as follows:
 -- {
 --     strErr = "Error text",
---     p = "pattern",   -- set if syntax error matched common error pattern
 --     loc = {     -- error location
 --         first = { iLine = lineNumber, iChar = charIndex },
 --         last  = { iLine = lineNumber, iChar = charIndex },
@@ -24,6 +22,10 @@ local err = {}
 --         first = { iLine = lineNumber, iChar = charIndex },
 --         last  = { iLine = lineNumber, iChar = charIndex },
 --     },
+--     -- Additional fields that may be added
+--     pattern = "pattern",   -- set if syntax error matched common error pattern
+--     nodes = nodeArray,     -- nodes matched in common error pattern
+--     level = levelNeeded,   -- set if higher syntax level required to parse
 -- }
 local errRecord
 
@@ -189,30 +191,36 @@ end
 -- Return a string describing the error state, or return nil if no error
 function err.getErrString()
 	if errRecord then
-		local str = string.format( "*** Location %d.%d to %d.%d: %s", 
-						errRecord.loc.first.iLine, errRecord.loc.first.iChar, 
-						errRecord.loc.last.iLine, errRecord.loc.last.iChar, 
-						errRecord.strErr ) 
-		if errRecord.refLoc then
-			str = str .. string.format( "\n*** Reference %d.%d to %d.%d", 
-							errRecord.refLoc.first.iLine, errRecord.refLoc.first.iChar, 
-							errRecord.refLoc.last.iLine, errRecord.refLoc.last.iChar )
+		if errRecord.loc.last == nil then
+			return string.format( "*** Line %d: %s", 
+						errRecord.loc.first.iLine,
+						errRecord.strErr)
+		else
+			local str = string.format( "*** Location %d.%d to %d.%d: %s", 
+							errRecord.loc.first.iLine, errRecord.loc.first.iChar, 
+							errRecord.loc.last.iLine, errRecord.loc.last.iChar, 
+							errRecord.strErr ) 
+			if errRecord.refLoc then
+				str = str .. string.format( "\n*** Reference %d.%d to %d.%d", 
+								errRecord.refLoc.first.iLine, errRecord.refLoc.first.iChar, 
+								errRecord.refLoc.last.iLine, errRecord.refLoc.last.iChar )
+			end
+			return str
 		end
-		return str
 	end
 	return nil
 end
 
--- Set the common error pattern name for the error state
-function err.setErrPattern( pattern )
+-- Set an addition field in the error state
+function err.setErrField( field, value )
 	if errRecord then
-		errRecord.p = pattern
+		errRecord[field] = value
 	end
 end
 
--- Return the common error pattern name for the error state, or nil if none
-function err.getErrPattern()
-	return errRecord and errRecord.p
+-- Return the given field in the error state, or nil if none
+function err.getErrField( field )
+	return errRecord and errRecord[field]
 end
 
 

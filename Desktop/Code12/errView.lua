@@ -25,6 +25,7 @@ local dyDocsToolbar = 24       -- height of toolbar for the docsWebView
 -- Display objects and groups
 local errGroup                 -- display group for error display
 local highlightGroup           -- display group for highlight rects
+local lineNumRect              -- line number highlight
 local refRect                  -- reference highlight
 local sourceRect               -- main source highlight
 local lineNumGroup             -- display group for line numbers
@@ -74,7 +75,8 @@ local function makeErrDisplay( sceneGroup )
 	-- Make the highlight rectangles
 	highlightGroup = g.makeGroup( errGroup, xText, margin )
 	local y = ((numSourceLines - 1) / 2) * dyLine
-	makeHilightRect( -xText, y, dxLineNum, dyLine )   -- line number highlight
+	lineNumRect = makeHilightRect( -dxChar, y, dxLineNum, dyLine )
+	lineNumRect.anchorX = 1
 	refRect = makeHilightRect( dxChar * 5, y, 
 							dxChar * 6, dyLine, true )
 	sourceRect = makeHilightRect( 0, y, dxChar * 4, dyLine )
@@ -124,7 +126,6 @@ local function makeErrDisplay( sceneGroup )
 	} )
 
 	-- Position the docs toolbar
-	print(errText.height)
 	-- Can't use errText.height: doesn't work when it wraps :(
 	docsToolbarGroup.y = errGroup.y + errText.y + dyLine * 2 + margin
 	moreInfoBtn.x = app.width - app.margin
@@ -144,7 +145,8 @@ local function showError()
 	errText.text = errRecord.strErr
 
 	-- Load the source lines around the error
-	local iLine = errRecord.loc.first.iLine   -- main error location
+	local loc = errRecord.loc
+	local iLine = loc.first.iLine   -- main error location
 	local numLines = lineNumGroup.numChildren
 	local before = (numLines - 1) / 2
 	local lineNumFirst = iLine - before
@@ -152,20 +154,21 @@ local function showError()
 	local lineNum = lineNumFirst
 	local sourceLines = app.sourceFile.strLines
 	for i = 1, numLines do 
-		if lineNum < 1 or lineNum > #sourceLines then
+		if lineNum < 1 or lineNum > #sourceLines + 1 then
 			lineNumGroup[i].text = ""
-			sourceGroup[i].text = ""
 		else
 			lineNumGroup[i].text = tostring( lineNum )
-			sourceGroup[i].text = sourceLines[lineNum]
 		end
+		sourceGroup[i].text = sourceLines[lineNum] or ""
 		lineNum = lineNum + 1
 	end
 
-	-- Position the main highlight
+	-- Size the line number highlight
 	local dxChar = app.consoleFontCharWidth
 	local dxExtra = 2   -- extra pixels of highlight horizontally
-	local loc = errRecord.loc
+	lineNumRect.width = (string.len( tostring( iLine ) ) + 1) * dxChar + dxExtra
+
+	-- Position the main highlight
 	sourceRect.x = (loc.first.iChar - 1) * dxChar - dxExtra
 	sourceRect.height = app.consoleFontHeight
 	local numChars = string.len( sourceLines[loc.first.iLine] or "" )
@@ -186,7 +189,7 @@ local function showError()
 			end
 		end
 	end
-	sourceRect.width = numChars * dxChar + dxExtra * 2
+	sourceRect.width = math.max( numChars, 2 ) * dxChar + dxExtra * 2
 
 	-- Position the ref highlight if it's showing  TODO: two line groups if necc
 	refRect.isVisible = false

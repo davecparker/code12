@@ -264,8 +264,8 @@ local forControl = { t = "forControl",
 	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
 	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
 	-- Common Errors
-	{ 11, 0, "three",			forInit, ",", "(*)", 						iNode = 2 },
-	{ 11, 0, "three",			forInit, ";", forExpr, ",", "(*)",			iNode = 4, 
+	{ 11, 0, "three",			forInit, ",", 0,	 						iNode = 2 },
+	{ 11, 0, "three",			forInit, ";", forExpr, ",", 0,				iNode = 4, 
 			strErr = "for loop parts should be separated by semicolons (;)\nComma not supported" },
 }
 
@@ -304,20 +304,32 @@ local line = { t = "line",
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
 									"ID", "(", ")", ")", ";",					"END" },
 	-- Common errors
-	{ 1, 0, "stmt", 			stmt, "END", 								iNode = 2, 
+	{ 1, 0, "stmt", 		stmt, "END", 										iNode = 2 }, 
+	{ 9, 0, "return", 		"return", expr, "END", 								iNode = 3, 
 			strErr = "Statement should end with a semicolon (;)" },
-	{ 3, 0, "varInit",			"ID", "ID", "=", expr, "END",				iNode = 5, 
-			strErr = "Variable initialization should end with a semicolon (;)" },
-	{ 3, 0, "varDecl",			"ID", idList, "END",						iNode = 3, 
+	{ 1, 0, "stmt", 		stmt, ";", 1, 										iNode = 3, 
+			strErr = "Code12 only allows one statement per line" },
+	{ 3, 0, "varInit",		"ID", "ID", "=", expr, "END",						iNode = 5 }, 
+	{ 3, 0, "varDecl",		"ID", idList, "END",								iNode = 3 }, 
+	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, "END",				iNode = 6 }, 
+	{ 12, 0, "arrayInit",	"ID", "[", "]", "ID", "=", arrayInit, "END", 		iNode = 7 },
+	{ 12, 0, "arrayDecl",	"ID", "[", "]", idList, "END",						iNode = 5,
 			strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 3, 0, "constInit", 		"final", "ID", "ID", "=", expr, "END",		iNode = 3, 
-			strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 8, 0, "if",				"if", "(", expr, ")", ";", "END",			iNode = 5, 
+	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ",",	1 },
+	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ";",	1 },
+	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ",", 1 }, 
+	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ";", 1, 
+			strErr = "Code12 requires each variable initialization to be on its own line" },
+	{ 8, 0, "if",			"if", "(", expr, ")", ";", 0,						iNode = 5 },
+	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,				iNode = 6,
 			strErr = "if statement should not end with a semicolon" },
-	{ 8, 0, "if",				"if", expr, "END",							iNode = 2, 
+	{ 8, 0, "if",			"if", expr, 0,										iNode = 2 }, 
+	{ 8, 0, "elseif",		"else", "if", expr, 0,								iNode = 3, 
 			strErr = "if statement test must be in parentheses" },
-	{ 1, 0, "import",			"import", "(*)", 
-			strErr = "Code12 programs should import only Code12.*" },
+	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END", iNode = 7,
+			strErr = "function header should not end with a semicolon" },
+	{ 1, 0, "import",		"import", "ID", 0, 
+			strErr = "import should be \"Code12.*;\"" },
 
 }
 
@@ -399,7 +411,8 @@ function parseGrammar( grammar )
 					else
 						err.setErrLineNum( nodes[1].iLine, strErr )
 					end
-					err.setErrPattern( pattern[3] )  -- pattern name
+					err.setErrField( "pattern", pattern[3] )  -- pattern name
+					err.setErrField( "nodes", nodes )
 				end
 
 				-- This pattern matches, so make a grammar node and return it
@@ -420,13 +433,10 @@ function parsePattern( pattern )
 	-- Try to match the pattern starting at the first item (pattern[4])
 	local nodes = {}   -- node array to build
 	local iItem = 4
-	while iItem <= #pattern do
+	local iItemLast = #pattern
+	while iItem <= iItemLast do
 		local item = pattern[iItem]
-		if item == "(*)" then
-			-- Special token matches and ignores anything to end of line
-			return nodes
-		end
-		-- Is this pattern item a token, grammar table, or parsing function?
+		-- Is this pattern item a token, grammar table, parsing function, or token count?
 		local t = type(item)
 		if t == "string" then
 			-- Token: compare to next token
@@ -454,6 +464,17 @@ function parsePattern( pattern )
 			end
 			-- Matched a sub-grammar item
 			nodes[#nodes + 1] = subTree
+		elseif t == "number" then
+			-- Matches at least this many of any token until end of line
+			if #tokens - iToken >= item then
+				while iItem <= iItemLast do
+					nodes[#nodes + 1] = tokens[iToken]
+					iToken = iToken + 1
+					iItem = iItem + 1
+				end	
+				return nodes
+			end
+			return nil  -- not enough tokens left
 		else
 			error( "*** Pattern " .. pattern[3] .. ": Unknown pattern element type " .. t )
 		end
@@ -519,6 +540,7 @@ local function parseCurrentLine( level )
 			err.setErrTokenSpan( tokens[1], lastToken,
 					"Use of %s requires syntax level %d",
 					syntaxFeatures[tryLevel], tryLevel )
+			err.setErrField( "level", tryLevel )
 			return nil
 		end
 	end

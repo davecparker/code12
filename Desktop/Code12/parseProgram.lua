@@ -38,8 +38,13 @@ local function parseClassHeader()
 		local tree = parseJava.parseLine( sourceLines[lineNum], 
 							lineNum, nil, syntaxLevel )
 		if not tree then
-			if err.getErrPattern() == "import" then
-				return false   -- invalid import set the err state already
+			if err.getErrField( "pattern" ) == "import" then
+				local node = err.getErrField( "nodes" )[2]
+				if node and node.str ~= "Code12" then
+					err.clearErr()   -- clear generic bad import error
+					err.setErrLineNum( lineNum, "Code12 programs should import only Code12.*" )
+				end
+				return false   -- invalid import
 			end
 			err.clearErr()  -- other parse error, use better error below
 			break    
@@ -71,9 +76,9 @@ local function parseClassHeader()
 	-- Report the error
 	local strErr
 	if foundCode12Import then
-		strErr = "Code12 programs must start with:\nclass YourName extends Code12Program"
+		strErr = "Code12 programs must start with:\n\"class YourName extends Code12Program\""
 	else
-		strErr = "Code12 programs must start with:\nimport Code12.*;"
+		strErr = "Code12 programs must start with:\n\"import Code12.*;\""
 	end
 	err.setErrLineNum( lineNum, strErr )	
 	return false
@@ -106,7 +111,7 @@ local function parseBlockBegin()
 	end
 
 	-- Report the error
-	err.setErrLineNum( lineNum, "Class header must be followed by a {" )	
+	err.setErrLineNum( lineNum, "Expected {" )	
 	return false
 end
 

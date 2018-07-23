@@ -9,6 +9,7 @@ line (blank)
 
 3. class BubblePop extends Code12Program
 line (classUser)
+    access (empty)
     ID (BubblePop)
     ID (Code12Program)
 
@@ -7269,6 +7270,7 @@ line (comment)
 
 515. class TestProgram extends Code12Program
 line (classUser)
+    access (empty)
     ID (TestProgram)
     ID (Code12Program)
 
@@ -7280,7 +7282,8 @@ line (comment)
     COMMENT ( "classUserPub",	"public", "class", "ID", "extends", "ID")
 
 518. public class TestProgram extends Code12Program
-line (classUserPub)
+line (classUser)
+    access (public)
     ID (TestProgram)
     ID (Code12Program)
 
@@ -7432,10 +7435,10 @@ line (comment)
 *** Location 551.1 to 551.9: Unsupported reserved word "interface"
 
 552. double 1stNumber; // variable name starting with a number
-*** Location 552.1 to 552.17: Syntax Error
+*** Line 552: Syntax error (unrecognized code)
 
 553. x = obj.1stNumber; // field name starting with a number
-*** Location 553.1 to 553.18: Syntax Error
+*** Line 553: Syntax error (unrecognized code)
 
 554. 
 line (blank)
@@ -7448,23 +7451,23 @@ line (comment)
 *** Location 556.37 to 556.37: Statement should end with a semicolon (;)
 
 557. int x = 10		// missing ; in varInit
-*** Location 557.36 to 557.36: Variable initialization should end with a semicolon (;)
+*** Location 557.36 to 557.36: Variable declaration should end with a semicolon (;)
 
 558. int x 			// missing ; in varDecl
 *** Location 558.33 to 558.33: Variable declaration should end with a semicolon (;)
 
 559. final int x = 10 // missing ; in constInit
-*** Location 559.11 to 559.11: Variable declaration should end with a semicolon (;)
+*** Location 559.43 to 559.43: Variable declaration should end with a semicolon (;)
 
 560. foo(x, );       // missing expr in exprList
-*** Location 560.1 to 560.9: Syntax Error
+*** Line 560: Syntax error (unrecognized code)
 
 561. x = a + ;       // missing expr after binary op
 *** Location 561.9 to 561.9: Expected expression after + operator
 *** Reference 561.7 to 561.7
 
 562. x = a ++ b;     // unexpected token after unary op
-*** Location 562.1 to 562.11: Syntax Error
+*** Line 562: Syntax error (unrecognized code)
 
 563. x = a ** b;     // missing expression between binary ops
 *** Location 563.8 to 563.8: Expected expression after * operator
@@ -7479,38 +7482,38 @@ line (comment)
 *** Reference 565.11 to 565.11
 
 566. x = ();         // missing expr in parentheses
-*** Location 566.1 to 566.7: Syntax Error
+*** Line 566: Syntax error (unrecognized code)
 
 567. x = 10 + ! ;    // missing expr after unary op
 *** Location 567.10 to 567.10: Expected expression after + operator
 *** Reference 567.8 to 567.8
 
 568. x = obj.3;      // expected ID after .
-*** Location 568.1 to 568.10: Syntax Error
+*** Line 568: Syntax error (unrecognized code)
 
 569. x = 3.obj;      // ID expected before .
-*** Location 569.1 to 569.10: Syntax Error
+*** Line 569: Syntax error (unrecognized code)
 
 570. if x == 3       // required next token in pattern doesn't match
 *** Location 570.4 to 570.9: if statement test must be in parentheses
 
 571. while i < max   // required next token in pattern doesn't match
-*** Location 571.1 to 571.13: Syntax Error
+*** Line 571: Syntax error (unrecognized code)
 
 572. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
-*** Location 572.1 to 572.21: Syntax Error
+*** Line 572: Syntax error (unrecognized code)
 
 573. x + 3;          // no matching pattern
-*** Location 573.1 to 573.6: Syntax Error
+*** Line 573: Syntax error (unrecognized code)
 
 574. x = 1,000;      // commas in numbers
-*** Location 574.1 to 574.10: Syntax Error
+*** Line 574: Syntax error (unrecognized code)
 
 575. x = 1.23.45;    // too many decimal points
-*** Location 575.1 to 575.12: Syntax Error
+*** Line 575: Syntax error (unrecognized code)
 
 576. x = 3.14e1.0;   // exponential notation with decimal point in exponent
-*** Location 576.1 to 576.13: Syntax Error
+*** Line 576: Syntax error (unrecognized code)
 
 577. x = 3.14e;      // Invalid exponential notation
 *** Location 577.5 to 577.10: Invalid exponential notation
@@ -7543,28 +7546,28 @@ line (comment)
 *** Location 586.29 to 586.29: Statement should end with a semicolon (;)
 
 587. x = (a + b + c / 3; 	// missing closing parenthesis
-*** Location 587.1 to 587.19: Syntax Error
+*** Line 587: Syntax error (unrecognized code)
 
 588. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
-*** Location 588.1 to 588.21: Syntax Error
+*** Line 588: Syntax error (unrecognized code)
 
 589. x = a + b + c ) / 3; 	// missing openning parenthesis
-*** Location 589.1 to 589.20: Syntax Error
+*** Line 589: Syntax error (unrecognized code)
 
 590. if ( i == 1 	// missing closing parenthesis with if
-*** Location 590.1 to 590.11: Syntax Error
+*** Line 590: Syntax error (unrecognized code)
 
 591. if ( i == 1 ); 	// if statment ended by ;
 *** Location 591.14 to 591.14: if statement should not end with a semicolon
 
 592. for ( i=0; i<n; i++); 	// for() followed directly by ;
-*** Location 592.1 to 592.21: Syntax Error
+*** Line 592: Syntax error (unrecognized code)
 
 593. x + 1 = x; 		// confusing left hand side an right hand side of assignment
-*** Location 593.1 to 593.10: Syntax Error
+*** Line 593: Syntax error (unrecognized code)
 
 594. 1000 = count; 	// confusing left hand side an right hand side of assignment
-*** Location 594.1 to 594.13: Syntax Error
+*** Line 594: Syntax error (unrecognized code)
 
 595. if ( x => 3 ) 	// => instead of <=
 *** Location 595.8 to 595.9: Invalid operator. Did you mean >= ?
@@ -7584,34 +7587,34 @@ Comma not supported
 Comma not supported
 
 600. for(int i=0: i<n: i++) 	// colons in place of semicolons
-*** Location 600.1 to 600.22: Syntax Error
+*** Line 600: Syntax error (unrecognized code)
 
 601. for{int i=0; i<n; i++} 	// {} in place of ()
-*** Location 601.1 to 601.22: Syntax Error
+*** Line 601: Syntax error (unrecognized code)
 
 602. for( x : arr ) 			// forgetting variable type
-*** Location 602.1 to 602.14: Syntax Error
+*** Line 602: Syntax error (unrecognized code)
 
 603. for( int x; arr ) 		// using ; instead of :
-*** Location 603.1 to 603.17: Syntax Error
+*** Line 603: Syntax error (unrecognized code)
 
 604. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Location 604.1 to 604.19: Syntax Error
+*** Line 604: Syntax error (unrecognized code)
 
 605. double foo[i]()			// index on function identifier
-*** Location 605.1 to 605.15: Syntax Error
+*** Line 605: Syntax error (unrecognized code)
 
 606. ct.println; 			// missing parenteses for function call without arguments
-*** Location 606.1 to 606.11: Syntax Error
+*** Line 606: Syntax error (unrecognized code)
 
 607. foo(int x, double y, GameObj z) 	// missing return type in function definition
-*** Location 607.1 to 607.31: Syntax Error
+*** Line 607: Syntax error (unrecognized code)
 
 608. foo(int x, double y, GameObj z); 	// supplying variable types in function call
-*** Location 608.1 to 608.32: Syntax Error
+*** Line 608: Syntax error (unrecognized code)
 
 609. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
-*** Location 609.1 to 609.40: Syntax Error
+*** Location 609.40 to 609.40: function header should not end with a semicolon
 
 610. String s = 'Hello'; 	// '' in place of "" for strings
 *** Location 610.12 to 610.12: char type not supported, use double quotes
@@ -7623,10 +7626,10 @@ Comma not supported
 *** Location 612.34 to 612.35: Unclosed string literal
 
 613. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Location 613.1 to 613.30: Syntax Error
+*** Line 613: Syntax error (unrecognized code)
 
 614. newObj() = oldObj; 				// assigning to a function value
-*** Location 614.1 to 614.18: Syntax Error
+*** Line 614: Syntax error (unrecognized code)
 
 615. 
 line (blank)
@@ -7640,47 +7643,47 @@ line (comment)
     COMMENT ( --------------------------------------------------------------------------------)
 
 618. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Location 618.1 to 618.24: Syntax Error
+*** Line 618: Code12 requires each variable initialization to be on its own line
 
 619. import java.io.PrintWriter;   // import other than Code12.*
-*** Location 619.1 to 619.27: Syntax Error
+*** Line 619: import should be "Code12.*;"
 
 620. int time = (int)( sec );      // type casting
-*** Location 620.1 to 620.24: Syntax Error
+*** Line 620: Syntax error (unrecognized code)
 
 621. time %= 3600;                 // %= operator
-*** Location 621.1 to 621.13: Syntax Error
+*** Line 621: Syntax error (unrecognized code)
 
 622. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
 *** Location 622.32 to 622.32: Invalid character (The "? :" operator is not supported by Code12)
 
 623. System.out.println("Hello world"); // classes other than GameObj and String
-*** Location 623.1 to 623.34: Syntax Error
+*** Line 623: Syntax error (unrecognized code)
 
 624. char ch = 'a'; 	// char type
 *** Location 624.11 to 624.11: char type not supported, use double quotes
 
 625. while(foo) { 	// opening { in control structure not on it's own line
-*** Location 625.1 to 625.12: Syntax Error
+*** Line 625: Syntax error (unrecognized code)
 
 626. i++; } 			// closing } not on it's own line
-*** Location 626.1 to 626.6: Syntax Error
+*** Location 626.6 to 626.6: Code12 only allows one statement per line
 
 627. String s = "A long string" +
 *** Location 627.29 to 627.29: Expected expression after + operator
 *** Reference 627.28 to 627.28
 
 628. "on more than one line using concatenation";
-*** Location 628.12 to 628.55: Syntax Error
+*** Line 628: Syntax error (unrecognized code)
 
 629. x = a; y = b; 	// more than one statement on a single line
-*** Location 629.1 to 629.13: Syntax Error
+*** Location 629.8 to 629.8: Code12 only allows one statement per line
 
 630. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
-*** Location 630.1 to 630.36: Syntax Error
+*** Location 630.4 to 630.11: if statement test must be in parentheses
 
 631. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Location 631.1 to 631.41: Syntax Error
+*** Line 631: Syntax error (unrecognized code)
 
 632. switch (choice)
 *** Location 632.1 to 632.6: Unsupported reserved word "switch"
@@ -7689,26 +7692,26 @@ line (comment)
 *** Location 633.1 to 633.8: Unsupported reserved word "continue"
 
 634. a[i++] = b[i++]; 	// increment/decrement only supported as statements
-*** Location 634.1 to 634.16: Syntax Error
+*** Line 634: Syntax error (unrecognized code)
 
 635. obj.group.equals("targets"); 		// indexing more than one level at a time
-*** Location 635.1 to 635.28: Syntax Error
+*** Line 635: Syntax error (unrecognized code)
 
 636. input.toLowerCase().equals("quit"); // indexing after function call
-*** Location 636.1 to 636.35: Syntax Error
+*** Line 636: Syntax error (unrecognized code)
 
 637. newBullet().ySpeed = 0;
-*** Location 637.1 to 637.23: Syntax Error
+*** Line 637: Syntax error (unrecognized code)
 
 638. final int N; 	// constant declaration without initialization
-*** Location 638.1 to 638.12: Syntax Error
+*** Line 638: Syntax error (unrecognized code)
 
 639. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
 *** Location 639.15 to 639.15: for loop parts should be separated by semicolons (;)
 Comma not supported
 
 640. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
-*** Location 640.1 to 640.20: Syntax Error
+*** Line 640: Syntax error (unrecognized code)
 
 641. int _var; // variable indentifiers starting with underscore
 *** Location 641.5 to 641.8: Names cannot start with an underscore in Code12
@@ -7720,7 +7723,7 @@ Comma not supported
 *** Location 643.11 to 643.11: The $ character is not allowed in Code12
 ======= Test Complete =========================================
 
-643 lines processed in 123 ms
+643 lines processed in 80 ms
 
 0 unexpected errors
 0 uncaught errors (95 expected errors)
