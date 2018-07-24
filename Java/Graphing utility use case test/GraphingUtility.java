@@ -4,11 +4,10 @@ import Code12.*;
 public class GraphingUtility extends Code12Program
 {
     GameObj xAxis, yAxis, equationText;
-    GameObj[] buttons = new GameObj[22];
-    GameObj[] buttonTexts = new GameObj[22];
-    String[] buttonTextLabels = {"x", ".", "+", "-", "*", "/", "^", "√", "(", ")", "←",
-                                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "more"};
-    int parenthesisCount = 0;
+    GameObj[] buttons = new GameObj[17];
+    GameObj[] buttonTexts = new GameObj[17];
+    String[] deconstructedExpression;
+    String equation = "";
 
     public static void main(String[] args)
     {
@@ -17,48 +16,52 @@ public class GraphingUtility extends Code12Program
 
     public void start()
     {
-        xAxis = ct.line(0, ct.getHeight() / 2, ct.getWidth(), ct.getHeight() / 2);
+        ct.setBackColor("light gray");
+        xAxis = ct.line(0, ct.getHeight() / 2, ct.getWidth(), ct.getHeight() / 2, "white");
         xAxis.align("center", true);
-        xAxis.lineWidth = 2;
-
-        yAxis = ct.line(ct.getWidth() / 2, 0, ct.getWidth() / 2, ct.getHeight());
+        //xAxis.lineWidth = 2;
+        yAxis = ct.line(ct.getWidth() / 2, 0, ct.getWidth() / 2, ct.getHeight(), "white");
         yAxis.align("center", true);
-        yAxis.lineWidth = 2;
-
-        equationText = ct.text("", ct.getWidth() / 20, 7*ct.getHeight() / 8 + 2, 2);
+        //yAxis.lineWidth = 2;
+        equationText = ct.text("", ct.getWidth() / 20, 7*ct.getHeight() / 8 + 2, 2, "white");
         equationText.align("left", true);
         equationText.setLayer(2);
 
         defineButtons();
-        disableButtons(".+*/^√)←");
+        enableButtons("x-0123456789");
+        disableButtons("+*/^<");
     }
 
     public void update()
     {
         for (int i = 0; i < buttons.length; i++)
         {
-            if (buttons[10].clicked())
+            String buttonString = buttonTexts[i].getText();
+            if (buttons[i].clicked() && buttonString.equals("<"))
                 backspaceAction();
-            else if (buttons[20].clicked())
-            {
-            }
             else if (buttons[i].clicked())
             {
-                incrementParenthesisCount(buttonTextLabels[i], false);
-                enableButtons("x.+-*/^√()0123456789←");
-                disableButtons(getToBeDisabledButtons(buttonTextLabels[i]));
-                equationText.setText(equationText.getText() + buttonTextLabels[i]);
+                equationText.setText(equationText.getText() + buttonTexts[i].getText());
+                enableButtons("x+-*/^0123456789<");
+                disableButtons(getToBeDisabledButtons());
             }
         }
 
-        if (isParseable())
+        if (hasEquationChanged() && isParseable())
         {
-            for (double x = 0; x < ct.getHeight(); x += 0.1)
-            {
-                //GameObj coordnate = ct.circle(x, equationOutput(x) + ct.getHeight() / 2, 1, "light blue");
-                //coordnate.setLineColor("light blue");
-            }
+            ct.clearGroup("coordinates");
+            equation = equationText.getText();
+            deconstructExpression();
+            for (double x = -0.05; x < ct.getWidth(); x += 0.1)
+                defineLine(x);
         }
+    }
+
+    public void defineLine(double x)
+    {
+        GameObj line = ct.line(x, -parse(x - 50) + ct.getHeight() / 2, x + 0.1, -parse((x + 0.1) - 50) + ct.getHeight() / 2, "light blue");
+        line.lineWidth = 3;
+        line.group = "coordinates";
     }
 
     public void defineButtons()
@@ -69,52 +72,28 @@ public class GraphingUtility extends Code12Program
 
     public void defineButton(int i)
     {
-        double x = 25 + 5 * (i % 11);
+        double x = 25 + 5 * (i % 11) + ct.intDiv(i, 16) * 25;
         double y = 5*ct.getHeight() / 6 + 10 + ct.intDiv(i, 11) * 5;
-
-        buttons[i] = ct.rect(x, y, 3, 1, "gray");
+        buttons[i] = ct.rect(x, y, 3, 1, "white");
         buttons[i].align("center", true);
-        buttons[i].clickable = true;
         buttons[i].setLayer(2);
-
-        buttonTexts[i] = ct.text(buttonTextLabels[i], x, y, 1);
+        buttonTexts[i] = ct.text(charAt("x0123456789+-*/^<", i), x, y, 1);
         buttonTexts[i].align("center", true);
         buttonTexts[i].setLayer(2);
     }
 
-    // TODO: eliminate multiple decimals in one number
-    public void disableButtons(String buttonsString)
-    {
-        for (int i = 0; i < buttonsString.length(); i++)
-            disableButton(charAt(buttonsString, i));
-        if (parenthesisCount == 0)
-            disableButton(")");
-    }
-
-    public void disableButton(String buttonString)
-    {
-        for (int i = 0; i < buttons.length; i++)
-        {
-            if (buttonString.equals(buttonTextLabels[i]))
-            {
-                buttons[i].clickable = false;
-                buttonTexts[i].setFillColor("red");
-                break;
-            }
-        }
-    }
-
     public void enableButtons(String buttonsString)
     {
-        for (int i = 0; i < buttonsString.length(); i++)
-            enableButton(charAt(buttonsString, i));
+        String[] buttonStrings = toCharArray(buttonsString);
+        for (String buttonString: buttonStrings)
+            enableButton(buttonString);
     }
 
     public void enableButton(String buttonString)
     {
         for (int i = 0; i < buttons.length; i++)
         {
-            if (buttonString.equals(buttonTextLabels[i]))
+            if (buttonString.equals(buttonTexts[i].getText()))
             {
                 buttons[i].clickable = true;
                 buttonTexts[i].setFillColor("black");
@@ -123,182 +102,144 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public String getToBeDisabledButtons(String buttonString)
+    public void disableButtons(String buttonsString)
     {
+        String[] buttonStrings = toCharArray(buttonsString);
+        for (String buttonString: buttonStrings)
+            disableButton(buttonString);
+    }
+
+    public void disableButton(String buttonString)
+    {
+        for (int i = 0; i < buttons.length; i++)
+        {
+            if (buttonString.equals(buttonTexts[i].getText()))
+            {
+                buttons[i].clickable = false;
+                buttonTexts[i].setFillColor("red");
+                break;
+            }
+        }
+    }
+
+    public String getToBeDisabledButtons()
+    {
+        String buttonString = getLastChar(equationText.getText());
         if (buttonString.equals("x"))
-            return "x.(0123456789";
-        if (buttonString.equals("."))
-            return "x.+-*/^√()";
-        if (buttonString.equals("+") || buttonString.equals("-") || buttonString.equals("√"))
-            return ".+-*/^√)";
-        if (buttonString.equals("*") || buttonString.equals("/") || buttonString.equals("^"))
-            return ".+*/^√)";
-        if (buttonString.equals("("))
-            return ".+*/^√)";
-        if (buttonString.equals(")"))
-            return "x.(0123456789";
-        return "";
+            return "x-0123456789";
+        if (buttonString.equals("+") || buttonString.equals("*") || buttonString.equals("^") || buttonString.equals(""))
+            return "+*/^";
+        if (buttonString.equals("/"))
+            return "0+*/^";
+        if (buttonString.equals("-"))
+            return "+-*/^";
+        return "x-";
     }
 
     public void backspaceAction()
     {
         String equationString = equationText.getText();
-        incrementParenthesisCount(pop(equationString), true);
         equationString = equationString.substring(0, equationString.length() - 1);
         equationText.setText(equationString);
-        enableButtons("x.+-*/^√()0123456789←");
-        disableButtons(getToBeDisabledButtons(pop(equationString)));
+        enableButtons("x+-*/^0123456789<");
+        disableButtons(getToBeDisabledButtons());
         if (equationString.length() == 0)
-            disableButton("←");
+            disableButton("<");
+    }
+
+    public void deconstructExpression()
+    {
+        String expression = equationText.getText();
+        String[] expressionArray = new String[expression.length()];
+        int count = 0;
+        for (int i = 0; i < expression.length(); i++)
+        {
+            if (isOperand(charAt(expression, i)))
+                expressionArray[count] = expressionArray[count] + charAt(expression, i);
+            else if (isOperator(charAt(expression, i)))
+            {
+                expressionArray[count + 1] = charAt(expression, i);
+                count += 2;
+            }
+        }
+        deconstructedExpression = expressionArray;
+    }
+
+    public double parse(double x)
+    {
+        String[] expression = substituteXVariable(x);
+        double solution = ct.parseNumber(expression[0]);
+        for (int i = 1; i < deconstructedExpression.length && expression[i] != null; i++)
+        {
+            if (expression[i].equals("+"))
+                solution += ct.parseNumber(expression[i + 1]);
+            else if (expression[i].equals("*"))
+                solution *= ct.parseNumber(expression[i + 1]);
+            else if (expression[i].equals("/"))
+                solution /= ct.parseNumber(expression[i + 1]);
+            else if (expression[i].equals("^"))
+                solution = Math.pow(solution, ct.parseNumber(expression[i + 1]));
+        }
+        return solution;
+    }
+
+    public String[] substituteXVariable(double x)
+    {
+        String[] expression = new String[deconstructedExpression.length];
+        for (int i = 0; i < deconstructedExpression.length; i++)
+        {
+            String token = deconstructedExpression[i];
+            if (token.equals("-x") && x < 0)
+                expression[i] = ct.formatDecimal(x);
+            else if (token.equals("x") || token.equals("-x") && x > 0)
+                expression[i] = ct.formatDecimal(x);
+            else
+                expression[i] = token;
+        }
+        return expression;
+    }
+
+    public boolean hasEquationChanged()
+    {
+        return !equation.equals(equationText.getText());
     }
 
     public boolean isParseable()
     {
-        String equationChar = pop(equationText.getText());
-        if (equationChar.equals(".") || equationChar.equals("+") || equationChar.equals("-") || equationChar.equals("*") || equationChar.equals("/") || equationChar.equals("^") || equationChar.equals("√") || equationChar.equals("("))
-            return false;
-        return true;
+        String equationChar = getLastChar(equationText.getText());
+        return !equationChar.equals("+") && !equationChar.equals("-") && !equationChar.equals("*") && !equationChar.equals("/") && !equationChar.equals("^") && !equationChar.equals("");
     }
 
-    public String parse(String expression, double x)
+    public boolean isOperand(String value)
     {
-        if (containsChar(expression, "("))
-        {
-            String expressionSub1 = expression.substring(0, expression.indexOf("("));
-            String simplifiedExpression = parse(getParenthesisSubstring(expression), x);
-            String expressionSub2 = expression.substring(expression.indexOf(")") + 1);
-            return parse(expressionSub1 + parenthesisExpression + expressionSub2);
-        }
-        if (containsChar(expression, "^"))
-        {
-            String expressionSub1 = expression.substring(0, expression.indexOf(getBaseNumber(expression, charAt(expression, "^"))));
-            String simplifiedExpression = Math.pow(getBaseNumber(expression, charAt(expression, "^")), getArgNumber(expression, charAt(expression, "^")));
-            String expressionSub2 = ;
-            return parse(expressionSub1 + ct.formatDecimal(simplifiedExpression) + );
-        }
-        if (containsChar(expression, "√"))
-        {
-            return parse();
-        }
-        if (containsChar(expression, "*") || containsChar(expression, "/"))
-        {
-            return parse();
-        }
-        if (containsChar(expression, "+") || containsChar(expression, "-"))
-        {
-            return parse();
-        }
-        return equation;
+        return value.equals("x") || value.equals("-") || value.equals(".") || value.equals("0") || value.equals("1") || value.equals("2") || value.equals("3") || value.equals("4") || value.equals("5") || value.equals("6") || value.equals("7") || value.equals("8") || value.equals("9");
     }
 
-    public String[] getEquationSubtrings(String equationString, String operand)
+    public boolean isOperator(String value)
     {
-        String[] expressions;
-        if (operand.equals("("))
-        {
-            expressions = new String[3];
-            expressions[0] = 
-        }
-        else if (operand.equals("√"))
-        {
-
-        }
-        else
-        {
-
-        }
-
+        return value.equals("+") || value.equals("*") || value.equals("/") || value.equals("^");
     }
 
-    public int[] getBaseNumberIndexes(String equationString, int index)
+    public String[] toCharArray(String s)
     {
-        int[] indexes = {0, index};
-        for (int i = index; i > 0; i--)
-        {
-            String character = charAt(equationString, i);
-            String newCharacter = "*";
-            if (i - 1 > 0)
-                newCharacter = charAt(equationString, i - 1)
-            if (character.equals("-") && !newCharacter.equals("*") && !newCharacter.equals("/") && !newCharacter.equals("^") && !newCharacter.equals("√"))
-                break;
-            if (ct.canParseNumber(charAt(equationString, i) + number))
-                indexes[0] = i;
-        }
-        return indexes;
+        String[] charArray = new String[s.length()];
+        for (int i = 0; i < s.length(); i++)
+            charArray[i] = charAt(s, i);
+        return charArray;
     }
 
-    public double getArgNumber(String equationString, int index)
+    public String getLastChar(String s)
     {
-        String number = "";
-        for (int i = index + 1; i < equationString.length(); i++)
-        {
-            if (ct.canParseNumber(number + charAt(equationString, i)))
-                number += charAt(equationString, i);
-        }
-        return ct.parseNumber(number);
+        return charAt(s, s.length() - 1);
     }
 
-    public double equationOutput(String solution)
+    public String charAt(String s, int i)
     {
-        return ct.parseNumber(solution);
-    }
-
-    public void incrementParenthesisCount(String buttonString, boolean backspaceAction)
-    {
-        if (buttonString.equals("(") && !backspaceAction || buttonString.equals(")") && backspaceAction)
-            parenthesisCount++;
-        else if (buttonString.equals(")") && !backspaceAction || buttonString.equals("(") && backspaceAction)
-            parenthesisCount--;
-    }
-
-    public String getParenthesisSubstring(String equationString)
-    {
-        int subParenthesisCount = 1;
-        int openingParenthesis = equationString.indexOf("(");
-        int closingParenthesis = 0;
-        for (int i = openingParenthesis + 2; i < equationString.length() - 1; i++)
-        {
-            String substring = charAt(equationString, i);
-            if (substring.equals("("))
-                subParenthesisCount++;
-            else if (substring.equals(")"))
-                subParenthesisCount--;
-            if (subParenthesisCount == 0)
-            {
-                closingParenthesis = i;
-                break;
-            }
-        }
-        return equationString.substring(openingParenthesis + 1, closingParenthesis);
-    }
-
-    public String charAt(String string, int i)
-    {
-        if (string.length() == 0)
+        if (s.length() <= 0 || i < 0)
             return "";
-        if (i == string.length())
-            return string.substring(i);
-        return string.substring(i, ++i);
-    }
-
-    public String pop(String string)
-    {
-        return charAt(string, string.length() - 1);
-    }
-
-    public boolean containsChar(String string, String value)
-    {
-        for (int i = 0; i < string.length(); i++)
-        {
-            if (i + value.length() > string.length())
-            {
-                if (value.equals(string.substring(i)))
-                    return true;
-            }
-            else if (value.equals( string.substring(i, i + value.length()) ))
-                return true;
-        }
-        return false;
+        if (i == s.length())
+            return s.substring(i);
+        return s.substring(i, i + 1);
     }
 
 }
