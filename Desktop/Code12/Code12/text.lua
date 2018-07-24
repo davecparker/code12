@@ -13,6 +13,33 @@ local GameObj = require("Code12.GameObjAPI")
 local appContext = ct._appContext
 
 
+---------------- Internal Functions ------------------------------------------
+
+-- Return the text to print for the given value
+local function textForValue(value)
+	if value == nil then
+		return "null"
+	elseif type(value) == "string" then
+		return value
+	elseif GameObj.isGameObj(value) then
+		return value:toString()
+	else
+		return tostring(value)
+	end
+end
+
+-- Print a value as it should appear in ct.log output
+local function logValue(value)
+	if type(value) == "string" then
+		ct.print("\"")
+		ct.print(value)
+		ct.print("\"")
+	else
+		ct.print(textForValue(value))
+	end
+end
+
+
 ---------------- Text Output API ---------------------------------------------
 
 -- API
@@ -23,7 +50,7 @@ function ct.print(value, ...)
 	end
 
 	-- Print/output the value
-	local text = (value == nil and "null") or tostring(value)
+	local text = textForValue(value)
 	if appContext then
 		appContext.print(text)     -- Code12 app console
 	elseif g.isSimulator then
@@ -45,7 +72,7 @@ function ct.println(value, ...)
 	end
 
 	-- Print/output the value
-	local text = (value == nil and "null") or tostring(value)
+	local text = textForValue(value)
 	if appContext then
 		appContext.println(text)   -- Code12 app console
 	elseif g.isSimulator then
@@ -56,21 +83,6 @@ function ct.println(value, ...)
 	if g.outputFile then
 		g.outputFile:write(text)   -- echo to text file
 		g.outputFile:write("\n")
-	end
-end
-
--- Print a value as it should appear in ct.log output
-local function logValue(value)
-	if value == nil then
-		ct.print("null")
-	elseif type(value) == "string" then
-		ct.print("\"")
-		ct.print(value)
-		ct.print("\"")
-	elseif GameObj.isGameObj(value) then
-		ct.print(value:toString())
-	else
-		ct.print(tostring(value))
 	end
 end
 

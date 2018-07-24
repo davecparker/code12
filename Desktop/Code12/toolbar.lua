@@ -34,7 +34,7 @@ local function chooseFile()
 	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
 	if path then
 		app.sourceFile.path = path
-		app.sourceFile.timeLoaded = os.time()
+		app.sourceFile.timeLoaded = 0
 		app.sourceFile.timeModLast = 0
 	end
 	native.setActivityIndicator( false )
@@ -82,7 +82,7 @@ function toolbar.create()
 		y = yCenter,
 		segmentWidth = segWidth,
 		segments = segmentNames,
-		defaultSegment = app.numSyntaxLevels,
+		defaultSegment = app.syntaxLevel,
 		onPress = 
 			function (event )
 				app.syntaxLevel = event.target.segmentNumber

@@ -62,6 +62,22 @@ local substituteType = {
 	["Boolean"] = "boolean",
 }
 
+-- Known Java types: map lowercase version to correct case string
+local knownTypes = {
+	["int"]      = "int",
+	["double"]   = "double",
+	["void"]     = "void",
+	["boolean"]  = "boolean",
+	["string"]   = "String",
+	["gameobj"]  = "GameObj",
+	["byte"]     = "byte",
+	["char"]     = "char",
+	["float"]    = "float",
+	["long"]     = "long",
+	["short"]    = "short",
+	["integer"]  = "Integer",
+}
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -186,6 +202,12 @@ end
 -- Return true if name is the name of a supported class with public static members
 function javaTypes.isClassWithStaticMembers( name )
 	return name == "ct" or name == "Math"
+end
+
+-- If nameLower (which should be all lowercase) is a Java type name ignoring case,
+-- then return the correct case, else nil. 
+function javaTypes.correctTypeName( nameLower )
+	return knownTypes[nameLower]
 end
 
 

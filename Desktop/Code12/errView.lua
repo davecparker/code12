@@ -125,7 +125,8 @@ local function makeErrDisplay( sceneGroup )
 
 	-- Position the docs toolbar
 	print(errText.height)
-	docsToolbarGroup.y = errGroup.y + errText.y + errText.height + margin
+	-- Can't use errText.height: doesn't work when it wraps :(
+	docsToolbarGroup.y = errGroup.y + errText.y + dyLine * 2 + margin
 	moreInfoBtn.x = app.width - app.margin
 
 	-- Position the docs web view

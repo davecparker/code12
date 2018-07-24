@@ -27,6 +27,7 @@ public interface GameInterface
    public double getPixelsPerUnit();
    public String getScreen();
    public void setScreen(String name);
+   public void setScreenOrigin(double x, double y);
    public void clearScreen();
    public void clearGroup(String group);
    public void setBackColor(String name);
@@ -48,6 +49,7 @@ public interface GameInterface
    public boolean clicked();
    public double clickX();
    public double clickY();
+   public GameObj objectClicked();
    public boolean keyPressed(String key);
    public boolean charTyped(String ch);
    

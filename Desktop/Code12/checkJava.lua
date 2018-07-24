@@ -43,6 +43,43 @@ local localNameStack = {}
 
 --- Misc Analysis Functions --------------------------------------------------
 
+-- If the name is an invalid name for a variable or function, then set the 
+-- error state and return true. Usage should be a description of how the name
+-- is being used (e.g. "variable", "function"). 
+-- Return false if the name is valid.
+local function isInvalidName( nameNode, usage )
+	-- Check special Code12 reserved names
+	local name = nameNode.str
+	if name == "ct" or name == "_fn" then
+		err.setErrNode( nameNode, 
+				"The name \"%s\" is reserved for use by the system", name )
+		return true
+	end
+
+	-- Check for constants with the wrong case
+	local nameLower = string.lower( name )
+	if nameLower == "true" or nameLower == "false" or nameLower == "null" then
+		err.setErrNode( nameNode, 
+				"Incorrect case for constant, should be \"%s\"", nameLower )
+		return true
+	end		
+
+	-- Check for known types
+	local typeName = javaTypes.correctTypeName( nameLower ) 
+	if typeName then
+		if typeName == name then
+			err.setErrNode( nameNode, 
+					"%s is a type name, expected a %s name here", name, usage )
+		else
+			err.setErrNode( nameNode, 
+					"Code12 does not allow names that differ only by upper/lower case from known names (\"%s\" is a type name)", 
+					typeName )
+		end
+		return true
+	end
+	return false
+end
+
 -- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
 -- If the name is found and the entry is a record (table) then return the record.
 -- If an entry has an index (name) differing only in case, then set the error state 
@@ -79,8 +116,86 @@ local function lookupID( nameToken, nameTable )
 	return nil
 end
 
+-- Process a method definition. If there is an error than set the error state
+-- and return false. Return true if successful.
+local function getMethod( typeNode, nameNode, paramList )
+	local fnName = nameNode.str
+	if isInvalidName( nameNode, "function" ) then
+		return false
+	end
+
+	-- Build the parameter table
+	local params = paramList.nodes
+	local paramTable = {}
+	for i = 1, #params do
+		local param = params[i]
+		local vtParam, name = javaTypes.vtAndNameFromParam( param )
+		if isInvalidName( param.nodes[2], "parameter" ) then
+			return false
+		end
+		paramTable[#paramTable + 1] = { name = name, vt = vtParam }
+	end
+
+	-- Get the return type
+	local vtReturn = javaTypes.vtFromRetType( typeNode ) 
+
+	-- Is this a pre-defined event function?
+	local event = lookupID( nameNode, apiTables["Code12Program"].methods )
+	if event then
+		-- Event: Check if the signature matches
+		if event.vt ~= vtReturn then
+			err.setErrNodeAndRef( typeNode, nameNode, 
+					"Return type of %s function should be %s",
+					fnName, javaTypes.typeNameFromVt( event.vt ))
+			return false
+		elseif #event.params ~= #paramTable then
+			err.setErrNodeAndRef( paramList, nameNode, 
+					"Wrong number of parameters for function %s ", fnName )
+			return false
+		else
+			for i = 1, #paramTable do
+				if paramTable[i].vt ~= event.params[i].vt then
+					err.setErrNodeAndRef( params[i], nameNode,
+							"Wrong type for parameter %d of function %s",
+							i, fnName )
+					return false
+				end
+			end
+		end
+		return true
+	end
+
+	-- User-defined function: Check if already defined
+	local method = userMethods[fnName] 
+	if method then
+		err.setErrNodeAndRef( nameNode, method.node,
+				"Function %s is already defined", fnName )
+		return false
+	end
+	local nameLower = string.lower( fnName )
+	method = userMethods[nameLower]
+	if method then
+		err.setErrNodeAndRef( nameNode, method.node,
+				"Function name %s differs only by upper/lower case from existing function %s", 
+				fnName, method.node.str )
+		return false
+	end
+
+	-- Add entry to userMethods table
+	userMethods[fnName] = { 
+		node = nameNode,
+		vt = vtReturn, 
+		params = paramTable
+	}
+	-- Add lowercase version if different
+	if nameLower ~= fnName then
+		userMethods[nameLower] = fnName
+	end
+	return true
+end
+
 -- Find user-defined methods in parseTrees and put them in the userMethods table.
--- Return true if successful, false if an error occured.
+-- Return false if an error occured and err.stopOnErrors() is true, else return true.
 local function getMethods( parseTrees )
 	for iTree = 1, #parseTrees do
 		local tree = parseTrees[iTree]
@@ -89,59 +204,11 @@ local function getMethods( parseTrees )
 		local nodes = tree.nodes
 		if p == "func" then
 			-- User-defined function or event function
-			local nameNode = nodes[3]
-			local fnName = nameNode.str
-
-			-- Build the parameter table
-			local paramTable = {}
-			local params = nodes[5].nodes
-			for i = 1, #params do
-				local param = params[i]
-				local vtParam, name = javaTypes.vtAndNameFromParam( param )
-				paramTable[#paramTable + 1] = { name = name, vt = vtParam }
-			end
-
-			-- Get the return type
-			local vtReturn = javaTypes.vtFromRetType( nodes[2] ) 
-
-			-- Is this a pre-defined event function?
-			local event = lookupID( nameNode, apiTables["Code12Program"].methods )
-			if event then
-				-- Event: Check if the signature matches
-				if event.vt ~= vtReturn then
-					err.setErrNodeAndRef( nodes[2], nameNode, 
-							"Return type of %s function should be %s",
-							fnName, javaTypes.typeNameFromVt( event.vt ))
-				elseif #event.params ~= #paramTable then
-					err.setErrNodeAndRef( nodes[5], nameNode, 
-							"Wrong number of parameters for function %s ", fnName )
-				else
-					for i = 1, #paramTable do
-						if paramTable[i].vt ~= event.params[i].vt then
-							print(paramTable[i].vt, event.params[i].vt)
-							err.setErrNodeAndRef( params[i], nameNode,
-									"Wrong type for parameter %d of function %s",
-									i, fnName )
-							break;
-						end
-					end
-				end
-			else
-				-- User-defined: Add entry to userMethods table
-				userMethods[fnName] = { 
-					node = nameNode,
-					vt = vtReturn, 
-					params = paramTable
-				}
-				-- Add lowercase version if different
-				local nameLower = string.lower( fnName )
-				if nameLower ~= fnName then
-					userMethods[nameLower] = fnName
+			if not getMethod( nodes[2], nodes[3], nodes[5] ) then
+				if err.stopOnErrors() then 
+					return false
 				end
 			end
-		end
-		if err.hasErr() and err.stopOnErrors() then 
-			return false
 		end
 	end
 	return true
@@ -251,7 +318,9 @@ end
 
 -- primaryExpr pattern: NUM
 local function vtExprNUM( nodes )
-	return ((nodes[1].str:find("%.") and 1) or 0)   -- double or int
+	-- Imitating Java, a number is double if it has a decimal point or
+	-- is in exponential notation, regardless of its value
+	return ((nodes[1].str:find("[%.eE]") and 1) or 0)   -- double or int
 end
 
 -- primaryExpr pattern: BOOL
@@ -330,7 +399,7 @@ local function vtExprPlus( nodes )
 	elseif vtLeft == "String" and vtRight == "String" then
 		return "String"
 	elseif vtLeft == "String" or vtRight == "String" then
-		-- Check if the other operand can be promoted to string (numbers only)
+		-- Check if the other operand can be promoted to string
 		local exprOther, vtOther
 		if vtLeft == "String" then
 			exprOther = nodes[3]
@@ -339,15 +408,11 @@ local function vtExprPlus( nodes )
 			exprOther = nodes[1]
 			vtOther = vtLeft
 		end
-		if type(vtOther) == "number" then
-			return "String"   -- the number will promote to a string 
-		elseif vtOther == "GameObj" then
+		if type(vtOther) == "table" then
 			err.setErrNodeAndRef( nodes[2], exprOther, 
-					"The (+) operator cannot be used on GameObj objects directly. Use the toString() method." )
-		else
-			err.setErrNodeAndRef( nodes[2], exprOther, 
-					"The (+) operator can only apply to numbers or Strings" )
+					"The (+) operator cannot be applied to arrays" ) 
 		end
+		return "String"   -- all primitive types can promote to a string 
 	else
 		-- Find the side that is wrong
 		local exprOther
@@ -410,7 +475,7 @@ local function vtExprEquality( nodes )
 	local vtRight = nodes[3].info.vt
 	if javaTypes.canCompareVts( vtLeft, vtRight ) then
 		-- Don't allow comparing Strings with ==
-		if vtLeft == "String" then
+		if vtLeft == "String" and vtRight == "String" then
 			if syntaxLevel >= 7 then
 				err.setErrNodeAndRef( nodes[2], nodes[1],
 						"Use str1.equals( str2 ) to compare two String values" )
@@ -531,6 +596,9 @@ end
 -- variable has been assigned and if not then set the error state and return nil. 
 function checkJava.vtVar( varNode, unassignedOK )
 	assert( varNode.tt == "ID" )
+	if isInvalidName( varNode, "variable" ) then
+		return nil
+	end
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
 		err.setErrNode( varNode,  "Undefined variable %s", varNode.str )
@@ -559,14 +627,12 @@ function checkJava.defineVar( nameNode, vt, isArray, assigned )
 	end
 
 	-- Check for invalid name
-	local varName = nameNode.str
-	if varName == "ct" or varName == "_fn" then
-		err.setErrNode( nameNode, 
-				"The name \"%s\" is reserved for use by the system", varName )
+	if isInvalidName( nameNode, "variable" ) then
 		return false
 	end
 
 	-- Check for existing definition
+	local varName = nameNode.str
 	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
 	if varFound then
 		err.setErrNodeAndRef( nameNode, varFound.node, 
@@ -726,8 +792,18 @@ end
 -- If not found then set the error state and return nil.
 local function findUserMethod( idNode )
 	assert( idNode.tt == "ID" )
+	if isInvalidName( idNode, "function" ) then
+		return nil
+	end
 	local method = lookupID( idNode, userMethods )
 	if method == nil then
+		-- User function not found
+		-- Trying to call an event?
+		local event = lookupID( idNode, apiTables["Code12Program"].methods )
+		if event then
+			err.setErrNode( idNode, "Calling event functions directly is not allowed")
+			return nil
+		end
 		-- TODO: Check for missing "ct." and other common errors
 		err.setErrNode( idNode, "Undefined function %s", idNode.str )
 		return nil
@@ -806,6 +882,16 @@ local function findMethod( fnValue )
 	return methodNameNode.str, method
 end
 
+-- Return true if all the parameters in params are of type int
+local function allParamsAreInt( params )
+	for i = 1, #params do
+		if params[i].info.vt ~= 0 then 
+			return false
+		end
+	end
+	return true
+end
+
 -- Do type checking on a function or method call with the given fnValue and
 -- paramList nodes. If there is an error then set the error state and return nil. 
 -- Return the return type vt if successful.
@@ -837,7 +923,9 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	end
 
 	-- Check parameter types for validity and match with the API
-	-- TODO: Handle overloaded Math methods
+	if method.overloaded and allParamsAreInt( params ) then
+		return 0    -- special case for overloaded Math methods: take ints, return int
+	end
 	for i = 1, #params do
 		if i > #method.params then
 			assert( method.variadic )

@@ -38,6 +38,7 @@ class GameCanvas extends Canvas implements ActionListener
       // Add input event listeners, sent to the GameInput helper
       addMouseListener(game.input);
       addKeyListener(game.input);
+      setFocusTraversalKeysEnabled(false);
    }   
    
    // Start the frame update timer

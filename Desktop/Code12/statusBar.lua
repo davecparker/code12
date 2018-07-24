@@ -49,8 +49,9 @@ function statusBar.update()
 
 	-- Set the fileText with update status
 	local _, filename = env.dirAndFilenameOfPath( sourceFile.path )
-	if sourceFile.timeModLast <= sourceFile.timeLoaded then
-		fileText.text = filename    -- file has not been updated
+	if sourceFile.timeLoaded == 0 or sourceFile.timeModLast == 0 
+			or sourceFile.timeModLast < app.startTime then
+		fileText.text = filename    -- not updated after this app run
 	else
 		local updateStr
 		local secs = os.time() - sourceFile.timeModLast
