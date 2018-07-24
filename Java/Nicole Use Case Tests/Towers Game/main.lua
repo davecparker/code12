@@ -19,9 +19,11 @@ require('Code12.api')
     this.large = nil; 
     
     this.poles = nil; 
+    this.disks = nil; 
+    this.boundingBoxes = nil; 
     
-    this.totalDisks = 3
-    this.count = 0
+    this.lastX = 0; 
+    this.lastY = 0; 
     
     
         
@@ -35,13 +37,26 @@ require('Code12.api')
         this.base.lineWidth = 5
         this.pole1 = ct.rect(this.base.x / 3, this.base.y - 7.5, 3, 20, "gray")
         this.pole1.lineWidth = 3
-        this.pole1box = ct.rect(this.pole1.x, this.pole1.y, this.pole1.width, ct.getHeight())
+        this.pole1box = ct.rect(this.pole1.x, this.pole1.y, this.pole1.width + 10, ct.getHeight())
+        this.pole1box:setFillColor(nil)
+        this.pole1box:setLineColor(nil)
+        
         this.pole2 = ct.rect(this.base.x, this.base.y - 7.5, 3, 20, "gray")
         this.pole2.lineWidth = 3
-        this.pole2box = ct.rect(this.pole2.x, this.pole2.y, this.pole2.width, ct.getHeight())
+        this.pole2box = ct.rect(this.pole2.x, this.pole2.y, this.pole2.width + 10, ct.getHeight())
+        this.pole2box:setFillColor(nil)
+        this.pole2box:setLineColor(nil)
+        
         this.pole3 = ct.rect(this.base.x + 34, this.base.y - 7.5, 3, 20, "gray")
         this.pole3.lineWidth = 3
-        this.pole3box = ct.rect(this.pole3.x, this.pole3.y, this.pole3.width, ct.getHeight())
+        this.pole3box = ct.rect(this.pole3.x, this.pole3.y, this.pole3.width + 10, ct.getHeight())
+        this.pole3box:setFillColor(nil)
+        this.pole3box:setLineColor(nil)
+        
+        this.boundingBoxes = { length = 3, default = nil }
+        ct.checkArrayIndex(this.boundingBoxes, 0); this.boundingBoxes[1+(0)] = this.pole1box
+        ct.checkArrayIndex(this.boundingBoxes, 1); this.boundingBoxes[1+(1)] = this.pole2box
+        ct.checkArrayIndex(this.boundingBoxes, 2); this.boundingBoxes[1+(2)] = this.pole3box
         
         this.small = ct.circle(this.pole2.x, this.pole2.y - 9, 10, "blue")
         this.small.height = 3
@@ -59,26 +74,28 @@ require('Code12.api')
         this.large:setLineColor("dark red")
         
         this.poles = { length = 3, default = nil }
-        ct.checkArrayIndex(this.poles, 0); this.poles[1+(0)] = this.small
-        ct.checkArrayIndex(this.poles, 1); this.poles[1+(1)] = this.medium
-        ct.checkArrayIndex(this.poles, 2); this.poles[1+(2)] = this.large
+        ct.checkArrayIndex(this.poles, 0); this.poles[1+(0)] = this.pole1
+        ct.checkArrayIndex(this.poles, 1); this.poles[1+(1)] = this.pole2
+        ct.checkArrayIndex(this.poles, 2); this.poles[1+(2)] = this.pole3
+        
+        this.disks = { length = 3, default = nil }
+        ct.checkArrayIndex(this.disks, 0); this.disks[1+(0)] = this.small
+        ct.checkArrayIndex(this.disks, 1); this.disks[1+(1)] = this.medium
+        ct.checkArrayIndex(this.disks, 2); this.disks[1+(2)] = this.large
         
         
     end
     
     
-    --three arrays for size
-    -- a sub 0 diam of bottom guy
-    -- count var ti keep track of amt on each pole
-    -- compare diameter
-    -- width
+    -- count variable to keep track of amt on each pole
     --/array of gmae obj
     -- find obj in pole, pole is an array
-    --GameObj[] pole. obect trying to find
+    --GameObj[] pole. object trying to find
     -- findObj(GameObj[]pole, a )
     -- findObj( a)
     --while 0 to null
     -- boolean movetopole( obj, pole)
+    
     function _fn.update()
         
         this.small.clickable = true
@@ -88,70 +105,109 @@ require('Code12.api')
         
     end
     
-    function _fn.findObj(arr, obj)
+    -- Find the pole from which an object came from
+    function _fn.poleFrom(obj)
         
+        -- iterate through the array to find out which "pole" the obj is on
+        -- e.g., arr[0] is pole number one
+        local i = 0; while i < this.poles.length do
+            
+            local j = 0; while j < this.disks.length do
+                
+                -- Is it the object searched for?
+                -- if so, return the pole number at which its located
+                if ct.indexArray(this.disks, j) == obj and obj:hit(ct.indexArray(this.boundingBoxes, i)) then
+                    return i; end
+            j = j + 1; end
+        i = i + 1; end
         
     end
     
+    -- or det top disk of each pole?
     
-    --public boolean moveToPole( GameObj obj, GameObj[] p)
-    --{
-    
-    --}
-    
-    -- dont keep track of their y coordinate positions
-    -- keep track if theyre on top or not?
-    
-    -- Helper function to determine if disk is on top of the others
-    -- The first object passed in parameter is the one being checked
-    function _fn.isOnTopOfAll(obj, obj2, obj3)
+    -- function to determine the amount of disks on each pole
+    -- parameter passed is a GameObj (the pole)
+    function _fn.getAmountOnPole(pole)
         
-        if obj.y <= obj2.y and obj.y <= obj3.y then
-            return true; 
-        else 
-            return false; end
+        local amount = 0
+        
+        local i = 0; while i < this.poles.length do
+            
+            local j = 0; while j < this.disks.length do
+                
+                if ct.indexArray(this.disks, j):hit(ct.indexArray(this.poles, i)) == true then
+                    amount = amount + 1; end
+                
+            j = j + 1; end
+        i = i + 1; end
+        
+        return amount
+        
     end
     
-    function _fn.isUnderneathAll(obj, obj2, obj3)
+    function _fn.isValidMove(diskMoving)
         
-        if obj.y > obj2.y and obj.y > obj3.y then
-            return true; 
-        else 
-            return false; end
+        local i = 0; while i < this.poles.length do
+            
+            local amount = _fn.getAmountOnPole(ct.indexArray(this.poles, i))
+            if amount == 0 then
+                
+                ct.println("does this execute")
+                return true
+            
+            else 
+                
+                -- So get the one on top to find its width
+                -- and compare its width with the diskMoving
+                -- if diskMoving.width < top.width, move is ok
+                -- else if diskMoving.width > top.width, send diskMoving back to pole it came from
+                local j = 0; while j < this.disks.length do
+                    
+                    -- If there is a disk is on the pole
+                    -- Check the top disk's width
+                    if diskMoving:hit(ct.indexArray(this.poles, j)) and diskMoving ~= ct.indexArray(this.disks, j) then
+                        
+                        ct.println("Test to see if the disk moving hit the disk on the pole")
+                        if diskMoving.width > ct.indexArray(this.disks, j).width then
+                            
+                            ct.println("This will print if the moving disk has a larger diam than disk on pole")
+                            return false
+                        
+                        elseif diskMoving.width < ct.indexArray(this.disks, j).width then
+                            
+                            ct.println("This will print if the moving disk has a smaller diam than disk on pole")
+                            return true
+                        end
+                        
+                    end
+                j = j + 1; end
+                
+            end
+        i = i + 1; end
     end
     
-    -- Helper function to determine if object is smaller or bigger than others
-    -- If ( bigger ) can't put on top of smaller
-    -- If ( smaller ) can put on top of bigger
+    function _fn.getWidths()
+        
+        local widths = { length = this.disks.length, default = 0 }
+        
+        local i = 0; while i < this.disks.length do
+            
+            ct.checkArrayIndex(widths, i); widths[1+(i)] = ct.indexArray(this.disks, i).width
+        i = i + 1; end
+        
+        return widths
     
-    
-    -- Helper function to let moved disks fall to the base of a given pole 
-    -- Once they reach the base of the pole, they stop falling ( ySpeed = 0 )
-    function _fn.moveDiskToPole(obj)
-        
-        
-        if this.small:hit(this.pole1box) or this.small:hit(this.pole2box) or this.small:hit(this.pole3box) then
+                elseif _fn.isValidMove(disk) == true then
+                    
+                    disk.x = ct.indexArray(this.poles, i).x
+                    disk.y = ct.indexArray(this.poles, i).y
+                    
+                end
+                
+                
+            j = j + 1; end
             
-            this.small.ySpeed = 1
-            if this.small.y > (this.pole1.y - this.pole1.height / 2) then
-                this.small.ySpeed = 0; end
-        end
-        
-        if this.medium:hit(this.pole1box) or this.medium:hit(this.pole2box) or this.medium:hit(this.pole3box) then
-            
-            this.medium.ySpeed = 1
-            if this.medium.y > (this.pole1.y - this.pole1.height / 2) then
-                this.medium.ySpeed = 0; end
-            
-        end
-        
-        if this.large:hit(this.pole1box) or this.large:hit(this.pole2box) or this.large:hit(this.pole3box) then
-            
-            this.large.ySpeed = 1
-            if this.large.y > (this.pole1.y - this.pole1.height / 2) then
-                this.large.ySpeed = 0; end
-            
-        end
+        i = i + 1; end
         
         
         
@@ -159,47 +215,86 @@ require('Code12.api')
     
     function _fn.onMousePress(obj, x, y)
         
-        local lastX = x
-        local lastY = y
-        
-        
-        -- TODO: save the previous x and y of the disks so that if the user makes an invalid move,
-        -- the disks go back to their old position
+        this.lastX = x
+        this.lastY = y
         
     end
     
-    --TODO: add function to check winning conditions
-    -- small > medium > large on a different pole than the starting
     
     function _fn.onMouseDrag(obj, x, y)
         
+        -- keep track of obj movibg
+        -- and the pole it came from remember pole 
+        --GameOBj diskMoving
+        --    int poleFrom
         if obj == this.small then
             
-            if _fn.isOnTopOfAll(this.small, this.medium, this.large) then
-                
-                -- Can only click on object when it is on top of the stack
-                this.small.x = x
-                this.small.y = y
-                --moveDiskToPole(small);
-            end
+            this.small.x = x
+            this.small.y = y
+            local polenum = _fn.poleFrom(this.small)
+            ct.println(polenum)
         end
         
         if obj == this.medium then
             
-            if _fn.isOnTopOfAll(this.medium, this.small, this.large) then
-                
-                this.medium.x = x
-                this.medium.y = y
-                
-            end
-            
+            this.medium.x = x
+            this.medium.y = y
         end
         
         if obj == this.large then
             
-            if _fn.isOnTopOfAll(this.large, this.medium, this.small) then
-                this.large.x = x; end
+            this.large.x = x
             this.large.y = y
+        end
+        
+        -- on mouse release
+        -- actually check and do stuff
+        
+    end
+    
+    function _fn.onMouseRelease(obj, x, y)
+        
+        if obj == this.small then
+            
+            if _fn.isValidMove(this.small) == true then
+                
+                ct.println("This should print if move for small is valid")
+                _fn.moveDiskToPole(this.small)
+            
+            elseif _fn.isValidMove(this.small) == false then
+                
+                ct.println("This should print if move for small is invalid")
+                local poleFrom = _fn.poleFrom(this.small)
+                this.small.x = ct.indexArray(this.poles, poleFrom).x
+                this.small.y = ct.indexArray(this.poles, poleFrom).y
+            end
+            
+        end
+        
+        if obj == this.medium then
+            
+            if _fn.isValidMove(this.medium) == true then
+                _fn.moveDiskToPole(this.medium); 
+            elseif _fn.isValidMove(this.medium) == false then
+                
+                ct.println("This should print if move for medium is invalid")
+                local poleFrom = _fn.poleFrom(this.medium)
+                this.medium.x = ct.indexArray(this.poles, poleFrom).x
+                this.medium.y = ct.indexArray(this.poles, poleFrom).y
+            end
+        end
+        
+        if obj == this.large then
+            
+            if _fn.isValidMove(this.large) == true then
+                _fn.moveDiskToPole(this.large); 
+            elseif _fn.isValidMove(this.large) == false then
+                
+                ct.println("This should print if move for large is invalid")
+                local poleFrom = _fn.poleFrom(this.large)
+                this.large.x = ct.indexArray(this.poles, poleFrom).x
+                this.large.y = ct.indexArray(this.poles, poleFrom).y
+            end
         end
         
     end

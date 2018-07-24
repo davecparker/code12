@@ -19,9 +19,11 @@ public class Towers extends Code12Program
    GameObj large;
 
    GameObj[] poles;
+   GameObj[] disks;
+   GameObj[] boundingBoxes;
 
-   int totalDisks = 3;
-   int count = 0;
+   double lastX;
+   double lastY;
 
    public static void main(String[] args)
    {
@@ -35,13 +37,26 @@ public class Towers extends Code12Program
          base.lineWidth = 5;
          pole1 = ct.rect( base.x / 3, base.y - 7.5, 3, 20,"gray");
          pole1.lineWidth = 3;
-         pole1box = ct.rect(pole1.x, pole1.y, pole1.width, ct.getHeight() );
+         pole1box = ct.rect(pole1.x, pole1.y, pole1.width + 10, ct.getHeight() );
+         pole1box.setFillColor(null);
+         pole1box.setLineColor(null);
+
          pole2 = ct.rect(base.x, base.y - 7.5, 3, 20, "gray");
          pole2.lineWidth = 3;
-         pole2box = ct.rect(pole2.x, pole2.y, pole2.width, ct.getHeight() );
+         pole2box = ct.rect(pole2.x, pole2.y, pole2.width + 10, ct.getHeight() );
+         pole2box.setFillColor(null);
+         pole2box.setLineColor(null);
+
          pole3 = ct.rect( base.x + 34, base.y - 7.5, 3, 20, "gray");
          pole3.lineWidth = 3;
-         pole3box = ct.rect(pole3.x, pole3.y, pole3.width, ct.getHeight() );
+         pole3box = ct.rect(pole3.x, pole3.y, pole3.width + 10, ct.getHeight() );
+         pole3box.setFillColor(null);
+         pole3box.setLineColor(null);
+
+         boundingBoxes = new GameObj[3];
+         boundingBoxes[0] = pole1box;
+         boundingBoxes[1] = pole2box;
+         boundingBoxes[2] = pole3box;
 
          small = ct.circle(pole2.x,pole2.y - 9, 10, "blue");
          small.height = 3;
@@ -59,26 +74,28 @@ public class Towers extends Code12Program
          large.setLineColor("dark red");
 
          poles = new GameObj[3];
-         poles[0] = small;
-         poles[1] = medium;
-         poles[2] = large;
+         poles[0] = pole1;
+         poles[1] = pole2;
+         poles[2] = pole3;
+
+         disks = new GameObj[3];
+         disks[0] = small;
+         disks[1] = medium;
+         disks[2] = large;
 
 
    }
 
 
-//three arrays for size
-   // a sub 0 diam of bottom guy
-   // count var ti keep track of amt on each pole
-   // compare diameter
-   // width
+   // count variable to keep track of amt on each pole
    ///array of gmae obj
    // find obj in pole, pole is an array
-   //GameObj[] pole. obect trying to find
+   //GameObj[] pole. object trying to find
    // findObj(GameObj[]pole, a )
    // findObj( a)
    //while 0 to null
    // boolean movetopole( obj, pole)
+
    public void update()
    {
       small.clickable = true;
@@ -88,119 +105,244 @@ public class Towers extends Code12Program
 
    }
 
-   public GameObj findObj( GameObj[] arr, GameObj obj)
+   // Find the pole from which an object came from
+   public int poleFrom( GameObj obj )
    {
+      // iterate through the array to find out which "pole" the obj is on
+      // e.g., arr[0] is pole number one
+      for ( int i = 0; i < poles.length; i++ )
+      {
+         for ( int j = 0; j < disks.length; j++ )
+         {
+            // Is it the object searched for?
+            // if so, return the pole number at which its located
+            if ( disks[j] == obj && obj.hit(boundingBoxes[i]) )
+               return i;
+         }
+      }
 
    }
 
+   // or det top disk of each pole?
 
-   //public boolean moveToPole( GameObj obj, GameObj[] p)
-   //{
-
-   //}
-
-   // dont keep track of their y coordinate positions
-   // keep track if theyre on top or not?
-
-   // Helper function to determine if disk is on top of the others
-   // The first object passed in parameter is the one being checked
-   public boolean isOnTopOfAll(GameObj obj, GameObj obj2, GameObj obj3 )
+   // function to determine the amount of disks on each pole
+   // parameter passed is a GameObj (the pole)
+   public int getAmountOnPole( GameObj pole )
    {
-      if ( obj.y <= obj2.y && obj.y <= obj3.y ) 
-         return true;
-      else
-         return false;
+      int amount = 0;
+
+      for ( int i = 0; i < poles.length; i++ )
+      {
+         for ( int j = 0; j < disks.length; j++ )
+         {
+            if ( disks[j].hit(poles[i]) == true )
+               amount++;
+
+         }
+      }
+
+      return amount;
+
    }
 
-   public boolean isUnderneathAll(GameObj obj, GameObj obj2, GameObj obj3 )
+   public boolean isValidMove(GameObj diskMoving) // bool is valid move? pass obj tring to move
    {
-      if ( obj.y > obj2.y && obj.y > obj3.y )
-         return true;
-      else
-         return false;
+      for ( int i = 0; i < poles.length; i++ )
+      {
+         int amount = getAmountOnPole( poles[i] );
+         if ( amount == 0 )
+         {
+            ct.println("does this execute");
+            return true;
+         }
+         else // There must be disks on the pole
+         {
+            // So get the one on top to find its width
+            // and compare its width with the diskMoving
+            // if diskMoving.width < top.width, move is ok
+            // else if diskMoving.width > top.width, send diskMoving back to pole it came from
+            for ( int j = 0; j < disks.length; j++ )
+            {
+               // If there is a disk is on the pole
+               // Check the top disk's width
+               if ( diskMoving.hit(poles[j]) && diskMoving != disks[j])
+               {
+                  ct.println("Test to see if the disk moving hit the disk on the pole");
+                  if ( diskMoving.width > disks[j].width )
+                  {
+                     ct.println("This will print if the moving disk has a larger diam than disk on pole");
+                     return false;
+                  }
+                  else if ( diskMoving.width < disks[j].width )
+                  {
+                     ct.println("This will print if the moving disk has a smaller diam than disk on pole");
+                     return true;
+                  }
+
+               }
+            }
+
+         }
+      }
    }
 
-   // Helper function to determine if object is smaller or bigger than others
+   public double[] getWidths()
+   {
+      double[] widths = new double[disks.length];
+
+      for ( int i = 0; i < disks.length; i++ )
+      {
+         widths[i] = disks[i].width;
+      }
+
+      return widths;
+   }
+
+   //public void isClosestToTOp
+   // Once we find the pole (and the amount of disks on each pole), compare their width to determine if a move is possible
+   // public boolean isValidMove( GameObj  obj, GameObj[] arr )
+   // {
+   //    // Iterate through the poles
+   //    for ( int i = 0; i < poles.length; i++ )
+   //    {
+   //       // Go through the amount of disks on each pole
+   //       //int amount = getAmountOnPole(i);
+   //       for ( int j = 0; j < amount; j++ )
+   //       {
+   //          for ( int k = 0; k < poles.length; k++ )
+   //          {
+   //             GameObj min; //holding variable
+
+
+
+   //          }
+   //       }
+
+   //    }
+   // }
+
+
    // If ( bigger ) can't put on top of smaller
    // If ( smaller ) can put on top of bigger
 
 
    // Helper function to let moved disks fall to the base of a given pole 
-   // Once they reach the base of the pole, they stop falling ( ySpeed = 0 )
-   public void moveDiskToPole(GameObj obj)
+   // Once they reach the base of the pole or another objject in poles array, they stop falling ( ySpeed = 0 )
+   public void moveDiskToPole(GameObj disk)
    {
-
-         if ( small.hit(pole1box) || small.hit(pole2box) || small.hit(pole3box) )
+      // move to stack
+      // falls to bottom unless other disks obj is hits
+      for ( int i = 0; i < poles.length; i++ )
+      {
+         for ( int j = 0; j < disks.length; j++ )
          {
-            small.ySpeed = 1;
-            if ( small.y > (pole1.y - pole1.height/2) )
-               small.ySpeed = 0;
+         /*
+            if ( disk.hit(disks[j]))
+            {
+               disk.x = disks[j].x - ( disks[j].height/4);
+               disk.y = disks[j].y - (disks[j].height / 2);
+            }*/
+
+            // else to go to base of pole
+            else if ( isValidMove(disk) == true )
+            {
+               disk.x = poles[i].x;
+               disk.y = poles[i].y;
+
+            }
+
+
          }
 
-         if ( medium.hit(pole1box) || medium.hit(pole2box) || medium.hit(pole3box) )
-         {
-            medium.ySpeed = 1;
-            if ( medium.y > (pole1.y - pole1.height/2) )
-               medium.ySpeed = 0;
-
-         }
-
-         if ( large.hit(pole1box) || large.hit(pole2box) || large.hit(pole3box) )
-         {
-            large.ySpeed = 1;
-            if ( large.y > ( pole1.y - pole1.height/2) )
-               large.ySpeed = 0;
-
-         }
+      }
 
 
 
    }
 
    public void onMousePress(GameObj obj, double x, double y)
-   {
-   		double lastX = x;
-   		double lastY = y;
-
-
-      // TODO: save the previous x and y of the disks so that if the user makes an invalid move,
-      // the disks go back to their old position
+   {// pole from where it came frm
+   		lastX = x;
+   		lastY = y;
 
    }
 
-   //TODO: add function to check winning conditions
-   // small > medium > large on a different pole than the starting
 
    public void onMouseDrag(GameObj obj, double x, double y)
    {
-         if ( obj == small )
+      // keep track of obj movibg
+      // and the pole it came from remember pole 
+      //GameOBj diskMoving
+      //    int poleFrom
+      if ( obj == small )
+      {
+         small.x = x;
+         small.y = y;
+         int polenum = poleFrom(small);
+         ct.println( polenum );
+      }
+
+      if ( obj == medium )
+      {
+         medium.x = x;
+         medium.y = y;
+      }
+
+      if ( obj == large )
+      {
+         large.x = x;
+         large.y = y;
+      }
+
+       // on mouse release
+       // actually check and do stuff
+
+   }
+
+   public void onMouseRelease(GameObj obj, double x, double y )
+   {
+      if ( obj == small )
+      {
+         if ( isValidMove(small) == true )
          {
-            if ( isOnTopOfAll(small,medium,large) )
-            {
-	            // Can only click on object when it is on top of the stack
-	            small.x = x;
-	            small.y = y;
-	            //moveDiskToPole(small);
-        	   }
+            ct.println("This should print if move for small is valid");
+            moveDiskToPole(small);
+         }
+         else if ( isValidMove(small) == false )
+         {
+            ct.println("This should print if move for small is invalid");
+            int poleFrom = poleFrom(small);
+            small.x = poles[poleFrom].x;
+            small.y = poles[poleFrom].y;
          }
 
-         if ( obj == medium )
-         {
-         	if ( isOnTopOfAll(medium,small,large) )
-         	{
-         		medium.x = x;
-            	medium.y = y;
+      }
 
-         	}
-            
-         }
-
-         if ( obj == large )
+      if ( obj == medium )
+      {
+         if ( isValidMove(medium) == true )
+            moveDiskToPole(medium);
+         else if ( isValidMove(medium) == false )
          {
-         	if ( isOnTopOfAll(large, medium, small) )
-            large.x = x;
-            large.y = y;
+            ct.println("This should print if move for medium is invalid");
+            int poleFrom = poleFrom(medium);
+            medium.x = poles[poleFrom].x;
+            medium.y = poles[poleFrom].y;
          }
+      }
+
+      if ( obj == large )
+      {
+         if ( isValidMove(large) == true )
+            moveDiskToPole(large);
+         else if ( isValidMove(large) == false)
+         {
+            ct.println("This should print if move for large is invalid");
+            int poleFrom = poleFrom(large);
+            large.x = poles[poleFrom].x;
+            large.y = poles[poleFrom].y;
+         }
+      }
 
    }
 }
