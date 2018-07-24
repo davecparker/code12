@@ -25,8 +25,8 @@ local function clickEvent(event, gameObj)
 
 	-- Get logical click location 
 	local xP, yP = g.mainGroup:contentToLocal( event.x, event.y )
-	local x = xP / g.scale
-	local y = yP / g.scale
+	local x = xP / g.scale + g.screen.originX
+	local y = yP / g.scale + g.screen.originY
 
 	local phase = event.phase
 	if phase == "began" then
@@ -239,6 +239,17 @@ function ct.clickY(...)
 
 	-- Return last click y
 	return g.clickY
+end
+
+-- API
+function ct.objectClicked(...)
+	-- Check params
+	if g.checkAPIParams("ct.objectClicked") then
+		g.checkNoParams(...)
+	end
+
+	-- Return clicked object if any
+	return g.gameObjClicked
 end
 
 -- API

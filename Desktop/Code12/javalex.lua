@@ -131,6 +131,12 @@ local function equalsToken()
 	if charNext == 61 then   --  =
 		iChar = iChar + 1
 		return "=="
+	elseif charNext == 60 then  --  <
+		setTokenErr( iChar - 1, iChar, "Invalid operator. Did you mean <= ?" )
+		return nil
+	elseif charNext == 62 then  --  >
+		setTokenErr( iChar - 1, iChar, "Invalid operator. Did you mean >= ?" )
+		return nil
 	end
 	return "="
 end
@@ -404,8 +410,7 @@ end
 
 -- Return string for token starting with .  (. or numeric literal token starting with a dot)
 local function  dotToken()
-	local charType = charTypes[chars[iChar + 1]]
-	if charType == false then   -- digit char
+	if charTypes[chars[iChar + 1]] == false then   -- digit char after dot
 		return numericLiteralToken(true)
 	end
 	iChar = iChar + 1

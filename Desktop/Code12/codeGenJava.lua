@@ -8,9 +8,9 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
+local err = require( "err" )
 local checkJava = require( "checkJava" )
 local javaTypes = require( "javaTypes" )
-local err = require( "err" )
 
 
 -- The codeGen module
@@ -260,6 +260,20 @@ function fnCallCode( tree )
 	return table.concat( parts )
 end
 
+-- Return Lua code for expr promoted to a string
+local function stringExprCode( expr )
+	local vt = expr.info.vt
+	if vt == "String" then
+		return exprCode( expr )
+	elseif vt == "GameObj" then
+		return exprCode( expr ) .. ":toString()"
+	elseif vt == "null" then
+		return "\"null\""
+	end  
+	-- Lua can promote int, double, and boolean with tostring()
+	return "tostring(" .. exprCode( expr ) .. ")"
+end
+
 -- Return Lua code for an expr
 function exprCode( expr )
 	local p = expr.p
@@ -293,7 +307,7 @@ function exprCode( expr )
 		-- Look for special cases of binary operators
 		if p == "+" and expr.info.vt == "String" then
 			-- The + operator is concatenating strings, not adding
-			luaOp = " .. "  -- TODO: Lua tables (GameObj) will not do a toString automatically
+			return stringExprCode( left ) .. ".." .. stringExprCode( right )
 		end
 		-- TODO: Verify that we don't need parentheses (Lua precedence is same as Java)
 		return exprCode( left ) .. luaOp .. exprCode( right )
@@ -527,7 +541,7 @@ local function generateForLoop( tree )
 			beginLuaLine( "for _, " )
 			addLua( nodes[2].str )
 			addLua( " in ipairs(" )
-			addLua( varNameCode(nodes[4].str) )
+			addLua( varNameCode( nodes[4].str ) )
 			addLua( ") do" )
 			generateControlledStmt()
 		end
@@ -780,7 +794,7 @@ function codeGenJava.getLuaCode( parseTrees )
 		end
 
 		-- print( "getLuaCode line " .. iTree )
-		if not checkJava.doTypeChecks( tree ) then
+		if not checkJava.doTypeChecks( tree ) and err.stopOnErrors() then
 			break
 		end
 		local p = tree.p

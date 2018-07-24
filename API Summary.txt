@@ -29,6 +29,7 @@ class ct
 	double getPixelsPerUnit()         // scale factor to convert coordinate units to pixels
 	String getScreen( )
 	void setScreen( String name )
+	void setScreenOrigin( double x, double y )
 	void clearScreen( )
 	void clearGroup( String group )
 	void setBackColor( String color )
@@ -52,6 +53,7 @@ class ct
 	boolean clicked( )
 	double clickX( )
 	double clickY( )
+	GameObj objectClicked( )
 	boolean keyPressed( String keyName )
 	boolean charTyped( String ch )
 
@@ -117,6 +119,7 @@ class GameObj
 	boolean clicked( )
 	boolean containsPoint( double x, double y )
 	boolean hit( GameObj obj )
+	GameObj objectHitInGroup( String group )
 }
 
 class Math

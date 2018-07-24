@@ -11,7 +11,6 @@
 local err = {}
 
 
-
 -- The error state. We only detect and store the first error in the program.
 -- The errRecord is a table as follows:
 -- {
@@ -26,6 +25,10 @@ local err = {}
 --     },
 -- }
 local errRecord
+
+-- Diagnostic error logging function. If set, errors are sent here instead of
+-- being recorded in the errRecord
+local fnLogErr
 
 
 --- Utility Functions -------------------------------------------------------
@@ -109,8 +112,17 @@ function err.setErr( loc, refLoc, strErr, ... )
 		assert( type(refLoc) == "table" and refLoc.first ~= nil )
 	end
 	assert( type(strErr) == "string" )
-	if errRecord == nil then
-		errRecord = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
+
+	local errNew = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
+	if fnLogErr then
+		-- In diagnostic mode, report every error but don't store the error state 
+		-- in errRecord (force checking to continue). 
+		fnLogErr( errNew )
+	else
+		-- Only set the error state if not already set (take the first error only)
+		if errRecord == nil then
+			errRecord = errNew
+		end
 	end
 end
 
@@ -193,6 +205,16 @@ end
 -- Clear the error state
 function err.clearErr()
 	errRecord = nil
+end
+
+-- Set the error logging function
+function err.setFnLogErr( fn )
+	fnLogErr = fn
+end
+
+-- Return true if we should stop on errors
+function err.stopOnErrors()
+	return fnLogErr == nil
 end
 
 
