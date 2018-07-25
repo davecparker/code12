@@ -104,7 +104,7 @@ class minesweeper extends Code12Program
 
       public void onMouseRelease( GameObj obj, double x, double y )
       {
-            if( count <= 60 )
+            if( timer <= 60 )
             {
                   if( obj != null)
                   {
@@ -157,7 +157,7 @@ class minesweeper extends Code12Program
             }
             else
             {
-                  
+
             }
       }
 
@@ -267,7 +267,7 @@ class minesweeper extends Code12Program
       {
             if( mouseDown )
             {
-                  count += 1;
+                  timer += 1;
             }
       }
 }
