@@ -3,8 +3,8 @@ import Code12.*;
 
 public class Vectors extends Code12Program
 {
-    GameObj[] vectors = new GameObj[20];
-    int[] shades = new int[20];
+    GameObj[] vectors = new GameObj[50];
+    int[] shades = new int[50];
 
     public static void main(String[] args)
     {
@@ -39,7 +39,7 @@ public class Vectors extends Code12Program
         int x = ct.random(-1, ct.toInt(ct.getWidth()) - 1);
         int y = ct.random(-1, ct.toInt(ct.getHeight()) - 1);
         if (vectors[i] == null)
-            vectors[i] = ct.circle(x, y, 3);
+            vectors[i] = ct.circle(x, y, 2);
         else
         {
             vectors[i].x = x;
@@ -70,7 +70,7 @@ public class Vectors extends Code12Program
     public void defineLine(int i, int j)
     {
         GameObj line = ct.line(vectors[i].x, vectors[i].y, vectors[j].x, vectors[j].y);
-        int minShade = Math.min(shades[i], shades[j]);
+        int minShade = ct.toInt(Math.min(shades[i], shades[j]));
         line.setLineColorRGB(minShade, minShade, minShade);
         line.group = "lines";
         line.setLayer(0);

@@ -65,7 +65,7 @@ public class Game extends Code12Program
             {
                 if (player.hit(enemies[i]))
                 {
-                    randomizeEnemyPosition(i);
+                    randomizeEnemyPosition(enemies[i]);
                     incrementScore("--");
                 }
             }
@@ -109,10 +109,10 @@ public class Game extends Code12Program
         object.ySpeed = 0;
     }
 
-    public void randomizeEnemyPosition(int i)
+    public void randomizeEnemyPosition(GameObj enemy)
     {
-        enemies[i].x = ct.random(0, ct.toInt(ct.getWidth()));
-        enemies[i].y = -2;
+        enemy.x = ct.random(0, ct.toInt(ct.getWidth()));
+        enemy.y = -2;
     }
 
     public void randomizeGoalPosition()
