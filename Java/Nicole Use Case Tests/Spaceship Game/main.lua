@@ -46,14 +46,12 @@ require('Code12.api')
         this.topBg = ct.image("seamless_tileable_nebula.jpg", width / 2, height / 2 - height, width)
         this.topBg.height = height
         this.beginText = ct.text("Click on the spaceship to begin!", width / 2, height - 40, 4, "white")
-        this.traveledText = ct.text("Light years traveled: " .. 0, 15, 5, 3, "white")
+        this.traveledText = ct.text("Light years traveled: "..tostring(0), 15, 5, 3, "white")
         
         this.asteroid = ct.image("asteroid.png", ct.random(10, 100), ct.random(10, 100), 10)
         
         this.spaceship = ct.image("spacecraft.png", width / 2, height - 10, 5)
         this.spaceship:setLayer(2)
-        this.spaceship.clickable = true
-        this.spaceship.visible = true
         
         this.flame = ct.image("transparent-flame.png", this.spaceship.x, this.spaceship.y + this.spaceship.height / 2, 5)
         this.flame.visible = false
@@ -64,7 +62,11 @@ require('Code12.api')
     
     function _fn.update()
         
-        ct.setTitle(ct.toInt(60 - (ct.getTimer() / 1000.0)) .. " seconds until the black hole")
+        this.flame.clickable = false
+        this.asteroid.clickable = false
+        this.bg.clickable = false
+        this.rayGun.visible = false
+        ct.setTitle(tostring(ct.toInt(60 - (ct.getTimer() / 1000.0))).." seconds until the black hole")
         -- Set the initial background down
         this.bg.ySpeed = 0.5
         -- Set the top background moving down
@@ -97,14 +99,14 @@ require('Code12.api')
             -- Increase amount of light years traveled
             this.traveledText:delete()
             this.lightYears = this.lightYears + (0.5)
-            this.traveledText = ct.text("Light years traveled: " .. this.lightYears, 15, 5, 3, "white")
+            this.traveledText = ct.text("Light years traveled: "..tostring(this.lightYears), 15, 5, 3, "white")
             
             -- Move the ray gun along with the spaceship
             this.rayGun.y = this.spaceship.y
             
             -- If the spaceship goes off screen, set it back to starting position
-            if this.spaceship.y < 0 then
-                this.spaceship.y = ct.getHeight() - 10; end
+            --if ( spaceship.y < 0 )
+            --spaceship.y = ct.getHeight() - 10;
             
         end
         -- Check to see if the ray gun hit an asteroid
@@ -145,7 +147,7 @@ require('Code12.api')
             this.asteroid.ySpeed = (origin.y - this.asteroid.y) / 15.0
             this.traveledText:delete()
             ct.setTitle("Game over")
-            ct.text("Game over! You traveled: " .. this.lightYears .. " light years.", ct.getWidth() / 2, ct.getHeight() - 20, 5, "white")
+            ct.text("Game over! You traveled: "..tostring(this.lightYears).." light years.", ct.getWidth() / 2, ct.getHeight() - 20, 5, "white")
             
         end
         

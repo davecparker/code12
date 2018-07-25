@@ -7,6 +7,7 @@ require('Code12.api')
     this.playerRight = nil; 
     this.platforms = nil; 
     this.items = nil; 
+    this.clouds = nil; 
     this.gravity = 0.5
     this.onGround = true
     
@@ -24,32 +25,42 @@ require('Code12.api')
         
         this.platforms = { length = 15, default = nil }
         
-        --background = ct.image("seamlessbg.jpg", width/2, height/2, width);
-        --background.height = height;
+        ct.setBackColorRGB(0, 100, 100)
         
-        -- platforms[0] is the ground
-        ct.checkArrayIndex(this.platforms, 0); this.platforms[1+(0)] = ct.rect(width / 2, height, width * 5, 10, "dark blue")
-        ct.checkArrayIndex(this.platforms, 1); this.platforms[1+(1)] = ct.rect(30, height - 10, 20, 10, "dark blue")
-        ct.checkArrayIndex(this.platforms, 2); this.platforms[1+(2)] = ct.rect(60, height - 20, 25, 20, "dark blue")
-        ct.checkArrayIndex(this.platforms, 3); this.platforms[1+(3)] = ct.rect(90, height - 20, 15, 10)
-        ct.checkArrayIndex(this.platforms, 4); this.platforms[1+(4)] = ct.rect(110, height - 10, 10, 10)
-        ct.checkArrayIndex(this.platforms, 5); this.platforms[1+(5)] = ct.rect(130, height - 15, 20, 10, "light gray")
-        ct.checkArrayIndex(this.platforms, 6); this.platforms[1+(6)] = ct.rect(155, height - 20, 10, 10, "gray")
-        ct.checkArrayIndex(this.platforms, 7); this.platforms[1+(7)] = ct.rect(175, height - 25, 20, 20, "gray")
-        ct.checkArrayIndex(this.platforms, 8); this.platforms[1+(8)] = ct.rect(190, height - 45, 15, 15, "light gray")
-        ct.checkArrayIndex(this.platforms, 9); this.platforms[1+(9)] = ct.rect(175, 35, 10, 2, "gray")
+        -- Background objects in the game
+        local tree = ct.image("tree.png", 15, height - 14, 15)
+        tree:setLayer(0)
+        local tree2 = ct.image("tree.png", 120, height - 14, 15)
+        tree2:setLayer(0)
+        local sun = ct.image("sun.png", width - 10, 10, 10)
+        this.clouds = { length = 5, default = nil }
+        ct.checkArrayIndex(this.clouds, 0); this.clouds[1+(0)] = ct.image("cloud3.png", -35, 10, 20)
+        ct.checkArrayIndex(this.clouds, 1); this.clouds[1+(1)] = ct.image("cloud2.png", -15, 20, 25)
+        ct.checkArrayIndex(this.clouds, 2); this.clouds[1+(2)] = ct.image("cloud1.png", 20, 10, 20)
+        ct.checkArrayIndex(this.clouds, 3); this.clouds[1+(3)] = ct.image("cloud2.png", 50, 30, 25)
+        ct.checkArrayIndex(this.clouds, 4); this.clouds[1+(4)] = ct.image("cloud3.png", 30, 20, 20)
         
-        local i = 0; while i < 5 do
-            
-            ct.indexArray(this.platforms, i):setFillColor(nil)
-        i = i + 1; end
+        -- Platforms, platforms[0] is the ground
+        ct.checkArrayIndex(this.platforms, 0); this.platforms[1+(0)] = ct.rect(width / 2, height, width * 5, 10, "dark green")
+        ct.checkArrayIndex(this.platforms, 1); this.platforms[1+(1)] = ct.rect(30, height - 10, 20, 10, "dark green")
+        ct.checkArrayIndex(this.platforms, 2); this.platforms[1+(2)] = ct.rect(60, height - 20, 25, 20, "dark green")
+        ct.checkArrayIndex(this.platforms, 3); this.platforms[1+(3)] = ct.rect(90, height - 20, 15, 10, "orange")
+        ct.checkArrayIndex(this.platforms, 4); this.platforms[1+(4)] = ct.rect(110, height - 10, 10, 10, "orange")
+        ct.checkArrayIndex(this.platforms, 5); this.platforms[1+(5)] = ct.rect(130, height - 15, 20, 10, "orange")
+        ct.checkArrayIndex(this.platforms, 6); this.platforms[1+(6)] = ct.rect(155, height - 20, 10, 10, "orange")
+        ct.checkArrayIndex(this.platforms, 7); this.platforms[1+(7)] = ct.rect(175, height - 25, 20, 20, "orange")
+        ct.checkArrayIndex(this.platforms, 8); this.platforms[1+(8)] = ct.rect(190, height - 45, 15, 15, "orange")
+        ct.checkArrayIndex(this.platforms, 9); this.platforms[1+(9)] = ct.rect(175, 35, 10, 2, "yellow")
+        ct.checkArrayIndex(this.platforms, 10); this.platforms[1+(10)] = ct.rect(155, 25, 10, 15, "yellow")
+        ct.checkArrayIndex(this.platforms, 11); this.platforms[1+(11)] = ct.rect(135, 15, 15, 20, "yellow")
         
+        
+        -- Two "twin" players (one facing left, one facing right)
+        -- Only one is visible at a time
         this.playerLeft = ct.image("stickmanleft.png", 10, 10, 10)
         this.playerLeft.visible = false
         this.playerRight = ct.image("stickmanright.png", 10, 10, 10)
         
-        -- only one player visible at a time
-        -- one facing left one right
         
     end
     
@@ -58,16 +69,17 @@ require('Code12.api')
         local width = ct.getWidth()
         local height = ct.getHeight()
         
+        -- Using ct.setScreenOrigin to adjust viewpoint of the "world"
         if this.playerRight.x > 100 or this.playerLeft.x > 100 then
-            
-            ct.setScreenOrigin(100, 0)
-            
-        end
+            ct.setScreenOrigin(100, 0); end
+        
+        if this.playerRight.x < 100 or this.playerLeft.x < 100 then
+            ct.setScreenOrigin(0, 0); end
         
         if this.playerRight.x > 200 or this.playerLeft.x > 200 then
-            
-            ct.setScreenOrigin(200, 0)
-        end
+            ct.setScreenOrigin(200, 0); end
+        if this.playerRight.y <= 0 then
+            ct.setScreenOrigin(0, -100); end
         
         if this.playerRight.y >= height then
             
@@ -75,6 +87,7 @@ require('Code12.api')
             ct.println("You died!")
         end
         
+        -- Simple gravity mechanics
         this.playerRight.ySpeed = this.playerRight.ySpeed + (this.gravity)
         this.playerLeft.ySpeed = this.playerLeft.ySpeed + (this.gravity)
         
@@ -87,18 +100,24 @@ require('Code12.api')
             -- Check to see if player hit a platform
             if this.playerRight:hit(platform) or this.playerLeft:hit(platform) then
                 
+                this.playerRight.ySpeed = 0.0
+                this.playerLeft.ySpeed = 0.0
                 -- so we've established that the player collided with a platform, but..
                 
                 -- if hit from top of platform, this occurs
                 if this.playerRight.y < (platform.y - platform.height / 2) or this.playerLeft.y < (platform.y - platform.height / 2) then
                     
-                    ct.println("Player hit a platform")
-                    this.playerRight.ySpeed = 0.0
-                    this.playerLeft.ySpeed = 0.0
+                    ct.println("Player hit a platform from the top")
                     
                     this.playerRight.y = platform.y - (platform.height / 2 + this.playerRight.height / 2)
                     this.playerLeft.y = platform.y - (platform.height / 2 + this.playerLeft.height / 2)
                     this.onGround = true
+                
+                else 
+                    
+                    ct.println("rebound against platform")
+                    _fn.endJump()
+                    --playerRig
                 end
                 
                 -- else, fall back to ground
@@ -198,12 +217,16 @@ require('Code12.api')
             this.playerLeft.visible = false
             this.playerRight.xSpeed = this.playerRight.xSpeed + (1)
             this.playerLeft.xSpeed = this.playerLeft.xSpeed + (1)
-            
+            local i = 0; while i < this.clouds.length do
+                
+                ct.checkArrayIndex(this.clouds, i); this.clouds[1+(i)].xSpeed = ct.indexArray(this.clouds, i).xSpeed + (0.001)
+                if ct.indexArray(this.clouds, i).x > ct.getWidth() then
+                    
+                    ct.indexArray(this.clouds, i):delete()
+                    ct.checkArrayIndex(this.clouds, i); this.clouds[1+(i)] = nil
+                end
+            i = i + 1; end
         end
-        
-        
-        
-        
         
     end
 
