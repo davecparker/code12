@@ -195,7 +195,7 @@ function app.processUserFile()
 	else
 		-- Make and run the Lua code
 		local codeStr = codeGenJava.getLuaCode( parseTrees )
-		if err.hasErr() then
+		if err.rec then
 			composer.gotoScene( "errView" )
 		else
 			writeLuaCode( codeStr )

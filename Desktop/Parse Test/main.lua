@@ -112,7 +112,6 @@ local function parseTestCode()
 			output( "************** Beginning of Expected Errors Section **************" )
 		else
 			-- Parse this line
-			err.clearErr()
 			local tree, tokens = parseJava.parseLine( strCode, lineNum, startTokens )
 			if tree == false then
 				-- This line is unfinished, carry the tokens forward to the next line
@@ -122,11 +121,7 @@ local function parseTestCode()
 				startTokens = nil
 				if tree == nil then
 					-- This line has an error on it, output it.
-					if not err.hasErr() then
-						output( "*** Missing error state!")
-					else
-						output( err.getErrString() )
-					end
+					output( err.getErrString( err.rec ) or "*** Missing error state!" )
 
 					-- Count the error
 					if errorSection then
@@ -141,14 +136,15 @@ local function parseTestCode()
 						-- Ignore blank lines
 						if tree.p ~= "blank" and tree.p ~= "comment" then
 							numUncaughtErrors = numUncaughtErrors + 1
-                     outFile:write( "*** Uncaught Error "..numUncaughtErrors.."\n" )
+							outFile:write( "*** Uncaught Error "..numUncaughtErrors.."\n" )
 						end
 					end
-               -- Output parse tree to output file only
-               parseJava.printParseTree( tree, 0, outFile )
+					-- Output parse tree to output file only
+					parseJava.printParseTree( tree, 0, outFile )
 				end
 			end
 		end
+		err.clearErr( lineNum )
 		lineNum = lineNum + 1
 	end
 	local endTime = math.round( system.getTimer() - startTime )  -- to nearest ms

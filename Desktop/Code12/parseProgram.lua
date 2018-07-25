@@ -35,18 +35,19 @@ local function parseClassHeader()
 	local foundCode12Import = false
 	while lineNum <= numLines do
 		-- Try to parse the line
+		-- TODO: parse lines ahead of time
 		local tree = parseJava.parseLine( sourceLines[lineNum], 
 							lineNum, nil, syntaxLevel )
-		if not tree then
-			if err.getErrField( "pattern" ) == "import" then
-				local node = err.getErrField( "nodes" )[2]
+		if tree == nil then
+			if err.rec.pattern == "import" then
+				local node = err.rec.nodes[2]
 				if node and node.str ~= "Code12" then
-					err.clearErr()   -- clear generic bad import error
+					err.clearErr( lineNum )   -- clear generic bad import error
 					err.setErrLineNum( lineNum, "Code12 programs should import only Code12.*" )
 				end
 				return false   -- invalid import
 			end
-			err.clearErr()  -- other parse error, use better error below
+			err.clearErr( lineNum )  -- other parse error, use better error below
 			break    
 		end
 
@@ -93,7 +94,7 @@ local function parseBlockBegin()
 		local tree = parseJava.parseLine( sourceLines[lineNum], 
 							lineNum, nil, syntaxLevel )
 		if not tree then
-			err.clearErr()  -- parse error, use better error below
+			err.clearErr( lineNum )  -- parse error, use better error below
 			break    
 		end
 

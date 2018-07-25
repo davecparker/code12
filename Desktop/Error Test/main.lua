@@ -31,7 +31,6 @@ local sourceFile = {
 local numUnexpectedErrors = 0
 local numExpectedErrors = 0
 local numUncaughtErrors = 0
-local strErrorFromLineNum = {}     -- err received at each line number
 local errLast                      -- the last error reported
 
 -- Text objects in the app window
@@ -84,19 +83,6 @@ local function trim1(s)
 	return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
--- Handle an error reported by Code12's error checking
-local function onLogError( errRecord )
-	-- Only log the first error on each line
-	if errLast and errLast.loc.first.iLine == errRecord.loc.first.iLine then
-		return
-	end
-	errLast = errRecord
-
-	-- Store the error in our array of errors by line number
-	local lineNum = errRecord.loc.first.iLine
-	strErrorFromLineNum[lineNum] = errRecord.strErr
-end
-
 -- Return the expected error text for the given lineNum,
 -- or "" if unspecified, or nil if none.
 local function strErrExpected( lineNum )
@@ -121,12 +107,13 @@ end
 local function checkErrorResults()
 	for lineNum = 1, #sourceFile.strLines do
 		local strCode = sourceFile.strLines[lineNum]
-		local strErr = strErrorFromLineNum[lineNum]
+		local errRec = err.getLoggedErrForLine( lineNum )
 		local strExpected = strErrExpected( lineNum )
 
 		-- Did we get an error on this line?
-		if strErr then
+		if errRec then
 			-- We got an error. Was it what we expected? 
+			local strErr = errRec.strErr
 			if strExpected then
 				if strExpected == "" then
 					-- Unspecified error (fine)
@@ -174,11 +161,10 @@ local function checkTestCode()
 	numUnexpectedErrors = 0
 	numExpectedErrors = 0
 	numUncaughtErrors = 0
-	strErrorFromLineNum = {}
 	local startTime = system.getTimer()
 
-	-- Install special Code12 hook to log errors and continue instead of stopping
-	err.setFnLogErr( onLogError )
+	-- Tell Code12 to log all errors instead of stopping
+	err.logAllErrors()
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
@@ -198,9 +184,9 @@ local function checkTestCode()
 			if tree == nil then
 				-- We don't expect any parse errors
 				output( lineNum .. ". " .. trim1( strCode ) )
-				output( "*** Unexpected parse error: " .. err.getErrString() .. "\n" )
+				output( "*** Unexpected parse error: " .. 
+						err.getLoggedErrForLine( lineNum ).strErr .. "\n" )
 				numUnexpectedErrors = numUnexpectedErrors + 1
-				err.clearErr()   -- leave this tree nil and continue
 			end
 			parseTrees[#parseTrees + 1] = tree
 		end
@@ -209,10 +195,8 @@ local function checkTestCode()
 	local endParseTime = system.getTimer()
 
 	-- Do Semantic Analysis and Code Generation on the parse trees
-	err.clearErr()
 	checkJava.initProgram( parseTrees, syntaxLevel )
 	local endCheckTime = system.getTimer()
-	err.clearErr()
 	codeGenJava.getLuaCode( parseTrees )
 	local endCodeGenTime = system.getTimer()
 

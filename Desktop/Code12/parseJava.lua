@@ -307,18 +307,19 @@ local line = { t = "line",
 	{ 1, 0, "stmt", 		stmt, "END", 										iNode = 2 }, 
 	{ 9, 0, "return", 		"return", expr, "END", 								iNode = 3, 
 			strErr = "Statement should end with a semicolon (;)" },
-	{ 1, 0, "stmt", 		stmt, ";", 1, 										iNode = 3, 
+	{ 1, 0, "stmt", 		stmt, ";", 2,
 			strErr = "Code12 only allows one statement per line" },
 	{ 3, 0, "varInit",		"ID", "ID", "=", expr, "END",						iNode = 5 }, 
-	{ 3, 0, "varDecl",		"ID", idList, "END",								iNode = 3 }, 
 	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, "END",				iNode = 6 }, 
-	{ 12, 0, "arrayInit",	"ID", "[", "]", "ID", "=", arrayInit, "END", 		iNode = 7 },
+	{ 12, 0, "arrayInit",	"ID", "[", "]", "ID", "=", arrayInit, "END", 		iNode = 7,
+			strErr = "Variable initialization should end with a semicolon (;)" },
+	{ 3, 0, "varDecl",		"ID", idList, "END",								iNode = 3 }, 
 	{ 12, 0, "arrayDecl",	"ID", "[", "]", idList, "END",						iNode = 5,
 			strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ",",	1 },
-	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ";",	1 },
-	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ",", 1 }, 
-	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ";", 1, 
+	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ",",	"ID", "=", 1 },
+	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ";",	"ID", "ID", "=", 1 },
+	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
+	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ";", "ID", "ID", "=", 1, 
 			strErr = "Code12 requires each variable initialization to be on its own line" },
 	{ 8, 0, "if",			"if", "(", expr, ")", ";", 0,						iNode = 5 },
 	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,				iNode = 6,
@@ -393,7 +394,6 @@ function parseGrammar( grammar )
 			if nodes then
 				-- If this matched a common error then set the error state
 				if patternMaxLevel == 0 then
-					local iNode = pattern.iNode
 					local strErr = pattern.strErr
 					if not strErr then
 						-- This common error pattern doesn't specify the strErr,
@@ -406,13 +406,17 @@ function parseGrammar( grammar )
 						until patErr.strErr ~= nil
 						strErr = patErr.strErr
 					end
+					local errInfo = {
+						strErr = strErr,
+						pattern = pattern[3],
+						nodes = nodes,
+					}
+					local iNode = pattern.iNode
 					if iNode then
-						err.setErrNode( nodes[iNode], strErr )
+						err.setErrNode( nodes[iNode], errInfo )
 					else
-						err.setErrLineNum( nodes[1].iLine, strErr )
+						err.setErrLineNum( tokens[1].iLine, errInfo )
 					end
-					err.setErrField( "pattern", pattern[3] )  -- pattern name
-					err.setErrField( "nodes", nodes )
 				end
 
 				-- This pattern matches, so make a grammar node and return it
@@ -497,60 +501,53 @@ function parsePattern( pattern )
 end
 
 -- Try to parse the current token stream as a line of code at the given
--- syntax level. If successful then return the parseTree. 
--- To match common errors specified in the grammar pass true for
--- matchCommonErrors, otherwise leave it nil for normal parsing.
--- If a parse cannot be made then return nil with the error state as set by
--- the parser or a generic syntax error if the specific error is not known.
-local function parseLineGrammar( level, matchCommonErrors )
-	-- Reset the parse state and parse the current token stream at level
-	err.clearErr()
-	syntaxLevel = level
-	maxSyntaxLevel = (matchCommonErrors and 0) or level
-	iToken = 1
-	return parseGrammar( line )
-end
-
--- Try to parse the current token stream as a line of code at the given
 -- syntax level. If successful then return the parseTree, otherwise
 -- return nil and set the error state. 
 -- If parsing failed at this level but would succeed at a higher level, 
 -- then set the error state to indicate this.
 local function parseCurrentLine( level )
 	-- Try at the requested syntax level first
-	local parseTree = parseLineGrammar( level )
+	syntaxLevel = level
+	maxSyntaxLevel = level
+	iToken = 1
+	local parseTree = parseGrammar( line )
 	if parseTree then
 		return parseTree  -- success
 	end
 
 	-- Try common errors at the given syntax level
-	parseTree = parseLineGrammar( level, true )
+	local iLine = tokens[1].iLine
+	err.clearErr( iLine )
+	maxSyntaxLevel = 0   -- causes common errors to also be considered
+	iToken = 1
+	parseTree = parseGrammar( line )
 	if parseTree then
-		assert( err.hasErr() )
 		return nil  -- matched common error
 	end	
 
 	-- Try parsing at higher levels
 	for tryLevel = level + 1, numSyntaxLevels do
-		parseTree = parseLineGrammar( tryLevel, true )
+		err.clearErr( iLine )
+		syntaxLevel = tryLevel
+		maxSyntaxLevel = 0   -- also match common errors
+		iToken = 1
+		parseTree = parseGrammar( line )
 		if parseTree then
 			-- Report error with minimum level required
-			err.clearErr()   -- in case we matched a common error
+			err.clearErr( iLine )   -- in case we matched a common error
 			local lastToken = tokens[#tokens - 1]  -- not counting the END
 			err.setErrTokenSpan( tokens[1], lastToken,
-					"Use of %s requires syntax level %d",
+					{ strErr = "Use of %s requires syntax level %d",
+					  level = tryLevel },
 					syntaxFeatures[tryLevel], tryLevel )
-			err.setErrField( "level", tryLevel )
 			return nil
 		end
 	end
 
 	-- TODO: Try modified patterns to isolate the error
 
-	-- Make a generic syntax error if the error is unknown
-	if not err.hasErr() then
-		err.setErrLineNum( tokens[1].iLine, "Syntax error (unrecognized code)" )
-	end
+	-- Make a generic syntax error to use if a more specific error was not set
+	err.setErrLineNum( tokens[1].iLine, "Syntax error (unrecognized code)" )
 	return nil
 end
 
@@ -566,7 +563,7 @@ end
 -- If startTokens is not nil, it is an array of tokens from a previous unfinished
 -- line to prepend to the tokens found on this line.
 -- Return the parse tree (recursive array of tokens and/or nodes).
--- The given lineNumber will be assigned to the tokens found.
+-- The given lineNumber will be assigned to the tokens found and the resulting tree.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
 function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
@@ -611,8 +608,10 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 	assert( tokens[#tokens].tt == "END" )
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
 	if lastToken and lastToken.tt == "," then
+		err.markIncompleteLine( lineNumber )
 		return false, tokens
 	end
+
 
 	-- Try to parse the line
 	local tree = parseCurrentLine( level or numSyntaxLevels )

@@ -775,6 +775,7 @@ end
 
 -- Generate and return the Lua code string corresponding to parseTrees,
 -- which is an array of parse trees for each line of Java code.
+-- Return nil if there is an abortable error
 function codeGenJava.getLuaCode( parseTrees )
 	-- Set up the working state
 	javaParseTrees = parseTrees
@@ -784,7 +785,7 @@ function codeGenJava.getLuaCode( parseTrees )
 	luaLineNum = 1   
 
 	-- Process each parse tree
-	while iTree <= #parseTrees and not err.hasErr() do
+	while iTree <= #parseTrees do
 		local tree = javaParseTrees[iTree]
 
 		-- Add blank Lua lines to catch up to the Java line number if necessary
@@ -794,26 +795,28 @@ function codeGenJava.getLuaCode( parseTrees )
 		end
 
 		-- print( "getLuaCode line " .. iTree )
-		if not checkJava.doTypeChecks( tree ) and err.stopOnErrors() then
-			break
-		end
-		local p = tree.p
-		local nodes = tree.nodes
+		if checkJava.doTypeChecks( tree ) then
+			local p = tree.p
+			local nodes = tree.nodes
 
-		if not generateVarDecl( tree, true ) then
-			if enableComments and p == "comment" then
-				-- Full line comment
-				beginLuaLine( "--" )
-				addLua( nodes[1].str )
-			elseif p == "begin" then          -- {  in boilerplate code
-				blockLevel = blockLevel + 1
-			elseif p == "end" then            -- }  in boilerplate code
-				blockLevel = blockLevel - 1
-			elseif p == "func" then
-				-- User-defined function
-				generateFunction( nodes[3].str, nodes[5].nodes )
+			if not generateVarDecl( tree, true ) then
+				if enableComments and p == "comment" then
+					-- Full line comment
+					beginLuaLine( "--" )
+					addLua( nodes[1].str )
+				elseif p == "begin" then          -- {  in boilerplate code
+					blockLevel = blockLevel + 1
+				elseif p == "end" then            -- }  in boilerplate code
+					blockLevel = blockLevel - 1
+				elseif p == "func" then
+					-- User-defined function
+					generateFunction( nodes[3].str, nodes[5].nodes )
+				end
 			end
-		end		
+		end
+		if err.shouldStop() then
+			return nil
+		end
 		iTree = iTree + 1
 	end
 

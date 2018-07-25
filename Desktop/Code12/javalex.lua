@@ -101,9 +101,7 @@ local commentLevel		-- current nesting level for block comments (/* */)
 -- Set the error state using the the current lineNumber, the given char index range,
 -- and strErr plus any additional arguments for string.format( strErr, ... )
 local function setTokenErr( iCharFirst, iCharLast, strErr, ... )
-	local locStart = err.makeSrcLoc( lineNumber, iCharFirst )
-	local locEnd = err.makeSrcLoc( lineNumber, iCharLast )
-	err.setErr( err.makeErrLoc( locStart, locEnd ), nil, strErr, ... )
+	err.setErrCharRange( lineNumber, iCharFirst, iCharLast, strErr, ... )
 end
 
 -- Set the error state for an invalid character, and return nil.
