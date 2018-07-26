@@ -10,6 +10,7 @@
 
 -- The parsing module
 package.path = package.path .. ';../Code12/?.lua'
+local javalex = require( "javalex" )
 local parseJava = require( "parseJava" )
 local err = require( "err" )
 
@@ -97,7 +98,7 @@ local function parseTestCode()
 	local numExpectedErrors = 0
 	local numUncaughtErrors = 0
 	local startTime = system.getTimer()
-	parseJava.init()
+	parseJava.initProgram()
 	local lineNum = 1
 	local startTokens = nil
 	while lineNum <= #sourceFile.strLines do
@@ -119,7 +120,7 @@ local function parseTestCode()
 				outFile:write( "-- Incomplete line carried forward\n" )
 			else
 				startTokens = nil
-				if tree == nil then
+				if tree == nil or tree.isError then
 					-- This line has an error on it, output it.
 					output( err.getErrString( err.rec ) or "*** Missing error state!" )
 
@@ -139,8 +140,10 @@ local function parseTestCode()
 							outFile:write( "*** Uncaught Error "..numUncaughtErrors.."\n" )
 						end
 					end
-					-- Output parse tree to output file only
-					parseJava.printParseTree( tree, 0, outFile )
+					if tree.p ~= "blank" then
+						-- Output parse tree to output file only
+						parseJava.printParseTree( tree, 0, outFile )
+					end
 				end
 			end
 		end

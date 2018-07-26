@@ -278,7 +278,6 @@ local arrayInit = { t = "arrayInit",
 -- A line of code
 local line = { t = "line",
 	{ 1, 12, "blank",															"END" },
-	{ 1, 12, "comment",			"COMMENT",										"END" },
 	{ 1, 12, "stmt",			stmt, ";",										"END" },
 	{ 3, 12, "varInit",			"ID", "ID", "=", expr, ";",						"END" },
 	{ 3, 12, "varDecl",			"ID", idList, ";",								"END" },
@@ -296,7 +295,7 @@ local line = { t = "line",
 	{ 12, 12, "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
 	{ 12, 12, "arrayDecl",		"ID", "[", "]", idList, ";",					"END" },
 	-- Boilerplate lines
-	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
+	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",					"END" },
 	{ 1, 12, "class",			"class", "ID", 									"END" },
 	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",			"END" },
 	{ 1, 12, "main",			"public", "static", "void", "ID", 
@@ -406,16 +405,11 @@ function parseGrammar( grammar )
 						until patErr.strErr ~= nil
 						strErr = patErr.strErr
 					end
-					local errInfo = {
-						strErr = strErr,
-						pattern = pattern[3],
-						nodes = nodes,
-					}
 					local iNode = pattern.iNode
 					if iNode then
-						err.setErrNode( nodes[iNode], errInfo )
+						err.setErrNode( nodes[iNode], strErr )
 					else
-						err.setErrLineNum( tokens[1].iLine, errInfo )
+						err.setErrLineNum( tokens[1].iLine, strErr )
 					end
 				end
 
@@ -501,8 +495,9 @@ function parsePattern( pattern )
 end
 
 -- Try to parse the current token stream as a line of code at the given
--- syntax level. If successful then return the parseTree, otherwise
--- return nil and set the error state. 
+-- syntax level. If a match is found then return the parseTree, otherwise
+-- return nil and set the error state. If the match was for a known 
+-- common syntax error, then set isError = true in the parse tree.
 -- If parsing failed at this level but would succeed at a higher level, 
 -- then set the error state to indicate this.
 local function parseCurrentLine( level )
@@ -522,7 +517,8 @@ local function parseCurrentLine( level )
 	iToken = 1
 	parseTree = parseGrammar( line )
 	if parseTree then
-		return nil  -- matched common error
+		parseTree.isError = true
+		return parseTree  -- matched a common error
 	end	
 
 	-- Try parsing at higher levels
@@ -537,8 +533,7 @@ local function parseCurrentLine( level )
 			err.clearErr( iLine )   -- in case we matched a common error
 			local lastToken = tokens[#tokens - 1]  -- not counting the END
 			err.setErrTokenSpan( tokens[1], lastToken,
-					{ strErr = "Use of %s requires syntax level %d",
-					  level = tryLevel },
+					"Use of %s requires syntax level %d",
 					syntaxFeatures[tryLevel], tryLevel )
 			return nil
 		end
@@ -554,15 +549,15 @@ end
 
 ----- Module functions -------------------------------------------------------
 
--- Init the parsing state
-function parseJava.init()
-	javalex.init()
+-- Init the parsing state for a program
+function parseJava.initProgram()
+	javalex.initProgram()
 end
 
 -- Parse the given line of code at the given syntax level (default numSyntaxLevels).
 -- If startTokens is not nil, it is an array of tokens from a previous unfinished
 -- line to prepend to the tokens found on this line.
--- Return the parse tree (recursive array of tokens and/or nodes).
+-- Return the parse tree (a recursive array of tokens and/or nodes) if successful.
 -- The given lineNumber will be assigned to the tokens found and the resulting tree.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
@@ -591,18 +586,6 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		-- startTokens = nil
 	end
 
-	-- Discard comment tokens, except if the entire line is a comment
-	if #tokens > 2 then
-		local i = 1
-		while i <= #tokens do
-			if tokens[i].tt == "COMMENT" then
-				table.remove( tokens, i )
-			else
-				i = i + 1
-			end
-		end
-	end
-
 	-- If this line ends in a comma token, then it is unfinished
 	assert( #tokens > 0 )
 	assert( tokens[#tokens].tt == "END" )
@@ -611,7 +594,6 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		err.markIncompleteLine( lineNumber )
 		return false, tokens
 	end
-
 
 	-- Try to parse the line
 	local tree = parseCurrentLine( level or numSyntaxLevels )

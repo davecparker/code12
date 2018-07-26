@@ -15,73 +15,69 @@ local err = require( "err" )
 local parseProgram = {}
 
 
--- Parsing state
-local syntaxLevel       -- syntax level we are parsing at
-local sourceLines       -- array of source code strings for each line
-local numLines          -- number of source code lines
+-- Parsing structures
 local lineParseTrees    -- array of parse trees for each source line
-local lineNum           -- current line number
 local programTree       -- program parse tree we are building
 local outerItems        -- array of OuterItems in the parse tree
+
+-- Parsing state
+local numParseTrees     -- number of trees in lineParseTrees
+local iTree             -- current tree index in lineParseTrees being analyzed
+
 
 
 --- Internal Functions -------------------------------------------------------
 
--- Check for the correct Code12 import then class header, store the classID, 
--- and parse past the class header.
--- If there is an error then set the error state and return false.
--- Return true if succesful.
-local function parseClassHeader()
+-- Check for the correct Code12 import and parse past it.
+-- Return true if succesful, else set the error state and return false.
+local function parseImport()
+	-- Check all imports that we find
 	local foundCode12Import = false
-	while lineNum <= numLines do
-		-- Try to parse the line
-		-- TODO: parse lines ahead of time
-		local tree = parseJava.parseLine( sourceLines[lineNum], 
-							lineNum, nil, syntaxLevel )
-		if tree == nil then
-			if err.rec.pattern == "import" then
-				local node = err.rec.nodes[2]
-				if node and node.str ~= "Code12" then
-					err.clearErr( lineNum )   -- clear generic bad import error
-					err.setErrLineNum( lineNum, "Code12 programs should import only Code12.*" )
-				end
-				return false   -- invalid import
-			end
-			err.clearErr( lineNum )  -- other parse error, use better error below
-			break    
-		end
-
-		-- Look for imports and class, keep comments, and skip blank lines
+	while iTree <= numParseTrees do
+		local tree = lineParseTrees[iTree]
 		local p = tree.p
-		if p == "importCode12" then
-			if tree.nodes[2].str ~= "Code12" then
-				err.setErrLineNum( lineNum, "Code12 programs should import only Code12.*" )	
+		if p == "importAll" then
+			if tree.nodes[2].str == "Code12" then
+				foundCode12Import = true
+			else   -- a package but not Code12
+				err.setErrLineParseTree( tree, 
+						"Code12 programs should import only Code12.*" )	
 				return false
 			end
-			foundCode12Import = true
-		elseif p == "classUser" then
-			if not foundCode12Import or tree.nodes[5].str ~= "Code12Program" then
-				break    -- missing import or wrong superclass
+		elseif tree.isError and p == "import" then
+			local node = tree.nodes[2]
+			if node and node.str == "Code12" then   -- Code12 but wrong syntax
+				err.overrideErrLineParseTree( tree, 
+						"Code12 programs must start with:\n\"import Code12.*;\"" )
+			else   -- not Code12
+				err.overrideErrLineParseTree( tree, 
+						"Code12 programs should import only Code12.*" )
 			end
-			lineNum = lineNum + 1
-			programTree.classID = tree.nodes[3]  -- class name
-			return true   -- found both the import and class header we needed
-		elseif p == "comment" then
-			outerItems[#outerItems + 1] = tree    -- keep comments
-		elseif p ~= "blank" then
-			break  -- unexpected line
+			return false
+		else   -- Not an import
+			if foundCode12Import then
+				return true
+			end
+			err.overrideErrLineParseTree( tree,
+					"Code12 programs must start with:\n\"import Code12.*;\"" )
+			return false
 		end
-		lineNum = lineNum + 1
+		iTree = iTree + 1
 	end
+	return false  -- sentinel should prevent getting here
+end
 
-	-- Report the error
-	local strErr
-	if foundCode12Import then
-		strErr = "Code12 programs must start with:\n\"class YourName extends Code12Program\""
-	else
-		strErr = "Code12 programs must start with:\n\"import Code12.*;\""
+-- Check for the correct class header, store the classID, and parse past it. 
+-- Return true if succesful, else set the error state and return false.
+local function parseClassHeader()
+	local tree = lineParseTrees[iTree]
+	if tree.p == "classUser" and tree.nodes[5].str == "Code12Program" then
+		programTree.classID = tree.nodes[3]  -- class name
+		iTree = iTree + 1
+		return true
 	end
-	err.setErrLineNum( lineNum, strErr )	
+	err.overrideErrLineParseTree( tree,
+			"Code12 programs must start with:\n\"class YourName extends Code12Program\"" )	
 	return false
 end
 
@@ -89,71 +85,63 @@ end
 -- If there is an error then set the error state and return false.
 -- Return true if succesful.
 local function parseBlockBegin()
-	while lineNum <= numLines do
-		-- Try to parse the line
-		local tree = parseJava.parseLine( sourceLines[lineNum], 
-							lineNum, nil, syntaxLevel )
-		if not tree then
-			err.clearErr( lineNum )  -- parse error, use better error below
-			break    
-		end
-
-		-- Look for block begin, keep comments, and skip blank lines
-		local p = tree.p
-		if p == "begin" then
-			lineNum = lineNum + 1
-			return true
-		elseif p == "comment" then
-			outerItems[#outerItems + 1] = tree    -- keep comments
-		elseif p ~= "blank" then
-			break  -- unexpected line
-		end
-		lineNum = lineNum + 1
+	local tree = lineParseTrees[iTree]
+	if tree.p == "begin" then
+		iTree = iTree + 1
+		return true
 	end
-
-	-- Report the error
-	err.setErrLineNum( lineNum, "Expected {" )	
+	err.overrideErrLineParseTree( tree, "Expected {" )	
 	return false
 end
 
 
 --- Module Functions ---------------------------------------------------------
 
--- Parse a program made of up strLines at the given syntax level 
+-- Parse a program made of up sourceLines at the given syntaxLevel 
 -- and return the programTree (see above).
 -- If there is an error then set the error state and return nil.
-function parseProgram.getProgramTree( strLines, level )
-	-- Init the parse state
-	syntaxLevel = level
-	sourceLines = strLines
-	numLines = #sourceLines
+function parseProgram.getProgramTree( sourceLines, syntaxLevel )
+	-- Init the parse structures
 	lineParseTrees = {}
-	lineNum = 1
 	programTree = { items = {} }
 	outerItems = programTree.items
 
-	-- Parse the import and the class header and get the class name
-	parseJava.init()
-	if not parseClassHeader() or not parseBlockBegin() then
-		return nil
-	end
-
-	-- Parse the rest of the lines
+	-- Parse the lines and build the lineParseTrees array
+	parseJava.initProgram()
 	local startTokens = nil
-	while lineNum <= #sourceLines do
+	for lineNum = 1, #sourceLines do
 		local tree, tokens = parseJava.parseLine( sourceLines[lineNum], 
 									lineNum, startTokens, syntaxLevel )
 		if tree == false then
 			-- Line is incomplete, carry tokens forward to next line
+			assert( type(extra) == "table" )
 			startTokens = tokens
 		else
 			startTokens = nil
 			if tree == nil then
-				return nil   -- parse error
+				-- Syntax error: Use stub error tree
+				lineParseTrees[#lineParseTrees + 1] = 
+						{ isError = true, iLine = lineNum }
+			elseif tree.p ~= "blank" then
+				lineParseTrees[#lineParseTrees + 1] = tree
 			end
-			lineParseTrees[#lineParseTrees + 1] = tree
 		end
-		lineNum = lineNum + 1
+	end
+
+	-- Add sentinel parse tree at the end
+	lineParseTrees[#lineParseTrees + 1] = 
+			{ t = "line", p = "EOF", nodes = {}, iLine = #sourceLines + 1 }
+	numParseTrees = #lineParseTrees
+
+	-- Parse the required program header
+	iTree = 1
+	if parseImport() and parseClassHeader() then
+		parseBlockBegin()
+	end
+
+	-- Return parse trees for now
+	if err.shouldStop() then
+		return nil
 	end
 	return lineParseTrees
 end

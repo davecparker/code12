@@ -88,6 +88,7 @@ local chars     		-- array of ASCII codes for the source string
 local lineNumber        -- the line number for the source string
 local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
+local commentForLine    -- array of end-of-line comments indexed by line number
 
 
 ----- Token scanning functions ------------------------------------------------
@@ -267,7 +268,6 @@ end
 -- The current comment level is tracked in commentLevel.
 -- Before the initial call to this function, commentLevel should
 -- be set to 1 and iChar should be just past the initial /*
--- Return the index of the last char in the comment.
 local function skipBlockComment()
 	while true do
 		local ch = chars[iChar]
@@ -275,13 +275,13 @@ local function skipBlockComment()
 			iChar = iChar + 2
 			commentLevel = commentLevel - 1
 			if commentLevel == 0 then
-				return iChar - 3
+				return
 			end
 		elseif ch == 47 and chars[iChar + 1] == 42 then  -- /*
 			iChar = iChar + 2
 			commentLevel = commentLevel + 1
 		elseif ch == nil then
-			return iChar - 1  -- unclosed comment continues to next line
+			return    -- unclosed comment continues to next line
 		else
 			iChar = iChar + 1
 		end
@@ -289,7 +289,8 @@ local function skipBlockComment()
 end
 
 -- Return string for token starting with /  (/  /=)
--- or ("COMMENT", str) for a comment (either block or to end of line)
+-- or ("COMMENT", str) for a comment to end of line, 
+-- or just "COMMENT" for a block comment.
 local function slashToken()
 	iChar = iChar + 1
 	local charNext = chars[iChar]
@@ -303,8 +304,8 @@ local function slashToken()
 		iChar = iChar + 1
 		local iCharStart = iChar
 		commentLevel = 1
-		local iCharEnd = skipBlockComment()
-		return "COMMENT", string.sub( source, iCharStart, iCharEnd )
+		skipBlockComment()
+		return "COMMENT"
 	elseif charNext == 61 then   --  =
 		iChar = iChar + 1
 		return "/="
@@ -417,10 +418,10 @@ end
 
 ----- Module functions -------------------------------------------------------
 
--- Init the state of the lexer 
-function javalex.init()
-	-- We need to remember the nested block comment level across calls to getTokens
+-- Init the state of the lexer for a program
+function javalex.initProgram()
 	commentLevel = 0
+	commentForLine = {}
 end
 
 -- Return an array of tokens for the given source string and line number. 
@@ -435,7 +436,7 @@ end
 --     "STR": string literal (note that str includes the quotes)
 --     "BOOL": boolean literal (str is "false" or "true")
 --     "NULL": the null literal (str is "null")
---     "COMMENT": a comment (str is text of the comment not including the open/close)
+--     "COMMENT": a comment (str is comment text if to end of line, else nil)
 --     "END": the end of the source string (str is empty string)
 -- Return nil and set the error state if a token is malformed or illegal.
 function javalex.getTokens( sourceStr, lineNum )
@@ -450,7 +451,7 @@ function javalex.getTokens( sourceStr, lineNum )
 
 	-- Are we inside a block comment that started on a previous line?
 	if commentLevel > 0 then
-		skipBlockComment()  -- don't generate COMMENT tokens for multi-line comments 
+		skipBlockComment()  -- don't generate tokens for block comments 
 	end
 
 	-- Scan the chars array
@@ -492,37 +493,46 @@ function javalex.getTokens( sourceStr, lineNum )
 				token.tt = tt   -- reserved word
 			end
 			token.str = str
+			tokens[#tokens + 1] = token
 		elseif charType == false then   -- numeric 0-9
 			-- Number constant
 			token.tt, token.str = numericLiteralToken()
 			if token.tt == nil then
 				return nil
 			end
+			tokens[#tokens + 1] = token
 		elseif charType == nil then
 			-- End of source string
 			token.tt = "END"
 			token.str = " "
-			 -- We're done, so add this last token and return tokens array
 			tokens[#tokens + 1] = token
 			return tokens 
 		elseif type(charType) == "function" then
-			-- Possible multi-char token, or char or string literal
+			-- Possible multi-char token, char or string literal, or comment
 			local tt, str = charType()   -- tt, (tt, str) or (nil, errRecord)
 			if tt == nil then 
 				return nil   -- token error (e.g. unclosed string literal)
+			elseif tt == "COMMENT" then
+				-- Remember text for end-of-line comments (discard block comments)
+				commentForLine[lineNum] = str
+			else
+				token.tt = tt
+				token.str = str or tt    -- simple tokens are their own string
+				tokens[#tokens + 1] = token
 			end
-			token.tt = tt
-			token.str = str or tt    -- simple tokens are their own string
 		else
 			-- Single char token
 			iChar = iChar + 1
 			token.tt = charType    -- single char string
 			token.str = charType   -- simple tokens are their own string
+			tokens[#tokens + 1] = token
 		end 
-
-		-- Add token to tokens array
-		tokens[#tokens + 1] = token
 	until false   -- returns internally when end of string is found
+end
+
+-- Return the comment string at the end of the given line number or nil if none
+function javalex.commentForLine( lineNum )
+	return commentForLine[lineNum]
 end
 
 

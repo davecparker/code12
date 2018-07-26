@@ -9,8 +9,9 @@
 
 -- Code12 modules
 local err = require( "err" )
-local checkJava = require( "checkJava" )
+local javalex = require( "javalex" )
 local javaTypes = require( "javaTypes" )
+local checkJava = require( "checkJava" )
 
 
 -- The codeGen module
@@ -30,7 +31,7 @@ local blockLevel = 0          -- indent level (begin/end block level) for Lua co
 local ctDefined = false       -- true when ct is defined (within functions)
 
 -- Code generation options
-local enableComments = true   -- generate Lua comments for full-line Java comments
+local enableComments = true   -- generate Lua comments for end-of-line Java comments
 local enableIndent = true     -- indent the Lua code per the code structure
 
 -- Indentation for the Lua code
@@ -44,6 +45,7 @@ end
 -- The generated Lua code
 local luaCodeStrs             -- array of strings for bulk concat (many less than one line)
 local luaLineNum              -- Current line number in the Lua code
+local luaLineIsBlank          -- true if the current Lua line is blank so far
 
 -- Map supported Java binary operators to Lua operator code (Lua op plus spaces)
 local luaOpFromJavaOp = {
@@ -100,19 +102,39 @@ local nameFromLuaReservedWord = {
 
 -- Add strCode as the start of a new Lua line, or blank line if strCode is nil
 local function beginLuaLine( strCode )
+	-- Add comment to end of previous line if any
+	if enableComments then
+		local strComment = javalex.commentForLine( luaLineNum )
+		if strComment then
+			if luaLineIsBlank then
+				luaCodeStrs[#luaCodeStrs + 1] = "--"
+			else
+				luaCodeStrs[#luaCodeStrs + 1] = "   --"
+			end
+			luaCodeStrs[#luaCodeStrs + 1] = strComment
+		end
+	end
+
+	-- End the previous line
 	luaCodeStrs[#luaCodeStrs + 1] = "\n"
 	luaLineNum = luaLineNum + 1
+
+	-- Indent for the new line and start with the given code
 	if enableIndent then
 		luaCodeStrs[#luaCodeStrs + 1] = strIndents[blockLevel] or ""
 	end
 	if strCode then
 		luaCodeStrs[#luaCodeStrs + 1] = strCode
+		luaLineIsBlank = false
+	else
+		luaLineIsBlank = true
 	end
 end
 
 -- Add strCode as Lua code
 local function addLua( strCode )
 	luaCodeStrs[#luaCodeStrs + 1] = strCode
+	luaLineIsBlank = false
 end
 
 -- Remove the last "end" in the Lua code
@@ -352,7 +374,7 @@ local function generateVarDecl( tree, isInstanceVar )
 		-- varType idList ;
 		local vt = javaTypes.vtFromVarType( tree.nodes[1] )
 		local idList = tree.nodes[2].nodes
-		beginLuaLine( "" )   -- we may have multiple statements on this line
+		beginLuaLine()   -- we may have multiple statements on this line
 		for i = 1, #idList do
 			local nameNode = idList[i]
 			local varName = nameNode.str
@@ -424,7 +446,7 @@ local function generateVarDecl( tree, isInstanceVar )
 		-- varType [ ] idList ;
 		local vt = javaTypes.vtFromVarType( tree.nodes[1] )
 		local idList = tree.nodes[4].nodes
-		beginLuaLine( "" )   -- we may have multiple statements on this line
+		beginLuaLine()   -- we may have multiple statements on this line
 		for i = 1, #idList do
 			local nameNode = idList[i]
 			local varName = nameNode.str
@@ -550,7 +572,7 @@ local function generateForLoop( tree )
 		local forInit = nodes[1]
 		local forExpr = nodes[3]
 		local forNext = nodes[5]
-		beginLuaLine( "" )    -- We will put the loop header on one line
+		beginLuaLine()    -- We will put the loop header on one line
 		checkJava.beginLocalBlock()
 
 		-- Do the forInit if any
@@ -608,15 +630,8 @@ local function generateBlockLine( tree )
 	local nodes = tree.nodes
 	if p == "stmt" then
 		-- stmt ;
-		beginLuaLine( "" )
+		beginLuaLine()
 		generateStmt( nodes[1] )
-	elseif p == "blank" then
-		-- blank
-		return
-	elseif enableComments and p == "comment" then
-		-- Full line comment
-		beginLuaLine( "--" )
-		addLua( nodes[1].str )
 	elseif generateVarDecl( tree, false ) then
 		-- Processed a local varInit, constInit, or varDecl
 		return
@@ -695,7 +710,7 @@ local function generateBlock()
 		local tree = javaParseTrees[iTree]
 		assert( tree.iLine ~= nil )
 		while luaLineNum < tree.iLine - 1 do
-			beginLuaLine( "" )
+			beginLuaLine()
 		end
 
 		local p = tree.p
@@ -791,7 +806,7 @@ function codeGenJava.getLuaCode( parseTrees )
 		-- Add blank Lua lines to catch up to the Java line number if necessary
 		assert( tree.iLine ~= nil )
 		while luaLineNum < tree.iLine - 1 do
-			beginLuaLine( "" )
+			beginLuaLine()
 		end
 
 		-- print( "getLuaCode line " .. iTree )
@@ -800,11 +815,7 @@ function codeGenJava.getLuaCode( parseTrees )
 			local nodes = tree.nodes
 
 			if not generateVarDecl( tree, true ) then
-				if enableComments and p == "comment" then
-					-- Full line comment
-					beginLuaLine( "--" )
-					addLua( nodes[1].str )
-				elseif p == "begin" then          -- {  in boilerplate code
+				if p == "begin" then          -- {  in boilerplate code
 					blockLevel = blockLevel + 1
 				elseif p == "end" then            -- }  in boilerplate code
 					blockLevel = blockLevel - 1

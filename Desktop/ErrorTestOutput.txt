@@ -6,7 +6,7 @@
 *** Unexpected error text: Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()
 
 40. ct.circle("Nope", "This", "is", "wrong");
-*** Unexpected error: Parameter 1 of circle expects type double, but String was passed
+*** Unexpected error: Parameter 1 of ct.circle expects type double, but String was passed
 
 ======= Test Complete =========================================
 

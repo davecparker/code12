@@ -1,10 +1,11 @@
 // OK
 
 import Code12.*;
-//import java.util.Scanner;
-import Code12.*;
+// import java.util.Scanner;
+// import Code12.*;
 // int foo = 5;
 // OK
+
 class TestProgram extends Code12Program
 // int foo = 6;
 {
@@ -17,12 +18,14 @@ class TestProgram extends Code12Program
       Code12.run(new TestProgram()); 
    }
    
+   // Start function
    public void start()
    {
+      // Make the background
       ct.setBackImage("underwater.jpg");
       dot = ct.circle(50, 50, 10);
       GameObj t = ct.rect(25, 75, 10, 50);
-      t.group = "targets";
+      t.group = "targets";   // things we can delete
       t = ct.rect(75, 75, 10, 50);
       t.group = "targets";
       t = ct.text("Hello", 50, 25, 10);
@@ -57,6 +60,7 @@ class TestProgram extends Code12Program
          ct.setScreenOrigin(xOrigin, yOrigin);
       }
 
+      // Move the dot with the arrow keys
       final double SPEED = 0.2;
       if (ct.keyPressed("left"))
          dot.x -= SPEED;

@@ -11,7 +11,7 @@
 -- Code12 modules
 package.path = package.path .. ';../Code12/?.lua'
 local err = require( "err" )
-local parseJava = require( "parseJava" )
+local parseProgram = require( "parseProgram" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
 
@@ -26,6 +26,7 @@ local sourceFile = {
 	path = nil,              -- full pathname to the file
 	strLines = {},           -- array of source code lines when read
 }
+local syntaxLevel = 12       -- test at max syntax level
 
 -- Error data
 local numUnexpectedErrors = 0
@@ -168,30 +169,7 @@ local function checkTestCode()
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
-	local parseTrees = {}
-	local startTokens = nil
-	parseJava.init()
-	local lineNum = 1
-	while lineNum <= #sourceFile.strLines do
-		local strCode = sourceFile.strLines[lineNum]
-		local tree, tokens = parseJava.parseLine( strCode, 
-									lineNum, startTokens, syntaxLevel )
-		if tree == false then
-			-- Line is incomplete, carry tokens forward to next line
-			startTokens = tokens
-		else
-			startTokens = nil
-			if tree == nil then
-				-- We don't expect any parse errors
-				output( lineNum .. ". " .. trim1( strCode ) )
-				output( "*** Unexpected parse error: " .. 
-						err.getLoggedErrForLine( lineNum ).strErr .. "\n" )
-				numUnexpectedErrors = numUnexpectedErrors + 1
-			end
-			parseTrees[#parseTrees + 1] = tree
-		end
-		lineNum = lineNum + 1
-	end
+	local parseTrees = parseProgram.getProgramTree( sourceFile.strLines, syntaxLevel )
 	local endParseTime = system.getTimer()
 
 	-- Do Semantic Analysis and Code Generation on the parse trees
@@ -208,7 +186,7 @@ local function checkTestCode()
 	output( "" )
 	outputAndDisplay( "Semantic Error Test:" )
 	outputAndDisplay( "" )
-	outputAndDisplay( string.format( "    %d lines processed", lineNum - 1 ) )
+	outputAndDisplay( string.format( "    %d lines processed", #sourceFile.strLines ) )
 	outputAndDisplay( string.format( "    %d ms Parse time", endParseTime - startTime ) )
 	outputAndDisplay( string.format( "    %d ms Semantic check time", endCheckTime - endParseTime ) )
 	outputAndDisplay( string.format( "    %d ms Code Generation time", endCodeGenTime - endCheckTime ) )
