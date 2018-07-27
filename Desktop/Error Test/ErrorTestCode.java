@@ -8,6 +8,15 @@ class ErrorTest extends Code12Program
 	}
 
 	// user defined functions
+	void errorFunc()
+	{
+		ct.println("Hello world");
+	}
+	// ERROR "Code12 API functions cannot be called before start()"
+	errorFunc();
+	void emptyFunc()
+	{
+	}
 	void voidFunc()
 	{
 		int i = 0;
@@ -140,9 +149,12 @@ class ErrorTest extends Code12Program
 		i = recursiveFunc(2);
 
 		// expressions
+		i = 5 / 1;
+		i = 100 / 20;
 		i = i + i;
 		i = i - i;
 		i = i * i;
+		i = i % i;
 		i = i * i + i - i;
 		i = i * ((i + i) - i);
 		d = i;
@@ -150,14 +162,17 @@ class ErrorTest extends Code12Program
 		d = d - i;
 		d = d * i;
 		d = d / i;
+		d = d % i;
 		d = i + d;
 		d = i - d;
 		d = i * d;
-		d = i / d;		
+		d = i / d;
+		d = i % d;
 		d = d + d;
 		d = d - d;
 		d = d * d;
 		d = d / d;
+		d = d % d;
 		d = i - i + i * i;
 		d = d + i * i - i;
 		d = i * i - d * d;
@@ -180,11 +195,13 @@ class ErrorTest extends Code12Program
 		b = d == i;
 		b = d == d;
 		b = b == b;
+		b = gObj == gObj;
 		b = i != i;
 		b = i != d;
 		b = d != i;
 		b = d != d;
 		b = b != b;
+		b = gObj != gObj;
 		b = i < i;
 		b = i > i;
 		b = i <= i;
@@ -574,6 +591,56 @@ class ErrorTest extends Code12Program
 	GameObj button = ct.text("START", 0, 0, 10);
 	// ERROR "Code12 API functions cannot be called before start()"
 	double WIDTH = ct.getWidth();
+	// ERROR "is reserved for use by the system"
+	void ct()
+	{
+		ct.println("Hello world");
+	}
+	// ERROR "Names cannot start with an underscore in Code12"
+	int _fn()
+	{
+		return 0;
+	}
+	// ERROR "int is a type name, expected a function name here"
+	double int()
+	{
+		return 0;
+	}
+	// ERROR "boolean is a type name, expected a variable name here"
+	double foo(int i, GameObj boolean)
+	{
+		return 0;
+	}
+	// ERROR "Code12 does not allow names that differ only by upper/lower case from known names ("GameObj" is a type name)"
+	boolean bar(String s, GameObj gameObj)
+	{
+		// ERROR "Incorrect case for constant, should be "true""
+		return TRUE;
+	}
+	// ERROR "Code12 does not allow names that differ only by upper/lower case from known names ("double" is a type name)"
+	int Double(int x)
+	{
+		return 2 * x;
+	}
+
+	// ERROR "Function voidFunc is already defined"
+	void voidFunc(int i)
+	{
+	}
+	void func()
+	{
+	}
+	// ERROR "differs only by upper/lower case from existing function"
+	void FUNC()
+	{
+	}
+	void AnotherFunc()
+	{
+	}	
+	// ERROR "differs only by upper/lower case from existing function"
+	// void anotherfunc() // crash
+	// {
+	// }
 
 	void expectedErrors()
 	{
@@ -755,9 +822,9 @@ class ErrorTest extends Code12Program
 		// ERROR "must be assigned before it is used"
 		g.xSpeed = 1;
 
-		// ERROR "Unknown variable type "integer"
+		// ERROR "Unknown variable type"
 		integer n = 100;
-		// ERROR "Unknown variable type "bool"
+		// ERROR "Unknown variable type"
 		bool gameOver = false;
 		// ERROR "Unknown API function"
 		GameObj r = ct.rectangle(0,0,10,10);
@@ -821,7 +888,16 @@ class ErrorTest extends Code12Program
 		// ERROR "The source variable in a for-each loop must be an array"
 		for (int x : intVar)
 		// ERROR "The source variable in a for-each loop must be an array"
+		for (double x : dblVar)
+		// ERROR "The source variable in a for-each loop must be an array"
+		for (boolean x : boolVar)
+		// ERROR "The source variable in a for-each loop must be an array"
+		for (String x : strVar)
+		// ERROR "The source variable in a for-each loop must be an array"
+		for (GameObj x : objVar)
+		// ERROR "The source variable in a for-each loop must be an array"
 		for (GameObj x : strVar)
+		
 		// ERROR "Array "intArr" contains elements of type int"
 		for (double x : intArr)
 		// ERROR "Array "objArr" contains elements of type GameObj"
@@ -894,6 +970,160 @@ class ErrorTest extends Code12Program
 		i = i << 2;
 		// ERROR "Unsupported operator"
 		i = i >>> 2;
+
+		// ERROR "is reserved for use by the system"
+		String ct;
+		// ERROR "Names cannot start with an underscore in Code12"
+		GameObj _fn;
+		// ERROR " is a type name, expected a variable name here"
+		int String;
+		// ERROR " is a type name, expected a variable name here"
+		double GameObj;
+
+		int lowercasefirst = 1;
+		// ERROR "Names are case-sensitive, known name is"
+		int lowerCaseFirst = 10;
+		GameObj upperCaseFirst = objVar;
+		// ERROR "Names are case-sensitive, known name is"
+		GameObj uppercasefirst = null;
+		// ERROR "Names are case-sensitive, known name is"
+		dblVar = dblvar + 1;
+
+		
+		// ERROR "Code12 does not allow names that differ only by upper/lower case from known names"
+		int DouBle;
+		// ERROR "Code12 does not allow names that differ only by upper/lower case from known names"
+		double BooLean;
+		// ERROR "Code12 does not allow names that differ only by upper/lower case from known names"
+		boolean string;
+
+		// ERROR "An index in [brackets] can only be applied to an array"
+		intVar[0] = 1;
+
+		// ERROR "Array index must be an integer value"
+		intArr[dblVar] = 1;
+
+		// ERROR "Arrays can only access their ".length" field
+		int numObjs = objArr.Length;
+
+		// ERROR "Type String has no data fields"
+		int len = strVar.length;
+		// ERROR "Type int has no data fields"
+		int size = intVar.size;
+
+		// ERROR "The negate operator (-) can only apply to numbers"
+		objVar = -objVar;
+
+		// ERROR "The not operator (!) can only apply to boolean values"
+		objVar.visible = !intVar;
+
+		// ERROR "The (+) operator cannot be applied to arrays"
+		strVar = strVar + intArr;
+		// ERROR "The (+) operator cannot be applied to arrays"
+		strVar = intArr + strVar;
+
+		// ERROR "The (+) operator can only apply to numbers or Strings"
+		boolVar = boolVar + !boolVar;
+		// ERROR "The (+) operator can only apply to numbers or Strings"
+		objVar = objVar + objVar;
+		// ERROR "The (+) operator can only apply to numbers or Strings"
+		intArr = intArr + 1;
+		// ERROR "The (+) operator can only apply to numbers or Strings"
+		objArr = objArr + objVar;
+
+		// ERROR "Numeric operator (-) can only apply to numbers"
+		strVar = strVar - intVar;
+		// ERROR "Numeric operator (*) can only apply to numbers"
+		boolVar = boolVar * 0;
+		// ERROR "Numeric operator (/) can only apply to numbers"
+		objVar = objVar / 2;
+		// ERROR "Numeric operator (%) can only apply to numbers"
+		intArr = intArr % 2;
+
+		// ERROR "Logical operator (&&) can only apply to boolean values"
+		intVar = intVar && 1001;
+		// ERROR "Logical operator (||) can only apply to boolean values"
+		boolVar = boolVar || 1010;
+
+		// ERROR "Inequality operator (<) can only apply to numbers"
+		if (boolVar < boolVar)
+		// ERROR "Inequality operator (>) can only apply to numbers"
+		boolVar = objVar > dblVar;
+		// ERROR "Inequality operator (<=) can only apply to numbers"
+		while( boolVar <= intVar )
+		// ERROR "Inequality operator (>=) can only apply to numbers"
+		dblVar = dblVar >= intArr;
+
+		// ERROR "Integer divide has remainder. Use double or ct.intDiv()"
+		intVar = 1 / 2;
+		// ERROR "Integer divide has remainder. Use double or ct.intDiv()"
+		dblVar = 3 / 8;
+
+		// ERROR "Variable intVar was already defined"
+		int intVar = 13;
+		// ERROR "Variable objArr was already defined"
+		GameObj[] objArr = new GameObj[10];
+
+		// ERROR "Method call on invalid type"
+		intArr.voidFunc();
+	}
+
+	// ERROR "Return type of update function should be void"
+	GameObj update()
+	{
+	}
+	// ERROR "Return type of onMousePress function should be void"
+	String onMousePress( GameObj obj, double x, double y )
+	{
+	}
+	// ERROR "Wrong number of parameters for function"
+	void onMousePress( double x, double y )
+	{
+	}
+	// ERROR Wrong number of parameters for function"
+	void onKeyPress( GameObj obj, double x, double y )
+	{
+	}
+
+	// ERROR "Wrong number of parameters for function"
+	// void onKeyRelease( ) // crash
+	// {
+	// }
+
+	// ERROR "Wrong type for parameter 1 of function onMousePress"
+	void onMousePress( boolean obj, double x, double y )
+	{
+	}
+
+	// ERROR "Wrong type for parameter 2 of function onMouseDrag"
+	void onMouseDrag( GameObj obj, int x, double y )
+	{
+	}
+
+	// ERROR "Wrong type for parameter 3 of function"
+	void onMouseRelease( GameObj obj, double x, String y )
+	{
+	}
+
+	// ERROR "Wrong type for parameter 1 of function"
+	void onKeyPress( double keyName )
+	{
+	}
+
+	// ERROR "Wrong type for parameter 1 of function"
+	void onKeyRelease( int keyName )
+	{
+	}
+
+	// ERROR "Wrong type for parameter 1 of function"
+	void onCharTyped( GameObj keyName )
+	{
+	}
+
+	int myVar = 1;
+	// ERROR "Variable myVar was already defined"
+	void myFunc(int myVar)
+	{
 	}
 
 }

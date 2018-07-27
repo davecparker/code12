@@ -581,7 +581,7 @@ int package;
 int private;	
 int protected;
 int public;	
-int return;	
+int return()
 int static;	
 int strictfp;	
 int super;
@@ -599,7 +599,7 @@ boolean true;
 boolean false;
 int null;
 
-// Syntax errors
+void foo.x()    // function definition with . as part of identifier
 x = 10          // missing ; in stmt
 int x = 10		// missing ; in varInit
 int x 			// missing ; in varDecl
@@ -652,6 +652,10 @@ for{int i=0; i<n; i++} 	// {} in place of ()
 for (int i==0; i<n; i++)// == instead of =
 for( x : arr ) 			// forgetting variable type
 for( int x; arr ) 		// using ; instead of : 
+for( int[] x : arr )
+for( int x : arr[] )
+for( arr : int x )
+for (String x : "string literal")
 double foo(x, y, z) 	// missing variable types for arguments in function definition
 double foo[i]()			// index on function identifier
 ct.println; 			// missing parenteses for function call without arguments
@@ -697,7 +701,7 @@ for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
 int _var; // variable indentifiers starting with underscore
 int $var; // $
 double pay$;
-int x[];	// arryas must be declared with [] between type and identifier
+int x[];	// arrays must be declared with [] between type and identifier
 public abstract class Account 
 assert x != null : "x variable is null";
 case 0 :

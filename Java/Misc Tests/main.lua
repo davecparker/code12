@@ -10,10 +10,8 @@ require('Code12.api')
     
     function _fn.start()
         
-        ct.println(3e)
     end
     
     function _fn.update()
         
     end
-    
