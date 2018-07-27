@@ -11,7 +11,7 @@ require('Code12.api')
     
     this.xOrigin = 50
     this.yOrigin = 0
-    this.dot = nil; 
+    this.dot = nil; this.r = nil; 
     
     
         
@@ -24,11 +24,11 @@ require('Code12.api')
         -- Make the background
         ct.setBackImage("underwater.jpg")
         this.dot = ct.circle(50, 50, 10)
-        local t = ct.rect(25, 75, 10, 50)
-        t.group = "targets"   -- things we can delete
-        t = ct.rect(75, 75, 10, 50)
-        t.group = "targets"
-        t = ct.text("Hello", 50, 25, 10)
+        this.r = ct.rect(25, 75, 10, 50)
+        this.r.group = "targets"   -- things we can delete
+        this.r = ct.rect(75, 75, 10, 50)
+        this.r.group = "targets"
+        local t = ct.text("Hello", 50, 25, 10)
         t.group = "targets"
         ct.setScreenOrigin(this.xOrigin, 0)
     end
