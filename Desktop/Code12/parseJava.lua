@@ -8,6 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules used
+local app = require( "app" )
 local err = require( "err" )
 local javalex = require( "javalex" )
 
@@ -607,7 +608,7 @@ end
 -- If file then output to it instead of the console.
 function parseJava.printParseTree( node, indentLevel, file )
 	if node then
-		-- Make description string for this node
+		-- Print description string for this node
 		local s = string.rep("    ", indentLevel)  -- indentation
 		if node.tt then
 			-- Token node
@@ -623,14 +624,7 @@ function parseJava.printParseTree( node, indentLevel, file )
 				s = s .. " (" .. node.p .. ")"
 			end
 		end
-
-		-- Output description
-		if file then
-			file:write( s )
-			file:write( "\n" )
-		else 
-			print(s)
-		end
+		app.printDebugStr( s, file )
 
 		-- Recursively print children at next indent level, if any
 		if node.nodes then

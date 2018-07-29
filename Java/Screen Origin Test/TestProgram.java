@@ -1,13 +1,6 @@
-// OK
-
 import Code12.*;
-// import java.util.Scanner;
-// import Code12.*;
-// int foo = 5;
-// OK
 
 class TestProgram extends Code12Program
-// int foo = 6;
 {
    double xOrigin = 50;
    double yOrigin = 0;
@@ -81,6 +74,5 @@ class TestProgram extends Code12Program
 
       if (ct.clicked())
          ct.log(ct.clickX(), ct.clickY());
-   }
-   
+   } 
 }

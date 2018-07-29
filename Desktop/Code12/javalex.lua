@@ -302,7 +302,6 @@ local function slashToken()
 	elseif charNext == 42 then  -- *
 		-- Block comment
 		iChar = iChar + 1
-		local iCharStart = iChar
 		commentLevel = 1
 		skipBlockComment()
 		return "COMMENT"

@@ -62,6 +62,16 @@ function app.getWindowSize()
 	app.height = display.actualContentHeight
 end
 
+-- Print str to file if file is not nil, else to the console
+function app.printDebugStr( str, file )
+	if file then
+		file:write( str )
+		file:write( "\n" )
+	else 
+		print( str )
+	end
+end
+
 
 ------------------------------------------------------------------------------
 return app

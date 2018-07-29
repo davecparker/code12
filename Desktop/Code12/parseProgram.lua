@@ -8,6 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
+local app = require( "app" )
 local parseJava = require( "parseJava" )
 local err = require( "err" )
 
@@ -15,8 +16,8 @@ local err = require( "err" )
 local parseProgram = {}
 
 
--- A program tree is a language-independent representation of a Code12 program.
--- It is made up of the following "structure" nodes, tokens, nested structures, 
+-- A structure tree is a language-independent representation of a Code12 program.
+-- It is made up of the following structure nodes, tokens, nested structures, 
 -- and arrays (plural names), with the following named fields:
 --
 -- program: { s = "program", nameID, vars, funcs }
@@ -53,7 +54,7 @@ local parseProgram = {}
 
 -- Parsing structures
 local parseTrees        -- array of parse trees for each source line
-local programTree       -- program tree we are building (see above)
+local programTree       -- structure tree for the prgoram (see above)
 
 -- Parsing state
 local numSourceLines    -- number of source code lines
@@ -62,6 +63,10 @@ local iTree             -- current tree index in parseTrees being analyzed
 
 
 --- Internal Functions -------------------------------------------------------
+
+-- Forward declarations
+local makeExpr
+
 
 -- Check for the correct Code12 import and move iTree past all imports.
 -- Return true if succesful, else set the error state and return false.
@@ -138,7 +143,7 @@ local function checkMain()
 		return false
 	end
 	local tree = parseTrees[iTree]
-	nodes = tree.nodes
+	local nodes = tree.nodes
 	if tree.isError or tree.p ~= "Code12Run" or 
 			nodes[1].str ~= "Code12" or nodes[3].str ~= "run" then
 		err.overrideErrLineParseTree( tree,
@@ -153,7 +158,7 @@ local function checkMain()
 		return false
 	end
 	iTree = iTree + 1
-	local tree = parseTrees[iTree]
+	tree = parseTrees[iTree]
 	if tree.p ~= "end" then
 		err.overrideErrLineParseTree( tree,
 				"Expected }" )
@@ -190,7 +195,7 @@ local function getBlockStmts()
 				return stmts
 			end
 		else
-			stmts[#stmts + 1] = tree   -- TODO: temp
+			stmts[#stmts + 1] = { s = "stmt" }
 		end
 	end
 
@@ -198,6 +203,67 @@ local function getBlockStmts()
 	err.setErrLineNum( numSourceLines + 1, 
 		"Missing } to end block starting at line %d", iLineStart )
 	return nil
+end
+
+-- Make and return an lValue structure from an lValue or fnValue parse node
+local function makeLValue( node )
+	local nodes = node.nodes
+	local indexExpr = nil
+	local indexNode = nodes[2]
+	if indexNode.p == "index" then
+		indexExpr = makeExpr( indexNode.nodes[2] )
+	end
+	local fieldID = nil
+	local fieldNode = nodes[3]
+	if fieldNode.p == "field" then
+		fieldID = fieldNode.nodes[2]
+	end
+	return { s = "lValue", nameID = nodes[1], 
+			indexExpr = indexExpr, fieldID = fieldID }
+end
+
+-- Make and return a call structure from a call parse node
+local function makeCall( node )
+	local nodes = node.nodes
+	local exprs = nil
+	local exprNodes = nodes[3].nodes
+	if #exprNodes > 0 then
+		exprs = {}
+		for i = 1, #exprNodes do
+			exprs[#exprs + 1] = makeExpr( exprNodes[i] )
+		end
+	end
+	return { s = "call", lValue = makeLValue( nodes[1] ), exprs = exprs }
+end
+
+-- Make and return an expr structure from a expr parse node
+function makeExpr( node )
+	-- No expr makes nil (e.g. an optional expr field)
+	if node == nil then
+		return nil
+	end
+
+	-- Handle the different primaryExpr types
+	assert( node.t == "expr" )
+	local p = node.p
+	local nodes = node.nodes
+	if p == "NUM" or p == "BOOL" or p == "NULL" or p == "STR" then
+		return { s = "literal", token = nodes[1] }
+	elseif p == "call" then
+		return makeCall( node )
+	elseif p == "lValue" then
+		return makeLValue( nodes[1] )
+	elseif p == "exprParens" then
+		return { s = "parens", expr = makeExpr( nodes[2] ) }
+	elseif p == "neg" or p == "!" then
+		return { s = "unaryOp", op = nodes[1].str, expr = makeExpr( nodes[2] ) }
+	elseif p == "newArray" then
+		return { s = "newArray", typeID = nodes[2], lengthExpr = makeExpr( nodes[4] ) }
+	else
+		-- Binary op
+		return { s = "binOp", op = nodes[2].str, leftExpr = makeExpr( nodes[1] ),
+				rightExpr = makeExpr( nodes[3] ) }
+	end
 end
 
 -- Make and return a var given the parsed fields.
@@ -210,7 +276,7 @@ local function makeVar( typeID, nameID, initExpr, isArray, isConst, isLocal )
 		isArray = isArray,
 		isConst = isConst,
 		isLocal = isLocal,
-		initExpr = initExpr
+		initExpr = makeExpr( initExpr )
 	}
 end
 
@@ -218,14 +284,35 @@ end
 -- including the contained statements, and move iTree past it.
 -- If there is an error then set the error state and return nil.
 local function getFunc( typeID, isArray, nameID, isPublic, paramList )
+	-- Build the param array
+	local params = {}
+	for _, node in ipairs( paramList.nodes ) do
+		local nodes = node.nodes
+		local param = { s = "param", typeID = nodes[1] }
+		if node.p == "array" then
+			param.nameID = nodes[4]
+			param.isArray = true
+		else
+			param.nameID = nodes[2]
+		end
+		params[#params + 1] = param
+	end
+
+	-- Get the stmts array
+	local stmts = getBlockStmts()
+	if stmts == nil then
+		return nil
+	end
+
+	-- Make the func
 	return { 
 		s = "func", 
 		typeID = typeID,
 		nameID = nameID,
 		isArray = isArray,
 		isPublic = isPublic,
-		params = paramList, 
-		stmts = getBlockStmts(),
+		params = params, 
+		stmts = stmts,
 	}
 end
 
@@ -272,7 +359,7 @@ local function getMembers()
 					isArray = (retType.p == "array") or nil
 				end
 				local isPublic = (nodes[1].p == "public") or nil
-				funcs[#funcs + 1] = getFunc( typeID, isArray, nodes[3], isPublic, nodes[5])
+				funcs[#funcs + 1] = getFunc( typeID, isArray, nodes[3], isPublic, nodes[5] )
 			else
 				getBlockStmts()  -- skip body of invalid function defintion
 			end
@@ -311,44 +398,59 @@ local function getMembers()
 	return false
 end
 
--- Print a program tree node recursively for debugging
-local function printProgramTree( node, indentLevel, file )
-	if type(node) == "table" then
-		if node.s then
-			-- Structure node: Make description string
-			local name = ((node.nameID and node.nameID.str) .. " ") or ""
-			local str = string.rep( "    ", indentLevel ) .. node.s .. " " .. name .. "{ "
-			for i, v in pairs( node ) do
-				if i ~= "s" and i ~= "nameID" then
-					local name
-					if type(v) == "table" then
-						name = v.str or "{}"
-					else
-						name = tostring( v )
-					end
-					str = str .. i .. " = " .. name .. ", "
-				end
-			end
-			str = str .. "}"
+-- Print a structure tree node recursively for debugging, labelled with name if included
+local function printStructureTree( node, indentLevel, file, label )
+	-- Make a label for this node
+	assert( type(node) == "table" and node.s )
+	local str = string.rep( "    ", indentLevel )
+	if label then
+		str = str .. label .. ": "
+	end
+	str = str .. node.s
+	if node.nameID and node.nameID.str then
+		str = str .. " " .. node.nameID.str
+	end
 
-			-- Output description
-			if file then
-				file:write( str )
-				file:write( "\n" )
-			else 
-				print( str )
-			end
-
-			-- Recursively print children at next indent level, if any
-			for i, v in pairs( node ) do
-				if type(v) == "table" then
-					printProgramTree( v, indentLevel + 1, file )
+	-- Add field names, and values if simple 
+	str = str .. " { "
+	for field, value in pairs( node ) do
+		if field ~= "s" and field ~= "nameID" then
+			if type(value) == "table" then
+				if value.tt then  
+					-- A token
+					str = str .. field .. " = " .. value.str  
+				elseif value.s then
+					-- A child structure node
+					str = str .. field
+				else
+					-- An array
+					str = str .. "#" .. field .. " = " .. #value
 				end
+			else
+				-- A primitive (e.g. boolean)
+				str = str .. field .. " = " .. tostring( value )
 			end
-		else
-			-- Array node
-			for i = 1, #node do
-				printProgramTree( node[i], indentLevel, file )
+			str = str .. ", "
+		end
+	end
+	str = str .. "}"
+
+	-- Output description
+	app.printDebugStr( str, file )
+
+	-- Recursively print children at next indent level, if any
+	for field, value in pairs( node ) do
+		if type(value) == "table" then
+			if value.s then
+				-- Child structure node
+				printStructureTree( value, indentLevel + 1, file, field )
+			elseif #value > 0 then
+				-- Array node
+				str = string.rep( "    ", indentLevel + 1 ) .. field .. ":"
+				app.printDebugStr( str, file )
+				for i = 1, #value do
+					printStructureTree( value[i], indentLevel + 2, file )
+				end
 			end
 		end
 	end
@@ -374,7 +476,7 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 									lineNum, startTokens, syntaxLevel )
 		if tree == false then
 			-- Line is incomplete, carry tokens forward to next line
-			assert( type(extra) == "table" )
+			assert( type(tokens) == "table" )
 			startTokens = tokens
 		else
 			startTokens = nil
@@ -407,7 +509,7 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	end
 
 	-- Print programTree for debugging
-	printProgramTree( programTree, 0 )
+	printStructureTree( programTree, 0 )
 
 	-- Return parse trees for now
 	if err.shouldStop() then
