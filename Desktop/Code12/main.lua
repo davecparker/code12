@@ -255,29 +255,28 @@ local function loadSettings()
 	-- Read the settings file
 	local file = io.open( settingsFilePath(), "r" )
 	if file then
-		local str = file:read( "*a" )	-- Read entile file as a string (JSON encoded)
+		local str = file:read( "*a" )	-- Read entire file as a string (JSON encoded)
 		io.close( file )
 		if str then
 			local t = json.decode( str )
 			if t then
-				-- Clear the recentPath if it doesn't exist anymore
-				file = io.open( t.recentPath, "r" )
-				if file then
-					userSettings.recentPath = t.recentPath
-					io.close( file )
-				else
-					userSettings.recentPath = nil
+				-- Restore last used source file by default
+				if t.recentPath then
+					-- Use the recentPath only if the file still exists
+					file = io.open( t.recentPath, "r" )
+					if file then
+						io.close( file )
+						userSettings.recentPath = t.recentPath
+						sourceFile.path = userSettings.recentPath
+					end
 				end
-				sourceFile.path = userSettings.recentPath
 
-				-- Make sure the syntaxLevel is valid
+				-- Use the saved syntaxLevel if valid
 				local level = t.syntaxLevel
 				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
 					userSettings.syntaxLevel = level
-				else
-					userSettings.syntaxLevel = app.numSyntaxLevels
+					app.syntaxLevel = userSettings.syntaxLevel
 				end
-				app.syntaxLevel = userSettings.syntaxLevel
 			end
 		end
 	end
