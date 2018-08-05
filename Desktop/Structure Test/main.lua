@@ -15,7 +15,10 @@ require('Code12.api')
     
     function _fn.start()
         
-        this.ball = ct.circle(50, 50, 30)
+        local X = 50
+        local y = 0; 
+        y = X
+        this.ball = ct.circle(X, y, 30)
     end
     
     function _fn.foo(i, d)
@@ -56,6 +59,7 @@ require('Code12.api')
     function _fn.makeCircles()
         
         local circles = { length = 10, default = nil }
+        local scores = { 10, 20, 30, length = 3, default = 0 }
         return circles
     end
 

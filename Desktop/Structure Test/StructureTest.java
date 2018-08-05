@@ -15,7 +15,10 @@ class StructureTest extends Code12Program
    
 	public void start()
 	{
-		ball = ct.circle( 50, 50, 30 );
+		final int X = 50;
+		int y;
+		y = X;
+		ball = ct.circle( X, y, 30 );
 	}
 
 	int foo(int i, double d)
@@ -56,6 +59,7 @@ class StructureTest extends Code12Program
 	GameObj[] makeCircles()
 	{
 		GameObj[] circles = new GameObj[10];
+		int[] scores = { 10, 20, 30 };
 		return circles;
 	}
 }

@@ -22,7 +22,7 @@ local parseProgram = {}
 --
 -- program: { s = "program", nameID, vars, funcs }
 --
--- var:  { s = "var", typeID, nameID, isArray, isConst, initExpr }
+-- var:  { s = "var", typeID, nameID, isArray, isConst, isLocal, initExpr }
 -- func: { s = "func", typeID, nameID, isArray, isPublic, params, stmts }
 -- 
 -- param: { s = "param", typeID, nameID, isArray }
@@ -168,9 +168,53 @@ local function checkMain()
 	return true
 end
 
+-- Make and return a var given the parsed fields.
+-- If there is an error then set the error state and return nil.
+local function makeVar( isLocal, typeID, nameID, initExpr, isArray, isConst )
+	return {
+		s = "var",
+		typeID = typeID,
+		nameID = nameID,
+		isArray = isArray,
+		isConst = isConst,
+		isLocal = isLocal,
+		initExpr = makeExpr( initExpr )
+	}
+end
+
+-- Check for a variable declaration or initialization for line pattern p and 
+-- the parse nodes, and add variable(s) to the structure array structs.
+-- The variable(s) are local if isLocal is included and true.
+-- Return true if the pattern was a variable pattern, else false.
+local function getVar( p, nodes, structs, isLocal )
+	if p == "varInit" then
+		-- e.g. int x = 10;
+		structs[#structs + 1] = makeVar( isLocal, nodes[1], nodes[2], nodes[4] )
+	elseif p == "varDecl" then
+		-- e.g. int x, y;
+		for _, nameID in ipairs( nodes[2].nodes ) do
+			structs[#structs + 1] = makeVar( isLocal, nodes[1], nameID )
+		end
+	elseif p == "constInit" then
+		-- e.g. final int LIMIT = 100;
+		structs[#structs + 1] = makeVar( isLocal, nodes[2], nodes[3], nodes[5], nil, true )			
+	elseif p == "arrayInit" then
+		-- e.g. int[] a = { 1, 2, 3 };   or   int[] a = new int[10];
+		structs[#structs + 1] = makeVar( isLocal, nodes[1], nodes[4], nodes[6], true )						
+	elseif p == "arrayDecl" then
+		-- e.g. GameObj[] coins, walls;
+		for _, nameID in ipairs( nodes[4].nodes ) do
+			structs[#structs + 1] = makeVar( isLocal, nodes[1], nameID, nil, true )
+		end	
+	else
+		return false   -- not a variable pattern
+	end
+	return true
+end	
+
+
 -- Process a block of statements beginning with { and ending with }
 -- and return an array of stmt.
--- If blockDescription is included then it is a string describing the block.
 -- If there is an error then set the error state and return nil.
 local function getBlockStmts()
 	-- Block must start with a {
@@ -185,6 +229,7 @@ local function getBlockStmts()
 	while iTree <= numParseTrees do
 		local tree = parseTrees[iTree]
 		local p = tree.p
+		local nodes = tree.nodes
 		iTree = iTree + 1
 
 		if p == "begin" then
@@ -194,6 +239,8 @@ local function getBlockStmts()
 			if braceLevel == 0 then
 				return stmts
 			end
+		elseif getVar( p, nodes, stmts, true ) then
+			-- Got local variable(s)
 		else
 			stmts[#stmts + 1] = { s = "stmt" }
 		end
@@ -236,14 +283,27 @@ local function makeCall( node )
 	return { s = "call", lValue = makeLValue( nodes[1] ), exprs = exprs }
 end
 
--- Make and return an expr structure from a expr parse node
+-- Make and return an expr structure from an expr or arrayInit parse node
 function makeExpr( node )
 	-- No expr makes nil (e.g. an optional expr field)
 	if node == nil then
 		return nil
 	end
 
-	-- Handle the different primaryExpr types
+	-- Handle arrayInit nodes
+	if node.t == "arrayInit" then
+		if node.p == "list" then
+			local exprs = {}
+			for _, exprNode in ipairs( node.nodes[2].nodes ) do
+				exprs[#exprs + 1] = makeExpr( exprNode )
+			end	
+			return { s = "arrayInit", exprs = exprs }
+		else
+			node = node.nodes[1]
+		end
+	end
+
+	-- Handle the different primaryExpr types plus binary operators
 	assert( node.t == "expr" )
 	local p = node.p
 	local nodes = node.nodes
@@ -264,20 +324,6 @@ function makeExpr( node )
 		return { s = "binOp", op = nodes[2].str, leftExpr = makeExpr( nodes[1] ),
 				rightExpr = makeExpr( nodes[3] ) }
 	end
-end
-
--- Make and return a var given the parsed fields.
--- If there is an error then set the error state and return nil.
-local function makeVar( typeID, nameID, initExpr, isArray, isConst, isLocal )
-	return {
-		s = "var",
-		typeID = typeID,
-		nameID = nameID,
-		isArray = isArray,
-		isConst = isConst,
-		isLocal = isLocal,
-		initExpr = makeExpr( initExpr )
-	}
 end
 
 -- Make and return a function member given the parsed fields,
@@ -331,24 +377,8 @@ local function getMembers()
 		local ok = not tree.isError
 		iTree = iTree + 1
 
-		if p == "varInit" then
-			vars[#vars + 1] = makeVar( nodes[1], nodes[2], nodes[4] );
-		elseif p == "varDecl" then
-			if ok then
-				for _, nameID in ipairs( nodes[2].nodes ) do
-					vars[#vars + 1] = makeVar( nodes[1], nameID )
-				end
-			end
-		elseif p == "constInit" then
-			vars[#vars + 1] = makeVar( nodes[2], nodes[3], nodes[5], nil, true );			
-		elseif p == "arrayInit" then
-			vars[#vars + 1] = makeVar( nodes[1], nodes[4], nodes[6], true );						
-		elseif p == "arrayDecl" then
-			if ok then
-				for _, nameID in ipairs( nodes[4].nodes ) do
-					vars[#vars + 1] = makeVar( nodes[1], nameID, nil, true )
-				end	
-			end		
+		if ok and getVar( p, nodes, vars ) then
+			-- Added instance variable(s)
 		elseif p == "func" then
 			if ok then
 				local typeID = nil
