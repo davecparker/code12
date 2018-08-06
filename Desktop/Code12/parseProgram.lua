@@ -66,6 +66,7 @@ local iTree             -- current tree index in parseTrees being analyzed
 
 -- Forward declarations
 local makeExpr
+local getBlockStmts
 
 
 -- Check for the correct Code12 import and move iTree past all imports.
@@ -212,48 +213,12 @@ local function getVar( p, nodes, structs, isLocal )
 	return true
 end	
 
-
--- Process a block of statements beginning with { and ending with }
--- and return an array of stmt.
--- If there is an error then set the error state and return nil.
-local function getBlockStmts()
-	-- Block must start with a {
-	local iLineStart = parseTrees[iTree].iLine
-	if not checkBlockBegin() then
-		return false
-	end
-	local braceLevel = 1
-
-	-- Get all lines until we get a matching end for the block begin
-	local stmts = {}
-	while iTree <= numParseTrees do
-		local tree = parseTrees[iTree]
-		local p = tree.p
-		local nodes = tree.nodes
-		iTree = iTree + 1
-
-		if p == "begin" then
-			braceLevel = braceLevel + 1
-		elseif p == "end" then
-			braceLevel = braceLevel - 1
-			if braceLevel == 0 then
-				return stmts
-			end
-		elseif getVar( p, nodes, stmts, true ) then
-			-- Got local variable(s)
-		else
-			stmts[#stmts + 1] = { s = "stmt" }
-		end
-	end
-
-	-- Got to EOF before finding matching }
-	err.setErrLineNum( numSourceLines + 1, 
-		"Missing } to end block starting at line %d", iLineStart )
-	return nil
-end
-
--- Make and return an lValue structure from an lValue or fnValue parse node
+-- Make and return an lValue structure from an ID token, lValue parse node, 
+-- or fnValue parse node
 local function makeLValue( node )
+	if node.tt == "ID" then
+		return { s = "lValue", nameID = node }
+	end
 	local nodes = node.nodes
 	local indexExpr = nil
 	local indexNode = nodes[2]
@@ -269,9 +234,8 @@ local function makeLValue( node )
 			indexExpr = indexExpr, fieldID = fieldID }
 end
 
--- Make and return a call structure from a call parse node
-local function makeCall( node )
-	local nodes = node.nodes
+-- Make and return a call structure from a call parse tree's nodes array
+local function makeCall( nodes )
 	local exprs = nil
 	local exprNodes = nodes[3].nodes
 	if #exprNodes > 0 then
@@ -281,6 +245,113 @@ local function makeCall( node )
 		end
 	end
 	return { s = "call", lValue = makeLValue( nodes[1] ), exprs = exprs }
+end
+
+-- Get and make stmt structure(s) from the given parse tree,
+-- which is not a "begin" or "end" pattern,
+-- and add them to the stmts array. Return true if successful.
+-- If there is an error then set the error state and return nil.
+local function getStmt( tree, stmts )
+	-- Fail on syntax errors
+	if tree.isError then
+		return false
+	end
+
+	-- Look for var decls
+	local p = tree.p
+	local nodes = tree.nodes
+	if getVar( p, nodes, stmts, true ) then
+		return true
+	end
+
+	-- Handle stmt patterns
+	local stmt = nil
+	if p == "stmt" then
+		local node = nodes[1]
+		p = node.p
+		nodes = node.nodes
+
+		if p == "call" then
+			stmt = makeCall( nodes )
+		elseif p == "varAssign" or p == "assign" then  -- TODO: remove this distinction?
+			stmt = { s = "assign", lValue = makeLValue( nodes[1] ), op = "=", 
+					expr = makeExpr( nodes[3] ) }
+		elseif p == "opAssign" then
+			stmt = { s = "assign", lValue = makeLValue( nodes[1] ),  op = nodes[2].p, 
+					expr = makeExpr( nodes[3] ) }
+		elseif p == "preInc" or p == "preDec" then
+			stmt = { s = "assign", lValue = makeLValue( nodes[2] ), op = nodes[1].tt }
+		elseif p == "postInc" or p == "postDec" then
+			stmt = { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2].tt }
+		elseif p == "break" then
+			stmt = { s = "break" }
+		else
+			error( "Unexpected stmt pattern " .. p )
+		end
+	-- Handle other valid line patterns
+	elseif p == "if" then
+		-- TODO
+	elseif p == "elseif" then
+		-- TODO
+	elseif p == "else" then
+		-- TODO
+	elseif p == "return" then
+		stmt = { s = "return", expr = makeExpr( nodes[2] ) }
+	elseif p == "do" then
+		-- TODO
+	elseif p == "while" then
+		-- TODO
+	elseif p == "for" then
+		-- TODO
+	else
+		-- Handle invalid line patterns
+		if p == "func" or p == "main" then
+			err.setErrNode( tree, "Function definitions cannot occur inside a statement block")
+		else
+			err.setErrNode( tree, "Unexpected statement" )
+		end
+		return false
+	end
+
+	-- Add the stmt
+	stmts[#stmts + 1] = stmt or { s = "stmt" }
+	return true
+end
+
+-- Process a block of statements beginning with { and ending with }
+-- and return an array of stmt.
+-- If there is an error then set the error state and return nil.
+function getBlockStmts()
+	-- Block must start with a {
+	local iLineStart = parseTrees[iTree].iLine
+	if not checkBlockBegin() then
+		return false
+	end
+	local braceLevel = 1
+
+	-- Get all lines until we get a matching end for the block begin
+	local stmts = {}
+	while iTree <= numParseTrees do
+		local tree = parseTrees[iTree]
+		local p = tree.p
+		iTree = iTree + 1
+
+		if p == "begin" then
+			braceLevel = braceLevel + 1
+		elseif p == "end" then
+			braceLevel = braceLevel - 1
+			if braceLevel == 0 then
+				return stmts
+			end
+		else
+			getStmt( tree, stmts )
+		end
+	end
+
+	-- Got to EOF before finding matching }
+	err.setErrLineNum( numSourceLines + 1, 
+		"Missing } to end block starting at line %d", iLineStart )
+	return nil
 end
 
 -- Make and return an expr structure from an expr or arrayInit parse node
@@ -310,7 +381,7 @@ function makeExpr( node )
 	if p == "NUM" or p == "BOOL" or p == "NULL" or p == "STR" then
 		return { s = "literal", token = nodes[1] }
 	elseif p == "call" then
-		return makeCall( node )
+		return makeCall( nodes )
 	elseif p == "lValue" then
 		return makeLValue( nodes[1] )
 	elseif p == "exprParens" then
@@ -456,8 +527,9 @@ local function printStructureTree( node, indentLevel, file, label )
 					-- An array
 					str = str .. "#" .. field .. " = " .. #value
 				end
-			else
-				-- A primitive (e.g. boolean)
+			elseif type(value) == "string" then
+				str = str .. field .. " = " .. "\"" .. value .. "\""
+			else  -- number or boolean
 				str = str .. field .. " = " .. tostring( value )
 			end
 			str = str .. ", "
