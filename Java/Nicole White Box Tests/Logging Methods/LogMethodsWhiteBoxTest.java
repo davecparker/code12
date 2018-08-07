@@ -27,6 +27,7 @@ public class LogMethodsWhiteBoxTest extends Code12Program
 
    public void start()
    {
+      ct.setOutputFile("test.txt");
       ct.setTitle("LogMethods, not to be confused with logarithms");
       
       s = "test";

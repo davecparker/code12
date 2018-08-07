@@ -26,7 +26,7 @@ require('Code12.api')
         -- ct.circle(50, 50, LIMIT);
         local x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0
         local xInt = ct.toInt(x)
-        local name = "Dave" .. " " .. "Parker"
+        local name = "Dave".." ".."Parker"
         local done = false; local _end = false; 
         -- boolean _end = false;
         -- int $java = 5;
@@ -38,7 +38,7 @@ require('Code12.api')
         -- ct.println( nums[10] );
         
         -- Try some console output
-        ct.println(this._function .. " " .. 1.23e2)
+        ct.println(this._function.." "..tostring(1.23e2))
         ct.println("This is the default \"Code12\" test app")
         ct.println("This is console output")
         ct.setOutputFile("output.txt")
@@ -58,14 +58,14 @@ require('Code12.api')
         ct.println("Done")
         ct.showAlert("Hey, this is an alert.\nThis is the second line.")
         local userName = ct.inputString("Enter your name")
-        ct.println("Hello " .. userName)
+        ct.println("Hello "..userName)
         local test = ct.inputYesNo("Would you like to print some lines?")
         if test then
             
             this.count = ct.inputInt("Enter number of lines to print")
             local i = 1; while i <= this.count do
                 
-                ct.println("Line " .. i)
+                ct.println("Line "..tostring(i))
             i = i + 1; end
         end
         -- ct.setOutputFile(null);
@@ -177,10 +177,10 @@ require('Code12.api')
         if obj ~= nil then
             
             obj.xSpeed = .1
-            ct.println(obj:toString() .. " was clicked")
+            ct.println(obj:toString().." was clicked")
         
         else 
-            ct.println("Mouse was pressed at (" .. x .. ", " .. y .. ")"); end
+            ct.println("Mouse was pressed at ("..tostring(x)..", "..tostring(y)..")"); end
     end
     
     function _fn.loopAndArrayTest()
