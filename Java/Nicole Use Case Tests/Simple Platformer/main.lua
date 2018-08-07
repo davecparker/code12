@@ -53,13 +53,18 @@ require('Code12.api')
         ct.checkArrayIndex(this.platforms, 9); this.platforms[1+(9)] = ct.rect(175, 35, 10, 2, "yellow")
         ct.checkArrayIndex(this.platforms, 10); this.platforms[1+(10)] = ct.rect(155, 25, 10, 15, "yellow")
         ct.checkArrayIndex(this.platforms, 11); this.platforms[1+(11)] = ct.rect(135, 15, 15, 20, "yellow")
+        -- ladder
+        
+        -- TODO: solid platforms
+        -- use variables to store your old location and sends you back there if there is a wall collision.
+        -- while ( player != colliding with platform) ? 
         
         
         -- Two "twin" players (one facing left, one facing right)
         -- Only one is visible at a time
-        this.playerLeft = ct.image("stickmanleft.png", 10, 10, 10)
+        this.playerLeft = ct.image("stickmanleft.png", 10, 10, 8)
         this.playerLeft.visible = false
-        this.playerRight = ct.image("stickmanright.png", 10, 10, 10)
+        this.playerRight = ct.image("stickmanright.png", 10, 10, 8)
         
         
     end
@@ -95,6 +100,7 @@ require('Code12.api')
         this.playerLeft.y = this.playerLeft.y + (this.playerLeft.ySpeed)
         
         
+        
         for _, platform in ipairs(this.platforms) do
             
             -- Check to see if player hit a platform
@@ -102,44 +108,83 @@ require('Code12.api')
                 
                 this.playerRight.ySpeed = 0.0
                 this.playerLeft.ySpeed = 0.0
-                -- so we've established that the player collided with a platform, but..
+                -- so we've established that the player collided with a platform, but from which side?
+                local from = _fn.hitFrom(this.playerLeft)
                 
                 -- if hit from top of platform, this occurs
                 if this.playerRight.y < (platform.y - platform.height / 2) or this.playerLeft.y < (platform.y - platform.height / 2) then
                     
-                    ct.println("Player hit a platform from the top")
                     
                     this.playerRight.y = platform.y - (platform.height / 2 + this.playerRight.height / 2)
                     this.playerLeft.y = platform.y - (platform.height / 2 + this.playerLeft.height / 2)
                     this.onGround = true
                 
-                else 
+                elseif (from == "bottom") then
                     
-                    ct.println("rebound against platform")
                     _fn.endJump()
-                    --playerRig
-                end
+                    
                 
-                -- else, fall back to ground
+                elseif (from == "left") then
+                    
+                    this.playerLeft.visible = false
+                    this.playerRight.visible = true
+                    
+                
+                elseif (from == "right") then
+                    
+                    this.playerRight.visible = false
+                    this.playerLeft.visible = true
+                    
+                end
             end
         end
         
         
     end
-    
-    -- need to define a hit from above vs. a hit from the side
-    function _fn.hitFromTop(player)
+    function _fn.hitFrom(player)
         
-        
+        for _, platform in ipairs(this.platforms) do
+            
+            local w = 0.5 * (player.width + platform.width)
+            local h = 0.5 * (player.height + platform.height)
+            local dx = player.x - platform.x
+            local dy = player.y - platform.y
+            
+            if math.abs(dx) <= w and math.abs(dy) <= h then
+                
+                -- collision has occurred
+                local wy = w * dy
+                local hx = h * dx
+                if wy > hx then
+                    
+                    if wy > -hx then
+                        
+                        ct.println("collsion from bottom")
+                        return "bottom"
+                    
+                    else 
+                        
+                        ct.println("collsion from right")
+                        return "right"
+                    end
+                
+                else 
+                    
+                    if wy > -hx then
+                        
+                        ct.println("collision from left")
+                        return "left"
+                    
+                    else 
+                        
+                        ct.println("collison from top")
+                        return "top"
+                    end
+                end
+            end
+        end
         
     end
-    
-    function _fn.hitFromSide()
-        
-        
-    end
-    
-    
     
     function _fn.startJump()
         
@@ -198,7 +243,6 @@ require('Code12.api')
         if (keyName == "space") then
             
             _fn.startJump()
-            ct.println("spacebar was pressed")
             ct.sound("retro_jump.wav")
             _fn.endJump()
         end
@@ -220,11 +264,7 @@ require('Code12.api')
             local i = 0; while i < this.clouds.length do
                 
                 ct.checkArrayIndex(this.clouds, i); this.clouds[1+(i)].xSpeed = ct.indexArray(this.clouds, i).xSpeed + (0.001)
-                if ct.indexArray(this.clouds, i).x > ct.getWidth() then
-                    
-                    ct.indexArray(this.clouds, i):delete()
-                    ct.checkArrayIndex(this.clouds, i); this.clouds[1+(i)] = nil
-                end
+                
             i = i + 1; end
         end
         

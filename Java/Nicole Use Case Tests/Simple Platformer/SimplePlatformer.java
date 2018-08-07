@@ -53,13 +53,18 @@ public class SimplePlatformer extends Code12Program
       platforms[9] = ct.rect(175, 35, 10, 2, "yellow");
       platforms[10] = ct.rect(155, 25, 10, 15, "yellow");
       platforms[11] = ct.rect(135, 15, 15, 20, "yellow");
+      // ladder
+
+      // TODO: solid platforms
+      // use variables to store your old location and sends you back there if there is a wall collision.
+      // while ( player != colliding with platform) ? 
 
 
       // Two "twin" players (one facing left, one facing right)
       // Only one is visible at a time
-      playerLeft = ct.image("stickmanleft.png", 10, 10,10);
+      playerLeft = ct.image("stickmanleft.png", 10, 10, 8);
       playerLeft.visible = false;
-      playerRight = ct.image("stickmanright.png", 10, 10, 10);
+      playerRight = ct.image("stickmanright.png", 10, 10, 8);
 
 
    }
@@ -95,51 +100,91 @@ public class SimplePlatformer extends Code12Program
       playerLeft.y += playerLeft.ySpeed;
 
 
-      for(GameObj platform : platforms)
+
+      for ( GameObj platform : platforms )
       {
          // Check to see if player hit a platform
          if ( playerRight.hit(platform) || playerLeft.hit(platform) )
          {
             playerRight.ySpeed = 0.0;
             playerLeft.ySpeed = 0.0;
-            // so we've established that the player collided with a platform, but..
+            // so we've established that the player collided with a platform, but from which side?
+            String from = hitFrom(playerLeft);
 
             // if hit from top of platform, this occurs
             if ( playerRight.y < (platform.y - platform.height/2) || playerLeft.y < (platform.y - platform.height/2) )
             {
-               ct.println("Player hit a platform from the top");
-               
+
                playerRight.y = platform.y - (platform.height/2 + playerRight.height/2);
                playerLeft.y = platform.y - (platform.height/2 + playerLeft.height/2);
                onGround = true;
             }
-            else
+            else if (from.equals("bottom"))
             {
-               ct.println("rebound against platform");
                endJump();
-               //playerRig
-            }
 
-            // else, fall back to ground
+            }
+            else if (from.equals("left"))
+            {
+               playerLeft.visible = false;
+               playerRight.visible = true;
+
+            }
+            else if (from.equals("right"))
+            {
+               playerRight.visible = false;
+               playerLeft.visible = true;
+
+            }
          }
       }
 
 
    }
-
-   // need to define a hit from above vs. a hit from the side
-   boolean hitFromTop(GameObj player)
+   String hitFrom(GameObj player)
    {
+      for (GameObj platform: platforms )
+      {
+         double w = 0.5 * (player.width + platform.width);
+         double h = 0.5 * (player.height + platform.height);
+         double dx = player.x - platform.x;
+         double dy = player.y - platform.y;
 
+         if ( Math.abs(dx) <= w && Math.abs(dy) <= h )
+         {
+            // collision has occurred
+            double wy = w * dy;
+            double hx = h * dx;
+            if ( wy > hx )
+            {
+               if ( wy > -hx )
+               {
+                  ct.println("collsion from bottom");
+                  return "bottom";
+               }
+               else
+               {
+                  ct.println("collsion from right");
+                  return "right";
+               }
+            }
+            else
+            {
+               if ( wy > -hx )
+               {
+                  ct.println("collision from left");
+                  return "left";
+               }
+               else
+               {
+                  ct.println("collison from top");
+                  return "top";
+               }
+            }
+         }
+      }
 
    }
-
-   boolean hitFromSide()
-   {
-
-   }
-
-
 
    public void startJump()
    {
@@ -198,7 +243,6 @@ public class SimplePlatformer extends Code12Program
       if ( keyName.equals("space"))
       {
          startJump();
-         ct.println("spacebar was pressed");
          ct.sound("retro_jump.wav");
          endJump();
       }
@@ -220,11 +264,7 @@ public class SimplePlatformer extends Code12Program
          for ( int i = 0; i < clouds.length; i++ )
          {
             clouds[i].xSpeed += 0.001;
-            if ( clouds[i].x > ct.getWidth() )
-            {
-               clouds[i].delete();
-               clouds[i] = null;
-            }
+
          }
       }
 

@@ -67,7 +67,7 @@ this.yourSpeed = 0;
         local i = 0; while i < this.circles.length do
             
             if obj == ct.indexArray(this.circles, i) then
-                ct.showAlert("You clicked on circle number " .. i .. "!"); end
+                ct.showAlert("You clicked on circle number "..tostring(i).."!"); end
         i = i + 1; end
     end
     
