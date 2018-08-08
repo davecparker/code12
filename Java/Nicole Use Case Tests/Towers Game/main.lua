@@ -127,20 +127,18 @@ require('Code12.api')
     
     -- function to determine the amount of disks on each pole
     -- parameter passed is a GameObj (the pole)
-    function _fn.getAmountOnPole(pole)
+    function _fn.getAmountOnGivenPole(i)
         
         local amount = 0
         
-        local i = 0; while i < this.poles.length do
+        if i >= 0 and i < 3 then
             
             local j = 0; while j < this.disks.length do
                 
                 if ct.indexArray(this.disks, j):hit(ct.indexArray(this.poles, i)) == true then
                     amount = amount + 1; end
-                
             j = j + 1; end
-        i = i + 1; end
-        
+        end
         return amount
         
     end
@@ -149,7 +147,8 @@ require('Code12.api')
         
         local i = 0; while i < this.poles.length do
             
-            local amount = _fn.getAmountOnPole(ct.indexArray(this.poles, i))
+            local amount = _fn.getAmountOnGivenPole(i)
+            -- If no disks are on the pole, the move will always be valid
             if amount == 0 then
                 
                 ct.println("does this execute")
@@ -196,105 +195,144 @@ require('Code12.api')
         i = i + 1; end
         
         return widths
+    end
     
-                elseif _fn.isValidMove(disk) == true then
-                    
-                    disk.x = ct.indexArray(this.poles, i).x
-                    disk.y = ct.indexArray(this.poles, i).y
-                    
-                end
+    --public void isClosestToTOp
+    -- Once we find the pole (and the amount of disks on each pole), compare their width to determine if a move is possible
+    -- public boolean isValidMove( GameObj  obj, GameObj[] arr )
+    -- {
+    --    // Iterate through the poles
+    --    for ( int i = 0; i < poles.length; i++ )
+    --    {
+    --       // Go through the amount of disks on each pole
+    --       //int amount = getAmountOnPole(i);
+    --       for ( int j = 0; j < amount; j++ )
+    --       {
+    --          for ( int k = 0; k < poles.length; k++ )
+    --          {
+    --             GameObj min; //holding variable
+    
+    
+    
+    --          }
+    --       }
+    
+    --    }
+    -- }
+    
+    
+    -- Helper function to let moved disks fall to the base of a given pole 
+    -- Once they reach the base of the pole or another objject in poles array, they stop falling ( ySpeed = 0 )
+    function _fn.moveDiskToPole(disk)
+        
+        -- move to stack
+        -- falls to bottom unless other disks obj is hit
+        local i = 0; while i < this.poles.length do
+            
+            --if ( disk.hit(disks[j]))
+            
+            
+            
+            
+            -- else to go to base of pole
+            if _fn.isValidMove(disk) == true then
                 
-                
-            j = j + 1; end
+                disk.x = ct.indexArray(this.poles, i).x
+                disk.y = ct.indexArray(this.poles, i).y
+            end
+            
             
         i = i + 1; end
         
-        
-        
-    end
-    
-    function _fn.onMousePress(obj, x, y)
-        
-        this.lastX = x
-        this.lastY = y
-        
     end
     
     
-    function _fn.onMouseDrag(obj, x, y)
+
+
+function _fn.onMousePress(obj, x, y)
+    
+    this.lastX = x
+    this.lastY = y
+    
+end
+
+
+function _fn.onMouseDrag(obj, x, y)
+    
+    -- keep track of obj movibg
+    -- and the pole it came from remember pole 
+    --GameOBj diskMoving
+    --    int poleFrom
+    if obj == this.small then
         
-        -- keep track of obj movibg
-        -- and the pole it came from remember pole 
-        --GameOBj diskMoving
-        --    int poleFrom
-        if obj == this.small then
+        this.small.x = x
+        this.small.y = y
+        local polenum = _fn.poleFrom(this.small)
+        ct.println(polenum)
+    end
+    
+    if obj == this.medium then
+        
+        this.medium.x = x
+        this.medium.y = y
+    end
+    
+    if obj == this.large then
+        
+        this.large.x = x
+        this.large.y = y
+    end
+    
+    -- on mouse release
+    -- actually check and do stuff
+    
+end
+
+function _fn.onMouseRelease(obj, x, y)
+    
+    if obj == this.small then
+        
+        if _fn.isValidMove(this.small) == true then
             
-            this.small.x = x
-            this.small.y = y
-            local polenum = _fn.poleFrom(this.small)
-            ct.println(polenum)
-        end
+            ct.println("This should print if move for small is valid")
+            _fn.moveDiskToPole(this.small)
         
-        if obj == this.medium then
+        elseif _fn.isValidMove(this.small) == false then
             
-            this.medium.x = x
-            this.medium.y = y
+            ct.println("This should print if move for small is invalid")
+            local poleFrom = _fn.poleFrom(this.small)
+            this.small.x = ct.indexArray(this.poles, poleFrom).x
+            this.small.y = ct.indexArray(this.poles, poleFrom).y
         end
-        
-        if obj == this.large then
-            
-            this.large.x = x
-            this.large.y = y
-        end
-        
-        -- on mouse release
-        -- actually check and do stuff
         
     end
     
-    function _fn.onMouseRelease(obj, x, y)
+    if obj == this.medium then
         
-        if obj == this.small then
+        if _fn.isValidMove(this.medium) == true then
+            _fn.moveDiskToPole(this.medium); 
+        elseif _fn.isValidMove(this.medium) == false then
             
-            if _fn.isValidMove(this.small) == true then
-                
-                ct.println("This should print if move for small is valid")
-                _fn.moveDiskToPole(this.small)
-            
-            elseif _fn.isValidMove(this.small) == false then
-                
-                ct.println("This should print if move for small is invalid")
-                local poleFrom = _fn.poleFrom(this.small)
-                this.small.x = ct.indexArray(this.poles, poleFrom).x
-                this.small.y = ct.indexArray(this.poles, poleFrom).y
-            end
-            
+            ct.println("This should print if move for medium is invalid")
+            local poleFrom = _fn.poleFrom(this.medium)
+            this.medium.x = ct.indexArray(this.poles, poleFrom).x
+            this.medium.y = ct.indexArray(this.poles, poleFrom).y
         end
-        
-        if obj == this.medium then
-            
-            if _fn.isValidMove(this.medium) == true then
-                _fn.moveDiskToPole(this.medium); 
-            elseif _fn.isValidMove(this.medium) == false then
-                
-                ct.println("This should print if move for medium is invalid")
-                local poleFrom = _fn.poleFrom(this.medium)
-                this.medium.x = ct.indexArray(this.poles, poleFrom).x
-                this.medium.y = ct.indexArray(this.poles, poleFrom).y
-            end
-        end
-        
-        if obj == this.large then
-            
-            if _fn.isValidMove(this.large) == true then
-                _fn.moveDiskToPole(this.large); 
-            elseif _fn.isValidMove(this.large) == false then
-                
-                ct.println("This should print if move for large is invalid")
-                local poleFrom = _fn.poleFrom(this.large)
-                this.large.x = ct.indexArray(this.poles, poleFrom).x
-                this.large.y = ct.indexArray(this.poles, poleFrom).y
-            end
-        end
-        
     end
+    
+    if obj == this.large then
+        
+        if _fn.isValidMove(this.large) == true then
+            _fn.moveDiskToPole(this.large); 
+        elseif _fn.isValidMove(this.large) == false then
+            
+            ct.println("This should print if move for large is invalid")
+            --int poleFrom = poleFrom(large);
+            
+            
+            this.large.x = this.lastX
+            this.large.y = this.lastY
+        end
+    end
+    
+end
