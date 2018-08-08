@@ -5,20 +5,20 @@
 644. // void anotherfunc() // crash
 *** Uncaught error, expected: differs only by upper/lower case from existing function
 
-1163. // void onKeyRelease( ) // crash
+1181. // void onKeyRelease( ) // crash
 *** Uncaught error, expected: Wrong number of parameters for function
 
 ======= Test Complete =========================================
 
 Semantic Error Test:
 
-    1204 lines processed
-    195 ms Parse time
-    1 ms Semantic check time
-    23 ms Code Generation time
-    220 ms Total time
+    1222 lines processed
+    95 ms Parse time
+    0 ms Semantic check time
+    13 ms Code Generation time
+    109 ms Total time
 
 0 unexpected errors
-3 uncaught errors (233 expected errors)
+3 uncaught errors (242 expected errors)
 
 FAILED
