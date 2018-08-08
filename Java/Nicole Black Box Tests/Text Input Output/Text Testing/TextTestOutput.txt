@@ -1,0 +1,2058 @@
+There is a [circle at (50, 50)] and a [rect at (10, 10)]
+Saving stuff into a string.
+Testing string... concatenation
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+[rect at (50, 50)]
+There is a  [line at (10, 10)]
+Line feeds 
+using Java's 
+escape character.
+Carriage return  Form feed  
+34
+Boolean is false
+
+The length of gfd is 3
+gfd to upper case is GFD
+gfd to lower case is gfd
+gfd is lexicographically greater than 3
+19 is the index of s
+test
+End index is out of bounds!
+      excess whitespace       
+After trimming: excess whitespace
+Two equal strings compared using the equals() method returns true
+The integer at index 0 is 89
+The integer at index 1 is 88
+The integer at index 2 is 8
+The integer at index 3 is 4
+The integer at index 4 is 3
+The integer at index 5 is 3
+The integer at index 6 is 5
+The integer at index 7 is 3
+The integer at index 8 is 4
+The integer at index 9 is 5
+[circle at (50, 50)]
+There is a  [rect at (50, 50)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (51, 50)]
+There is a  [rect at (50, 49)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (52, 50)]
+There is a  [rect at (50, 48)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (53, 50)]
+There is a  [rect at (50, 47)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (54, 50)]
+There is a  [rect at (50, 46)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (55, 50)]
+There is a  [rect at (50, 45)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (56, 50)]
+There is a  [rect at (50, 44)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (57, 50)]
+There is a  [rect at (50, 43)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (58, 50)]
+There is a  [rect at (50, 42)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (59, 50)]
+There is a  [rect at (50, 41)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (60, 50)]
+There is a  [rect at (50, 40)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (61, 50)]
+There is a  [rect at (50, 39)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (62, 50)]
+There is a  [rect at (50, 38)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (63, 50)]
+There is a  [rect at (50, 37)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (64, 50)]
+There is a  [rect at (50, 36)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (65, 50)]
+There is a  [rect at (50, 35)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (66, 50)]
+There is a  [rect at (50, 34)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (67, 50)]
+There is a  [rect at (50, 33)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (68, 50)]
+There is a  [rect at (50, 32)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (69, 50)]
+There is a  [rect at (50, 31)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (70, 50)]
+There is a  [rect at (50, 30)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (71, 50)]
+There is a  [rect at (50, 29)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (72, 50)]
+There is a  [rect at (50, 28)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (73, 50)]
+There is a  [rect at (50, 27)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (74, 50)]
+There is a  [rect at (50, 26)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (75, 50)]
+There is a  [rect at (50, 25)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (76, 50)]
+There is a  [rect at (50, 24)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (77, 50)]
+There is a  [rect at (50, 23)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (78, 50)]
+There is a  [rect at (50, 22)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (79, 50)]
+There is a  [rect at (50, 21)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (80, 50)]
+There is a  [rect at (50, 20)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (81, 50)]
+There is a  [rect at (50, 19)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (82, 50)]
+There is a  [rect at (50, 18)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (83, 50)]
+There is a  [rect at (50, 17)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (84, 50)]
+There is a  [rect at (50, 16)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (85, 50)]
+There is a  [rect at (50, 15)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (86, 50)]
+There is a  [rect at (50, 14)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (87, 50)]
+There is a  [rect at (50, 13)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (88, 50)]
+There is a  [rect at (50, 12)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (89, 50)]
+There is a  [rect at (50, 11)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (90, 50)]
+There is a  [rect at (50, 10)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (91, 50)]
+There is a  [rect at (50, 9)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (92, 50)]
+There is a  [rect at (50, 8)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (93, 50)]
+There is a  [rect at (50, 7)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (94, 50)]
+There is a  [rect at (50, 6)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (95, 50)]
+There is a  [rect at (50, 5)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (96, 50)]
+There is a  [rect at (50, 4)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (97, 50)]
+There is a  [rect at (50, 3)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (98, 50)]
+There is a  [rect at (50, 2)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (99, 50)]
+There is a  [rect at (50, 1)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (0, 50)]
+There is a  [rect at (50, 0)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (1, 50)]
+There is a  [rect at (50, -1)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (2, 50)]
+There is a  [rect at (50, -2)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (3, 50)]
+There is a  [rect at (50, -3)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (4, 50)]
+There is a  [rect at (50, -4)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (5, 50)]
+There is a  [rect at (50, -5)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (6, 50)]
+There is a  [rect at (50, -6)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (7, 50)]
+There is a  [rect at (50, -7)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (8, 50)]
+There is a  [rect at (50, -8)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (9, 50)]
+There is a  [rect at (50, -9)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (10, 50)]
+There is a  [rect at (50, -10)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (11, 50)]
+There is a  [rect at (50, -11)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (12, 50)]
+There is a  [rect at (50, -12)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (13, 50)]
+There is a  [rect at (50, -13)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (14, 50)]
+There is a  [rect at (50, -14)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (15, 50)]
+There is a  [rect at (50, -15)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (16, 50)]
+There is a  [rect at (50, -16)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (17, 50)]
+There is a  [rect at (50, -17)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (18, 50)]
+There is a  [rect at (50, -18)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (19, 50)]
+There is a  [rect at (50, -19)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (20, 50)]
+There is a  [rect at (50, -20)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (21, 50)]
+There is a  [rect at (50, -21)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (22, 50)]
+There is a  [rect at (50, -22)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (23, 50)]
+There is a  [rect at (50, -23)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (24, 50)]
+There is a  [rect at (50, -24)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (25, 50)]
+There is a  [rect at (50, -25)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (26, 50)]
+There is a  [rect at (50, -26)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (27, 50)]
+There is a  [rect at (50, -27)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (28, 50)]
+There is a  [rect at (50, -28)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (29, 50)]
+There is a  [rect at (50, -29)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (30, 50)]
+There is a  [rect at (50, -30)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (31, 50)]
+There is a  [rect at (50, -31)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (32, 50)]
+There is a  [rect at (50, -32)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (33, 50)]
+There is a  [rect at (50, -33)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (34, 50)]
+There is a  [rect at (50, -34)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (35, 50)]
+There is a  [rect at (50, -35)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (36, 50)]
+There is a  [rect at (50, -36)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (37, 50)]
+There is a  [rect at (50, -37)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (38, 50)]
+There is a  [rect at (50, -38)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (39, 50)]
+There is a  [rect at (50, -39)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (40, 50)]
+There is a  [rect at (50, -40)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (41, 50)]
+There is a  [rect at (50, -41)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (42, 50)]
+There is a  [rect at (50, -42)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (43, 50)]
+There is a  [rect at (50, -43)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (44, 50)]
+There is a  [rect at (50, -44)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (45, 50)]
+There is a  [rect at (50, -45)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (46, 50)]
+There is a  [rect at (50, -46)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (47, 50)]
+There is a  [rect at (50, -47)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (48, 50)]
+There is a  [rect at (50, -48)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (49, 50)]
+There is a  [rect at (50, -49)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (50, 50)]
+There is a  [rect at (50, -50)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (51, 50)]
+There is a  [rect at (50, -51)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (52, 50)]
+There is a  [rect at (50, -52)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (53, 50)]
+There is a  [rect at (50, -53)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (54, 50)]
+There is a  [rect at (50, -54)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (55, 50)]
+There is a  [rect at (50, -55)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (56, 50)]
+There is a  [rect at (50, -56)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (57, 50)]
+There is a  [rect at (50, -57)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (58, 50)]
+There is a  [rect at (50, -58)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (59, 50)]
+There is a  [rect at (50, -59)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (60, 50)]
+There is a  [rect at (50, -60)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (61, 50)]
+There is a  [rect at (50, -61)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (62, 50)]
+There is a  [rect at (50, -62)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (63, 50)]
+There is a  [rect at (50, -63)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (64, 50)]
+There is a  [rect at (50, -64)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (65, 50)]
+There is a  [rect at (50, -65)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (66, 50)]
+There is a  [rect at (50, -66)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (67, 50)]
+There is a  [rect at (50, -67)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (68, 50)]
+There is a  [rect at (50, -68)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (69, 50)]
+There is a  [rect at (50, -69)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (70, 50)]
+There is a  [rect at (50, -70)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (71, 50)]
+There is a  [rect at (50, -71)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (72, 50)]
+There is a  [rect at (50, -72)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (73, 50)]
+There is a  [rect at (50, -73)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (74, 50)]
+There is a  [rect at (50, -74)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (75, 50)]
+There is a  [rect at (50, -75)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (76, 50)]
+There is a  [rect at (50, -76)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (77, 50)]
+There is a  [rect at (50, -77)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (78, 50)]
+There is a  [rect at (50, -78)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (79, 50)]
+There is a  [rect at (50, -79)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (80, 50)]
+There is a  [rect at (50, -80)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (81, 50)]
+There is a  [rect at (50, -81)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (82, 50)]
+There is a  [rect at (50, -82)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (83, 50)]
+There is a  [rect at (50, -83)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (84, 50)]
+There is a  [rect at (50, -84)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (85, 50)]
+There is a  [rect at (50, -85)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (86, 50)]
+There is a  [rect at (50, -86)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (87, 50)]
+There is a  [rect at (50, -87)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (88, 50)]
+There is a  [rect at (50, -88)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (89, 50)]
+There is a  [rect at (50, -89)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (90, 50)]
+There is a  [rect at (50, -90)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (91, 50)]
+There is a  [rect at (50, -91)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (92, 50)]
+There is a  [rect at (50, -92)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (93, 50)]
+There is a  [rect at (50, -93)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (94, 50)]
+There is a  [rect at (50, -94)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (95, 50)]
+There is a  [rect at (50, -95)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (96, 50)]
+There is a  [rect at (50, -96)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (97, 50)]
+There is a  [rect at (50, -97)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (98, 50)]
+There is a  [rect at (50, -98)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (99, 50)]
+There is a  [rect at (50, -99)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (0, 50)]
+There is a  [rect at (50, -100)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (1, 50)]
+There is a  [rect at (50, -101)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (2, 50)]
+There is a  [rect at (50, -102)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (3, 50)]
+There is a  [rect at (50, -103)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (4, 50)]
+There is a  [rect at (50, -104)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (5, 50)]
+There is a  [rect at (50, -105)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (6, 50)]
+There is a  [rect at (50, -106)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (7, 50)]
+There is a  [rect at (50, -107)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (8, 50)]
+There is a  [rect at (50, -108)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (9, 50)]
+There is a  [rect at (50, -109)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (10, 50)]
+There is a  [rect at (50, -110)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (11, 50)]
+There is a  [rect at (50, -111)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (12, 50)]
+There is a  [rect at (50, -112)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (13, 50)]
+There is a  [rect at (50, -113)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (14, 50)]
+There is a  [rect at (50, -114)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (15, 50)]
+There is a  [rect at (50, -115)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (16, 50)]
+There is a  [rect at (50, -116)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (17, 50)]
+There is a  [rect at (50, -117)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (18, 50)]
+There is a  [rect at (50, -118)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (19, 50)]
+There is a  [rect at (50, -119)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (20, 50)]
+There is a  [rect at (50, -120)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (21, 50)]
+There is a  [rect at (50, -121)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (22, 50)]
+There is a  [rect at (50, -122)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (23, 50)]
+There is a  [rect at (50, -123)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (24, 50)]
+There is a  [rect at (50, -124)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (25, 50)]
+There is a  [rect at (50, -125)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (26, 50)]
+There is a  [rect at (50, -126)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (27, 50)]
+There is a  [rect at (50, -127)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (28, 50)]
+There is a  [rect at (50, -128)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (29, 50)]
+There is a  [rect at (50, -129)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (30, 50)]
+There is a  [rect at (50, -130)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (31, 50)]
+There is a  [rect at (50, -131)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (32, 50)]
+There is a  [rect at (50, -132)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (33, 50)]
+There is a  [rect at (50, -133)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (34, 50)]
+There is a  [rect at (50, -134)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (35, 50)]
+There is a  [rect at (50, -135)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (36, 50)]
+There is a  [rect at (50, -136)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (37, 50)]
+There is a  [rect at (50, -137)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (38, 50)]
+There is a  [rect at (50, -138)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (39, 50)]
+There is a  [rect at (50, -139)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (40, 50)]
+There is a  [rect at (50, -140)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (41, 50)]
+There is a  [rect at (50, -141)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (42, 50)]
+There is a  [rect at (50, -142)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (43, 50)]
+There is a  [rect at (50, -143)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (44, 50)]
+There is a  [rect at (50, -144)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (45, 50)]
+There is a  [rect at (50, -145)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (46, 50)]
+There is a  [rect at (50, -146)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (47, 50)]
+There is a  [rect at (50, -147)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (48, 50)]
+There is a  [rect at (50, -148)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (49, 50)]
+There is a  [rect at (50, -149)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (50, 50)]
+There is a  [rect at (50, -150)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (51, 50)]
+There is a  [rect at (50, -151)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (52, 50)]
+There is a  [rect at (50, -152)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (53, 50)]
+There is a  [rect at (50, -153)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (54, 50)]
+There is a  [rect at (50, -154)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (55, 50)]
+There is a  [rect at (50, -155)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (56, 50)]
+There is a  [rect at (50, -156)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (57, 50)]
+There is a  [rect at (50, -157)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (58, 50)]
+There is a  [rect at (50, -158)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (59, 50)]
+There is a  [rect at (50, -159)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (60, 50)]
+There is a  [rect at (50, -160)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (61, 50)]
+There is a  [rect at (50, -161)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (62, 50)]
+There is a  [rect at (50, -162)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (63, 50)]
+There is a  [rect at (50, -163)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (64, 50)]
+There is a  [rect at (50, -164)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (65, 50)]
+There is a  [rect at (50, -165)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (66, 50)]
+There is a  [rect at (50, -166)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (67, 50)]
+There is a  [rect at (50, -167)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (68, 50)]
+There is a  [rect at (50, -168)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (69, 50)]
+There is a  [rect at (50, -169)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (70, 50)]
+There is a  [rect at (50, -170)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (71, 50)]
+There is a  [rect at (50, -171)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (72, 50)]
+There is a  [rect at (50, -172)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (73, 50)]
+There is a  [rect at (50, -173)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (74, 50)]
+There is a  [rect at (50, -174)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (75, 50)]
+There is a  [rect at (50, -175)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (76, 50)]
+There is a  [rect at (50, -176)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (77, 50)]
+There is a  [rect at (50, -177)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (78, 50)]
+There is a  [rect at (50, -178)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (79, 50)]
+There is a  [rect at (50, -179)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (80, 50)]
+There is a  [rect at (50, -180)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (81, 50)]
+There is a  [rect at (50, -181)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (82, 50)]
+There is a  [rect at (50, -182)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (83, 50)]
+There is a  [rect at (50, -183)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (84, 50)]
+There is a  [rect at (50, -184)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (85, 50)]
+There is a  [rect at (50, -185)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (86, 50)]
+There is a  [rect at (50, -186)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (87, 50)]
+There is a  [rect at (50, -187)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (88, 50)]
+There is a  [rect at (50, -188)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (89, 50)]
+There is a  [rect at (50, -189)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (90, 50)]
+There is a  [rect at (50, -190)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (91, 50)]
+There is a  [rect at (50, -191)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (92, 50)]
+There is a  [rect at (50, -192)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (93, 50)]
+There is a  [rect at (50, -193)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (94, 50)]
+There is a  [rect at (50, -194)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (95, 50)]
+There is a  [rect at (50, -195)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (96, 50)]
+There is a  [rect at (50, -196)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (97, 50)]
+There is a  [rect at (50, -197)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (98, 50)]
+There is a  [rect at (50, -198)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (99, 50)]
+There is a  [rect at (50, -199)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (0, 50)]
+There is a  [rect at (50, -200)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (1, 50)]
+There is a  [rect at (50, -201)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (2, 50)]
+There is a  [rect at (50, -202)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (3, 50)]
+There is a  [rect at (50, -203)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (4, 50)]
+There is a  [rect at (50, -204)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (5, 50)]
+There is a  [rect at (50, -205)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (6, 50)]
+There is a  [rect at (50, -206)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (7, 50)]
+There is a  [rect at (50, -207)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (8, 50)]
+There is a  [rect at (50, -208)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (9, 50)]
+There is a  [rect at (50, -209)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (10, 50)]
+There is a  [rect at (50, -210)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (11, 50)]
+There is a  [rect at (50, -211)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (12, 50)]
+There is a  [rect at (50, -212)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (13, 50)]
+There is a  [rect at (50, -213)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (14, 50)]
+There is a  [rect at (50, -214)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (15, 50)]
+There is a  [rect at (50, -215)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (16, 50)]
+There is a  [rect at (50, -216)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (17, 50)]
+There is a  [rect at (50, -217)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (18, 50)]
+There is a  [rect at (50, -218)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (19, 50)]
+There is a  [rect at (50, -219)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (20, 50)]
+There is a  [rect at (50, -220)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (21, 50)]
+There is a  [rect at (50, -221)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (22, 50)]
+There is a  [rect at (50, -222)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (23, 50)]
+There is a  [rect at (50, -223)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (24, 50)]
+There is a  [rect at (50, -224)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (25, 50)]
+There is a  [rect at (50, -225)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (26, 50)]
+There is a  [rect at (50, -226)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (27, 50)]
+There is a  [rect at (50, -227)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (28, 50)]
+There is a  [rect at (50, -228)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (29, 50)]
+There is a  [rect at (50, -229)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (30, 50)]
+There is a  [rect at (50, -230)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (31, 50)]
+There is a  [rect at (50, -231)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (32, 50)]
+There is a  [rect at (50, -232)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (33, 50)]
+There is a  [rect at (50, -233)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (34, 50)]
+There is a  [rect at (50, -234)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (35, 50)]
+There is a  [rect at (50, -235)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (36, 50)]
+There is a  [rect at (50, -236)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (37, 50)]
+There is a  [rect at (50, -237)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (38, 50)]
+There is a  [rect at (50, -238)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (39, 50)]
+There is a  [rect at (50, -239)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (40, 50)]
+There is a  [rect at (50, -240)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (41, 50)]
+There is a  [rect at (50, -241)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (42, 50)]
+There is a  [rect at (50, -242)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (43, 50)]
+There is a  [rect at (50, -243)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (44, 50)]
+There is a  [rect at (50, -244)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (45, 50)]
+There is a  [rect at (50, -245)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (46, 50)]
+There is a  [rect at (50, -246)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (47, 50)]
+There is a  [rect at (50, -247)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (48, 50)]
+There is a  [rect at (50, -248)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (49, 50)]
+There is a  [rect at (50, -249)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (50, 50)]
+There is a  [rect at (50, -250)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (51, 50)]
+There is a  [rect at (50, -251)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (52, 50)]
+There is a  [rect at (50, -252)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (53, 50)]
+There is a  [rect at (50, -253)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (54, 50)]
+There is a  [rect at (50, -254)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (55, 50)]
+There is a  [rect at (50, -255)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (56, 50)]
+There is a  [rect at (50, -256)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (57, 50)]
+There is a  [rect at (50, -257)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (58, 50)]
+There is a  [rect at (50, -258)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (59, 50)]
+There is a  [rect at (50, -259)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (60, 50)]
+There is a  [rect at (50, -260)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (61, 50)]
+There is a  [rect at (50, -261)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (62, 50)]
+There is a  [rect at (50, -262)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (63, 50)]
+There is a  [rect at (50, -263)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (64, 50)]
+There is a  [rect at (50, -264)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (65, 50)]
+There is a  [rect at (50, -265)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (66, 50)]
+There is a  [rect at (50, -266)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (67, 50)]
+There is a  [rect at (50, -267)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (68, 50)]
+There is a  [rect at (50, -268)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (69, 50)]
+There is a  [rect at (50, -269)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (70, 50)]
+There is a  [rect at (50, -270)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (71, 50)]
+There is a  [rect at (50, -271)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (72, 50)]
+There is a  [rect at (50, -272)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (73, 50)]
+There is a  [rect at (50, -273)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (74, 50)]
+There is a  [rect at (50, -274)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (75, 50)]
+There is a  [rect at (50, -275)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (76, 50)]
+There is a  [rect at (50, -276)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (77, 50)]
+There is a  [rect at (50, -277)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (78, 50)]
+There is a  [rect at (50, -278)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (79, 50)]
+There is a  [rect at (50, -279)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (80, 50)]
+There is a  [rect at (50, -280)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (81, 50)]
+There is a  [rect at (50, -281)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (82, 50)]
+There is a  [rect at (50, -282)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (83, 50)]
+There is a  [rect at (50, -283)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (84, 50)]
+There is a  [rect at (50, -284)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (85, 50)]
+There is a  [rect at (50, -285)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (86, 50)]
+There is a  [rect at (50, -286)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (87, 50)]
+There is a  [rect at (50, -287)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (88, 50)]
+There is a  [rect at (50, -288)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (89, 50)]
+There is a  [rect at (50, -289)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (90, 50)]
+There is a  [rect at (50, -290)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (91, 50)]
+There is a  [rect at (50, -291)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (92, 50)]
+There is a  [rect at (50, -292)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (93, 50)]
+There is a  [rect at (50, -293)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (94, 50)]
+There is a  [rect at (50, -294)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (95, 50)]
+There is a  [rect at (50, -295)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (96, 50)]
+There is a  [rect at (50, -296)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (97, 50)]
+There is a  [rect at (50, -297)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (98, 50)]
+There is a  [rect at (50, -298)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (99, 50)]
+There is a  [rect at (50, -299)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (0, 50)]
+There is a  [rect at (50, -300)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (1, 50)]
+There is a  [rect at (50, -301)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (2, 50)]
+There is a  [rect at (50, -302)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (3, 50)]
+There is a  [rect at (50, -303)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (4, 50)]
+There is a  [rect at (50, -304)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (5, 50)]
+There is a  [rect at (50, -305)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (6, 50)]
+There is a  [rect at (50, -306)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (7, 50)]
+There is a  [rect at (50, -307)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (8, 50)]
+There is a  [rect at (50, -308)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (9, 50)]
+There is a  [rect at (50, -309)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (10, 50)]
+There is a  [rect at (50, -310)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (11, 50)]
+There is a  [rect at (50, -311)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (12, 50)]
+There is a  [rect at (50, -312)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (13, 50)]
+There is a  [rect at (50, -313)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (14, 50)]
+There is a  [rect at (50, -314)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (15, 50)]
+There is a  [rect at (50, -315)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (16, 50)]
+There is a  [rect at (50, -316)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (17, 50)]
+There is a  [rect at (50, -317)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (18, 50)]
+There is a  [rect at (50, -318)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (19, 50)]
+There is a  [rect at (50, -319)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (20, 50)]
+There is a  [rect at (50, -320)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (21, 50)]
+There is a  [rect at (50, -321)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (22, 50)]
+There is a  [rect at (50, -322)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (23, 50)]
+There is a  [rect at (50, -323)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (24, 50)]
+There is a  [rect at (50, -324)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (25, 50)]
+There is a  [rect at (50, -325)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (26, 50)]
+There is a  [rect at (50, -326)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (27, 50)]
+There is a  [rect at (50, -327)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (28, 50)]
+There is a  [rect at (50, -328)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (29, 50)]
+There is a  [rect at (50, -329)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (30, 50)]
+There is a  [rect at (50, -330)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (31, 50)]
+There is a  [rect at (50, -331)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (32, 50)]
+There is a  [rect at (50, -332)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (33, 50)]
+There is a  [rect at (50, -333)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (34, 50)]
+There is a  [rect at (50, -334)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (35, 50)]
+There is a  [rect at (50, -335)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (36, 50)]
+There is a  [rect at (50, -336)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (37, 50)]
+There is a  [rect at (50, -337)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (38, 50)]
+There is a  [rect at (50, -338)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (39, 50)]
+There is a  [rect at (50, -339)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (40, 50)]
+There is a  [rect at (50, -340)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (41, 50)]
+There is a  [rect at (50, -341)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (42, 50)]
+There is a  [rect at (50, -342)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (43, 50)]
+There is a  [rect at (50, -343)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (44, 50)]
+There is a  [rect at (50, -344)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (45, 50)]
+There is a  [rect at (50, -345)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (46, 50)]
+There is a  [rect at (50, -346)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (47, 50)]
+There is a  [rect at (50, -347)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (48, 50)]
+There is a  [rect at (50, -348)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (49, 50)]
+There is a  [rect at (50, -349)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (50, 50)]
+There is a  [rect at (50, -350)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (51, 50)]
+There is a  [rect at (50, -351)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (52, 50)]
+There is a  [rect at (50, -352)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (53, 50)]
+There is a  [rect at (50, -353)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (54, 50)]
+There is a  [rect at (50, -354)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (55, 50)]
+There is a  [rect at (50, -355)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (56, 50)]
+There is a  [rect at (50, -356)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (57, 50)]
+There is a  [rect at (50, -357)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (58, 50)]
+There is a  [rect at (50, -358)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (59, 50)]
+There is a  [rect at (50, -359)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (60, 50)]
+There is a  [rect at (50, -360)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (61, 50)]
+There is a  [rect at (50, -361)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (62, 50)]
+There is a  [rect at (50, -362)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (63, 50)]
+There is a  [rect at (50, -363)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (64, 50)]
+There is a  [rect at (50, -364)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (65, 50)]
+There is a  [rect at (50, -365)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (66, 50)]
+There is a  [rect at (50, -366)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (67, 50)]
+There is a  [rect at (50, -367)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (68, 50)]
+There is a  [rect at (50, -368)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (69, 50)]
+There is a  [rect at (50, -369)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (70, 50)]
+There is a  [rect at (50, -370)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (71, 50)]
+There is a  [rect at (50, -371)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (72, 50)]
+There is a  [rect at (50, -372)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (73, 50)]
+There is a  [rect at (50, -373)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (74, 50)]
+There is a  [rect at (50, -374)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (75, 50)]
+There is a  [rect at (50, -375)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (76, 50)]
+There is a  [rect at (50, -376)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (77, 50)]
+There is a  [rect at (50, -377)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (78, 50)]
+There is a  [rect at (50, -378)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (79, 50)]
+There is a  [rect at (50, -379)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (80, 50)]
+There is a  [rect at (50, -380)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (81, 50)]
+There is a  [rect at (50, -381)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (82, 50)]
+There is a  [rect at (50, -382)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (83, 50)]
+There is a  [rect at (50, -383)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (84, 50)]
+There is a  [rect at (50, -384)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (85, 50)]
+There is a  [rect at (50, -385)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (86, 50)]
+There is a  [rect at (50, -386)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (87, 50)]
+There is a  [rect at (50, -387)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (88, 50)]
+There is a  [rect at (50, -388)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (89, 50)]
+There is a  [rect at (50, -389)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (90, 50)]
+There is a  [rect at (50, -390)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (91, 50)]
+There is a  [rect at (50, -391)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (92, 50)]
+There is a  [rect at (50, -392)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (93, 50)]
+There is a  [rect at (50, -393)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (94, 50)]
+There is a  [rect at (50, -394)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (95, 50)]
+There is a  [rect at (50, -395)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (96, 50)]
+There is a  [rect at (50, -396)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (97, 50)]
+There is a  [rect at (50, -397)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (98, 50)]
+There is a  [rect at (50, -398)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (99, 50)]
+There is a  [rect at (50, -399)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (0, 50)]
+There is a  [rect at (50, -400)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (1, 50)]
+There is a  [rect at (50, -401)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (2, 50)]
+There is a  [rect at (50, -402)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (3, 50)]
+There is a  [rect at (50, -403)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (4, 50)]
+There is a  [rect at (50, -404)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (5, 50)]
+There is a  [rect at (50, -405)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
+[circle at (6, 50)]
+There is a  [rect at (50, -406)]
+ this many units off-screen:  50
+There was a mouse click at  0, 0
