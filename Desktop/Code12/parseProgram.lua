@@ -35,11 +35,11 @@ local parseProgram = {}
 --     { s = "while", expr, stmts }
 --     { s = "doWhile", expr, stmts }
 --     { s = "for", initStmt, expr, nextStmt, stmts }
---     { s = "forArray", typeID, nameID, arrayID, stmts }
+--     { s = "forArray", typeID, varID, arrayID, stmts }
 --     { s = "break" }
 --     { s = "return", expr }
 --
--- lValue: { s = "lValue", nameID, indexExpr, fieldID }
+-- lValue: { s = "lValue", varID, indexExpr, fieldID }
 -- 
 -- expr:
 --     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
@@ -67,7 +67,7 @@ local iTree             -- current tree index in parseTrees being analyzed
 -- Forward declarations
 local makeExpr
 local getBlockStmts
-local getStmt
+local getLineStmts
 
 
 -- Check for the correct Code12 import and move iTree past all imports.
@@ -218,8 +218,9 @@ end
 -- or fnValue parse node
 local function makeLValue( node )
 	if node.tt == "ID" then
-		return { s = "lValue", nameID = node }
+		return { s = "lValue", varID = node }
 	end
+	assert( node.t == "lValue" or node.t == "fnValue" )
 	local nodes = node.nodes
 	local indexExpr = nil
 	local indexNode = nodes[2]
@@ -228,10 +229,10 @@ local function makeLValue( node )
 	end
 	local fieldID = nil
 	local fieldNode = nodes[3]
-	if fieldNode.p == "field" then
+	if fieldNode.p ~= "empty" then
 		fieldID = fieldNode.nodes[2]
 	end
-	return { s = "lValue", nameID = nodes[1], 
+	return { s = "lValue", varID = nodes[1], 
 			indexExpr = indexExpr, fieldID = fieldID }
 end
 
@@ -248,10 +249,11 @@ local function makeCall( nodes )
 	return { s = "call", lValue = makeLValue( nodes[1] ), exprs = exprs }
 end
 
--- Get the controlled stmt(s) for an if, else, or loop, and return
--- and array of stmt structures. If the next item to process is a begin
--- block then get an entire block of stmts until the matching block end,
--- otherwise get a single stmt. Return nil if there was an error.
+-- Get the single controlled stmt or block of controlled stmts for an 
+-- if, else, or loop, and return an array of stmt structures. 
+-- If the next item to process is a begin block then get an entire block 
+-- of stmts until the matching block end, otherwise get a single stmt. 
+-- Return nil if there was an error.
 local function getControlledStmts()
 	local tree = parseTrees[iTree]
 	local p = tree.p
@@ -266,9 +268,9 @@ local function getControlledStmts()
 		return nil
 	else
 		-- Single controlled stmt
-		iTree = iTree + 1  -- pass the controlled stmt as expected by getStmt
+		iTree = iTree + 1  -- pass the controlled stmt as expected by getLineStmts
 		local stmts = {}
-		if getStmt( tree, stmts ) then
+		if getLineStmts( tree, stmts ) then
 			return stmts
 		end
 	end
@@ -294,68 +296,137 @@ local function getElseStmts()
 	return nil	
 end
 
--- Get and make stmt structure(s) from the given parse tree,
--- which is not a "begin" or "end" pattern and has already been passed.
--- and add them to the stmts array. Return true if successful.
+-- Get and return a stmt structure for the given stmt parse tree.
+-- Return nil if there is an error.
+local function getStmt( node )
+	local p = node.p
+	local nodes = node.nodes
+
+	if p == "call" then
+		return makeCall( nodes )
+	elseif p == "varAssign" or p == "assign" then  -- TODO: remove this distinction?
+		return { s = "assign", lValue = makeLValue( nodes[1] ), op = "=", 
+				expr = makeExpr( nodes[3] ) }
+	elseif p == "opAssign" then
+		return { s = "assign", lValue = makeLValue( nodes[1] ),  op = nodes[2].p, 
+				expr = makeExpr( nodes[3] ) }
+	elseif p == "preInc" or p == "preDec" then
+		return { s = "assign", lValue = makeLValue( nodes[2] ), op = nodes[1].tt }
+	elseif p == "postInc" or p == "postDec" then
+		return { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2].tt }
+	elseif p == "break" then
+		return { s = "break" }
+	end
+	error( "Unexpected stmt pattern " .. p )
+end
+
+-- Get and return a for or forArray structure given the forControl parse tree node.
+-- Return nil if there is an error.
+local function getForStmt( forControl )
+	local nodes = forControl.nodes
+	if forControl.p == "array" then
+		-- for (typeID nameID : arrayID) controlledStmts
+		return { s = "forArray", typeID = nodes[1], varID = nodes[2], 
+				arrayID = nodes[4], stmts = getControlledStmts() }
+	else
+		-- for (init; expr; next) controlledStmts
+		local stmt = { s = "for", stmts = getControlledStmts() }
+
+		-- Add the initStmt if any
+		local forInit = nodes[1]
+		if forInit.p == "varInit" then
+			local ns = forInit.nodes
+			stmt.initStmt = makeVar( true, ns[1], ns[2], ns[4] )
+		elseif forInit.p == "stmt" then
+			stmt.initStmt = getStmt( forInit.nodes[1] )
+		end
+
+		-- Add the expr if any
+		local forExpr = nodes[3]
+		if forExpr.p == "expr" then
+			print(forExpr.nodes[1].t)
+			stmt.expr = makeExpr( forExpr.nodes[1] )
+		end
+
+		-- Add the nextStmt if any
+		local forNext = nodes[5]
+		if forNext.p == "stmt" then
+			stmt.nextStmt = getStmt( forNext.nodes[1] )
+		end
+		return stmt
+	end
+end
+
+-- Get and make stmt structure(s) from the given line parse tree,
+-- which is not a "begin" or "end" pattern, and has already been passed.
+-- Add the stmts to the stmts array. Return true if successful.
 -- If there is an error then set the error state and return false.
-function getStmt( tree, stmts )
+function getLineStmts( tree, stmts )	
+	assert( tree.t == "line" )
+	local p = tree.p
+	local nodes = tree.nodes
+
 	-- Fail on syntax errors
 	if tree.isError then
 		return false
 	end
 
 	-- Look for var decls
-	local p = tree.p
-	local nodes = tree.nodes
 	if getVar( p, nodes, stmts, true ) then
 		return true
 	end
 
-	-- Handle stmt patterns
+	-- Handle the line patterns
 	local stmt = nil
 	if p == "stmt" then
-		local node = nodes[1]
-		p = node.p
-		nodes = node.nodes
-
-		if p == "call" then
-			stmt = makeCall( nodes )
-		elseif p == "varAssign" or p == "assign" then  -- TODO: remove this distinction?
-			stmt = { s = "assign", lValue = makeLValue( nodes[1] ), op = "=", 
-					expr = makeExpr( nodes[3] ) }
-		elseif p == "opAssign" then
-			stmt = { s = "assign", lValue = makeLValue( nodes[1] ),  op = nodes[2].p, 
-					expr = makeExpr( nodes[3] ) }
-		elseif p == "preInc" or p == "preDec" then
-			stmt = { s = "assign", lValue = makeLValue( nodes[2] ), op = nodes[1].tt }
-		elseif p == "postInc" or p == "postDec" then
-			stmt = { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2].tt }
-		elseif p == "break" then
-			stmt = { s = "break" }
-		else
-			error( "Unexpected stmt pattern " .. p )
-		end
-	-- Handle other valid line patterns
+		-- stmt ;
+		stmt = getStmt( nodes[1] )
 	elseif p == "if" then
+		-- if (expr) controlledStmts [else controlledStmts]
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
 				elseStmts = getElseStmts() }
 	elseif p == "elseif" or p == "else" then
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
-		err.setErrNode( tree, "else without matching if (misplaced {} brackets?)")
+		err.setErrNode( tree, "else without matching if (misplaced { } brackets?)")
 		return false
 	elseif p == "return" then
 		-- TODO: Remember to check for return being only at end of a block
 		stmt = { s = "return", expr = makeExpr( nodes[2] ) }
 	elseif p == "do" then
-		-- TODO
+		-- do controlledStmts while (expr);
+		stmt = { s = "doWhile", stmts = getControlledStmts() }
+		if stmt.stmts == nil then
+			return nil
+		end
+		local endTree = parseTrees[iTree]
+		iTree = iTree + 1
+		if endTree.p ~= "while" then
+			err.setErrNodeAndRef( endTree, tree, 
+					"Expected while statement to end do-while loop" )
+			return nil
+		end
+		local whileEnd = endTree.nodes[4]
+		if whileEnd.p ~= "do-while" then
+			err.setErrNodeAndRef( whileEnd, tree, 
+					"while statement at end of do-while loop must end with a semicolon" )
+			return nil
+		end
+		stmt.expr = makeExpr( endTree.nodes[3] )
 	elseif p == "while" then
-		-- TODO
+		-- while (expr) controlledStmts
+		local whileEnd = nodes[4]
+		if whileEnd.p ~= "while" then
+			err.setErrNode( whileEnd, "while loop header should not end with a semicolon" )
+			return nil
+		end
+		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts() }
 	elseif p == "for" then
-		-- TODO
+		-- for loop variants
+		stmt = getForStmt( nodes[3] )
 	else
-		-- Handle invalid line patterns
+		-- Invalid line pattern
 		if p == "func" or p == "main" then
 			err.setErrNode( tree, "Function definitions cannot occur inside a statement block")
 		else
@@ -364,9 +435,12 @@ function getStmt( tree, stmts )
 		return false
 	end
 
-	-- Add the stmt
-	stmts[#stmts + 1] = stmt or { s = "stmt" }
-	return true
+	-- Add the stmt if successful
+	if stmt then
+		stmts[#stmts + 1] = stmt
+		return true
+	end
+	return false
 end
 
 -- Process a block of statements beginning with { and ending with }
@@ -395,7 +469,7 @@ function getBlockStmts()
 				return stmts
 			end
 		else
-			getStmt( tree, stmts )
+			getLineStmts( tree, stmts )
 		end
 	end
 
