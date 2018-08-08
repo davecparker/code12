@@ -67,6 +67,7 @@ local iTree             -- current tree index in parseTrees being analyzed
 -- Forward declarations
 local makeExpr
 local getBlockStmts
+local getStmt
 
 
 -- Check for the correct Code12 import and move iTree past all imports.
@@ -247,11 +248,57 @@ local function makeCall( nodes )
 	return { s = "call", lValue = makeLValue( nodes[1] ), exprs = exprs }
 end
 
+-- Get the controlled stmt(s) for an if, else, or loop, and return
+-- and array of stmt structures. If the next item to process is a begin
+-- block then get an entire block of stmts until the matching block end,
+-- otherwise get a single stmt. Return nil if there was an error.
+local function getControlledStmts()
+	local tree = parseTrees[iTree]
+	local p = tree.p
+	if p == "begin" then
+		return getBlockStmts()
+	elseif p == "end" then
+		err.setErrNode( tree, "} without matching {" )
+		return nil
+	elseif p == "varInit" or p == "varDecl" or p == "arrayInit" or p == "arrayDecl" then
+		-- Var decls are not allowed as a single controlled statement
+		err.setErrNode( tree, "Variable declarations are not allowed here" )
+		return nil
+	else
+		-- Single controlled stmt
+		iTree = iTree + 1  -- pass the controlled stmt as expected by getStmt
+		local stmts = {}
+		if getStmt( tree, stmts ) then
+			return stmts
+		end
+	end
+	return nil
+end
+
+-- Check to see if the next stmt is an else or else if, and if so then 
+-- get the controlled stmts and return an array of stmt structures. 
+-- Return nil if there is no else or an error.
+local function getElseStmts()
+	local tree = parseTrees[iTree]
+	local p = tree.p
+	if p == "else" then
+		iTree = iTree + 1
+		return getControlledStmts()
+	elseif p == "elseif" then
+		-- Controlled stmts is a single stmt, which is the following if
+		iTree = iTree + 1
+		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
+				stmts = getControlledStmts(), 
+				elseStmts = getElseStmts() } }
+	end
+	return nil	
+end
+
 -- Get and make stmt structure(s) from the given parse tree,
--- which is not a "begin" or "end" pattern,
+-- which is not a "begin" or "end" pattern and has already been passed.
 -- and add them to the stmts array. Return true if successful.
--- If there is an error then set the error state and return nil.
-local function getStmt( tree, stmts )
+-- If there is an error then set the error state and return false.
+function getStmt( tree, stmts )
 	-- Fail on syntax errors
 	if tree.isError then
 		return false
@@ -290,12 +337,16 @@ local function getStmt( tree, stmts )
 		end
 	-- Handle other valid line patterns
 	elseif p == "if" then
-		-- TODO
-	elseif p == "elseif" then
-		-- TODO
-	elseif p == "else" then
-		-- TODO
+		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
+				stmts = getControlledStmts(), 
+				elseStmts = getElseStmts() }
+	elseif p == "elseif" or p == "else" then
+		-- Handling of an if above should also consume the else if any,
+		-- so an else here is without a matching if.
+		err.setErrNode( tree, "else without matching if (misplaced {} brackets?)")
+		return false
 	elseif p == "return" then
+		-- TODO: Remember to check for return being only at end of a block
 		stmt = { s = "return", expr = makeExpr( nodes[2] ) }
 	elseif p == "do" then
 		-- TODO

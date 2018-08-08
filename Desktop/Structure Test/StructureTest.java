@@ -23,7 +23,20 @@ class StructureTest extends Code12Program
 
 	int foo(int i, double d)
 	{
-		return i + 1;
+		if (i < 0)
+			return i + 1;
+		else
+		{
+			i += 3;
+			d *= 2;
+		}
+
+		if (d == i)
+			d = i;
+		else
+			i = 0;
+
+		return 0;
 	}
 
 	// More instance variables
@@ -35,7 +48,7 @@ class StructureTest extends Code12Program
 
 	public void update()
 	{
-		moveBall( true );
+		moveBall( false );
 	}
 
 	public void onMousePress( GameObj obj, double x, double y )
@@ -53,6 +66,12 @@ class StructureTest extends Code12Program
 	int moveBall(boolean wrap)
 	{
 		ball.x++;
+		if (wrap)
+		{
+			boolean checked = true;
+			if (ball.x > 100)
+				ball.x = 0;
+		}
 		return ball.x;
 	}
 

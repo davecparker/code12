@@ -23,7 +23,20 @@ require('Code12.api')
     
     function _fn.foo(i, d)
         
-        return i + 1
+        if i < 0 then
+            return i + 1; 
+        else 
+            
+            i = i + (3)
+            d = d * (2)
+        end
+        
+        if d == i then
+            d = i; 
+        else 
+            i = 0; end
+        
+        return 0
     end
     
     -- More instance variables
@@ -35,7 +48,7 @@ require('Code12.api')
     
     function _fn.update()
         
-        _fn.moveBall(true)
+        _fn.moveBall(false)
     end
     
     function _fn.onMousePress(obj, x, y)
@@ -53,6 +66,12 @@ require('Code12.api')
     function _fn.moveBall(wrap)
         
         this.ball.x = this.ball.x + 1
+        if wrap then
+            
+            local checked = true
+            if this.ball.x > 100 then
+                this.ball.x = 0; end
+        end
         return this.ball.x
     end
     
