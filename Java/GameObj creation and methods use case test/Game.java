@@ -5,7 +5,6 @@ public class Game extends Code12Program
 {
     GameObj player, goal, score;
     GameObj[] enemies;
-    boolean playerDead = false;
     double enemyCount = 0;
     int scoreCount = 0;
 
@@ -37,44 +36,41 @@ public class Game extends Code12Program
 
     public void update()
     {
-        if (!playerDead)
+        if (isBeyondLeftBoundary(player))
+            player.x = ct.getWidth();
+        else if (isBeyondRightBoundary(player))
+            player.x = 0;
+
+        if (isBeyondUpperBoundary(player))
+            preventPassingUpperBoundary(player);
+        else if (isBeyondLowerBoundary(player))
+            preventPassingLowerBoundary(player);
+
+        for (int i = 0; i < enemies.length; i++)
         {
-            if (isBeyondLeftBoundary(player))
-                player.x = ct.getWidth();
-            else if (isBeyondRightBoundary(player))
-                player.x = 0;
-
-            if (isBeyondUpperBoundary(player))
-                preventPassingUpperBoundary(player);
-            else if (isBeyondLowerBoundary(player))
-                preventPassingLowerBoundary(player);
-
-            for (int i = 0; i < enemies.length; i++)
-            {
-                if (isBeyondLowerBoundary(enemies[i]))
-                    randomizeEnemyPosition(i);
-            }
-
-            if (player.hit(goal))
-            {
-                randomizeGoalPosition();
-                incrementScore("++");
-            }
-
-            for (int i = 0; i < enemies.length; i++)
-            {
-                if (player.hit(enemies[i]))
-                {
-                    randomizeEnemyPosition(enemies[i]);
-                    incrementScore("--");
-                }
-            }
-
-            if (scoreCount < 0)
-                winningAction();
-            else if (scoreCount == 10)
-                losingAction();
+            if (isBeyondLowerBoundary(enemies[i]))
+                randomizeEnemyPosition(enemies[i]);
         }
+
+        if (player.hit(goal))
+        {
+            randomizeGoalPosition();
+            incrementScore("++");
+        }
+
+        for (int i = 0; i < enemies.length; i++)
+        {
+            if (player.hit(enemies[i]))
+            {
+                randomizeEnemyPosition(enemies[i]);
+                incrementScore("--");
+            }
+        }
+
+        if (scoreCount < 0)
+            winningAction();
+        else if (scoreCount == 10)
+            losingAction();
     }
 
     public boolean isBeyondLeftBoundary(GameObj object)
@@ -136,7 +132,6 @@ public class Game extends Code12Program
         player.delete();
         goal.delete();
         ct.clearGroup("enemies");
-        playerDead = true;
     }
 
     public void losingAction()
@@ -145,7 +140,6 @@ public class Game extends Code12Program
         player.delete();
         goal.delete();
         ct.clearGroup("enemies");
-        playerDead = true;
     }
 
     public void onKeyPress(String key)
