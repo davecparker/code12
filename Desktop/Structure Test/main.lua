@@ -23,6 +23,11 @@ require('Code12.api')
     
     function _fn.foo(i, d)
         
+        return 0
+    end
+    
+    function _fn.test(i, d)
+        
         if i < 0 then
             return i + 1; 
         else 
@@ -33,8 +38,32 @@ require('Code12.api')
         
         if d == i then
             d = i; 
+        elseif d < i then
+            d = -i; 
         else 
             i = 0; end
+        
+        repeat
+            i = i + 1; 
+        until not (i < 0)
+        
+        d = 13
+        
+        while i > 10 do
+            
+            i = i - 1
+            i = i + 1
+        end
+        
+        d = 24
+        
+        local j = i; while j < 10 do
+            
+            d = d + (i)
+            i = i - 1
+        end
+        
+        i = 0
         
         return 0
     end
@@ -78,6 +107,8 @@ require('Code12.api')
     function _fn.makeCircles()
         
         local circles = { length = 10, default = nil }
+        for _, c in ipairs(circles) do
+            c:setFillColor("black"); end
         local scores = { 10, 20, 30, length = 3, default = 0 }
         return circles
     end

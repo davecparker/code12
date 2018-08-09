@@ -23,6 +23,11 @@ class StructureTest extends Code12Program
 
 	int foo(int i, double d)
 	{
+		return 0;
+	}
+
+	int test(int i, double d)
+	{
 		if (i < 0)
 			return i + 1;
 		else
@@ -33,8 +38,32 @@ class StructureTest extends Code12Program
 
 		if (d == i)
 			d = i;
+		else if (d < i)
+			d = -i;
 		else
 			i = 0;
+
+		do
+			i++;
+		while (i < 0);
+
+		d = 13;
+
+		while (i > 10)
+		{
+			i--;
+			i++;
+		}
+
+		d = 24;
+
+		for (int j = i; j < 10; )
+		{
+			d += i;
+			i--;
+		}
+
+		i = 0;
 
 		return 0;
 	}
@@ -78,6 +107,8 @@ class StructureTest extends Code12Program
 	GameObj[] makeCircles()
 	{
 		GameObj[] circles = new GameObj[10];
+		for (GameObj c: circles)
+			c.setFillColor( "black" );
 		int[] scores = { 10, 20, 30 };
 		return circles;
 	}

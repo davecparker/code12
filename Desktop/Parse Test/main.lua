@@ -113,7 +113,7 @@ local function parseTestCode()
 			output( "************** Beginning of Expected Errors Section **************" )
 		else
 			-- Parse this line
-			local tree, tokens = parseJava.parseLine( strCode, lineNum, startTokens )
+			local tree, tokens = parseJava.parseLine( strCode, lineNum, startTokens ) -- TODO: Set and change syntax level?
 			if tree == false then
 				-- This line is unfinished, carry the tokens forward to the next line
 				startTokens = tokens
