@@ -89,6 +89,8 @@ local lineNumber        -- the line number for the source string
 local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
 local commentForLine    -- array of end-of-line comments indexed by line number
+local indents			-- stack of indents
+local dedents			-- stack of dedents
 
 
 ----- Token scanning functions ------------------------------------------------
@@ -421,6 +423,7 @@ end
 function javalex.initProgram()
 	commentLevel = 0
 	commentForLine = {}
+	indentForLine = {}
 end
 
 -- Return an array of tokens for the given source string and line number. 
@@ -453,7 +456,24 @@ function javalex.getTokens( sourceStr, lineNum )
 		skipBlockComment()  -- don't generate tokens for block comments 
 	end
 
-	-- Scan the chars array
+	-- Determine the indentation level
+	local TABSIZE = 4
+	local indent = 0 -- Then number of spaces the line is indented, assuming a tab stop of 4 spaces
+	local charType = charTypes[chars[iChar]]
+	while charType == " " do
+		if chars[iChar] == 9 then -- TAB
+			indent = indent + TABSIZE - indent % TABSIZE
+		elseif chars[iChar] == 32 then -- Space
+			indent = indent + 1
+		end
+		iChar = iChar + 1
+		charType = charTypes[chars[iChar]]
+	end
+
+	indentForLine[lineNum] = indent
+	table.add(indents, indentStr)
+
+	-- Scan the rest of the chars array
 	repeat
 		-- Skip whitespace
 		local charType = charTypes[chars[iChar]]
@@ -534,6 +554,11 @@ function javalex.commentForLine( lineNum )
 	return commentForLine[lineNum]
 end
 
+-- Return the indent level of the given line number in number of spaces,
+-- Assuming a tab stop of 4 spaces
+function javalex.indentForLine( lineNum )
+	return indentForLine[lineNum]
+end
 
 ----- Initialization ---------------------------------------------------------
 
