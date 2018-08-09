@@ -28,6 +28,7 @@ local sourceFile = {
 }
 
 -- Error data
+local syntaxLevel = 12
 local numUnexpectedErrors = 0
 local numExpectedErrors = 0
 local numUncaughtErrors = 0
@@ -195,13 +196,6 @@ local function checkTestCode()
 			startTokens = tokens
 		else
 			startTokens = nil
-			if tree == nil then
-				-- We don't expect any parse errors
-				output( lineNum .. ". " .. trim1( strCode ) )
-				output( "*** Unexpected parse error: " .. err.getErrString() .. "\n" )
-				numUnexpectedErrors = numUnexpectedErrors + 1
-				err.clearErr()   -- leave this tree nil and continue
-			end
 			parseTrees[#parseTrees + 1] = tree
 		end
 		lineNum = lineNum + 1

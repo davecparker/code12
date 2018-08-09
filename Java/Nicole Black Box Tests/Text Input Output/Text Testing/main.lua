@@ -22,6 +22,7 @@ require('Code12.api')
     
     function _fn.start()
         
+        ct.setOutputFile("TextTestOutput.txt")
         
         -- Printing to console
         -- ct.print()
@@ -63,8 +64,7 @@ require('Code12.api')
         if ct.isError(d) then
             ct.println("NaN or infinity"); end
         ct.println(d)
-        local bool = ct.inputBoolean("Enter a boolean: ")
-        --  bool = false;   //bug; this should default to false if user skips it
+        local bool = ct.inputYesNo("Enter a boolean: ")
         if bool then
             ct.println("Boolean is true"); 
         else 

@@ -9,20 +9,20 @@ public class GameObjCreationTest extends Code12Program
     GameObj fps;
     int time;
     String[] colors = {"black", "white", "red", "green", "blue", "cyan",
-                        "majenta", "yellow", "gray", "orange", "pink", "purple",
-                        "light gray", "light red", "light green", "light blue", "light cyan", "light majenta",
+                        "magenta", "yellow", "gray", "orange", "pink", "purple",
+                        "light gray", "light red", "light green", "light blue", "light cyan", "light magenta",
                         "light yellow", "dark gray", "dark red", "dark green", "dark blue", "dark cyan",
-                        "dark majenta", "dark yellow", null};
+                        "dark magenta", "dark yellow", null};
 
     // RECOMMENDATION: test only one at a time
-    boolean circleTest = false,      // tests special cases for diameter and color parameters
-            rectTest = false,        // tests special cases for height and width parameters
-            lineTest = false,        // tests placements of x and y coordinates for both points
-            textTest = false,        // tests String escape sequences and special cases for height parameter
-            imageTest = false,       // tests image parameter and special cases for width parameter
-            gridTest = false,        // creates a square grid of any object that is true spanning from -200 to 200
-            colorTest = false,       // tests all colors available
-            performanceTest = false; // tests fps when constantly adding objects to screen
+    boolean circleTest = false;     // tests special cases for diameter and color parameters
+    boolean rectTest = false;       // tests special cases for height and width parameters
+    boolean lineTest = false;       // tests placements of x and y coordinates for both points
+    boolean textTest = false;       // tests String escape sequences and special cases for height parameter
+    boolean imageTest = false;      // tests image parameter and special cases for width parameter
+    boolean gridTest = false;       // creates a square grid of any object that is true spanning from -200 to 200
+    boolean colorTest = true;      // tests all colors available
+    boolean performanceTest = false;// tests fps when constantly adding objects to screen
 
     public static void main(String[] args)
     {
@@ -123,11 +123,19 @@ public class GameObjCreationTest extends Code12Program
         // test colors
         if (colorTest)
         {
-            int x = 15, y = 10;
+            int x = 15;
+            int y = 10;
             for (int i = 0; i < colors.length; i++)
             {
                 ct.circle(x, y, 10, colors[i]);
-                ct.text((i == colors.length - 1 ? "null" : colors[i]), x, y, 2, (i == 0 ? "white" : "black"));
+                if (i == colors.length - 1 && i == 0)
+                    ct.text("null", x, y, 2, "white");
+                else if (i == colors.length - 1 && !(i == 0))
+                    ct.text("null", x, y, 2, "black");
+                else if (!(i == colors.length - 1) && i == 0)
+                    ct.text(colors[i], x, y, 2, "white");
+                else
+                    ct.text(colors[i], x, y, 2, "black");
                 x += 15;
                 if (x >= ct.getWidth())
                 {
@@ -161,14 +169,15 @@ public class GameObjCreationTest extends Code12Program
 
             if (speedRefrence.x >= ct.getWidth() || speedRefrence.x <= 0)
                speedRefrence.xSpeed *= -1;
-            objText.setText(ct.formatInt(++objCount));
+            objCount++;
+            objText.setText(ct.formatInt(objCount));
 
             ct.circle(ct.random(0, 100), ct.random(15, 100), 3, "white");
             ct.rect(ct.random(0, 100), ct.random(15, 100), 3, 3, "white");
             ct.image("goldfish.png", ct.random(0, 100), ct.random(15, 100), 3);
 
-            fps.setText(ct.formatInt(1000 / newTime));
-            ct.println(1000 / newTime);
+            fps.setText(ct.formatInt(ct.intDiv(1000, newTime)));
+            ct.println(ct.intDiv(1000, newTime));
         }
     }
 
