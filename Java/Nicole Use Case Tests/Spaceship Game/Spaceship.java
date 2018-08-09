@@ -52,8 +52,6 @@ public class Spaceship extends Code12Program
 
       spaceship = ct.image("spacecraft.png", width/2, height - 10, 5 );
       spaceship.setLayer(2);
-      spaceship.clickable = true;
-      spaceship.visible = true;
       
       flame = ct.image("transparent-flame.png", spaceship.x, spaceship.y + spaceship.height/2, 5 );
       flame.visible = false;
@@ -64,6 +62,10 @@ public class Spaceship extends Code12Program
    
    public void update()
    {
+      flame.clickable = false;
+      asteroid.clickable = false;
+      bg.clickable = false;
+      rayGun.visible = false;
       ct.setTitle( ct.toInt( 60 - (ct.getTimer() / 1000.0 ) ) + " seconds until the black hole" );
       // Set the initial background down
       bg.ySpeed = 0.5;
@@ -103,8 +105,8 @@ public class Spaceship extends Code12Program
          rayGun.y = spaceship.y;
          
          // If the spaceship goes off screen, set it back to starting position
-         if ( spaceship.y < 0 )
-            spaceship.y = ct.getHeight() - 10;
+         //if ( spaceship.y < 0 )
+            //spaceship.y = ct.getHeight() - 10;
 
       }
        // Check to see if the ray gun hit an asteroid

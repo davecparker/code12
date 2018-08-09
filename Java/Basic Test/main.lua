@@ -14,7 +14,7 @@ require('Code12.api')
         ct.setTitle("Fish and Shapes Test")
         ct.setHeight(178)
         
-        ct.println("Code 12 Version " .. ct.getVersion())
+        ct.println("Code 12 Version "..tostring(ct.getVersion()))
         ct.logm("Screen size:", ct.getWidth(), ct.getHeight())
         ct.logm("Scale factor:", ct.getPixelsPerUnit())
         ct.print("Testing the ")
@@ -94,7 +94,7 @@ require('Code12.api')
         
         elseif this.fish:clicked() then
             
-            ct.log("Clicked " .. this.fish:toString())
+            ct.log("Clicked "..this.fish:toString())
             -- ct.clearScreen();
             ct.setScreen("end")
         

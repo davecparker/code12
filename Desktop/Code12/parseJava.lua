@@ -500,7 +500,6 @@ local function parseCurrentLine( level )
 	-- Try common errors at the given syntax level
 	parseTree = parseLineGrammar( level, true )
 	if parseTree then
-		assert( err.hasErr() )
 		return nil  -- matched common error
 	end	
 
