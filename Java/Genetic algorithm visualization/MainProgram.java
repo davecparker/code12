@@ -1,126 +1,239 @@
 
 import Code12.*;
 
-public class MainProgram extends Code12Program {
+public class MainProgram extends Code12Program
+{
+    GameObj goal, timer, maxFitness, gen;
+    GameObj[] dots, obstacles;
+    String[] spatialDirections = {"up", "down", "left", "right"};
+    String[] directions = new String[(60 * 10) * 50];
+    boolean[] killed = new boolean[50];
+    int veteranIndex, step;
+    double time;
 
-    public GameObj goal;
-    public GameObj timer;
-    public double time;
-    public GameObj maxFitness;
-    public GameObj gen;
-    public int genCount;
-    public GameObj[] obstacles = new GameObj[10];
-    public Dot[] dots = new Dot[100];
-
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         Code12.run(new MainProgram());
     }
 
-    public void start() {
-        // goal
-        this.goal = ct.circle(ct.getWidth() / 2, 2, 1);
+    public void start()
+    {
+        goal = ct.circle(ct.getWidth() / 2, 2, 1);
+        timer = ct.text("10.0", ct.getWidth() / 20, ct.getHeight() / 20, 5);
+        timer.align("center", true);
+        timer.setLayer(3);
+        time = ct.getTimer();
+        maxFitness = ct.text("0.00", ct.getWidth() - (ct.getWidth() / 10), ct.getHeight() / 20, 5);
+        maxFitness.align("center", true);
+        maxFitness.setLayer(3);
+        gen = ct.text("Gen 1", ct.getWidth() / 10, ct.getHeight() - (ct.getHeight() / 20), 5);
+        gen.align("center", true);
+        gen.setLayer(3);
+        dots = new GameObj[50];
+        veteranIndex = 0;
+        step = 0;
 
-        // timer
-        this.timer = ct.text("0.0", ct.getWidth() / 20, ct.getHeight() / 20, 5);
-        this.timer.setLayer(3);
-        this.time = System.currentTimeMillis();
+        defineObstacles();
+        defineDots();
+        defineDirections();
+    }
 
-        // max fitness of population
-        this.maxFitness = ct.text("0.0", ct.getWidth() - (ct.getWidth() / 10), ct.getHeight() / 20, 5);
-        this.maxFitness.setLayer(3);
+    public void update()
+    {
+        updateTimer();
+        conditionalUpdates();
+        if (areAllDotsDead())
+            nextGenPrep();
+    }
 
-        // generation
-        this.gen = ct.text("Gen 1", ct.getWidth() / 10, ct.getHeight() - (ct.getHeight() / 20), 5);
-        this.gen.setLayer(3);
-        this.genCount = 1;
-
-        // obstacles
-        for (int i = 0; i < this.obstacles.length; i++) {
-            int x = ct.random(0, (int) ct.getWidth());
-            int y = ct.random((int) (ct.getHeight() / 5), (int) (ct.getHeight() - (ct.getHeight() / 5)));
-            int width = ct.random(1, 8);
-            int height = ct.random(1, 15);
-            this.obstacles[i] = ct.rect(x, y, width, height);
+    public void conditionalUpdates()
+    {
+        for (int i = 0; i < dots.length; i++)
+        {
+            killUponSpecifiedEvents(i);
+            updateVeteranIndex();
+            updateMaxFitness();
+            if (!killed[i])
+                move(i, step);
         }
-
-        // dots
-        for (int i = 0; i < this.dots.length; i++)
-            this.dots[i] = new Dot(ct, this.goal, this.obstacles);
+        step++;
     }
 
-    public void update() {
-        // update timer
-        this.timer.setText(tenSecondTimer());
-
-        // conditional updates for dots
-        for (int i = 0; i < this.dots.length; i++) {
-            this.dots[i].killUponSpecifiedEvents(ct.getWidth(), ct.getHeight());
-            if (!this.dots[i].dead)
-                this.dots[i].move();
+    public void nextGenPrep()
+    {
+        for (int i = 0; i < dots.length; i++)
+        {
+            dots[i].delete();
+            killed[i] = false;
+            defineDot(i);
+            copyVeteranDirections(i);
+            if (i != veteranIndex)
+                mutate(i);
         }
-
-        // if all dots are eliminated
-        if (isAllDotsDead()) {
-            int veteranIndex = getIndexOfMaxFitnessDot();
-            double maxFitnessOfPopulation = this.dots[veteranIndex].getFitness();
-            AIBrain maxFitnessBrain = this.dots[veteranIndex].brain;
-            for (int i = 0; i < this.dots.length; i++) {
-                // reset dots
-                this.dots[i].dot.delete();
-                this.dots[i] = new Dot(ct, this.goal, this.obstacles, maxFitnessBrain.clone());
-
-                // assign veteran
-                if (i == veteranIndex) {
-                    this.dots[i].setVeteran(true);
-                    continue;
-                }
-
-                // mutate
-                this.dots[i].brain.mutate();
-            }
-
-            // prep for next round
-            resetTimer();
-            updateMaxFitness(maxFitnessOfPopulation);
-            updateGen();
-        }
+        defineVeteran();
+        updateGen();
+        time = ct.getTimer();
+        step = 0;
     }
 
-    private String tenSecondTimer() {
-        double time = -(((System.currentTimeMillis() - this.time) / 1000) - 10);
-        if (time > 0)
-            return ct.formatDecimal(time, 1);
-        return "0.0";
-    }
-
-    private void resetTimer() {
-        this.time = System.currentTimeMillis();
-    }
-
-    private void updateMaxFitness(double maxFitnessOfPopulation) {
-        this.maxFitness.setText(ct.formatDecimal(maxFitnessOfPopulation, 2));
-    }
-
-    private void updateGen() {
-        this.genCount++;
-        this.gen.setText("Gen " + this.genCount);
-    }
-
-    private boolean isAllDotsDead() {
-        for (int i = 0; i < this.dots.length; i++) {
-            if (!this.dots[i].dead)
+    public boolean areAllDotsDead()
+    {
+        for (int i = 0; i < dots.length; i++)
+        {
+            if (!killed[i])
                 return false;
         }
         return true;
     }
 
-    private int getIndexOfMaxFitnessDot() {
-        int maxFitnessIndex = 0;
-        for (int i = 1; i < this.dots.length; i++) {
-            if (this.dots[i].getFitness() > this.dots[maxFitnessIndex].getFitness())
-                maxFitnessIndex = i;
+    public void defineObstacles()
+    {
+        obstacles = new GameObj[10];
+        for (int i = 0; i < obstacles.length; i++)
+        {
+            int x = ct.random(0, ct.toInt(ct.getWidth()));
+            int y = ct.random(ct.toInt(ct.getHeight() / 5), ct.toInt(ct.getHeight()) - ct.toInt(ct.getHeight() / 5));
+            obstacles[i] = ct.rect(x, y, ct.random(1, 8), ct.random(1, 15));
+            obstacles[i].align("center", true);
         }
-        return maxFitnessIndex;
+    }
+
+    public void defineDots()
+    {
+        //dots = new GameObj[50];
+        for (int i = 0; i < dots.length; i++)
+            defineDot(i);
+    }
+
+    public void defineDot(int i)
+    {
+        dots[i] = ct.circle(ct.getWidth() / 2, ct.getHeight() - (ct.getHeight() / 50), 1);
+        dots[i].setFillColor("blue");
+        dots[i].align("center", true);
+    }
+
+    public void defineVeteran()
+    {
+        dots[veteranIndex].setFillColor("green");
+        dots[veteranIndex].setLayer(2);
+    }
+
+    public void defineDirections()
+    {
+        for (int i = 0; i < directions.length; i++)
+            directions[i] = spatialDirections[ct.random(0, 3)];
+    }
+
+    public void updateTimer()
+    {
+        double timeDiff = -(ct.getTimer() - time) / 1000 + 10;
+        if (timeDiff > 0)
+            timer.setText(ct.formatDecimal(timeDiff, 1));
+        else
+            timer.setText("0.0");
+    }
+
+    public void updateVeteranIndex()
+    {
+        for (int i = 0; i < dots.length; i++)
+        {
+            if (getFitness(i) > getFitness(veteranIndex))
+                veteranIndex = i;
+        }
+    }
+
+    public void updateMaxFitness()
+    {
+        if (getFitness(veteranIndex) > ct.parseNumber(maxFitness.getText()))
+            maxFitness.setText(ct.formatDecimal(getFitness(veteranIndex), 2));
+    }
+
+    public void updateGen()
+    {
+        String genText = gen.getText();
+        gen.setText("Gen " + (ct.parseInt(genText.substring(genText.indexOf(" "))) + 1));
+    }
+
+    public void killUponSpecifiedEvents(int i)
+    {
+        killOutsideBoundary(i);
+        killWithinGoal(i);
+        killWithinObstacles(i);
+        killTimerFinished(i);
+    }
+
+    public void killOutsideBoundary(int i)
+    {
+        if (dots[i].x <= 0 || dots[i].x >= ct.getWidth() || dots[i].y <= 0 || dots[i].y >= ct.getHeight())
+            kill(i);
+    }
+
+    public void killWithinGoal(int i)
+    {
+        if (dots[i].hit(goal))
+            kill(i);
+    }
+
+    public void killWithinObstacles(int i)
+    {
+        if (isWithinObstacles(i))
+            kill(i);
+    }
+
+    public boolean isWithinObstacles(int i)
+    {
+        for (int j = 0; j < obstacles.length; j++)
+        {
+            if (dots[i].hit(obstacles[j]))
+                return true;
+        }
+        return false;
+    }
+
+    public void killTimerFinished(int i)
+    {
+        String currentTime = timer.getText();
+        if (currentTime.equals("0.0") || step >= 600)
+            kill(i);
+    }
+
+    public void kill(int i)
+    {
+        killed[i] = true;
+        dots[i].xSpeed = 0;
+        dots[i].ySpeed = 0;
+    }
+
+    public void move(int i, int j)
+    {
+        String newDirection = directions[600 * i + j];
+        if (newDirection.equals("up"))
+            dots[i].ySpeed = 1;
+        else if (newDirection.equals("down"))
+            dots[i].ySpeed = -1;
+        else if (newDirection.equals("right"))
+            dots[i].xSpeed = 1;
+        else if (newDirection.equals("left"))
+            dots[i].xSpeed = -1;
+    }
+
+    public double getFitness(int i)
+    {
+        if (dots[i].hit(goal))
+            return 100 / Math.pow(step, 0.01);
+        return 100 / ct.distance(goal.x, goal.y, dots[i].x, dots[i].y);
+    }
+
+    public void copyVeteranDirections(int i)
+    {
+        for (int j = 0; j < 600; j++)
+            directions[600 * i + j] = directions[600 * veteranIndex + j];
+    }
+
+    public void mutate(int i)
+    {
+        for (int j = 0; j < 10; j++)
+            directions[600 * i + ct.random(0, 590)] = spatialDirections[ct.random(0, 3)];
     }
 
 }
