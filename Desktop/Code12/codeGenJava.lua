@@ -623,6 +623,9 @@ end
 -- Generate code for the block line in tree
 local function generateBlockLine( tree )
 	-- Do type checks on the line first, but not in for loop headers yet
+	if tree.isError then
+		return
+	end
 	if tree.p ~= "for" and not checkJava.doTypeChecks( tree ) then
 		return
 	end

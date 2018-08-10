@@ -118,7 +118,7 @@ end
 
 -- Process a method definition. If there is an error than set the error state
 -- and return false. Return true if successful.
-local function getMethod( typeNode, nameNode, paramList )
+local function getMethod( tree, typeNode, nameNode, paramList )
 	local fnName = nameNode.str
 	if isInvalidName( nameNode, "function" ) then
 		return false
@@ -149,7 +149,7 @@ local function getMethod( typeNode, nameNode, paramList )
 					fnName, javaTypes.typeNameFromVt( event.vt ))
 			return false
 		elseif #event.params ~= #paramTable then
-			err.setErrNodeAndRef( paramList, nameNode, 
+			err.setErrNode( tree, 
 					"Wrong number of parameters for function %s ", fnName )
 			return false
 		else
@@ -199,12 +199,11 @@ end
 local function getMethods( parseTrees )
 	for iTree = 1, #parseTrees do
 		local tree = parseTrees[iTree]
-		assert( tree.t == "line" )
 		local p = tree.p
 		local nodes = tree.nodes
-		if p == "func" then
+		if not tree.isError and p == "func" then
 			-- User-defined function or event function
-			getMethod( nodes[2], nodes[3], nodes[5] )
+			getMethod( tree, nodes[2], nodes[3], nodes[5] )
 			if err.shouldStop() then 
 				return false
 			end

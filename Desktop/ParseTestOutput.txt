@@ -351,7 +351,14 @@ line (stmt)
         expr (NUM)
             NUM (3.e8)
 
-48. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
+48. double x = 5.; // number with decimal point but no digits after
+line (varInit)
+    ID (double)
+    ID (x)
+    expr (NUM)
+        NUM (5.)
+
+49. double xyz = ( 2 * x + y - 3.14 ) / z + 1.414; // initialization with expression
 line (varInit)
     ID (double)
     ID (xyz)
@@ -383,7 +390,7 @@ line (varInit)
         expr (NUM)
             NUM (1.414)
 
-49. double mean = (a + b + c) / 3;
+50. double mean = (a + b + c) / 3;
 line (varInit)
     ID (double)
     ID (mean)
@@ -409,7 +416,7 @@ line (varInit)
         expr (NUM)
             NUM (3)
 
-50. double y = m * x + b;
+51. double y = m * x + b;
 line (varInit)
     ID (double)
     ID (y)
@@ -431,7 +438,7 @@ line (varInit)
                 index (empty)
                 field (empty)
 
-51. z = p * r % q + w / x - y;
+52. z = p * r % q + w / x - y;
 line (stmt)
     stmt (varAssign)
         ID (z)
@@ -471,7 +478,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-52. y = a * x * x + b * x + c;
+53. y = a * x * x + b * x + c;
 line (stmt)
     stmt (varAssign)
         ID (y)
@@ -511,7 +518,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-53. y = (a * x * x) + (b * x) + c;
+54. y = (a * x * x) + (b * x) + c;
 line (stmt)
     stmt (varAssign)
         ID (y)
@@ -553,7 +560,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-54. double z2 = z * 2.0; // initialization from another variable
+55. double z2 = z * 2.0; // initialization from another variable
 line (varInit)
     ID (double)
     ID (z2)
@@ -566,7 +573,7 @@ line (varInit)
         expr (NUM)
             NUM (2.0)
 
-55. x = (a + b) / 2 + (c - d) / 2; // multiple parentheses
+56. x = (a + b) / 2 + (c - d) / 2; // multiple parentheses
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -602,7 +609,7 @@ line (stmt)
                 expr (NUM)
                     NUM (2)
 
-56. x = ( ( a + b ) / c ) / 2; // nested parentheses
+57. x = ( ( a + b ) / c ) / 2; // nested parentheses
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -629,7 +636,7 @@ line (stmt)
             expr (NUM)
                 NUM (2)
 
-57. x = y % 12; // mod operator
+58. x = y % 12; // mod operator
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -642,11 +649,11 @@ line (stmt)
             expr (NUM)
                 NUM (12)
 
-58. 
+59. 
 
-59. // relational operators and if/else
+60. // relational operators and if/else
 
-60. if (count == 0)
+61. if (count == 0)
 line (if)
     expr (==)
         expr (lValue)
@@ -657,7 +664,7 @@ line (if)
         expr (NUM)
             NUM (0)
 
-61. if (x != 10)
+62. if (x != 10)
 line (if)
     expr (!=)
         expr (lValue)
@@ -668,7 +675,7 @@ line (if)
         expr (NUM)
             NUM (10)
 
-62. if (temp > 98.6)
+63. if (temp > 98.6)
 line (if)
     expr (>)
         expr (lValue)
@@ -679,7 +686,7 @@ line (if)
         expr (NUM)
             NUM (98.6)
 
-63. if ( temp <= 100 )
+64. if ( temp <= 100 )
 line (if)
     expr (<=)
         expr (lValue)
@@ -690,7 +697,7 @@ line (if)
         expr (NUM)
             NUM (100)
 
-64. else if (x >= 42)
+65. else if (x >= 42)
 line (elseif)
     expr (>=)
         expr (lValue)
@@ -701,10 +708,10 @@ line (elseif)
         expr (NUM)
             NUM (42)
 
-65. else
+66. else
 line (else)
 
-66. boolean differenceIsSmall = Math.abs(x - a) < eps;
+67. boolean differenceIsSmall = Math.abs(x - a) < eps;
 line (varInit)
     ID (boolean)
     ID (differenceIsSmall)
@@ -733,31 +740,31 @@ line (varInit)
                 index (empty)
                 field (empty)
 
-67. 
+68. 
 
-68. // Strings
+69. // Strings
 
-69. String greeting; //  declaration without initialization - String type
+70. String greeting; //  declaration without initialization - String type
 line (varDecl)
     ID (String)
     idList (list)
         ID (greeting)
 
-70. greeting = "hello"; // assigning value to a string
+71. greeting = "hello"; // assigning value to a string
 line (stmt)
     stmt (varAssign)
         ID (greeting)
         expr (STR)
             STR ("hello")
 
-71. String greeting2 = "hello there"; // declaration with initialization - String type
+72. String greeting2 = "hello there"; // declaration with initialization - String type
 line (varInit)
     ID (String)
     ID (greeting2)
     expr (STR)
         STR ("hello there")
 
-72. String greeting3 = greeting1; // declaration with initialization from another variable's value
+73. String greeting3 = greeting1; // declaration with initialization from another variable's value
 line (varInit)
     ID (String)
     ID (greeting3)
@@ -767,7 +774,7 @@ line (varInit)
             index (empty)
             field (empty)
 
-73. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
+74. String greeting4 = greeting1 + " " + "world"; // declaration with concatenation
 line (varInit)
     ID (String)
     ID (greeting4)
@@ -783,7 +790,7 @@ line (varInit)
         expr (STR)
             STR ("world")
 
-74. String greeting5 = greeting2.substring(0, 6); // declaration with String method
+75. String greeting5 = greeting2.substring(0, 6); // declaration with String method
 line (varInit)
     ID (String)
     ID (greeting5)
@@ -799,7 +806,7 @@ line (varInit)
             expr (NUM)
                 NUM (6)
 
-75. s = "boolean variable b = " + true; // String concatenation with boolean
+76. s = "boolean variable b = " + true; // String concatenation with boolean
 line (stmt)
     stmt (varAssign)
         ID (s)
@@ -809,21 +816,21 @@ line (stmt)
             expr (BOOL)
                 BOOL (true)
 
-76. s = "line1\nline2"; // String with newline
+77. s = "line1\nline2"; // String with newline
 line (stmt)
     stmt (varAssign)
         ID (s)
         expr (STR)
             STR ("line1\nline2")
 
-77. s = "\"Hello,\" he said."; // String with escaped quotes
+78. s = "\"Hello,\" he said."; // String with escaped quotes
 line (stmt)
     stmt (varAssign)
         ID (s)
         expr (STR)
             STR ("\"Hello,\" he said.")
 
-78. ct.println("He said 'Hello'"); // String with single quotes
+79. ct.println("He said 'Hello'"); // String with single quotes
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -835,14 +842,14 @@ line (stmt)
             expr (STR)
                 STR ("He said 'Hello'")
 
-79. docsDir = "C:\\Users\\Ben\\Documents\\"; // String with escaped backslash
+80. docsDir = "C:\\Users\\Ben\\Documents\\"; // String with escaped backslash
 line (stmt)
     stmt (varAssign)
         ID (docsDir)
         expr (STR)
             STR ("C:\\Users\\Ben\\Documents\\")
 
-80. ct.println( "I\tneed\tmy\tspace" ); // String with escaped tab
+81. ct.println( "I\tneed\tmy\tspace" ); // String with escaped tab
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -854,7 +861,7 @@ line (stmt)
             expr (STR)
                 STR ("I\tneed\tmy\tspace")
 
-81. input = input.toUpperCase(); // method call
+82. input = input.toUpperCase(); // method call
 line (stmt)
     stmt (varAssign)
         ID (input)
@@ -866,18 +873,18 @@ line (stmt)
                     ID (toUpperCase)
             exprList (empty)
 
-82. i_dont_like_camel_case = "butItTakesLessKeystrokes"; // variable identifier with underscores
+83. i_dont_like_camel_case = "butItTakesLessKeystrokes"; // variable identifier with underscores
 line (stmt)
     stmt (varAssign)
         ID (i_dont_like_camel_case)
         expr (STR)
             STR ("butItTakesLessKeystrokes")
 
-83. 
+84. 
 
-84. // loops
+85. // loops
 
-85. for (int i = 0; i < 10; i++)
+86. for (int i = 0; i < 10; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -901,7 +908,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-86. for (i = 0; i < 10; i = i + 2)
+87. for (i = 0; i < 10; i = i + 2)
 line (for)
     forControl (three)
         forInit (stmt)
@@ -930,7 +937,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-87. for (int i = 0; i < 100 && 2 * i < 50; i = i * 2)
+88. for (int i = 0; i < 100 && 2 * i < 50; i = i * 2)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -971,7 +978,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-88. for (int i = 100; i > 0; i--)
+89. for (int i = 100; i > 0; i--)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -995,7 +1002,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-89. for (int i = 10; i > 0; i = i - 2)
+90. for (int i = 10; i > 0; i = i - 2)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -1024,7 +1031,7 @@ line (for)
                     expr (NUM)
                         NUM (2)
 
-90. for (int i = 0; i < len; i++)
+91. for (int i = 0; i < len; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -1051,7 +1058,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-91. for (int i = 0; i < arr.length; i++)
+92. for (int i = 0; i < arr.length; i++)
 line (for)
     forControl (three)
         forInit (varInit)
@@ -1079,16 +1086,16 @@ line (for)
                     index (empty)
                     field (empty)
 
-92. for (GameObj bullet : bullets )
+93. for (GameObj bullet : bullets )
 line (for)
     forControl (array)
         ID (GameObj)
         ID (bullet)
         ID (bullets)
 
-93. 
+94. 
 
-94. while (j < 100)
+95. while (j < 100)
 line (while)
     expr (<)
         expr (lValue)
@@ -1100,10 +1107,10 @@ line (while)
             NUM (100)
     whileEnd (while)
 
-95. do
+96. do
 line (do)
 
-96. while (j < 100);
+97. while (j < 100);
 line (while)
     expr (<)
         expr (lValue)
@@ -1115,7 +1122,7 @@ line (while)
             NUM (100)
     whileEnd (do-while)
 
-97. while (j < foo && i != bar);
+98. while (j < foo && i != bar);
 line (while)
     expr (&&)
         expr (<)
@@ -1142,7 +1149,7 @@ line (while)
                     field (empty)
     whileEnd (do-while)
 
-98. while (j >= 100);
+99. while (j >= 100);
 line (while)
     expr (>=)
         expr (lValue)
@@ -1154,7 +1161,7 @@ line (while)
             NUM (100)
     whileEnd (do-while)
 
-99. while (j <= foo && i != bar);
+100. while (j <= foo && i != bar);
 line (while)
     expr (&&)
         expr (<=)
@@ -1181,7 +1188,7 @@ line (while)
                     field (empty)
     whileEnd (do-while)
 
-100. while (i < max && notFound)
+101. while (i < max && notFound)
 line (while)
     expr (&&)
         expr (<)
@@ -1202,17 +1209,17 @@ line (while)
                 field (empty)
     whileEnd (while)
 
-101. 
+102. 
 
-102. // arrays
+103. // arrays
 
-103. int[] a;
+104. int[] a;
 line (arrayDecl)
     ID (int)
     idList (list)
         ID (a)
 
-104. int[] a = new int[100];
+105. int[] a = new int[100];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1222,7 +1229,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (100)
 
-105. int[] a = new int[foo];
+106. int[] a = new int[foo];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1235,7 +1242,7 @@ line (arrayInit)
                     index (empty)
                     field (empty)
 
-106. int[] a = new int[b.length * 2];
+107. int[] a = new int[b.length * 2];
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1252,7 +1259,7 @@ line (arrayInit)
                 expr (NUM)
                     NUM (2)
 
-107. int[] a = {1, 2, 3};
+108. int[] a = {1, 2, 3};
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1265,13 +1272,13 @@ line (arrayInit)
             expr (NUM)
                 NUM (3)
 
-108. int[] a = { 1,
+109. int[] a = { 1,
 -- Incomplete line carried forward
 
-109. 2,
+110. 2,
 -- Incomplete line carried forward
 
-110. 3};
+111. 3};
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1284,7 +1291,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (3)
 
-111. int[] a = b;
+112. int[] a = b;
 line (arrayInit)
     ID (int)
     ID (a)
@@ -1295,7 +1302,7 @@ line (arrayInit)
                 index (empty)
                 field (empty)
 
-112. double[] data = new double[1000];
+113. double[] data = new double[1000];
 line (arrayInit)
     ID (double)
     ID (data)
@@ -1305,7 +1312,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (1000)
 
-113. String[] greetings = {"hello", "hola", "bonjour"};
+114. String[] greetings = {"hello", "hola", "bonjour"};
 line (arrayInit)
     ID (String)
     ID (greetings)
@@ -1318,13 +1325,13 @@ line (arrayInit)
             expr (STR)
                 STR ("bonjour")
 
-114. GameObj[] targets;
+115. GameObj[] targets;
 line (arrayDecl)
     ID (GameObj)
     idList (list)
         ID (targets)
 
-115. GameObj[] targets = new GameObj[100];
+116. GameObj[] targets = new GameObj[100];
 line (arrayInit)
     ID (GameObj)
     ID (targets)
@@ -1334,7 +1341,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (100)
 
-116. GameObj[] targets = new GameObj[numTargets];
+117. GameObj[] targets = new GameObj[numTargets];
 line (arrayInit)
     ID (GameObj)
     ID (targets)
@@ -1347,7 +1354,7 @@ line (arrayInit)
                     index (empty)
                     field (empty)
 
-117. foo = bar[i];
+118. foo = bar[i];
 line (stmt)
     stmt (varAssign)
         ID (foo)
@@ -1362,7 +1369,7 @@ line (stmt)
                             field (empty)
                 field (empty)
 
-118. foo = bar[0];
+119. foo = bar[0];
 line (stmt)
     stmt (varAssign)
         ID (foo)
@@ -1374,18 +1381,18 @@ line (stmt)
                         NUM (0)
                 field (empty)
 
-119. 
+120. 
 
-120. // function definitions
+121. // function definitions
 
-121. void foo()
+122. void foo()
 line (func)
     access (empty)
     retType (void)
     ID (foo)
     paramList (empty)
 
-122. void fooBar(int aParameter)
+123. void fooBar(int aParameter)
 line (func)
     access (empty)
     retType (void)
@@ -1395,7 +1402,7 @@ line (func)
             ID (int)
             ID (aParameter)
 
-123. int foo(double x)
+124. int foo(double x)
 line (func)
     access (empty)
     retType (value)
@@ -1406,7 +1413,7 @@ line (func)
             ID (double)
             ID (x)
 
-124. String bar(String[] a, int length)
+125. String bar(String[] a, int length)
 line (func)
     access (empty)
     retType (value)
@@ -1420,7 +1427,7 @@ line (func)
             ID (int)
             ID (length)
 
-125. String[] split(String s, String delim)
+126. String[] split(String s, String delim)
 line (func)
     access (empty)
     retType (array)
@@ -1434,7 +1441,7 @@ line (func)
             ID (String)
             ID (delim)
 
-126. public double add(double x, double y, double z)
+127. public double add(double x, double y, double z)
 line (func)
     access (public)
     retType (value)
@@ -1451,11 +1458,11 @@ line (func)
             ID (double)
             ID (z)
 
-127. 
+128. 
 
-128. // function calls
+129. // function calls
 
-129. ct.println("Hello world");
+130. ct.println("Hello world");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1467,7 +1474,7 @@ line (stmt)
             expr (STR)
                 STR ("Hello world")
 
-130. ct.println("Hello " + name);
+131. ct.println("Hello " + name);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1485,7 +1492,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-131. ct.println("Hello\nWorld");
+132. ct.println("Hello\nWorld");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1497,7 +1504,7 @@ line (stmt)
             expr (STR)
                 STR ("Hello\nWorld")
 
-132. x = add(3, 4);
+133. x = add(3, 4);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -1512,7 +1519,7 @@ line (stmt)
                 expr (NUM)
                     NUM (4)
 
-133. m = mean(1.2, 3.4, 5.67);
+134. m = mean(1.2, 3.4, 5.67);
 line (stmt)
     stmt (varAssign)
         ID (m)
@@ -1529,13 +1536,13 @@ line (stmt)
                 expr (NUM)
                     NUM (5.67)
 
-134. foo(x,
+135. foo(x,
 -- Incomplete line carried forward
 
-135. y,
+136. y,
 -- Incomplete line carried forward
 
-136. z);
+137. z);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1559,36 +1566,36 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-137. 
+138. 
 
-138. // multiline comments
+139. // multiline comments
 
-139. /* this is a multiline comment
+140. /* this is a multiline comment
 
-140. * this is the second line
+141. * this is the second line
 
-141. * this is the third line
+142. * this is the third line
 
-142. */
+143. */
 
-143. }
+144. }
 line (end)
 
-144. // -------------------------------------------------------------
+145. // -------------------------------------------------------------
 
-145. // Parsing white box tests
+146. // Parsing white box tests
 
-146. // -------------------------------------------------------------
+147. // -------------------------------------------------------------
 
-147. // "blank"
+148. // "blank"
 
-148. 
+149. 
 
-149. // "comment"
+150. // "comment"
 
-150. // single comment line
+151. // single comment line
 
-151. while ( x < 100 ) // comment at end of line of code
+152. while ( x < 100 ) // comment at end of line of code
 line (while)
     expr (<)
         expr (lValue)
@@ -1600,31 +1607,31 @@ line (while)
             NUM (100)
     whileEnd (while)
 
-152. /* block comment line 1
+153. /* block comment line 1
 
-153. * block comment line 2
+154. * block comment line 2
 
-154. */
+155. */
 
-155. /* block comment with /* nested comment */ */
+156. /* block comment with /* nested comment */ */
 
-156. int x = 0; /* block comment after code on same line */
+157. int x = 0; /* block comment after code on same line */
 line (varInit)
     ID (int)
     ID (x)
     expr (NUM)
         NUM (0)
 
-157. /* block comment before code on same line */ double pi = 3.14;
+158. /* block comment before code on same line */ double pi = 3.14;
 line (varInit)
     ID (double)
     ID (pi)
     expr (NUM)
         NUM (3.14)
 
-158. // block comments inside line of code
+159. // block comments inside line of code
 
-159. double foo(int i /*fee*/, double db /*fi*/, boolean boo /*fo*/)
+160. double foo(int i /*fee*/, double db /*fi*/, boolean boo /*fo*/)
 line (func)
     access (empty)
     retType (value)
@@ -1641,15 +1648,15 @@ line (func)
             ID (boolean)
             ID (boo)
 
-160. 
+161. 
 
-161. // "stmt",       stmt, ";"
+162. // "stmt",       stmt, ";"
 
-162. // -- stmt "call"      fnValue, "(", exprList, ")"
+163. // -- stmt "call"      fnValue, "(", exprList, ")"
 
-163. // -- -- exprList "empty"
+164. // -- -- exprList "empty"
 
-164. foo();
+165. foo();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1658,7 +1665,7 @@ line (stmt)
             method (empty)
         exprList (empty)
 
-165. foo.bar();
+166. foo.bar();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1668,7 +1675,7 @@ line (stmt)
                 ID (bar)
         exprList (empty)
 
-166. foo[i].bar();
+167. foo[i].bar();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1683,9 +1690,9 @@ line (stmt)
                 ID (bar)
         exprList (empty)
 
-167. // -- -- exprList "list"
+168. // -- -- exprList "list"
 
-168. foo(123); // "NUM"
+169. foo(123); // "NUM"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1696,7 +1703,7 @@ line (stmt)
             expr (NUM)
                 NUM (123)
 
-169. foo(12.345);
+170. foo(12.345);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1707,7 +1714,7 @@ line (stmt)
             expr (NUM)
                 NUM (12.345)
 
-170. foo(1.234e56);
+171. foo(1.234e56);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1718,7 +1725,7 @@ line (stmt)
             expr (NUM)
                 NUM (1.234e56)
 
-171. foo(1.234e+56);
+172. foo(1.234e+56);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1729,7 +1736,7 @@ line (stmt)
             expr (NUM)
                 NUM (1.234e+56)
 
-172. foo(1.234e-56);
+173. foo(1.234e-56);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1740,7 +1747,7 @@ line (stmt)
             expr (NUM)
                 NUM (1.234e-56)
 
-173. foo(.234e56);
+174. foo(.234e56);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1751,7 +1758,7 @@ line (stmt)
             expr (NUM)
                 NUM (.234e56)
 
-174. foo(.234e+56);
+175. foo(.234e+56);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1762,7 +1769,7 @@ line (stmt)
             expr (NUM)
                 NUM (.234e+56)
 
-175. foo(.234e-56);
+176. foo(.234e-56);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1773,7 +1780,7 @@ line (stmt)
             expr (NUM)
                 NUM (.234e-56)
 
-176. foo(true); // "BOOL"
+177. foo(true); // "BOOL"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1784,7 +1791,7 @@ line (stmt)
             expr (BOOL)
                 BOOL (true)
 
-177. foo(false);
+178. foo(false);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1795,7 +1802,7 @@ line (stmt)
             expr (BOOL)
                 BOOL (false)
 
-178. foo(null); // "NULL"
+179. foo(null); // "NULL"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1806,7 +1813,7 @@ line (stmt)
             expr (NULL)
                 NULL (null)
 
-179. foo("string literal"); // "STR"
+180. foo("string literal"); // "STR"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1817,7 +1824,7 @@ line (stmt)
             expr (STR)
                 STR ("string literal")
 
-180. foo(bar()); // "call"
+181. foo(bar()); // "call"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1832,7 +1839,7 @@ line (stmt)
                     method (empty)
                 exprList (empty)
 
-181. foo(bar(123));
+182. foo(bar(123));
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1849,7 +1856,7 @@ line (stmt)
                     expr (NUM)
                         NUM (123)
 
-182. foo(x); // "lValue"
+183. foo(x); // "lValue"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1863,7 +1870,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-183. foo(obj.x);
+184. foo(obj.x);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1878,7 +1885,7 @@ line (stmt)
                     field (field)
                         ID (x)
 
-184. foo(objs[i]);
+185. foo(objs[i]);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1897,7 +1904,7 @@ line (stmt)
                                 field (empty)
                     field (empty)
 
-185. foo(objs[i].x);
+186. foo(objs[i].x);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1917,7 +1924,7 @@ line (stmt)
                     field (field)
                         ID (x)
 
-186. foo(123); // "exprParens"
+187. foo(123); // "exprParens"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1928,7 +1935,7 @@ line (stmt)
             expr (NUM)
                 NUM (123)
 
-187. foo(-123); // "neg"
+188. foo(-123); // "neg"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1940,7 +1947,7 @@ line (stmt)
                 expr (NUM)
                     NUM (123)
 
-188. foo(-.234e+56);
+189. foo(-.234e+56);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1952,7 +1959,7 @@ line (stmt)
                 expr (NUM)
                     NUM (.234e+56)
 
-189. foo(-obj.x);
+190. foo(-obj.x);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1968,7 +1975,7 @@ line (stmt)
                         field (field)
                             ID (x)
 
-190. foo(!true);   // "!"
+191. foo(!true);   // "!"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1980,7 +1987,7 @@ line (stmt)
                 expr (BOOL)
                     BOOL (true)
 
-191. foo(!false);
+192. foo(!false);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -1992,7 +1999,7 @@ line (stmt)
                 expr (BOOL)
                     BOOL (false)
 
-192. foo(!paused);
+193. foo(!paused);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2007,7 +2014,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-193. foo(new int [100]); // "newArray"
+194. foo(new int [100]); // "newArray"
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2020,7 +2027,7 @@ line (stmt)
                 expr (NUM)
                     NUM (100)
 
-194. foo(new GameObj [numBullets]);
+195. foo(new GameObj [numBullets]);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2036,7 +2043,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-195. foo(new GameObj [numBullets * 2]);
+196. foo(new GameObj [numBullets * 2]);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2055,9 +2062,9 @@ line (stmt)
                     expr (NUM)
                         NUM (2)
 
-196. // -- -- exprList "list" (1 non-primary expr)
+197. // -- -- exprList "list" (1 non-primary expr)
 
-197. foo(123 + obj.x);
+198. foo(123 + obj.x);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2075,7 +2082,7 @@ line (stmt)
                         field (field)
                             ID (x)
 
-198. foo(-123 + obj.x - obj2.x);
+199. foo(-123 + obj.x - obj2.x);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2101,7 +2108,7 @@ line (stmt)
                         field (field)
                             ID (x)
 
-199. foo(100 - obj.x * -3.14);
+200. foo(100 - obj.x * -3.14);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2123,7 +2130,7 @@ line (stmt)
                         expr (NUM)
                             NUM (3.14)
 
-200. foo((1 + a[iTop]) - 1);
+201. foo((1 + a[iTop]) - 1);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2149,7 +2156,7 @@ line (stmt)
                 expr (NUM)
                     NUM (1)
 
-201. foo((1 + a[iTop]) / 1);
+202. foo((1 + a[iTop]) / 1);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2175,7 +2182,7 @@ line (stmt)
                 expr (NUM)
                     NUM (1)
 
-202. foo((a[i] + b[j]) / 3);
+203. foo((a[i] + b[j]) / 3);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2209,9 +2216,9 @@ line (stmt)
                 expr (NUM)
                     NUM (3)
 
-203. // -- -- exprList "list" (multiple exprs)
+204. // -- -- exprList "list" (multiple exprs)
 
-204. foo(x, why, zee);
+205. foo(x, why, zee);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2235,13 +2242,13 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-205. foo(x,
+206. foo(x,
 -- Incomplete line carried forward
 
-206. y,
+207. y,
 -- Incomplete line carried forward
 
-207. z);
+208. z);
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2265,7 +2272,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-208. foo( x + y, a || b && c, bar[i].m(z * (u + v)) );
+209. foo( x + y, a || b && c, bar[i].m(z * (u + v)) );
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -2332,132 +2339,132 @@ line (stmt)
                                         index (empty)
                                         field (empty)
 
-209. // -- stmt "varAssign"      "ID", "=", expr
+210. // -- stmt "varAssign"      "ID", "=", expr
 
-210. // -- -- valid "ID"s
+211. // -- -- valid "ID"s
 
-211. x = 0;
+212. x = 0;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (NUM)
             NUM (0)
 
-212. xValue = 0;
+213. xValue = 0;
 line (stmt)
     stmt (varAssign)
         ID (xValue)
         expr (NUM)
             NUM (0)
 
-213. x123 = 0;
+214. x123 = 0;
 line (stmt)
     stmt (varAssign)
         ID (x123)
         expr (NUM)
             NUM (0)
 
-214. x123four = 0;
+215. x123four = 0;
 line (stmt)
     stmt (varAssign)
         ID (x123four)
         expr (NUM)
             NUM (0)
 
-215. some_variable = 0;
+216. some_variable = 0;
 line (stmt)
     stmt (varAssign)
         ID (some_variable)
         expr (NUM)
             NUM (0)
 
-216. x1_ = 0;
+217. x1_ = 0;
 line (stmt)
     stmt (varAssign)
         ID (x1_)
         expr (NUM)
             NUM (0)
 
-217. // x = primaryExpr
+218. // x = primaryExpr
 
-218. var = 12.345; 			// "NUM"
+219. var = 12.345; 			// "NUM"
 line (stmt)
     stmt (varAssign)
         ID (var)
         expr (NUM)
             NUM (12.345)
 
-219. x = 1.234e56;
+220. x = 1.234e56;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (NUM)
             NUM (1.234e56)
 
-220. x = 1.234e+56;
+221. x = 1.234e+56;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (NUM)
             NUM (1.234e+56)
 
-221. x = 1.234e-56;
+222. x = 1.234e-56;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (NUM)
             NUM (1.234e-56)
 
-222. x = .234e56;
+223. x = .234e56;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (NUM)
             NUM (.234e56)
 
-223. x = .234e+56;
+224. x = .234e+56;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (NUM)
             NUM (.234e+56)
 
-224. x = .234e-56;
+225. x = .234e-56;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (NUM)
             NUM (.234e-56)
 
-225. x = true; 				// "BOOL"
+226. x = true; 				// "BOOL"
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (BOOL)
             BOOL (true)
 
-226. x = false;
+227. x = false;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (BOOL)
             BOOL (false)
 
-227. x = null;				// "NULL"
+228. x = null;				// "NULL"
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (NULL)
             NULL (null)
 
-228. x = "string literal"; 	// "STR"
+229. x = "string literal"; 	// "STR"
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (STR)
             STR ("string literal")
 
-229. x = foo(); 				// "call"
+230. x = foo(); 				// "call"
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2468,7 +2475,7 @@ line (stmt)
                 method (empty)
             exprList (empty)
 
-230. x = foo.bar(123);
+231. x = foo.bar(123);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2482,7 +2489,7 @@ line (stmt)
                 expr (NUM)
                     NUM (123)
 
-231. x = y; 					// "lValue"
+232. x = y; 					// "lValue"
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2492,7 +2499,7 @@ line (stmt)
                 index (empty)
                 field (empty)
 
-232. x = obj.x;
+233. x = obj.x;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2503,7 +2510,7 @@ line (stmt)
                 field (field)
                     ID (x)
 
-233. x = objs[i];
+234. x = objs[i];
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2518,7 +2525,7 @@ line (stmt)
                             field (empty)
                 field (empty)
 
-234. x = objs[i].x;
+235. x = objs[i].x;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2534,7 +2541,7 @@ line (stmt)
                 field (field)
                     ID (x)
 
-235. x = (123); 				// "exprParens"
+236. x = (123); 				// "exprParens"
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2542,7 +2549,7 @@ line (stmt)
             expr (NUM)
                 NUM (123)
 
-236. x = -123; 				// "neg"
+237. x = -123; 				// "neg"
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2550,7 +2557,7 @@ line (stmt)
             expr (NUM)
                 NUM (123)
 
-237. x = -.234e+56;
+238. x = -.234e+56;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2558,7 +2565,7 @@ line (stmt)
             expr (NUM)
                 NUM (.234e+56)
 
-238. x = -obj.x;
+239. x = -obj.x;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2570,7 +2577,7 @@ line (stmt)
                     field (field)
                         ID (x)
 
-239. x = !true;   			// "!"
+240. x = !true;   			// "!"
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2578,7 +2585,7 @@ line (stmt)
             expr (BOOL)
                 BOOL (true)
 
-240. x = !false;
+241. x = !false;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2586,7 +2593,7 @@ line (stmt)
             expr (BOOL)
                 BOOL (false)
 
-241. x = !paused;
+242. x = !paused;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2597,7 +2604,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-242. x = new GameObj [numBullets]; // "newArray"
+243. x = new GameObj [numBullets]; // "newArray"
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2609,9 +2616,9 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-243. // x = complex expr
+244. // x = complex expr
 
-244. x = x * y;
+245. x = x * y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2627,7 +2634,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-245. x = x / y;
+246. x = x / y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2643,7 +2650,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-246. x = x % y;
+247. x = x % y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2659,7 +2666,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-247. x = x + y;
+248. x = x + y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2675,7 +2682,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-248. x = x - y;
+249. x = x - y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2691,7 +2698,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-249. x = x << y;
+250. x = x << y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2707,7 +2714,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-250. x = x >> y;
+251. x = x >> y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2723,7 +2730,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-251. x = x >>> y;
+252. x = x >>> y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2739,7 +2746,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-252. b = x < y;
+253. b = x < y;
 line (stmt)
     stmt (varAssign)
         ID (b)
@@ -2755,7 +2762,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-253. b = x <= y;
+254. b = x <= y;
 line (stmt)
     stmt (varAssign)
         ID (b)
@@ -2771,7 +2778,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-254. b = x > y;
+255. b = x > y;
 line (stmt)
     stmt (varAssign)
         ID (b)
@@ -2787,7 +2794,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-255. b = x >= y;
+256. b = x >= y;
 line (stmt)
     stmt (varAssign)
         ID (b)
@@ -2803,7 +2810,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-256. b = x == y;
+257. b = x == y;
 line (stmt)
     stmt (varAssign)
         ID (b)
@@ -2819,7 +2826,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-257. b = x != y;
+258. b = x != y;
 line (stmt)
     stmt (varAssign)
         ID (b)
@@ -2835,7 +2842,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-258. x = x & y;
+259. x = x & y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2851,7 +2858,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-259. x = x ^ y;
+260. x = x ^ y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2867,7 +2874,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-260. x = x | y;
+261. x = x | y;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2883,7 +2890,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-261. b = x && y;
+262. b = x && y;
 line (stmt)
     stmt (varAssign)
         ID (b)
@@ -2899,7 +2906,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-262. b = x || y;
+263. b = x || y;
 line (stmt)
     stmt (varAssign)
         ID (b)
@@ -2915,7 +2922,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-263. x = x + y + z;
+264. x = x + y + z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2937,7 +2944,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-264. x = x - y - z;
+265. x = x - y - z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2959,7 +2966,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-265. x = x * y * z;
+266. x = x * y * z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -2981,7 +2988,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-266. x = x / y / z;
+267. x = x / y / z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3003,7 +3010,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-267. x = x % y % z;
+268. x = x % y % z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3025,7 +3032,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-268. x = x + y - z;
+269. x = x + y - z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3047,7 +3054,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-269. x = x - y + z;
+270. x = x - y + z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3069,7 +3076,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-270. x = x + y * z;
+271. x = x + y * z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3091,7 +3098,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-271. x = x * y + z;
+272. x = x * y + z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3113,7 +3120,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-272. x = x + y / z;
+273. x = x + y / z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3135,7 +3142,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-273. x = x / y + z;
+274. x = x / y + z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3157,7 +3164,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-274. x = x + y % z;
+275. x = x + y % z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3179,7 +3186,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-275. x = x % y + z;
+276. x = x % y + z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3201,7 +3208,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-276. x = x - y * z;
+277. x = x - y * z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3223,7 +3230,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-277. x = x * y - z;
+278. x = x * y - z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3245,7 +3252,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-278. x = x - y / z;
+279. x = x - y / z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3267,7 +3274,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-279. x = x / y - z;
+280. x = x / y - z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3289,7 +3296,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-280. x = x - y % z;
+281. x = x - y % z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3311,7 +3318,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-281. x = x % y - z;
+282. x = x % y - z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3333,7 +3340,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-282. x = x * y / z;
+283. x = x * y / z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3355,7 +3362,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-283. x = x / y * z;
+284. x = x / y * z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3377,7 +3384,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-284. x = x * y % z;
+285. x = x * y % z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3399,7 +3406,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-285. x = x % y * z;
+286. x = x % y * z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3421,7 +3428,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-286. x = x / y % z;
+287. x = x / y % z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3443,7 +3450,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-287. x = x % y / z;
+288. x = x % y / z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3465,7 +3472,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-288. x = (x + y) + z;
+289. x = (x + y) + z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3488,7 +3495,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-289. x = x - (y - z);
+290. x = x - (y - z);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3511,7 +3518,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-290. x = (x * y) * z;
+291. x = (x * y) * z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3534,7 +3541,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-291. x = x / (y / z);
+292. x = x / (y / z);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3557,7 +3564,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-292. x = (x + y) - z;
+293. x = (x + y) - z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3580,7 +3587,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-293. x = x - (y + z);
+294. x = x - (y + z);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3603,7 +3610,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-294. x = (x + y) * z;
+295. x = (x + y) * z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3626,7 +3633,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-295. x = x * (y + z);
+296. x = x * (y + z);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3649,7 +3656,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-296. x = (x + y) / z;
+297. x = (x + y) / z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3672,7 +3679,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-297. x = x / (y + z);
+298. x = x / (y + z);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3695,7 +3702,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-298. x = (x - y) * z;
+299. x = (x - y) * z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3718,7 +3725,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-299. x = x * (y - z);
+300. x = x * (y - z);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3741,7 +3748,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-300. x = (x - y) / z;
+301. x = (x - y) / z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3764,7 +3771,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-301. x = x / (y - z);
+302. x = x / (y - z);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3787,7 +3794,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-302. x = (x * y) / z;
+303. x = (x * y) / z;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3810,7 +3817,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-303. x = x / (y * z);
+304. x = x / (y * z);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3833,7 +3840,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-304. x = 123 + obj.x;
+305. x = 123 + obj.x;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3847,7 +3854,7 @@ line (stmt)
                     field (field)
                         ID (x)
 
-305. x = -123 + obj.x - obj2.x;
+306. x = -123 + obj.x - obj2.x;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3869,7 +3876,7 @@ line (stmt)
                     field (field)
                         ID (x)
 
-306. x = 100 - obj.x * -3.14;
+307. x = 100 - obj.x * -3.14;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3887,7 +3894,7 @@ line (stmt)
                     expr (NUM)
                         NUM (3.14)
 
-307. x = (1 + a[iTop]) - 1;
+308. x = (1 + a[iTop]) - 1;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3909,7 +3916,7 @@ line (stmt)
             expr (NUM)
                 NUM (1)
 
-308. x = (1 + a[iTop]) / 1;
+309. x = (1 + a[iTop]) / 1;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3931,7 +3938,7 @@ line (stmt)
             expr (NUM)
                 NUM (1)
 
-309. x = 1 + (a[i] + b[j]) / 3;
+310. x = 1 + (a[i] + b[j]) / 3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -3964,7 +3971,7 @@ line (stmt)
                 expr (NUM)
                     NUM (3)
 
-310. x = x1 * y1 + x2 * y2 + x3 * y3;
+311. x = x1 * y1 + x2 * y2 + x3 * y3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4004,7 +4011,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-311. x = x[0] * y[0] + x[1] * y[1] + x[2] * y[2];
+312. x = x[0] * y[0] + x[1] * y[1] + x[2] * y[2];
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4056,7 +4063,7 @@ line (stmt)
                                 NUM (2)
                         field (empty)
 
-312. x = (x1 + x2 + x3) / 3;
+313. x = (x1 + x2 + x3) / 3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4082,7 +4089,7 @@ line (stmt)
             expr (NUM)
                 NUM (3)
 
-313. x = (x[0] + x[1] + x[2] + x[3]) / 4;
+314. x = (x[0] + x[1] + x[2] + x[3]) / 4;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4122,7 +4129,7 @@ line (stmt)
             expr (NUM)
                 NUM (4)
 
-314. x = sum / n;
+315. x = sum / n;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4138,7 +4145,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-315. x = Math.sqrt(a * a + b * b);
+316. x = Math.sqrt(a * a + b * b);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4173,7 +4180,7 @@ line (stmt)
                                 index (empty)
                                 field (empty)
 
-316. x = Math.sqrt(Math.pow(a,2) + Math.pow(b,2));
+317. x = Math.sqrt(Math.pow(a,2) + Math.pow(b,2));
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4214,7 +4221,7 @@ line (stmt)
                             expr (NUM)
                                 NUM (2)
 
-317. x = Math.sqrt( (a.x - b.x) * (a.x - b.x) + (a.y - b.y)*(a.y - b.y) );
+318. x = Math.sqrt( (a.x - b.x) * (a.x - b.x) + (a.y - b.y)*(a.y - b.y) );
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4285,7 +4292,7 @@ line (stmt)
                                         field (field)
                                             ID (y)
 
-318. x = Math.sqrt( Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) );
+319. x = Math.sqrt( Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) );
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4342,7 +4349,7 @@ line (stmt)
                             expr (NUM)
                                 NUM (2)
 
-319. x = Math.sqrt((obj.x + obj.y) / 2 - (a[i] + b[j]) / 3);
+320. x = Math.sqrt((obj.x + obj.y) / 2 - (a[i] + b[j]) / 3);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4397,14 +4404,14 @@ line (stmt)
                         expr (NUM)
                             NUM (3)
 
-320. x = true;
+321. x = true;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (BOOL)
             BOOL (true)
 
-321. x = !true;
+322. x = !true;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4412,14 +4419,14 @@ line (stmt)
             expr (BOOL)
                 BOOL (true)
 
-322. x = false;
+323. x = false;
 line (stmt)
     stmt (varAssign)
         ID (x)
         expr (BOOL)
             BOOL (false)
 
-323. x = !false;
+324. x = !false;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4427,7 +4434,7 @@ line (stmt)
             expr (BOOL)
                 BOOL (false)
 
-324. x = !boolVar1 && boolVar2;
+325. x = !boolVar1 && boolVar2;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4444,7 +4451,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-325. x = boolVar1 && !boolVar2;
+326. x = boolVar1 && !boolVar2;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4461,7 +4468,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-326. x = !boolVar1 && !boolVar2;
+327. x = !boolVar1 && !boolVar2;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4479,7 +4486,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-327. x = !(boolVar1 && boolVar2);
+328. x = !(boolVar1 && boolVar2);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4497,7 +4504,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-328. x = !boolVar1 || boolVar2;
+329. x = !boolVar1 || boolVar2;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4514,7 +4521,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-329. x = boolVar1 || !boolVar2;
+330. x = boolVar1 || !boolVar2;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4531,7 +4538,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-330. x = !boolVar1 || !boolVar2;
+331. x = !boolVar1 || !boolVar2;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4549,7 +4556,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-331. x = !(boolVar1 || boolVar2);
+332. x = !(boolVar1 || boolVar2);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4567,7 +4574,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-332. x = boolVar1 && boolVar2 && boolVar3;
+333. x = boolVar1 && boolVar2 && boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4589,7 +4596,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-333. x = boolVar1 || boolVar2 || boolVar3;
+334. x = boolVar1 || boolVar2 || boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4611,7 +4618,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-334. x = boolVar1 && boolVar2 || boolVar3;
+335. x = boolVar1 && boolVar2 || boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4633,7 +4640,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-335. x = !boolVar1 && boolVar2 || boolVar3;
+336. x = !boolVar1 && boolVar2 || boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4656,7 +4663,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-336. x = boolVar1 && !boolVar2 || boolVar3;
+337. x = boolVar1 && !boolVar2 || boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4679,7 +4686,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-337. x = boolVar1 && boolVar2 || !boolVar3;
+338. x = boolVar1 && boolVar2 || !boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4702,7 +4709,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-338. x = !boolVar1 && !boolVar2 || boolVar3;
+339. x = !boolVar1 && !boolVar2 || boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4726,7 +4733,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-339. x = boolVar1 || boolVar2 && boolVar3;
+340. x = boolVar1 || boolVar2 && boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4748,7 +4755,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-340. x = (boolVar1 && boolVar2) || boolVar3;
+341. x = (boolVar1 && boolVar2) || boolVar3;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4771,7 +4778,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-341. x = boolVar1 && (boolVar2 || boolVar3);
+342. x = boolVar1 && (boolVar2 || boolVar3);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4794,7 +4801,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-342. x = (boolVar1 && boolVar2) || (boolVar3 && boolVar4);
+343. x = (boolVar1 && boolVar2) || (boolVar3 && boolVar4);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4824,7 +4831,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-343. x = (boolVar1 && (boolVar2 || boolVar3)) && boolVar4;
+344. x = (boolVar1 && (boolVar2 || boolVar3)) && boolVar4;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4854,7 +4861,7 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-344. x = x && ( (y || z) && !w );
+345. x = x && ( (y || z) && !w );
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4885,7 +4892,7 @@ line (stmt)
                                 index (empty)
                                 field (empty)
 
-345. x = x < 0;
+346. x = x < 0;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4898,7 +4905,7 @@ line (stmt)
             expr (NUM)
                 NUM (0)
 
-346. x = x <= 1.2;
+347. x = x <= 1.2;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4911,7 +4918,7 @@ line (stmt)
             expr (NUM)
                 NUM (1.2)
 
-347. x = x > .1;
+348. x = x > .1;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4924,7 +4931,7 @@ line (stmt)
             expr (NUM)
                 NUM (.1)
 
-348. x = x >= .1e-23;
+349. x = x >= .1e-23;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4937,7 +4944,7 @@ line (stmt)
             expr (NUM)
                 NUM (.1e-23)
 
-349. x = x < eps && x > -eps;
+350. x = x < eps && x > -eps;
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -4966,7 +4973,7 @@ line (stmt)
                             index (empty)
                             field (empty)
 
-350. x = xValue > eps[i] && xValue < eps[i + j];
+351. x = xValue > eps[i] && xValue < eps[i + j];
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -5010,7 +5017,7 @@ line (stmt)
                                         field (empty)
                         field (empty)
 
-351. x = x1 < foo() || y2 >= foo[i].bar(arr[i]);
+352. x = x1 < foo() || y2 >= foo[i].bar(arr[i]);
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -5056,7 +5063,7 @@ line (stmt)
                                             field (empty)
                                 field (empty)
 
-352. x = x >= y.bar() && ( z_val <= 1 + 2.3 || 5 > 7 );
+353. x = x >= y.bar() && ( z_val <= 1 + 2.3 || 5 > 7 );
 line (stmt)
     stmt (varAssign)
         ID (x)
@@ -5093,9 +5100,9 @@ line (stmt)
                         expr (NUM)
                             NUM (7)
 
-353. // -- stmt "assign"      lValue, "=", expr
+354. // -- stmt "assign"      lValue, "=", expr
 
-354. obj.x = -0.5;
+355. obj.x = -0.5;
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5107,7 +5114,7 @@ line (stmt)
             expr (NUM)
                 NUM (0.5)
 
-355. obj.height = obj2.height;
+356. obj.height = obj2.height;
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5122,7 +5129,7 @@ line (stmt)
                 field (field)
                     ID (height)
 
-356. xCoord[i] = obj.x;
+357. xCoord[i] = obj.x;
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5141,7 +5148,7 @@ line (stmt)
                 field (field)
                     ID (x)
 
-357. objs[i].x = foo(i);
+358. objs[i].x = foo(i);
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5166,7 +5173,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-358. a[0] = startValue;
+359. a[0] = startValue;
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5181,7 +5188,7 @@ line (stmt)
                 index (empty)
                 field (empty)
 
-359. a[i] = max;
+360. a[i] = max;
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5199,7 +5206,7 @@ line (stmt)
                 index (empty)
                 field (empty)
 
-360. a[i] = a[i - 1];
+361. a[i] = a[i - 1];
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5225,7 +5232,7 @@ line (stmt)
                             NUM (1)
                 field (empty)
 
-361. a[i] = b[i];
+362. a[i] = b[i];
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5248,7 +5255,7 @@ line (stmt)
                             field (empty)
                 field (empty)
 
-362. dist[i] = Math.sqrt( (a[i].x - b[i].x) * (a[i].x - b[i].x) + (a[i].y - b[i].y)*(a[i].y - b[i].y) );
+363. dist[i] = Math.sqrt( (a[i].x - b[i].x) * (a[i].x - b[i].x) + (a[i].y - b[i].y)*(a[i].y - b[i].y) );
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5367,7 +5374,7 @@ line (stmt)
                                         field (field)
                                             ID (y)
 
-363. dist[i] = Math.sqrt( Math.pow(a[i].x - b[i].x, 2) + Math.pow(a[i].y - b[i].y, 2) );
+364. dist[i] = Math.sqrt( Math.pow(a[i].x - b[i].x, 2) + Math.pow(a[i].y - b[i].y, 2) );
 line (stmt)
     stmt (assign)
         lValue (lValue)
@@ -5452,9 +5459,9 @@ line (stmt)
                             expr (NUM)
                                 NUM (2)
 
-364. // -- stmt "opAssign"
+365. // -- stmt "opAssign"
 
-365. i += 1;
+366. i += 1;
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5465,7 +5472,7 @@ line (stmt)
         expr (NUM)
             NUM (1)
 
-366. obj.x += -0.5;
+367. obj.x += -0.5;
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5478,7 +5485,7 @@ line (stmt)
             expr (NUM)
                 NUM (0.5)
 
-367. obj.height -= obj2.height;
+368. obj.height -= obj2.height;
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5494,7 +5501,7 @@ line (stmt)
                 field (field)
                     ID (height)
 
-368. xCoord[i] *= obj.x;
+369. xCoord[i] *= obj.x;
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5514,7 +5521,7 @@ line (stmt)
                 field (field)
                     ID (x)
 
-369. objs[i].x /= foo(i);
+370. objs[i].x /= foo(i);
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5540,7 +5547,7 @@ line (stmt)
                         index (empty)
                         field (empty)
 
-370. a[0] += startValue;
+371. a[0] += startValue;
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5556,7 +5563,7 @@ line (stmt)
                 index (empty)
                 field (empty)
 
-371. a[i] -= max;
+372. a[i] -= max;
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5575,7 +5582,7 @@ line (stmt)
                 index (empty)
                 field (empty)
 
-372. a[i] *= a[i - 1];
+373. a[i] *= a[i - 1];
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5602,7 +5609,7 @@ line (stmt)
                             NUM (1)
                 field (empty)
 
-373. a[i] /= b[i];
+374. a[i] /= b[i];
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5626,7 +5633,7 @@ line (stmt)
                             field (empty)
                 field (empty)
 
-374. dist[i] += Math.sqrt( (a[i].x - b[i].x) * (a[i].x - b[i].x) + (a[i].y - b[i].y)*(a[i].y - b[i].y) );
+375. dist[i] += Math.sqrt( (a[i].x - b[i].x) * (a[i].x - b[i].x) + (a[i].y - b[i].y)*(a[i].y - b[i].y) );
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5746,7 +5753,7 @@ line (stmt)
                                         field (field)
                                             ID (y)
 
-375. dist[i] -= Math.sqrt( Math.pow(a[i].x - b[i].x, 2) + Math.pow(a[i].y - b[i].y, 2) );
+376. dist[i] -= Math.sqrt( Math.pow(a[i].x - b[i].x, 2) + Math.pow(a[i].y - b[i].y, 2) );
 line (stmt)
     stmt (opAssign)
         lValue (lValue)
@@ -5832,9 +5839,9 @@ line (stmt)
                             expr (NUM)
                                 NUM (2)
 
-376. // -- stmt "preInc"
+377. // -- stmt "preInc"
 
-377. ++x;
+378. ++x;
 line (stmt)
     stmt (preInc)
         lValue (lValue)
@@ -5842,7 +5849,7 @@ line (stmt)
             index (empty)
             field (empty)
 
-378. ++x.y;
+379. ++x.y;
 line (stmt)
     stmt (preInc)
         lValue (lValue)
@@ -5851,7 +5858,7 @@ line (stmt)
             field (field)
                 ID (y)
 
-379. ++a[i];
+380. ++a[i];
 line (stmt)
     stmt (preInc)
         lValue (lValue)
@@ -5864,7 +5871,7 @@ line (stmt)
                         field (empty)
             field (empty)
 
-380. ++a[i].x;
+381. ++a[i].x;
 line (stmt)
     stmt (preInc)
         lValue (lValue)
@@ -5878,9 +5885,9 @@ line (stmt)
             field (field)
                 ID (x)
 
-381. // -- stmt "preDec"
+382. // -- stmt "preDec"
 
-382. --x;
+383. --x;
 line (stmt)
     stmt (preDec)
         lValue (lValue)
@@ -5888,7 +5895,7 @@ line (stmt)
             index (empty)
             field (empty)
 
-383. --x.y;
+384. --x.y;
 line (stmt)
     stmt (preDec)
         lValue (lValue)
@@ -5897,7 +5904,7 @@ line (stmt)
             field (field)
                 ID (y)
 
-384. --a[i];
+385. --a[i];
 line (stmt)
     stmt (preDec)
         lValue (lValue)
@@ -5910,7 +5917,7 @@ line (stmt)
                         field (empty)
             field (empty)
 
-385. --a[i].x;
+386. --a[i].x;
 line (stmt)
     stmt (preDec)
         lValue (lValue)
@@ -5924,9 +5931,9 @@ line (stmt)
             field (field)
                 ID (x)
 
-386. // -- stmt "postInc"
+387. // -- stmt "postInc"
 
-387. x++;
+388. x++;
 line (stmt)
     stmt (postInc)
         lValue (lValue)
@@ -5934,7 +5941,7 @@ line (stmt)
             index (empty)
             field (empty)
 
-388. x.y++;
+389. x.y++;
 line (stmt)
     stmt (postInc)
         lValue (lValue)
@@ -5943,7 +5950,7 @@ line (stmt)
             field (field)
                 ID (y)
 
-389. a[i]++;
+390. a[i]++;
 line (stmt)
     stmt (postInc)
         lValue (lValue)
@@ -5956,7 +5963,7 @@ line (stmt)
                         field (empty)
             field (empty)
 
-390. a[i].x++;
+391. a[i].x++;
 line (stmt)
     stmt (postInc)
         lValue (lValue)
@@ -5970,9 +5977,9 @@ line (stmt)
             field (field)
                 ID (x)
 
-391. // -- stmt "postDec"
+392. // -- stmt "postDec"
 
-392. x--;
+393. x--;
 line (stmt)
     stmt (postDec)
         lValue (lValue)
@@ -5980,7 +5987,7 @@ line (stmt)
             index (empty)
             field (empty)
 
-393. x.y--;
+394. x.y--;
 line (stmt)
     stmt (postDec)
         lValue (lValue)
@@ -5989,7 +5996,7 @@ line (stmt)
             field (field)
                 ID (y)
 
-394. a[i]--;
+395. a[i]--;
 line (stmt)
     stmt (postDec)
         lValue (lValue)
@@ -6002,7 +6009,7 @@ line (stmt)
                         field (empty)
             field (empty)
 
-395. a[i].x--;
+396. a[i].x--;
 line (stmt)
     stmt (postDec)
         lValue (lValue)
@@ -6016,47 +6023,47 @@ line (stmt)
             field (field)
                 ID (x)
 
-396. // -- break
+397. // -- break
 
-397. break;
+398. break;
 line (stmt)
     stmt (break)
 
-398. 
+399. 
 
-399. // "varInit",       "ID", "ID", "=", expr, ";"
+400. // "varInit",       "ID", "ID", "=", expr, ";"
 
-400. // -- expr is a primaryExpr
+401. // -- expr is a primaryExpr
 
-401. int i = 0;
+402. int i = 0;
 line (varInit)
     ID (int)
     ID (i)
     expr (NUM)
         NUM (0)
 
-402. double c = 2.99792458e+8;
+403. double c = 2.99792458e+8;
 line (varInit)
     ID (double)
     ID (c)
     expr (NUM)
         NUM (2.99792458e+8)
 
-403. boolean b = true;
+404. boolean b = true;
 line (varInit)
     ID (boolean)
     ID (b)
     expr (BOOL)
         BOOL (true)
 
-404. String greeting = "hello";
+405. String greeting = "hello";
 line (varInit)
     ID (String)
     ID (greeting)
     expr (STR)
         STR ("hello")
 
-405. int x = foo();
+406. int x = foo();
 line (varInit)
     ID (int)
     ID (x)
@@ -6067,7 +6074,7 @@ line (varInit)
             method (empty)
         exprList (empty)
 
-406. double y = bar("foo");
+407. double y = bar("foo");
 line (varInit)
     ID (double)
     ID (y)
@@ -6080,7 +6087,7 @@ line (varInit)
             expr (STR)
                 STR ("foo")
 
-407. boolean b = x;
+408. boolean b = x;
 line (varInit)
     ID (boolean)
     ID (b)
@@ -6090,7 +6097,7 @@ line (varInit)
             index (empty)
             field (empty)
 
-408. String s = x.y;
+409. String s = x.y;
 line (varInit)
     ID (String)
     ID (s)
@@ -6101,7 +6108,7 @@ line (varInit)
             field (field)
                 ID (y)
 
-409. GameObj g = arr[index];
+410. GameObj g = arr[index];
 line (varInit)
     ID (GameObj)
     ID (g)
@@ -6116,7 +6123,7 @@ line (varInit)
                         field (empty)
             field (empty)
 
-410. double x = arr[i].x;
+411. double x = arr[i].x;
 line (varInit)
     ID (double)
     ID (x)
@@ -6132,7 +6139,7 @@ line (varInit)
             field (field)
                 ID (x)
 
-411. int i = (j);
+412. int i = (j);
 line (varInit)
     ID (int)
     ID (i)
@@ -6143,7 +6150,7 @@ line (varInit)
                 index (empty)
                 field (empty)
 
-412. double d = -123.e-56;
+413. double d = -123.e-56;
 line (varInit)
     ID (double)
     ID (d)
@@ -6151,7 +6158,7 @@ line (varInit)
         expr (NUM)
             NUM (123.e-56)
 
-413. boolean b = !b;
+414. boolean b = !b;
 line (varInit)
     ID (boolean)
     ID (b)
@@ -6162,9 +6169,9 @@ line (varInit)
                 index (empty)
                 field (empty)
 
-414. // -- expr is not a primaryExpr
+415. // -- expr is not a primaryExpr
 
-415. int m = (s + e) / 2;
+416. int m = (s + e) / 2;
 line (varInit)
     ID (int)
     ID (m)
@@ -6184,7 +6191,7 @@ line (varInit)
         expr (NUM)
             NUM (2)
 
-416. int mid = start + (end - start) / 2;
+417. int mid = start + (end - start) / 2;
 line (varInit)
     ID (int)
     ID (mid)
@@ -6210,7 +6217,7 @@ line (varInit)
             expr (NUM)
                 NUM (2)
 
-417. double dotProduct = x1 * y1 + x2 * y2 + x3 * y3;
+418. double dotProduct = x1 * y1 + x2 * y2 + x3 * y3;
 line (varInit)
     ID (double)
     ID (dotProduct)
@@ -6250,7 +6257,7 @@ line (varInit)
                     index (empty)
                     field (empty)
 
-418. double avg = (x[0] + x[1] + x[2] + x[3]) / 4.0;
+419. double avg = (x[0] + x[1] + x[2] + x[3]) / 4.0;
 line (varInit)
     ID (double)
     ID (avg)
@@ -6290,7 +6297,7 @@ line (varInit)
         expr (NUM)
             NUM (4.0)
 
-419. double avg = sum(arr) / arr.length;
+420. double avg = sum(arr) / arr.length;
 line (varInit)
     ID (double)
     ID (avg)
@@ -6313,7 +6320,7 @@ line (varInit)
                 field (field)
                     ID (length)
 
-420. GameObj b = bullets[i];
+421. GameObj b = bullets[i];
 line (varInit)
     ID (GameObj)
     ID (b)
@@ -6328,7 +6335,7 @@ line (varInit)
                         field (empty)
             field (empty)
 
-421. double dist = Math.sqrt( Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) );
+422. double dist = Math.sqrt( Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) );
 line (varInit)
     ID (double)
     ID (dist)
@@ -6385,7 +6392,7 @@ line (varInit)
                         expr (NUM)
                             NUM (2)
 
-422. boolean b = ( x || y ) && ( x || z );
+423. boolean b = ( x || y ) && ( x || z );
 line (varInit)
     ID (boolean)
     ID (b)
@@ -6415,7 +6422,7 @@ line (varInit)
                         index (empty)
                         field (empty)
 
-423. boolean b = ( x && ( (y || z) && !w ) );
+424. boolean b = ( x && ( (y || z) && !w ) );
 line (varInit)
     ID (boolean)
     ID (b)
@@ -6447,24 +6454,24 @@ line (varInit)
                                 index (empty)
                                 field (empty)
 
-424. 
+425. 
 
-425. // "varDecl",       "ID", idList, ";"
+426. // "varDecl",       "ID", idList, ";"
 
-426. int x;
+427. int x;
 line (varDecl)
     ID (int)
     idList (list)
         ID (x)
 
-427. double x1, x2;
+428. double x1, x2;
 line (varDecl)
     ID (double)
     idList (list)
         ID (x1)
         ID (x2)
 
-428. double x_1, x_2, x_3;
+429. double x_1, x_2, x_3;
 line (varDecl)
     ID (double)
     idList (list)
@@ -6472,7 +6479,7 @@ line (varDecl)
         ID (x_2)
         ID (x_3)
 
-429. boolean paused, turboModeOn, cheatModeOn;
+430. boolean paused, turboModeOn, cheatModeOn;
 line (varDecl)
     ID (boolean)
     idList (list)
@@ -6480,7 +6487,7 @@ line (varDecl)
         ID (turboModeOn)
         ID (cheatModeOn)
 
-430. String city, state, zip;
+431. String city, state, zip;
 line (varDecl)
     ID (String)
     idList (list)
@@ -6488,18 +6495,18 @@ line (varDecl)
         ID (state)
         ID (zip)
 
-431. 
+432. 
 
-432. // "constInit",      "final", "ID", "ID", "=", expr, ";"
+433. // "constInit",      "final", "ID", "ID", "=", expr, ";"
 
-433. final int MAX_VALUE = 100;
+434. final int MAX_VALUE = 100;
 line (constInit)
     ID (int)
     ID (MAX_VALUE)
     expr (NUM)
         NUM (100)
 
-434. final double MAX_VAL_DOUBLE = 1.0 * MAX_VALUE;
+435. final double MAX_VAL_DOUBLE = 1.0 * MAX_VALUE;
 line (constInit)
     ID (double)
     ID (MAX_VAL_DOUBLE)
@@ -6512,7 +6519,7 @@ line (constInit)
                 index (empty)
                 field (empty)
 
-435. final int MAX = max(arr, len);
+436. final int MAX = max(arr, len);
 line (constInit)
     ID (int)
     ID (MAX)
@@ -6533,14 +6540,14 @@ line (constInit)
                     index (empty)
                     field (empty)
 
-436. final String NAME = "Max";
+437. final String NAME = "Max";
 line (constInit)
     ID (String)
     ID (NAME)
     expr (STR)
         STR ("Max")
 
-437. final GameObj foo = bar;
+438. final GameObj foo = bar;
 line (constInit)
     ID (GameObj)
     ID (foo)
@@ -6550,7 +6557,7 @@ line (constInit)
             index (empty)
             field (empty)
 
-438. final boolean FOO = !bar || (p && !q);
+439. final boolean FOO = !bar || (p && !q);
 line (constInit)
     ID (boolean)
     ID (FOO)
@@ -6575,7 +6582,7 @@ line (constInit)
                             index (empty)
                             field (empty)
 
-439. final int N = 1 - a * ( b + c ) / 2;
+440. final int N = 1 - a * ( b + c ) / 2;
 line (constInit)
     ID (int)
     ID (N)
@@ -6604,7 +6611,7 @@ line (constInit)
             expr (NUM)
                 NUM (2)
 
-440. final double WIDTH = ct.getWidth();
+441. final double WIDTH = ct.getWidth();
 line (constInit)
     ID (double)
     ID (WIDTH)
@@ -6616,7 +6623,7 @@ line (constInit)
                 ID (getWidth)
         exprList (empty)
 
-441. final int X0 = x[0];
+442. final int X0 = x[0];
 line (constInit)
     ID (int)
     ID (X0)
@@ -6628,7 +6635,7 @@ line (constInit)
                     NUM (0)
             field (empty)
 
-442. final boolean FOO = bar[i].x + Math.sqrt(z);
+443. final boolean FOO = bar[i].x + Math.sqrt(z);
 line (constInit)
     ID (boolean)
     ID (FOO)
@@ -6657,18 +6664,18 @@ line (constInit)
                         index (empty)
                         field (empty)
 
-443. 
+444. 
 
-444. // "func", 		access, retType, "ID", "(", paramList, ")"
+445. // "func", 		access, retType, "ID", "(", paramList, ")"
 
-445. public void foo()
+446. public void foo()
 line (func)
     access (public)
     retType (void)
     ID (foo)
     paramList (empty)
 
-446. public int foo()
+447. public int foo()
 line (func)
     access (public)
     retType (value)
@@ -6676,7 +6683,7 @@ line (func)
     ID (foo)
     paramList (empty)
 
-447. public boolean foo2(double x)
+448. public boolean foo2(double x)
 line (func)
     access (public)
     retType (value)
@@ -6687,7 +6694,7 @@ line (func)
             ID (double)
             ID (x)
 
-448. public double foo(int[] arr)
+449. public double foo(int[] arr)
 line (func)
     access (public)
     retType (value)
@@ -6698,7 +6705,7 @@ line (func)
             ID (int)
             ID (arr)
 
-449. public String foo_bar(double x1, boolean b_2, GameObj gameObj)
+450. public String foo_bar(double x1, boolean b_2, GameObj gameObj)
 line (func)
     access (public)
     retType (value)
@@ -6715,7 +6722,7 @@ line (func)
             ID (GameObj)
             ID (gameObj)
 
-450. public GameObj fooBar(GameObj[] objs, boolean [] bs, double []ds, int []  is)
+451. public GameObj fooBar(GameObj[] objs, boolean [] bs, double []ds, int []  is)
 line (func)
     access (public)
     retType (value)
@@ -6735,7 +6742,7 @@ line (func)
             ID (int)
             ID (is)
 
-451. public int[] foo()
+452. public int[] foo()
 line (func)
     access (public)
     retType (array)
@@ -6743,7 +6750,7 @@ line (func)
     ID (foo)
     paramList (empty)
 
-452. public double[] foo()
+453. public double[] foo()
 line (func)
     access (public)
     retType (array)
@@ -6751,14 +6758,14 @@ line (func)
     ID (foo)
     paramList (empty)
 
-453. void foo()
+454. void foo()
 line (func)
     access (empty)
     retType (void)
     ID (foo)
     paramList (empty)
 
-454. int foo123()
+455. int foo123()
 line (func)
     access (empty)
     retType (value)
@@ -6766,7 +6773,7 @@ line (func)
     ID (foo123)
     paramList (empty)
 
-455. boolean foo2(double x)
+456. boolean foo2(double x)
 line (func)
     access (empty)
     retType (value)
@@ -6777,7 +6784,7 @@ line (func)
             ID (double)
             ID (x)
 
-456. double foo(int[] arr)
+457. double foo(int[] arr)
 line (func)
     access (empty)
     retType (value)
@@ -6788,7 +6795,7 @@ line (func)
             ID (int)
             ID (arr)
 
-457. String foo_bar(double[] x1s, boolean b_2, GameObj gameObj)
+458. String foo_bar(double[] x1s, boolean b_2, GameObj gameObj)
 line (func)
     access (empty)
     retType (value)
@@ -6805,7 +6812,7 @@ line (func)
             ID (GameObj)
             ID (gameObj)
 
-458. GameObj fooBar(GameObj obj, boolean [] bs, double []ds, int []  is)
+459. GameObj fooBar(GameObj obj, boolean [] bs, double []ds, int []  is)
 line (func)
     access (empty)
     retType (value)
@@ -6825,7 +6832,7 @@ line (func)
             ID (int)
             ID (is)
 
-459. GameObj[] myMethod(GameObj[] objs)
+460. GameObj[] myMethod(GameObj[] objs)
 line (func)
     access (empty)
     retType (array)
@@ -6836,84 +6843,84 @@ line (func)
             ID (GameObj)
             ID (objs)
 
-460. 
+461. 
 
-461. // "begin",			"{"
+462. // "begin",			"{"
 
-462. {
+463. {
 line (begin)
 
-463. 
+464. 
 
-464. // "end",			"}"
+465. // "end",			"}"
 
-465. }
+466. }
 line (end)
 
-466. 
+467. 
 
-467. // "if",			"if", "(", expr, ")"
+468. // "if",			"if", "(", expr, ")"
 
-468. if (true)
+469. if (true)
 line (if)
     expr (BOOL)
         BOOL (true)
 
-469. 
+470. 
 
-470. // "elseif",		"else", "if", "(", expr, ")"
+471. // "elseif",		"else", "if", "(", expr, ")"
 
-471. else if ( true )
+472. else if ( true )
 line (elseif)
     expr (BOOL)
         BOOL (true)
 
-472. 
+473. 
 
-473. // "else"
+474. // "else"
 
-474. else
+475. else
 line (else)
 
-475. 
+476. 
 
-476. // "return",			"return", expr, ";"
+477. // "return",			"return", expr, ";"
 
-477. return 0;
+478. return 0;
 line (return)
     expr (NUM)
         NUM (0)
 
-478. 
+479. 
 
-479. // "do"
+480. // "do"
 
-480. do
+481. do
 line (do)
 
-481. 
+482. 
 
-482. // "while",				"while", "(", expr, whileEnd
+483. // "while",				"while", "(", expr, whileEnd
 
-483. while (true)
+484. while (true)
 line (while)
     expr (BOOL)
         BOOL (true)
     whileEnd (while)
 
-484. while (true);
+485. while (true);
 line (while)
     expr (BOOL)
         BOOL (true)
     whileEnd (do-while)
 
-485. 
+486. 
 
-486. // "for",				"for", "(", forControl, ")"
+487. // "for",				"for", "(", forControl, ")"
 
-487. // -- forControl "three"
+488. // -- forControl "three"
 
-488. for ( i = 0 ; i < n ; i++ )
+489. for ( i = 0 ; i < n ; i++ )
 line (for)
     forControl (three)
         forInit (stmt)
@@ -6940,7 +6947,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-489. for ( int i = 0 ; i < n ; i++ )
+490. for ( int i = 0 ; i < n ; i++ )
 line (for)
     forControl (three)
         forInit (varInit)
@@ -6967,7 +6974,7 @@ line (for)
                     index (empty)
                     field (empty)
 
-490. for ( i = 0 ; ; )
+491. for ( i = 0 ; ; )
 line (for)
     forControl (three)
         forInit (stmt)
@@ -6978,7 +6985,7 @@ line (for)
         forExpr (empty)
         forNext (empty)
 
-491. for ( int i = 0 ; ; )
+492. for ( int i = 0 ; ; )
 line (for)
     forControl (three)
         forInit (varInit)
@@ -6989,7 +6996,7 @@ line (for)
         forExpr (empty)
         forNext (empty)
 
-492. for ( ; i < n ; )
+493. for ( ; i < n ; )
 line (for)
     forControl (three)
         forInit (empty)
@@ -7007,7 +7014,7 @@ line (for)
                         field (empty)
         forNext (empty)
 
-493. for ( ; ; i++ )
+494. for ( ; ; i++ )
 line (for)
     forControl (three)
         forInit (empty)
@@ -7019,34 +7026,34 @@ line (for)
                     index (empty)
                     field (empty)
 
-494. for ( ; ; )
+495. for ( ; ; )
 line (for)
     forControl (three)
         forInit (empty)
         forExpr (empty)
         forNext (empty)
 
-495. // -- forControl "array"
+496. // -- forControl "array"
 
-496. for ( GameObj g : gameObjs )
+497. for ( GameObj g : gameObjs )
 line (for)
     forControl (array)
         ID (GameObj)
         ID (g)
         ID (gameObjs)
 
-497. 
+498. 
 
-498. // "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";"
+499. // "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";"
 
-499. int[] a = {};
+500. int[] a = {};
 line (arrayInit)
     ID (int)
     ID (a)
     arrayInit (list)
         exprList (empty)
 
-500. double[] a = { 1 };
+501. double[] a = { 1 };
 line (arrayInit)
     ID (double)
     ID (a)
@@ -7055,7 +7062,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (1)
 
-501. boolean[] a = { 1, 2, 3 };
+502. boolean[] a = { 1, 2, 3 };
 line (arrayInit)
     ID (boolean)
     ID (a)
@@ -7068,7 +7075,7 @@ line (arrayInit)
             expr (NUM)
                 NUM (3)
 
-502. GameObj[] a = new GameObj[100];
+503. GameObj[] a = new GameObj[100];
 line (arrayInit)
     ID (GameObj)
     ID (a)
@@ -7078,17 +7085,17 @@ line (arrayInit)
             expr (NUM)
                 NUM (100)
 
-503. 
+504. 
 
-504. // "arrayDecl",		"ID", "[", "]", idList, ";"
+505. // "arrayDecl",		"ID", "[", "]", idList, ";"
 
-505. String[] a;
+506. String[] a;
 line (arrayDecl)
     ID (String)
     idList (list)
         ID (a)
 
-506. int[] a, b, c;
+507. int[] a, b, c;
 line (arrayDecl)
     ID (int)
     idList (list)
@@ -7096,70 +7103,70 @@ line (arrayDecl)
         ID (b)
         ID (c)
 
-507. 
+508. 
 
-508. // "importCode12",	"import", "ID", ".", "*", ";"
+509. // "importCode12",	"import", "ID", ".", "*", ";"
 
-509. import Code12.*;
+510. import Code12.*;
 line (importAll)
     ID (Code12)
 
-510. 
+511. 
 
-511. // "class",			"class", "ID",
+512. // "class",			"class", "ID",
 
-512. class Foo
+513. class Foo
 line (class)
     ID (Foo)
 
-513. 
+514. 
 
-514. // "classUser",		"class", "ID", "extends", "ID"
+515. // "classUser",		"class", "ID", "extends", "ID"
 
-515. class TestProgram extends Code12Program
+516. class TestProgram extends Code12Program
 line (classUser)
     access (empty)
     ID (TestProgram)
     ID (Code12Program)
 
-516. 
+517. 
 
-517. // "classUserPub",	"public", "class", "ID", "extends", "ID"
+518. // "classUserPub",	"public", "class", "ID", "extends", "ID"
 
-518. public class TestProgram extends Code12Program
+519. public class TestProgram extends Code12Program
 line (classUser)
     access (public)
     ID (TestProgram)
     ID (Code12Program)
 
-519. 
+520. 
 
-520. // "main",			"public", "static", "void", "ID", "(", "ID", "[", "]", "ID", ")"
+521. // "main",			"public", "static", "void", "ID", "(", "ID", "[", "]", "ID", ")"
 
-521. public static void main(String[] args)
+522. public static void main(String[] args)
 line (main)
     ID (main)
     ID (String)
     ID (args)
 
-522. 
+523. 
 
-523. // "Code12Run",		"ID", ".", "ID", "(", "new", "ID", "(", ")", ")", ";"
+524. // "Code12Run",		"ID", ".", "ID", "(", "new", "ID", "(", ")", ")", ";"
 
-524. Code12.run(new TestProgram());
+525. Code12.run(new TestProgram());
 line (Code12Run)
     ID (Code12)
     ID (run)
     ID (TestProgram)
 
-525. 
+526. 
 
-526. }
+527. }
 line (end)
 
-527. 
+528. 
 
-528. public void onMousePress(GameObj obj, double x, double y)
+529. public void onMousePress(GameObj obj, double x, double y)
 line (func)
     access (public)
     retType (void)
@@ -7175,12 +7182,12 @@ line (func)
             ID (double)
             ID (y)
 
-529. {
+530. {
 line (begin)
 
-530. // Pop bubbles that get clicked
+531. // Pop bubbles that get clicked
 
-531. if (obj != null)
+532. if (obj != null)
 line (if)
     expr (!=)
         expr (lValue)
@@ -7191,10 +7198,10 @@ line (if)
         expr (NULL)
             NULL (null)
 
-532. {
+533. {
 line (begin)
 
-533. obj.delete();
+534. obj.delete();
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -7204,7 +7211,7 @@ line (stmt)
                 ID (delete)
         exprList (empty)
 
-534. ct.sound("pop.wav");
+535. ct.sound("pop.wav");
 line (stmt)
     stmt (call)
         fnValue (fnValue)
@@ -7216,337 +7223,598 @@ line (stmt)
             expr (STR)
                 STR ("pop.wav")
 
-535. }
-line (end)
-
 536. }
 line (end)
 
 537. }
 line (end)
 
-538. 
+538. }
+line (end)
 
-539. ////////////////////////////////////////////////////////////////////
+539. 
 
-540. ERRORS
+540. ////////////////////////////////////////////////////////////////////
+
+541. ERRORS
 ************** Beginning of Expected Errors Section **************
 
-541. 
+542. 
 
-542. // Lexical errors
+543. // Lexical errors
 
-543. @               // invalid character
-*** Line 543 char 1: Invalid character
+544. @               // invalid character
+*** Line 544 char 1: Invalid character
 
-544. foo('a');       // char literals not supported
-*** Line 544 char 5: char type not supported, use double quotes
+545. foo('a');       // char literals not supported
+*** Line 545 char 5: char type not supported, use double quotes
 
-545. foo(" );        // unclosed string literal
-*** Line 545 chars 5-43: Unclosed string literal
+546. foo(" );        // unclosed string literal
+*** Line 546 chars 5-43: Unclosed string literal
 
-546. foo("\);        // unclosed string literal ending in backslash
-*** Line 546 chars 6-7: Unsupported or illegal escape sequence
-
-547. s = "\          // unclosed string literal ending in backslash
+547. foo("\);        // unclosed string literal ending in backslash
 *** Line 547 chars 6-7: Unsupported or illegal escape sequence
 
-548. s = "\";        // unclosed string literal from escaped double quote
-*** Line 548 chars 5-68: Unclosed string literal
+548. s = "\          // unclosed string literal ending in backslash
+*** Line 548 chars 6-7: Unsupported or illegal escape sequence
 
-549. s = "\ ";       // illegal escape character
-*** Line 549 chars 6-7: Unsupported or illegal escape sequence
+549. s = "\";        // unclosed string literal from escaped double quote
+*** Line 549 chars 5-68: Unclosed string literal
 
-550. s = "\r";       // unsupported escape sequence
+550. s = "\ ";       // illegal escape character
 *** Line 550 chars 6-7: Unsupported or illegal escape sequence
 
-551. interface foo   // unsupported reserved word
-*** Line 551 chars 1-9: Unsupported reserved word "interface"
+551. s = "\r";       // unsupported escape sequence
+*** Line 551 chars 6-7: Unsupported or illegal escape sequence
 
-552. double 1stNumber; // variable name starting with a number
-*** Line 552: Syntax error (unrecognized code)
+552. interface foo   // unsupported reserved word
+*** Line 552 chars 1-9: Unsupported reserved word "interface"
 
-553. x = obj.1stNumber; // field name starting with a number
+553. double 1stNumber; // variable name starting with a number
 *** Line 553: Syntax error (unrecognized code)
 
-554. 
+554. x = obj.1stNumber; // field name starting with a number
+*** Line 554: Syntax error (unrecognized code)
 
-555. // Syntax errors
+555. // Using reserved words as identifiers
 
-556. x = 10          // missing ; in stmt
-*** Line 556 char 37: Statement should end with a semicolon (;)
+556. int abstract;
+*** Line 556 chars 5-12: Unsupported reserved word "abstract"
 
-557. int x = 10		// missing ; in varInit
-*** Line 557 char 36: Variable initialization should end with a semicolon (;)
+557. int break;
+*** Line 557: Syntax error (unrecognized code)
 
-558. int x 			// missing ; in varDecl
-*** Line 558 char 33: Variable declaration should end with a semicolon (;)
+558. int case;
+*** Line 558 chars 5-8: Unsupported reserved word "case"
 
-559. final int x = 10 // missing ; in constInit
-*** Line 559 char 43: Variable initialization should end with a semicolon (;)
+559. int catch;
+*** Line 559 chars 5-9: Unsupported reserved word "catch"
 
-560. foo(x, );       // missing expr in exprList
+560. double class;
 *** Line 560: Syntax error (unrecognized code)
 
-561. x = a + ;       // missing expr after binary op
-*** Line 561 char 9: Expected expression after + operator
-*** Reference Line 561 char 7
+561. boolean const;
+*** Line 561: Syntax error (unrecognized code)
 
-562. x = a ++ b;     // unexpected token after unary op
-*** Line 562: Syntax error (unrecognized code)
+562. boolean continue;
+*** Line 562 chars 9-16: Unsupported reserved word "continue"
 
-563. x = a ** b;     // missing expression between binary ops
-*** Line 563 char 8: Expected expression after * operator
-*** Reference Line 563 char 7
+563. boolean default;
+*** Line 563 chars 9-15: Unsupported reserved word "default"
 
-564. x = a + b * ;   // missing expr after higher precedence binary op
-*** Line 564 char 13: Expected expression after * operator
-*** Reference Line 564 char 11
+564. String do;
+*** Line 564: Syntax error (unrecognized code)
 
-565. x = a * b + ;   // missing expr after lower precedence binary op
-*** Line 565 char 13: Expected expression after + operator
-*** Reference Line 565 char 11
+565. GameObj else;
+*** Line 565: Syntax error (unrecognized code)
 
-566. x = ();         // missing expr in parentheses
-*** Line 566: Syntax error (unrecognized code)
+566. GameObj enum;
+*** Line 566 chars 9-12: Unsupported reserved word "enum"
 
-567. x = 10 + ! ;    // missing expr after unary op
-*** Line 567 char 10: Expected expression after + operator
-*** Reference Line 567 char 8
+567. int[] extends;
+*** Line 567: Syntax error (unrecognized code)
 
-568. x = obj.3;      // expected ID after .
+568. double final;
 *** Line 568: Syntax error (unrecognized code)
 
-569. x = 3.obj;      // ID expected before .
-*** Line 569: Syntax error (unrecognized code)
+569. double finally();
+*** Line 569 chars 8-14: Unsupported reserved word "finally"
 
-570. if x == 3       // required next token in pattern doesn't match
-*** Line 570 chars 4-9: if statement test must be in parentheses
+570. boolean foo(int for);
+*** Line 570: Syntax error (unrecognized code)
 
-571. while i < max   // required next token in pattern doesn't match
+571. for(int do = 0; do < 10; do++)
 *** Line 571: Syntax error (unrecognized code)
 
-572. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
-*** Line 572: Syntax error (unrecognized code)
+572. String goto;
+*** Line 572 chars 8-11: Unsupported reserved word "goto"
 
-573. x + 3;          // no matching pattern
+573. String if;
 *** Line 573: Syntax error (unrecognized code)
 
-574. x = 1,000;      // commas in numbers
-*** Line 574: Syntax error (unrecognized code)
+574. GameObj implements;
+*** Line 574 chars 9-18: Unsupported reserved word "implements"
 
-575. x = 1.23.45;    // too many decimal points
+575. int import;
 *** Line 575: Syntax error (unrecognized code)
 
-576. x = 3.14e1.0;   // exponential notation with decimal point in exponent
-*** Line 576: Syntax error (unrecognized code)
+576. int instanceof;
+*** Line 576 chars 5-14: Unsupported reserved word "instanceof"
 
-577. x = 3.14e;      // Invalid exponential notation
-*** Line 577 chars 5-10: Invalid exponential notation
+577. int interface;
+*** Line 577 chars 5-13: Unsupported reserved word "interface"
 
-578. x = 3.141e+;    // Invalid exponential notation
-*** Line 578 chars 5-12: Invalid exponential notation
+578. int native;
+*** Line 578 chars 5-10: Unsupported reserved word "native"
 
-579. x = 3.1415e-;   // Invalid exponential notation
-*** Line 579 chars 5-13: Invalid exponential notation
+579. int new;
+*** Line 579: Syntax error (unrecognized code)
 
-580. x = 3.14159e+exponent; // Invalid exponential notation
-*** Line 580 chars 5-14: Invalid exponential notation
+580. int package;
+*** Line 580 chars 5-11: Unsupported reserved word "package"
 
-581. x = 3.141592ee0;// Invalid exponential notation
-*** Line 581 chars 5-14: Invalid exponential notation
+581. int private;
+*** Line 581 chars 5-11: Unsupported reserved word "private"
 
-582. x = 3.141592EE0;// Invalid exponential notation
-*** Line 582 chars 5-14: Invalid exponential notation
+582. int protected;
+*** Line 582 chars 5-13: Unsupported reserved word "protected"
 
-583. x = 3e; 		// Invalid exponential notation
-*** Line 583 chars 5-7: Invalid exponential notation
+583. int public;
+*** Line 583: Syntax error (unrecognized code)
 
-584. x = .3E; 		// Invalid exponential notation
-*** Line 584 chars 5-8: Invalid exponential notation
+584. int return()
+*** Line 584: Syntax error (unrecognized code)
 
-585. foo(x,          // (incomplete line continued below)
--- Incomplete line carried forward
+585. int static;
+*** Line 585: Syntax error (unrecognized code)
 
-586. y)              // missing ;
-*** Line 586 char 29: Statement should end with a semicolon (;)
+586. int strictfp;
+*** Line 586 chars 5-12: Unsupported reserved word "strictfp"
 
-587. x = (a + b + c / 3; 	// missing closing parenthesis
-*** Line 587: Syntax error (unrecognized code)
+587. int super;
+*** Line 587 chars 5-9: Unsupported reserved word "super"
 
-588. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
-*** Line 588: Syntax error (unrecognized code)
+588. int switch;
+*** Line 588 chars 5-10: Unsupported reserved word "switch"
 
-589. x = a + b + c ) / 3; 	// missing openning parenthesis
-*** Line 589: Syntax error (unrecognized code)
+589. int synchronized;
+*** Line 589 chars 5-16: Unsupported reserved word "synchronized"
 
-590. if ( i == 1 	// missing closing parenthesis with if
-*** Line 590: Syntax error (unrecognized code)
+590. int this;
+*** Line 590 chars 5-8: Unsupported reserved word "this"
 
-591. if ( i == 1 ); 	// if statment ended by ;
-*** Line 591 char 14: if statement should not end with a semicolon
+591. int throw;
+*** Line 591 chars 5-9: Unsupported reserved word "throw"
 
-592. for ( i=0; i<n; i++); 	// for() followed directly by ;
-*** Line 592: Syntax error (unrecognized code)
+592. int throws;
+*** Line 592 chars 5-10: Unsupported reserved word "throws"
 
-593. x + 1 = x; 		// confusing left hand side an right hand side of assignment
-*** Line 593: Syntax error (unrecognized code)
+593. int transient;
+*** Line 593 chars 5-13: Unsupported reserved word "transient"
 
-594. 1000 = count; 	// confusing left hand side an right hand side of assignment
-*** Line 594: Syntax error (unrecognized code)
+594. int try;
+*** Line 594 chars 5-7: Unsupported reserved word "try"
 
-595. if ( x => 3 ) 	// => instead of <=
-*** Line 595 chars 8-9: Invalid operator. Did you mean >= ?
+595. int void;
+*** Line 595: Syntax error (unrecognized code)
 
-596. if ( x =< 5 ) 	// =< instead of >=.
-*** Line 596 chars 8-9: Invalid operator. Did you mean <= ?
+596. int volatile;
+*** Line 596 chars 5-12: Unsupported reserved word "volatile"
 
-597. elseif( x > 2 ) // elseif instead of else if
-*** Line 597 char 45: Statement should end with a semicolon (;)
+597. int while;
+*** Line 597: Syntax error (unrecognized code)
 
-598. for(int i=0, i<n, i++) 	// commas in place of semicolons
-*** Line 598 char 12: for loop parts should be separated by semicolons (;)
-Comma not supported
+598. boolean true;
+*** Line 598: Syntax error (unrecognized code)
 
-599. for(int i=0; i<n, i++) 	// comma in place of semicolon
-*** Line 599 char 17: for loop parts should be separated by semicolons (;)
-Comma not supported
+599. boolean false;
+*** Line 599: Syntax error (unrecognized code)
 
-600. for(int i=0: i<n: i++) 	// colons in place of semicolons
+600. int null;
 *** Line 600: Syntax error (unrecognized code)
 
-601. for{int i=0; i<n; i++} 	// {} in place of ()
-*** Line 601: Syntax error (unrecognized code)
+601. 
 
-602. for( x : arr ) 			// forgetting variable type
+602. void foo.x()    // function definition with . as part of identifier
 *** Line 602: Syntax error (unrecognized code)
 
-603. for( int x; arr ) 		// using ; instead of :
-*** Line 603: Syntax error (unrecognized code)
+603. x = 10          // missing ; in stmt
+*** Line 603 char 37: Statement should end with a semicolon (;)
 
-604. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Line 604: Syntax error (unrecognized code)
+604. int x = 10		// missing ; in varInit
+*** Line 604 char 36: Variable initialization should end with a semicolon (;)
 
-605. double foo[i]()			// index on function identifier
-*** Line 605: Syntax error (unrecognized code)
+605. int x 			// missing ; in varDecl
+*** Line 605 char 33: Variable declaration should end with a semicolon (;)
 
-606. ct.println; 			// missing parenteses for function call without arguments
-*** Line 606: Syntax error (unrecognized code)
+606. final int x = 10 // missing ; in constInit
+*** Line 606 char 43: Variable initialization should end with a semicolon (;)
 
-607. foo(int x, double y, GameObj z) 	// missing return type in function definition
+607. foo(x, );       // missing expr in exprList
 *** Line 607: Syntax error (unrecognized code)
 
-608. foo(int x, double y, GameObj z); 	// supplying variable types in function call
+608. f00()++;		// ++ applied to non-lvalue
 *** Line 608: Syntax error (unrecognized code)
 
-609. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
-*** Line 609 char 40: function header should not end with a semicolon
+609. --x.foo();		// -- applied to non-lvalue
+*** Line 609: Syntax error (unrecognized code)
 
-610. String s = 'Hello'; 	// '' in place of "" for strings
-*** Line 610 char 12: char type not supported, use double quotes
+610. x = / b;		// missing expr before binary op
+*** Line 610: Syntax error (unrecognized code)
 
-611. String s = "A long string
-*** Line 611 chars 12-25: Unclosed string literal
+611. x = a + ;       // missing expr after binary op
+*** Line 611 char 9: Expected expression after + operator
+*** Reference Line 611 char 7
 
-612. on more than one line";
-*** Line 612 chars 34-35: Unclosed string literal
+612. x = a ++ b;     // unexpected token after unary op
+*** Line 612: Syntax error (unrecognized code)
 
-613. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Line 613: Syntax error (unrecognized code)
+613. x = a ** b;     // missing expression between binary ops
+*** Line 613 char 8: Expected expression after * operator
+*** Reference Line 613 char 7
 
-614. newObj() = oldObj; 				// assigning to a function value
-*** Line 614: Syntax error (unrecognized code)
+614. x = a + b * ;   // missing expr after higher precedence binary op
+*** Line 614 char 13: Expected expression after * operator
+*** Reference Line 614 char 11
 
-615. 
+615. x = a * b + ;   // missing expr after lower precedence binary op
+*** Line 615 char 13: Expected expression after + operator
+*** Reference Line 615 char 11
 
-616. // Unsupported Java syntax
+616. x = ();         // missing expr in parentheses
+*** Line 616: Syntax error (unrecognized code)
 
-617. // --------------------------------------------------------------------------------
+617. x = 10 + ! ;    // missing expr after unary op
+*** Line 617 char 10: Expected expression after + operator
+*** Reference Line 617 char 8
 
-618. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Line 618: Code12 requires each variable initialization to be on its own line
+618. x = obj.3;      // expected ID after .
+*** Line 618: Syntax error (unrecognized code)
 
-619. import java.io.PrintWriter;   // import other than Code12.*
-*** Line 619: import should be "Code12.*;"
+619. x = 3.obj;      // ID expected before .
+*** Line 619: Syntax error (unrecognized code)
 
-620. int time = (int)( sec );      // type casting
-*** Line 620: Syntax error (unrecognized code)
+620. if x == 3       // required next token in pattern doesn't match
+*** Line 620 chars 4-9: if statement test must be in parentheses
 
-621. time %= 3600;                 // %= operator
+621. while i < max   // required next token in pattern doesn't match
 *** Line 621: Syntax error (unrecognized code)
 
-622. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-*** Line 622 char 32: Invalid character (The "? :" operator is not supported by Code12)
+622. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
+*** Line 622: Syntax error (unrecognized code)
 
-623. System.out.println("Hello world"); // classes other than GameObj and String
+623. x + 3;          // no matching pattern
 *** Line 623: Syntax error (unrecognized code)
 
-624. char ch = 'a'; 	// char type
-*** Line 624 char 11: char type not supported, use double quotes
+624. x = 1,000;      // commas in numbers
+*** Line 624: Syntax error (unrecognized code)
 
-625. while(foo) { 	// opening { in control structure not on it's own line
+625. x = 1.23.45;    // too many decimal points
 *** Line 625: Syntax error (unrecognized code)
 
-626. i++; } 			// closing } not on it's own line
+626. x = 3.14e1.0;   // exponential notation with decimal point in exponent
 *** Line 626: Syntax error (unrecognized code)
 
-627. String s = "A long string" +
-*** Line 627 char 29: Expected expression after + operator
-*** Reference Line 627 char 28
+627. x = 3.14e;      // Invalid exponential notation
+*** Line 627 chars 5-10: Invalid exponential notation
 
-628. "on more than one line using concatenation";
-*** Line 628: Syntax error (unrecognized code)
+628. x = 3.141e+;    // Invalid exponential notation
+*** Line 628 chars 5-12: Invalid exponential notation
 
-629. x = a; y = b; 	// more than one statement on a single line
-*** Line 629: Code12 only allows one statement per line
+629. x = 3.1415e-;   // Invalid exponential notation
+*** Line 629 chars 5-13: Invalid exponential notation
 
-630. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
-*** Line 630 chars 4-11: if statement test must be in parentheses
+630. x = 3.14159e+exponent; // Invalid exponential notation
+*** Line 630 chars 5-14: Invalid exponential notation
 
-631. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Line 631: Syntax error (unrecognized code)
+631. x = 3.141592ee0;// Invalid exponential notation
+*** Line 631 chars 5-14: Invalid exponential notation
 
-632. switch (choice)
-*** Line 632 chars 1-6: Unsupported reserved word "switch"
+632. x = 3.141592EE0;// Invalid exponential notation
+*** Line 632 chars 5-14: Invalid exponential notation
 
-633. continue;
-*** Line 633 chars 1-8: Unsupported reserved word "continue"
+633. x = 3e; 		// Invalid exponential notation
+*** Line 633 chars 5-7: Invalid exponential notation
 
-634. a[i++] = b[i++]; 	// increment/decrement only supported as statements
-*** Line 634: Syntax error (unrecognized code)
+634. x = .3E; 		// Invalid exponential notation
+*** Line 634 chars 5-8: Invalid exponential notation
 
-635. obj.group.equals("targets"); 		// indexing more than one level at a time
-*** Line 635: Syntax error (unrecognized code)
+635. foo(x,          // (incomplete line continued below)
+-- Incomplete line carried forward
 
-636. input.toLowerCase().equals("quit"); // indexing after function call
-*** Line 636: Syntax error (unrecognized code)
+636. y)              // missing ;
+*** Line 636 char 29: Statement should end with a semicolon (;)
 
-637. newBullet().ySpeed = 0;
+637. x = (a + b + c / 3; 	// missing closing parenthesis
 *** Line 637: Syntax error (unrecognized code)
 
-638. final int N; 	// constant declaration without initialization
+638. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
 *** Line 638: Syntax error (unrecognized code)
 
-639. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
-*** Line 639 char 15: for loop parts should be separated by semicolons (;)
-Comma not supported
+639. x = a + b + c ) / 3; 	// missing openning parenthesis
+*** Line 639: Syntax error (unrecognized code)
 
-640. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
+640. if ( i == 1 	// missing closing parenthesis with if
 *** Line 640: Syntax error (unrecognized code)
 
-641. int _var; // variable indentifiers starting with underscore
-*** Line 641 chars 5-8: Names cannot start with an underscore in Code12
+641. if ( i == 1 ); 	// if statment ended by ;
+*** Line 641 char 14: if statement should not end with a semicolon
 
-642. int $var; // $
-*** Line 642 char 5: The $ character is not allowed in Code12
+642. for ( i=0; i<n; i++); 	// for() followed directly by ;
+*** Line 642: Syntax error (unrecognized code)
 
-643. double pay$;
-*** Line 643 char 11: The $ character is not allowed in Code12
+643. x + 1 = x; 		// confusing left hand side an right hand side of assignment
+*** Line 643: Syntax error (unrecognized code)
+
+644. 1000 = count; 	// confusing left hand side an right hand side of assignment
+*** Line 644: Syntax error (unrecognized code)
+
+645. if ( x => 3 ) 	// => instead of <=
+*** Line 645 chars 8-9: Invalid operator. Did you mean >= ?
+
+646. if ( x =< 5 ) 	// =< instead of >=.
+*** Line 646 chars 8-9: Invalid operator. Did you mean <= ?
+
+647. elseif( x > 2 ) // elseif instead of else if
+*** Line 647 char 45: Statement should end with a semicolon (;)
+
+648. for(int i=0, i<n, i++) 	// commas in place of semicolons
+*** Line 648 char 12: for loop parts should be separated by semicolons (;)
+Comma not supported
+
+649. for(int i=0; i<n, i++) 	// comma in place of semicolon
+*** Line 649 char 17: for loop parts should be separated by semicolons (;)
+Comma not supported
+
+650. for(int i=0: i<n: i++) 	// colons in place of semicolons
+*** Line 650: Syntax error (unrecognized code)
+
+651. for{int i=0; i<n; i++} 	// {} in place of ()
+*** Line 651: Syntax error (unrecognized code)
+
+652. for (int i==0; i<n; i++)// == instead of =
+*** Line 652: Syntax error (unrecognized code)
+
+653. for( x : arr ) 			// forgetting variable type
+*** Line 653: Syntax error (unrecognized code)
+
+654. for( int x; arr ) 		// using ; instead of :
+*** Line 654: Syntax error (unrecognized code)
+
+655. for( int[] x : arr )
+*** Line 655: Syntax error (unrecognized code)
+
+656. for( int x : arr[] )
+*** Line 656: Syntax error (unrecognized code)
+
+657. for( arr : int x )
+*** Line 657: Syntax error (unrecognized code)
+
+658. for (String x : "string literal")
+*** Line 658: Syntax error (unrecognized code)
+
+659. double foo(x, y, z) 	// missing variable types for arguments in function definition
+*** Line 659: Syntax error (unrecognized code)
+
+660. double foo[i]()			// index on function identifier
+*** Line 660: Syntax error (unrecognized code)
+
+661. ct.println; 			// missing parenteses for function call without arguments
+*** Line 661: Syntax error (unrecognized code)
+
+662. foo(int x, double y, GameObj z) 	// missing return type in function definition
+*** Line 662: Syntax error (unrecognized code)
+
+663. foo(int x, double y, GameObj z); 	// supplying variable types in function call
+*** Line 663: Syntax error (unrecognized code)
+
+664. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
+*** Line 664 char 40: function header should not end with a semicolon
+
+665. String s = 'Hello'; 	// '' in place of "" for strings
+*** Line 665 char 12: char type not supported, use double quotes
+
+666. String s = "A long string
+*** Line 666 chars 12-25: Unclosed string literal
+
+667. on more than one line";
+*** Line 667 chars 34-35: Unclosed string literal
+
+668. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
+*** Line 668: Syntax error (unrecognized code)
+
+669. newObj() = oldObj; 				// assigning to a function value
+*** Line 669: Syntax error (unrecognized code)
+
+670. f = void foo()					// mixing assignment and function declaration
+*** Line 670: Syntax error (unrecognized code)
+
+671. def func(x):					// Python syntax
+*** Line 671: Syntax error (unrecognized code)
+
+672. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
+*** Line 672: Syntax error (unrecognized code)
+
+673. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
+*** Line 673: Syntax error (unrecognized code)
+
+674. int intArr = {1, 2, 3}; // missing []
+*** Line 674: Syntax error (unrecognized code)
+
+675. 
+
+676. // Unsupported Java syntax
+
+677. // --------------------------------------------------------------------------------
+
+678. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+*** Line 678: Code12 requires each variable initialization to be on its own line
+
+679. import java.io.PrintWriter;   // import other than Code12.*
+*** Line 679: import should be "Code12.*;"
+
+680. int time = (int)( sec );      // type casting
+*** Line 680: Syntax error (unrecognized code)
+
+681. time %= 3600;                 // %= operator
+*** Line 681: Syntax error (unrecognized code)
+
+682. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+*** Line 682 char 32: Invalid character (The "? :" operator is not supported by Code12)
+
+683. System.out.println("Hello world"); // classes other than GameObj and String
+*** Line 683: Syntax error (unrecognized code)
+
+684. char ch = 'a'; 	// char type
+*** Line 684 char 11: char type not supported, use double quotes
+
+685. while(foo) { 	// opening { in control structure not on it's own line
+*** Line 685: Syntax error (unrecognized code)
+
+686. i++; } 			// closing } not on it's own line
+*** Line 686: Syntax error (unrecognized code)
+
+687. String s = "A long string" +
+*** Line 687 char 29: Expected expression after + operator
+*** Reference Line 687 char 28
+
+688. "on more than one line using concatenation";
+*** Line 688: Syntax error (unrecognized code)
+
+689. x = a; y = b; 	// more than one statement on a single line
+*** Line 689: Code12 only allows one statement per line
+
+690. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
+*** Line 690 chars 4-11: if statement test must be in parentheses
+
+691. double getVariable() { return variable; } // {} must start and end on their own lines
+*** Line 691: Syntax error (unrecognized code)
+
+692. switch (choice)
+*** Line 692 chars 1-6: Unsupported reserved word "switch"
+
+693. continue;
+*** Line 693 chars 1-8: Unsupported reserved word "continue"
+
+694. a[i++] = b[i++]; 	// increment/decrement only supported as statements
+*** Line 694: Syntax error (unrecognized code)
+
+695. obj.group.equals("targets"); 		// indexing more than one level at a time
+*** Line 695: Syntax error (unrecognized code)
+
+696. input.toLowerCase().equals("quit"); // indexing after function call
+*** Line 696: Syntax error (unrecognized code)
+
+697. newBullet().ySpeed = 0;
+*** Line 697: Syntax error (unrecognized code)
+
+698. final int N; 	// constant declaration without initialization
+*** Line 698: Syntax error (unrecognized code)
+
+699. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
+*** Line 699 char 15: for loop parts should be separated by semicolons (;)
+Comma not supported
+
+700. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
+*** Line 700: Syntax error (unrecognized code)
+
+701. int _var; // variable indentifiers starting with underscore
+*** Line 701 chars 5-8: Names cannot start with an underscore in Code12
+
+702. int $var; // $
+*** Line 702 char 5: The $ character is not allowed in Code12
+
+703. double pay$;
+*** Line 703 char 11: The $ character is not allowed in Code12
+
+704. int x[];	// arrays must be declared with [] between type and identifier
+*** Line 704: Syntax error (unrecognized code)
+
+705. public abstract class Account
+*** Line 705 chars 8-15: Unsupported reserved word "abstract"
+
+706. assert x != null : "x variable is null";
+*** Line 706 chars 1-6: Unsupported reserved word "assert"
+
+707. case 0 :
+*** Line 707 chars 1-4: Unsupported reserved word "case"
+
+708. catch(Exception e)
+*** Line 708 chars 1-5: Unsupported reserved word "catch"
+
+709. continue;
+*** Line 709 chars 1-8: Unsupported reserved word "continue"
+
+710. default :
+*** Line 710 chars 1-7: Unsupported reserved word "default"
+
+711. enum WeekDays
+*** Line 711 chars 1-4: Unsupported reserved word "enum"
+
+712. goto
+*** Line 712 chars 1-4: Unsupported reserved word "goto"
+
+713. finally
+*** Line 713 chars 1-7: Unsupported reserved word "finally"
+
+714. public class C implements I
+*** Line 714 chars 16-25: Unsupported reserved word "implements"
+
+715. if (x instanceof y)
+*** Line 715 chars 7-16: Unsupported reserved word "instanceof"
+
+716. public interface I
+*** Line 716 chars 8-16: Unsupported reserved word "interface"
+
+717. native void foo()
+*** Line 717 chars 1-6: Unsupported reserved word "native"
+
+718. package P;
+*** Line 718 chars 1-7: Unsupported reserved word "package"
+
+719. private int x;
+*** Line 719 chars 1-7: Unsupported reserved word "private"
+
+720. protected int x;
+*** Line 720 chars 1-9: Unsupported reserved word "protected"
+
+721. static int x = 10;
+*** Line 721: Syntax error (unrecognized code)
+
+722. strictfp void foo()
+*** Line 722 chars 1-8: Unsupported reserved word "strictfp"
+
+723. super.foo();
+*** Line 723 chars 1-5: Unsupported reserved word "super"
+
+724. switch (x)
+*** Line 724 chars 1-6: Unsupported reserved word "switch"
+
+725. synchronized(sync_object)
+*** Line 725 chars 1-12: Unsupported reserved word "synchronized"
+
+726. this.x = x;
+*** Line 726 chars 1-4: Unsupported reserved word "this"
+
+727. throw e;
+*** Line 727 chars 1-5: Unsupported reserved word "throw"
+
+728. void foo() throws Exception
+*** Line 728 chars 12-17: Unsupported reserved word "throws"
+
+729. transient int x;
+*** Line 729 chars 1-9: Unsupported reserved word "transient"
+
+730. try
+*** Line 730 chars 1-3: Unsupported reserved word "try"
+
+731. volatile int x = 10;
+*** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-643 lines processed in 83 ms
+731 lines processed in 204 ms
 
 0 unexpected errors
-0 uncaught errors (95 expected errors)
+0 uncaught errors (182 expected errors)
 
 SUCCESS
