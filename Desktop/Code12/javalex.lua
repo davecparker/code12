@@ -89,9 +89,9 @@ local lineNumber        -- the line number for the source string
 local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
 local commentForLine    -- array of end-of-line comments indexed by line number
-local indents			-- stack of indents
-local dedents			-- stack of dedents
-
+local indentLevelForLine-- array of indent levels (0, 1, 2, ...) indexed by line number
+local maxColStack       -- stack of column counts for indentation, assuming a tab size of 8
+local minColStack       -- stack of column counts for indentation, assuming a tab size of 1
 
 ----- Token scanning functions ------------------------------------------------
 
@@ -423,7 +423,9 @@ end
 function javalex.initProgram()
 	commentLevel = 0
 	commentForLine = {}
-	indentForLine = {}
+	indentLevelForLine = { 0 }
+	maxColStack = { 0 }
+	minColStack = { 0 }
 end
 
 -- Return an array of tokens for the given source string and line number. 
@@ -456,22 +458,61 @@ function javalex.getTokens( sourceStr, lineNum )
 		skipBlockComment()  -- don't generate tokens for block comments 
 	end
 
-	-- Determine the indentation level
-	local TABSIZE = 4
-	local indent = 0 -- Then number of spaces the line is indented, assuming a tab stop of 4 spaces
-	local charType = charTypes[chars[iChar]]
-	while charType == " " do
-		if chars[iChar] == 9 then -- TAB
-			indent = indent + TABSIZE - indent % TABSIZE
-		elseif chars[iChar] == 32 then -- Space
-			indent = indent + 1
+	-- Determine the indent+ level
+	local maxCol = 0 -- number of spaces the line is indented, assuming a tab stop of 8
+	local minCol = 0 -- number of spaces the line is indented, assuming a tab stop of 1
+	local c = chars[iChar]
+	repeat 
+		if c == 32 then -- Space
+			maxCol = maxCol + 1
+		elseif c == 9 then -- TAB
+			maxCol = maxCol + 8 - maxCol % 8
+		else
+			break
 		end
+		minCol = minCol + 1
 		iChar = iChar + 1
-		charType = charTypes[chars[iChar]]
-	end
+		c = chars[iChar]
+	until false -- breaks internally when chars[iChar] is not a space or tab (c ~= 32 and c ~= 9)
+	indentLevelForLine[lineNum] = maxCol
 
-	indentForLine[lineNum] = indent
-	table.add(indents, indentStr)
+	-- Lines with only whitespace or comments shouldn't affect indentation
+	local blankLine
+	if c == 10 then -- new line
+		blankLine = true
+	else if c == 47 then -- /
+		c = chars[iChar + 1]
+		if c == 47 then -- /
+			blankLine = true
+		end
+	end
+	if not blankLine then
+		local prevMaxCol == maxColStack[#maxColStack]
+		local prevMinCol == minColStack[#minColStack]
+		if maxCol == prevMaxCol then -- No change in indent level
+			-- Check for consistency with minCol
+			if not blankLine and minCol ~= prevMinCol then
+				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
+			end
+		elseif maxCol > prevMaxCol then -- Increase in indent level
+			-- Check for consistency with minCol
+			if minCol <= prevMinCol then
+				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
+			end
+			-- Add to col stacks
+			maxColStack[#maxColStack + 1] = maxCol
+			minColStack[#minColStack + 1] = minCol
+		else -- maxCol < prevMaxCol -- Decrease in indent level
+			-- Check for consistency with minCol
+			if minCol >= prevMinCol then
+				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
+			end
+			-- Check for consistency with previous indent levels
+			while #maxColStack > 0 and maxCol < prevMaxCol do
+				
+			end
+		end
+	end
 
 	-- Scan the rest of the chars array
 	repeat
@@ -556,8 +597,8 @@ end
 
 -- Return the indent level of the given line number in number of spaces,
 -- Assuming a tab stop of 4 spaces
-function javalex.indentForLine( lineNum )
-	return indentForLine[lineNum]
+function javalex.indentLevelForLine( lineNum )
+	return indentLevelForLine[lineNum]
 end
 
 ----- Initialization ---------------------------------------------------------
