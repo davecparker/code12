@@ -2,7 +2,7 @@
 --
 -- main.lua
 --
--- Test driver for Code12's Java parsing
+-- Test driver for Code12's Java line-level parsing
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------

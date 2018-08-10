@@ -181,8 +181,8 @@ function app.processUserFile()
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
-	local parseTrees = parseProgram.getProgramTree( sourceFile.strLines, 
-								app.syntaxLevel )
+	local programTree, parseTrees = parseProgram.getProgramTree( 
+								sourceFile.strLines, app.syntaxLevel )
 	if parseTrees == nil then
 		composer.gotoScene( "errView" )
 		return

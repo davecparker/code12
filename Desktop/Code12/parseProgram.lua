@@ -22,22 +22,22 @@ local parseProgram = {}
 --
 -- program: { s = "program", nameID, vars, funcs }
 --
--- var:  { s = "var", typeID, nameID, isArray, isConst, isLocal, initExpr }
--- func: { s = "func", typeID, nameID, isArray, isPublic, params, stmts }
+-- var:  { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal, initExpr }
+-- func: { s = "func", iLine, typeID, nameID, isArray, isPublic, params, stmts }
 -- 
 -- param: { s = "param", typeID, nameID, isArray }
 --
 -- stmt:
---     { s = "var", typeID, nameID, isArray, isConst, isLocal = true, initExpr }
---     { s = "call", lValue, exprs }
---     { s = "assign", lValue, op, expr }     -- op.tt: =, +=, -=, *=, /=, ++, --
---     { s = "if", expr, stmts, elseStmts }
---     { s = "while", expr, stmts }
---     { s = "doWhile", expr, stmts }
---     { s = "for", initStmt, expr, nextStmt, stmts }
---     { s = "forArray", typeID, varID, arrayID, stmts }
---     { s = "break" }
---     { s = "return", expr }
+--     { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal = true, initExpr }
+--     { s = "call", iLine, lValue, exprs }
+--     { s = "assign", iLine, lValue, op, expr }     -- op.tt: =, +=, -=, *=, /=, ++, --
+--     { s = "if", iLine, expr, stmts, elseStmts }
+--     { s = "while", iLine, expr, stmts }
+--     { s = "doWhile", iLine, expr, stmts }
+--     { s = "for", iLine, initStmt, expr, nextStmt, stmts }
+--     { s = "forArray", iLine, typeID, varID, arrayID, stmts }
+--     { s = "break", iLine }
+--     { s = "return", iLine, expr }
 --
 -- lValue: { s = "lValue", varID, indexExpr, fieldID }
 -- 
@@ -47,7 +47,7 @@ local parseProgram = {}
 --     { s = "lValue", lValue }
 --     { s = "parens", expr }
 --     { s = "unaryOp", op, expr }                -- op.tt: -, !
---     { s = "binOp", leftExpr op, rightExpr }    -- op.tt: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
+--     { s = "binOp", left, op, right }    -- op.tt: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
 --     { s = "newArray", typeID, lengthExpr }
 --     { s = "arrayInit", exprs }
 
@@ -175,6 +175,7 @@ end
 local function makeVar( isLocal, typeID, nameID, initExpr, isArray, isConst )
 	return {
 		s = "var",
+		iLine = typeID.iLine,
 		typeID = typeID,
 		nameID = nameID,
 		isArray = isArray,
@@ -344,7 +345,6 @@ local function getForStmt( forControl )
 		-- Add the expr if any
 		local forExpr = nodes[3]
 		if forExpr.p == "expr" then
-			print(forExpr.nodes[1].t)
 			stmt.expr = makeExpr( forExpr.nodes[1] )
 		end
 
@@ -437,6 +437,7 @@ function getLineStmts( tree, stmts )
 
 	-- Add the stmt if successful
 	if stmt then
+		stmt.iLine = tree.iLine
 		stmts[#stmts + 1] = stmt
 		return true
 	end
@@ -517,8 +518,8 @@ function makeExpr( node )
 		return { s = "newArray", typeID = nodes[2], lengthExpr = makeExpr( nodes[4] ) }
 	else
 		-- Binary op
-		return { s = "binOp", op = nodes[2].str, leftExpr = makeExpr( nodes[1] ),
-				rightExpr = makeExpr( nodes[3] ) }
+		return { s = "binOp", op = nodes[2].str, left = makeExpr( nodes[1] ),
+				right = makeExpr( nodes[3] ) }
 	end
 end
 
@@ -548,7 +549,8 @@ local function getFunc( typeID, isArray, nameID, isPublic, paramList )
 
 	-- Make the func
 	return { 
-		s = "func", 
+		s = "func",
+		iLine = nameID.iLine, 
 		typeID = typeID,
 		nameID = nameID,
 		isArray = isArray,
@@ -628,39 +630,60 @@ end
 local function printStructureTree( node, indentLevel, file, label )
 	-- Make a label for this node
 	assert( type(node) == "table" and node.s )
-	local str = string.rep( "    ", indentLevel )
+	local str
+	if node.iLine then
+		str = string.format( "%3d.%s", node.iLine, string.rep( "    ", indentLevel ) )
+	else
+		str = string.rep( "    ", indentLevel + 1 )  -- empty line number takes one indent
+	end
 	if label then
 		str = str .. label .. ": "
 	end
-	str = str .. node.s
+	if node.s == "binOp" then
+		str = str .. "(" .. node.op .. ")"
+	else
+		str = str .. node.s
+		if node.op then
+			str = str .. " (" .. node.op .. ")"
+		end
+	end
 	if node.nameID and node.nameID.str then
 		str = str .. " " .. node.nameID.str
 	end
 
-	-- Add field names, and values if simple 
-	str = str .. " { "
+	-- Add misc fields if any 
+	local miscFieldsStr = ""
+	local first = true
 	for field, value in pairs( node ) do
-		if field ~= "s" and field ~= "nameID" then
+		if field ~= "s" and field ~= "iLine" and field ~= "nameID" and field ~= "op" then
+			local fieldStr = nil
 			if type(value) == "table" then
 				if value.tt then  
 					-- A token
-					str = str .. field .. " = " .. value.str  
-				elseif value.s then
-					-- A child structure node
-					str = str .. field
-				else
+					fieldStr = field .. " = " .. value.str  
+				elseif value.s == nil then
 					-- An array
-					str = str .. "#" .. field .. " = " .. #value
+					fieldStr = "#" .. field .. " = " .. #value
 				end
 			elseif type(value) == "string" then
-				str = str .. field .. " = " .. "\"" .. value .. "\""
+				fieldStr = field .. " = " .. "\"" .. value .. "\""
 			else  -- number or boolean
-				str = str .. field .. " = " .. tostring( value )
+				fieldStr = field .. " = " .. tostring( value )
 			end
-			str = str .. ", "
+
+			if fieldStr then
+				if first then
+					miscFieldsStr = miscFieldsStr .. fieldStr
+					first = false
+				else
+					miscFieldsStr = miscFieldsStr .. ", " .. fieldStr
+				end
+			end
 		end
 	end
-	str = str .. "}"
+	if miscFieldsStr ~= "" then
+		str = str .. " { " .. miscFieldsStr .. " }"
+	end
 
 	-- Output description
 	app.printDebugStr( str, file )
@@ -673,7 +696,7 @@ local function printStructureTree( node, indentLevel, file, label )
 				printStructureTree( value, indentLevel + 1, file, field )
 			elseif #value > 0 then
 				-- Array node
-				str = string.rep( "    ", indentLevel + 1 ) .. field .. ":"
+				str = string.rep( "    ", indentLevel + 2 ) .. field .. ":"
 				app.printDebugStr( str, file )
 				for i = 1, #value do
 					printStructureTree( value[i], indentLevel + 2, file )
@@ -687,7 +710,7 @@ end
 --- Module Functions ---------------------------------------------------------
 
 -- Parse a program made of up sourceLines at the given syntaxLevel 
--- and return the programTree (see above).
+-- and return the program structure tree (see above).
 -- If there is an error then set the error state and return nil.
 function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	-- Init the parse structures
@@ -736,13 +759,19 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	end
 
 	-- Print programTree for debugging
-	printStructureTree( programTree, 0 )
+	-- printStructureTree( programTree, 0 )
 
-	-- Return parse trees for now
+	-- Return parse trees also for now (TODO: temp)
 	if err.shouldStop() then
 		return nil
 	end
-	return parseTrees
+	return programTree, parseTrees
+end
+
+-- Print a program structure tree to the given output file or to the console
+-- if file is not included.
+function parseProgram.printProgramTree( programTree, file )
+	printStructureTree( programTree, 0, file )
 end
 
 

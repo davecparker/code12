@@ -2,7 +2,7 @@
 --
 -- main.lua
 --
--- Test driver for Code12's Semantic Error Checking and Code Generation Errors
+-- Test driver for Code12's High-level parsing and Semantic Error Checking
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
@@ -18,6 +18,7 @@ local codeGenJava = require( "codeGenJava" )
 
 -- Input and output files
 local javaFilename = "ErrorTestCode.java"
+local structureFilename = "../ErrorTestStructure.txt"   -- in parent so Corona won't trigger re-run
 local outputFilename = "../ErrorTestOutput.txt"   -- in parent so Corona won't trigger re-run
 local outFile
 
@@ -167,16 +168,28 @@ local function checkTestCode()
 	-- Tell Code12 to log all errors instead of stopping
 	err.logAllErrors()
 
-	-- Create parse tree array
+	-- Get the program structure tree and parse tree array
 	local startTime = system.getTimer()
-	local parseTrees = parseProgram.getProgramTree( sourceFile.strLines, syntaxLevel )
-	local endParseTime = system.getTimer()
+	local programTree, parseTrees = parseProgram.getProgramTree( 
+								sourceFile.strLines, syntaxLevel )
+	local parseTime = system.getTimer() - startTime
 
-	-- Do Semantic Analysis and Code Generation on the parse trees
+	-- Output the structure tree
+	local structureFile = io.open( structureFilename, "w" )
+	if structureFile then
+		parseProgram.printProgramTree( programTree, structureFile )
+		io.close( structureFile )
+	end
+
+	-- Do Semantic Analysis
+	startTime = system.getTimer()
 	checkJava.initProgram( parseTrees, syntaxLevel )
-	local endCheckTime = system.getTimer()
+	local semCheckTime = system.getTimer() - startTime
+
+	-- Do Code Generation
+	startTime = system.getTimer()
 	codeGenJava.getLuaCode( parseTrees )
-	local endCodeGenTime = system.getTimer()
+	local codeGenTime = system.getTimer() - startTime
 
 	-- Check the results
 	checkErrorResults()
@@ -187,10 +200,10 @@ local function checkTestCode()
 	outputAndDisplay( "Semantic Error Test:" )
 	outputAndDisplay( "" )
 	outputAndDisplay( string.format( "    %d lines processed", #sourceFile.strLines ) )
-	outputAndDisplay( string.format( "    %d ms Parse time", endParseTime - startTime ) )
-	outputAndDisplay( string.format( "    %d ms Semantic check time", endCheckTime - endParseTime ) )
-	outputAndDisplay( string.format( "    %d ms Code Generation time", endCodeGenTime - endCheckTime ) )
-	outputAndDisplay( string.format( "    %d ms Total time", endCodeGenTime - startTime ) )
+	outputAndDisplay( string.format( "    %d ms Parse time", parseTime ) )
+	outputAndDisplay( string.format( "    %d ms Semantic check time", semCheckTime ) )
+	outputAndDisplay( string.format( "    %d ms Code Generation time", codeGenTime ) )
+	outputAndDisplay( string.format( "    %d ms Total time",  parseTime + semCheckTime + codeGenTime) )
 	outputAndDisplay( "" )
 	outputAndDisplay( string.format( "%d unexpected errors", numUnexpectedErrors ) )
 	outputAndDisplay( string.format( "%d uncaught errors (%d expected errors)", 
