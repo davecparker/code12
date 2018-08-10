@@ -423,7 +423,7 @@ end
 function javalex.initProgram()
 	commentLevel = 0
 	commentForLine = {}
-	indentLevelForLine = { 0 }
+	indentLevelForLine = {}
 	maxColStack = { 0 }
 	minColStack = { 0 }
 end
@@ -458,7 +458,7 @@ function javalex.getTokens( sourceStr, lineNum )
 		skipBlockComment()  -- don't generate tokens for block comments 
 	end
 
-	-- Determine the indent+ level
+	-- Determine the indent level
 	local maxCol = 0 -- number of spaces the line is indented, assuming a tab stop of 8
 	local minCol = 0 -- number of spaces the line is indented, assuming a tab stop of 1
 	local c = chars[iChar]
@@ -480,18 +480,18 @@ function javalex.getTokens( sourceStr, lineNum )
 	local blankLine
 	if c == 10 then -- new line
 		blankLine = true
-	else if c == 47 then -- /
+	elseif c == 47 then -- /
 		c = chars[iChar + 1]
 		if c == 47 then -- /
 			blankLine = true
 		end
 	end
 	if not blankLine then
-		local prevMaxCol == maxColStack[#maxColStack]
-		local prevMinCol == minColStack[#minColStack]
+		local prevMaxCol = maxColStack[#maxColStack]
+		local prevMinCol = minColStack[#minColStack]
 		if maxCol == prevMaxCol then -- No change in indent level
 			-- Check for consistency with minCol
-			if not blankLine and minCol ~= prevMinCol then
+			if minCol ~= prevMinCol then
 				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
 			end
 		elseif maxCol > prevMaxCol then -- Increase in indent level
@@ -503,13 +503,18 @@ function javalex.getTokens( sourceStr, lineNum )
 			maxColStack[#maxColStack + 1] = maxCol
 			minColStack[#minColStack + 1] = minCol
 		else -- maxCol < prevMaxCol -- Decrease in indent level
-			-- Check for consistency with minCol
-			if minCol >= prevMinCol then
-				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
-			end
 			-- Check for consistency with previous indent levels
 			while #maxColStack > 0 and maxCol < prevMaxCol do
-				
+				maxColStack[#maxColStack] = nil
+				minColStack[#minColStack] = nil
+				prevMaxCol = maxColStack[#maxColStack]
+			end
+			if maxCol ~= prevMaxCol then
+				setTokenErr( 1, iChar - 1, "Inconsistent dedent")
+			end
+			-- Check for consistency with minCol
+			if minCol ~= minColStack[#minColStack] then
+				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
 			end
 		end
 	end
