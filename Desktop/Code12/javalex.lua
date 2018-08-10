@@ -90,8 +90,8 @@ local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
 local commentForLine    -- array of end-of-line comments indexed by line number
 local indentLevelForLine-- array of indent levels (0, 1, 2, ...) indexed by line number
-local maxColStack       -- stack of column counts for indentation, assuming a tab size of 8
-local minColStack       -- stack of column counts for indentation, assuming a tab size of 1
+local colStack       -- stack of column counts for indentation, assuming a tab size of 8
+local altColStack       -- stack of column counts for indentation, assuming a tab size of 1
 
 ----- Token scanning functions ------------------------------------------------
 
@@ -424,8 +424,8 @@ function javalex.initProgram()
 	commentLevel = 0
 	commentForLine = {}
 	indentLevelForLine = {}
-	maxColStack = { 0 }
-	minColStack = { 0 }
+	colStack = { 0 }
+	altColStack = { 0 }
 end
 
 -- Return an array of tokens for the given source string and line number. 
@@ -459,26 +459,26 @@ function javalex.getTokens( sourceStr, lineNum )
 	end
 
 	-- Determine the indent level
-	local maxCol = 0 -- number of spaces the line is indented, assuming a tab stop of 8
-	local minCol = 0 -- number of spaces the line is indented, assuming a tab stop of 1
+	local col = 0 -- number of spaces the line is indented, assuming a tab stop of 8
+	local altCol = 0 -- number of spaces the line is indented, assuming a tab stop of 1
 	local c = chars[iChar]
 	repeat 
 		if c == 32 then -- Space
-			maxCol = maxCol + 1
+			col = col + 1
 		elseif c == 9 then -- TAB
-			maxCol = maxCol + 8 - maxCol % 8
+			col = col + 8 - col % 8
 		else
 			break
 		end
-		minCol = minCol + 1
+		altCol = altCol + 1
 		iChar = iChar + 1
 		c = chars[iChar]
 	until false -- breaks internally when chars[iChar] is not a space or tab (c ~= 32 and c ~= 9)
-	indentLevelForLine[lineNum] = maxCol
+	indentLevelForLine[lineNum] = col
 
 	-- Lines with only whitespace or comments shouldn't affect indentation
 	local blankLine
-	if c == 10 then -- new line
+	if c == nil then -- new line
 		blankLine = true
 	elseif c == 47 then -- /
 		c = chars[iChar + 1]
@@ -487,33 +487,33 @@ function javalex.getTokens( sourceStr, lineNum )
 		end
 	end
 	if not blankLine then
-		local prevMaxCol = maxColStack[#maxColStack]
-		local prevMinCol = minColStack[#minColStack]
-		if maxCol == prevMaxCol then -- No change in indent level
-			-- Check for consistency with minCol
-			if minCol ~= prevMinCol then
+		local colStackTop = colStack[#colStack]
+		local altColStackTop = altColStack[#altColStack]
+		if col == colStackTop then -- No change in indent level
+			-- Check for consistency with altCol
+			if altCol ~= altColStackTop then
 				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
 			end
-		elseif maxCol > prevMaxCol then -- Increase in indent level
-			-- Check for consistency with minCol
-			if minCol <= prevMinCol then
+		elseif col > colStackTop then -- Increase in indent level
+			-- Check for consistency with altCol
+			if altCol <= altColStackTop then
 				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
 			end
-			-- Add to col stacks
-			maxColStack[#maxColStack + 1] = maxCol
-			minColStack[#minColStack + 1] = minCol
-		else -- maxCol < prevMaxCol -- Decrease in indent level
+			-- Add to column stacks
+			colStack[#colStack + 1] = col
+			altColStack[#altColStack + 1] = altCol
+		else -- col < colStackTop -- Decrease in indent level
 			-- Check for consistency with previous indent levels
-			while #maxColStack > 0 and maxCol < prevMaxCol do
-				maxColStack[#maxColStack] = nil
-				minColStack[#minColStack] = nil
-				prevMaxCol = maxColStack[#maxColStack]
+			while #colStack > 1 and col < colStackTop do
+				colStack[#colStack] = nil
+				altColStack[#altColStack] = nil
+				colStackTop = colStack[#colStack]
 			end
-			if maxCol ~= prevMaxCol then
+			if col ~= colStackTop then
 				setTokenErr( 1, iChar - 1, "Inconsistent dedent")
 			end
-			-- Check for consistency with minCol
-			if minCol ~= minColStack[#minColStack] then
+			-- Check for consistency with altCol
+			if altCol ~= altColStack[#altColStack] then
 				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
 			end
 		end

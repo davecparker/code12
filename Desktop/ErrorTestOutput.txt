@@ -1,21 +1,15 @@
 ======= Test Started ==========================================
-583. }
-*** Unexpected error: Inconsistent dedent
-
-1064. }
-*** Unexpected error: Inconsistent dedent
-
 ======= Test Complete =========================================
 
 Semantic Error Test:
 
     1125 lines processed
-    147 ms Parse time
+    123 ms Parse time
     0 ms Semantic check time
-    12 ms Code Generation time
-    160 ms Total time
+    14 ms Code Generation time
+    138 ms Total time
 
-2 unexpected errors
+0 unexpected errors
 0 uncaught errors (204 expected errors)
 
-FAILED
+SUCCESS
