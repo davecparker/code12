@@ -89,8 +89,8 @@ local lineNumber        -- the line number for the source string
 local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
 local commentForLine    -- array of end-of-line comments indexed by line number
-local indentLevelForLine-- array of indent levels (0, 1, 2, ...) indexed by line number
-local colStack       -- stack of column counts for indentation, assuming a tab size of 8
+local indentLevelForLine-- array of indent levels indexed by line number
+local colStack          -- stack of column counts for indentation, assuming a tab size of 8
 local altColStack       -- stack of column counts for indentation, assuming a tab size of 1
 
 ----- Token scanning functions ------------------------------------------------
@@ -105,6 +105,11 @@ local altColStack       -- stack of column counts for indentation, assuming a ta
 -- and strErr plus any additional arguments for string.format( strErr, ... )
 local function setTokenErr( iCharFirst, iCharLast, strErr, ... )
 	err.setErrCharRange( lineNumber, iCharFirst, iCharLast, strErr, ... )
+end
+
+-- Set the error state for inconsistent mixing of tabs and spaces for, and return nil.
+local function setTabErr( iCharLast )
+	setTokenErr( 1, iCharLast, "Code12 doesn't allow mixing tabs and spaces for indentation" )
 end
 
 -- Set the error state for an invalid character, and return nil.
@@ -486,35 +491,30 @@ function javalex.getTokens( sourceStr, lineNum )
 			blankLine = true
 		end
 	end
+	-- Check for consistent use of tabs with spaces
 	if not blankLine then
 		local colStackTop = colStack[#colStack]
 		local altColStackTop = altColStack[#altColStack]
 		if col == colStackTop then -- No change in indent level
-			-- Check for consistency with altCol
 			if altCol ~= altColStackTop then
-				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
+				setTabErr( iChar - 1 )
 			end
 		elseif col > colStackTop then -- Increase in indent level
-			-- Check for consistency with altCol
 			if altCol <= altColStackTop then
-				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
+				setTabErr( iChar - 1 )
 			end
 			-- Add to column stacks
 			colStack[#colStack + 1] = col
 			altColStack[#altColStack + 1] = altCol
 		else -- col < colStackTop -- Decrease in indent level
-			-- Check for consistency with previous indent levels
+			if altCol >= altColStackTop then
+				setTabErr( iChar - 1 )
+			end
+			-- Update column stacks
 			while #colStack > 1 and col < colStackTop do
 				colStack[#colStack] = nil
 				altColStack[#altColStack] = nil
 				colStackTop = colStack[#colStack]
-			end
-			if col ~= colStackTop then
-				setTokenErr( 1, iChar - 1, "Inconsistent dedent")
-			end
-			-- Check for consistency with altCol
-			if altCol ~= altColStack[#altColStack] then
-				setTokenErr( 1, iChar - 1, "Code12 doesn't allow mixing tabs and spaces for indentation")
 			end
 		end
 	end

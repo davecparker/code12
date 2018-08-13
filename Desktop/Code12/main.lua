@@ -62,11 +62,6 @@ local function runLuaCode( luaCode )
 	end
 end
 
--- Return a detabbed version of str using the given tabWidth
-local function detabString( str )
-	return string.gsub( str, "\t", "    " )   -- TODO (temp)
-end
-
 -- Read the sourceFile and store all of its source lines.
 -- Return true if success.
 local function readSourceFile()
@@ -81,7 +76,7 @@ local function readSourceFile()
 				if s == nil then 
 					break  -- end of file
 				end
-				sourceFile.strLines[lineNum] = detabString(s)
+				sourceFile.strLines[lineNum] = s
 				lineNum = lineNum + 1
 			until false -- breaks internally
 			io.close( file )

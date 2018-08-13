@@ -1061,7 +1061,16 @@ class ErrorTest extends Code12Program
 
 		// ERROR "Method call on invalid type"
 		intArr.voidFunc();
-	}
+
+		String indent = "2 Tabs";
+		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+ 		indent = "1 Space + 2 Tabs";
+		indent = "2 Tabs";
+		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+        indent = "8 Spaces";
+		indent = "2 Tabs";
+	// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+    }// 4 spaces used for indentation
 
 	// ERROR "Return type of update function should be void"
 	GameObj update()
