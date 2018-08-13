@@ -18,24 +18,61 @@ public class MainProgram extends Code12Program
 
     public void start()
     {
-        goal = ct.circle(ct.getWidth() / 2, 2, 1);
-        timer = ct.text("10.0", ct.getWidth() / 20, ct.getHeight() / 20, 5);
+        ct.setBackColor("gray");
+        goal = ct.circle(ct.getWidth() / 2, 2, 1, "white");
+        timer = ct.text("10.0", ct.getWidth() / 20, ct.getHeight() / 20, 5, "white");
         timer.align("center", true);
         timer.setLayer(3);
         time = ct.getTimer();
-        maxFitness = ct.text("0.00", ct.getWidth() - (ct.getWidth() / 10), ct.getHeight() / 20, 5);
+        maxFitness = ct.text("0.00", ct.getWidth() - (ct.getWidth() / 10), ct.getHeight() / 20, 5, "white");
         maxFitness.align("center", true);
         maxFitness.setLayer(3);
-        gen = ct.text("Gen 1", ct.getWidth() / 10, ct.getHeight() - (ct.getHeight() / 20), 5);
+        gen = ct.text("Gen 1", ct.getWidth() / 10, ct.getHeight() - (ct.getHeight() / 20), 5, "white");
         gen.align("center", true);
         gen.setLayer(3);
-        dots = new GameObj[50];
         veteranIndex = 0;
         step = 0;
 
         defineObstacles();
         defineDots();
         defineDirections();
+    }
+
+    public void defineObstacles()
+    {
+        obstacles = new GameObj[10];
+        for (int i = 0; i < obstacles.length; i++)
+        {
+            int x = ct.random(0, ct.toInt(ct.getWidth()));
+            int y = ct.random(ct.toInt(ct.getHeight() / 5), ct.toInt(ct.getHeight()) - ct.toInt(ct.getHeight() / 5));
+            obstacles[i] = ct.rect(x, y, ct.random(1, 8), ct.random(1, 15), "dark gray");
+            obstacles[i].align("center", true);
+        }
+    }
+
+    public void defineDots()
+    {
+        dots = new GameObj[50];
+        for (int i = 0; i < dots.length; i++)
+            defineDot(i);
+    }
+
+    public void defineDot(int i)
+    {
+        dots[i] = ct.circle(ct.getWidth() / 2, ct.getHeight() - (ct.getHeight() / 50), 1, "light blue");
+        dots[i].align("center", true);
+    }
+
+    public void defineVeteran()
+    {
+        dots[veteranIndex].setFillColor("light green");
+        dots[veteranIndex].setLayer(2);
+    }
+
+    public void defineDirections()
+    {
+        for (int i = 0; i < directions.length; i++)
+            directions[i] = spatialDirections[ct.random(0, 3)];
     }
 
     public void update()
@@ -84,44 +121,6 @@ public class MainProgram extends Code12Program
                 return false;
         }
         return true;
-    }
-
-    public void defineObstacles()
-    {
-        obstacles = new GameObj[10];
-        for (int i = 0; i < obstacles.length; i++)
-        {
-            int x = ct.random(0, ct.toInt(ct.getWidth()));
-            int y = ct.random(ct.toInt(ct.getHeight() / 5), ct.toInt(ct.getHeight()) - ct.toInt(ct.getHeight() / 5));
-            obstacles[i] = ct.rect(x, y, ct.random(1, 8), ct.random(1, 15));
-            obstacles[i].align("center", true);
-        }
-    }
-
-    public void defineDots()
-    {
-        //dots = new GameObj[50];
-        for (int i = 0; i < dots.length; i++)
-            defineDot(i);
-    }
-
-    public void defineDot(int i)
-    {
-        dots[i] = ct.circle(ct.getWidth() / 2, ct.getHeight() - (ct.getHeight() / 50), 1);
-        dots[i].setFillColor("blue");
-        dots[i].align("center", true);
-    }
-
-    public void defineVeteran()
-    {
-        dots[veteranIndex].setFillColor("green");
-        dots[veteranIndex].setLayer(2);
-    }
-
-    public void defineDirections()
-    {
-        for (int i = 0; i < directions.length; i++)
-            directions[i] = spatialDirections[ct.random(0, 3)];
     }
 
     public void updateTimer()
@@ -208,13 +207,13 @@ public class MainProgram extends Code12Program
     {
         String newDirection = directions[600 * i + j];
         if (newDirection.equals("up"))
-            dots[i].ySpeed = 1;
+            dots[i].ySpeed = 0.5;
         else if (newDirection.equals("down"))
-            dots[i].ySpeed = -1;
+            dots[i].ySpeed = -0.5;
         else if (newDirection.equals("right"))
-            dots[i].xSpeed = 1;
+            dots[i].xSpeed = 0.5;
         else if (newDirection.equals("left"))
-            dots[i].xSpeed = -1;
+            dots[i].xSpeed = -0.5;
     }
 
     public double getFitness(int i)
