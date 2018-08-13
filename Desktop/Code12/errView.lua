@@ -140,24 +140,30 @@ end
 -- Set the x, width, and height of a highlight rect given an err loc
 local function setHighlightRectFromLoc( r, loc )
 	-- There are 3 cases: multi-line, whole line, or partial line
-	-- Start with state for whole line
+	r.x = -dxExtra   -- default for whole and multi-line cases
+	r.height = app.consoleFontHeight  -- default for single line cases
 	local iLine = loc.iLine
 	local sourceLines = app.sourceFile.strLines
-	local numChars = string.len( sourceLines[iLine] or "" )
-	r.x = -dxExtra
-	r.height = app.consoleFontHeight
+	local numCols = 0
 	if loc.iLineEnd and loc.iLineEnd > iLine then
-		-- Multi-line. Make a rectangle bounding all the lines. 
-		for i = iLine + 1, loc.iLineEnd do
-			numChars = math.max( numChars, string.len( sourceLines[i] or "" ) )
+		-- Multi-line. Make a rectangle bounding all the lines.
+		r.height = 0
+		for i = iLine, loc.iLineEnd do
+			local cols = string.len( app.detabLine( sourceLines[i] or "" ) )
+			numCols = math.max( numCols, cols )
 			r.height = r.height + app.consoleFontHeight
 		end
 	elseif loc.iCharStart then
 		-- Partial line
-		r.x = (loc.iCharStart - 1) * dxChar - dxExtra
-		numChars = (loc.iCharEnd or numChars) - loc.iCharStart + 1
+		local _, iColStart, iColEnd = app.detabLine(
+				sourceLines[iLine] or "", loc.iCharStart, loc.iCharEnd )
+		r.x = (iColStart - 1) * dxChar - dxExtra
+		numCols = iColEnd - iColStart + 1
+	else
+		-- Whole line
+		numCols = string.len( app.detabLine( sourceLines[iLine] or "" ) )
 	end
-	r.width = math.max( numChars, 1 ) * dxChar + dxExtra * 2
+	r.width = math.max( numCols, 1 ) * dxChar + dxExtra * 2
 end
 
 -- Show the error state
@@ -183,7 +189,7 @@ local function showError()
 		else
 			lineNumGroup[i].text = tostring( lineNum )
 		end
-		sourceGroup[i].text = sourceLines[lineNum] or ""
+		sourceGroup[i].text = app.detabLine( sourceLines[lineNum] or "" )
 		lineNum = lineNum + 1
 	end
 
