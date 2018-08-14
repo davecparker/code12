@@ -4,10 +4,10 @@
 Semantic Error Test:
 
     1134 lines processed
-    111 ms Parse time
+    122 ms Parse time
     0 ms Semantic check time
-    14 ms Code Generation time
-    126 ms Total time
+    20 ms Code Generation time
+    144 ms Total time
 
 0 unexpected errors
 0 uncaught errors (207 expected errors)
