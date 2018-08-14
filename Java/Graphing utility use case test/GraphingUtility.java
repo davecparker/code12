@@ -7,6 +7,7 @@ public class GraphingUtility extends Code12Program
     GameObj[] buttons = new GameObj[17];
     GameObj[] buttonTexts = new GameObj[17];
     String[] deconstructedExpression;
+    String[] simplifiedExpression;
     String equation = "";
 
     public static void main(String[] args)
@@ -19,10 +20,8 @@ public class GraphingUtility extends Code12Program
         ct.setBackColor("light gray");
         xAxis = ct.line(0, ct.getHeight() / 2, ct.getWidth(), ct.getHeight() / 2, "white");
         xAxis.align("center", true);
-        //xAxis.lineWidth = 2;
         yAxis = ct.line(ct.getWidth() / 2, 0, ct.getWidth() / 2, ct.getHeight(), "white");
         yAxis.align("center", true);
-        //yAxis.lineWidth = 2;
         equationText = ct.text("", ct.getWidth() / 20, 7*ct.getHeight() / 8 + 2, 2, "white");
         equationText.align("left", true);
         equationText.setLayer(2);
@@ -32,34 +31,66 @@ public class GraphingUtility extends Code12Program
         disableButtons("+*/^<");
     }
 
-    public void update()
+    public void onMouseRelease(GameObj obj, double x, double y)
     {
-        for (int i = 0; i < buttons.length; i++)
+        if (obj == buttons[16] || obj == buttonTexts[16])
+            backspaceAction();
+        for (int i = 0; i < buttons.length - 1; i++)
         {
-            String buttonString = buttonTexts[i].getText();
-            if (buttons[i].clicked() && buttonString.equals("<"))
-                backspaceAction();
-            else if (buttons[i].clicked())
+            if (obj == buttons[i] || obj == buttonTexts[i] && buttons[i].clickable)
             {
                 equationText.setText(equationText.getText() + buttonTexts[i].getText());
                 enableButtons("x+-*/^0123456789<");
                 disableButtons(getToBeDisabledButtons());
             }
         }
+    }
 
+    public void onKeyRelease(String keyName)
+    {
+        if (keyName.equals("backspace"))
+            backspaceAction();
+    }
+
+    public void onCharTyped(String keyName)
+    {
+        for (int i = 0; i < buttons.length - 1; i++)
+        {
+            if (keyName.equals(buttonTexts[i].getText()) && buttons[i].clickable)
+            {
+                equationText.setText(equationText.getText() + buttonTexts[i].getText());
+                enableButtons("x+-*/^0123456789<");
+                disableButtons(getToBeDisabledButtons());
+            }
+        }
+    }
+
+    public void update()
+    {
         if (hasEquationChanged() && isParseable())
         {
             ct.clearGroup("coordinates");
             equation = equationText.getText();
             deconstructExpression();
-            for (double x = -0.05; x < ct.getWidth(); x += 0.1)
-                defineLine(x);
+            defineLines();
         }
     }
 
-    public void defineLine(double x)
+    public void defineLines()
     {
-        GameObj line = ct.line(x, -parse(x - 50) + ct.getHeight() / 2, x + 0.1, -parse((x + 0.1) - 50) + ct.getHeight() / 2, "light blue");
+        double y = -parse(-50) + ct.getHeight() / 2;
+        double y2 = -parse(-49.99) + ct.getHeight() / 2;
+        for (double x = 0; x < ct.getWidth(); x += 0.01)
+        {
+            defineLine(x, y, x + 0.01, y2);
+            y = y2;
+            y2 = -parse((x + 0.01) - 50) + ct.getHeight() / 2;
+        }
+    }
+
+    public void defineLine(double x, double y, double x2, double y2)
+    {
+        GameObj line = ct.line(x, y, x2, y2, "light blue");
         line.lineWidth = 3;
         line.group = "coordinates";
     }
@@ -96,6 +127,7 @@ public class GraphingUtility extends Code12Program
             if (buttonString.equals(buttonTexts[i].getText()))
             {
                 buttons[i].clickable = true;
+                buttonTexts[i].clickable = true;
                 buttonTexts[i].setFillColor("black");
                 break;
             }
@@ -116,6 +148,7 @@ public class GraphingUtility extends Code12Program
             if (buttonString.equals(buttonTexts[i].getText()))
             {
                 buttons[i].clickable = false;
+                buttonTexts[i].clickable = false;
                 buttonTexts[i].setFillColor("red");
                 break;
             }
@@ -150,53 +183,52 @@ public class GraphingUtility extends Code12Program
     public void deconstructExpression()
     {
         String expression = equationText.getText();
-        String[] expressionArray = new String[expression.length()];
+        deconstructedExpression = new String[100];
         int count = 0;
         for (int i = 0; i < expression.length(); i++)
         {
-            if (isOperand(charAt(expression, i)))
-                expressionArray[count] = expressionArray[count] + charAt(expression, i);
-            else if (isOperator(charAt(expression, i)))
-            {
-                expressionArray[count + 1] = charAt(expression, i);
-                count += 2;
-            }
+            deconstructedExpression[count] = "";
+            for (; i < expression.length() && isOperand(charAt(expression, i)); i++)
+                deconstructedExpression[count] += charAt(expression, i);
+            if (isOperator(charAt(expression, i)))
+                deconstructedExpression[count + 1] = charAt(expression, i);
+            count += 2;
         }
-        deconstructedExpression = expressionArray;
     }
 
     public double parse(double x)
     {
-        String[] expression = substituteXVariable(x);
-        double solution = ct.parseNumber(expression[0]);
-        for (int i = 1; i < deconstructedExpression.length && expression[i] != null; i++)
+        substituteXVariable(x);
+        double solution = ct.parseNumber(simplifiedExpression[0]);
+        for (int i = 1; i < simplifiedExpression.length && simplifiedExpression[i] != null; i++)
         {
-            if (expression[i].equals("+"))
-                solution += ct.parseNumber(expression[i + 1]);
-            else if (expression[i].equals("*"))
-                solution *= ct.parseNumber(expression[i + 1]);
-            else if (expression[i].equals("/"))
-                solution /= ct.parseNumber(expression[i + 1]);
-            else if (expression[i].equals("^"))
-                solution = Math.pow(solution, ct.parseNumber(expression[i + 1]));
+            if (simplifiedExpression[i].equals("+"))
+                solution += ct.parseNumber(simplifiedExpression[i + 1]);
+            else if (simplifiedExpression[i].equals("*"))
+                solution *= ct.parseNumber(simplifiedExpression[i + 1]);
+            else if (simplifiedExpression[i].equals("/"))
+                solution /= ct.parseNumber(simplifiedExpression[i + 1]);
+            else if (simplifiedExpression[i].equals("^"))
+                solution = Math.pow(solution, ct.parseNumber(simplifiedExpression[i + 1]));
         }
         return solution;
     }
 
-    public String[] substituteXVariable(double x)
+    public void substituteXVariable(double x)
     {
-        String[] expression = new String[deconstructedExpression.length];
-        for (int i = 0; i < deconstructedExpression.length; i++)
+        simplifiedExpression = new String[100];
+        for (int i = 0; i < deconstructedExpression.length && deconstructedExpression[i] != null; i++)
         {
             String token = deconstructedExpression[i];
-            if (token.equals("-x") && x < 0)
-                expression[i] = ct.formatDecimal(x);
-            else if (token.equals("x") || token.equals("-x") && x > 0)
-                expression[i] = ct.formatDecimal(x);
+            if (token.equals("-x") && x > 0)
+                simplifiedExpression[i] = "-" + ct.formatDecimal(x);
+            else if (token.equals("-x") && x <= 0)
+                simplifiedExpression[i] = ct.formatDecimal(Math.abs(x));
+            else if (token.equals("x") || token.equals("-x") && x <= 0)
+                simplifiedExpression[i] = ct.formatDecimal(x);
             else
-                expression[i] = token;
+                simplifiedExpression[i] = deconstructedExpression[i];
         }
-        return expression;
     }
 
     public boolean hasEquationChanged()
