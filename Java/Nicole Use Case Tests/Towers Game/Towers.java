@@ -102,6 +102,14 @@ public class Towers extends Code12Program
       medium.clickable = true;
       large.clickable = true;
 
+      double i = 2 + (3 * 4);
+      ct.println(i);
+
+      double test = 2 * (2+3);
+      ct.println(test);
+
+      double anotherTest = i * (1.0 - Math.pow(test / i, test));
+      ct.println(anotherTest);
 
    }
 
@@ -127,29 +135,28 @@ public class Towers extends Code12Program
 
    // function to determine the amount of disks on each pole
    // parameter passed is a GameObj (the pole)
-   public int getAmountOnPole( GameObj pole )
+   public int getAmountOnGivenPole( int i )
    {
       int amount = 0;
 
-      for ( int i = 0; i < poles.length; i++ )
+      if ( i >= 0 && i < 3 )
       {
          for ( int j = 0; j < disks.length; j++ )
          {
             if ( disks[j].hit(poles[i]) == true )
                amount++;
-
          }
       }
-
       return amount;
 
    }
 
-   public boolean isValidMove(GameObj diskMoving) // bool is valid move? pass obj tring to move
+   public boolean isValidMove(GameObj diskMoving)
    {
       for ( int i = 0; i < poles.length; i++ )
       {
-         int amount = getAmountOnPole( poles[i] );
+         int amount = getAmountOnGivenPole(i);
+         // If no disks are on the pole, the move will always be valid
          if ( amount == 0 )
          {
             ct.println("does this execute");
@@ -222,40 +229,30 @@ public class Towers extends Code12Program
    // }
 
 
-   // If ( bigger ) can't put on top of smaller
-   // If ( smaller ) can put on top of bigger
-
-
    // Helper function to let moved disks fall to the base of a given pole 
    // Once they reach the base of the pole or another objject in poles array, they stop falling ( ySpeed = 0 )
    public void moveDiskToPole(GameObj disk)
    {
       // move to stack
-      // falls to bottom unless other disks obj is hits
+      // falls to bottom unless other disks obj is hit
       for ( int i = 0; i < poles.length; i++ )
       {
-         for ( int j = 0; j < disks.length; j++ )
-         {
-         /*
-            if ( disk.hit(disks[j]))
+            /*if ( disk.hit(disks[j]))
             {
                disk.x = disks[j].x - ( disks[j].height/4);
                disk.y = disks[j].y - (disks[j].height / 2);
             }*/
-
             // else to go to base of pole
-            else if ( isValidMove(disk) == true )
+             if ( isValidMove(disk) == true )
             {
                disk.x = poles[i].x;
                disk.y = poles[i].y;
-
             }
 
 
          }
 
       }
-
 
 
    }

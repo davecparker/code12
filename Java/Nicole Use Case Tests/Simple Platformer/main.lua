@@ -8,9 +8,17 @@ require('Code12.api')
     this.platforms = nil; 
     this.items = nil; 
     this.clouds = nil; 
+    this.ladder = nil; 
     this.gravity = 0.5
     this.onGround = true
     
+    
+    this.isJumping = false
+    this.wasJumping = false
+    this.jumpTime = 0
+    
+    this.maxJumpTime = .8
+    this.jumpLaunchVelocity = -3000.0
     
     
         
@@ -30,8 +38,7 @@ require('Code12.api')
         -- Background objects in the game
         local tree = ct.image("tree.png", 15, height - 14, 15)
         tree:setLayer(0)
-        local tree2 = ct.image("tree.png", 120, height - 14, 15)
-        tree2:setLayer(0)
+        
         local sun = ct.image("sun.png", width - 10, 10, 10)
         this.clouds = { length = 5, default = nil }
         ct.checkArrayIndex(this.clouds, 0); this.clouds[1+(0)] = ct.image("cloud3.png", -35, 10, 20)
@@ -41,7 +48,7 @@ require('Code12.api')
         ct.checkArrayIndex(this.clouds, 4); this.clouds[1+(4)] = ct.image("cloud3.png", 30, 20, 20)
         
         -- Platforms, platforms[0] is the ground
-        ct.checkArrayIndex(this.platforms, 0); this.platforms[1+(0)] = ct.rect(width / 2, height, width * 5, 10, "dark green")
+        ct.checkArrayIndex(this.platforms, 0); this.platforms[1+(0)] = ct.rect(width / 4, height, 40, 10, "dark green")
         ct.checkArrayIndex(this.platforms, 1); this.platforms[1+(1)] = ct.rect(30, height - 10, 20, 10, "dark green")
         ct.checkArrayIndex(this.platforms, 2); this.platforms[1+(2)] = ct.rect(60, height - 20, 25, 20, "dark green")
         ct.checkArrayIndex(this.platforms, 3); this.platforms[1+(3)] = ct.rect(90, height - 20, 15, 10, "orange")
@@ -53,10 +60,12 @@ require('Code12.api')
         ct.checkArrayIndex(this.platforms, 9); this.platforms[1+(9)] = ct.rect(175, 35, 10, 2, "yellow")
         ct.checkArrayIndex(this.platforms, 10); this.platforms[1+(10)] = ct.rect(155, 25, 10, 15, "yellow")
         ct.checkArrayIndex(this.platforms, 11); this.platforms[1+(11)] = ct.rect(135, 15, 15, 20, "yellow")
-        -- ladder
+        
+        this.ladder = ct.image("ladder.png", 135, 0, 10)
         
         -- TODO: solid platforms
         -- use variables to store your old location and sends you back there if there is a wall collision.
+        -- or where the player rectangle OVERLAPS with platform rect
         -- while ( player != colliding with platform) ? 
         
         
@@ -65,6 +74,11 @@ require('Code12.api')
         this.playerLeft = ct.image("stickmanleft.png", 10, 10, 8)
         this.playerLeft.visible = false
         this.playerRight = ct.image("stickmanright.png", 10, 10, 8)
+        
+        --playerLeft = ct.image("stickmanleft.png", 10, height - 8 , 8);
+        
+        
+        
         
         
     end
@@ -75,16 +89,20 @@ require('Code12.api')
         local height = ct.getHeight()
         
         -- Using ct.setScreenOrigin to adjust viewpoint of the "world"
+        
+        -- Moving the origin to the left
+        --if ( playerRight.x < 100 || playerLeft.x  < 100 )
+        --ct.setScreenOrigin(-100,0);
+        
+        -- Moving the origin to the right
         if this.playerRight.x > 100 or this.playerLeft.x > 100 then
             ct.setScreenOrigin(100, 0); end
-        
-        if this.playerRight.x < 100 or this.playerLeft.x < 100 then
-            ct.setScreenOrigin(0, 0); end
-        
         if this.playerRight.x > 200 or this.playerLeft.x > 200 then
             ct.setScreenOrigin(200, 0); end
-        if this.playerRight.y <= 0 then
-            ct.setScreenOrigin(0, -100); end
+        
+        -- Move the origin upwards
+        if this.playerRight.y <= 0 or this.playerLeft.y <= 0 then
+            ct.setScreenOrigin(100, 100); end
         
         if this.playerRight.y >= height then
             
@@ -96,10 +114,11 @@ require('Code12.api')
         this.playerRight.ySpeed = this.playerRight.ySpeed + (this.gravity)
         this.playerLeft.ySpeed = this.playerLeft.ySpeed + (this.gravity)
         
+        this.playerRight.x = this.playerRight.x + (this.playerRight.xSpeed)
+        this.playerLeft.x = this.playerLeft.x + (this.playerLeft.xSpeed)
+        
         this.playerRight.y = this.playerRight.y + (this.playerRight.ySpeed)
         this.playerLeft.y = this.playerLeft.y + (this.playerLeft.ySpeed)
-        
-        
         
         for _, platform in ipairs(this.platforms) do
             
@@ -129,22 +148,48 @@ require('Code12.api')
                     this.playerLeft.visible = false
                     this.playerRight.visible = true
                     
+                    this.playerLeft.x = platform.x + platform.width
+                    this.playerRight.x = platform.x + platform.width
+                    
                 
                 elseif (from == "right") then
                     
                     this.playerRight.visible = false
                     this.playerLeft.visible = true
                     
+                    this.playerLeft.x = platform.x - platform.width
+                    this.playerRight.x = platform.x - platform.width
                 end
             end
         end
         
+        if this.playerRight:hit(this.ladder) or this.playerLeft:hit(this.ladder) then
+            
+            this.playerRight.ySpeed = -0.25
+            this.playerLeft.ySpeed = -0.25
+            
+            if this.playerRight.y <= 0 then
+                
+                this.playerRight.ySpeed = 0
+                this.playerLeft.ySpeed = 0
+            end
+            
+        end
         
     end
+    -- Collision detection to detect from which side the rectangle collision occurred
+    -- Minkowski sum of the two original rectangles (A and B), 
+    -- which is a new rectangle, and then checks where the center
+    -- of A lies relatively that new rectangle
+    -- (to know whether a collision is happening) 
+    -- and to its diagonals (to know where the collision is happening):
+    
     function _fn.hitFrom(player)
         
         for _, platform in ipairs(this.platforms) do
             
+            -- Detect whether the collision between player and platform occurred 
+            -- from the right, left, top, or bottom
             local w = 0.5 * (player.width + platform.width)
             local h = 0.5 * (player.height + platform.height)
             local dx = player.x - platform.x
@@ -159,7 +204,7 @@ require('Code12.api')
                     
                     if wy > -hx then
                         
-                        ct.println("collsion from bottom")
+                        --ct.println("collsion from bottom");
                         return "bottom"
                     
                     else 
@@ -177,7 +222,7 @@ require('Code12.api')
                     
                     else 
                         
-                        ct.println("collison from top")
+                        --ct.println("collison from top");
                         return "top"
                     end
                 end
@@ -190,12 +235,11 @@ require('Code12.api')
         
         if this.onGround then
             
-            ct.println("start the jump")
             this.playerRight.ySpeed = -6.0
             this.playerLeft.ySpeed = -6.0
             
-            this.playerRight.xSpeed = 0.5
-            this.playerLeft.xSpeed = 0.5
+            this.playerRight.xSpeed = 1.5
+            this.playerLeft.xSpeed = 1.5
             
             this.onGround = false
         end
@@ -205,13 +249,47 @@ require('Code12.api')
         
         if this.playerRight.ySpeed < -3.0 or this.playerLeft.ySpeed < -3.0 then
             
-            ct.println("end the jump")
             this.playerRight.ySpeed = -3.0
             this.playerLeft.ySpeed = -3.0
             this.playerRight.xSpeed = 0
             this.playerLeft.xSpeed = 0
         end
     end
+    
+    --public double doJump(double velocityY, double gameTime)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     function _fn.onKeyRelease(keyName)
@@ -227,13 +305,6 @@ require('Code12.api')
             this.playerRight.xSpeed = 0
             this.playerLeft.xSpeed = 0
         end
-        
-        --if ( keyName.equals("space"))
-        
-        
-        
-        
-        
     end
     
     
@@ -245,6 +316,9 @@ require('Code12.api')
             _fn.startJump()
             ct.sound("retro_jump.wav")
             _fn.endJump()
+            --isJumping = true;
+            --playerRight.ySpeed = doJump(playerRight.ySpeed, ct.getTimer() );
+            
         end
         
         if (keyName == "left") then
