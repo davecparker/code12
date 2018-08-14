@@ -90,8 +90,8 @@ local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
 local commentForLine    -- array of end-of-line comments indexed by line number
 local indentLevelForLine-- array of indent levels indexed by line number
-local colStack          -- stack of column counts for indentation, assuming a tab size of 8
-local altColStack       -- stack of column counts for indentation, assuming a tab size of 1
+local colPrev           -- previous non-blank line's column count for indentation, assuming a tab size of 8
+local altColPrev        -- previous non-blank line's column count for indentation, assuming a tab size of 1
 
 ----- Token scanning functions ------------------------------------------------
 
@@ -429,8 +429,8 @@ function javalex.initProgram()
 	commentLevel = 0
 	commentForLine = {}
 	indentLevelForLine = {}
-	colStack = { 0 }
-	altColStack = { 0 }
+	colPrev = 0
+	altColPrev = 0
 end
 
 -- Return an array of tokens for the given source string and line number. 
@@ -491,32 +491,24 @@ function javalex.getTokens( sourceStr, lineNum )
 			blankLine = true
 		end
 	end
-	-- Check for consistent use of tabs with spaces
 	if not blankLine then
-		local colStackTop = colStack[#colStack]
-		local altColStackTop = altColStack[#altColStack]
-		if col == colStackTop then -- No change in indent level
-			if altCol ~= altColStackTop then
+		-- Check for consistent use of tabs with spaces
+		if col == colPrev then -- No change in indent level
+			if altCol ~= altColPrev then
 				setTabErr( iChar - 1 )
 			end
-		elseif col > colStackTop then -- Increase in indent level
-			if altCol <= altColStackTop then
+		elseif col > colPrev then -- Increase in indent level
+			if altCol <= altColPrev then
 				setTabErr( iChar - 1 )
 			end
-			-- Add to column stacks
-			colStack[#colStack + 1] = col
-			altColStack[#altColStack + 1] = altCol
-		else -- col < colStackTop -- Decrease in indent level
-			if altCol >= altColStackTop then
+		else -- col < colPrev -- Decrease in indent level
+			if altCol >= altColPrev then
 				setTabErr( iChar - 1 )
-			end
-			-- Update column stacks
-			while #colStack > 1 and col < colStackTop do
-				colStack[#colStack] = nil
-				altColStack[#altColStack] = nil
-				colStackTop = colStack[#colStack]
 			end
 		end
+		-- Update colPrev and altColPrev
+		colPrev = col
+		altColPrev = altCol
 	end
 
 	-- Scan the rest of the chars array

@@ -1065,12 +1065,20 @@ class ErrorTest extends Code12Program
 		String indent = "2 Tabs";
 		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
  		indent = "1 Space + 2 Tabs";
+		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
 		indent = "2 Tabs";
 		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
         indent = "8 Spaces";
+		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
 		indent = "2 Tabs";
+		if (true)
+			ct.println();
+			if (true)
+				ct.println();
+		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+    	indent = "4 Spaces + 1 Tab";
 	// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
-    }// 4 spaces used for indentation
+	} // 1 Tab for indent
 
 	// ERROR "Return type of update function should be void"
 	GameObj update()
