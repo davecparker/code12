@@ -429,8 +429,7 @@ function javalex.initProgram()
 	commentLevel = 0
 	commentForLine = {}
 	indentLevelForLine = {}
-	colPrev = 0
-	altColPrev = 0
+	prevIndentStr = ""
 end
 
 -- Return an array of tokens for the given source string and line number. 
@@ -493,22 +492,16 @@ function javalex.getTokens( sourceStr, lineNum )
 	end
 	if not blankLine then
 		-- Check for consistent use of tabs with spaces
-		if col == colPrev then -- No change in indent level
-			if altCol ~= altColPrev then
-				setTabErr( iChar - 1 )
-			end
-		elseif col > colPrev then -- Increase in indent level
-			if altCol <= altColPrev then
-				setTabErr( iChar - 1 )
-			end
-		else -- col < colPrev -- Decrease in indent level
-			if altCol >= altColPrev then
-				setTabErr( iChar - 1 )
-			end
+		local indentStr = string.sub(sourceStr, 1, iChar - 1)
+		local len = iChar - 1
+		local prevLen = string.len(prevIndentStr)
+		if len == prevLen and indentStr ~= prevIndentStr
+				or len > prevLen and string.sub(indentStr, 1, prevLen) ~= prevIndentStr
+				or len < prevLen and string.sub(prevIndentStr, 1, len) ~= indentStr then
+			setTabErr( iChar - 1 )
 		end
-		-- Update colPrev and altColPrev
-		colPrev = col
-		altColPrev = altCol
+		-- Update prevIndentStr
+		prevIndentStr = indentStr
 	end
 
 	-- Scan the rest of the chars array
