@@ -5,8 +5,13 @@ require('Code12.api')
     this.rows = 10
     this.columns = 10
     this.squares = { length = this.rows * this.columns, default = nil }
-    this.numbMines = 10
+    this.flags = { length = this.rows * this.columns, default = nil }
+    this.numbFlags = 0
+    this.numb = nil; 
+    this.numbmines = 10
     this.squareState = nil; 
+    this.timer = 0
+    this.mouseDown = false
     
     
         
@@ -95,66 +100,130 @@ require('Code12.api')
         j = j + 1; end
     end
     
-    function _fn.onMouseRelease(obj, x, y)
+    function _fn.checkWin()
         
-        if obj ~= nil then
+        local win = true
+        for _, square in ipairs(this.squares) do
             
-            obj.visible = false
-            this.squareState = obj:getText()
-            
-            if (this.squareState == "Mine") then
+            this.squareState = square:getText()
+            if square.visible == true and not (this.squareState == "mine") then
                 
-                for _, square in ipairs(this.squares) do
-                    
-                    square.clickable = false
-                    local compare = square:getText()
-                    if (compare == "Mine") then
-                        
-                        if square.visible then
-                            
-                            square.visible = false
-                        end
-                    end
-                end
-                
-                local endText = ct.text("Game Over", 50, 20, 20)
-                endText:setLayer(3)
-            end
-            
-            if (this.squareState == "0") then
-                
-                local i = _fn.getSquareIndex(obj)
-                local sqrX = i % this.columns
-                local sqrY = ct.intDiv(i, this.columns)
-                local j = -1; while j <= 1 do
-                    
-                    local k = -1; while k <= 1 do
-                        
-                        if _fn.goodIndex(sqrX + j, sqrY + k) then
-                            
-                            local otherSquare = _fn.getSquare(sqrX + j, sqrY + k)
-                            otherSquare.visible = false
-                            local compare = otherSquare:getText()
-                            if (compare == "0") then
-                                
-                                local otherSquareI = _fn.getSquareIndex(otherSquare)
-                                _fn.emptySquare(otherSquareI)
-                            end
-                        end
-                    k = k + 1; end
-                j = j + 1; end
+                win = false
+                break
             end
         end
+        
+        if win then
+            
+            _fn.endState(true)
+        end
+    end
+    
+    function _fn.endState(win)
+        
+        local endText = nil; 
+        if win then
+            
+            endText = "You Won!"
+        
+        else 
+            
+            endText = "Game Over"
+        end
+        
+        for _, flag in ipairs(this.flags) do
+            
+            flag.clickable = false
+        end
+        for _, square in ipairs(this.squares) do
+            
+            square.clickable = false
+            local compare = square:getText()
+            if (compare == "mine") then
+                
+                if square.visible then
+                    
+                    square.visible = false
+                end
+            end
+        end
+        
+        local endTextObj = ct.text(endText, 50, 20, 20)
+        endTextObj:setLayer(3)
+        endTextObj.clickable = false
+    end
+    
+    function _fn.onMousePress(obj, x, y)
+        
+        this.mouseDown = true
+    end
+    
+    function _fn.onMouseRelease(obj, x, y)
+        
+        this.mouseDown = false
+        
+        if this.timer <= 15 then
+            
+            if obj ~= nil then
+                
+                obj.visible = false
+                this.squareState = obj:getText()
+                
+                
+                if (this.squareState == "mine") then
+                    
+                    _fn.endState(false)
+                end
+                
+                
+                if (this.squareState == "0") then
+                    
+                    local i = _fn.getSquareIndex(obj)
+                    local sqrX = i % this.columns
+                    local sqrY = ct.intDiv(i, this.columns)
+                    local j = -1; while j <= 1 do
+                        
+                        local k = -1; while k <= 1 do
+                            
+                            if _fn.goodIndex(sqrX + j, sqrY + k) then
+                                
+                                local otherSquare = _fn.getSquare(sqrX + j, sqrY + k)
+                                local compare = otherSquare:getText()
+                                if (compare == "0") and otherSquare.visible then
+                                    
+                                    local otherSquareI = _fn.getSquareIndex(otherSquare)
+                                    _fn.emptySquare(otherSquareI)
+                                end
+                            end
+                        k = k + 1; end
+                    j = j + 1; end
+                end
+            end
+        
+        else 
+            
+            if obj ~= nil then
+                
+                local flag = ct.image("flag.png", obj.x, obj.y, 3)
+                flag:setLayer(3)
+                flag:setText(obj:getText())
+                ct.checkArrayIndex(this.flags, this.numbFlags); this.flags[1+(this.numbFlags)] = flag
+                this.numbFlags = this.numbFlags + (1)
+            end
+        end
+        
+        this.timer = 0
+        _fn.checkWin()
     end
     
     function _fn.start()
         
+        ct.setHeight(100)
         local x = 0; while x < this.rows do
             
             local y = 0; while y < this.columns do
                 
                 local square = ct.rect(2.7 + (x * 5), 12.9 + (y * 5), 5, 5, "gray")
-                square.clickable = true
                 square:setLayer(2)
                 square:setText("")
                 _fn.setSquare(x, y, square)
@@ -163,26 +232,26 @@ require('Code12.api')
         
         --Plants the mines
         local m = 0
-        local mineCords = { length = this.numbMines, default = 0 }
+        local mineCords = { length = this.numbmines, default = 0 }
         
-        while m < this.numbMines do
+        while m < this.numbmines do
             
             local randX = ct.random(0, this.rows - 1)
             local randY = ct.random(0, this.columns - 1)
             --Checks if there is already a mine at this randomly selected coordinate
-            local uniqueMine = true
-            local newMineCord = this.columns * randX + randY
+            local uniquemine = true
+            local newmineCord = this.columns * randX + randY
             
             for _, mineChord in ipairs(mineCords) do
                 
-                if mineChord == newMineCord then
-                    uniqueMine = false; end
+                if mineChord == newmineCord then
+                    uniquemine = false; end
             end
             
-            if uniqueMine then
+            if uniquemine then
                 
-                _fn.setSquareValue(randX, randY, "Mine")
-                ct.checkArrayIndex(mineCords, m); mineCords[1+(m)] = newMineCord
+                _fn.setSquareValue(randX, randY, "mine")
+                ct.checkArrayIndex(mineCords, m); mineCords[1+(m)] = newmineCord
                 m = m + 1
             end
         end
@@ -194,9 +263,9 @@ require('Code12.api')
                 
                 
                 this.squareState = _fn.getSquareValue(x, y)
-                if not ((this.squareState == "Mine")) then
+                if not ((this.squareState == "mine")) then
                     
-                    local adjMines = 0
+                    local adjmines = 0
                     local j = -1; while j <= 1 do
                         
                         local k = -1; while k <= 1 do
@@ -204,18 +273,18 @@ require('Code12.api')
                             if _fn.goodIndex(x + j, y + k) then
                                 
                                 local compare = _fn.getSquareValue(x + j, y + k)
-                                if (compare == "Mine") then
+                                if (compare == "mine") then
                                     
-                                    adjMines = adjMines + (1)
+                                    adjmines = adjmines + (1)
                                 end
                             end
                         k = k + 1; end
                     j = j + 1; end
-                    if adjMines == 0 then
+                    if adjmines == 0 then
                         _fn.setSquareValue(x, y, "0"); 
                     else 
                         
-                        _fn.setSquareValue(x, y, ct.formatInt(adjMines))
+                        _fn.setSquareValue(x, y, ct.formatInt(adjmines))
                     end
                 end
             y = y + 1; end
@@ -229,19 +298,22 @@ require('Code12.api')
             local sqrY = square.y
             
             this.squareState = square:getText()
-            if (this.squareState == "Mine") then
+            if (this.squareState == "mine") then
                 
-                ct.image("mine.jpg", sqrX, sqrY, 5)
+                local mine = ct.image("mine.jpg", sqrX, sqrY, 5)
+                mine.clickable = false
             
             else 
                 
                 if (this.squareState == "0") then
                     
-                    ct.text("", sqrX, sqrY, 5)
+                    this.numb = ct.text("", sqrX, sqrY, 5)
+                    this.numb.clickable = false
                 
                 else 
                     
-                    ct.text(this.squareState, sqrX, sqrY, 5)
+                    this.numb = ct.text(this.squareState, sqrX, sqrY, 5)
+                    this.numb.clickable = false
                 end
                 
             end
@@ -249,3 +321,10 @@ require('Code12.api')
         end
     end
     
+    function _fn.update()
+        
+        if this.mouseDown then
+            
+            this.timer = this.timer + (1)
+        end
+    end

@@ -173,6 +173,7 @@ end
 function app.processUserFile()
 	-- Read the file
 	if not readSourceFile() then
+		print("Failed to load")
 		return
 	end
 

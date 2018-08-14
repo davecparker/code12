@@ -18,10 +18,10 @@ require('Code12.api')
         ct.setHeight(128)
         
         --draws the bird
-        ct.image("yellowbird-downflap.png", 50, 50, 10)
+        ct.image("yellowbird-downflap.png", 50, 44, 10)
         
         --draws the count
-        ct.image("0.png", 50, 18, 5)
+        ct.image("0.png", 50, 16, 5)
         
         --draws the ground
         ct.image("base.png", 20, 122, 40)
