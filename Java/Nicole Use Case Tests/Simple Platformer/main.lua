@@ -38,8 +38,7 @@ require('Code12.api')
         -- Background objects in the game
         local tree = ct.image("tree.png", 15, height - 14, 15)
         tree:setLayer(0)
-        local tree2 = ct.image("tree.png", 120, height - 14, 15)
-        tree2:setLayer(0)
+        
         local sun = ct.image("sun.png", width - 10, 10, 10)
         this.clouds = { length = 5, default = nil }
         ct.checkArrayIndex(this.clouds, 0); this.clouds[1+(0)] = ct.image("cloud3.png", -35, 10, 20)
@@ -49,7 +48,7 @@ require('Code12.api')
         ct.checkArrayIndex(this.clouds, 4); this.clouds[1+(4)] = ct.image("cloud3.png", 30, 20, 20)
         
         -- Platforms, platforms[0] is the ground
-        ct.checkArrayIndex(this.platforms, 0); this.platforms[1+(0)] = ct.rect(width / 2, height, width * 5, 10, "dark green")
+        ct.checkArrayIndex(this.platforms, 0); this.platforms[1+(0)] = ct.rect(width / 4, height, 40, 10, "dark green")
         ct.checkArrayIndex(this.platforms, 1); this.platforms[1+(1)] = ct.rect(30, height - 10, 20, 10, "dark green")
         ct.checkArrayIndex(this.platforms, 2); this.platforms[1+(2)] = ct.rect(60, height - 20, 25, 20, "dark green")
         ct.checkArrayIndex(this.platforms, 3); this.platforms[1+(3)] = ct.rect(90, height - 20, 15, 10, "orange")
@@ -178,7 +177,12 @@ require('Code12.api')
         end
         
     end
-    
+    -- Collision detection to detect from which side the rectangle collision occurred
+    -- Minkowski sum of the two original rectangles (A and B), 
+    -- which is a new rectangle, and then checks where the center
+    -- of A lies relatively that new rectangle
+    -- (to know whether a collision is happening) 
+    -- and to its diagonals (to know where the collision is happening):
     
     function _fn.hitFrom(player)
         
@@ -252,40 +256,40 @@ require('Code12.api')
         end
     end
     
-    function _fn.doJump(velocityY, gameTime)
-        
-        -- If the player wants to jump
-        if this.isJumping then
-            
-            ct.println("test")
-            ct.println("on ground = "..tostring(this.onGround))
-            -- Begin or continue a jump
-            if this.onGround or this.jumpTime > 0.0 then
-                
-                ct.println("test: jump should begin")
-                -- test sound here
-                this.jumpTime = this.jumpTime + (gameTime)
-            end
-            
-            -- If we are in the ascent of the jump
-            if 0.0 < this.jumpTime or this.jumpTime <= this.maxJumpTime then
-                
-                ct.println("test2")
-                -- Fully override the vertical velocity with a power curve that gives players more control over the top of the jump (If you dont want this you can remove the Math.Pow)
-                velocityY = this.jumpLaunchVelocity * (1.0 - math.pow(this.jumpTime / this.maxJumpTime, 10))
-            
-            else 
-                this.jumpTime = 0.0; end
-        
-        else 
-            
-            -- Continues not jumping or cancels a jump in progress
-            this.jumpTime = 0.0
-        end
-        
-        this.wasJumping = this.isJumping
-        return velocityY
-    end
+    --public double doJump(double velocityY, double gameTime)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     function _fn.onKeyRelease(keyName)

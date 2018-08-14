@@ -38,8 +38,7 @@ public class SimplePlatformer extends Code12Program
       // Background objects in the game
       GameObj tree = ct.image("tree.png", 15, height - 14,15);
       tree.setLayer(0);
-      GameObj tree2 = ct.image("tree.png", 120, height - 14, 15);
-      tree2.setLayer(0);
+
       GameObj sun = ct.image("sun.png", width - 10, 10, 10 );
       clouds = new GameObj[5];
       clouds[0] = ct.image("cloud3.png", -35, 10, 20);
@@ -49,7 +48,7 @@ public class SimplePlatformer extends Code12Program
       clouds[4] = ct.image("cloud3.png", 30, 20, 20);
 
       // Platforms, platforms[0] is the ground
-      platforms[0]= ct.rect(width/2, height, width * 5, 10,"dark green");
+      platforms[0]= ct.rect(width/4, height, 40, 10,"dark green");
       platforms[1] = ct.rect(30, height - 10, 20, 10, "dark green");
       platforms[2] = ct.rect(60, height - 20, 25, 20, "dark green");
       platforms[3] = ct.rect(90, height - 20, 15, 10,"orange");
@@ -179,7 +178,12 @@ public class SimplePlatformer extends Code12Program
       }
 
    }
-
+   // Collision detection to detect from which side the rectangle collision occurred
+   // Minkowski sum of the two original rectangles (A and B), 
+   // which is a new rectangle, and then checks where the center
+   // of A lies relatively that new rectangle
+   // (to know whether a collision is happening) 
+   // and to its diagonals (to know where the collision is happening):
 
    String hitFrom(GameObj player)
    {
@@ -253,7 +257,7 @@ public class SimplePlatformer extends Code12Program
       }  
    }
 
-   public double doJump(double velocityY, double gameTime)
+   /*public double doJump(double velocityY, double gameTime)
    {
       // If the player wants to jump
       if (isJumping)
@@ -286,7 +290,7 @@ public class SimplePlatformer extends Code12Program
       
       wasJumping = isJumping;
       return velocityY;
-   }
+   }*/
 
 
    public void onKeyRelease( String keyName )
