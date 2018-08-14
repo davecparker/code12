@@ -8,10 +8,18 @@ public class SimplePlatformer extends Code12Program
    GameObj[] platforms;
    GameObj[] items;
    GameObj[] clouds;
+   GameObj ladder;
    double gravity = 0.5; 
    boolean onGround = true;
-  
 
+
+   boolean isJumping = false; //Is the player in a jump?
+   boolean wasJumping = false; //Did the player just exit a jump?
+   double jumpTime = 0; //Time the player has been in a jump (Useful for adding a power curve or to max out on jump height)
+
+   double maxJumpTime = .8; //If you want to max out a jump, otherwise remove the relevant parts of the code
+   double jumpLaunchVelocity = -3000.0; //How
+ 
    public static void main(String[] args)
    {
       Code12.run(new SimplePlatformer());
@@ -53,10 +61,12 @@ public class SimplePlatformer extends Code12Program
       platforms[9] = ct.rect(175, 35, 10, 2, "yellow");
       platforms[10] = ct.rect(155, 25, 10, 15, "yellow");
       platforms[11] = ct.rect(135, 15, 15, 20, "yellow");
-      // ladder
+      
+      ladder = ct.image("ladder.png", 135, 0, 10);
 
       // TODO: solid platforms
       // use variables to store your old location and sends you back there if there is a wall collision.
+      // or where the player rectangle OVERLAPS with platform rect
       // while ( player != colliding with platform) ? 
 
 
@@ -65,6 +75,11 @@ public class SimplePlatformer extends Code12Program
       playerLeft = ct.image("stickmanleft.png", 10, 10, 8);
       playerLeft.visible = false;
       playerRight = ct.image("stickmanright.png", 10, 10, 8);
+
+      /*playerLeft = ct.image("stickmanleft.png", 10, height - 8 , 8);
+      playerLeft.visible = false;
+      playerRight = ct.image("stickmanright.png", 10, height - 8, 8);*/
+
 
 
    }
@@ -75,16 +90,20 @@ public class SimplePlatformer extends Code12Program
       double height = ct.getHeight();
 
       // Using ct.setScreenOrigin to adjust viewpoint of the "world"
+
+      // Moving the origin to the left
+       //if ( playerRight.x < 100 || playerLeft.x  < 100 )
+         //ct.setScreenOrigin(-100,0);
+
+      // Moving the origin to the right
       if ( playerRight.x > 100 || playerLeft.x > 100 )
          ct.setScreenOrigin(100,0);
-
-       if ( playerRight.x < 100 || playerLeft.x  < 100 )
-         ct.setScreenOrigin(0,0);
-
       if ( playerRight.x > 200 || playerLeft.x > 200 )
          ct.setScreenOrigin(200,0);
-      if ( playerRight.y <= 0 )
-         ct.setScreenOrigin(0,-100);
+
+      // Move the origin upwards
+      if ( playerRight.y <= 0 || playerLeft.y <= 0 )
+         ct.setScreenOrigin(100,100);
 
       if ( playerRight.y >= height )
       {
@@ -96,10 +115,11 @@ public class SimplePlatformer extends Code12Program
       playerRight.ySpeed += gravity;
       playerLeft.ySpeed += gravity;
 
+      playerRight.x += playerRight.xSpeed;
+      playerLeft.x += playerLeft.xSpeed;
+
       playerRight.y += playerRight.ySpeed;
       playerLeft.y += playerLeft.ySpeed;
-
-
 
       for ( GameObj platform : platforms )
       {
@@ -124,10 +144,14 @@ public class SimplePlatformer extends Code12Program
                endJump();
 
             }
+            // reverse player's direction if collision with the side of a platform
             else if (from.equals("left"))
             {
                playerLeft.visible = false;
                playerRight.visible = true;
+
+               playerLeft.x = platform.x + platform.width;
+               playerRight.x = platform.x + platform.width;
 
             }
             else if (from.equals("right"))
@@ -135,16 +159,34 @@ public class SimplePlatformer extends Code12Program
                playerRight.visible = false;
                playerLeft.visible = true;
 
+               playerLeft.x = platform.x - platform.width;
+               playerRight.x = platform.x - platform.width;
             }
          }
       }
 
+      if ( playerRight.hit(ladder) || playerLeft.hit(ladder))
+      {
+         playerRight.ySpeed = -0.25;
+         playerLeft.ySpeed = -0.25;
+         
+         if ( playerRight.y <= 0 )
+         {
+            playerRight.ySpeed = 0;
+            playerLeft.ySpeed = 0;
+         }
+
+      }
 
    }
+
+
    String hitFrom(GameObj player)
    {
-      for (GameObj platform: platforms )
+      for (GameObj platform: platforms)
       {
+         // Detect whether the collision between player and platform occurred 
+         // from the right, left, top, or bottom
          double w = 0.5 * (player.width + platform.width);
          double h = 0.5 * (player.height + platform.height);
          double dx = player.x - platform.x;
@@ -159,7 +201,7 @@ public class SimplePlatformer extends Code12Program
             {
                if ( wy > -hx )
                {
-                  ct.println("collsion from bottom");
+                  //ct.println("collsion from bottom");
                   return "bottom";
                }
                else
@@ -177,7 +219,7 @@ public class SimplePlatformer extends Code12Program
                }
                else
                {
-                  ct.println("collison from top");
+                  //ct.println("collison from top");
                   return "top";
                }
             }
@@ -190,12 +232,11 @@ public class SimplePlatformer extends Code12Program
    {
       if ( onGround )
       {
-         ct.println("start the jump");
          playerRight.ySpeed = -6.0;
          playerLeft.ySpeed = -6.0;
 
-         playerRight.xSpeed = 0.5;
-         playerLeft.xSpeed = 0.5;
+         playerRight.xSpeed = 1.5;
+         playerLeft.xSpeed = 1.5;
 
          onGround = false;
       }
@@ -205,14 +246,48 @@ public class SimplePlatformer extends Code12Program
    {
       if ( playerRight.ySpeed < -3.0 || playerLeft.ySpeed < -3.0 )
       {
-         ct.println("end the jump");
          playerRight.ySpeed = -3.0;
          playerLeft.ySpeed = -3.0;
          playerRight.xSpeed = 0;
          playerLeft.xSpeed = 0;
       }  
    }
-  
+
+   public double doJump(double velocityY, double gameTime)
+   {
+      // If the player wants to jump
+      if (isJumping)
+      {
+         ct.println("test");
+         ct.println( "on ground = " + onGround);
+         // Begin or continue a jump
+         if (onGround || jumpTime > 0.0)
+         {
+            ct.println("test: jump should begin");
+            // test sound here
+            jumpTime += gameTime;
+         }
+
+         // If we are in the ascent of the jump
+         if (0.0 < jumpTime || jumpTime <= maxJumpTime)
+         {
+            ct.println("test2");
+            // Fully override the vertical velocity with a power curve that gives players more control over the top of the jump (If you dont want this you can remove the Math.Pow)
+            velocityY = jumpLaunchVelocity * (1.0 - (double)Math.Pow(jumpTime / maxJumpTime, JumpControlPower));
+         }
+         else
+            jumpTime = 0.0;   // Reached the apex of the jump
+      }
+      else
+      {
+         // Continues not jumping or cancels a jump in progress
+         jumpTime = 0.0;
+      }
+      
+      wasJumping = isJumping;
+      return velocityY;
+   }
+
 
    public void onKeyRelease( String keyName )
    {
@@ -227,13 +302,6 @@ public class SimplePlatformer extends Code12Program
          playerRight.xSpeed = 0;
          playerLeft.xSpeed  = 0;
       }
-
-      /*if ( keyName.equals("space"))
-      {
-         if ( playerRight.ySpeed < -6 )
-            playerRight.ySpeed = -6;
-      }*/
-
    }
 
 
@@ -245,6 +313,9 @@ public class SimplePlatformer extends Code12Program
          startJump();
          ct.sound("retro_jump.wav");
          endJump();
+         //isJumping = true;
+         //playerRight.ySpeed = doJump(playerRight.ySpeed, ct.getTimer() );
+
       }
 
       if ( keyName.equals("left") )

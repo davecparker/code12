@@ -102,6 +102,14 @@ require('Code12.api')
         this.medium.clickable = true
         this.large.clickable = true
         
+        local i = 2 + (3 * 4)
+        ct.println(i)
+        
+        local test = 2 * (2 + 3)
+        ct.println(test)
+        
+        local anotherTest = i * (1.0 - math.pow(test / i, test))
+        ct.println(anotherTest)
         
     end
     
@@ -327,11 +335,9 @@ function _fn.onMouseRelease(obj, x, y)
         elseif _fn.isValidMove(this.large) == false then
             
             ct.println("This should print if move for large is invalid")
-            --int poleFrom = poleFrom(large);
-            
-            
-            this.large.x = this.lastX
-            this.large.y = this.lastY
+            local poleFrom = _fn.poleFrom(this.large)
+            this.large.x = ct.indexArray(this.poles, poleFrom).x
+            this.large.y = ct.indexArray(this.poles, poleFrom).y
         end
     end
     

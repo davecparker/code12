@@ -102,6 +102,14 @@ public class Towers extends Code12Program
       medium.clickable = true;
       large.clickable = true;
 
+      double i = 2 + (3 * 4);
+      ct.println(i);
+
+      double test = 2 * (2+3);
+      ct.println(test);
+
+      double anotherTest = i * (1.0 - Math.pow(test / i, test));
+      ct.println(anotherTest);
 
    }
 
@@ -327,11 +335,9 @@ public class Towers extends Code12Program
          else if ( isValidMove(large) == false)
          {
             ct.println("This should print if move for large is invalid");
-            /*int poleFrom = poleFrom(large);
+            int poleFrom = poleFrom(large);
             large.x = poles[poleFrom].x;
-            large.y = poles[poleFrom].y;*/
-            large.x = lastX;
-            large.y = lastY;
+            large.y = poles[poleFrom].y;
          }
       }
 
