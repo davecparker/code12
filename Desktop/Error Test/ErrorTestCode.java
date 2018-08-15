@@ -1063,21 +1063,21 @@ class ErrorTest extends Code12Program
 		intArr.voidFunc();
 
 		String indent = "2 Tabs";
-		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+		// ERROR "Mix of tabs and spaces"
  		indent = "1 Space + 2 Tabs";
-		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+		// ERROR "Mix of tabs and spaces"
 		indent = "2 Tabs";
-		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+		// ERROR "Mix of tabs and spaces"
         indent = "8 Spaces";
-		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+		// ERROR "Mix of tabs and spaces"
 		indent = "2 Tabs";
 		if (true)
 			ct.println();
 			if (true)
 				ct.println();
-		// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+		// ERROR "Mix of tabs and spaces"
     	indent = "4 Spaces + 1 Tab";
-	// ERROR "Code12 doesn't allow mixing tabs and spaces for indentation"
+	// ERROR "Mix of tabs and spaces"
 	} // 1 Tab for indent
 
 	// ERROR "Return type of update function should be void"

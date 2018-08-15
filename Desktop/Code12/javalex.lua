@@ -90,8 +90,7 @@ local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
 local commentForLine    -- array of end-of-line comments indexed by line number
 local indentLevelForLine-- array of indent levels indexed by line number
-local colPrev           -- previous non-blank line's column count for indentation, assuming a tab size of 8
-local altColPrev        -- previous non-blank line's column count for indentation, assuming a tab size of 1
+local prevIndentStr     -- string containing indent characters of previous line of code
 
 ----- Token scanning functions ------------------------------------------------
 
@@ -105,11 +104,6 @@ local altColPrev        -- previous non-blank line's column count for indentatio
 -- and strErr plus any additional arguments for string.format( strErr, ... )
 local function setTokenErr( iCharFirst, iCharLast, strErr, ... )
 	err.setErrCharRange( lineNumber, iCharFirst, iCharLast, strErr, ... )
-end
-
--- Set the error state for inconsistent mixing of tabs and spaces for, and return nil.
-local function setTabErr( iCharLast )
-	setTokenErr( 1, iCharLast, "Code12 doesn't allow mixing tabs and spaces for indentation" )
 end
 
 -- Set the error state for an invalid character, and return nil.
@@ -464,7 +458,6 @@ function javalex.getTokens( sourceStr, lineNum )
 
 	-- Determine the indent level
 	local col = 0 -- number of spaces the line is indented, assuming a tab stop of 8
-	local altCol = 0 -- number of spaces the line is indented, assuming a tab stop of 1
 	local c = chars[iChar]
 	repeat 
 		if c == 32 then -- Space
@@ -474,7 +467,6 @@ function javalex.getTokens( sourceStr, lineNum )
 		else
 			break
 		end
-		altCol = altCol + 1
 		iChar = iChar + 1
 		c = chars[iChar]
 	until false -- breaks internally when chars[iChar] is not a space or tab (c ~= 32 and c ~= 9)
@@ -498,7 +490,7 @@ function javalex.getTokens( sourceStr, lineNum )
 		if len == prevLen and indentStr ~= prevIndentStr
 				or len > prevLen and string.sub(indentStr, 1, prevLen) ~= prevIndentStr
 				or len < prevLen and string.sub(prevIndentStr, 1, len) ~= indentStr then
-			setTabErr( iChar - 1 )
+			setTokenErr( 1, iChar - 1, "Mix of tabs and spaces used for indentation in not consistent with the previous line of code" )
 		end
 		-- Update prevIndentStr
 		prevIndentStr = indentStr
