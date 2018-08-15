@@ -578,7 +578,7 @@ function javalex.commentForLine( lineNum )
 end
 
 -- Return the indent level of the given line number in number of spaces,
--- Assuming a tab stop of 4 spaces
+-- assuming a tab stop of 8 spaces
 function javalex.indentLevelForLine( lineNum )
 	return indentLevelForLine[lineNum]
 end
