@@ -28,7 +28,7 @@ local parseProgram = {}
 -- param: { s = "param", typeID, nameID, isArray }
 --
 -- stmt:
---     { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal = true, initExpr }
+--     { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal, initExpr }
 --     { s = "call", iLine, lValue, exprs }
 --     { s = "assign", iLine, lValue, op, expr }     -- op.tt: =, +=, -=, *=, /=, ++, --
 --     { s = "if", iLine, expr, stmts, elseStmts }
@@ -46,7 +46,7 @@ local parseProgram = {}
 --     { s = "call", lValue, exprs }
 --     { s = "lValue", lValue }
 --     { s = "parens", expr }
---     { s = "unaryOp", op, expr }                -- op.tt: -, !
+--     { s = "unaryOp", op, expr }         -- op.tt: -, !
 --     { s = "binOp", left, op, right }    -- op.tt: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
 --     { s = "newArray", typeID, lengthExpr }
 --     { s = "arrayInit", exprs }
@@ -362,14 +362,13 @@ end
 -- Add the stmts to the stmts array. Return true if successful.
 -- If there is an error then set the error state and return false.
 function getLineStmts( tree, stmts )	
-	assert( tree.t == "line" )
-	local p = tree.p
-	local nodes = tree.nodes
-
 	-- Fail on syntax errors
 	if tree.isError then
 		return false
 	end
+	assert( tree.t == "line" )
+	local p = tree.p
+	local nodes = tree.nodes
 
 	-- Look for var decls
 	if getVar( p, nodes, stmts, true ) then
@@ -453,22 +452,20 @@ function getBlockStmts()
 	if not checkBlockBegin() then
 		return false
 	end
-	local braceLevel = 1
 
 	-- Get all lines until we get a matching end for the block begin
 	local stmts = {}
 	while iTree <= numParseTrees do
 		local tree = parseTrees[iTree]
 		local p = tree.p
-		iTree = iTree + 1
+		iTree = iTree + 1    -- pass this line
 
 		if p == "begin" then
-			braceLevel = braceLevel + 1
+			-- Ad-hoc blocks are not supported
+			err.setErrLineNum( tree.iLine, "Unexpected {" )
+			return nil
 		elseif p == "end" then
-			braceLevel = braceLevel - 1
-			if braceLevel == 0 then
-				return stmts
-			end
+			return stmts   -- this ends our block
 		else
 			getLineStmts( tree, stmts )
 		end

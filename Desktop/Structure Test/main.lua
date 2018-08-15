@@ -84,11 +84,11 @@ require('Code12.api')
         
         -- if (obj != null)
         -- {
-        --     obj.xSpeed = .1;
-        --     ct.println( obj.toString() + " was clicked" );
+        -- 	obj.xSpeed = .1;
+        -- 	ct.println( obj.toString() + " was clicked" );
         -- }
         -- else
-        --     ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
+        -- 	ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
     end
     
     -- Move the ball
