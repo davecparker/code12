@@ -15,7 +15,7 @@ local json = require( "json" )
 local g = require( "Code12.globals" )
 local app = require( "app" )
 local env = require( "env" )
-local parseJava = require( "parseJava" )
+local parseProgram = require( "parseProgram" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
 local err = require( "err" )
@@ -62,11 +62,6 @@ local function runLuaCode( luaCode )
 	end
 end
 
--- Return a detabbed version of str using the given tabWidth
-local function detabString( str )
-	return string.gsub( str, "\t", "    " )   -- TODO (temp)
-end
-
 -- Read the sourceFile and store all of its source lines.
 -- Return true if success.
 local function readSourceFile()
@@ -81,7 +76,7 @@ local function readSourceFile()
 				if s == nil then 
 					break  -- end of file
 				end
-				sourceFile.strLines[lineNum] = detabString(s)
+				sourceFile.strLines[lineNum] = s
 				lineNum = lineNum + 1
 			until false -- breaks internally
 			io.close( file )
@@ -181,34 +176,22 @@ function app.processUserFile()
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
-	local parseTrees = {}
-	local startTokens = nil
-	parseJava.init()
-	for lineNum = 1, #sourceFile.strLines do
-		local strUserCode = sourceFile.strLines[lineNum]
-		local tree, tokens = parseJava.parseLine( strUserCode, 
-									lineNum, startTokens, app.syntaxLevel )
-		if tree == false then
-			-- Line is incomplete, carry tokens forward to next line
-			startTokens = tokens
-		else
-			startTokens = nil
-			if tree == nil then
-				composer.gotoScene( "errView" )
-				return
-			end
-			parseTrees[#parseTrees + 1] = tree
-		end
+	local programTree, parseTrees = parseProgram.getProgramTree( 
+								sourceFile.strLines, app.syntaxLevel )
+	if parseTrees == nil then
+		composer.gotoScene( "errView" )
+		return
 	end
 	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
 	-- Do Semantic Analysis on the parse trees
-	if not checkJava.initProgram( parseTrees, app.syntaxLevel ) then
+	checkJava.initProgram( parseTrees, app.syntaxLevel )
+	if err.rec then
 		composer.gotoScene( "errView" )
 	else
 		-- Make and run the Lua code
 		local codeStr = codeGenJava.getLuaCode( parseTrees )
-		if err.hasErr() then
+		if err.rec then
 			composer.gotoScene( "errView" )
 		else
 			writeLuaCode( codeStr )
@@ -267,29 +250,28 @@ local function loadSettings()
 	-- Read the settings file
 	local file = io.open( settingsFilePath(), "r" )
 	if file then
-		local str = file:read( "*a" )	-- Read entile file as a string (JSON encoded)
+		local str = file:read( "*a" )	-- Read entire file as a string (JSON encoded)
 		io.close( file )
 		if str then
 			local t = json.decode( str )
 			if t then
-				-- Clear the recentPath if it doesn't exist anymore
-				file = io.open( t.recentPath, "r" )
-				if file then
-					userSettings.recentPath = t.recentPath
-					io.close( file )
-				else
-					userSettings.recentPath = nil
+				-- Restore last used source file by default
+				if t.recentPath then
+					-- Use the recentPath only if the file still exists
+					file = io.open( t.recentPath, "r" )
+					if file then
+						io.close( file )
+						userSettings.recentPath = t.recentPath
+						sourceFile.path = userSettings.recentPath
+					end
 				end
-				sourceFile.path = userSettings.recentPath
 
-				-- Make sure the syntaxLevel is valid
+				-- Use the saved syntaxLevel if valid
 				local level = t.syntaxLevel
 				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
 					userSettings.syntaxLevel = level
-				else
-					userSettings.syntaxLevel = app.numSyntaxLevels
+					app.syntaxLevel = userSettings.syntaxLevel
 				end
-				app.syntaxLevel = userSettings.syntaxLevel
 			end
 		end
 	end

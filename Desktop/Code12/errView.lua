@@ -20,11 +20,14 @@ local err = require( "err" )
 local errView = composer.newScene()
 
 -- UI metrics
+local dxChar = app.consoleFontCharWidth
+local dxExtra = 2   -- extra pixels of highlight horizontally
 local dyDocsToolbar = 24       -- height of toolbar for the docsWebView
 
 -- Display objects and groups
 local errGroup                 -- display group for error display
 local highlightGroup           -- display group for highlight rects
+local lineNumRect              -- line number highlight
 local refRect                  -- reference highlight
 local sourceRect               -- main source highlight
 local lineNumGroup             -- display group for line numbers
@@ -61,7 +64,6 @@ local function makeErrDisplay( sceneGroup )
 
 	-- Layout metrics
 	local margin = app.margin
-	local dxChar = app.consoleFontCharWidth
 	local dxLineNum = math.round( dxChar * 6 )
 	local xText = math.round( dxLineNum + dxChar )
 	local dyLine = app.consoleFontHeight
@@ -74,7 +76,8 @@ local function makeErrDisplay( sceneGroup )
 	-- Make the highlight rectangles
 	highlightGroup = g.makeGroup( errGroup, xText, margin )
 	local y = ((numSourceLines - 1) / 2) * dyLine
-	makeHilightRect( -xText, y, dxLineNum, dyLine )   -- line number highlight
+	lineNumRect = makeHilightRect( -dxChar, y, dxLineNum, dyLine )
+	lineNumRect.anchorX = 1
 	refRect = makeHilightRect( dxChar * 5, y, 
 							dxChar * 6, dyLine, true )
 	sourceRect = makeHilightRect( 0, y, dxChar * 4, dyLine )
@@ -86,7 +89,7 @@ local function makeErrDisplay( sceneGroup )
 			parent = lineNumGroup,
 			text = "", 
 			x = dxLineNum, 
-			y = (i - 1) * dyLine,
+			y = math.round( (i - 1) * dyLine ),
 			font = app.consoleFont, 
 			fontSize = app.consoleFontSize,
 			align = "right",
@@ -103,7 +106,7 @@ local function makeErrDisplay( sceneGroup )
 			parent = sourceGroup,
 			text = "", 
 			x = 0, 
-			y = (i - 1) * dyLine,
+			y = math.round( (i - 1) * dyLine ),
 			font = app.consoleFont, 
 			fontSize = app.consoleFontSize,
 			align = "left",
@@ -124,7 +127,6 @@ local function makeErrDisplay( sceneGroup )
 	} )
 
 	-- Position the docs toolbar
-	print(errText.height)
 	-- Can't use errText.height: doesn't work when it wraps :(
 	docsToolbarGroup.y = errGroup.y + errText.y + dyLine * 2 + margin
 	moreInfoBtn.x = app.width - app.margin
@@ -135,16 +137,46 @@ local function makeErrDisplay( sceneGroup )
 	docsWebView.height = app.height - docsWebView.y - app.dyStatusBar - 1
 end
 
+-- Set the x, width, and height of a highlight rect given an err loc
+local function setHighlightRectFromLoc( r, loc )
+	-- There are 3 cases: multi-line, whole line, or partial line
+	r.x = -dxExtra   -- default for whole and multi-line cases
+	r.height = app.consoleFontHeight  -- default for single line cases
+	local iLine = loc.iLine
+	local sourceLines = app.sourceFile.strLines
+	local numCols = 0
+	if loc.iLineEnd and loc.iLineEnd > iLine then
+		-- Multi-line. Make a rectangle bounding all the lines.
+		r.height = 0
+		for i = iLine, loc.iLineEnd do
+			local cols = string.len( app.detabLine( sourceLines[i] or "" ) )
+			numCols = math.max( numCols, cols )
+			r.height = r.height + app.consoleFontHeight
+		end
+	elseif loc.iCharStart then
+		-- Partial line
+		local _, iColStart, iColEnd = app.detabLine(
+				sourceLines[iLine] or "", loc.iCharStart, loc.iCharEnd )
+		r.x = (iColStart - 1) * dxChar - dxExtra
+		numCols = iColEnd - iColStart + 1
+	else
+		-- Whole line
+		numCols = string.len( app.detabLine( sourceLines[iLine] or "" ) )
+	end
+	r.width = math.max( numCols, 1 ) * dxChar + dxExtra * 2
+end
+
 -- Show the error state
 local function showError()
 	-- Set the error text
-	assert( err.hasErr() )
-	local errRecord = err.getErrRecord()
+	assert( err.rec )
+	local errRecord = err.rec
 	print( "\n" .. errRecord.strErr )
 	errText.text = errRecord.strErr
 
 	-- Load the source lines around the error
-	local iLine = errRecord.loc.first.iLine   -- main error location
+	local loc = errRecord.loc
+	local iLine = loc.iLine   -- main error location
 	local numLines = lineNumGroup.numChildren
 	local before = (numLines - 1) / 2
 	local lineNumFirst = iLine - before
@@ -152,51 +184,30 @@ local function showError()
 	local lineNum = lineNumFirst
 	local sourceLines = app.sourceFile.strLines
 	for i = 1, numLines do 
-		if lineNum < 1 or lineNum > #sourceLines then
+		if lineNum < 1 or lineNum > #sourceLines + 1 then
 			lineNumGroup[i].text = ""
-			sourceGroup[i].text = ""
 		else
 			lineNumGroup[i].text = tostring( lineNum )
-			sourceGroup[i].text = sourceLines[lineNum]
 		end
+		sourceGroup[i].text = app.detabLine( sourceLines[lineNum] or "" )
 		lineNum = lineNum + 1
 	end
 
-	-- Position the main highlight
-	local dxChar = app.consoleFontCharWidth
-	local dxExtra = 2   -- extra pixels of highlight horizontally
-	local loc = errRecord.loc
-	sourceRect.x = (loc.first.iChar - 1) * dxChar - dxExtra
-	sourceRect.height = app.consoleFontHeight
-	local numChars = string.len( sourceLines[loc.first.iLine] or "" )
-	if loc.last ~= nil then  -- otherwise whole line as set above
-		if loc.first.iLine == loc.last.iLine then
-			-- Portion of a single line
-			numChars = loc.last.iChar - loc.first.iChar + 1
-		else
-			-- Multi-line. Make a rectangle bounding it all. 
-			-- TODO: Is this good enough or do we need multiple rects?
-			sourceRect.x = 0
-			for iLineNext = loc.first.iLine + 1, loc.last.iLine do
-				local numCharsNext = string.len( sourceLines[iLineNext] or "" )
-				if numCharsNext > numChars then
-					numChars = numCharsNext
-				end
-				sourceRect.height = sourceRect.height + app.consoleFontHeight
-			end
-		end
-	end
-	sourceRect.width = numChars * dxChar + dxExtra * 2
+	-- Size the line number highlight
+	lineNumRect.width = (string.len( tostring( iLine ) ) + 1) * dxChar + dxExtra
 
-	-- Position the ref highlight if it's showing  TODO: two line groups if necc
+	-- Position the main highlight.
+	setHighlightRectFromLoc( sourceRect, loc )
+
+	-- Position the ref highlight if it's showing  
+	-- TODO: Make two line groups if necc
 	refRect.isVisible = false
-	if errRecord.refLoc then
-		local iLineRef = errRecord.refLoc.first.iLine
+	local refLoc = errRecord.refLoc
+	if refLoc then
+		local iLineRef = refLoc.iLine
 		if iLineRef >= lineNumFirst and iLineRef <= lineNumLast then
+			setHighlightRectFromLoc( refRect, refLoc )
 			refRect.y = (iLineRef - lineNumFirst) * app.consoleFontHeight
-			refRect.x = (errRecord.refLoc.first.iChar - 1) * dxChar - dxExtra
-			numChars = errRecord.refLoc.last.iChar - errRecord.refLoc.first.iChar + 1
-			refRect.width = numChars * dxChar + dxExtra * 2
 			refRect.isVisible = true
 		end
 	end
@@ -349,7 +360,7 @@ end
 -- Window resize handler
 function errView:resize()
 	-- Remake the error display, if any
-	if err.hasErr() then
+	if err.rec then
 		displayError( self.view )
 	end
 end

@@ -1,0 +1,2555 @@
+    program ErrorTest { #funcs = 14, #vars = 2 }
+        funcs:
+ 11.        func emptyFunc { #stmts = 0, #params = 0 }
+ 14.        func voidFunc { #stmts = 1, #params = 0 }
+                stmts:
+ 16.                var i { typeID = int, isLocal = true }
+                        initExpr: literal { token = 0 }
+ 18.        func intFunc { typeID = int, #stmts = 2, #params = 0 }
+                stmts:
+ 20.                var i { typeID = int, isLocal = true }
+                        initExpr: literal { token = 1 }
+ 21.                return
+                        expr: lValue { varID = i }
+ 23.        func dblFunc { typeID = double, #stmts = 2, #params = 0 }
+                stmts:
+ 25.                var d { typeID = double, isLocal = true }
+                        initExpr: literal { token = 0.0 }
+ 26.                return
+                        expr: lValue { varID = d }
+ 28.        func boolFunc { typeID = boolean, #stmts = 2, #params = 0 }
+                stmts:
+ 30.                var b { typeID = boolean, isLocal = true }
+                        initExpr: literal { token = true }
+ 31.                return
+                        expr: lValue { varID = b }
+ 33.        func strFunc { typeID = String, #stmts = 2, #params = 0 }
+                stmts:
+ 35.                var s { typeID = String, isLocal = true }
+                        initExpr: literal { token = "" }
+ 36.                return
+                        expr: lValue { varID = s }
+ 38.        func gObjFunc { typeID = GameObj, #stmts = 1, #params = 0 }
+                stmts:
+ 40.                return
+                        expr: call { #exprs = 3 }
+                            lValue: lValue { varID = ct, fieldID = circle }
+                            exprs:
+                                literal { token = 0.0 }
+                                literal { token = 0.0 }
+                                literal { token = 1.0 }
+ 42.        func intArrFuncInt { typeID = int, #stmts = 1, isArray = true, #params = 1 }
+                stmts:
+ 44.                return
+                        expr: newArray { typeID = int }
+                            lengthExpr: lValue { varID = n }
+                params:
+                    param n { typeID = int }
+ 46.        func intFuncInt { typeID = int, #stmts = 1, #params = 1 }
+                stmts:
+ 48.                return
+                        expr: (+)
+                            right: literal { token = 1 }
+                            left: (*)
+                                right: literal { token = 2 }
+                                left: lValue { varID = i }
+                params:
+                    param i { typeID = int }
+ 50.        func dblFuncIntDbl { typeID = double, #stmts = 1, #params = 2 }
+                stmts:
+ 52.                return
+                        expr: (+)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+                params:
+                    param i { typeID = int }
+                    param d { typeID = double }
+ 54.        func boolFuncBoolStringGameObj { typeID = boolean, #stmts = 1, #params = 3 }
+                stmts:
+ 56.                return
+                        expr: (&&)
+                            right: lValue { varID = g, fieldID = visible }
+                            left: (&&)
+                                right: call { #exprs = 1 }
+                                    lValue: lValue { varID = s, fieldID = equals }
+                                    exprs:
+                                        literal { token = "" }
+                                left: lValue { varID = b }
+                params:
+                    param b { typeID = boolean }
+                    param s { typeID = String }
+                    param g { typeID = GameObj }
+ 58.        func recursiveFunc { typeID = int, #stmts = 2, #params = 1 }
+                stmts:
+ 60.                if { #stmts = 1 }
+                        expr: (<=)
+                            right: literal { token = 0 }
+                            left: lValue { varID = i }
+                        stmts:
+ 61.                        return
+                                expr: literal { token = 0 }
+ 62.                return
+                        expr: (+)
+                            right: call { #exprs = 1 }
+                                lValue: lValue { varID = recursiveFunc }
+                                exprs:
+                                    (-)
+                                        right: literal { token = 1 }
+                                        left: lValue { varID = i }
+                            left: literal { token = 1 }
+                params:
+                    param i { typeID = int }
+ 67.        func start { typeID = int, #stmts = 402, isPublic = true, #params = 0 }
+                stmts:
+ 72.                var i { typeID = int, isLocal = true }
+                        initExpr: literal { token = 3 }
+ 73.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: unaryOp (-)
+                            expr: literal { token = 5 }
+ 74.                assign (++)
+                        lValue: lValue { varID = i }
+ 75.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (+)
+                            right: literal { token = 1 }
+                            left: lValue { varID = i }
+ 76.                assign (+=)
+                        lValue: lValue { varID = i }
+                        expr: literal { token = 1 }
+ 77.                assign (-=)
+                        lValue: lValue { varID = i }
+                        expr: literal { token = 2 }
+ 78.                assign (*=)
+                        lValue: lValue { varID = i }
+                        expr: literal { token = 3 }
+ 79.                assign (/=)
+                        lValue: lValue { varID = i }
+                        expr: literal { token = 4 }
+ 80.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call
+                            lValue: lValue { varID = intFunc }
+ 81.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = intFuncInt }
+                            exprs:
+                                (-)
+                                    right: (*)
+                                        right: lValue { varID = i }
+                                        left: literal { token = 345 }
+                                    left: (-)
+                                        right: parens
+                                            expr: (+)
+                                                right: lValue { varID = i }
+                                                left: lValue { varID = i }
+                                        left: lValue { varID = i }
+ 82.                var foo { typeID = int, isLocal = true }
+                        initExpr: (+)
+                            right: literal { token = 4 }
+                            left: lValue { varID = i }
+ 83.                var score { typeID = int, isLocal = true }
+                        initExpr: literal { token = 500 }
+ 84.                var j { typeID = int, isLocal = true }
+ 84.                var k { typeID = int, isLocal = true }
+ 85.                var exponentialNumberNoDot { typeID = double, isLocal = true }
+                        initExpr: literal { token = 12e10 }
+ 86.                var exponentialNumberWithDot { typeID = double, isLocal = true }
+                        initExpr: literal { token = 3.42e2 }
+ 87.                var expontialNumberWithDecimalPlaces { typeID = double, isLocal = true }
+                        initExpr: literal { token = 6.62e-34 }
+ 88.                var d { typeID = double, isLocal = true }
+                        initExpr: literal { token = 3.14 }
+ 89.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = 100 }
+ 90.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = .5 }
+ 91.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = 1.2345e6 }
+ 92.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = 1.2345e+67 }
+ 93.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = .12e0 }
+ 94.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: unaryOp (-)
+                            expr: literal { token = .123e-456 }
+ 95.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: unaryOp (-)
+                            expr: literal { token = .5 }
+ 96.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (/)
+                            right: literal { token = 2 }
+                            left: lValue { varID = d }
+ 97.                assign (++)
+                        lValue: lValue { varID = d }
+ 98.                assign (+=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = 0.5 }
+ 99.                assign (-=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = 7 }
+100.                assign (*=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = 8 }
+101.                assign (/=)
+                        lValue: lValue { varID = d }
+                        expr: literal { token = 8.0 }
+102.                var d2 { typeID = double, isLocal = true }
+                        initExpr: literal { token = 3 }
+103.                var d3 { typeID = double, isLocal = true }
+                        initExpr: (+)
+                            right: (*)
+                                right: parens
+                                    expr: (+)
+                                        right: lValue { varID = d }
+                                        left: lValue { varID = d2 }
+                                left: literal { token = 2 }
+                            left: lValue { varID = d }
+104.                var x1 { typeID = double, isLocal = true }
+104.                var x2 { typeID = double, isLocal = true }
+104.                var y1 { typeID = double, isLocal = true }
+104.                var y2 { typeID = double, isLocal = true }
+105.                assign (=)
+                        lValue: lValue { varID = x1 }
+                        expr: literal { token = 1 }
+106.                assign (=)
+                        lValue: lValue { varID = x2 }
+                        expr: literal { token = 2.0 }
+107.                assign (=)
+                        lValue: lValue { varID = y1 }
+                        expr: literal { token = .5e+1 }
+108.                assign (=)
+                        lValue: lValue { varID = y2 }
+                        expr: unaryOp (-)
+                            expr: literal { token = .5e-1 }
+109.                var eps { typeID = double, isLocal = true }
+                        initExpr: literal { token = 1e-4 }
+110.                var name { typeID = String, isLocal = true }
+                        initExpr: literal { token = "Einstein" }
+111.                var b { typeID = boolean, isLocal = true }
+                        initExpr: literal { token = true }
+112.                var b2 { typeID = boolean, isLocal = true }
+                        initExpr: literal { token = false }
+113.                var b3 { typeID = boolean, isLocal = true }
+                        initExpr: (||)
+                            right: lValue { varID = b2 }
+                            left: lValue { varID = b }
+114.                var s { typeID = String, isLocal = true }
+                        initExpr: literal { token = "A string variable" }
+115.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: lValue { varID = s }
+116.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: literal { token = null }
+119.                var colors { typeID = String, isArray = true, isLocal = true }
+                        initExpr: arrayInit { #exprs = 5 }
+                            exprs:
+                                literal { token = "black" }
+                                literal { token = "white" }
+                                literal { token = "red" }
+                                literal { token = "green" }
+                                literal { token = "blue" }
+120.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: literal { token = 100 }
+121.                var strArr { typeID = String, isArray = true, isLocal = true }
+                        initExpr: newArray { typeID = String }
+                            lengthExpr: lValue { varID = i }
+122.                assign (=)
+                        lValue: lValue { varID = strArr }
+                        expr: lValue { varID = colors }
+123.                var intArr { typeID = int, isArray = true, isLocal = true }
+                        initExpr: arrayInit { #exprs = 3 }
+                            exprs:
+                                literal { token = 1 }
+                                literal { token = 2 }
+                                literal { token = 3 }
+124.                assign (=)
+                        lValue: lValue { varID = intArr }
+                        expr: newArray { typeID = int }
+                            lengthExpr: literal { token = 100 }
+125.                var intArr2 { typeID = int, isArray = true, isLocal = true }
+                        initExpr: newArray { typeID = int }
+                            lengthExpr: call
+                                lValue: lValue { varID = s, fieldID = length }
+126.                assign (=)
+                        lValue: lValue { varID = intArr }
+                        expr: lValue { varID = intArr2 }
+127.                var dblArr { typeID = double, isArray = true, isLocal = true }
+                        initExpr: arrayInit { #exprs = 3 }
+                            exprs:
+                                literal { token = 1.1 }
+                                literal { token = 2.2 }
+                                literal { token = 3.3 }
+128.                var dblArr2 { typeID = double, isArray = true, isLocal = true }
+                        initExpr: newArray { typeID = double }
+                            lengthExpr: literal { token = 100 }
+129.                assign (=)
+                        lValue: lValue { varID = dblArr }
+                        expr: lValue { varID = dblArr2 }
+130.                var gObjArr { typeID = GameObj, isArray = true, isLocal = true }
+                        initExpr: newArray { typeID = GameObj }
+                            lengthExpr: (*)
+                                right: literal { token = 2 }
+                                left: lValue { varID = i }
+133.                call
+                        lValue: lValue { varID = voidFunc }
+134.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call
+                            lValue: lValue { varID = intFunc }
+135.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call
+                            lValue: lValue { varID = dblFunc }
+136.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call
+                            lValue: lValue { varID = boolFunc }
+137.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call
+                            lValue: lValue { varID = strFunc }
+138.                var gObj { typeID = GameObj, isLocal = true }
+                        initExpr: call
+                            lValue: lValue { varID = gObjFunc }
+139.                assign (=)
+                        lValue: lValue { varID = intArr }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = intArrFuncInt }
+                            exprs:
+                                lValue { varID = i }
+140.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = intFuncInt }
+                            exprs:
+                                lValue { varID = i }
+141.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = dblFuncIntDbl }
+                            exprs:
+                                lValue { varID = i }
+                                lValue { varID = d }
+142.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 3 }
+                            lValue: lValue { varID = boolFuncBoolStringGameObj }
+                            exprs:
+                                lValue { varID = b }
+                                lValue { varID = s }
+                                lValue { varID = gObj }
+143.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = recursiveFunc }
+                            exprs:
+                                literal { token = 2 }
+146.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (/)
+                            right: literal { token = 1 }
+                            left: literal { token = 5 }
+147.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (/)
+                            right: literal { token = 20 }
+                            left: literal { token = 100 }
+148.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (+)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+149.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (-)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+150.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (*)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+151.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (%)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+152.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (-)
+                            right: lValue { varID = i }
+                            left: (+)
+                                right: lValue { varID = i }
+                                left: (*)
+                                    right: lValue { varID = i }
+                                    left: lValue { varID = i }
+153.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (*)
+                            right: parens
+                                expr: (-)
+                                    right: lValue { varID = i }
+                                    left: parens
+                                        expr: (+)
+                                            right: lValue { varID = i }
+                                            left: lValue { varID = i }
+                            left: lValue { varID = i }
+154.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: lValue { varID = i }
+155.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (+)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+156.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (-)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+157.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (*)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+158.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (/)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+159.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (%)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+160.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (+)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+161.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (-)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+162.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (*)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+163.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (/)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+164.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (%)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+165.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (+)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+166.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (-)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+167.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (*)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+168.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (/)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+169.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (%)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+170.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (+)
+                            right: (*)
+                                right: lValue { varID = i }
+                                left: lValue { varID = i }
+                            left: (-)
+                                right: lValue { varID = i }
+                                left: lValue { varID = i }
+171.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (-)
+                            right: lValue { varID = i }
+                            left: (+)
+                                right: (*)
+                                    right: lValue { varID = i }
+                                    left: lValue { varID = i }
+                                left: lValue { varID = d }
+172.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (-)
+                            right: (*)
+                                right: lValue { varID = d }
+                                left: lValue { varID = d }
+                            left: (*)
+                                right: lValue { varID = i }
+                                left: lValue { varID = i }
+173.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: parens
+                            expr: (-)
+                                right: (*)
+                                    right: lValue { varID = d }
+                                    left: lValue { varID = d }
+                                left: (*)
+                                    right: parens
+                                        expr: lValue { varID = i }
+                                    left: lValue { varID = i }
+174.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = s }
+                            left: lValue { varID = s }
+175.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: literal { token = "s" }
+                            left: (+)
+                                right: lValue { varID = s }
+                                left: lValue { varID = s }
+176.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = i }
+                            left: lValue { varID = s }
+177.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = d }
+                            left: lValue { varID = s }
+178.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = b }
+                            left: lValue { varID = s }
+179.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = gObj }
+                            left: lValue { varID = s }
+180.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = s }
+                            left: lValue { varID = i }
+181.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = s }
+                            left: lValue { varID = d }
+182.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = s }
+                            left: lValue { varID = b }
+183.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: lValue { varID = s }
+                            left: lValue { varID = gObj }
+184.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: lValue { varID = b }
+185.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: unaryOp (!)
+                            expr: lValue { varID = b }
+186.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: parens
+                            expr: lValue { varID = b }
+187.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (==)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+188.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (==)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+189.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (==)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+190.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (==)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+191.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (==)
+                            right: lValue { varID = b }
+                            left: lValue { varID = b }
+192.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (==)
+                            right: lValue { varID = gObj }
+                            left: lValue { varID = gObj }
+193.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (!=)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+194.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (!=)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+195.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (!=)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+196.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (!=)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+197.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (!=)
+                            right: lValue { varID = b }
+                            left: lValue { varID = b }
+198.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (!=)
+                            right: lValue { varID = gObj }
+                            left: lValue { varID = gObj }
+199.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+200.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+201.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<=)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+202.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>=)
+                            right: lValue { varID = i }
+                            left: lValue { varID = i }
+203.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+204.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+205.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<=)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+206.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>=)
+                            right: lValue { varID = d }
+                            left: lValue { varID = i }
+207.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+208.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+209.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<=)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+210.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>=)
+                            right: lValue { varID = i }
+                            left: lValue { varID = d }
+211.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+212.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+213.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<=)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+214.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>=)
+                            right: lValue { varID = d }
+                            left: lValue { varID = d }
+215.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (||)
+                            right: lValue { varID = b }
+                            left: lValue { varID = b }
+216.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (&&)
+                            right: lValue { varID = b }
+                            left: lValue { varID = b }
+217.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<)
+                            right: literal { token = 2 }
+                            left: literal { token = 1 }
+218.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (<=)
+                            right: literal { token = 2 }
+                            left: literal { token = 1.1 }
+219.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>)
+                            right: literal { token = 2 }
+                            left: literal { token = 1 }
+220.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (>=)
+                            right: literal { token = 2.2 }
+                            left: literal { token = 1 }
+221.                assign (=)
+                        lValue: lValue { varID = b2 }
+                        expr: (||)
+                            right: (&&)
+                                right: (==)
+                                    right: lValue { varID = b }
+                                    left: lValue { varID = b }
+                                left: lValue { varID = b3 }
+                            left: lValue { varID = b2 }
+222.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (==)
+                            right: literal { token = 0 }
+                            left: (%)
+                                right: literal { token = 2 }
+                                left: lValue { varID = i }
+223.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (&&)
+                            right: lValue { varID = b }
+                            left: parens
+                                expr: (||)
+                                    right: lValue { varID = b }
+                                    left: lValue { varID = b }
+224.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: (&&)
+                            right: parens
+                                expr: (<)
+                                    right: literal { token = 0.0001 }
+                                    left: (-)
+                                        right: literal { token = 3.14159 }
+                                        left: lValue { varID = Math, fieldID = PI }
+                            left: parens
+                                expr: (==)
+                                    right: literal { token = 2 }
+                                    left: (+)
+                                        right: literal { token = 1 }
+                                        left: literal { token = 1 }
+227.                if { #elseStmts = 1, #stmts = 1 }
+                        expr: (==)
+                            right: literal { token = 0 }
+                            left: lValue { varID = i }
+                        elseStmts:
+                            if { #elseStmts = 1, #stmts = 1 }
+                                expr: (<=)
+                                    right: literal { token = 10 }
+                                    left: lValue { varID = i }
+                                elseStmts:
+232.                                assign (*=)
+                                        lValue: lValue { varID = i }
+                                        expr: literal { token = 5 }
+                                stmts:
+230.                                assign (++)
+                                        lValue: lValue { varID = i }
+                        stmts:
+228.                        call { #exprs = 1 }
+                                lValue: lValue { varID = ct, fieldID = setBackColor }
+                                exprs:
+                                    lValue { varID = colors }
+                                        indexExpr: lValue { varID = i }
+234.                if { #elseStmts = 1, #stmts = 2 }
+                        expr: (>)
+                            right: literal { token = 0 }
+                            left: lValue { varID = i }
+                        elseStmts:
+                            if { #elseStmts = 1, #stmts = 2 }
+                                expr: (<=)
+                                    right: literal { token = 10 }
+                                    left: lValue { varID = i }
+                                elseStmts:
+                                    if { #elseStmts = 2, #stmts = 1 }
+                                        expr: lValue { varID = b }
+                                        elseStmts:
+248.                                        var tempStr { typeID = String, isLocal = true }
+                                                initExpr: literal { token = "I'll be " }
+249.                                        assign (=)
+                                                lValue: lValue { varID = tempStr }
+                                                expr: (+)
+                                                    right: literal { token = "out of scope soon" }
+                                                    left: lValue { varID = tempStr }
+                                        stmts:
+245.                                        assign (++)
+                                                lValue: lValue { varID = i }
+                                stmts:
+241.                                assign (=)
+                                        lValue: lValue { varID = d }
+                                        expr: literal { token = 7 }
+242.                                call { #exprs = 1 }
+                                        lValue: lValue { varID = ct, fieldID = setSoundVolume }
+                                        exprs:
+                                            literal { token = 1 }
+                        stmts:
+236.                        assign (=)
+                                lValue: lValue { varID = j }
+                                expr: literal { token = 0 }
+237.                        assign (=)
+                                lValue: lValue { varID = k }
+                                expr: literal { token = 0 }
+251.                if { #stmts = 1 }
+                        expr: (&&)
+                            right: (<=)
+                                right: lValue { varID = eps }
+                                left: call { #exprs = 4 }
+                                    lValue: lValue { varID = ct, fieldID = distance }
+                                    exprs:
+                                        lValue { varID = x1 }
+                                        lValue { varID = y1 }
+                                        lValue { varID = x2 }
+                                        lValue { varID = y2 }
+                            left: call { #exprs = 1 }
+                                lValue: lValue { varID = ct, fieldID = isError }
+                                exprs:
+                                    call { #exprs = 1 }
+                                        lValue: lValue { varID = Math, fieldID = tan }
+                                        exprs:
+                                            lValue { varID = d }
+                        stmts:
+252.                        call { #exprs = 1 }
+                                lValue: lValue { varID = ct, fieldID = println }
+                                exprs:
+                                    literal { token = "oops" }
+255.                for { #stmts = 1 }
+                        expr: literal { token = false }
+                        stmts:
+256.                        for { #stmts = 1 }
+                                stmts:
+257.                                for { #stmts = 1 }
+                                        initStmt: assign (=)
+                                            lValue: lValue { varID = i }
+                                            expr: literal { token = 0 }
+                                        stmts:
+258.                                        for { #stmts = 1 }
+                                                expr: (<)
+                                                    right: literal { token = 10 }
+                                                    left: lValue { varID = i }
+                                                stmts:
+259.                                                for { #stmts = 1 }
+                                                        nextStmt: assign (++)
+                                                            lValue: lValue { varID = i }
+                                                        stmts:
+260.                                                        for { #stmts = 1 }
+                                                                expr: lValue { varID = b }
+                                                                stmts:
+261.                                                                assign (=)
+                                                                        lValue: lValue { varID = d }
+                                                                        expr: literal { token = 0 }
+263.                for { #stmts = 2 }
+                        expr: (<)
+                            right: literal { token = 10 }
+                            left: lValue { varID = ii }
+263.                    initStmt: var ii { typeID = int, isLocal = true }
+                            initExpr: literal { token = 0 }
+                        nextStmt: assign (++)
+                            lValue: lValue { varID = ii }
+                        stmts:
+265.                        for { #stmts = 1 }
+                                expr: (!=)
+                                    right: literal { token = 10 }
+                                    left: lValue { varID = jj }
+265.                            initStmt: var jj { typeID = int, isLocal = true }
+                                    initExpr: literal { token = 0 }
+                                nextStmt: assign (+=)
+                                    lValue: lValue { varID = jj }
+                                    expr: literal { token = 1 }
+                                stmts:
+266.                                if { #stmts = 1 }
+                                        expr: (||)
+                                            right: (==)
+                                                right: literal { token = 0 }
+                                                left: lValue { varID = jj }
+                                            left: (==)
+                                                right: literal { token = 0 }
+                                                left: lValue { varID = ii }
+                                        stmts:
+267.                                        break
+268.                        break
+271.                for { #stmts = 2 }
+                        expr: (<)
+                            right: literal { token = 10 }
+                            left: lValue { varID = ii }
+271.                    initStmt: var ii { typeID = int, isLocal = true }
+                            initExpr: literal { token = 0 }
+                        nextStmt: assign (++)
+                            lValue: lValue { varID = ii }
+                        stmts:
+273.                        for { #stmts = 2 }
+                                expr: (!=)
+                                    right: literal { token = 10 }
+                                    left: lValue { varID = jj }
+273.                            initStmt: var jj { typeID = int, isLocal = true }
+                                    initExpr: literal { token = 0 }
+                                nextStmt: assign (+=)
+                                    lValue: lValue { varID = jj }
+                                    expr: literal { token = 1 }
+                                stmts:
+275.                                if { #stmts = 2 }
+                                        expr: (&&)
+                                            right: (==)
+                                                right: literal { token = 0 }
+                                                left: lValue { varID = jj }
+                                            left: (==)
+                                                right: literal { token = 0 }
+                                                left: lValue { varID = ii }
+                                        stmts:
+277.                                        assign (=)
+                                                lValue: lValue { varID = intArr }
+                                                    indexExpr: lValue { varID = ii }
+                                                expr: literal { token = 0 }
+278.                                        break
+280.                                break
+282.                        break
+285.                var xVar { typeID = double, isLocal = true }
+                        initExpr: literal { token = 0 }
+286.                var yVar { typeID = double, isLocal = true }
+                        initExpr: literal { token = 1 }
+287.                for { #stmts = 1 }
+                        expr: (<)
+                            right: literal { token = 1 }
+                            left: lValue { varID = xVar }
+287.                    initStmt: var dx { typeID = double, isLocal = true }
+                            initExpr: literal { token = .1 }
+                        nextStmt: assign (+=)
+                            lValue: lValue { varID = xVar }
+                            expr: lValue { varID = dx }
+                        stmts:
+288.                        for { #stmts = 1 }
+                                expr: (>)
+                                    right: literal { token = 0 }
+                                    left: lValue { varID = yVar }
+288.                            initStmt: var dy { typeID = double, isLocal = true }
+                                    initExpr: unaryOp (-)
+                                        expr: literal { token = .5 }
+                                nextStmt: assign (+=)
+                                    lValue: lValue { varID = yVar }
+                                    expr: lValue { varID = dy }
+                                stmts:
+289.                                assign (=)
+                                        lValue: lValue { varID = d }
+                                        expr: (-)
+                                            right: (/)
+                                                right: lValue { varID = dy }
+                                                left: lValue { varID = yVar }
+                                            left: (+)
+                                                right: lValue { varID = dx }
+                                                left: lValue { varID = xVar }
+291.                assign (=)
+                        lValue: lValue { varID = intArr }
+                        expr: newArray { typeID = int }
+                            lengthExpr: literal { token = 1 }
+292.                forArray { typeID = int, varID = a, arrayID = intArr, #stmts = 1 }
+                        stmts:
+293.                        assign (=)
+                                lValue: lValue { varID = a }
+                                expr: literal { token = 0 }
+296.                while { #stmts = 1 }
+                        expr: lValue { varID = b }
+                        stmts:
+297.                        assign (=)
+                                lValue: lValue { varID = b }
+                                expr: literal { token = false }
+299.                while { #stmts = 3 }
+                        expr: lValue { varID = b }
+                        stmts:
+301.                        call
+                                lValue: lValue { varID = voidFunc }
+302.                        assign (++)
+                                lValue: lValue { varID = i }
+303.                        assign (=)
+                                lValue: lValue { varID = b }
+                                expr: literal { token = false }
+306.                doWhile { #stmts = 1 }
+                        expr: lValue { varID = b }
+                        stmts:
+307.                        assign (=)
+                                lValue: lValue { varID = b }
+                                expr: literal { token = false }
+310.                doWhile { #stmts = 1 }
+                        expr: lValue { varID = b }
+                        stmts:
+312.                        assign (=)
+                                lValue: lValue { varID = b }
+                                expr: literal { token = false }
+317.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            literal { token = "Hello world" }
+318.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            (+)
+                                right: literal { token = "world" }
+                                left: (+)
+                                    right: literal { token = " " }
+                                    left: literal { token = "Hello" }
+319.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            literal { token = "Hello world\n" }
+320.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            lValue { varID = i }
+321.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            lValue { varID = d }
+322.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            lValue { varID = b }
+323.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            (+)
+                                right: lValue { varID = i }
+                                left: literal { token = "i = " }
+324.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            (+)
+                                right: lValue { varID = d }
+                                left: literal { token = "d = " }
+325.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            lValue { varID = name }
+326.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            (+)
+                                right: lValue { varID = name }
+                                left: (+)
+                                    right: literal { token = " " }
+                                    left: literal { token = "Hello" }
+327.                var circleObj { typeID = GameObj, isLocal = true }
+                        initExpr: call { #exprs = 3 }
+                            lValue: lValue { varID = ct, fieldID = circle }
+                            exprs:
+                                literal { token = 50 }
+                                literal { token = 50 }
+                                literal { token = 20 }
+328.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = print }
+                        exprs:
+                            lValue { varID = circleObj }
+329.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            literal { token = "Hello world" }
+330.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            (+)
+                                right: literal { token = "world" }
+                                left: (+)
+                                    right: literal { token = " " }
+                                    left: literal { token = "Hello" }
+331.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            literal { token = "Hello world\n" }
+332.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            lValue { varID = i }
+333.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            lValue { varID = d }
+334.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            lValue { varID = b }
+335.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            (+)
+                                right: lValue { varID = i }
+                                left: literal { token = "i = " }
+336.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            (+)
+                                right: lValue { varID = d }
+                                left: literal { token = "d = " }
+337.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            lValue { varID = name }
+338.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            (+)
+                                right: lValue { varID = name }
+                                left: (+)
+                                    right: literal { token = " " }
+                                    left: literal { token = "Hello" }
+339.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            lValue { varID = circleObj }
+340.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = log }
+                        exprs:
+                            lValue { varID = circleObj }
+341.                var obj2 { typeID = GameObj, isLocal = true }
+                        initExpr: lValue { varID = circleObj }
+342.                var obj3 { typeID = GameObj, isLocal = true }
+                        initExpr: lValue { varID = obj2 }
+343.                call { #exprs = 9 }
+                        lValue: lValue { varID = ct, fieldID = log }
+                        exprs:
+                            literal { token = "circleObj = " }
+                            lValue { varID = circleObj }
+                            literal { token = "obj2 = " }
+                            lValue { varID = obj2 }
+                            literal { token = "obj3=" }
+                            lValue { varID = obj3 }
+                            literal { token = 3.14 }
+                            lValue { varID = Math, fieldID = PI }
+                            literal { token = 42 }
+344.                call { #exprs = 2 }
+                        lValue: lValue { varID = ct, fieldID = logm }
+                        exprs:
+                            literal { token = "message" }
+                            literal { token = null }
+345.                call { #exprs = 3 }
+                        lValue: lValue { varID = ct, fieldID = logm }
+                        exprs:
+                            literal { token = "message" }
+                            lValue { varID = obj2 }
+                            lValue { varID = obj3 }
+346.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setOutputFile }
+                        exprs:
+                            literal { token = "output.txt" }
+347.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setOutputFile }
+                        exprs:
+                            literal { token = "output/nameList.txt" }
+348.                var outputFilename { typeID = String, isLocal = true }
+                        initExpr: literal { token = "output.txt" }
+349.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setOutputFile }
+                        exprs:
+                            lValue { varID = outputFilename }
+352.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = showAlert }
+                        exprs:
+                            literal { token = "alert meassage" }
+353.                var message { typeID = String, isLocal = true }
+                        initExpr: literal { token = "alert!" }
+354.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = showAlert }
+                        exprs:
+                            lValue { varID = message }
+355.                var n { typeID = int, isLocal = true }
+                        initExpr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputInt }
+                            exprs:
+                                literal { token = "enter a number: " }
+356.                assign (=)
+                        lValue: lValue { varID = n }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputInt }
+                            exprs:
+                                literal { token = "enter a number: " }
+357.                assign (=)
+                        lValue: lValue { varID = n }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputInt }
+                            exprs:
+                                lValue { varID = message }
+358.                var x { typeID = double, isLocal = true }
+                        initExpr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputNumber }
+                            exprs:
+                                literal { token = "enter a number: " }
+359.                assign (=)
+                        lValue: lValue { varID = x }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputNumber }
+                            exprs:
+                                literal { token = "enter a number: " }
+360.                assign (=)
+                        lValue: lValue { varID = x }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputNumber }
+                            exprs:
+                                lValue { varID = message }
+361.                var quit { typeID = boolean, isLocal = true }
+                        initExpr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputYesNo }
+                            exprs:
+                                literal { token = "Quit?" }
+362.                assign (=)
+                        lValue: lValue { varID = quit }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputYesNo }
+                            exprs:
+                                lValue { varID = message }
+363.                var inputStr { typeID = String, isLocal = true }
+                        initExpr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputString }
+                            exprs:
+                                literal { token = "Quit?" }
+364.                assign (=)
+                        lValue: lValue { varID = inputStr }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputString }
+                            exprs:
+                                literal { token = "Quit?" }
+365.                assign (=)
+                        lValue: lValue { varID = inputStr }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = inputString }
+                            exprs:
+                                lValue { varID = message }
+368.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setTitle }
+                        exprs:
+                            literal { token = "Title" }
+369.                var title { typeID = String, isLocal = true }
+                        initExpr: literal { token = "Title" }
+370.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setTitle }
+                        exprs:
+                            lValue { varID = title }
+371.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setTitle }
+                        exprs:
+                            (+)
+                                right: lValue { varID = i }
+                                left: (+)
+                                    right: literal { token = " " }
+                                    left: lValue { varID = title }
+372.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setTitle }
+                        exprs:
+                            (+)
+                                right: lValue { varID = d }
+                                left: lValue { varID = title }
+373.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setHeight }
+                        exprs:
+                            (/)
+                                right: literal { token = 16 }
+                                left: (*)
+                                    right: literal { token = 9 }
+                                    left: literal { token = 100.0 }
+374.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setHeight }
+                        exprs:
+                            lValue { varID = i }
+375.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setHeight }
+                        exprs:
+                            lValue { varID = d }
+376.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setHeight }
+                        exprs:
+                            (+)
+                                right: (*)
+                                    right: literal { token = 4 }
+                                    left: literal { token = 5 }
+                                left: (*)
+                                    right: lValue { varID = d }
+                                    left: lValue { varID = i }
+377.                var height { typeID = double, isLocal = true }
+                        initExpr: call
+                            lValue: lValue { varID = ct, fieldID = getHeight }
+378.                assign (=)
+                        lValue: lValue { varID = height }
+                        expr: call
+                            lValue: lValue { varID = ct, fieldID = getHeight }
+379.                var width { typeID = double, isLocal = true }
+                        initExpr: (-)
+                            right: literal { token = 10 }
+                            left: (*)
+                                right: literal { token = 0.5 }
+                                left: call
+                                    lValue: lValue { varID = ct, fieldID = getWidth }
+380.                assign (=)
+                        lValue: lValue { varID = width }
+                        expr: call
+                            lValue: lValue { varID = ct, fieldID = getWidth }
+381.                var pxPerUnit { typeID = double, isLocal = true }
+                        initExpr: call
+                            lValue: lValue { varID = ct, fieldID = getPixelsPerUnit }
+382.                assign (=)
+                        lValue: lValue { varID = pxPerUnit }
+                        expr: call
+                            lValue: lValue { varID = ct, fieldID = getPixelsPerUnit }
+383.                var pixelWidth { typeID = int, isLocal = true }
+                        initExpr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = round }
+                            exprs:
+                                (*)
+                                    right: call
+                                        lValue: lValue { varID = ct, fieldID = getPixelsPerUnit }
+                                    left: call
+                                        lValue: lValue { varID = ct, fieldID = getWidth }
+384.                var pixelHeight { typeID = int, isLocal = true }
+                        initExpr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = round }
+                            exprs:
+                                (*)
+                                    right: call
+                                        lValue: lValue { varID = ct, fieldID = getPixelsPerUnit }
+                                    left: call
+                                        lValue: lValue { varID = ct, fieldID = getHeight }
+385.                var currentScreen { typeID = String, isLocal = true }
+                        initExpr: call
+                            lValue: lValue { varID = ct, fieldID = getScreen }
+386.                assign (=)
+                        lValue: lValue { varID = currentScreen }
+                        expr: call
+                            lValue: lValue { varID = ct, fieldID = getScreen }
+387.                call
+                        lValue: lValue { varID = ct, fieldID = clearScreen }
+388.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = clearGroup }
+                        exprs:
+                            literal { token = "targets" }
+389.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = clearGroup }
+                        exprs:
+                            literal { token = "" }
+390.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setBackColor }
+                        exprs:
+                            literal { token = "orange" }
+391.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setBackColor }
+                        exprs:
+                            literal { token = "light blue" }
+392.                var backColor { typeID = String, isLocal = true }
+                        initExpr: literal { token = "red" }
+393.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setBackColor }
+                        exprs:
+                            lValue { varID = backColor }
+394.                call { #exprs = 3 }
+                        lValue: lValue { varID = ct, fieldID = setBackColorRGB }
+                        exprs:
+                            literal { token = 255 }
+                            literal { token = 0 }
+                            literal { token = 0 }
+395.                call { #exprs = 3 }
+                        lValue: lValue { varID = ct, fieldID = setBackColorRGB }
+                        exprs:
+                            lValue { varID = i }
+                            lValue { varID = i }
+                            lValue { varID = i }
+396.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setBackImage }
+                        exprs:
+                            literal { token = "background.png" }
+397.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setBackImage }
+                        exprs:
+                            literal { token = "C:\\Users\\ben\\Pictures\\landscape.jpg" }
+398.                var filename { typeID = String, isLocal = true }
+                        initExpr: literal { token = "landscape.png" }
+399.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setBackImage }
+                        exprs:
+                            lValue { varID = filename }
+401.                assign (=)
+                        lValue: lValue { varID = x }
+                        expr: literal { token = 50 }
+402.                var y { typeID = double, isLocal = true }
+                        initExpr: literal { token = 50 }
+403.                var diameter { typeID = double, isLocal = true }
+                        initExpr: literal { token = 10 }
+404.                var circle { typeID = GameObj, isLocal = true }
+                        initExpr: call { #exprs = 3 }
+                            lValue: lValue { varID = ct, fieldID = circle }
+                            exprs:
+                                literal { token = 50 }
+                                literal { token = 20 }
+                                literal { token = 10 }
+405.                assign (=)
+                        lValue: lValue { varID = circle }
+                        expr: call { #exprs = 3 }
+                            lValue: lValue { varID = ct, fieldID = circle }
+                            exprs:
+                                literal { token = 50.0 }
+                                literal { token = 20.0 }
+                                literal { token = 10.0 }
+406.                assign (=)
+                        lValue: lValue { varID = circle }
+                        expr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = circle }
+                            exprs:
+                                literal { token = 50 }
+                                literal { token = 20 }
+                                literal { token = 10.5 }
+                                literal { token = "blue" }
+407.                assign (=)
+                        lValue: lValue { varID = circle }
+                        expr: call { #exprs = 3 }
+                            lValue: lValue { varID = ct, fieldID = circle }
+                            exprs:
+                                lValue { varID = x }
+                                lValue { varID = y }
+                                lValue { varID = diameter }
+408.                var color { typeID = String, isLocal = true }
+                        initExpr: literal { token = "green" }
+409.                assign (=)
+                        lValue: lValue { varID = circle }
+                        expr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = circle }
+                            exprs:
+                                lValue { varID = x }
+                                lValue { varID = y }
+                                lValue { varID = diameter }
+                                lValue { varID = color }
+410.                var rect { typeID = GameObj, isLocal = true }
+                        initExpr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = rect }
+                            exprs:
+                                lValue { varID = x }
+                                lValue { varID = y }
+                                lValue { varID = width }
+                                lValue { varID = height }
+411.                assign (=)
+                        lValue: lValue { varID = rect }
+                        expr: call { #exprs = 5 }
+                            lValue: lValue { varID = ct, fieldID = rect }
+                            exprs:
+                                lValue { varID = x }
+                                lValue { varID = y }
+                                lValue { varID = width }
+                                lValue { varID = height }
+                                lValue { varID = color }
+412.                assign (=)
+                        lValue: lValue { varID = rect }
+                        expr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = rect }
+                            exprs:
+                                literal { token = 50.0 }
+                                literal { token = 33.3 }
+                                literal { token = 11.2 }
+                                literal { token = 23.890 }
+413.                assign (=)
+                        lValue: lValue { varID = rect }
+                        expr: call { #exprs = 5 }
+                            lValue: lValue { varID = ct, fieldID = rect }
+                            exprs:
+                                literal { token = 50 }
+                                literal { token = 33 }
+                                literal { token = 11 }
+                                literal { token = 23 }
+                                literal { token = "green" }
+414.                var line { typeID = GameObj, isLocal = true }
+                        initExpr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = line }
+                            exprs:
+                                lValue { varID = i }
+                                lValue { varID = d }
+                                lValue { varID = width }
+                                lValue { varID = height }
+415.                assign (=)
+                        lValue: lValue { varID = line }
+                        expr: call { #exprs = 5 }
+                            lValue: lValue { varID = ct, fieldID = line }
+                            exprs:
+                                lValue { varID = x1 }
+                                lValue { varID = y1 }
+                                lValue { varID = x2 }
+                                lValue { varID = y2 }
+                                lValue { varID = color }
+416.                assign (=)
+                        lValue: lValue { varID = line }
+                        expr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = line }
+                            exprs:
+                                literal { token = 0.0 }
+                                literal { token = .0 }
+                                literal { token = 100.0 }
+                                literal { token = 95.0 }
+417.                assign (=)
+                        lValue: lValue { varID = line }
+                        expr: call { #exprs = 5 }
+                            lValue: lValue { varID = ct, fieldID = line }
+                            exprs:
+                                literal { token = 0 }
+                                literal { token = 0 }
+                                literal { token = 100 }
+                                literal { token = 95 }
+                                literal { token = "red" }
+418.                var text { typeID = GameObj, isLocal = true }
+                        initExpr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = text }
+                            exprs:
+                                lValue { varID = s }
+                                lValue { varID = x }
+                                lValue { varID = y }
+                                lValue { varID = height }
+419.                assign (=)
+                        lValue: lValue { varID = text }
+                        expr: call { #exprs = 5 }
+                            lValue: lValue { varID = ct, fieldID = text }
+                            exprs:
+                                lValue { varID = s }
+                                lValue { varID = x }
+                                lValue { varID = y }
+                                lValue { varID = height }
+                                lValue { varID = color }
+420.                assign (=)
+                        lValue: lValue { varID = text }
+                        expr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = text }
+                            exprs:
+                                (+)
+                                    right: lValue { varID = score }
+                                    left: literal { token = "Score: " }
+                                literal { token = 20.0 }
+                                literal { token = 90.0 }
+                                literal { token = 10.0 }
+421.                assign (=)
+                        lValue: lValue { varID = text }
+                        expr: call { #exprs = 5 }
+                            lValue: lValue { varID = ct, fieldID = text }
+                            exprs:
+                                (+)
+                                    right: lValue { varID = score }
+                                    left: literal { token = "Score: " }
+                                literal { token = 20 }
+                                literal { token = 90 }
+                                literal { token = 10 }
+                                literal { token = "purple" }
+422.                var img { typeID = GameObj, isLocal = true }
+                        initExpr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = image }
+                            exprs:
+                                lValue { varID = filename }
+                                lValue { varID = x }
+                                lValue { varID = y }
+                                lValue { varID = width }
+423.                assign (=)
+                        lValue: lValue { varID = img }
+                        expr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = image }
+                            exprs:
+                                literal { token = "car.png" }
+                                literal { token = 42 }
+                                literal { token = 25 }
+                                literal { token = 38.7 }
+424.                assign (=)
+                        lValue: lValue { varID = img }
+                        expr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = image }
+                            exprs:
+                                literal { token = "C:\\Users\\john\\Pictures\\car.jpg" }
+                                literal { token = 42 }
+                                literal { token = 25 }
+                                literal { token = 38 }
+425.                var objs { typeID = GameObj, isArray = true, isLocal = true }
+                        initExpr: arrayInit { #exprs = 5 }
+                            exprs:
+                                lValue { varID = circle }
+                                lValue { varID = rect }
+                                lValue { varID = line }
+                                lValue { varID = text }
+                                lValue { varID = img }
+426.                assign (=)
+                        lValue: lValue { varID = img }
+                        expr: lValue { varID = rect }
+428.                var mouseClicked { typeID = boolean, isLocal = true }
+                        initExpr: call
+                            lValue: lValue { varID = ct, fieldID = clicked }
+429.                if { #stmts = 1 }
+                        expr: call
+                            lValue: lValue { varID = ct, fieldID = clicked }
+                        stmts:
+430.                        assign (=)
+                                lValue: lValue { varID = mouseClicked }
+                                expr: call
+                                    lValue: lValue { varID = ct, fieldID = clicked }
+431.                if { #stmts = 1 }
+                        expr: (>)
+                            right: literal { token = 50 }
+                            left: call
+                                lValue: lValue { varID = ct, fieldID = clickX }
+                        stmts:
+432.                        assign (=)
+                                lValue: lValue { varID = x }
+                                expr: call
+                                    lValue: lValue { varID = ct, fieldID = clickX }
+433.                assign (=)
+                        lValue: lValue { varID = x }
+                        expr: call
+                            lValue: lValue { varID = ct, fieldID = clickX }
+434.                if { #stmts = 1 }
+                        expr: (<=)
+                            right: lValue { varID = x }
+                            left: call
+                                lValue: lValue { varID = ct, fieldID = clickY }
+                        stmts:
+435.                        assign (=)
+                                lValue: lValue { varID = y }
+                                expr: call
+                                    lValue: lValue { varID = ct, fieldID = clickY }
+436.                assign (=)
+                        lValue: lValue { varID = y }
+                        expr: call
+                            lValue: lValue { varID = ct, fieldID = clickY }
+437.                var keyName { typeID = String, isLocal = true }
+                        initExpr: literal { token = "space" }
+438.                var keyPressed { typeID = boolean, isLocal = true }
+                        initExpr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = keyPressed }
+                            exprs:
+                                lValue { varID = keyName }
+439.                if { #stmts = 1 }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = keyPressed }
+                            exprs:
+                                lValue { varID = keyName }
+                        stmts:
+440.                        if { #stmts = 1 }
+                                expr: call { #exprs = 1 }
+                                    lValue: lValue { varID = ct, fieldID = keyPressed }
+                                    exprs:
+                                        literal { token = "up" }
+                                stmts:
+441.                                assign (=)
+                                        lValue: lValue { varID = keyPressed }
+                                        expr: call { #exprs = 1 }
+                                            lValue: lValue { varID = ct, fieldID = keyPressed }
+                                            exprs:
+                                                literal { token = "up" }
+442.                if { #stmts = 1 }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = charTyped }
+                            exprs:
+                                literal { token = "+" }
+                        stmts:
+443.                        assign (++)
+                                lValue: lValue { varID = x }
+444.                var ch { typeID = String, isLocal = true }
+                        initExpr: literal { token = "+" }
+445.                if { #stmts = 1 }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = charTyped }
+                            exprs:
+                                lValue { varID = ch }
+                        stmts:
+446.                        assign (=)
+                                lValue: lValue { varID = b }
+                                expr: call { #exprs = 1 }
+                                    lValue: lValue { varID = ct, fieldID = charTyped }
+                                    exprs:
+                                        literal { token = "+" }
+447.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = charTyped }
+                            exprs:
+                                lValue { varID = ch }
+449.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = loadSound }
+                            exprs:
+                                lValue { varID = filename }
+450.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = loadSound }
+                        exprs:
+                            literal { token = "pow.wav" }
+451.                if { #stmts = 1 }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = loadSound }
+                            exprs:
+                                literal { token = "sounds/ding.mp3" }
+                        stmts:
+452.                        call { #exprs = 1 }
+                                lValue: lValue { varID = ct, fieldID = sound }
+                                exprs:
+                                    literal { token = "sounds/ding.mp3" }
+453.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = sound }
+                        exprs:
+                            lValue { varID = filename }
+454.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setSoundVolume }
+                        exprs:
+                            lValue { varID = d }
+455.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setSoundVolume }
+                        exprs:
+                            literal { token = 1 }
+456.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = setSoundVolume }
+                        exprs:
+                            literal { token = 0.5 }
+458.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = random }
+                            exprs:
+                                lValue { varID = i }
+                                lValue { varID = i }
+459.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = random }
+                            exprs:
+                                literal { token = 0 }
+                                literal { token = 100 }
+460.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = round }
+                            exprs:
+                                lValue { varID = d }
+461.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = round }
+                            exprs:
+                                lValue { varID = i }
+462.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = round }
+                            exprs:
+                                literal { token = 1.62 }
+463.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = round }
+                            exprs:
+                                (*)
+                                    right: lValue { varID = i }
+                                    left: lValue { varID = d }
+464.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = round }
+                            exprs:
+                                (+)
+                                    right: (*)
+                                        right: lValue { varID = i }
+                                        left: lValue { varID = d }
+                                    left: literal { token = 1 }
+465.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = round }
+                            exprs:
+                                call { #exprs = 4 }
+                                    lValue: lValue { varID = ct, fieldID = distance }
+                                    exprs:
+                                        lValue { varID = x1 }
+                                        lValue { varID = y1 }
+                                        lValue { varID = x2 }
+                                        lValue { varID = y2 }
+466.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = roundDecimal }
+                            exprs:
+                                lValue { varID = d }
+                                lValue { varID = i }
+467.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = roundDecimal }
+                            exprs:
+                                (+)
+                                    right: literal { token = 1 }
+                                    left: (*)
+                                        right: lValue { varID = i }
+                                        left: lValue { varID = d }
+                                (*)
+                                    right: literal { token = 2 }
+                                    left: lValue { varID = i }
+468.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = roundDecimal }
+                            exprs:
+                                literal { token = 2.71828182846 }
+                                literal { token = 2 }
+469.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = roundDecimal }
+                            exprs:
+                                call { #exprs = 4 }
+                                    lValue: lValue { varID = ct, fieldID = distance }
+                                    exprs:
+                                        lValue { varID = x1 }
+                                        lValue { varID = y1 }
+                                        lValue { varID = x2 }
+                                        lValue { varID = y2 }
+                                literal { token = 1 }
+470.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = intDiv }
+                            exprs:
+                                lValue { varID = i }
+                                lValue { varID = i }
+471.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = intDiv }
+                            exprs:
+                                literal { token = 5 }
+                                literal { token = 2 }
+472.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = isError }
+                            exprs:
+                                lValue { varID = d }
+473.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = isError }
+                            exprs:
+                                (/)
+                                    right: lValue { varID = d }
+                                    left: lValue { varID = d }
+474.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = isError }
+                            exprs:
+                                (/)
+                                    right: lValue { varID = i }
+                                    left: lValue { varID = d }
+475.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = isError }
+                            exprs:
+                                (/)
+                                    right: literal { token = 0 }
+                                    left: literal { token = 0.0 }
+476.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 4 }
+                            lValue: lValue { varID = ct, fieldID = distance }
+                            exprs:
+                                lValue { varID = circle, fieldID = x }
+                                lValue { varID = circle, fieldID = y }
+                                lValue { varID = rect, fieldID = x }
+                                lValue { varID = rect, fieldID = y }
+477.                if { #stmts = 1 }
+                        expr: (<)
+                            right: (/)
+                                right: literal { token = 2 }
+                                left: parens
+                                    expr: (+)
+                                        right: lValue { varID = rect, fieldID = width }
+                                        left: lValue { varID = circle, fieldID = width }
+                            left: call { #exprs = 4 }
+                                lValue: lValue { varID = ct, fieldID = distance }
+                                exprs:
+                                    lValue { varID = circle, fieldID = x }
+                                    lValue { varID = circle, fieldID = y }
+                                    lValue { varID = rect, fieldID = x }
+                                    lValue { varID = rect, fieldID = y }
+                        stmts:
+478.                        assign (=)
+                                lValue: lValue { varID = i }
+                                expr: call
+                                    lValue: lValue { varID = ct, fieldID = getTimer }
+479.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: (-)
+                            right: lValue { varID = i }
+                            left: call
+                                lValue: lValue { varID = ct, fieldID = getTimer }
+480.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call
+                            lValue: lValue { varID = ct, fieldID = getVersion }
+481.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = round }
+                        exprs:
+                            call
+                                lValue: lValue { varID = ct, fieldID = getVersion }
+483.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = toInt }
+                            exprs:
+                                lValue { varID = d }
+484.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = toInt }
+                            exprs:
+                                (*)
+                                    right: lValue { varID = i }
+                                    left: lValue { varID = d }
+485.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = toInt }
+                            exprs:
+                                literal { token = .707 }
+486.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = toInt }
+                            exprs:
+                                lValue { varID = Math, fieldID = PI }
+487.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = toInt }
+                            exprs:
+                                literal { token = 6.0221409e+2 }
+488.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = parseInt }
+                            exprs:
+                                lValue { varID = s }
+489.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = parseInt }
+                            exprs:
+                                literal { token = "345" }
+490.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = canParseInt }
+                            exprs:
+                                lValue { varID = s }
+491.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = canParseInt }
+                            exprs:
+                                literal { token = "12345" }
+492.                while { #stmts = 1 }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = canParseInt }
+                            exprs:
+                                lValue { varID = s }
+                        stmts:
+493.                        assign (=)
+                                lValue: lValue { varID = d }
+                                expr: call { #exprs = 1 }
+                                    lValue: lValue { varID = ct, fieldID = parseNumber }
+                                    exprs:
+                                        lValue { varID = s }
+494.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: (*)
+                            right: literal { token = 100 }
+                            left: call { #exprs = 1 }
+                                lValue: lValue { varID = ct, fieldID = parseNumber }
+                                exprs:
+                                    literal { token = "123.45" }
+495.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = canParseNumber }
+                            exprs:
+                                literal { token = "543.210" }
+496.                while { #stmts = 1 }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = canParseNumber }
+                            exprs:
+                                lValue { varID = s }
+                        stmts:
+497.                        assign (=)
+                                lValue: lValue { varID = s }
+                                expr: call { #exprs = 1 }
+                                    lValue: lValue { varID = ct, fieldID = formatDecimal }
+                                    exprs:
+                                        lValue { varID = d }
+498.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = formatDecimal }
+                            exprs:
+                                lValue { varID = d }
+                                lValue { varID = i }
+499.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = formatDecimal }
+                            exprs:
+                                lValue { varID = d }
+                                call { #exprs = 2 }
+                                    lValue: lValue { varID = ct, fieldID = intDiv }
+                                    exprs:
+                                        (*)
+                                            right: lValue { varID = i }
+                                            left: literal { token = 2 }
+                                        lValue { varID = i }
+500.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: (+)
+                            right: literal { token = ":00" }
+                            left: call { #exprs = 2 }
+                                lValue: lValue { varID = ct, fieldID = formatDecimal }
+                                exprs:
+                                    literal { token = 6.0221 }
+                                    literal { token = 7 }
+501.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = ct, fieldID = formatInt }
+                            exprs:
+                                lValue { varID = i }
+502.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = ct, fieldID = formatInt }
+                            exprs:
+                                (+)
+                                    right: literal { token = 1 }
+                                    left: lValue { varID = i }
+                                (+)
+                                    right: lValue { varID = k }
+                                    left: lValue { varID = j }
+504.                assign (=)
+                        lValue: lValue { varID = rect, fieldID = x }
+                        expr: (-)
+                            right: literal { token = 10 }
+                            left: lValue { varID = circle, fieldID = y }
+505.                assign (=)
+                        lValue: lValue { varID = circle, fieldID = width }
+                        expr: (*)
+                            right: literal { token = 1.5 }
+                            left: lValue { varID = circle, fieldID = height }
+506.                assign (=)
+                        lValue: lValue { varID = rect, fieldID = height }
+                        expr: (*)
+                            right: literal { token = 1.1 }
+                            left: lValue { varID = img, fieldID = height }
+507.                assign (=)
+                        lValue: lValue { varID = line, fieldID = x }
+                        expr: (+)
+                            right: lValue { varID = line, fieldID = width }
+                            left: lValue { varID = line, fieldID = x }
+508.                assign (=)
+                        lValue: lValue { varID = img, fieldID = width }
+                        expr: (*)
+                            right: literal { token = .9 }
+                            left: lValue { varID = img, fieldID = width }
+509.                assign (=)
+                        lValue: lValue { varID = img, fieldID = xSpeed }
+                        expr: literal { token = 0 }
+510.                assign (=)
+                        lValue: lValue { varID = img, fieldID = ySpeed }
+                        expr: literal { token = .5 }
+511.                assign (=)
+                        lValue: lValue { varID = line, fieldID = lineWidth }
+                        expr: literal { token = 3 }
+512.                assign (=)
+                        lValue: lValue { varID = img, fieldID = lineWidth }
+                        expr: (*)
+                            right: literal { token = 2 }
+                            left: lValue { varID = line, fieldID = lineWidth }
+513.                assign (=)
+                        lValue: lValue { varID = rect, fieldID = visible }
+                        expr: literal { token = false }
+514.                assign (=)
+                        lValue: lValue { varID = circle, fieldID = clickable }
+                        expr: lValue { varID = circle, fieldID = visible }
+515.                if { #stmts = 1 }
+                        expr: lValue { varID = img, fieldID = visible }
+                        stmts:
+516.                        assign (=)
+                                lValue: lValue { varID = img, fieldID = clickable }
+                                expr: literal { token = true }
+517.                if { #stmts = 1 }
+                        expr: (!=)
+                            right: literal { token = false }
+                            left: lValue { varID = img, fieldID = clickable }
+                        stmts:
+518.                        assign (=)
+                                lValue: lValue { varID = img, fieldID = autoDelete }
+                                expr: lValue { varID = img, fieldID = visible }
+519.                assign (=)
+                        lValue: lValue { varID = line, fieldID = group }
+                        expr: lValue { varID = s }
+520.                assign (=)
+                        lValue: lValue { varID = line, fieldID = autoDelete }
+                        expr: (||)
+                            right: (&&)
+                                right: (==)
+                                    right: literal { token = 1 }
+                                    left: call { #exprs = 1 }
+                                        lValue: lValue { varID = s, fieldID = indexOf }
+                                        exprs:
+                                            lValue { varID = line, fieldID = group }
+                                left: call { #exprs = 1 }
+                                    lValue: lValue { varID = s, fieldID = equals }
+                                    exprs:
+                                        literal { token = "world" }
+                            left: call { #exprs = 1 }
+                                lValue: lValue { varID = s, fieldID = equals }
+                                exprs:
+                                    literal { token = "hello" }
+522.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call
+                            lValue: lValue { varID = rect, fieldID = getType }
+523.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            (+)
+                                right: literal { token = "more text" }
+                                left: call
+                                    lValue: lValue { varID = text, fieldID = getText }
+524.                call { #exprs = 1 }
+                        lValue: lValue { varID = img, fieldID = setText }
+                        exprs:
+                            literal { token = "racecar.png" }
+525.                call { #exprs = 1 }
+                        lValue: lValue { varID = text, fieldID = setText }
+                        exprs:
+                            (+)
+                                right: lValue { varID = d }
+                                left: literal { token = "Score: " }
+526.                call { #exprs = 1 }
+                        lValue: lValue { varID = text, fieldID = setText }
+                        exprs:
+                            (+)
+                                right: lValue { varID = i }
+                                left: literal { token = "Score: " }
+527.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = log }
+                        exprs:
+                            call
+                                lValue: lValue { varID = line, fieldID = toString }
+528.                call { #exprs = 2 }
+                        lValue: lValue { varID = img, fieldID = setSize }
+                        exprs:
+                            (*)
+                                right: literal { token = 1.1 }
+                                left: lValue { varID = img, fieldID = width }
+                            (*)
+                                right: literal { token = 1.1 }
+                                left: lValue { varID = img, fieldID = height }
+529.                call { #exprs = 1 }
+                        lValue: lValue { varID = text, fieldID = align }
+                        exprs:
+                            lValue { varID = s }
+530.                call { #exprs = 2 }
+                        lValue: lValue { varID = text, fieldID = align }
+                        exprs:
+                            lValue { varID = s }
+                            literal { token = true }
+531.                call { #exprs = 2 }
+                        lValue: lValue { varID = text, fieldID = align }
+                        exprs:
+                            lValue { varID = s }
+                            literal { token = false }
+532.                call { #exprs = 1 }
+                        lValue: lValue { varID = circle, fieldID = setFillColor }
+                        exprs:
+                            (+)
+                                right: lValue { varID = s }
+                                left: literal { token = "light" }
+533.                call { #exprs = 1 }
+                        lValue: lValue { varID = circle, fieldID = setFillColor }
+                        exprs:
+                            call
+                                lValue: lValue { varID = text, fieldID = getText }
+534.                call { #exprs = 3 }
+                        lValue: lValue { varID = circle, fieldID = setFillColorRGB }
+                        exprs:
+                            lValue { varID = i }
+                            lValue { varID = j }
+                            lValue { varID = k }
+535.                call { #exprs = 1 }
+                        lValue: lValue { varID = rect, fieldID = setLineColor }
+                        exprs:
+                            lValue { varID = colors }
+                                indexExpr: lValue { varID = i }
+536.                call { #exprs = 3 }
+                        lValue: lValue { varID = rect, fieldID = setLineColorRGB }
+                        exprs:
+                            lValue { varID = i }
+                            (-)
+                                right: lValue { varID = i }
+                                left: literal { token = 255 }
+                            literal { token = 0 }
+537.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call
+                            lValue: lValue { varID = rect, fieldID = getLayer }
+538.                if { #stmts = 1 }
+                        expr: (>=)
+                            right: call
+                                lValue: lValue { varID = circle, fieldID = getLayer }
+                            left: call
+                                lValue: lValue { varID = rect, fieldID = getLayer }
+                        stmts:
+539.                        assign (=)
+                                lValue: lValue { varID = b }
+                                expr: call { #exprs = 1 }
+                                    lValue: lValue { varID = colors, fieldID = equals }
+                                        indexExpr: call
+                                            lValue: lValue { varID = rect, fieldID = getLayer }
+                                    exprs:
+                                        literal { token = "green" }
+540.                call { #exprs = 1 }
+                        lValue: lValue { varID = img, fieldID = setLayer }
+                        exprs:
+                            unaryOp (-)
+                                expr: literal { token = 42 }
+541.                call
+                        lValue: lValue { varID = img, fieldID = delete }
+542.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call
+                            lValue: lValue { varID = img, fieldID = clicked }
+543.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = img, fieldID = containsPoint }
+                            exprs:
+                                call
+                                    lValue: lValue { varID = ct, fieldID = clickX }
+                                call
+                                    lValue: lValue { varID = ct, fieldID = clickY }
+544.                if { #stmts = 1 }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = img, fieldID = containsPoint }
+                            exprs:
+                                call
+                                    lValue: lValue { varID = ct, fieldID = clickX }
+                                call
+                                    lValue: lValue { varID = ct, fieldID = clickY }
+                        stmts:
+545.                        while { #stmts = 1 }
+                                expr: call { #exprs = 1 }
+                                    lValue: lValue { varID = img, fieldID = hit }
+                                    exprs:
+                                        lValue { varID = rect }
+                                stmts:
+546.                                assign (=)
+                                        lValue: lValue { varID = b }
+                                        expr: (==)
+                                            right: literal { token = true }
+                                            left: call { #exprs = 1 }
+                                                lValue: lValue { varID = img, fieldID = hit }
+                                                exprs:
+                                                    lValue { varID = rect }
+548.                var e { typeID = double, isLocal = true }
+                        initExpr: lValue { varID = Math, fieldID = E }
+549.                var pi { typeID = double, isLocal = true }
+                        initExpr: lValue { varID = Math, fieldID = PI }
+550.                if { #stmts = 1 }
+                        expr: (<)
+                            right: lValue { varID = eps }
+                            left: call { #exprs = 1 }
+                                lValue: lValue { varID = Math, fieldID = abs }
+                                exprs:
+                                    (-)
+                                        right: lValue { varID = img, fieldID = x }
+                                        left: lValue { varID = rect, fieldID = x }
+                        stmts:
+551.                        assign (=)
+                                lValue: lValue { varID = i }
+                                expr: call { #exprs = 1 }
+                                    lValue: lValue { varID = Math, fieldID = abs }
+                                    exprs:
+                                        lValue { varID = i }
+552.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = acos }
+                            exprs:
+                                unaryOp (-)
+                                    expr: literal { token = 0.5 }
+553.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = asin }
+                            exprs:
+                                (/)
+                                    right: literal { token = 2 }
+                                    left: call { #exprs = 1 }
+                                        lValue: lValue { varID = Math, fieldID = sqrt }
+                                        exprs:
+                                            literal { token = 3 }
+554.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = atan }
+                            exprs:
+                                (/)
+                                    right: call { #exprs = 1 }
+                                        lValue: lValue { varID = Math, fieldID = sqrt }
+                                        exprs:
+                                            literal { token = 2 }
+                                    left: literal { token = 1 }
+555.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = Math, fieldID = atan2 }
+                            exprs:
+                                (-)
+                                    right: lValue { varID = img, fieldID = x }
+                                    left: call
+                                        lValue: lValue { varID = ct, fieldID = clickX }
+                                (-)
+                                    right: lValue { varID = img, fieldID = y }
+                                    left: call
+                                        lValue: lValue { varID = ct, fieldID = clickY }
+556.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = ceil }
+                            exprs:
+                                lValue { varID = d }
+557.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = cos }
+                            exprs:
+                                (/)
+                                    right: literal { token = 2 }
+                                    left: lValue { varID = Math, fieldID = PI }
+558.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = cosh }
+                            exprs:
+                                (*)
+                                    right: literal { token = 2 }
+                                    left: lValue { varID = Math, fieldID = PI }
+559.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = exp }
+                            exprs:
+                                (+)
+                                    right: literal { token = 1 }
+                                    left: (*)
+                                        right: lValue { varID = Math, fieldID = PI }
+                                        left: literal { token = 2 }
+560.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = floor }
+                            exprs:
+                                unaryOp (-)
+                                    expr: literal { token = 1.67 }
+561.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = log }
+                            exprs:
+                                literal { token = 32 }
+562.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = log10 }
+                            exprs:
+                                lValue { varID = d }
+563.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = Math, fieldID = max }
+                            exprs:
+                                lValue { varID = d }
+                                lValue { varID = d }
+564.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = Math, fieldID = max }
+                            exprs:
+                                lValue { varID = i }
+                                lValue { varID = i }
+565.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = Math, fieldID = min }
+                            exprs:
+                                lValue { varID = d }
+                                lValue { varID = d }
+566.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = Math, fieldID = min }
+                            exprs:
+                                lValue { varID = i }
+                                lValue { varID = i }
+567.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 2 }
+                            lValue: lValue { varID = Math, fieldID = pow }
+                            exprs:
+                                lValue { varID = d }
+                                lValue { varID = d }
+568.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = sin }
+                            exprs:
+                                lValue { varID = d }
+569.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = sinh }
+                            exprs:
+                                lValue { varID = d }
+570.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = sqrt }
+                            exprs:
+                                lValue { varID = d }
+571.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = tan }
+                            exprs:
+                                lValue { varID = d }
+572.                assign (=)
+                        lValue: lValue { varID = d }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = Math, fieldID = tanh }
+                            exprs:
+                                lValue { varID = d }
+574.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = s, fieldID = compareTo }
+                            exprs:
+                                lValue { varID = s }
+575.                assign (=)
+                        lValue: lValue { varID = b }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = s, fieldID = equals }
+                            exprs:
+                                lValue { varID = s }
+576.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = s, fieldID = indexOf }
+                            exprs:
+                                lValue { varID = s }
+577.                assign (=)
+                        lValue: lValue { varID = i }
+                        expr: call
+                            lValue: lValue { varID = s, fieldID = length }
+578.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = s, fieldID = substring }
+                            exprs:
+                                lValue { varID = i }
+579.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call { #exprs = 1 }
+                            lValue: lValue { varID = s, fieldID = substring }
+                            exprs:
+                                lValue { varID = i }
+580.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call
+                            lValue: lValue { varID = s, fieldID = toLowerCase }
+581.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call
+                            lValue: lValue { varID = s, fieldID = toUpperCase }
+582.                assign (=)
+                        lValue: lValue { varID = s }
+                        expr: call
+                            lValue: lValue { varID = s, fieldID = trim }
+590.        func ct { #stmts = 1, #params = 0 }
+                stmts:
+592.                call { #exprs = 1 }
+                        lValue: lValue { varID = ct, fieldID = println }
+                        exprs:
+                            literal { token = "Hello world" }
+        vars:
+586.        var button { typeID = GameObj }
+                initExpr: call { #exprs = 4 }
+                    lValue: lValue { varID = ct, fieldID = text }
+                    exprs:
+                        literal { token = "START" }
+                        literal { token = 0 }
+                        literal { token = 0 }
+                        literal { token = 10 }
+588.        var WIDTH { typeID = double }
+                initExpr: call
+                    lValue: lValue { varID = ct, fieldID = getWidth }

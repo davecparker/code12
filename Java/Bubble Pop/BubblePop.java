@@ -2,21 +2,18 @@ import Code12.*;
 
 class BubblePop extends Code12Program
 {
-   public static void main(String[] args)
-   { 
-      Code12.run(new BubblePop()); 
-   }
-   
+   int hits = 0;
+   int misses = 0;
+
    public void start()
    {
       // Make the background 
-      ct.setHeight(150);
       ct.setBackImage("underwater.jpg"); 
 
       // Pre-load the pop sound
       ct.loadSound("pop.wav");
    }
-   
+
    public void update()
    {
       // Make bubbles at random times, positions, and sizes
@@ -27,17 +24,25 @@ class BubblePop extends Code12Program
          double size = ct.random(5, 20);
          GameObj bubble = ct.image("bubble.png", x, y, size);
          bubble.ySpeed = -1;
-         bubble.clickable = true;
       }
    }
    
    public void onMousePress(GameObj obj, double x, double y)
    {
-      // Pop bubbles that get clicked
-      if (obj != null)
+      // Pop bubbles that get clicked, and count hits and misses
+      if (obj == null)
+         misses++;
+      else
       {
          obj.delete();
          ct.sound("pop.wav");
+         hits++;
       }
+      ct.println(hits + " hits, " + misses + " misses");
    }
+
+   // public static void main(String[] args)
+   // { 
+   //    Code12.run(new BubblePop()); 
+   // }
 }
