@@ -9,6 +9,8 @@ require('Code12.api')
     this.slider = nil; 
     
     
+    -- TODO: do this without using circles, just the limiting circle and points
+    
         
         
     
@@ -25,7 +27,7 @@ require('Code12.api')
         _fn.drawTriangle(this.c1, this.c2, this.c3, 1)
         
         -- set up everything in advance
-        -- TODO: do this more efficiently
+        -- way to do this more efficiently?
         local c4 = ct.circle(150, 10, 1, "blue")
         local c5 = ct.circle(110, 90, 1, "green")
         local c6 = ct.circle(190, 90, 1, "red")
@@ -111,12 +113,11 @@ require('Code12.api')
         end
         
     end
-    -- experiment...on click, change origin, recurse again 
-    --but closer up scale?
     function _fn.update()
         
         this.slider.xSpeed = 15
         
+        -- TODO: improve this lol
         if this.slider.x > 100 then
             
             ct.setScreenOrigin(100, 0)
