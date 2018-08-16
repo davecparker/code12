@@ -83,15 +83,16 @@ local reservedWordTokens = {
 }
 
 -- State for the lexer used by token scanning functions
-local source    		-- the source string
-local chars     		-- array of ASCII codes for the source string
-local lineNumber        -- the line number for the source string
-local iChar     		-- index to current char in chars
-local commentLevel		-- current nesting level for block comments (/* */)
-local commentForLine    -- array of end-of-line comments indexed by line number
-local indentLevelForLine-- array of indent levels indexed by line number
-local prevIndentStr     -- previous (non blank/comment) line of code's indent string
-local prevIndentLineNum -- previous (non blank/comment) line of code's line number
+local source    		   -- the source string
+local chars     		   -- array of ASCII codes for the source string
+local lineNumber           -- the line number for the source string
+local iChar     		   -- index to current char in chars
+local commentLevel		   -- current nesting level for block comments (/* */)
+local commentForLine       -- array of end-of-line comments indexed by line number
+local indentLevelForLine   -- array of indent levels indexed by line number
+local prevIndentStr        -- previous (non blank/comment) line of code's indent string
+local prevIndentLineNum    -- previous (non blank/comment) line of code's line number
+
 
 ----- Token scanning functions ------------------------------------------------
 
@@ -417,6 +418,20 @@ local function  dotToken()
 	return "."
 end
 
+-- TODO
+local function checkIndentation( tokens )
+	if #tokens == 0 then
+		-- set indent for this line to 0
+	else
+		-- determine indent
+		-- store indent level
+		-- check inconsistent indent
+		-- if prevIndentStr and 
+		-- save prev indent
+	end
+end
+
+
 ----- Module functions -------------------------------------------------------
 
 -- Init the state of the lexer for a program
@@ -424,7 +439,7 @@ function javalex.initProgram()
 	commentLevel = 0
 	commentForLine = {}
 	indentLevelForLine = {}
-	prevIndentStr = ""
+	prevIndentStr = ""   -- TODO: nil
 end
 
 -- Return an array of tokens for the given source string and line number. 
@@ -485,13 +500,14 @@ function javalex.getTokens( sourceStr, lineNum )
 	end
 	if not blankLine then
 		-- Check for consistent use of tabs with spaces
-		local indentStr = string.sub(sourceStr, 1, iChar - 1)
+		local indentStr = string.sub( sourceStr, 1, iChar - 1 )
 		local len = iChar - 1
-		local prevLen = string.len(prevIndentStr)
+		local prevLen = string.len( prevIndentStr )
 		if len == prevLen and indentStr ~= prevIndentStr
-				or len > prevLen and string.sub(indentStr, 1, prevLen) ~= prevIndentStr
-				or len < prevLen and string.sub(prevIndentStr, 1, len) ~= indentStr then
-			err.setErr( {iLine = lineNum}, {iLine = prevIndentLineNum}, "Mix of tabs and spaces used for indentation is not consistent with the previous line of code" )
+				or len > prevLen and string.sub( indentStr, 1, prevLen ) ~= prevIndentStr
+				or len < prevLen and string.sub( prevIndentStr, 1, len ) ~= indentStr then
+			err.setErr( { iLine = lineNum }, { iLine = prevIndentLineNum }, 
+					"Mix of tabs and spaces used for indentation is not consistent with the previous line of code" )
 		end
 		-- Update prevIndentStr and prevIndentLineNum
 		prevIndentStr = indentStr
@@ -547,6 +563,7 @@ function javalex.getTokens( sourceStr, lineNum )
 			tokens[#tokens + 1] = token
 		elseif charType == nil then
 			-- End of source string
+			checkIndentation( tokens )
 			token.tt = "END"
 			token.str = " "
 			tokens[#tokens + 1] = token
@@ -584,6 +601,7 @@ end
 function javalex.indentLevelForLine( lineNum )
 	return indentLevelForLine[lineNum]
 end
+
 
 ----- Initialization ---------------------------------------------------------
 
