@@ -2,7 +2,7 @@
 --
 -- main.lua
 --
--- Test driver for Code12's Java parsing
+-- Test driver for Code12's Java line-level parsing
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
@@ -10,6 +10,7 @@
 
 -- The parsing module
 package.path = package.path .. ';../Code12/?.lua'
+local javalex = require( "javalex" )
 local parseJava = require( "parseJava" )
 local err = require( "err" )
 
@@ -97,7 +98,7 @@ local function parseTestCode()
 	local numExpectedErrors = 0
 	local numUncaughtErrors = 0
 	local startTime = system.getTimer()
-	parseJava.init()
+	parseJava.initProgram()
 	local lineNum = 1
 	local startTokens = nil
 	while lineNum <= #sourceFile.strLines do
@@ -112,7 +113,6 @@ local function parseTestCode()
 			output( "************** Beginning of Expected Errors Section **************" )
 		else
 			-- Parse this line
-			err.clearErr()
 			local tree, tokens = parseJava.parseLine( strCode, lineNum, startTokens ) -- TODO: Set and change syntax level?
 			if tree == false then
 				-- This line is unfinished, carry the tokens forward to the next line
@@ -120,13 +120,9 @@ local function parseTestCode()
 				outFile:write( "-- Incomplete line carried forward\n" )
 			else
 				startTokens = nil
-				if tree == nil then
+				if tree == nil or tree.isError then
 					-- This line has an error on it, output it.
-					if not err.hasErr() then
-						output( "*** Missing error state!")
-					else
-						output( err.getErrString() )
-					end
+					output( err.getErrString( err.rec ) or "*** Missing error state!" )
 
 					-- Count the error
 					if errorSection then
@@ -141,14 +137,17 @@ local function parseTestCode()
 						-- Ignore blank lines
 						if tree.p ~= "blank" and tree.p ~= "comment" then
 							numUncaughtErrors = numUncaughtErrors + 1
-                     outFile:write( "*** Uncaught Error "..numUncaughtErrors.."\n" )
+							outFile:write( "*** Uncaught Error "..numUncaughtErrors.."\n" )
 						end
 					end
-               -- Output parse tree to output file only
-               parseJava.printParseTree( tree, 0, outFile )
+					if tree.p ~= "blank" then
+						-- Output parse tree to output file only
+						parseJava.printParseTree( tree, 0, outFile )
+					end
 				end
 			end
 		end
+		err.clearErr( lineNum )
 		lineNum = lineNum + 1
 	end
 	local endTime = math.round( system.getTimer() - startTime )  -- to nearest ms

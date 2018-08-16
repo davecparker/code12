@@ -1,24 +1,15 @@
 ======= Test Started ==========================================
-16. errorFunc();
-*** Uncaught error, expected: Code12 API functions cannot be called before start()
-
-641. // void anotherfunc() // crash
-*** Uncaught error, expected: differs only by upper/lower case from existing function
-
-1089. // void onKeyRelease( ) // crash
-*** Uncaught error, expected: Wrong number of parameters for function
-
 ======= Test Complete =========================================
 
 Semantic Error Test:
 
-    1130 lines processed
-    280 ms Parse time
-    1 ms Semantic check time
-    29 ms Code Generation time
-    310 ms Total time
+    1142 lines processed
+    98 ms Parse time
+    0 ms Semantic check time
+    12 ms Code Generation time
+    111 ms Total time
 
 0 unexpected errors
-3 uncaught errors (202 expected errors)
+0 uncaught errors (210 expected errors)
 
-FAILED
+SUCCESS
