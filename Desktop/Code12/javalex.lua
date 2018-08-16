@@ -90,7 +90,8 @@ local iChar     		-- index to current char in chars
 local commentLevel		-- current nesting level for block comments (/* */)
 local commentForLine    -- array of end-of-line comments indexed by line number
 local indentLevelForLine-- array of indent levels indexed by line number
-local prevIndentStr     -- string containing indent characters of previous line of code
+local prevIndentStr     -- previous (non blank/comment) line of code's indent string
+local prevIndentLineNum -- previous (non blank/comment) line of code's line number
 
 ----- Token scanning functions ------------------------------------------------
 
@@ -490,10 +491,11 @@ function javalex.getTokens( sourceStr, lineNum )
 		if len == prevLen and indentStr ~= prevIndentStr
 				or len > prevLen and string.sub(indentStr, 1, prevLen) ~= prevIndentStr
 				or len < prevLen and string.sub(prevIndentStr, 1, len) ~= indentStr then
-			setTokenErr( 1, iChar - 1, "Mix of tabs and spaces used for indentation in not consistent with the previous line of code" )
+			err.setErr( {iLine = lineNum}, {iLine = prevIndentLineNum}, "Mix of tabs and spaces used for indentation is not consistent with the previous line of code" )
 		end
-		-- Update prevIndentStr
+		-- Update prevIndentStr and prevIndentLineNum
 		prevIndentStr = indentStr
+		prevIndentLineNum = lineNum
 	end
 
 	-- Scan the rest of the chars array
