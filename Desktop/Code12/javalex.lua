@@ -91,7 +91,7 @@ local commentLevel		   -- current nesting level for block comments (/* */)
 local commentForLine       -- array of end-of-line comments indexed by line number
 local indentLevelForLine   -- array of indent levels indexed by line number
 local prevIndentStr        -- previous (non blank/comment) line of code's indent string
-local prevIndentLineNum    -- previous (non blank/comment) line of code's line number
+local prevLineNumber       -- previous (non blank/comment) line of code's line number
 
 
 ----- Token scanning functions ------------------------------------------------
@@ -418,16 +418,30 @@ local function  dotToken()
 	return "."
 end
 
--- TODO
+-- Determine and store the indentation level of source and check for consistent use of tabs and spaces
 local function checkIndentation( tokens )
 	if #tokens == 0 then
 		-- set indent for this line to 0
+		indentLevelForLine[lineNumber] = 0
 	else
 		-- determine indent
+		local indLvl = tokens[1].iChar - 1
 		-- store indent level
+		indentLevelForLine[lineNumber] = indLvl
+		local indentStr = string.sub( source, 1, indLvl )
 		-- check inconsistent indent
-		-- if prevIndentStr and 
+		if prevIndentStr then
+			local prevIndLvl = indentLevelForLine[prevLineNumber]
+			if indLvl == prevIndLvl and indentStr ~= prevIndentStr
+					or indLvl > prevIndLvl and string.sub( indentStr, 1, prevIndLvl ) ~= prevIndentStr
+					or indLvl < prevIndLvl and string.sub( prevIndentStr, 1, indLvl ) ~= indentStr then
+				err.setErr( { iLine = lineNumber }, { iLine = prevLineNumber }, 
+						"Mix of tabs and spaces used for indentation is not consistent with the previous line of code" )
+			end
+		end
 		-- save prev indent
+		prevIndentStr = indentStr
+		prevLineNumber = lineNumber
 	end
 end
 
@@ -439,7 +453,8 @@ function javalex.initProgram()
 	commentLevel = 0
 	commentForLine = {}
 	indentLevelForLine = {}
-	prevIndentStr = ""   -- TODO: nil
+	prevIndentStr = nil
+	prevLineNumber = nil
 end
 
 -- Return an array of tokens for the given source string and line number. 
@@ -472,49 +487,7 @@ function javalex.getTokens( sourceStr, lineNum )
 		skipBlockComment()  -- don't generate tokens for block comments 
 	end
 
-	-- Determine the indent level
-	local col = 0 -- number of spaces the line is indented, assuming a tab stop of 8
-	local c = chars[iChar]
-	repeat 
-		if c == 32 then -- Space
-			col = col + 1
-		elseif c == 9 then -- TAB
-			col = col + 8 - col % 8
-		else
-			break
-		end
-		iChar = iChar + 1
-		c = chars[iChar]
-	until false -- breaks internally when chars[iChar] is not a space or tab (c ~= 32 and c ~= 9)
-	indentLevelForLine[lineNum] = col
-
-	-- Lines with only whitespace or comments shouldn't affect indentation
-	local blankLine
-	if c == nil then -- new line
-		blankLine = true
-	elseif c == 47 then -- /
-		c = chars[iChar + 1]
-		if c == 47 then -- /
-			blankLine = true
-		end
-	end
-	if not blankLine then
-		-- Check for consistent use of tabs with spaces
-		local indentStr = string.sub( sourceStr, 1, iChar - 1 )
-		local len = iChar - 1
-		local prevLen = string.len( prevIndentStr )
-		if len == prevLen and indentStr ~= prevIndentStr
-				or len > prevLen and string.sub( indentStr, 1, prevLen ) ~= prevIndentStr
-				or len < prevLen and string.sub( prevIndentStr, 1, len ) ~= indentStr then
-			err.setErr( { iLine = lineNum }, { iLine = prevIndentLineNum }, 
-					"Mix of tabs and spaces used for indentation is not consistent with the previous line of code" )
-		end
-		-- Update prevIndentStr and prevIndentLineNum
-		prevIndentStr = indentStr
-		prevIndentLineNum = lineNum
-	end
-
-	-- Scan the rest of the chars array
+	-- Scan the chars array
 	repeat
 		-- Skip whitespace
 		local charType = charTypes[chars[iChar]]
