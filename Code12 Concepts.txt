@@ -111,7 +111,7 @@ for ways to use the Code12 API at each level:
 
 6. Object Data Fields
 ---------------------
-* Make a GameObj move smoothly be setting its xSpeed and/or ySpeed field in start() 
+* Make a GameObj move smoothly by setting its xSpeed and/or ySpeed field in start() 
 * Make a GameObj move smoothly by changing its x and/or y fields in update()
 * Make an object grow/shrink by changing its width or height in update()
 * Make a thick outline by setting an object's lineWidth field after creation
@@ -120,25 +120,33 @@ for ways to use the Code12 API at each level:
 
 7. Object Method Calls
 ----------------------
-
+* Any of the GameObj methods can now be used, for many different features
+* The supported String methods can now be used to manipulate strings
 
 8. If-else
 ----------
-
+* Use the result of ct.inputYesNo() to see if the user wants to do something or not
+* Use ct.clicked(), ct.objectClicked(), and GameObj.clicked() to detect mouse clicks
+* Use ct.keyPressed() and ct.charTyped() to detect keyboard input
+* Detect when a GameObj goes off screen in update() and recycle or bounce it
+* Use GameObj.hit(), GameObj.containsPoint() and GameObj.objectHitIngroup() to detect hits
 
 9. Function Definitions
 -----------------------
-
+* Define your own functions to reduce repeated code, etc.
 
 10. Parameters
 --------------
-
+* Add parameters to functions you define to make them more reusable
 
 11. Loops
 ---------
-
+* Create several obstacles or enemies at random locations
+* Create a row or column of objects with regular spacing
 
 12. Arrays
 ----------
+* Keep track of groups of objects of different types, so that you can process them 
+  together with the same code with loops
 
  
