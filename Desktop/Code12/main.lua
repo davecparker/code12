@@ -50,7 +50,7 @@ local appContext = ct._appContext
 -- Run the given lua code string dynamically, and then call the contained start function.
 local function runLuaCode( luaCode )
 	-- Load the code dynamically and execute it
-	local codeFunction = loadstring( luaCode )
+	local codeFunction, strErr = loadstring( luaCode )
 	if type(codeFunction) == "function" then
 		-- Run user code main chunk, which defines the functions
 		codeFunction()
@@ -58,7 +58,23 @@ local function runLuaCode( luaCode )
 		-- Run and show the program output
 		composer.gotoScene( "runView" )
 	else
-		print( "*** Lua code failed to load" )
+		-- Lua code failed to load (unexpected code generation error?)
+		-- Try to get the line number and report an error.
+		print( "*** Lua code failed to load: " .. strErr )
+		local strLineNum, strMessage = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
+		local iLine = nil
+		if strLineNum then
+			local lineNum = tonumber( strLineNum )
+			if lineNum then
+				iLine = lineNum
+			end
+		end
+		if iLine then
+			err.setErrLineNum( iLine, "This line caused an unexpected code generation error" )
+		else
+			err.setErrLineNum( 1, "Sorry, your program caused an unexpected code generation error" )
+		end
+		composer.gotoScene( "errView" )
 	end
 end
 
@@ -164,13 +180,8 @@ local function initNewProgram()
 	err.initProgram()
 end
 
--- Process the user file (parse then run or show error)
+-- Process the sourceFile (parse then run or show error), which has already been read. 
 function app.processUserFile()
-	-- Read the file
-	if not readSourceFile() then
-		return
-	end
-
 	-- Get ready to run a new program
 	initNewProgram()
 
@@ -180,7 +191,7 @@ function app.processUserFile()
 								sourceFile.strLines, app.syntaxLevel )
 	if parseTrees == nil then
 		composer.gotoScene( "errView" )
-		return
+		return true
 	end
 	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
@@ -198,21 +209,28 @@ function app.processUserFile()
 			runLuaCode( codeStr )
 		end
 	end
+	return true
 end
 
 -- Check user file for changes and (re)run it if modified or never loaded
 local function checkUserFile()
 	if sourceFile.path then
-		-- Get the file modification time
+		-- Check the file modification time
 		local timeMod = env.fileModTimeFromPath( sourceFile.path )
 		if sourceFile.timeModLast == 0 then
 			sourceFile.timeModLast = timeMod or os.time()
 		end
 
-		-- Load file if changed or never loaded
+		-- Consider the file updated if timeMod changed or if never loaded
 		if sourceFile.timeLoaded == 0 
 				or (timeMod and timeMod > sourceFile.timeModLast) then
-			sourceFile.timeModLast = timeMod 
+			sourceFile.timeModLast = timeMod
+			sourceFile.updated = true
+		end
+
+		-- (Re)Load and process the file if updated 
+		if sourceFile.updated and readSourceFile() then
+			sourceFile.updated = false    -- until next time the file updates
 			app.processUserFile()
 			statusBar.update()
 		end
