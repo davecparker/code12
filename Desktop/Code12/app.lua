@@ -43,6 +43,7 @@ local app =  {
 		path = nil,              -- full pathname to the file
 		timeLoaded = 0,          -- time this file was loaded or 0 if not loaded
 		timeModLast = 0,         -- last modification time or 0 if unknown
+		updated = false,         -- set to true when file update is detected
 		strLines = {},           -- array of source code lines when read
 	},
 
