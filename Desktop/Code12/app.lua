@@ -73,49 +73,63 @@ function app.printDebugStr( str, file )
 	end
 end
 
--- Return a detabbed version of strLine, and optionally the column numbers corresponding to 
--- iCharStart and iCharEnd if they are given
-function app.detabLine( strLine, iCharStart, iCharEnd )
+-- Return a detabbed version of string strLine
+function app.detabLine( strLine )
 	local chars = { string.byte( strLine, 1, string.len(strLine) ) }
 	local numChars = #chars
 	local charsDetabbed = {}
-	local iColStart, iColEnd
-	if iCharStart then
-		iColStart = iCharStart
-		if iCharEnd then
-			iColEnd = iCharEnd
-		else
-			iColEnd = numChars
-		end
-	end
 	local tabWidth = app.tabWidth
 	local col = 1
-	for i = 1, numChars
-	 do
+	for i = 1, numChars do
 		local ch = chars[i]
 		if ch == 9 then -- Tab
-			local numSpaces = tabWidth - (col - 1) % tabWidth
-			if iCharStart then
-			-- Adjust iColStart and iColEnd if needed
-				if col < iColStart then
-					iColStart = iColStart + numSpaces - 1
-					iColEnd = iColEnd + numSpaces - 1
-				elseif col <= iColEnd then
-					iColEnd = iColEnd + numSpaces - 1
-				end
-			end
 			-- Insert spaces to replace the tab
+			local numSpaces = tabWidth - (col - 1) % tabWidth
 			for j = 1, numSpaces do
 				charsDetabbed[col] = 32 -- Space
 				col = col + 1
 			end	
 		else
+			-- Copy the non-tab character
 			charsDetabbed[col] = ch
 			col = col + 1
 		end
 	end
-	return string.char( unpack( charsDetabbed ) ), iColStart, iColEnd
+	return string.char( unpack( charsDetabbed ) )
 end
 
+-- Return corresponding column indices iColStart and iColEndFor the given string
+-- strLine and character indices iCharStart and iCharEnd (if iCharEnd is not
+-- given, iColEnd will correspond to the end of strLine)
+function app.iCharToICol( strLine, iCharStart, iCharEnd )
+	local chars = { string.byte( strLine, 1, string.len(strLine) ) }
+	local numChars = #chars
+	local iColStart = iCharStart
+	local iColEnd
+	if iCharEnd then
+		iColEnd = iCharEnd
+	else
+		iColEnd = numChars
+	end
+	local tabWidth = app.tabWidth
+	local col = 1
+	for i = 1, numChars do
+		local ch = chars[i]
+		if ch == 9 then -- Tab
+			local numSpaces = tabWidth - (col - 1) % tabWidth
+			-- if needed, increment iColStart and iColEnd
+			if col < iColStart then
+				iColStart = iColStart + numSpaces - 1
+				iColEnd = iColEnd + numSpaces - 1
+			elseif col <= iColEnd then
+				iColEnd = iColEnd + numSpaces - 1
+			end
+			col = col + numSpaces
+		else
+			col = col + 1
+		end
+	end
+	return iColStart, iColEnd
+end
 ------------------------------------------------------------------------------
 return app
