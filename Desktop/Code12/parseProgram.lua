@@ -11,6 +11,7 @@
 local app = require( "app" )
 local parseJava = require( "parseJava" )
 local err = require( "err" )
+local javalex = require( "javalex" )
 
 -- The parseProgram module
 local parseProgram = {}
@@ -453,11 +454,20 @@ function getBlockStmts()
 		return false
 	end
 
+	-- Check block is indented from beginning {
+	local startIndent = javalex.indentLevelForLine(iLineStart)
+	local blockIndent = javalex.indentLevelForLine(parseTrees[iTree].iLine)
+	if blockIndent <= startIndent then
+		err.setErrLineNum( parseTrees[iTree].iLine, "Block should be indented from it's beginning {" )
+		return nil
+	end
+
 	-- Get all lines until we get a matching end for the block begin
 	local stmts = {}
 	while iTree <= numParseTrees do
 		local tree = parseTrees[iTree]
 		local p = tree.p
+		local currIndent = javalex.indentLevelForLine(tree.iLine)
 		iTree = iTree + 1    -- pass this line
 
 		if p == "begin" then
@@ -465,8 +475,16 @@ function getBlockStmts()
 			err.setErrLineNum( tree.iLine, "Unexpected {" )
 			return nil
 		elseif p == "end" then
+			if currIndent ~= startIndent then
+				err.setErrLineNum( tree.iLine, "A block's ending } should have the same indentation as it's beginning {" )
+				return nil
+			end
 			return stmts   -- this ends our block
 		else
+			if currIndent ~= blockIndent then
+				err.setErrLineNum( tree.iLine, "Unexpected change in indentation" )
+				return nil
+			end
 			getLineStmts( tree, stmts )
 		end
 	end
