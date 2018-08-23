@@ -149,19 +149,20 @@ local function setHighlightRectFromLoc( r, loc )
 		-- Multi-line. Make a rectangle bounding all the lines.
 		r.height = 0
 		for i = iLine, loc.iLineEnd do
-			local cols = string.len( app.detabLine( sourceLines[i] or "" ) )
+			local _, cols = app.iCharToICol( sourceLines[i] or "", 1 )
 			numCols = math.max( numCols, cols )
 			r.height = r.height + app.consoleFontHeight
 		end
 	elseif loc.iCharStart then
 		-- Partial line
-		local _, iColStart, iColEnd = app.detabLine(
+		local iColStart, iColEnd = app.iCharToICol(
 				sourceLines[iLine] or "", loc.iCharStart, loc.iCharEnd )
 		r.x = (iColStart - 1) * dxChar - dxExtra
 		numCols = iColEnd - iColStart + 1
 	else
 		-- Whole line
-		numCols = string.len( app.detabLine( sourceLines[iLine] or "" ) )
+		local _, cols = app.iCharToICol( sourceLines[iLine] or "", 1 )
+		numCols = cols
 	end
 	r.width = math.max( numCols, 1 ) * dxChar + dxExtra * 2
 end
