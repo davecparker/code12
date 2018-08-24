@@ -63,7 +63,7 @@ require('Code12.api')
         this.frame = this.updates % 20
         this.frame = ct.intDiv(this.frame, 10)
         this.frameNumb = ct.formatInt(this.frame)
-        local filename = "yellowbird" .. this.frameNumb .. ".png"
+        local filename = "yellowbird"..this.frameNumb..".png"
         this.bird:delete()
         this.bird = ct.image(filename, this.birdX, this.birdY, this.hbird)
         --//////////////////////////////////////////////////
@@ -73,7 +73,7 @@ require('Code12.api')
         this.halfseconds = ct.intDiv(this.updates, 30)
         this.frame = this.halfseconds % 10
         this.frameNumb = ct.formatInt(this.frame)
-        filename = this.frameNumb .. ".png"
+        filename = this.frameNumb..".png"
         this.score:delete()
         this.score = ct.image(filename, this.scoreX, this.scoreY, 5)
     end

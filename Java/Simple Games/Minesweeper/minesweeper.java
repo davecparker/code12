@@ -2,16 +2,17 @@ import Code12.*;
 
 class minesweeper extends Code12Program
 {  
-      int rows = 10;
-      int columns = 10;
+      int columns = 20;
+      int rows = 14;
       GameObj[] squares = new GameObj[rows * columns];
       GameObj[] flags = new GameObj[rows * columns];
       int numbFlags = 0;
       GameObj numb;
-      int numbmines = 10;
+      int numbmines = 20;
       String squareState;
       double timer = 0;
       boolean mouseDown = false;
+      GameObj smiley;
 
       public static void main(String[] args)
       { 
@@ -58,9 +59,9 @@ class minesweeper extends Code12Program
 
       public boolean goodIndex( int x, int y )
       {
-            if( x >= 0 && x < rows )
+            if( x >= 0 && x < columns )
             {
-                  if( y >= 0 && y < columns )
+                  if( y >= 0 && y < rows )
                   {
                         int i = (y * columns) + x;
                            if( i >= 0 && i <= squares.length - 1 )
@@ -204,6 +205,7 @@ class minesweeper extends Code12Program
             {
                   if( obj!= null )
                   {
+                        ct.println(timer);
                         GameObj flag = ct.image( "flag.png", obj.x, obj.y, 3 );
                         flag.setLayer( 3 );
                         flag.setText( obj.getText() );
@@ -217,11 +219,13 @@ class minesweeper extends Code12Program
       }
 
       public void start()
-      {  
-            ct.setHeight(100);
-            for( int x = 0; x < rows; x++ ) // x = x cord of the square
+      { 
+            ct.setHeight(80.5); //sets the screen height to match the grid size
+
+            smiley = ct.image( "smiley.jpg", 50, 5, 10 );
+            for( int y = 0; y < rows; y++ ) //  y = y cord of the square
             {
-                  for( int y = 0; y < columns; y++ ) //  y = y cord of the square
+                  for( int x = 0; x < columns; x++ ) // x = x cord of the square
                   {
                         GameObj square = ct.rect( 2.7+(x*5), 12.9+(y*5), 5, 5, "gray");
                         square.setLayer( 2 );
@@ -236,30 +240,30 @@ class minesweeper extends Code12Program
 
             while( m < numbmines )
             {
-                  int randX = ct.random( 0, rows - 1 );
-                  int randY = ct.random( 0, columns - 1 );
+                  int randX = ct.random( 0, columns - 1 );
+                  int randY = ct.random( 0, rows - 1 );
                   //Checks if there is already a mine at this randomly selected coordinate
-                  boolean uniquemine = true; 
-                  int newmineCord = columns * randX + randY;
+                  boolean uniqueMine = true; 
+                  int newMineCord = (columns * randY) + randX;
                   
                   for( int mineChord : mineCords )
                   {
-                        if( mineChord == newmineCord )     
-                              uniquemine = false;
+                        if( mineChord == newMineCord )     
+                              uniqueMine = false;
                   }
 
-                  if( uniquemine )
+                  if( uniqueMine )
                   {
                         setSquareValue( randX, randY, "mine");
-                        mineCords[m] = newmineCord;
+                        mineCords[m] = newMineCord;
                         m++;
                   }
             }
 
             //Calculates the square numbers
-            for( int x = 0; x < rows; x++ )
+            for( int x = 0; x < columns; x++ )
             {
-                  for( int y = 0; y < columns; y++ )
+                  for( int y = 0; y < rows; y++ )
                   {
                         
                         squareState = getSquareValue(  x, y ); 
@@ -327,5 +331,6 @@ class minesweeper extends Code12Program
             {
                   timer += 1;
             }
+
       }
 }

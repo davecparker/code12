@@ -46,8 +46,8 @@ public class MainProgram extends Code12Program
       {
          for ( int x = 20; x <= 54; x+=17 ) // inner loop controls x of buttons
          {
-            GameOnj button = ct.rect( x, y, 15, 10, "gray");
-            String buttonText = ct.formatInt( num );
+            button = ct.rect( x, y, 15, 10, "gray");
+            buttonText = ct.formatInt( num );
             button.setText( buttonText );
             ct.text( buttonText , x, y, 10, "black" );
             num++;
