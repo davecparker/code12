@@ -257,40 +257,7 @@ public class SimplePlatformer extends Code12Program
       }  
    }
 
-   /*public double doJump(double velocityY, double gameTime)
-   {
-      // If the player wants to jump
-      if (isJumping)
-      {
-         ct.println("test");
-         ct.println( "on ground = " + onGround);
-         // Begin or continue a jump
-         if (onGround || jumpTime > 0.0)
-         {
-            ct.println("test: jump should begin");
-            // test sound here
-            jumpTime += gameTime;
-         }
-
-         // If we are in the ascent of the jump
-         if (0.0 < jumpTime || jumpTime <= maxJumpTime)
-         {
-            ct.println("test2");
-            // Fully override the vertical velocity with a power curve that gives players more control over the top of the jump (If you dont want this you can remove the Math.Pow)
-            velocityY = jumpLaunchVelocity * (1.0 - (double)Math.Pow(jumpTime / maxJumpTime, JumpControlPower));
-         }
-         else
-            jumpTime = 0.0;   // Reached the apex of the jump
-      }
-      else
-      {
-         // Continues not jumping or cancels a jump in progress
-         jumpTime = 0.0;
-      }
-      
-      wasJumping = isJumping;
-      return velocityY;
-   }*/
+  
 
 
    public void onKeyRelease( String keyName )

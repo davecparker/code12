@@ -13,12 +13,12 @@ require('Code12.api')
     this.onGround = true
     
     
-    this.isJumping = false
-    this.wasJumping = false
-    this.jumpTime = 0
+    this.isJumping = false   --Is the player in a jump?
+    this.wasJumping = false   --Did the player just exit a jump?
+    this.jumpTime = 0   --Time the player has been in a jump (Useful for adding a power curve or to max out on jump height)
     
-    this.maxJumpTime = .8
-    this.jumpLaunchVelocity = -3000.0
+    this.maxJumpTime = .8   --If you want to max out a jump, otherwise remove the relevant parts of the code
+    this.jumpLaunchVelocity = -3000.0   --How
     
     
         
@@ -75,7 +75,7 @@ require('Code12.api')
         this.playerLeft.visible = false
         this.playerRight = ct.image("stickmanright.png", 10, 10, 8)
         
-        --playerLeft = ct.image("stickmanleft.png", 10, height - 8 , 8);
+        
         
         
         
@@ -142,7 +142,7 @@ require('Code12.api')
                     
                     _fn.endJump()
                     
-                
+                -- reverse player's direction if collision with the side of a platform
                 elseif (from == "left") then
                     
                     this.playerLeft.visible = false
@@ -256,39 +256,6 @@ require('Code12.api')
         end
     end
     
-    --public double doJump(double velocityY, double gameTime)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
@@ -343,5 +310,6 @@ require('Code12.api')
         end
         
     end
+
 
 
