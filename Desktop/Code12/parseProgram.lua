@@ -260,6 +260,9 @@ local function getControlledStmts()
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "begin" then
+		if javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( parseTrees[iTree - 1].iLine ) then
+			err.setErrNode( tree, "A controlled block's beginning { should have the same indentation as it's control statement" )
+		end
 		return getBlockStmts()
 	elseif p == "end" then
 		err.setErrNode( tree, "} without matching {" )
@@ -269,6 +272,9 @@ local function getControlledStmts()
 		err.setErrNode( tree, "Variable declarations are not allowed here" )
 		return nil
 	else
+		if javalex.indentLevelForLine( tree.iLine ) <= javalex.indentLevelForLine( parseTrees[iTree - 1].iLine ) then
+			err.setErrNode( tree, "A controlled statement should be indented from it's control statement" )
+		end
 		-- Single controlled stmt
 		iTree = iTree + 1  -- pass the controlled stmt as expected by getLineStmts
 		local stmts = {}
@@ -282,18 +288,24 @@ end
 -- Check to see if the next stmt is an else or else if, and if so then 
 -- get the controlled stmts and return an array of stmt structures. 
 -- Return nil if there is no else or an error.
-local function getElseStmts()
+local function getElseStmts( indentLevel )
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "else" then
+		if javalex.indentLevelForLine( tree.iLine ) ~= indentLevel then
+			err.setErrNode( tree, "Unexpected change in indentation for this else" )
+		end
 		iTree = iTree + 1
 		return getControlledStmts()
 	elseif p == "elseif" then
 		-- Controlled stmts is a single stmt, which is the following if
+		if javalex.indentLevelForLine( tree.iLine ) ~= indentLevel then
+			err.setErrNode( tree, "Unexpected change in indentation for this else if" )
+		end
 		iTree = iTree + 1
 		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
 				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts() } }
+				elseStmts = getElseStmts( indentLevel ) } }
 	end
 	return nil	
 end
@@ -376,6 +388,9 @@ function getLineStmts( tree, stmts )
 		return true
 	end
 
+	-- Store indent level
+	local indentLevel = javalex.indentLevelForLine( tree.iLine )
+
 	-- Handle the line patterns
 	local stmt = nil
 	if p == "stmt" then
@@ -385,7 +400,7 @@ function getLineStmts( tree, stmts )
 		-- if (expr) controlledStmts [else controlledStmts]
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts() }
+				elseStmts = getElseStmts( indentLevel ) }
 	elseif p == "elseif" or p == "else" then
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
@@ -455,11 +470,10 @@ function getBlockStmts()
 	end
 
 	-- Check block is indented from beginning {
-	local startIndent = javalex.indentLevelForLine(iLineStart)
-	local blockIndent = javalex.indentLevelForLine(parseTrees[iTree].iLine)
+	local startIndent = javalex.indentLevelForLine( iLineStart )
+	local blockIndent = javalex.indentLevelForLine( parseTrees[iTree].iLine )
 	if blockIndent <= startIndent then
 		err.setErrLineNum( parseTrees[iTree].iLine, "Block should be indented from it's beginning {" )
-		return nil
 	end
 
 	-- Get all lines until we get a matching end for the block begin
@@ -467,7 +481,7 @@ function getBlockStmts()
 	while iTree <= numParseTrees do
 		local tree = parseTrees[iTree]
 		local p = tree.p
-		local currIndent = javalex.indentLevelForLine(tree.iLine)
+		local currIndent = javalex.indentLevelForLine( tree.iLine )
 		iTree = iTree + 1    -- pass this line
 
 		if p == "begin" then
@@ -477,13 +491,11 @@ function getBlockStmts()
 		elseif p == "end" then
 			if currIndent ~= startIndent then
 				err.setErrLineNum( tree.iLine, "A block's ending } should have the same indentation as it's beginning {" )
-				return nil
 			end
 			return stmts   -- this ends our block
 		else
 			if currIndent ~= blockIndent then
 				err.setErrLineNum( tree.iLine, "Unexpected change in indentation" )
-				return nil
 			end
 			getLineStmts( tree, stmts )
 		end
