@@ -7,7 +7,7 @@ import Code12.*;
 
 public class DuckHunt extends Code12Program
 {
-public static void main( String[] args )
+	public static void main( String[] args )
 	{
 		Code12.run( new DuckHunt() ); 
 	}
