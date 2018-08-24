@@ -717,6 +717,7 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	-- Parse the lines and build the parseTrees array
 	parseJava.initProgram()
 	local startTokens = nil
+	local iLineStart = nil
 	numSourceLines = #sourceLines
 	for lineNum = 1, numSourceLines do
 		local tree, tokens = parseJava.parseLine( sourceLines[lineNum], 
@@ -725,15 +726,20 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 			-- Line is incomplete, carry tokens forward to next line
 			assert( type(tokens) == "table" )
 			startTokens = tokens
+			if iLineStart == nil then
+				iLineStart = lineNum  -- remember what line this multi-line parse stated on
+			end
 		else
 			startTokens = nil
 			if tree == nil then
 				-- Syntax error: Use stub error tree
-				parseTrees[#parseTrees + 1] = 
-						{ isError = true, iLine = lineNum }
-			elseif tree.p ~= "blank" then
+				tree = { isError = true, iLine = lineNum }
+			end 
+			if tree.p ~= "blank" then
+				tree.iLineStart = iLineStart or lineNum
 				parseTrees[#parseTrees + 1] = tree
 			end
+			iLineStart = nil
 		end
 	end
 

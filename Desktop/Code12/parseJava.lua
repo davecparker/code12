@@ -543,7 +543,8 @@ local function parseCurrentLine( level )
 	-- TODO: Try modified patterns to isolate the error
 
 	-- Make a generic syntax error to use if a more specific error was not set
-	err.setErrLineNum( tokens[1].iLine, "Syntax error (unrecognized code)" )
+	local lastToken = tokens[#tokens - 1]  -- not counting the END
+	err.setErrTokenSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
 	return nil
 end
 
