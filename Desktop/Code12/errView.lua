@@ -131,7 +131,7 @@ local function makeErrDisplay( sceneGroup )
 	-- to the main loc to show in the same code group.
 	local loc = err.rec.loc
 	local refLoc = err.rec.refLoc
-	if refLoc and math.abs( refLoc.iLine - loc.iLine ) <= minSourceLines then
+	if refLoc == nil or math.abs( refLoc.iLine - loc.iLine ) <= minSourceLines then
 		-- Make just one group, but big enough to show the refLoc if any
 		local numLines = minSourceLines
 		if refLoc then
