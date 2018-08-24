@@ -61,7 +61,7 @@ local function runLuaCode( luaCode )
 		-- Lua code failed to load (unexpected code generation error?)
 		-- Try to get the line number and report an error.
 		print( "*** Lua code failed to load: " .. strErr )
-		local strLineNum, strMessage = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
+		local strLineNum = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
 		local iLine = nil
 		if strLineNum then
 			local lineNum = tonumber( strLineNum )
@@ -196,18 +196,18 @@ function app.processUserFile()
 	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
 	-- Do Semantic Analysis on the parse trees
-	checkJava.initProgram( parseTrees, app.syntaxLevel )
+	checkJava.checkProgram( programTree, app.syntaxLevel )
 	if err.rec then
 		composer.gotoScene( "errView" )
 	else
 		-- Make and run the Lua code
-		local codeStr = codeGenJava.getLuaCode( parseTrees )
-		if err.rec then
-			composer.gotoScene( "errView" )
-		else
-			writeLuaCode( codeStr )
-			runLuaCode( codeStr )
-		end
+		-- local codeStr = codeGenJava.getLuaCode( parseTrees )
+		-- if err.rec then
+		-- 	composer.gotoScene( "errView" )
+		-- else
+		-- 	writeLuaCode( codeStr )
+		-- 	runLuaCode( codeStr )
+		-- end
 	end
 	return true
 end

@@ -166,9 +166,8 @@ local fnValue = { t = "fnValue",
 
 -- A return type for a procedure/function definition
 local retType = { t = "retType",
-	{ 1, 12, "void",			"void" 					},
 	{ 12, 12, "array",			"ID", "[", "]"			},
-	{ 9, 12, "value",			"ID"					},
+	{ 1, 12, "simple",			"ID"					},
 }
 
 -- An access permission specifier
@@ -225,7 +224,6 @@ local opAssignOp = { t = "opAssignOp",
 -- A statement
 local stmt = { t = "stmt",
 	{ 1, 12, "call",			fnValue, "(", exprList, ")" 		},
-	{ 3, 12, "varAssign",		"ID", "=", expr 					},
 	{ 3, 12, "assign",			lValue, "=", expr 					},
 	{ 4, 12, "opAssign",		lValue, opAssignOp, expr 			},
 	{ 4, 12, "preInc",			"++", lValue 						},
@@ -299,7 +297,7 @@ local line = { t = "line",
 	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",					"END" },
 	{ 1, 12, "class",			"class", "ID", 									"END" },
 	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",			"END" },
-	{ 1, 12, "main",			"public", "static", "void", "ID", 
+	{ 1, 12, "main",			"public", "static", "ID", "ID", 
 									"(", "ID", "[", "]", "ID", ")",				"END" },
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
 									"ID", "(", ")", ")", ";",					"END" },

@@ -36,11 +36,12 @@ local incompleteLines = {}
 
 --- Utility Functions -------------------------------------------------------
 
--- Expand loc as necessary to contain the location spanned by node
+-- Expand loc as necessary to contain the location spanned by node,
+-- which can be a token, parse tree node, or strucure node.
 local function expandLocToNode( loc, node )
-	-- Is this a token or a parse tree?
-	if node.tt then   -- token
-		-- Update start position if this token is before
+	assert( type(node) == "table" )
+	if node.tt then
+		-- Token: update start position if this token is before
 		if loc.iLine == nil or node.iLine < loc.iLine then
 			loc.iLine = node.iLine
 			loc.iCharStart = nil
@@ -57,16 +58,22 @@ local function expandLocToNode( loc, node )
 		if loc.iCharEnd == nil or iCharEnd > loc.iCharEnd then
 			loc.iCharEnd = iCharEnd
 		end
-	else
-		-- Non-token, search all children
-		local nodes = node.nodes
-		for i = 1, #nodes do
-			expandLocToNode( loc, nodes[i] ) 
+	elseif node.t then
+		-- Parse tree node: expand to all children
+		for _, child in ipairs(node.nodes) do
+			expandLocToNode( loc, child ) 
+		end
+	elseif node.s then
+		-- Structure node: expand to all children
+		for _, child in pairs(node) do
+			if type(child) == "table" then
+				expandLocToNode( loc, child )
+			end
 		end
 	end
 end
 
--- Make and return a loc record using the extent of the given parse tree node
+-- Make and return a loc record using the extent of the given parse tree or structure node
 local function errLocFromNode( node )
 	local loc = {}
 	expandLocToNode( loc, node )
@@ -194,8 +201,8 @@ function err.setErrCharRange( iLine, iCharStart, iCharEnd, strErr, ... )
 end
 
 -- Record an error with:
---      node          parse tree for main location of the error
---      refNode       parse tree for an addition location to reference, or nil if none.
+--      node          parse or structure node for main location of the error
+--      refNode       parse or structure node for addition loc to reference, or nil if none.
 --      strErr        error message string
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErrNodeAndRef( node, refNode, strErr, ... )
@@ -207,7 +214,7 @@ function err.setErrNodeAndRef( node, refNode, strErr, ... )
 end
 
 -- Record an error with:
---      node          parse tree for location of the error
+--      node          parse or structure node for location of the error
 --      strErr        error message string
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErrNode( node, strErr, ... )

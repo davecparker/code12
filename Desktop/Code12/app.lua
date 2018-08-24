@@ -86,7 +86,7 @@ function app.detabLine( strLine )
 		if ch == 9 then -- Tab
 			-- Insert spaces to replace the tab
 			local numSpaces = tabWidth - (col - 1) % tabWidth
-			for j = 1, numSpaces do
+			for _ = 1, numSpaces do
 				charsDetabbed[col] = 32 -- Space
 				col = col + 1
 			end	

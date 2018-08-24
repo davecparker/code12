@@ -359,10 +359,10 @@ local function generateVarDecl( tree, isInstanceVar )
 		end
 		local varName = nameNode.str
 		if isInstanceVar then
-			checkJava.defineInstanceVar( nameNode, vt, false, true )
+			checkJava.defineInstanceVar( nameNode, vt, true )
 			beginLuaLine( varNameCode( varName ) )
 		else
-			checkJava.defineLocalVar( nameNode, vt, false, true )
+			checkJava.defineLocalVar( nameNode, vt, true )
 			beginLuaLine( "local " )
 			addLua( varNameCode( varName ) )
 		end
@@ -379,9 +379,9 @@ local function generateVarDecl( tree, isInstanceVar )
 			local nameNode = idList[i]
 			local varName = nameNode.str
 			if isInstanceVar then
-				checkJava.defineInstanceVar( nameNode, vt, false )
+				checkJava.defineInstanceVar( nameNode, vt )
 			else
-				checkJava.defineLocalVar( nameNode, vt, false )
+				checkJava.defineLocalVar( nameNode, vt )
 				addLua( "local " )
 			end
 			addLua( varNameCode( varName ) )
@@ -403,10 +403,10 @@ local function generateVarDecl( tree, isInstanceVar )
 		local nameNode = nodes[4]
 		local varName = nameNode.str
 		if isInstanceVar then
-			checkJava.defineInstanceVar( nameNode, vt, true, true )
+			checkJava.defineInstanceVar( nameNode, vt, true )
 			beginLuaLine( varNameCode( varName ) )
 		else
-			checkJava.defineLocalVar( nameNode, vt, true, true )
+			checkJava.defineLocalVar( nameNode, vt, true )
 			beginLuaLine( "local " )
 			addLua( varNameCode( varName ) )
 		end
@@ -451,9 +451,9 @@ local function generateVarDecl( tree, isInstanceVar )
 			local nameNode = idList[i]
 			local varName = nameNode.str
 			if isInstanceVar then
-				checkJava.defineInstanceVar( nameNode, vt, true )
+				checkJava.defineInstanceVar( nameNode, vt )
 			else
-				checkJava.defineLocalVar( nameNode, vt, true )
+				checkJava.defineLocalVar( nameNode, vt )
 				addLua( "local " )
 			end
 			addLua( varNameCode( varName ) )
@@ -496,15 +496,15 @@ local function generateStmt( tree )
 			return
 		end
 		addLua( fnCallCode( tree ) )
-	elseif p == "varAssign" then
-		-- ID = expr
-		local varNode = nodes[1]
-		local expr = nodes[3]
-		if checkJava.canAssignToVarNode( varNode, expr ) then
-			addLua( varNameCode( varNode.str ) )
-			addLua( " = " )
-			addLua( exprCode( expr ) )
-		end
+	-- elseif p == "varAssign" then
+	-- 	-- ID = expr
+	-- 	local varNode = nodes[1]
+	-- 	local expr = nodes[3]
+	-- 	if checkJava.canAssignToVarNode( varNode, expr ) then
+	-- 		addLua( varNameCode( varNode.str ) )
+	-- 		addLua( " = " )
+	-- 		addLua( exprCode( expr ) )
+	-- 	end
 	elseif p == "assign" then
 		-- lValue = expr
 		local lValue = nodes[1]
@@ -559,7 +559,7 @@ local function generateForLoop( tree )
 					"Array \"%s\" contains elements of type %s",
 					nodes[4].str, javaTypes.typeNameFromVt( vtArray.vt ) );
 		else
-			checkJava.defineLocalVar( nodes[2], vtVar, false, true )
+			checkJava.defineLocalVar( nodes[2], vtVar, true )
 			beginLuaLine( "for _, " )
 			addLua( nodes[2].str )
 			addLua( " in ipairs(" )
@@ -580,7 +580,7 @@ local function generateForLoop( tree )
 		if forInit.p == "varInit" then
 			local vt = javaTypes.vtFromVarType( forInit.nodes[1] )
 			local nameNode = forInit.nodes[2]
-			checkJava.defineLocalVar( nameNode, vt, false, true )
+			checkJava.defineLocalVar( nameNode, vt, true )
 			local expr = forInit.nodes[4]
 			checkJava.canAssignToVarNode( nameNode, expr, true )
 			addLua( "local " )

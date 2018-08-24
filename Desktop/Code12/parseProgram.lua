@@ -41,7 +41,7 @@ local parseProgram = {}
 --
 -- lValue: { s = "lValue", varID, indexExpr, fieldID }
 -- 
--- expr:
+-- expr:  (Type checking will add a vt field to the expr)
 --     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
 --     { s = "call", lValue, exprs }
 --     { s = "lValue", lValue }
@@ -140,7 +140,7 @@ end
 -- Check for a correct main function body and move iTree past it.
 -- If there is an error then set the error state and return false.
 -- Return true if succesful.
-local function checkMain()
+local function checkMainBody()
 	if not checkBlockBegin() then
 		return false
 	end
@@ -305,16 +305,16 @@ local function getStmt( node )
 
 	if p == "call" then
 		return makeCall( nodes )
-	elseif p == "varAssign" or p == "assign" then  -- TODO: remove this distinction?
-		return { s = "assign", lValue = makeLValue( nodes[1] ), op = "=", 
+	elseif p == "assign" then
+		return { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2], 
 				expr = makeExpr( nodes[3] ) }
 	elseif p == "opAssign" then
-		return { s = "assign", lValue = makeLValue( nodes[1] ),  op = nodes[2].p, 
+		return { s = "assign", lValue = makeLValue( nodes[1] ),  op = nodes[2].nodes[1], 
 				expr = makeExpr( nodes[3] ) }
 	elseif p == "preInc" or p == "preDec" then
-		return { s = "assign", lValue = makeLValue( nodes[2] ), op = nodes[1].tt }
+		return { s = "assign", lValue = makeLValue( nodes[2] ), op = nodes[1] }
 	elseif p == "postInc" or p == "postDec" then
-		return { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2].tt }
+		return { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2] }
 	elseif p == "break" then
 		return { s = "break" }
 	end
@@ -376,7 +376,7 @@ function getLineStmts( tree, stmts )
 	end
 
 	-- Handle the line patterns
-	local stmt = nil
+	local stmt
 	if p == "stmt" then
 		-- stmt ;
 		stmt = getStmt( nodes[1] )
@@ -510,12 +510,12 @@ function makeExpr( node )
 	elseif p == "exprParens" then
 		return { s = "parens", expr = makeExpr( nodes[2] ) }
 	elseif p == "neg" or p == "!" then
-		return { s = "unaryOp", op = nodes[1].str, expr = makeExpr( nodes[2] ) }
+		return { s = "unaryOp", op = nodes[1], expr = makeExpr( nodes[2] ) }
 	elseif p == "newArray" then
 		return { s = "newArray", typeID = nodes[2], lengthExpr = makeExpr( nodes[4] ) }
 	else
 		-- Binary op
-		return { s = "binOp", op = nodes[2].str, left = makeExpr( nodes[1] ),
+		return { s = "binOp", op = nodes[2], left = makeExpr( nodes[1] ),
 				right = makeExpr( nodes[3] ) }
 	end
 end
@@ -575,21 +575,24 @@ local function getMembers()
 		if ok and getVar( p, nodes, vars ) then
 			-- Added instance variable(s)
 		elseif p == "func" then
+			-- User function or event definition
 			if ok then
-				local typeID = nil
-				local isArray = nil
-				local retType = nodes[2]
-				if retType.p ~= "void" then
-					typeID = retType.nodes[1]
-					isArray = (retType.p == "array") or nil
-				end
 				local isPublic = (nodes[1].p == "public") or nil
+				local retType = nodes[2]
+				local typeID = retType.nodes[1]
+				local isArray = (retType.p == "array") or nil
 				funcs[#funcs + 1] = getFunc( typeID, isArray, nodes[3], isPublic, nodes[5] )
 			else
 				getBlockStmts()  -- skip body of invalid function defintion
 			end
 		elseif p == "main" then
-			if not checkMain() then
+			-- A function header that looks like main
+			if not ok or nodes[3].str ~= "void" or nodes[4].str ~= "main" 
+					or nodes[6].str ~= "String" then
+				err.setErrLineParseTree( tree, "Invalid function definition" )  -- TODO: improve?
+				return false
+			end
+			if not checkMainBody() then
 				return false
 			end
 		elseif p == "end" then
@@ -637,11 +640,11 @@ local function printStructureTree( node, indentLevel, file, label )
 		str = str .. label .. ": "
 	end
 	if node.s == "binOp" then
-		str = str .. "(" .. node.op .. ")"
+		str = str .. "(" .. node.op.str .. ")"
 	else
 		str = str .. node.s
 		if node.op then
-			str = str .. " (" .. node.op .. ")"
+			str = str .. " (" .. node.op.str .. ")"
 		end
 	end
 	if node.nameID and node.nameID.str then
@@ -756,7 +759,7 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	end
 
 	-- Print programTree for debugging
-	-- printStructureTree( programTree, 0 )
+	printStructureTree( programTree, 0 )
 
 	-- Return parse trees also for now (TODO: temp)
 	if err.shouldStop() then
@@ -767,8 +770,8 @@ end
 
 -- Print a program structure tree to the given output file or to the console
 -- if file is not included.
-function parseProgram.printProgramTree( programTree, file )
-	printStructureTree( programTree, 0, file )
+function parseProgram.printProgramTree( tree, file )
+	printStructureTree( tree, 0, file )
 end
 
 

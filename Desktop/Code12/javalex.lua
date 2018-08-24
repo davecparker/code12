@@ -31,7 +31,7 @@ local charTypes = {}  -- built in initCharTypes()
 --    false if reserved word not supported by Code12
 --    nil if not reserved word, or not treated as a reserved word.
 -- The following reserved words (primitive types) are treated as normal IDs:
---    byte, boolean, char, double, float, int, long, short
+--    byte, boolean, char, double, float, int, long, short, void
 local reservedWordTokens = {
 	["abstract"]		= false,	
 	["assert"] 			= false,	
@@ -72,7 +72,6 @@ local reservedWordTokens = {
 	["throws"] 			= false,	
 	["transient"] 		= false,
 	["try"] 			= false,	
-	["void"] 			= "void",	
 	["volatile"] 		= false,	
 	["while"] 			= "while",
 
