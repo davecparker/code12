@@ -15,7 +15,7 @@ local json = require( "json" )
 local g = require( "Code12.globals" )
 local app = require( "app" )
 local env = require( "env" )
-local parseJava = require( "parseJava" )
+local parseProgram = require( "parseProgram" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
 local err = require( "err" )
@@ -50,7 +50,7 @@ local appContext = ct._appContext
 -- Run the given lua code string dynamically, and then call the contained start function.
 local function runLuaCode( luaCode )
 	-- Load the code dynamically and execute it
-	local codeFunction = loadstring( luaCode )
+	local codeFunction, strErr = loadstring( luaCode )
 	if type(codeFunction) == "function" then
 		-- Run user code main chunk, which defines the functions
 		codeFunction()
@@ -58,13 +58,24 @@ local function runLuaCode( luaCode )
 		-- Run and show the program output
 		composer.gotoScene( "runView" )
 	else
-		print( "*** Lua code failed to load" )
+		-- Lua code failed to load (unexpected code generation error?)
+		-- Try to get the line number and report an error.
+		print( "*** Lua code failed to load: " .. strErr )
+		local strLineNum, strMessage = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
+		local iLine = nil
+		if strLineNum then
+			local lineNum = tonumber( strLineNum )
+			if lineNum then
+				iLine = lineNum
+			end
+		end
+		if iLine then
+			err.setErrLineNum( iLine, "This line caused an unexpected code generation error" )
+		else
+			err.setErrLineNum( 1, "Sorry, your program caused an unexpected code generation error" )
+		end
+		composer.gotoScene( "errView" )
 	end
-end
-
--- Return a detabbed version of str using the given tabWidth
-local function detabString( str )
-	return string.gsub( str, "\t", "    " )   -- TODO (temp)
 end
 
 -- Read the sourceFile and store all of its source lines.
@@ -81,7 +92,7 @@ local function readSourceFile()
 				if s == nil then 
 					break  -- end of file
 				end
-				sourceFile.strLines[lineNum] = detabString(s)
+				sourceFile.strLines[lineNum] = s
 				lineNum = lineNum + 1
 			until false -- breaks internally
 			io.close( file )
@@ -169,67 +180,57 @@ local function initNewProgram()
 	err.initProgram()
 end
 
--- Process the user file (parse then run or show error)
+-- Process the sourceFile (parse then run or show error), which has already been read. 
 function app.processUserFile()
-	-- Read the file
-	if not readSourceFile() then
-		return
-	end
-
 	-- Get ready to run a new program
 	initNewProgram()
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
-	local parseTrees = {}
-	local startTokens = nil
-	parseJava.init()
-	for lineNum = 1, #sourceFile.strLines do
-		local strUserCode = sourceFile.strLines[lineNum]
-		local tree, tokens = parseJava.parseLine( strUserCode, 
-									lineNum, startTokens, app.syntaxLevel )
-		if tree == false then
-			-- Line is incomplete, carry tokens forward to next line
-			startTokens = tokens
-		else
-			startTokens = nil
-			if tree == nil then
-				composer.gotoScene( "errView" )
-				return
-			end
-			parseTrees[#parseTrees + 1] = tree
-		end
+	local programTree, parseTrees = parseProgram.getProgramTree( 
+								sourceFile.strLines, app.syntaxLevel )
+	if parseTrees == nil then
+		composer.gotoScene( "errView" )
+		return true
 	end
 	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
 	-- Do Semantic Analysis on the parse trees
-	if not checkJava.initProgram( parseTrees, app.syntaxLevel ) then
+	checkJava.initProgram( parseTrees, app.syntaxLevel )
+	if err.rec then
 		composer.gotoScene( "errView" )
 	else
 		-- Make and run the Lua code
 		local codeStr = codeGenJava.getLuaCode( parseTrees )
-		if err.hasErr() then
+		if err.rec then
 			composer.gotoScene( "errView" )
 		else
 			writeLuaCode( codeStr )
 			runLuaCode( codeStr )
 		end
 	end
+	return true
 end
 
 -- Check user file for changes and (re)run it if modified or never loaded
 local function checkUserFile()
 	if sourceFile.path then
-		-- Get the file modification time
+		-- Check the file modification time
 		local timeMod = env.fileModTimeFromPath( sourceFile.path )
 		if sourceFile.timeModLast == 0 then
 			sourceFile.timeModLast = timeMod or os.time()
 		end
 
-		-- Load file if changed or never loaded
+		-- Consider the file updated if timeMod changed or if never loaded
 		if sourceFile.timeLoaded == 0 
 				or (timeMod and timeMod > sourceFile.timeModLast) then
-			sourceFile.timeModLast = timeMod 
+			sourceFile.timeModLast = timeMod
+			sourceFile.updated = true
+		end
+
+		-- (Re)Load and process the file if updated 
+		if sourceFile.updated and readSourceFile() then
+			sourceFile.updated = false    -- until next time the file updates
 			app.processUserFile()
 			statusBar.update()
 		end
@@ -267,29 +268,28 @@ local function loadSettings()
 	-- Read the settings file
 	local file = io.open( settingsFilePath(), "r" )
 	if file then
-		local str = file:read( "*a" )	-- Read entile file as a string (JSON encoded)
+		local str = file:read( "*a" )	-- Read entire file as a string (JSON encoded)
 		io.close( file )
 		if str then
 			local t = json.decode( str )
 			if t then
-				-- Clear the recentPath if it doesn't exist anymore
-				file = io.open( t.recentPath, "r" )
-				if file then
-					userSettings.recentPath = t.recentPath
-					io.close( file )
-				else
-					userSettings.recentPath = nil
+				-- Restore last used source file by default
+				if t.recentPath then
+					-- Use the recentPath only if the file still exists
+					file = io.open( t.recentPath, "r" )
+					if file then
+						io.close( file )
+						userSettings.recentPath = t.recentPath
+						sourceFile.path = userSettings.recentPath
+					end
 				end
-				sourceFile.path = userSettings.recentPath
 
-				-- Make sure the syntaxLevel is valid
+				-- Use the saved syntaxLevel if valid
 				local level = t.syntaxLevel
 				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
 					userSettings.syntaxLevel = level
-				else
-					userSettings.syntaxLevel = app.numSyntaxLevels
+					app.syntaxLevel = userSettings.syntaxLevel
 				end
-				app.syntaxLevel = userSettings.syntaxLevel
 			end
 		end
 	end

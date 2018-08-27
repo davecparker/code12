@@ -118,7 +118,7 @@ end
 
 -- Process a method definition. If there is an error than set the error state
 -- and return false. Return true if successful.
-local function getMethod( typeNode, nameNode, paramList )
+local function getMethod( tree, typeNode, nameNode, paramList )
 	local fnName = nameNode.str
 	if isInvalidName( nameNode, "function" ) then
 		return false
@@ -149,7 +149,7 @@ local function getMethod( typeNode, nameNode, paramList )
 					fnName, javaTypes.typeNameFromVt( event.vt ))
 			return false
 		elseif #event.params ~= #paramTable then
-			err.setErrNodeAndRef( paramList, nameNode, 
+			err.setErrNode( tree, 
 					"Wrong number of parameters for function %s ", fnName )
 			return false
 		else
@@ -166,18 +166,17 @@ local function getMethod( typeNode, nameNode, paramList )
 	end
 
 	-- User-defined function: Check if already defined
-	local method = userMethods[fnName] 
-	if method then
-		err.setErrNodeAndRef( nameNode, method.node,
-				"Function %s is already defined", fnName )
+	local methodFound, methodCorrectCase, nameCorrectCase 
+			= lookupID( nameNode, userMethods )
+	if methodFound then
+		err.setErrNodeAndRef( nameNode, methodFound.node, 
+				"Function %s was already defined", fnName )
 		return false
-	end
-	local nameLower = string.lower( fnName )
-	method = userMethods[nameLower]
-	if method then
-		err.setErrNodeAndRef( nameNode, method.node,
-				"Function name %s differs only by upper/lower case from existing function %s", 
-				fnName, method.node.str )
+	elseif methodCorrectCase then
+		err.clearErr( nameNode.iLine )
+		err.setErrNodeAndRef( nameNode, methodCorrectCase.node, 
+				"Function %s differs only by upper/lower case from existing function %s", 
+				fnName, nameCorrectCase )
 		return false
 	end
 
@@ -188,6 +187,7 @@ local function getMethod( typeNode, nameNode, paramList )
 		params = paramTable
 	}
 	-- Add lowercase version if different
+	local nameLower = string.lower( fnName )
 	if nameLower ~= fnName then
 		userMethods[nameLower] = fnName
 	end
@@ -195,19 +195,17 @@ local function getMethod( typeNode, nameNode, paramList )
 end
 
 -- Find user-defined methods in parseTrees and put them in the userMethods table.
--- Return false if an error occured and err.stopOnErrors() is true, else return true.
+-- Return false if an abortable error occured, else return true.
 local function getMethods( parseTrees )
 	for iTree = 1, #parseTrees do
 		local tree = parseTrees[iTree]
-		assert( tree.t == "line" )
 		local p = tree.p
 		local nodes = tree.nodes
-		if p == "func" then
+		if not tree.isError and p == "func" then
 			-- User-defined function or event function
-			if not getMethod( nodes[2], nodes[3], nodes[5] ) then
-				if err.stopOnErrors() then 
-					return false
-				end
+			getMethod( tree, nodes[2], nodes[3], nodes[5] )
+			if err.shouldStop() then 
+				return false
 			end
 		end
 	end
@@ -619,8 +617,8 @@ end
 -- If assigned (default false) then mark it as assigned.
 -- Return true if successful, false if error.
 function checkJava.defineVar( nameNode, vt, isArray, assigned )
-	if vt == nil or err.hasErr() then
-		return false
+	if vt == nil then
+		return false   -- type could not be determined, so definition is invalid
 	end
 	if isArray then
 		vt = { vt = vt }   -- make vt into array of specified type
@@ -639,7 +637,7 @@ function checkJava.defineVar( nameNode, vt, isArray, assigned )
 				"Variable %s was already defined", varName )
 		return false
 	elseif varCorrectCase then
-		err.clearErr()
+		err.clearErr( nameNode.iLine )
 		err.setErrNodeAndRef( nameNode, varCorrectCase.node, 
 				"Variable %s differs only by upper/lower case from existing variable %s", 
 				varName, nameCorrectCase )
@@ -811,7 +809,7 @@ local function findUserMethod( idNode )
 	return method
 end
 
--- Return (method name, method table entry) for the given fnValue node.
+-- Return (method display name, method table entry) for the given fnValue node.
 -- If not found then the method table entry will be nil.
 local function findMethod( fnValue )
 	assert( fnValue.t == "fnValue" )
@@ -879,7 +877,9 @@ local function findMethod( fnValue )
 		end
 		return nil
 	end
-	return methodNameNode.str, method
+
+	-- Return display name and method entry
+	return className .. "." .. methodNameNode.str, method
 end
 
 -- Return true if all the parameters in params are of type int
@@ -908,7 +908,7 @@ function checkJava.vtCheckCall( fnValue, paramList )
 	if #params < min then
 		if #params == 0 then
 			err.setErrNode( fnValue, 
-					"Function %s requires %d parameter%s", 
+					"%s requires %d parameter%s", 
 					fnName, min, (min ~= 1 and "s") or "" )
 		else
 			err.setErrNodeAndRef( paramList, fnValue, 
@@ -957,7 +957,8 @@ function checkJava.doTypeChecks( tree )
 		for i = 1, #nodes do
 			local node = nodes[i]
 			if node.t then  -- don't recurse down into tokens
-				if not checkJava.doTypeChecks( node ) and err.stopOnErrors() then
+				checkJava.doTypeChecks( node ) 
+				if err.shouldStop() then
 					return false
 				end
 			end
@@ -986,8 +987,6 @@ function checkJava.initProgram( parseTrees, level )
 	userMethods = {}
 	isInstanceVar = {}
 	localNameStack = {}
-
-	err.initProgram()
 
 	-- Get method types first, since vars can forward reference them
 	return getMethods( parseTrees )

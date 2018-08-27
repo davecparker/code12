@@ -8,6 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules used
+local app = require( "app" )
 local err = require( "err" )
 local javalex = require( "javalex" )
 
@@ -264,8 +265,8 @@ local forControl = { t = "forControl",
 	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
 	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
 	-- Common Errors
-	{ 11, 0, "three",			forInit, ",", "(*)", 						iNode = 2 },
-	{ 11, 0, "three",			forInit, ";", forExpr, ",", "(*)",			iNode = 4, 
+	{ 11, 0, "three",			forInit, ",", 0,	 						iNode = 2 },
+	{ 11, 0, "three",			forInit, ";", forExpr, ",", 0,				iNode = 4, 
 			strErr = "for loop parts should be separated by semicolons (;)\nComma not supported" },
 }
 
@@ -278,7 +279,6 @@ local arrayInit = { t = "arrayInit",
 -- A line of code
 local line = { t = "line",
 	{ 1, 12, "blank",															"END" },
-	{ 1, 12, "comment",			"COMMENT",										"END" },
 	{ 1, 12, "stmt",			stmt, ";",										"END" },
 	{ 3, 12, "varInit",			"ID", "ID", "=", expr, ";",						"END" },
 	{ 3, 12, "varDecl",			"ID", idList, ";",								"END" },
@@ -296,27 +296,41 @@ local line = { t = "line",
 	{ 12, 12, "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
 	{ 12, 12, "arrayDecl",		"ID", "[", "]", idList, ";",					"END" },
 	-- Boilerplate lines
-	{ 1, 12, "importCode12",	"import", "ID", ".", "*", ";",					"END" },
+	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",					"END" },
 	{ 1, 12, "class",			"class", "ID", 									"END" },
-	{ 1, 12, "classUser",		"class", "ID", "extends", "ID",					"END" },
-	{ 1, 12, "classUserPub",	"public", "class", "ID", "extends", "ID",		"END" },
+	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",			"END" },
 	{ 1, 12, "main",			"public", "static", "void", "ID", 
 									"(", "ID", "[", "]", "ID", ")",				"END" },
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
 									"ID", "(", ")", ")", ";",					"END" },
 	-- Common errors
-	{ 1, 0, "stmt", 			stmt, "END", 								iNode = 2, 
+	{ 1, 0, "stmt", 		stmt, "END", 										iNode = 2 }, 
+	{ 9, 0, "return", 		"return", expr, "END", 								iNode = 3, 
 			strErr = "Statement should end with a semicolon (;)" },
-	{ 3, 0, "varInit",			"ID", "ID", "=", expr, "END",				iNode = 5, 
+	{ 1, 0, "stmt", 		stmt, ";", 2,
+			strErr = "Code12 only allows one statement per line" },
+	{ 3, 0, "varInit",		"ID", "ID", "=", expr, "END",						iNode = 5 }, 
+	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, "END",				iNode = 6 }, 
+	{ 12, 0, "arrayInit",	"ID", "[", "]", "ID", "=", arrayInit, "END", 		iNode = 7,
 			strErr = "Variable initialization should end with a semicolon (;)" },
-	{ 3, 0, "varDecl",			"ID", idList, "END",						iNode = 3, 
+	{ 3, 0, "varDecl",		"ID", idList, "END",								iNode = 3 }, 
+	{ 12, 0, "arrayDecl",	"ID", "[", "]", idList, "END",						iNode = 5,
 			strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 3, 0, "constInit", 		"final", "ID", "ID", "=", expr, "END",		iNode = 3, 
-			strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 8, 0, "if",				"if", "(", expr, ")", ";", "END",			iNode = 5, 
+	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ",",	"ID", "=", 1 },
+	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ";",	"ID", "ID", "=", 1 },
+	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
+	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ";", "ID", "ID", "=", 1, 
+			strErr = "Code12 requires each variable initialization to be on its own line" },
+	{ 8, 0, "if",			"if", "(", expr, ")", ";", 0,						iNode = 5 },
+	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,				iNode = 6,
 			strErr = "if statement should not end with a semicolon" },
-	{ 8, 0, "if",				"if", expr, "END",							iNode = 2, 
+	{ 8, 0, "if",			"if", expr, 0,										iNode = 2 }, 
+	{ 8, 0, "elseif",		"else", "if", expr, 0,								iNode = 3, 
 			strErr = "if statement test must be in parentheses" },
+	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END", iNode = 7,
+			strErr = "function header should not end with a semicolon" },
+	{ 1, 0, "import",		"import", "ID", 0, 
+			strErr = "import should be \"Code12.*;\"" },
 
 }
 
@@ -380,11 +394,8 @@ function parseGrammar( grammar )
 			if nodes then
 				-- If this matched a common error then set the error state
 				if patternMaxLevel == 0 then
-					local iNode = pattern.iNode
-					assert( iNode )
-					if pattern.strErr then
-						err.setErrNode( nodes[iNode], pattern.strErr )
-					else
+					local strErr = pattern.strErr
+					if not strErr then
 						-- This common error pattern doesn't specify the strErr,
 						-- so it should be in a group where the last one does.
 						local j = i
@@ -393,7 +404,13 @@ function parseGrammar( grammar )
 							j = j + 1
 							patErr = grammar[j]
 						until patErr.strErr ~= nil
-						err.setErrNode( nodes[iNode], patErr.strErr )
+						strErr = patErr.strErr
+					end
+					local iNode = pattern.iNode
+					if iNode then
+						err.setErrNode( nodes[iNode], strErr )
+					else
+						err.setErrLineNum( tokens[1].iLine, strErr )
 					end
 				end
 
@@ -415,13 +432,10 @@ function parsePattern( pattern )
 	-- Try to match the pattern starting at the first item (pattern[4])
 	local nodes = {}   -- node array to build
 	local iItem = 4
-	while iItem <= #pattern do
+	local iItemLast = #pattern
+	while iItem <= iItemLast do
 		local item = pattern[iItem]
-		if item == "(*)" then
-			-- Special token matches and ignores anything to end of line
-			return nodes
-		end
-		-- Is this pattern item a token, grammar table, or parsing function?
+		-- Is this pattern item a token, grammar table, parsing function, or token count?
 		local t = type(item)
 		if t == "string" then
 			-- Token: compare to next token
@@ -449,6 +463,17 @@ function parsePattern( pattern )
 			end
 			-- Matched a sub-grammar item
 			nodes[#nodes + 1] = subTree
+		elseif t == "number" then
+			-- Matches at least this many of any token until end of line
+			if #tokens - iToken >= item then
+				while iItem <= iItemLast do
+					nodes[#nodes + 1] = tokens[iToken]
+					iToken = iToken + 1
+					iItem = iItem + 1
+				end	
+				return nodes
+			end
+			return nil  -- not enough tokens left
 		else
 			error( "*** Pattern " .. pattern[3] .. ": Unknown pattern element type " .. t )
 		end
@@ -471,44 +496,42 @@ function parsePattern( pattern )
 end
 
 -- Try to parse the current token stream as a line of code at the given
--- syntax level. If successful then return the parseTree. 
--- To match common errors specified in the grammar pass true for
--- matchCommonErrors, otherwise leave it nil for normal parsing.
--- If a parse cannot be made then return nil with the error state as set by
--- the parser or a generic syntax error if the specific error is not known.
-local function parseLineGrammar( level, matchCommonErrors )
-	-- Reset the parse state and parse the current token stream at level
-	err.clearErr()
-	syntaxLevel = level
-	maxSyntaxLevel = (matchCommonErrors and 0) or level
-	iToken = 1
-	return parseGrammar( line )
-end
-
--- Try to parse the current token stream as a line of code at the given
--- syntax level. If successful then return the parseTree, otherwise
--- return nil and set the error state. 
+-- syntax level. If a match is found then return the parseTree, otherwise
+-- return nil and set the error state. If the match was for a known 
+-- common syntax error, then set isError = true in the parse tree.
 -- If parsing failed at this level but would succeed at a higher level, 
 -- then set the error state to indicate this.
 local function parseCurrentLine( level )
 	-- Try at the requested syntax level first
-	local parseTree = parseLineGrammar( level )
+	syntaxLevel = level
+	maxSyntaxLevel = level
+	iToken = 1
+	local parseTree = parseGrammar( line )
 	if parseTree then
 		return parseTree  -- success
 	end
 
 	-- Try common errors at the given syntax level
-	parseTree = parseLineGrammar( level, true )
+	local iLine = tokens[1].iLine
+	err.clearErr( iLine )
+	maxSyntaxLevel = 0   -- causes common errors to also be considered
+	iToken = 1
+	parseTree = parseGrammar( line )
 	if parseTree then
-		return nil  -- matched common error
+		parseTree.isError = true
+		return parseTree  -- matched a common error
 	end	
 
 	-- Try parsing at higher levels
 	for tryLevel = level + 1, numSyntaxLevels do
-		parseTree = parseLineGrammar( tryLevel, true )
+		err.clearErr( iLine )
+		syntaxLevel = tryLevel
+		maxSyntaxLevel = 0   -- also match common errors
+		iToken = 1
+		parseTree = parseGrammar( line )
 		if parseTree then
 			-- Report error with minimum level required
-			err.clearErr()   -- in case we matched a common error
+			err.clearErr( iLine )   -- in case we matched a common error
 			local lastToken = tokens[#tokens - 1]  -- not counting the END
 			err.setErrTokenSpan( tokens[1], lastToken,
 					"Use of %s requires syntax level %d",
@@ -519,27 +542,25 @@ local function parseCurrentLine( level )
 
 	-- TODO: Try modified patterns to isolate the error
 
-	-- Make a generic syntax error if the error is unknown
-	if not err.hasErr() then
-		local lastToken = tokens[#tokens - 1]  -- not counting the END
-		err.setErrTokenSpan( tokens[1], lastToken, "Syntax Error" )
-	end
+	-- Make a generic syntax error to use if a more specific error was not set
+	local lastToken = tokens[#tokens - 1]  -- not counting the END
+	err.setErrTokenSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
 	return nil
 end
 
 
 ----- Module functions -------------------------------------------------------
 
--- Init the parsing state
-function parseJava.init()
-	javalex.init()
+-- Init the parsing state for a program
+function parseJava.initProgram()
+	javalex.initProgram()
 end
 
 -- Parse the given line of code at the given syntax level (default numSyntaxLevels).
 -- If startTokens is not nil, it is an array of tokens from a previous unfinished
 -- line to prepend to the tokens found on this line.
--- Return the parse tree (recursive array of tokens and/or nodes).
--- The given lineNumber will be assigned to the tokens found.
+-- Return the parse tree (a recursive array of tokens and/or nodes) if successful.
+-- The given lineNumber will be assigned to the tokens found and the resulting tree.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
 function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
@@ -567,23 +588,12 @@ function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
 		-- startTokens = nil
 	end
 
-	-- Discard comment tokens, except if the entire line is a comment
-	if #tokens > 2 then
-		local i = 1
-		while i <= #tokens do
-			if tokens[i].tt == "COMMENT" then
-				table.remove( tokens, i )
-			else
-				i = i + 1
-			end
-		end
-	end
-
 	-- If this line ends in a comma token, then it is unfinished
 	assert( #tokens > 0 )
 	assert( tokens[#tokens].tt == "END" )
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
 	if lastToken and lastToken.tt == "," then
+		err.markIncompleteLine( lineNumber )
 		return false, tokens
 	end
 
@@ -599,7 +609,7 @@ end
 -- If file then output to it instead of the console.
 function parseJava.printParseTree( node, indentLevel, file )
 	if node then
-		-- Make description string for this node
+		-- Print description string for this node
 		local s = string.rep("    ", indentLevel)  -- indentation
 		if node.tt then
 			-- Token node
@@ -615,14 +625,7 @@ function parseJava.printParseTree( node, indentLevel, file )
 				s = s .. " (" .. node.p .. ")"
 			end
 		end
-
-		-- Output description
-		if file then
-			file:write( s )
-			file:write( "\n" )
-		else 
-			print(s)
-		end
+		app.printDebugStr( s, file )
 
 		-- Recursively print children at next indent level, if any
 		if node.nodes then

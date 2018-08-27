@@ -43,11 +43,13 @@ local app =  {
 		path = nil,              -- full pathname to the file
 		timeLoaded = 0,          -- time this file was loaded or 0 if not loaded
 		timeModLast = 0,         -- last modification time or 0 if unknown
+		updated = false,         -- set to true when file update is detected
 		strLines = {},           -- array of source code lines when read
 	},
 
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
+	tabWidth = 4,                -- current tab width
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
@@ -62,6 +64,73 @@ function app.getWindowSize()
 	app.height = display.actualContentHeight
 end
 
+-- Print str to file if file is not nil, else to the console
+function app.printDebugStr( str, file )
+	if file then
+		file:write( str )
+		file:write( "\n" )
+	else 
+		print( str )
+	end
+end
 
+-- Return a detabbed version of string strLine
+function app.detabLine( strLine )
+	local chars = { string.byte( strLine, 1, string.len(strLine) ) }
+	local numChars = #chars
+	local charsDetabbed = {}
+	local tabWidth = app.tabWidth
+	local col = 1
+	for i = 1, numChars do
+		local ch = chars[i]
+		if ch == 9 then -- Tab
+			-- Insert spaces to replace the tab
+			local numSpaces = tabWidth - (col - 1) % tabWidth
+			for j = 1, numSpaces do
+				charsDetabbed[col] = 32 -- Space
+				col = col + 1
+			end	
+		else
+			-- Copy the non-tab character
+			charsDetabbed[col] = ch
+			col = col + 1
+		end
+	end
+	return string.char( unpack( charsDetabbed ) )
+end
+
+-- Return corresponding column indices iColStart and iColEndFor the given string
+-- strLine and character indices iCharStart and iCharEnd (if iCharEnd is not
+-- given, iColEnd will correspond to the end of strLine)
+function app.iCharToICol( strLine, iCharStart, iCharEnd )
+	local chars = { string.byte( strLine, 1, string.len(strLine) ) }
+	local numChars = #chars
+	local iColStart = iCharStart
+	local iColEnd
+	if iCharEnd then
+		iColEnd = iCharEnd
+	else
+		iColEnd = numChars
+	end
+	local tabWidth = app.tabWidth
+	local col = 1
+	for i = 1, numChars do
+		local ch = chars[i]
+		if ch == 9 then -- Tab
+			local numSpaces = tabWidth - (col - 1) % tabWidth
+			-- if needed, increment iColStart and iColEnd
+			if col < iColStart then
+				iColStart = iColStart + numSpaces - 1
+				iColEnd = iColEnd + numSpaces - 1
+			elseif col <= iColEnd then
+				iColEnd = iColEnd + numSpaces - 1
+			end
+			col = col + numSpaces
+		else
+			col = col + 1
+		end
+	end
+	return iColStart, iColEnd
+end
 ------------------------------------------------------------------------------
 return app

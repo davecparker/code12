@@ -4,22 +4,24 @@ class TestProgram extends Code12Program
 {
    double xOrigin = 50;
    double yOrigin = 0;
-   GameObj dot;
+   GameObj dot, r;
 
    public static void main(String[] args)
    { 
       Code12.run(new TestProgram()); 
    }
    
+   // Start function
    public void start()
    {
+      // Make the background
       ct.setBackImage("underwater.jpg");
       dot = ct.circle(50, 50, 10);
-      GameObj t = ct.rect(25, 75, 10, 50);
-      t.group = "targets";
-      t = ct.rect(75, 75, 10, 50);
-      t.group = "targets";
-      t = ct.text("Hello", 50, 25, 10);
+      r = ct.rect(25, 75, 10, 50);
+      r.group = "targets";   // things we can delete
+      r = ct.rect(75, 75, 10, 50);
+      r.group = "targets";
+      GameObj t = ct.text("Hello", 50, 25, 10);
       t.group = "targets";
       ct.setScreenOrigin(xOrigin, 0);
    }
@@ -51,6 +53,7 @@ class TestProgram extends Code12Program
          ct.setScreenOrigin(xOrigin, yOrigin);
       }
 
+      // Move the dot with the arrow keys
       final double SPEED = 0.2;
       if (ct.keyPressed("left"))
          dot.x -= SPEED;
@@ -71,6 +74,5 @@ class TestProgram extends Code12Program
 
       if (ct.clicked())
          ct.log(ct.clickX(), ct.clickY());
-   }
-   
+   } 
 }

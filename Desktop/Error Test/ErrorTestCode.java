@@ -8,12 +8,6 @@ class ErrorTest extends Code12Program
 	}
 
 	// user defined functions
-	void errorFunc()
-	{
-		ct.println("Hello world");
-	}
-	// ERROR "Code12 API functions cannot be called before start()"
-	errorFunc();
 	void emptyFunc()
 	{
 	}
@@ -367,7 +361,7 @@ class ErrorTest extends Code12Program
 		double x = ct.inputNumber("enter a number: ");
 		x = ct.inputNumber("enter a number: ");
 		x = ct.inputNumber(message);
-		boolean quit = ct.inputYesNo("Quit?"); // Crashes Error Test/main.lua
+		boolean quit = ct.inputYesNo("Quit?");
 		quit = ct.inputYesNo(message);
 		String inputStr = ct.inputString("Quit?");
 		inputStr = ct.inputString("Quit?");
@@ -434,22 +428,23 @@ class ErrorTest extends Code12Program
 		GameObj[] objs = { circle, rect, line, text, img };
 		img = rect;
 		// Code12 API -- Mouse and Keyboard Input
+		boolean mouseClicked = ct.clicked();
 		if (ct.clicked())
-			boolean mouseClicked = ct.clicked();
-		mouseClicked = ct.clicked();
+			mouseClicked = ct.clicked();
 		if ( ct.clickX() > 50 )
-			double clickX = ct.clickX();
+			x = ct.clickX();
 		x = ct.clickX();
 		if ( ct.clickY() <= x )
-			double clickY = ct.clickY();
+			y = ct.clickY();
 		y = ct.clickY();
 		String keyName = "space";
+		boolean keyPressed = ct.keyPressed(keyName);
 		if (ct.keyPressed(keyName))
 			if (ct.keyPressed("up"))
-				boolean upKeyPressed = ct.keyPressed("up");
-		boolean keyPressed = ct.keyPressed(keyName);
+				keyPressed = ct.keyPressed("up");
 		if ( ct.charTyped("+") )
-			String ch = "A";
+			x++;
+		String ch = "+";
 		if ( ct.charTyped(ch) )
 			b = ct.charTyped("+");
 		b = ct.charTyped(ch);
@@ -609,7 +604,7 @@ class ErrorTest extends Code12Program
 	{
 		return 0;
 	}
-	// ERROR "boolean is a type name, expected a variable name here"
+	// ERROR "boolean is a type name"
 	double foo(int i, GameObj boolean)
 	{
 		return 0;
@@ -626,24 +621,24 @@ class ErrorTest extends Code12Program
 		return 2 * x;
 	}
 
-	// ERROR "Function voidFunc is already defined"
+	// ERROR "already defined"
 	void voidFunc(int i)
 	{
 	}
 	void func()
 	{
 	}
-	// ERROR "differs only by upper/lower case from existing function"
+	// ERROR "Names are case-sensitive"
 	void FUNC()
 	{
 	}
 	void AnotherFunc()
 	{
 	}	
-	// ERROR "differs only by upper/lower case from existing function"
-	// void anotherfunc() // crash
-	// {
-	// }
+	// ERROR "Names are case-sensitive"
+	void anotherfunc()
+	{
+	}
 
 	void expectedErrors()
 	{
@@ -1123,6 +1118,7 @@ class ErrorTest extends Code12Program
 		
 		// ERROR "Method call on invalid type (array of int)"
 		intArr.voidFunc();
+		
 		// ERROR "Method call on invalid type (int)"
 		intArr[0].voidFunc();
 		// ERROR "Method call on invalid type (boolean)"
@@ -1158,7 +1154,24 @@ class ErrorTest extends Code12Program
 		Math.atan(4,3);
 		// ERROR "Parameter 1 of logm expects type String, but int was passed"
 		ct.logm(intVar, objVar);
-	}
+
+		String indent = "2 Tabs";
+		// ERROR "Mix of tabs and spaces"
+ 		indent = "1 Space + 2 Tabs";
+		// ERROR "Mix of tabs and spaces"
+		indent = "2 Tabs";
+		// ERROR "Mix of tabs and spaces"
+        indent = "8 Spaces";
+		// ERROR "Mix of tabs and spaces"
+		indent = "2 Tabs";
+		if (true)
+			ct.println();
+			if (true)
+				ct.println();
+		// ERROR "Mix of tabs and spaces"
+    	indent = "4 Spaces + 1 Tab";
+	// ERROR "Mix of tabs and spaces"
+	} // 1 Tab for indent
 
 	// ERROR "Return type of update function should be void"
 	GameObj update()
@@ -1178,9 +1191,9 @@ class ErrorTest extends Code12Program
 	}
 
 	// ERROR "Wrong number of parameters for function"
-	// void onKeyRelease( ) // crash
-	// {
-	// }
+	void onKeyRelease( )
+	{
+	}
 
 	// ERROR "Wrong type for parameter 1 of function onMousePress"
 	void onMousePress( boolean obj, double x, double y )

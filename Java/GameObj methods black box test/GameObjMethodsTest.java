@@ -15,15 +15,16 @@ public class GameObjMethodsTest extends Code12Program
         objArray[0] = ct.circle(10, 10, 5, "red");
         objArray[1] = ct.rect(30, 30, 10, 5, "blue");
         objArray[2] = ct.line(0, 0, 100, 100);
-        objArray[3] = ct.text("code12", 50, 50, 5, "majenta");
+        objArray[3] = ct.text("code12", 50, 50, 5, "magenta");
         objArray[4] = ct.image("goldfish.png", 80, 80, 5);
 
-        player = ct.rect(80, 20, 5, 5, "blue");
+        GameObj player = ct.rect(80, 20, 5, 5, "blue");
 
         for (int i = 0; i < objArray.length; i++)
         {
             // getType
             ct.println("Getting GameObj type");
+            ct.println(objArray[i].getType());
             ct.println("Type: " + objArray[i].getType());
 
             // getText
@@ -34,7 +35,7 @@ public class GameObjMethodsTest extends Code12Program
             ct.println("Setting text to null value");
             objArray[i].setText(null);
             ct.println("New text: " + objArray[i].getText());
-            ct.println("Setting text to \'NEW TEXT\'");
+            ct.println("Setting text to NEW TEXT");
             objArray[i].setText("NEW TEXT");
             ct.println("New text: " + objArray[i].getText());
 
@@ -45,34 +46,34 @@ public class GameObjMethodsTest extends Code12Program
             // setSize
             ct.println("Setting size to 10 by 20");
             objArray[i].setSize(10, 20);
-            ct.println("Width, height: " + objArray[i].width + ", " + objArray[i].height)
+            ct.println("Width, height: " + objArray[i].width + ", " + objArray[i].height);
 
             // align
             ct.println("Aligning to top left");
             objArray[i].align("top left");
             objArray[i].align("top left", true);
-            //objArray[i].align(" ");                                      // recognizes typo and returns a error saying "invalid argument"
-            //objArray[i].align(null);                                     // java.lang.NullPointerException
+            objArray[i].align(" ");
+            objArray[i].align(null);
 
             // setFillColor
             ct.println("Set fill color to cyan");
-            objArray[i].setFillColor("cya");                               // gray in color
+            objArray[i].setFillColor("cya");
             objArray[i].setFillColor("cyan");
 
             // setFillColorRGB
             ct.println("Set fill RGB color to purple");
             objArray[i].setFillColorRGB(255, 0, 255);
-            //objArray[i].setFillColorRGB(256, 10, 10);                    // java.lang.IllegalArgumentException: Color parameter outside of expected range: Red
-            //objArray[i].setFillColorRGB(-1, 10, 10);                     // java.lang.IllegalArgumentException: Color parameter outside of expected range: Red
+            objArray[i].setFillColorRGB(256, 10, 10);
+            objArray[i].setFillColorRGB(-1, 10, 10);
 
             // setLineColor
             ct.println("Set line color to red");
-            objArray[i].setLineColor("re");                                // gray in color
+            objArray[i].setLineColor("re");
             objArray[i].setLineColor("red");
 
             // setLineColorRGB
             objArray[i].setLineColorRGB(0, 0, 255);
-            //objArray[i].setLineColorRGB(-1, 0, 0);                       // java.lang.IllegalArgumentException: Color parameter outside of expected range: Red
+            objArray[i].setLineColorRGB(-1, 0, 0);
             ct.println("Set line RGB color to blue");
 
             // getLayer

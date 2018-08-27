@@ -22,9 +22,6 @@ public class HitAndAlignTest extends Code12Program
         objArray[4] = ct.image("goldfish.png", 80, 80, 5);
 
         player = ct.rect(25, 75, 5, 5);
-
-        for (int i = 0; i < objArray.length; i++)
-            objArray[i].clickable = true;
     }
 
     public void update()
