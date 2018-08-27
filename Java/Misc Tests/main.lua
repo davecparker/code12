@@ -8,10 +8,17 @@ require('Code12.api')
         
     
     
+    this.t = nil; 
+    
+    
     function _fn.start()
         
+        this.t = ct.text("code12", 80, 25, 6)
     end
     
     function _fn.update()
         
+        this.t.x = this.t.x - (0.1)
+        this.t.y = this.t.y + (0.1)
+        this.t.height = this.t.height + (0.05)
     end

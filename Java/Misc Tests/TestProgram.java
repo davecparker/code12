@@ -2,9 +2,8 @@ import Code12.*;
 
 class TestProgram extends Code12Program
 {
-	
 	public static void main(String[] args)
-	{ 
+	{
 		Code12.run(new TestProgram()); 
 	}
 	
@@ -13,6 +12,6 @@ class TestProgram extends Code12Program
 	}
 	
 	public void update()
-	{	
+	{
 	}
 }
