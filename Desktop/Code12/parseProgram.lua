@@ -83,7 +83,7 @@ local function checkImport()
 			if tree.nodes[2].str == "Code12" then
 				foundCode12Import = true
 				if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
-					err.setErrNode( tree, "The start of a program shouldn't be indented" )
+					err.setErrLineNum( tree, "The start of a program shouldn't be indented" )
 				end
 			else   -- a package but not Code12
 				err.setErrLineParseTree( tree, 
@@ -120,7 +120,7 @@ local function checkClassHeader()
 	local tree = parseTrees[iTree]
 	if tree.p == "classUser" and tree.nodes[5].str == "Code12Program" then
 		if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
-			err.setErrNode( tree, "A program's class header shouldn't be indented" )
+			err.setErrLineNum( tree.iLine, "A program's class header shouldn't be indented" )
 		end
 		programTree.nameID = tree.nodes[3]  -- class name
 		iTree = iTree + 1
@@ -136,9 +136,32 @@ end
 -- Return true if succesful.
 local function checkBlockBegin()
 	local tree = parseTrees[iTree]
+	local prevTree = parseTrees[iTree - 1]
 	if tree.p == "begin" then
-		if javalex.indentLevelForLine(tree.iLine) ~= javalex.indentLevelForLine(parseTrees[iTree - 1].iLine) then
-			err.setErrNode( tree, "Unexpected change in indentation" )
+		if javalex.indentLevelForLine(tree.iLine) ~= javalex.indentLevelForLine(prevTree.iLine) then
+			local p = prevTree.p
+			if p == "func" then
+				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+					"The { after a function header should have the same indentation as the function header" )
+			elseif p == "if" then
+				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+					"The { after an if statement should have the same indentation as the 'if'" )
+			elseif p == "else if" then
+				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+					"The { after an else if statement should have the same indentation as the 'else if'" )
+			elseif p == "else" then
+				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+					"The { after an 'else' should have the same indentation as the 'else'" )
+			elseif p == "do" then
+				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+					"The { after a 'do' should have the same indentation as the 'do'" )
+			elseif p == "while" then -- TODO
+				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+					"The { after a while loop header should have the same indentation as the 'while'" )
+			elseif p == "for" then -- TODO
+								err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+					"The { after a for loop header should have the same indentation as the 'for'" )
+			end
 		end
 		iTree = iTree + 1
 		return true
@@ -270,10 +293,6 @@ local function getControlledStmts()
 	local p = tree.p
 	local indentLevel = javalex.indentLevelForLine( parseTrees[iTree - 1].iLine )
 	if p == "begin" then
-		if javalex.indentLevelForLine( tree.iLine ) ~= indentLevel then
-			err.setErrNode( tree, 
-				"A controlled block's beginning { should have the same indentation as it's control statement" )
-		end
 		return getBlockStmts()
 	elseif p == "end" then
 		err.setErrNode( tree, "} without matching {" )
@@ -284,7 +303,8 @@ local function getControlledStmts()
 		return nil
 	else
 		if javalex.indentLevelForLine( tree.iLine ) <= indentLevel then
-			err.setErrNode( tree, "A controlled statement should be indented from it's control statement" )
+			-- TODO: different error messages for different types of control statements
+			err.setErrLineNum( tree, "A controlled statement should be indented from its control statement" )
 		end
 		-- Single controlled stmt
 		iTree = iTree + 1  -- pass the controlled stmt as expected by getLineStmts
@@ -303,15 +323,12 @@ local function getElseStmts( indentLevel )
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "else" then
-		if javalex.indentLevelForLine( tree.iLine ) ~= indentLevel then
-			err.setErrNode( tree, "Unexpected change in indentation for this else" )
-		end
 		iTree = iTree + 1
 		return getControlledStmts()
 	elseif p == "elseif" then
 		-- Controlled stmts is a single stmt, which is the following if
 		if javalex.indentLevelForLine( tree.iLine ) ~= indentLevel then
-			err.setErrNode( tree, "Unexpected change in indentation for this else if" )
+			err.setErrLineNum( tree.iLine, "Unexpected change in indentation for this else if" )
 		end
 		iTree = iTree + 1
 		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
@@ -488,7 +505,7 @@ function getBlockStmts()
 	local startIndent = javalex.indentLevelForLine( iLineStart )
 	local blockIndent = javalex.indentLevelForLine( tree.iLine )
 	if blockIndent <= startIndent and tree.p ~= "end" then
-		err.setErrNode( parseTrees[iTree], "A block should be indented from it's beginning {" )
+		err.setErrLineNum( parseTrees[iTree].iLine, "A block should be indented from its beginning {" )
 	end
 
 	-- Get all lines until we get a matching end for the block begin
@@ -505,12 +522,12 @@ function getBlockStmts()
 			return nil
 		elseif p == "end" then
 			if currIndent ~= startIndent then
-				err.setErrNode( tree, "A block's ending } should have the same indentation as it's beginning {" )
+				err.setErrLineNum( tree.iLine, "A block's ending } should have the same indentation as its beginning {" )
 			end
 			return stmts   -- this ends our block
 		else
 			if currIndent ~= blockIndent then
-				err.setErrNode( tree, "Unexpected change in indentation" )
+				err.setErrLineNum( tree.iLine, "Unexpected change in indentation" )
 			end
 			getLineStmts( tree, stmts )
 		end
@@ -627,11 +644,11 @@ local function getMembers()
 		-- Check indentation
 		if p ~= "end" then
 			if indentLevel and javalex.indentLevelForLine( tree.iLine ) ~= indentLevel then
-				err.setErrNode( tree, "Unexpected change in indentation" )
+				err.setErrLineNum( tree.iLine, "Unexpected change in indentation" )
 			end
 		else
 			if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
-				err.setErrNode( tree, "The ending } of the class should not be indented" )
+				err.setErrLineNum( tree.iLine, "The ending } of the class should not be indented" )
 			end
 		end
 
