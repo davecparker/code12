@@ -10,6 +10,7 @@
 -- Code12 modules
 local app = require( "app" )
 local parseJava = require( "parseJava" )
+local javaTypes = require( "javaTypes" )
 local err = require( "err" )
 
 -- The parseProgram module
@@ -20,12 +21,17 @@ local parseProgram = {}
 -- It is made up of the following structure nodes, tokens, nested structures, 
 -- and arrays (plural names), with the following named fields:
 --
--- program: { s = "program", nameID, vars, funcs }
+-- program: 
+--     { s = "program", nameID, vars, funcs }
 --
--- var:  { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal, initExpr }
--- func: { s = "func", iLine, typeID, nameID, isArray, isPublic, params, stmts }
+-- var:  (Type checking adds a vt field)
+--     { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal, initExpr }
+--
+-- func: 
+--     { s = "func", iLine, typeID, nameID, isArray, isPublic, params, stmts }
 -- 
--- param: { s = "param", typeID, nameID, isArray }
+-- param: 
+--     { s = "param", typeID, nameID, isArray }
 --
 -- stmt:
 --     { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal, initExpr }
@@ -39,9 +45,10 @@ local parseProgram = {}
 --     { s = "break", iLine }
 --     { s = "return", iLine, expr }
 --
--- lValue: { s = "lValue", varID, indexExpr, fieldID }
+-- lValue:  (Type checking adds vtObj, vt, and isLocal fields)
+--     { s = "lValue", varID, indexExpr, fieldID }
 -- 
--- expr:  (Type checking will add a vt field to the expr)
+-- expr:  (Type checking adds a vt field)
 --     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
 --     { s = "call", lValue, exprs }
 --     { s = "lValue", lValue }
@@ -563,6 +570,7 @@ end
 local function getMembers()
 	local vars = programTree.vars
 	local funcs = programTree.funcs
+	local gotFunc = false     -- set to true when the first func was seen
 
 	-- Look for instance variables and functions
 	while iTree <= numParseTrees do
@@ -574,6 +582,11 @@ local function getMembers()
 
 		if ok and getVar( p, nodes, vars ) then
 			-- Added instance variable(s)
+			-- Code12 does not allow instance variables to follow member functions,
+			-- because it greatly complicates keeping Java and Lua line numbers in sync.
+			if gotFunc then
+				err.setErrNode( tree, "Class-level variables must be defined at the beginning of the class" )
+			end 
 		elseif p == "func" then
 			-- User function or event definition
 			if ok then
@@ -585,6 +598,7 @@ local function getMembers()
 			else
 				getBlockStmts()  -- skip body of invalid function defintion
 			end
+			gotFunc = true
 		elseif p == "main" then
 			-- A function header that looks like main
 			if not ok or nodes[3].str ~= "void" or nodes[4].str ~= "main" 
@@ -655,8 +669,10 @@ local function printStructureTree( node, indentLevel, file, label )
 	local miscFieldsStr = ""
 	local first = true
 	for field, value in pairs( node ) do
-		if field ~= "s" and field ~= "iLine" and field ~= "nameID" and field ~= "op" then
-			local fieldStr = nil
+		local fieldStr = nil
+		if field == "vt" or field == "vtObj" then
+			fieldStr = field .. " = " .. javaTypes.typeNameFromVt( value )
+		elseif field ~= "s" and field ~= "iLine" and field ~= "nameID" and field ~= "op" then
 			if type(value) == "table" then
 				if value.tt then  
 					-- A token
@@ -670,14 +686,14 @@ local function printStructureTree( node, indentLevel, file, label )
 			else  -- number or boolean
 				fieldStr = field .. " = " .. tostring( value )
 			end
+		end
 
-			if fieldStr then
-				if first then
-					miscFieldsStr = miscFieldsStr .. fieldStr
-					first = false
-				else
-					miscFieldsStr = miscFieldsStr .. ", " .. fieldStr
-				end
+		if fieldStr then
+			if first then
+				miscFieldsStr = miscFieldsStr .. fieldStr
+				first = false
+			else
+				miscFieldsStr = miscFieldsStr .. ", " .. fieldStr
 			end
 		end
 	end
@@ -764,14 +780,11 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 		end
 	end
 
-	-- Print programTree for debugging
-	printStructureTree( programTree, 0 )
-
-	-- Return parse trees also for now (TODO: temp)
+	-- Return result
 	if err.shouldStop() then
 		return nil
 	end
-	return programTree, parseTrees
+	return programTree
 end
 
 -- Print a program structure tree to the given output file or to the console

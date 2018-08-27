@@ -187,27 +187,29 @@ function app.processUserFile()
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
-	local programTree, parseTrees = parseProgram.getProgramTree( 
+	local programTree = parseProgram.getProgramTree( 
 								sourceFile.strLines, app.syntaxLevel )
-	if parseTrees == nil then
+	if programTree == nil then
 		composer.gotoScene( "errView" )
 		return true
 	end
-	print( string.format( "\nFile parsed in %.3f ms\n", system.getTimer() - startTime ) )
 
 	-- Do Semantic Analysis on the parse trees
+	-- parseProgram.printProgramTree( programTree )
 	checkJava.checkProgram( programTree, app.syntaxLevel )
+	-- parseProgram.printProgramTree( programTree )
 	if err.rec then
 		composer.gotoScene( "errView" )
 	else
 		-- Make and run the Lua code
-		-- local codeStr = codeGenJava.getLuaCode( parseTrees )
-		-- if err.rec then
-		-- 	composer.gotoScene( "errView" )
-		-- else
-		-- 	writeLuaCode( codeStr )
-		-- 	runLuaCode( codeStr )
-		-- end
+		local codeStr = codeGenJava.getLuaCode( programTree )
+		print( string.format( "\nFile processed in %.3f ms\n", system.getTimer() - startTime ) )
+		if err.rec then
+			composer.gotoScene( "errView" )
+		else
+			writeLuaCode( codeStr )
+			runLuaCode( codeStr )
+		end
 	end
 	return true
 end

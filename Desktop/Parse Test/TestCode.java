@@ -592,7 +592,6 @@ int throw;
 int throws;	
 int transient;
 int try;	
-int void;	
 int volatile;	
 int while;
 boolean true;
@@ -702,6 +701,7 @@ int _var; // variable indentifiers starting with underscore
 int $var; // $
 double pay$;
 int x[];	// arrays must be declared with [] between type and identifier
+int _func() // function names starting with underscore
 public abstract class Account 
 assert x != null : "x variable is null";
 case 0 :

@@ -43,6 +43,8 @@ local isInstanceVar = {}
 -- Stack of local variable names, with an empty name "" marking the beginning of each block
 local localNameStack = {}
 
+-- Other processing state
+local beforeStart      -- true when checking code that will run before start() 
 
 -- Forward declarations for recursion
 local vtSetExprNode
@@ -259,6 +261,9 @@ local function vtLValueNode( lValue )
 		if vt == nil then
 			return nil
 		end
+		if not checkJava.isInstanceVarName( varName ) then
+			lValue.isLocal = true
+		end
 	end
 
 	-- Check array index if any, and get the element type
@@ -301,10 +306,14 @@ local function vtLValueNode( lValue )
 					fieldID.str, className )
 			return nil
 		end
+
+		-- Store the object type as vtObj in the lValue, then get the field type
+		lValue.vtObj = vt
 		vt = fieldFound.vt
 	end
 	
-	-- Return the resulting type
+	-- Store the final value vt in the lValue and return it
+	lValue.vt = vt
 	return vt
 end
 
@@ -462,6 +471,32 @@ local function vtExprNumeric( node )
 	return nil
 end
 
+-- binOp: / (calls vtExprNumeric then does additional checks)
+local function vtExprDivide( node )
+	-- Check as numeric binOp then check for bad int divide
+	local vt = vtExprNumeric( node )
+	if vt == 0 then
+		-- int divide: allow only if dividing constants with no remainder
+		local left = node.left
+		local right = node.right
+		if left.s == "literal" and left.token.tt == "NUM" 
+				and right.s == "literal" and right.token.tt == "NUM" then
+			-- Both sides are constant so we can check for a remainder
+			local n = tonumber( left.token.str )
+			local d = tonumber( right.token.str )
+			local r = n / d
+			if r == math.floor( r ) then
+				return 0   -- valid int result
+			end
+			err.setErrNode( node, "Integer divide has remainder. Use double or ct.intDiv()" )
+		end
+		-- The remainder can't be determined, but Code12 doesn't allow this
+		-- because chances are the programmer made a mistake.
+		err.setErrNode( node, "Integer divide may lose remainder. Use double or ct.intDiv()" )
+	end
+	return vt
+end
+
 -- binOp: &&, ||
 local function vtExprLogical( node )
 	-- Both sides must be boolean, result is boolean
@@ -535,7 +570,7 @@ local fnVtExprVariations = {
 	["+"]           = vtExprPlus,
 	["-"]           = vtExprNumeric,
 	["*"]           = vtExprNumeric,
-	["/"]           = vtExprNumeric,
+	["/"]           = vtExprDivide,
 	["%"]           = vtExprNumeric,
 	["&&"]          = vtExprLogical,
 	["||"]          = vtExprLogical,
@@ -585,36 +620,6 @@ function vtSetExprNode( node )
 	-- Store and return the result
 	node.vt = vt       
 	return vt
-end
-
-
---- Post Check Analysis Functions  -------------------------------------------
-
--- If the integer divide in expr might have a remainder, then set
--- the error state and return true, otherwise return false.
-local function isBadIntDivide( expr )
-	assert( expr.op.tt == "/" )
-	assert( expr.vt == 0 )
-	local left = expr.left
-	local right = expr.right
-
-	if left.s == "literal" and left.token.tt == "NUM" 
-			and right.s == "literal" and right.token.tt == "NUM" then
-		-- Both sides are constant so we can check for a remainder
-		local n = tonumber( left.token.str )
-		local d = tonumber( right.token.str )
-		local r = n / d
-		if r == math.floor( r ) then
-			return false   -- no remainder, so OK as-is
-		else
-			err.setErrNode( expr, "Integer divide has remainder. Use double or ct.intDiv()" )
-			return true
-		end
-	end
-	-- The remainder can't be determined, but Code12 doesn't allow this
-	-- because chances are the programmer made a mistake.
-	err.setErrNode( expr, "Integer divide may lose remainder. Use double or ct.intDiv()" )
-	return true
 end
 
 
@@ -838,8 +843,9 @@ local function findUserMethod( nameID )
 	return method
 end
 
--- Return (method display name, method table entry) for the given lValue node.
--- If not found then the method table entry will be nil.
+-- Return (method table entry, class name, method display name) for lValue,
+-- which is the function lValue of a call. The class name will be nil for 
+-- user-defined methods. If the method is not found then return nil.
 local function findMethod( lValue )
 	assert( lValue.s == "lValue" )
 	local nameID = lValue.varID
@@ -853,7 +859,7 @@ local function findMethod( lValue )
 			err.setErrNode( lValue, "Invalid function or method name" )
 			return nil
 		end
-		return nameStr, findUserMethod( nameID )
+		return findUserMethod( nameID ), nil, nameStr
 	end
 
 	-- Determine the class
@@ -897,18 +903,8 @@ local function findMethod( lValue )
 		return nil
 	end
 
-	-- Return display name and method entry
-	return className .. "." .. fieldID.str, method
-end
-
--- Return true if all the exprs in params are of type int
-local function allExprsAreInt( exprs )
-	for _, expr in ipairs( exprs ) do
-		if expr.vt ~= 0 then 
-			return false
-		end
-	end
-	return true
+	-- Return results
+	return method, className, className .. "." .. fieldID.str
 end
 
 -- Do type checking on a function or method call with the given lValue and exprs.
@@ -916,15 +912,27 @@ end
 -- Return the return type vt if successful.
 function checkJava.vtCheckCall( lValue, exprs )
 	-- Find the method
-	local fnName, method = findMethod( lValue )
+	local method, className, fnName = findMethod( lValue )
 	if method == nil then
 		return nil
 	end
 
+	-- Code12 does not allow calling ct or user-defined methods before start()
+	if beforeStart then
+		if className == "ct" then
+			err.setErrNode( lValue, "Code12 API functions cannot be called before start()" )
+			return nil
+		elseif className == nil then
+			err.setErrNode( lValue, "User-defined functions cannot be called before start()" )
+			return nil
+		end
+	end
+
 	-- Check parameter count
+	local numExprs = (exprs and #exprs) or 0
 	local min = method.min or #method.params
-	if #exprs < min then
-		if #exprs == 0 then
+	if numExprs < min then
+		if numExprs == 0 then
 			err.setErrNode( lValue, 
 					"%s requires %d parameter%s", 
 					fnName, min, (min ~= 1 and "s") or "" )
@@ -934,23 +942,35 @@ function checkJava.vtCheckCall( lValue, exprs )
 					fnName, min )
 		end
 		return nil
-	elseif not method.variadic and #exprs > #method.params then
+	elseif not method.variadic and numExprs > #method.params then
 		err.setErrNodeAndRef( exprs, lValue, 
 				"Too many parameters passed to %s", fnName )
 		return nil
 	end
 
-	-- Check parameter types for validity and match with the API
-	if method.overloaded and allExprsAreInt( exprs ) then
-		return 0    -- special case for overloaded Math methods: take ints, return int
+	-- Get the exprs types and the check special case for overloaded methods:
+	-- If all parameters are int then it returns int (only apples to Math methods).
+	if exprs then
+		local allExprsAreInt = true
+		for _, expr in ipairs( exprs ) do
+			local vt = vtSetExprNode( expr )
+			if vt ~= 0 then
+				allExprsAreInt = false
+			end
+		end
+		if method.overloaded and allExprsAreInt then
+			return 0   -- e.g. Math.max(int, int) returns int
+		end
 	end
-	for i = 1, #exprs do
+
+	-- Check parameter types for validity and match with the API
+	for i = 1, numExprs do
 		if i > #method.params then
 			assert( method.variadic )
 			break    -- variadic function can take any types after those specified
 		end
 		local expr = exprs[i]
-		local vtPassed = vtSetExprNode( expr )
+		local vtPassed = expr.vt
 		local vtNeeded = method.params[i].vt
 		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
 			err.setErrNode( expr, "Parameter %d of %s expects type %s, but %s was passed",
@@ -964,16 +984,11 @@ function checkJava.vtCheckCall( lValue, exprs )
 	return method.vt 
 end
 
--- TODO: Do additional post checks after we know the type of this node
--- and all types underneath it.
--- if vt == 0 and tree.p == "/" and isBadIntDivide( tree ) then
--- 	return false   -- invalid int divide 
--- end
-
 -- Check a variable structure and define the variable
 local function checkVar( var )
-	-- Get the declared type
+	-- Get the declared type and store it in the var structure
 	local vt = javaTypes.vtFromVarType( var.typeID, var.isArray )
+	var.vt = vt
 
 	-- Define the variable
 	local nameID = var.nameID
@@ -1006,7 +1021,7 @@ end
 -- Check that the loop test expr is boolean
 local function checkLoopExpr( expr )
 	if vtSetExprNode( expr ) ~= true then
-		err.setErrNode( expr, "Loop test must be boolean (true or false)" )
+		err.setErrNode( expr, "Loop test must evaluate to a boolean (true or false)" )
 	end
 end
 
@@ -1044,7 +1059,9 @@ function checkStmt( stmt )
 		end
 	elseif s == "if" then
 		-- { s = "if", iLine, expr, stmts, elseStmts }
-		checkLoopExpr( stmt.expr )
+		if vtSetExprNode( stmt.expr ) ~= true then
+			err.setErrNode( stmt.expr, "Conditional test must be boolean (true or false)" )
+		end
 		checkBlock( stmt.stmts )
 		checkBlock( stmt.elseStmts )
 	elseif s == "while" then
@@ -1076,6 +1093,7 @@ function checkStmt( stmt )
 		-- { s = "forArray", iLine, typeID, varID, arrayID, stmts }
 		local vtVar = javaTypes.vtFromVarType( stmt.typeID )
 		local vtArray = checkJava.vtVar( stmt.arrayID )
+		print(stmt.arrayID.str, vtArray)
 		if type(vtArray) ~= "table" then
 			err.setErrNode( stmt.arrayID, 
 					"The source variable in a for-each loop must be an array" )
@@ -1107,23 +1125,31 @@ function checkJava.checkProgram( programTree, level )
 	eventMethodsDefined = {}
 	isInstanceVar = {}
 	localNameStack = {}
+	beforeStart = true
 
 	-- Get method definitions first, since vars can forward reference them
 	assert( programTree.s == "program" )
-	if programTree.funcs then
-		for _, func in ipairs( programTree.funcs ) do
+	local vars = programTree.vars
+	local funcs = programTree.funcs
+	if funcs then
+		for _, func in ipairs( funcs ) do
 			defineMethod( func )
 		end
 	end
 
 	-- Check instance vars
-	for _, var in ipairs( programTree.vars ) do
-		checkVar( var )
+	if vars then
+		for _, var in ipairs( vars ) do
+			checkVar( var )
+		end
 	end
 
 	-- Check method bodies
-	for _, func in ipairs( programTree.funcs ) do
-		checkBlock( func.stmts, func.params )
+	beforeStart = false
+	if funcs then
+		for _, func in ipairs( funcs ) do
+			checkBlock( func.stmts, func.params )
+		end
 	end
 
 	-- Do some overall post-checks if there are no other errors
@@ -1135,6 +1161,8 @@ function checkJava.checkProgram( programTree, level )
 		end
 	end
 end
+
+-- TODO: Make checkJava functions local
 
 
 ------------------------------------------------------------------------------

@@ -63,7 +63,7 @@ local function expandLocToNode( loc, node )
 		for _, child in ipairs(node.nodes) do
 			expandLocToNode( loc, child ) 
 		end
-	elseif node.s then
+	else
 		-- Structure node: expand to all children
 		for _, child in pairs(node) do
 			if type(child) == "table" then

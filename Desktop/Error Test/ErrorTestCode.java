@@ -2,6 +2,13 @@ import Code12.*;
 
 class ErrorTest extends Code12Program
 {
+	int myVar = 1;
+	// ERROR "Code12 API functions cannot be called before start()"
+	GameObj button = ct.text("START", 0, 0, 10);
+	// ERROR "cannot be called before start()"
+	int intResult = intFunc();
+	// TODO: Need more tests involving instance (class-level) variables
+
 	public static void main(String[] args)
 	{ 
 		Code12.run(new ErrorTest()); 
@@ -582,20 +589,16 @@ class ErrorTest extends Code12Program
 		s = s.trim();
 	}
 
-	// ERROR "Code12 API functions cannot be called before start()"
-	GameObj button = ct.text("START", 0, 0, 10);
-	// ERROR "Code12 API functions cannot be called before start()"
-	double WIDTH = ct.getWidth();
+
+	// ERROR "Class-level variables must be defined at the beginning of the class"
+	double newWidth = ct.getWidth();
+
 	// ERROR "is reserved for use by the system"
 	void ct()
 	{
 		ct.println("Hello world");
 	}
-	// ERROR "Names cannot start with an underscore in Code12"
-	int _fn()
-	{
-		return 0;
-	}
+
 	// ERROR "int is a type name, expected a function name here"
 	double int()
 	{
@@ -813,13 +816,14 @@ class ErrorTest extends Code12Program
 		int uninitializedVar;
 		// ERROR "must be assigned before it is used"
 		if (uninitializedVar < 0)
+			uninitializedVar = 0;
 		GameObj g;
 		// ERROR "must be assigned before it is used"
 		g.xSpeed = 1;
 
-		// ERROR "Unknown variable type"
+		// ERROR "Unknown type name"
 		integer n = 100;
-		// ERROR "Unknown variable type"
+		// ERROR "Unknown type name"
 		bool gameOver = false;
 		// ERROR "Unknown API function"
 		GameObj r = ct.rectangle(0,0,10,10);
@@ -856,13 +860,14 @@ class ErrorTest extends Code12Program
 
 		// ERROR "Use == to compare for equality"
 		if (i = 0)
-		// ERROR "Array element type does not match the array type"
+			i = 0;
+		// ERROR "cannot be assigned"
 		int[] intArr2 = {1, 2, 3.14};
-		// ERROR "Array element type does not match the array type"
+		// ERROR "Array initializers must all be the same type"
 		double[] dblArr = {1, "two", 3.14};
-		// ERROR "Cannot initialize array of String with type array of GameObj"
+		// ERROR "cannot be assigned"
 		String[] strArr = new GameObj[100];
-		// ERROR "Cannot initialize array of boolean with type array of int"
+		// ERROR "cannot be assigned"
 		boolean[] boolArr = intArrFuncInt(10);
 		// ERROR "Array count must be an integer"
 		intArr = new int[1.5];
@@ -882,41 +887,57 @@ class ErrorTest extends Code12Program
 
 		// ERROR "The source variable in a for-each loop must be an array"
 		for (int x : intVar)
+			voidFunc();
 		// ERROR "The source variable in a for-each loop must be an array"
 		for (double x : dblVar)
+			voidFunc();
 		// ERROR "The source variable in a for-each loop must be an array"
 		for (boolean x : boolVar)
+			voidFunc();
 		// ERROR "The source variable in a for-each loop must be an array"
 		for (String x : strVar)
+			voidFunc();
 		// ERROR "The source variable in a for-each loop must be an array"
 		for (GameObj x : objVar)
+			voidFunc();
 		// ERROR "The source variable in a for-each loop must be an array"
 		for (GameObj x : strVar)
+			voidFunc();
 		
 		// ERROR "Array "intArr" contains elements of type int"
 		for (double x : intArr)
+			voidFunc();
 		// ERROR "Array "objArr" contains elements of type GameObj"
 		for (String x : objArr)
-		
+			voidFunc();
+
 		// ERROR "Loop test must evaluate to a boolean"
 		for ( ; intVar ; )
+			voidFunc();
 		// ERROR "Loop test must evaluate to a boolean"
 		for ( ; dblVar ; )
+			voidFunc();
 		// ERROR "Loop test must evaluate to a boolean"
 		for ( ; strVar ; )
+			voidFunc();
 		// ERROR "Loop test must evaluate to a boolean"
 		for ( ; objVar ; )
+			voidFunc();
 
 		do
 			voidFunc();
-		// ERROR "Loop test must be boolean"
+		// ERROR "Loop test must evaluate to a boolean"
 		while(intVar);
-		// ERROR "Loop test must be boolean"
+
+		// ERROR "Loop test must evaluate to a boolean"
 		while(dblVar)
-		// ERROR "Loop test must be boolean"
+			voidFunc();
+		// ERROR "Loop test must evaluate to a boolean"
 		while(strVar)
-		// ERROR "Loop test must be boolean"
+			voidFunc();
+		// ERROR "Loop test must evaluate to a boolean"
 		while(objVar)
+			voidFunc();
 
 		// ERROR "Conditional test must be boolean"
 		if(intVar)
@@ -953,6 +974,8 @@ class ErrorTest extends Code12Program
 		strVar += "hello";
 		// ERROR "Use str1.equals( str2 ) to compare two String values"
 		if (strVar == "s")
+			voidFunc();
+
 		// ERROR "Unsupported operator"
 		i = i ^ i;
 		// ERROR "Unsupported operator"
@@ -968,8 +991,6 @@ class ErrorTest extends Code12Program
 
 		// ERROR "is reserved for use by the system"
 		String ct;
-		// ERROR "Names cannot start with an underscore in Code12"
-		GameObj _fn;
 		// ERROR " is a type name, expected a variable name here"
 		int String;
 		// ERROR " is a type name, expected a variable name here"
@@ -1042,10 +1063,13 @@ class ErrorTest extends Code12Program
 
 		// ERROR "Inequality operator (<) can only apply to numbers"
 		if (boolVar < boolVar)
+			voidFunc();
 		// ERROR "Inequality operator (>) can only apply to numbers"
 		boolVar = objVar > dblVar;
 		// ERROR "Inequality operator (<=) can only apply to numbers"
 		while( boolVar <= intVar )
+			voidFunc();
+
 		// ERROR "Inequality operator (>=) can only apply to numbers"
 		dblVar = dblVar >= intArr;
 
@@ -1079,6 +1103,11 @@ class ErrorTest extends Code12Program
     	indent = "4 Spaces + 1 Tab";
 	// ERROR "Mix of tabs and spaces"
 	} // 1 Tab for indent
+
+	// ERROR "Variable myVar was already defined"
+	void myFunc(int myVar)
+	{
+	}
 
 	// ERROR "Return type of update function should be void"
 	GameObj update()
@@ -1129,12 +1158,6 @@ class ErrorTest extends Code12Program
 
 	// ERROR "Wrong type for parameter 1 of function"
 	void onCharTyped( GameObj keyName )
-	{
-	}
-
-	int myVar = 1;
-	// ERROR "Variable myVar was already defined"
-	void myFunc(int myVar)
 	{
 	}
 
