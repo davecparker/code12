@@ -1134,25 +1134,25 @@ class ErrorTest extends Code12Program
 		// ERROR "Unknown method"
 		Math.foo();
 		
-		// ERROR "Function intFuncInt requires 1 parameter"
+		// ERROR "requires 1 parameter"
 		intFuncInt();
-		// ERROR "Function dblFuncIntDbl requires 2 parameters"
+		// ERROR "requires 2 parameters"
 		dblFuncIntDbl();
-		// ERROR "Function log requires 1 parameter"
+		// ERROR "requires 1 parameter"
 		ct.log();
-		// ERROR "Function atan2 requires 2 parameters"
+		// ERROR "requires 2 parameters"
 		Math.atan2();
-		// ERROR "Not enough parameters passed to boolFuncBoolStringGameObj (requires 3)"
+		// ERROR "Not enough parameters passed"
 		boolFuncBoolStringGameObj(false, "");
-		// ERROR "Not enough parameters passed to rect (requires 4)"
+		// ERROR "Not enough parameters passed"
 		ct.rect(0,0,10);
-		// ERROR "Too many parameters passed to voidFunc"
+		// ERROR "Too many parameters passed"
 		voidFunc(intVar);
-		// ERROR "Too many parameters passed to print"
+		// ERROR "Too many parameters passed"
 		ct.print("intVar =", intVar);
-		// ERROR "Too many parameters passed to atan"
+		// ERROR "Too many parameters passed"
 		Math.atan(4,3);
-		// ERROR "Parameter 1 of logm expects type String, but int was passed"
+		// ERROR "Parameter 1 of ct.logm expects type String, but int was passed"
 		ct.logm(intVar, objVar);
 
 		String indent = "2 Tabs";
