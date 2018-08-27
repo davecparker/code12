@@ -79,8 +79,8 @@ require('Code12.api')
         this.leftWall = ct.line(0, 0, 0, ct.getHeight(), "red")
         this.topWall = ct.line(0, 0, 100, 0, "red")
         
-        -- Start the game paused and in normal mode
-        this.paused = true
+        -- Start the game unpaused and with turbo mode off
+        this.paused = false
         this.turboMode = false
     end
     
@@ -122,7 +122,7 @@ require('Code12.api')
                 
                 _fn.deleteDuck(j)
                 this.ducksMissed = this.ducksMissed + 1
-                ct.println("duck #" .. this.ducksMissed .. " hit left wall")
+                ct.println("duck #"..tostring(this.ducksMissed).." hit left wall")
             
             else 
                 
@@ -140,7 +140,7 @@ require('Code12.api')
                 
                 _fn.deleteBullet(i)
                 this.bulletsMissed = this.bulletsMissed + 1
-                ct.println("bullet #" .. this.bulletsMissed .. " hit top wall")
+                ct.println("bullet #"..tostring(this.bulletsMissed).." hit top wall")
                 
                 -- Don't check this bullet hitting ducks
                 break
@@ -166,11 +166,11 @@ require('Code12.api')
         
         -- Update ducksHitDisplay
         local percent = ct.round(100.0 * this.ducksHit / (this.ducksHit + this.ducksMissed))
-        this.ducksHitDisplay:setText("Ducks hit: " .. percent .. "%")
+        this.ducksHitDisplay:setText("Ducks hit: "..tostring(percent).."%")
         
         -- Update accuracyDisplay
         percent = ct.round(100.0 * this.ducksHit / (this.ducksHit + this.bulletsMissed))
-        this.accuracyDisplay:setText("Shot Accuracy: " .. percent .. "%")
+        this.accuracyDisplay:setText("Shot Accuracy: "..tostring(percent).."%")
     end
     
     -- Makes a bullet at position xStart, yStart that will then

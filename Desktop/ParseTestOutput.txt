@@ -8355,7 +8355,7 @@ Comma not supported
 *** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 95 ms
+731 lines processed in 93 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)
