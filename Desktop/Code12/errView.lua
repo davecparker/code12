@@ -23,15 +23,14 @@ local errView = composer.newScene()
 local dxChar = app.consoleFontCharWidth
 local dxExtra = 2   -- extra pixels of highlight horizontally
 local dyDocsToolbar = 24       -- height of toolbar for the docsWebView
+local minSourceLines = 7       -- show at least this many source lines
+local margin = app.margin
+local dyLine = app.consoleFontHeight
 
 -- Display objects and groups
-local errGroup                 -- display group for error display
-local highlightGroup           -- display group for highlight rects
-local lineNumRect              -- line number highlight
-local refRect                  -- reference highlight
-local sourceRect               -- main source highlight
-local lineNumGroup             -- display group for line numbers
-local sourceGroup              -- display group for source lines
+local errGroup                 -- overall display group for error display
+local mainCodeGroup            -- display group for main/only code display
+local refCodeGroup             -- display group for ref code display if separate (TODO)
 local errText                  -- text object for error message
 local docsToolbarGroup         -- display group for the docs toolbar
 local moreInfoBtn              -- More Info button on docs toolbar
@@ -42,9 +41,9 @@ local docsWebView              -- web view for the documentation pane
 
 --- Internal Functions ------------------------------------------------
 
--- Make and return a highlight rectangle, in the reference color if ref
-local function makeHilightRect( x, y, width, height, ref )
-	local r = g.uiItem( display.newRect( highlightGroup, x, y + 1, width, height + 1 ) )
+-- Make and return a highlight rectangle in group, in the reference color if ref
+local function makeHilightRect( group, x, y, width, height, ref )
+	local r = g.uiItem( display.newRect( group, x, y + 1, width, height + 1 ) )
 	if ref then
 		r:setFillColor( 1, 1, 0.6 )
 	else
@@ -53,40 +52,41 @@ local function makeHilightRect( x, y, width, height, ref )
 	return r
 end
 
--- Make the error display, or destroy and remake it if it exists
-local function makeErrDisplay( sceneGroup )
-	-- (Re)make group to hold all err display items
-	if errGroup then
-		errGroup:removeSelf()
-	end
-	errGroup = g.makeGroup( sceneGroup, 0, app.dyToolbar )
-	local numSourceLines = 7
+-- Make and return a display group inside errGroup for a code display 
+-- of numSourceLines lines, containing the following sub-fields:
+--    highlightGroup:  display group for highlight rects
+--    lineNumRect:     line number highlight
+--    refRect:         second reference highlight rect if any
+--    sourceRect:      main source highlight rect
+--    lineNumGroup:    display group for line numbers
+--    sourceGroup:     display group for source lines
+--    totalHeight:     total height of the code display
+local function makeCodeGroup( numSourceLines )
+	-- Make the overall code group to return
+	local cg = g.makeGroup( errGroup )
 
 	-- Layout metrics
-	local margin = app.margin
 	local dxLineNum = math.round( dxChar * 6 )
 	local xText = math.round( dxLineNum + dxChar )
-	local dyLine = app.consoleFontHeight
-	local dySource = numSourceLines * dyLine
 
-	-- Make background rect for the source display
-	g.uiItem( display.newRect( errGroup, 0, 0, app.width, dySource + margin * 2 ), 
-			1, app.borderShade )
+	-- Compute total height and make framed background rect
+	cg.totalHeight = numSourceLines * dyLine + margin * 2
+	g.uiItem( display.newRect( cg, 0, 0, app.width, cg.totalHeight ), 1, app.borderShade )
 
 	-- Make the highlight rectangles
-	highlightGroup = g.makeGroup( errGroup, xText, margin )
+	cg.highlightGroup = g.makeGroup( cg, xText, margin )
 	local y = ((numSourceLines - 1) / 2) * dyLine
-	lineNumRect = makeHilightRect( -dxChar, y, dxLineNum, dyLine )
-	lineNumRect.anchorX = 1
-	refRect = makeHilightRect( dxChar * 5, y, 
+	cg.lineNumRect = makeHilightRect( cg.highlightGroup, -dxChar, y, dxLineNum, dyLine )
+	cg.lineNumRect.anchorX = 1
+	cg.refRect = makeHilightRect( cg.highlightGroup, dxChar * 5, y, 
 							dxChar * 6, dyLine, true )
-	sourceRect = makeHilightRect( 0, y, dxChar * 4, dyLine )
+	cg.sourceRect = makeHilightRect( cg.highlightGroup, 0, y, dxChar * 4, dyLine )
 
 	-- Make the lines numbers
-	lineNumGroup = g.makeGroup( errGroup, 0, margin )
+	cg.lineNumGroup = g.makeGroup( cg, 0, margin )
 	for i = 1, numSourceLines do
 		local t = display.newText{
-			parent = lineNumGroup,
+			parent = cg.lineNumGroup,
 			text = "", 
 			x = dxLineNum, 
 			y = math.round( (i - 1) * dyLine ),
@@ -100,10 +100,10 @@ local function makeErrDisplay( sceneGroup )
 	end
 
 	-- Make the source lines
-	sourceGroup = g.makeGroup( errGroup, xText, margin )
+	cg.sourceGroup = g.makeGroup( cg, xText, margin )
 	for i = 1, numSourceLines do
 		g.uiBlack( display.newText{
-			parent = sourceGroup,
+			parent = cg.sourceGroup,
 			text = "", 
 			x = 0, 
 			y = math.round( (i - 1) * dyLine ),
@@ -113,12 +113,54 @@ local function makeErrDisplay( sceneGroup )
 		} )
 	end
 
+	-- Return the code group
+	return cg
+end
+
+
+-- Make the error display, or destroy and remake it if it exists
+local function makeErrDisplay( sceneGroup )
+	-- (Re)make group to hold all err display items
+	if errGroup then
+		errGroup:removeSelf()
+	end
+	errGroup = g.makeGroup( sceneGroup, 0, app.dyToolbar )
+	local y
+
+	-- Make two code groups if there is a refLoc and it's not close enough
+	-- to the main loc to show in the same code group.
+	local loc = err.rec.loc
+	local refLoc = err.rec.refLoc
+	if refLoc == nil or math.abs( refLoc.iLine - loc.iLine ) <= minSourceLines then
+		-- Make just one group, but big enough to show the refLoc if any
+		local numLines = minSourceLines
+		if refLoc then
+			local dLines = math.abs( refLoc.iLine - loc.iLine )
+			numLines = math.max( minSourceLines, dLines * 2 + 1 )
+		end
+		mainCodeGroup = makeCodeGroup( numLines )
+		y = mainCodeGroup.y + mainCodeGroup.totalHeight
+		refCodeGroup = nil
+	else
+		-- Make two code groups
+		mainCodeGroup = makeCodeGroup( minSourceLines )
+		refCodeGroup = makeCodeGroup( minSourceLines )
+		-- Position them in the right order for their line numbers
+		if refLoc.iLine < loc.iLine then
+			mainCodeGroup.y = refCodeGroup.y + refCodeGroup.totalHeight
+			y = mainCodeGroup.y + mainCodeGroup.totalHeight
+		else
+			refCodeGroup.y = mainCodeGroup.y + mainCodeGroup.totalHeight
+			y = refCodeGroup.y + refCodeGroup.totalHeight
+		end
+	end
+
 	-- Make the error text
 	errText = g.uiBlack( display.newText{
 		parent = errGroup,
 		text = "", 
 		x = margin * 2, 
-		y = sourceGroup.y + dySource + margin * 2,
+		y = y + margin,
 		width = app.width - margin * 4,
 		height = 0,
 		font = native.systemFontBold, 
@@ -129,7 +171,7 @@ local function makeErrDisplay( sceneGroup )
 	-- Position the docs toolbar
 	-- Can't use errText.height: doesn't work when it wraps :(
 	docsToolbarGroup.y = errGroup.y + errText.y + dyLine * 2 + margin
-	moreInfoBtn.x = app.width - app.margin
+	moreInfoBtn.x = app.width - margin
 
 	-- Position the docs web view
 	docsWebView.y = docsToolbarGroup.y + dyDocsToolbar + 1
@@ -167,6 +209,48 @@ local function setHighlightRectFromLoc( r, loc )
 	r.width = math.max( numCols, 1 ) * dxChar + dxExtra * 2
 end
 
+-- Load source content around loc.iLine into the code group cg,
+-- set the main highlight using loc, and if refLoc then set the ref
+-- highlight using refLoc.
+local function loadCodeGroup( cg, loc, refLoc )
+	-- Load the source lines
+	local iLine = loc.iLine
+	local numLines = cg.lineNumGroup.numChildren
+	local before = (numLines - 1) / 2
+	local lineNumFirst = iLine - before
+	local lineNumLast = lineNumFirst + numLines
+	local lineNum = lineNumFirst
+	local sourceLines = app.sourceFile.strLines
+	for i = 1, numLines do 
+		if lineNum < 1 or lineNum > #sourceLines + 1 then
+			cg.lineNumGroup[i].text = ""
+		else
+			cg.lineNumGroup[i].text = tostring( lineNum )
+		end
+		cg.sourceGroup[i].text = app.detabLine( sourceLines[lineNum] or "" )
+		lineNum = lineNum + 1
+	end
+
+	-- Size the line number highlight
+	cg.lineNumRect.width = (string.len( tostring( loc.iLine ) ) + 1) * dxChar + dxExtra
+
+	-- Position the main highlight.
+	setHighlightRectFromLoc( cg.sourceRect, loc )
+
+	-- Position the ref highlight if given  
+	local refRect = cg.refRect
+	if refLoc then
+		local iLineRef = refLoc.iLine
+		if iLineRef >= lineNumFirst and iLineRef <= lineNumLast then
+			setHighlightRectFromLoc( refRect, refLoc )
+			refRect.y = (iLineRef - lineNumFirst) * app.consoleFontHeight
+			refRect.isVisible = true
+		end
+	else
+		refRect.isVisible = false
+	end
+end
+
 -- Show the error state
 local function showError()
 	-- Set the error text
@@ -175,42 +259,12 @@ local function showError()
 	print( "\n" .. errRecord.strErr )
 	errText.text = errRecord.strErr
 
-	-- Load the source lines around the error
-	local loc = errRecord.loc
-	local iLine = loc.iLine   -- main error location
-	local numLines = lineNumGroup.numChildren
-	local before = (numLines - 1) / 2
-	local lineNumFirst = iLine - before
-	local lineNumLast = lineNumFirst + numLines
-	local lineNum = lineNumFirst
-	local sourceLines = app.sourceFile.strLines
-	for i = 1, numLines do 
-		if lineNum < 1 or lineNum > #sourceLines + 1 then
-			lineNumGroup[i].text = ""
-		else
-			lineNumGroup[i].text = tostring( lineNum )
-		end
-		sourceGroup[i].text = app.detabLine( sourceLines[lineNum] or "" )
-		lineNum = lineNum + 1
-	end
-
-	-- Size the line number highlight
-	lineNumRect.width = (string.len( tostring( iLine ) ) + 1) * dxChar + dxExtra
-
-	-- Position the main highlight.
-	setHighlightRectFromLoc( sourceRect, loc )
-
-	-- Position the ref highlight if it's showing  
-	-- TODO: Make two line groups if necc
-	refRect.isVisible = false
-	local refLoc = errRecord.refLoc
-	if refLoc then
-		local iLineRef = refLoc.iLine
-		if iLineRef >= lineNumFirst and iLineRef <= lineNumLast then
-			setHighlightRectFromLoc( refRect, refLoc )
-			refRect.y = (iLineRef - lineNumFirst) * app.consoleFontHeight
-			refRect.isVisible = true
-		end
+	-- Are we using two code groups or just one?
+	if refCodeGroup then
+		loadCodeGroup( mainCodeGroup, errRecord.loc )
+		loadCodeGroup( refCodeGroup, errRecord.refLoc )
+	else
+		loadCodeGroup( mainCodeGroup, errRecord.loc, errRecord.refLoc )
 	end
 end
 
@@ -270,7 +324,7 @@ local function makeDocsToolbar( parent )
 
 	-- More Info button 
 	moreInfoBtn = widget.newButton{
-		x = app.width - app.margin, 
+		x = app.width - margin, 
 		y = yCenter,
 		label = "More Info.",
 		labelAlign = "right",
@@ -286,7 +340,7 @@ local function makeDocsToolbar( parent )
 	-- Back and forward buttons
 	local size = dyDocsToolbar
 	backBtn = display.newImageRect( docsToolbarGroup, "images/back.png", size, size )
-	backBtn.x = app.margin + size / 2
+	backBtn.x = margin + size / 2
 	backBtn.y = yCenter
 	backBtn.isVisible = false
 	backBtn:addEventListener( "tap", 
@@ -296,7 +350,7 @@ local function makeDocsToolbar( parent )
 		end )
 	forwardBtn = display.newImageRect( docsToolbarGroup, "images/back.png", size, size )
 	forwardBtn.rotation = 180
-	forwardBtn.x = backBtn.x + size + app.margin
+	forwardBtn.x = backBtn.x + size + margin
 	forwardBtn.y = yCenter
 	forwardBtn.isVisible = false
 	forwardBtn:addEventListener( "tap", 
