@@ -70,6 +70,37 @@ local makeExpr
 local getBlockStmts
 local getLineStmts
 
+-- Set an error when a block's begining { does not have the same indentation as its function header
+-- or control statement
+local function indentErrBlockBegin( tree, prevTree )
+	local p = prevTree.p
+	if p == "func" or p == "main" then
+		err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLineStart, 
+				"The { after a function header should have the same indentation as the function header" )
+	elseif p == "if" then
+		err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+				"The { after an if statement should have the same indentation as the \"if\"" )
+	elseif p == "elseif" then
+		err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+				"The { after an else if statement should have the same indentation as the \"else if\"" )
+	elseif p == "else" then
+		err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+				"The { after an \"else\" should have the same indentation as the \"else\"" )
+	elseif p == "do" then
+		err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+				"The { after a \"do\" should have the same indentation as the \"do\"" )
+	elseif p == "while" then
+		err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+				"The { after a while loop header should have the same indentation as the \"while\"" )
+	elseif p == "for" then
+		err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
+				"The { after a for loop header should have the same indentation as the \"for\"" )
+	end
+end
+
+local function indentErrorBlockBody( )
+	-- body
+end
 
 -- Check for the correct Code12 import and move iTree past all imports.
 -- Return true if succesful, else set the error state and return false.
@@ -83,7 +114,7 @@ local function checkImport()
 			if tree.nodes[2].str == "Code12" then
 				foundCode12Import = true
 				if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
-					err.setErrLineNum( tree, "The start of a program shouldn't be indented" )
+					err.setErrLineNum( tree.iLine, "\"import Code12.*;\" shouldn't be indented" )
 				end
 			else   -- a package but not Code12
 				err.setErrLineParseTree( tree, 
@@ -120,7 +151,7 @@ local function checkClassHeader()
 	local tree = parseTrees[iTree]
 	if tree.p == "classUser" and tree.nodes[5].str == "Code12Program" then
 		if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
-			err.setErrLineNum( tree.iLine, "A program's class header shouldn't be indented" )
+			err.setErrLineNum( tree.iLine, "The class header shouldn't be indented" )
 		end
 		programTree.nameID = tree.nodes[3]  -- class name
 		iTree = iTree + 1
@@ -138,30 +169,8 @@ local function checkBlockBegin()
 	local tree = parseTrees[iTree]
 	local prevTree = parseTrees[iTree - 1]
 	if tree.p == "begin" then
-		if javalex.indentLevelForLine(tree.iLine) ~= javalex.indentLevelForLine(prevTree.iLine) then
-			local p = prevTree.p
-			if p == "func" then
-				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
-					"The { after a function header should have the same indentation as the function header" )
-			elseif p == "if" then
-				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
-					"The { after an if statement should have the same indentation as the 'if'" )
-			elseif p == "else if" then
-				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
-					"The { after an else if statement should have the same indentation as the 'else if'" )
-			elseif p == "else" then
-				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
-					"The { after an 'else' should have the same indentation as the 'else'" )
-			elseif p == "do" then
-				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
-					"The { after a 'do' should have the same indentation as the 'do'" )
-			elseif p == "while" then -- TODO
-				err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
-					"The { after a while loop header should have the same indentation as the 'while'" )
-			elseif p == "for" then -- TODO
-								err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLine, 
-					"The { after a for loop header should have the same indentation as the 'for'" )
-			end
+		if javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( prevTree.iLineStart ) then
+			indentErrBlockBegin( tree, prevTree )
 		end
 		iTree = iTree + 1
 		return true
@@ -191,6 +200,11 @@ local function checkMain()
 				[[This name must match the program's class name "%s"]],
 				className )
 		return false
+	end
+	local prevTree = parseTrees[iTree - 1]
+	if javalex.indentLevelForLine( tree.iLineStart ) <= javalex.indentLevelForLine( prevTree.iLine ) then
+		err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLine, 
+				"The body of a function should be indented more than its opening {" )
 	end
 	iTree = iTree + 1
 	tree = parseTrees[iTree]
@@ -291,7 +305,6 @@ end
 local function getControlledStmts()
 	local tree = parseTrees[iTree]
 	local p = tree.p
-	local indentLevel = javalex.indentLevelForLine( parseTrees[iTree - 1].iLine )
 	if p == "begin" then
 		return getBlockStmts()
 	elseif p == "end" then
@@ -302,11 +315,12 @@ local function getControlledStmts()
 		err.setErrNode( tree, "Variable declarations are not allowed here" )
 		return nil
 	else
-		if javalex.indentLevelForLine( tree.iLine ) <= indentLevel then
-			-- TODO: different error messages for different types of control statements
-			err.setErrLineNum( tree, "A controlled statement should be indented from its control statement" )
-		end
 		-- Single controlled stmt
+		if javalex.indentLevelForLine( tree.iLineStart ) <= javalex.indentLevelForLine( parseTrees[iTree - 1].iLineStart ) then
+			local prevTree = parseTrees[iTree - 1]
+			err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
+					"This line should be indented more than its controlling \"%s\"", prevTree.p )
+		end
 		iTree = iTree + 1  -- pass the controlled stmt as expected by getLineStmts
 		local stmts = {}
 		if getLineStmts( tree, stmts ) then
@@ -319,21 +333,26 @@ end
 -- Check to see if the next stmt is an else or else if, and if so then 
 -- get the controlled stmts and return an array of stmt structures. 
 -- Return nil if there is no else or an error.
-local function getElseStmts( indentLevel )
+local function getElseStmts( ifTree )
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "else" then
+		if javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( ifTree.iLineStart ) then
+			err.setErrLineNumAndRefLineNum( tree.iLine, ifTree.iLineStart, 
+					"This \"else\" should have the same indentation as the highlighted \"if\" above it" )
+		end
 		iTree = iTree + 1
 		return getControlledStmts()
 	elseif p == "elseif" then
-		-- Controlled stmts is a single stmt, which is the following if
-		if javalex.indentLevelForLine( tree.iLine ) ~= indentLevel then
-			err.setErrLineNum( tree.iLine, "Unexpected change in indentation for this else if" )
+		if javalex.indentLevelForLine( tree.iLineStart ) ~= javalex.indentLevelForLine( ifTree.iLineStart ) then
+			err.setErrLineNumAndRefLineNum( tree.iLineStart, ifTree.iLineStart, 
+					"This \"else if\" should have the same indentation as the highlighted \"if\" above it" )
 		end
+		-- Controlled stmts is a single stmt, which is the following if
 		iTree = iTree + 1
 		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
 				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts( indentLevel ) } }
+				elseStmts = getElseStmts( ifTree ) } }
 	end
 	return nil	
 end
@@ -417,7 +436,7 @@ function getLineStmts( tree, stmts )
 	end
 
 	-- Store indent level
-	local indentLevel = javalex.indentLevelForLine( tree.iLine )
+	local indentLevel = javalex.indentLevelForLine( tree.iLineStart )
 
 	-- Handle the line patterns
 	local stmt = nil
@@ -428,7 +447,7 @@ function getLineStmts( tree, stmts )
 		-- if (expr) controlledStmts [else controlledStmts]
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts( indentLevel ) }
+				elseStmts = getElseStmts( tree ) }
 	elseif p == "elseif" or p == "else" then
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
@@ -456,8 +475,8 @@ function getLineStmts( tree, stmts )
 					"while statement at end of do-while loop must end with a semicolon" )
 			return nil
 		end
-		if javalex.indentLevelForLine( endTree.iLine ) ~= indentLevel then
-			err.setErrNodeAndRef( endTree, tree, "while statement should have the same indentation as do" )
+		if javalex.indentLevelForLine( endTree.iLineStart ) ~= indentLevel then
+			err.setErrNodeAndRef( endTree, tree, "This while statement should have the same indentation as its \"do\"" )
 		end
 		stmt.expr = makeExpr( endTree.nodes[3] )
 	elseif p == "while" then
@@ -495,25 +514,28 @@ end
 -- If there is an error then set the error state and return nil.
 function getBlockStmts()
 	-- Block must start with a {
-	local iLineStart = parseTrees[iTree].iLine
+	local iLineBlockBegin = parseTrees[iTree].iLine
 	if not checkBlockBegin() then
 		return false
 	end
 
 	-- Check block is indented from beginning {
 	local tree = parseTrees[iTree]
-	local startIndent = javalex.indentLevelForLine( iLineStart )
-	local blockIndent = javalex.indentLevelForLine( tree.iLine )
-	if blockIndent <= startIndent and tree.p ~= "end" then
-		err.setErrLineNum( parseTrees[iTree].iLine, "A block should be indented from its beginning {" )
+	local beginIndent = javalex.indentLevelForLine( iLineBlockBegin )
+	local iLineFirstBlockStmt = tree.iLineStart
+	local blockIndent = javalex.indentLevelForLine( iLineFirstBlockStmt)
+	if blockIndent <= beginIndent and tree.p ~= "end" then
+		err.setErrLineNumAndRefLineNum( parseTrees[iTree].iLineStart, iLineBlockBegin,
+				"A block should be indented more than its beginning {" )
 	end
 
 	-- Get all lines until we get a matching end for the block begin
 	local stmts = {}
 	while iTree <= numParseTrees do
+		local prevTree = tree
 		local tree = parseTrees[iTree]
 		local p = tree.p
-		local currIndent = javalex.indentLevelForLine( tree.iLine )
+		local currIndent = javalex.indentLevelForLine( tree.iLineStart )
 		iTree = iTree + 1    -- pass this line
 
 		if p == "begin" then
@@ -521,13 +543,15 @@ function getBlockStmts()
 			err.setErrLineNum( tree.iLine, "Unexpected {" )
 			return nil
 		elseif p == "end" then
-			if currIndent ~= startIndent then
-				err.setErrLineNum( tree.iLine, "A block's ending } should have the same indentation as its beginning {" )
+			if currIndent ~= beginIndent then
+				err.setErrLineNumAndRefLineNum( tree.iLineStart, iLineBlockBegin, 
+						"A block's ending } should have the same indentation as its beginning {" )
 			end
 			return stmts   -- this ends our block
 		else
 			if currIndent ~= blockIndent then
-				err.setErrLineNum( tree.iLine, "Unexpected change in indentation" )
+				err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
+						"Unexpected change in indentation (Missing/misplaced curly brackets?)" )
 			end
 			getLineStmts( tree, stmts )
 		end
@@ -625,11 +649,15 @@ end
 local function getMembers()
 	local vars = programTree.vars
 	local funcs = programTree.funcs
-	local indentLevel
+
+	-- Save indentation level and line number of first member
+	local firstMemberLineNum, firstMemberIndentLevel
 	if iTree <= numParseTrees then
-		indentLevel = javalex.indentLevelForLine( parseTrees[iTree].iLine )
-		if indentLevel == 0 then
-			err.setErrNode( parseTrees[iTree], "Class member variables and functions should be indented" )
+		firstMemberLineNum = parseTrees[iTree].iLineStart
+		firstMemberIndentLevel = javalex.indentLevelForLine( firstMemberLineNum )
+		if firstMemberIndentLevel == 0 then
+			err.setErrLineNum( parseTrees[iTree].iLineStart,
+					"Class member variable declarations and function definitions should be indented" )
 		end
 	end
 
@@ -643,8 +671,9 @@ local function getMembers()
 
 		-- Check indentation
 		if p ~= "end" then
-			if indentLevel and javalex.indentLevelForLine( tree.iLine ) ~= indentLevel then
-				err.setErrLineNum( tree.iLine, "Unexpected change in indentation" )
+			if javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
+				err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
+						"Class member variable declarations and function definitions should all have the same indentation" )
 			end
 		else
 			if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
@@ -699,7 +728,7 @@ local function getMembers()
 	end
 
 	-- Reached EOF before finding the end of the class
-	err.setErrLineNum( numSourceLines + 1, "Missing } to end the program class" )
+	err.setErrLineNum( numSourceLines + 1, "Missing } to end the class" )
 	return false
 end
 
