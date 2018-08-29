@@ -24,14 +24,14 @@ local parseProgram = {}
 -- program: 
 --     { s = "program", nameID, vars, funcs }
 --
--- var:  (Semantic analysis adds vt and assigned fields)
---     { s = "var", iLine, typeID, nameID, isArray, isConst, isGlobal, initExpr }
+-- var:  (Semantic analysis adds assigned field)
+--     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 --
--- func:  (Semantic analysis adds a vt field)
---     { s = "func", iLine, typeID, nameID, isArray, isPublic, paramVars, stmts }
+-- func:
+--     { s = "func", iLine, nameID, vt, isPublic, paramVars, stmts }
 --
 -- stmt:
---     { s = "var", iLine, typeID, nameID, isArray, isConst, isGlobal, initExpr }
+--     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 --     { s = "call", iLine, lValue, nameID, exprs }
 --     { s = "assign", iLine, lValue, op, expr }     -- op.tt: =, +=, -=, *=, /=, ++, --
 --     { s = "if", iLine, expr, stmts, elseStmts }
@@ -48,11 +48,11 @@ local parseProgram = {}
 -- expr:  (Semantic analysis adds a vt field)
 --     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
 --     { s = "call", iLine, lValue, nameID, exprs }
---     { s = "lValue", lValue }
+--     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "parens", expr }
 --     { s = "unaryOp", op, expr }         -- op.tt: -, !
 --     { s = "binOp", left, op, right }    -- op.tt: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
---     { s = "newArray", typeID, lengthExpr }
+--     { s = "newArray", vt, lengthExpr }
 --     { s = "arrayInit", exprs }
 --
 -- There are several types of calls possible. Examples at increasing syntax level:
@@ -193,10 +193,9 @@ end
 local function makeVar( isGlobal, typeID, nameID, initExpr, isArray, isConst )
 	return {
 		s = "var",
-		iLine = typeID.iLine,
-		typeID = typeID,
+		iLine = nameID.iLine,
 		nameID = nameID,
-		isArray = isArray,
+		vt = javaTypes.vtFromVarType( typeID, isArray ),
 		isConst = isConst,
 		isGlobal = isGlobal,
 		initExpr = makeExpr( initExpr )
@@ -568,7 +567,8 @@ function makeExpr( node )
 	elseif p == "neg" or p == "!" then
 		return { s = "unaryOp", op = nodes[1], expr = makeExpr( nodes[2] ) }
 	elseif p == "newArray" then
-		return { s = "newArray", typeID = nodes[2], lengthExpr = makeExpr( nodes[4] ) }
+		return { s = "newArray", vt = javaTypes.vtFromVarType( nodes[2] ), 
+				lengthExpr = makeExpr( nodes[4] ) }
 	else
 		-- Binary op
 		return { s = "binOp", op = nodes[2], left = makeExpr( nodes[1] ),
@@ -601,9 +601,8 @@ local function getFunc( typeID, isArray, nameID, isPublic, paramList )
 	return { 
 		s = "func",
 		iLine = nameID.iLine, 
-		typeID = typeID,
 		nameID = nameID,
-		isArray = isArray,
+		vt = javaTypes.vtFromType( typeID, isArray ),
 		isPublic = isPublic,
 		paramVars = paramVars, 
 		stmts = stmts,

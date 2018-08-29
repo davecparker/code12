@@ -27,7 +27,7 @@ local variables = {}
 
 -- Table of user-defined methods that are currently defined. 
 -- These map a name to a table in the same format as the apiTables 
--- plus func and var fields:
+-- plus a func field that references the function definition.
 --     { vt = vtReturn, func = func, 
 --            params = array of { name = str, vt = vtParam, var = var } }
 -- There are also entries of type string 
@@ -162,11 +162,9 @@ local function defineVar( var )
 end
 
 -- Check a var structure and define the variable.
--- Determime the variable type and store it in var.vt.
 -- If there is an initExpr then check it and mark the var as assigned.
 local function checkVar( var )
-	-- { s = "var", iLine, typeID, nameID, isArray, isConst, isGlobal, initExpr }
-	var.vt = javaTypes.vtFromVarType( var.typeID, var.isArray )
+	-- { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 	defineVar( var )
 	if var.initExpr then
 		checkJava.canAssignToVarNode( var.nameID, var.initExpr )
@@ -213,9 +211,6 @@ end
 -- If the method is a Code12 event, then check the signature, otherwise add the
 -- user-defined method to userMethods. Set the error state if there is an error.
 local function defineMethod( func )
-	-- tree, typeNode, nameNode, paramList
-	assert( func.s == "func" )
-
 	-- Make sure the name is valid
 	local nameNode = func.nameID
 	if isInvalidName( nameNode, "function" ) then
@@ -223,36 +218,29 @@ local function defineMethod( func )
 	end
 	local fnName = nameNode.str
 
-	-- Get the return type and store it in the func
-	local typeNode = func.typeID
-	local vtReturn = javaTypes.vtFromType( typeNode, func.isArray )
-	func.vt = vtReturn 
-
-	-- Add vt fields to the paramVars and build the params table
+	-- Check the parameter names and build the params table
 	local params = {}
 	local paramVars = func.paramVars
 	local numParams = (paramVars and #paramVars) or 0
 	for i = 1, numParams do
 		local var = paramVars[i]
 		local nameID = var.nameID
-		local vt = javaTypes.vtFromVarType( var.typeID, var.isArray )
-		if vt == nil or isInvalidName( nameID, "parameter" ) then
+		if isInvalidName( nameID, "parameter" ) then
 			return
 		end
-		var.vt = vt
-		params[#params + 1] = { name = nameID.str, vt = vt, var = var }
+		params[#params + 1] = { name = nameID.str, vt = var.vt }
 	end
 
 	-- Is this a pre-defined event function?
 	local event = lookupID( nameNode, apiTables["Code12Program"].methods )
 	if event then
 		-- Event: Check if the signature matches
-		if event.vt ~= vtReturn then
-			err.setErrNodeAndRef( typeNode, nameNode, 
+		if event.vt ~= func.vt then
+			err.setErrNode( func, 
 					"Return type of %s function should be %s",
 					fnName, javaTypes.typeNameFromVt( event.vt ) )
 		elseif #event.params ~= numParams then
-			err.setErrLineNum( nameNode.iLine, 
+			err.setErrNode( func, 
 					"Wrong number of parameters for function %s ", fnName )
 		else
 			for i = 1, numParams do
@@ -285,7 +273,7 @@ local function defineMethod( func )
 	end
 
 	-- Add entry to userMethods table and lowercase mapping if different
-	userMethods[fnName] = { vt = vtReturn, func = func, params = params }
+	userMethods[fnName] = { vt = func.vt, func = func, params = params }
 	local nameLower = string.lower( fnName )
 	if nameLower ~= fnName then
 		userMethods[nameLower] = fnName
@@ -455,8 +443,7 @@ local function vtExprNewArray( node )
 		err.setErrNode( node.lengthExpr, "Array count must be an integer" )
 		return nil
 	end
-	local vt = javaTypes.vtFromVarType( node.typeID )
-	return { vt = vt }  -- array of specified type
+	return { vt = node.vt }  -- array of element type
 end
 
 -- arrayInit
@@ -1026,7 +1013,7 @@ end
 function checkStmt( stmt )
 	local s = stmt.s
 	if s == "var" then
-		-- { s = "var", iLine, typeID, nameID, isArray, isConst, isGlobal, initExpr }
+		-- { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 		checkVar( stmt )
 	elseif s == "call" then
 		-- { s = "call", iLine, className, objLValue, nameID, exprs }
