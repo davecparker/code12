@@ -20,25 +20,22 @@ local checkJava = {}
 -- File local state
 local syntaxLevel          -- the langauge (syntax) level
 
--- Tables of user-defined variables and methods. These map a name to a table containing 
--- where the name was defined (node), its value type (vt), and the params if a method. 
--- There are also entries of type string that map a lowercase version of the name to the
--- name with the correct case. So the entries are one of:
---     Variables:
---         { node = token, vt = vt, assigned = false }   -- assigned set when assigned
---     Methods:
---         { node = token, vt = vt, params = {} }   
---                    -- params is an array of { name = name, vt = vtParam }
---     Either:
---         strCorrectCase    -- string name with correct case
+-- Table of variables that are currently defined. 
+-- These map a name to a var structure. There are also entries of type string 
+-- that map a lowercase version of the name to the name with the correct case.
 local variables = {}
+
+-- Table of user-defined methods that are currently defined. 
+-- These map a name to a table in the same format as the apiTables 
+-- plus func and var fields:
+--     { vt = vtReturn, func = func, 
+--            params = array of { name = str, vt = vtParam, var = var } }
+-- There are also entries of type string 
+-- that map a lowercase version of the name to the name with the correct case.
 local userMethods = {}
 
 -- Set of strings for names of event methods that the user has defined (overridden)
 local eventMethodsDefined = {}
-
--- Table that maps a name to true if it is an instance variable (not a local variable)
-local isInstanceVar = {} 
 
 -- Stack of local variable names, with an empty name "" marking the beginning of each block
 local localNameStack = {}
@@ -126,6 +123,92 @@ local function lookupID( nameToken, nameTable )
 	return nil
 end
 
+-- Define the variable with the given var structure.
+-- Return true if successful, false if error.
+local function defineVar( var )
+	local vt = var.vt
+	local nameNode = var.nameID
+	if vt == nil or isInvalidName( nameNode, "variable" ) then
+		return false   -- invalid type or name
+	end
+
+	-- Check for existing definition
+	local varName = nameNode.str
+	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
+	if varFound then
+		err.setErrNodeAndRef( nameNode, varFound.nameID, 
+				"Variable %s was already defined", varName )
+		return false
+	elseif varCorrectCase then
+		err.clearErr( nameNode.iLine )
+		err.setErrNodeAndRef( nameNode, varCorrectCase.nameID, 
+				"Variable %s differs only by upper/lower case from existing variable %s", 
+				varName, nameCorrectCase )
+		return false
+	end
+
+	-- Define it and the case-insensitive lower-case version as well if necessary
+	variables[varName] = var
+	local varNameLower = string.lower( varName )
+	if varNameLower ~= varName then
+		variables[varNameLower] = varName
+	end
+
+	-- Push local variables on the locals stack
+	if not var.isGlobal then
+		localNameStack[#localNameStack + 1] = nameNode.str
+	end
+	return true
+end
+
+-- Check a var structure and define the variable.
+-- Determime the variable type and store it in var.vt.
+-- If there is an initExpr then check it and mark the var as assigned.
+local function checkVar( var )
+	-- { s = "var", iLine, typeID, nameID, isArray, isConst, isGlobal, initExpr }
+	var.vt = javaTypes.vtFromVarType( var.typeID, var.isArray )
+	defineVar( var )
+	if var.initExpr then
+		checkJava.canAssignToVarNode( var.nameID, var.initExpr )
+	end
+end
+
+-- Return the variable table entry for the given variable name node.
+-- If the variable is undefined then set the error state and return nil.
+-- Unless unassignedOK is passed and true then also check to make sure the
+-- variable has been assigned and if not then set the error state and return nil. 
+local function getVariable( varNode, unassignedOK )
+	assert( varNode.tt == "ID" )
+	if isInvalidName( varNode, "variable" ) then
+		return nil
+	end
+	local varFound = lookupID( varNode, variables )
+	if varFound == nil then
+		err.setErrNode( varNode,  "Undefined variable %s", varNode.str )
+		return nil
+	end
+	if unassignedOK ~= true then
+		if not varFound.assigned then
+			err.setErrNode( varNode,  
+				"Variable %s must be assigned before it is used", varNode.str )
+			return nil
+		end
+	end
+	return varFound
+end
+
+-- Return the value type (vt) for the given variable name node.
+-- If the variable is undefined then set the error state and return nil.
+-- Unless unassignedOK is passed and true then also check to make sure the
+-- variable has been assigned and if not then set the error state and return nil. 
+local function vtVarNode( varNode, unassignedOK )
+	local varFound = getVariable( varNode, unassignedOK )
+	if varFound then
+		return varFound.vt
+	end
+	return nil
+end
+
 -- Process a method definition header, but not the body.
 -- If the method is a Code12 event, then check the signature, otherwise add the
 -- user-defined method to userMethods. Set the error state if there is an error.
@@ -140,29 +223,24 @@ local function defineMethod( func )
 	end
 	local fnName = nameNode.str
 
-	-- Get the return type
+	-- Get the return type and store it in the func
 	local typeNode = func.typeID
-	local vtReturn = javaTypes.vtFromType( typeNode, func.isArray ) 
+	local vtReturn = javaTypes.vtFromType( typeNode, func.isArray )
+	func.vt = vtReturn 
 
-	-- Build the parameter table
-	local paramTable = {}
-	local params = func.params
-	if params then
-		for _, param in ipairs( params ) do
-			assert( param.s == "param" )
-			local vt = javaTypes.vtFromVarType( param.typeID )
-			if vt == nil then
-				return
-			end
-			if param.isArray then
-				vt = { vt = vt }
-			end
-			local nameID = param.nameID
-			if isInvalidName( nameID, "parameter" ) then
-				return
-			end
-			paramTable[#paramTable + 1] = { name = nameID.str, vt = vt }
+	-- Add vt fields to the paramVars and build the params table
+	local params = {}
+	local paramVars = func.paramVars
+	local numParams = (paramVars and #paramVars) or 0
+	for i = 1, numParams do
+		local var = paramVars[i]
+		local nameID = var.nameID
+		local vt = javaTypes.vtFromVarType( var.typeID, var.isArray )
+		if vt == nil or isInvalidName( nameID, "parameter" ) then
+			return
 		end
+		var.vt = vt
+		params[#params + 1] = { name = nameID.str, vt = vt, var = var }
 	end
 
 	-- Is this a pre-defined event function?
@@ -173,13 +251,13 @@ local function defineMethod( func )
 			err.setErrNodeAndRef( typeNode, nameNode, 
 					"Return type of %s function should be %s",
 					fnName, javaTypes.typeNameFromVt( event.vt ) )
-		elseif #event.params ~= #paramTable then
+		elseif #event.params ~= numParams then
 			err.setErrLineNum( nameNode.iLine, 
 					"Wrong number of parameters for function %s ", fnName )
 		else
-			for i = 1, #paramTable do
-				if paramTable[i].vt ~= event.params[i].vt then
-					err.setErrNodeAndRef( func.params[i].typeID, nameNode,
+			for i = 1, numParams do
+				if params[i].vt ~= event.params[i].vt then
+					err.setErrNodeAndRef( paramVars[i], nameNode,
 							"Wrong type for parameter %d of function %s",
 							i, fnName )
 					return
@@ -206,13 +284,8 @@ local function defineMethod( func )
 		return
 	end
 
-	-- Add entry to userMethods table
-	userMethods[fnName] = { 
-		node = nameNode,
-		vt = vtReturn, 
-		params = paramTable
-	}
-	-- Add lowercase version if different
+	-- Add entry to userMethods table and lowercase mapping if different
+	userMethods[fnName] = { vt = vtReturn, func = func, params = params }
 	local nameLower = string.lower( fnName )
 	if nameLower ~= fnName then
 		userMethods[nameLower] = fnName
@@ -246,24 +319,24 @@ local function vtArrayElement( arrayNode, vtArray, indexExpr )
 	return vtArray.vt   -- element type of the array
 end
 
--- Return the value type (vt) for an lValue structure.
+-- Return the value type (vt) for an lValue structure, and 
+-- store the corresponding isGlobal and vt fields in the lValue.
 -- If there is an error, then set the error state and return nil.
 local function vtLValueNode( lValue )
 	assert( lValue.s == "lValue" )
 
-	-- Get the variable and its type
+	-- Get the variable and its type, and store the var if any
 	local varNode = lValue.varID
 	local varName = varNode.str
 	local vt = nil
 	local isClass = javaTypes.isClassWithStaticMembers( varName )  --  e.g. Math.PI
 	if not isClass then
-		vt = checkJava.vtVar( varNode )
-		if vt == nil then
+		local varFound = getVariable( varNode )
+		if varFound == nil then
 			return nil
 		end
-		if not checkJava.isInstanceVarName( varName ) then
-			lValue.isLocal = true
-		end
+		lValue.isGlobal = varFound.isGlobal
+		vt = varFound.vt
 	end
 
 	-- Check array index if any, and get the element type
@@ -306,13 +379,10 @@ local function vtLValueNode( lValue )
 					fieldID.str, className )
 			return nil
 		end
-
-		-- Store the object type as vtObj in the lValue, then get the field type
-		lValue.vtObj = vt
 		vt = fieldFound.vt
 	end
 	
-	-- Store the final value vt in the lValue and return it
+	-- Store the vt in the lValue and return it
 	lValue.vt = vt
 	return vt
 end
@@ -375,7 +445,7 @@ end
 
 -- call
 local function vtExprCall( node )
-	return checkJava.vtCheckCall( node.lValue, node.exprs )
+	return checkJava.vtCheckCall( node )
 end
 
 -- newArray
@@ -625,102 +695,14 @@ end
 
 --- Module Functions ---------------------------------------------------------
 
--- Return true if the given variable name is a defined instance variable.
-function checkJava.isInstanceVarName( varName )
-	return isInstanceVar[varName]
-end
-
--- Return the value type (vt) for a variable name token node.
--- If the variable is undefined then set the error state and return nil.
--- Unless unassignedOK is passed and true then also check to make sure the
--- variable has been assigned and if not then set the error state and return nil. 
-function checkJava.vtVar( varNode, unassignedOK )
-	assert( varNode.tt == "ID" )
-	if isInvalidName( varNode, "variable" ) then
-		return nil
-	end
-	local varFound = lookupID( varNode, variables )
-	if varFound == nil then
-		err.setErrNode( varNode,  "Undefined variable %s", varNode.str )
-		return nil
-	end
-	if unassignedOK ~= true then
-		if not varFound.assigned then
-			err.setErrNode( varNode,  
-				"Variable %s must be assigned before it is used", varNode.str )
-			--error("Stop")
-			return nil
-		end
-	end
-	return varFound.vt
-end
-
--- Define the variable with the given nameNode and vt.
--- If assigned (default false) then mark it as assigned.
--- Return true if successful, false if error.
-function checkJava.defineVar( nameNode, vt, assigned )
-	if vt == nil then
-		return false   -- type could not be determined, so definition is invalid
-	end
-
-	-- Check for invalid name
-	if isInvalidName( nameNode, "variable" ) then
-		return false
-	end
-
-	-- Check for existing definition
-	local varName = nameNode.str
-	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
-	if varFound then
-		err.setErrNodeAndRef( nameNode, varFound.node, 
-				"Variable %s was already defined", varName )
-		return false
-	elseif varCorrectCase then
-		err.clearErr( nameNode.iLine )
-		err.setErrNodeAndRef( nameNode, varCorrectCase.node, 
-				"Variable %s differs only by upper/lower case from existing variable %s", 
-				varName, nameCorrectCase )
-		return false
-	end
-
-	-- Define it and the case-insensitive lower-case version as well if necessary
-	variables[varName] = { node = nameNode, vt = vt, assigned = assigned }
-	local varNameLower = string.lower( varName )
-	if varNameLower ~= varName then
-		variables[varNameLower] = varName
-	end
-	return true
-end
-
--- Define an instance variable with the given nameNode and vt.
--- If assigned (default false) then mark it as assigned.
--- Return true if successful, false if error.
-function checkJava.defineInstanceVar( nameNode, vt, assigned )
-	if not checkJava.defineVar( nameNode, vt, assigned ) then
-		return false
-	end
-	isInstanceVar[nameNode.str] = true
-	return true
-end
-
--- Define a local variable with the given nameNode and vt.
--- If assigned (default false) then mark it as assigned.
--- Return true if successful, false if error.
-function checkJava.defineLocalVar( nameNode, vt, assigned )
-	if not checkJava.defineVar( nameNode, vt, assigned ) then
-		return false
-	end
-	localNameStack[#localNameStack + 1] = nameNode.str    -- push on locals stack
-	return true
-end
-
--- Begin a new local variable block, then if params then define the params.
-function checkJava.beginLocalBlock( params )
+-- Begin a new local variable block, then if paramVars then define 
+-- the formal parameters as local variables.
+function checkJava.beginLocalBlock( paramVars )
 	localNameStack[#localNameStack + 1] = ""   -- push special sentinel marking block start
-	if params then
-		for _, param in ipairs( params ) do
-			local vt = javaTypes.vtFromVarType( param.typeID, param.isArray )
-			checkJava.defineLocalVar( param.nameID, vt, true )
+	if paramVars then
+		for _, var in ipairs( paramVars ) do
+			checkVar( var )
+			var.assigned = true
 		end
 	end
 end
@@ -779,13 +761,13 @@ end
 -- If the types are not compatible then set the error state and return false.
 -- Otherwise mark the variable as assigned and return true.
 function checkJava.canAssignToVarNode( varNode, expr )
-	local vt = checkJava.vtVar( varNode, true )
+	local vt = vtVarNode( varNode, true )
 	if not checkJava.canAssignToVt( varNode, vt, expr ) then
 		return false
 	end
-	local varRecord = variables[varNode.str]
-	if type(varRecord) == "table" then
-		varRecord.assigned = true
+	local var = variables[varNode.str]
+	if type(var) == "table" then
+		var.assigned = true
 	end
 	return true
 end
@@ -843,112 +825,148 @@ local function findUserMethod( nameID )
 	return method
 end
 
--- Return (method table entry, class name, method display name) for lValue,
--- which is the function lValue of a call. The class name will be nil for 
--- user-defined methods. If the method is not found then return nil.
-local function findMethod( lValue )
-	assert( lValue.s == "lValue" )
-	local nameID = lValue.varID
-	local indexExpr = lValue.indexExpr
-	local fieldID = lValue.fieldID
+-- If the lValue and nameID from a call match a supported System.out method,
+-- then return the entry in the apiTables. If there is an error then
+-- set the error state and return nil. Just return nil if no match.
+local function findSystemOutMethod( lValue, nameID )
+	if lValue.fieldID == nil then
+		return nil
+	end
+	local varName = lValue.varID.str
+	if string.lower( varName ) ~= "system" then
+		return nil
+	end
+	local fieldName = lValue.fieldID.str
+	if string.lower( fieldName ) ~= "out" or lValue.indexExpr then
+		err.setErrNodeSpan( lValue, nameID, "Invalid function name" )
+		return nil
+	end
+	if varName ~= "System" or fieldName ~= "out" then
+		err.setErrNode( lValue, 
+				'Names are case-sensitive. The correct case is "System.out"' )
+		return nil
+	end
+	return lookupID( nameID, apiTables["PrintStream"].methods )
+end
+
+-- Return (method table entry, class name, method display name) for the
+-- given lValue and nameID in a call structure. The class name will be nil
+-- for user-defined methods. If the method is not found then return nil.
+local function findMethod( lValue, nameID )
+	assert( lValue == nil or lValue.s == "lValue" )
+	assert( nameID.tt )
+	local nameStr = nameID.str
 
 	-- Is this a call to a user-defined function?
-	local nameStr = nameID.str
-	if fieldID == nil then
-		if indexExpr then
-			err.setErrNode( lValue, "Invalid function or method name" )
-			return nil
-		end
+	if lValue == nil then
 		return findUserMethod( nameID ), nil, nameStr
 	end
 
-	-- Determine the class
-	local className = nil
-	local vtObj = nil
-	local class = lookupID( nameID, apiTables )
+	-- Check for System.out methods
+	local method = findSystemOutMethod( lValue, nameID )
+	if method then
+		return method, "PrintStream", "System.out." .. nameStr
+	end
+
+	-- Determine the className and class API entry
+	local className
+	local class = lookupID( lValue.varID, apiTables )
 	if class then
-		if javaTypes.isClassWithStaticMembers( nameStr ) then
-			className = nameStr    -- ct or Math
+		-- Static method call
+		if lValue.indexExpr then
+			err.setErrNode( lValue.indexExpr,
+					"An index in [brackets] can only be applied to an array" )
+			return nil
+		end
+		local varName = lValue.varID.str
+		if javaTypes.isClassWithStaticMembers( varName ) then
+			className = varName    -- ct or Math
 		else
-			err.setErrNode( lValue, 
-					"Cannot call methods directly on class %s", nameStr);
+			-- Error: e.g. GameObj.delete(), String.equals()
+			err.setErrNodeSpan( lValue, nameID,
+					"Cannot call methods directly on class %s", varName );
+			return nil
 		end
 	else
-		vtObj = checkJava.vtVar( nameID )
-	end
-	if indexExpr then
-		vtObj = vtArrayElement( nameID, vtObj, indexExpr )
-	end
-	if className == nil then
-		if vtObj == "String" or vtObj == "GameObj" then
-			className = vtObj
+		-- Instance method call
+		local vt = vtLValueNode( lValue )
+		if vt == "String" or vt == "GameObj" then
+			className = vt
 			class = apiTables[className]
 		else
-			err.setErrNode( lValue, "Method call on invalid type (%s)",
-					javaTypes.typeNameFromVt( vtObj ))
+			-- Error: e.g. intVar.delete()
+			err.setErrNodeSpan( lValue, nameID, 
+					"Method call on invalid type (%s)",
+					javaTypes.typeNameFromVt( vt ) )
 			return nil
 		end
 	end
 
 	-- Look up the method
-	local method = lookupID( fieldID, class.methods )
+	method = lookupID( nameID, class.methods )
 	if method == nil then
 		if className == "ct" then
-			err.setErrNode( lValue, "Unknown API function" )
+			err.setErrNodeSpan( lValue, nameID, "Unknown API function" )
 		else
-			err.setErrNode( lValue,
-					"Unknown method \"%s\" for class %s",
-					fieldID.str, className )
+			err.setErrNodeAndRef( nameID, lValue,
+					'Unknown method "%s" for class %s',
+					nameStr, className )
 		end
 		return nil
 	end
 
 	-- Return results
-	return method, className, className .. "." .. fieldID.str
+	return method, className, className .. "." .. nameStr
 end
 
--- Do type checking on a function or method call with the given lValue and exprs.
--- If there is an error then set the error state and return nil. 
--- Return the return type vt if successful.
-function checkJava.vtCheckCall( lValue, exprs )
+-- Check a call stmt or expr structure.
+-- If there is an error then set the error state and return nil, 
+-- otherwise return the vt for the return type vt if successful.
+function checkJava.vtCheckCall( call )
+	-- { s = "call", lValue, nameID, exprs }
+	local lValue = call.lValue
+	local nameID = call.nameID
+	local exprs = call.exprs
+
 	-- Find the method
-	local method, className, fnName = findMethod( lValue )
+	local method, className, fnName = findMethod( lValue, nameID )
 	if method == nil then
 		return nil
 	end
+	local refFunc = method.func   -- for user-defined methods, nil for API
 
 	-- Code12 does not allow calling ct or user-defined methods before start()
 	if beforeStart then
-		if className == "ct" then
-			err.setErrNode( lValue, "Code12 API functions cannot be called before start()" )
+		if lValue == nil then
+			err.setErrNode( call, "User-defined functions cannot be called before start()" )
 			return nil
-		elseif className == nil then
-			err.setErrNode( lValue, "User-defined functions cannot be called before start()" )
+		elseif className == "ct" then
+			err.setErrNode( call, "Code12 API functions cannot be called before start()" )
 			return nil
 		end
 	end
 
 	-- Check parameter count
 	local numExprs = (exprs and #exprs) or 0
-	local min = method.min or #method.params
+	local numParams = #method.params
+	local min = method.min or numParams
 	if numExprs < min then
 		if numExprs == 0 then
-			err.setErrNode( lValue, 
-					"%s requires %d parameter%s", 
+			err.setErrNodeAndRef( call, refFunc, "%s requires %d parameter%s", 
 					fnName, min, (min ~= 1 and "s") or "" )
 		else
-			err.setErrNodeAndRef( exprs, lValue, 
+			err.setErrNodeAndRef( call, refFunc, 
 					"Not enough parameters passed to %s (requires %d)", 
 					fnName, min )
 		end
 		return nil
-	elseif not method.variadic and numExprs > #method.params then
-		err.setErrNodeAndRef( exprs, lValue, 
+	elseif not method.variadic and numExprs > numParams then
+		err.setErrNodeAndRef( call, refFunc, 
 				"Too many parameters passed to %s", fnName )
 		return nil
 	end
 
-	-- Get the exprs types and the check special case for overloaded methods:
+	-- Get the exprs types and the check special case for overloaded Math methods:
 	-- If all parameters are int then it returns int (only apples to Math methods).
 	if exprs then
 		local allExprsAreInt = true
@@ -965,7 +983,7 @@ function checkJava.vtCheckCall( lValue, exprs )
 
 	-- Check parameter types for validity and match with the API
 	for i = 1, numExprs do
-		if i > #method.params then
+		if i > numParams then
 			assert( method.variadic )
 			break    -- variadic function can take any types after those specified
 		end
@@ -973,44 +991,23 @@ function checkJava.vtCheckCall( lValue, exprs )
 		local vtPassed = expr.vt
 		local vtNeeded = method.params[i].vt
 		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
-			err.setErrNode( expr, "Parameter %d of %s expects type %s, but %s was passed",
-					i, fnName, javaTypes.typeNameFromVt( vtNeeded ), 
+			err.setErrNodeAndRef( expr, refFunc, 
+					"Parameter %d (%s) of %s expects type %s, but %s was passed",
+					i, method.params[i].name, fnName, javaTypes.typeNameFromVt( vtNeeded ), 
 					javaTypes.typeNameFromVt( vtPassed ) )
 			return nil
 		end
 	end
 
 	-- Result is the method's return type
-	return method.vt 
+	return method.vt
 end
 
--- Check a variable structure and define the variable
-local function checkVar( var )
-	-- Get the declared type and store it in the var structure
-	local vt = javaTypes.vtFromVarType( var.typeID, var.isArray )
-	var.vt = vt
-
-	-- Define the variable
-	local nameID = var.nameID
-	local initExpr = var.initExpr
-	local assigned = (initExpr ~= nil)
-	if var.isLocal then
-		checkJava.defineLocalVar( nameID, vt, assigned )
-	else
-		checkJava.defineInstanceVar( nameID, vt, assigned )
-	end
-
-	-- Check the init assignment if any
-	if initExpr then
-		checkJava.canAssignToVarNode( nameID, initExpr )
-	end
-end
-
--- If stmts then check the block of stmts. If params is included then define 
+-- If stmts then check the block of stmts. If paramVars is included then define 
 -- these formal parameters at the beginning of the block.
-local function checkBlock( stmts, params )
+local function checkBlock( stmts, paramVars )
 	if stmts then
-		checkJava.beginLocalBlock( params )
+		checkJava.beginLocalBlock( paramVars )
 		for _, stmt in ipairs( stmts ) do
 			checkStmt( stmt )
 		end
@@ -1029,11 +1026,11 @@ end
 function checkStmt( stmt )
 	local s = stmt.s
 	if s == "var" then
-		-- { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal, initExpr }
+		-- { s = "var", iLine, typeID, nameID, isArray, isConst, isGlobal, initExpr }
 		checkVar( stmt )
 	elseif s == "call" then
-		-- { s = "call", iLine, lValue, exprs }
-		checkJava.vtCheckCall( stmt.lValue, stmt.exprs )
+		-- { s = "call", iLine, className, objLValue, nameID, exprs }
+		checkJava.vtCheckCall( stmt )
 	elseif s == "assign" then
 		-- { s = "assign", iLine, lValue, op, expr }   op.tt: =, +=, -=, *=, /=, ++, --	
 		local lValue = stmt.lValue
@@ -1042,8 +1039,15 @@ function checkStmt( stmt )
 		if opType == "=" then
 			-- Check for simple assignment, which marks the variable as assigned
 			if lValue.indexExpr == nil and lValue.fieldID == nil then
-				checkJava.canAssignToVarNode( lValue.varID, stmt.expr )
+				local varID = lValue.varID
+				if checkJava.canAssignToVarNode( varID, stmt.expr ) then
+					local var = variables[varID.str]
+					if type(var) == "table" then
+						lValue.isGlobal = var.isGlobal    -- TODO: Find cleaner way to do this
+					end
+				end
 			else
+				-- The variable must already be defined
 				vtSetExprNode( lValue )
 				checkJava.canAssignToLValue( lValue, stmt.expr )
 			end
@@ -1090,23 +1094,22 @@ function checkStmt( stmt )
 			checkJava.endLocalBlock()
 		end
 	elseif s == "forArray" then
-		-- { s = "forArray", iLine, typeID, varID, arrayID, stmts }
-		local vtVar = javaTypes.vtFromVarType( stmt.typeID )
-		local vtArray = checkJava.vtVar( stmt.arrayID )
-		print(stmt.arrayID.str, vtArray)
-		if type(vtArray) ~= "table" then
-			err.setErrNode( stmt.arrayID, 
-					"The source variable in a for-each loop must be an array" )
-		elseif vtArray.vt ~= vtVar then
-			err.setErrNodeAndRef( stmt.typeID, stmt.arrayID,
-					"Array \"%s\" contains elements of type %s",
-					stmt.arrayID.str, javaTypes.typeNameFromVt( vtArray.vt ) )
+		-- { s = "forArray", iLine, var, expr, stmts }
+		checkJava.beginLocalBlock()  -- extra block to contain the loop var
+		local var = stmt.var
+		checkVar( var )
+		local vtExpr = vtSetExprNode( stmt.expr )
+		if type(vtExpr) ~= "table" then
+			err.setErrNode( stmt.expr, "A for-each loop must operate on an array" )
+		elseif vtExpr.vt ~= var.vt then
+			err.setErrNodeAndRef( var, stmt.expr,
+					"The loop array contains elements of type %s",
+					javaTypes.typeNameFromVt( vtExpr.vt ) )
 		else
-			checkJava.beginLocalBlock()  -- extra block to contain the loop var
-			checkJava.defineLocalVar( stmt.varID, vtVar, true )
+			var.assigned = true
 			checkBlock( stmt.stmts )
-			checkJava.endLocalBlock()
 		end
+		checkJava.endLocalBlock()
 	elseif s == "return" then
 		-- { s = "return", iLine, expr }
 		vtSetExprNode( stmt.expr )    -- TODO: Check that matches function return type
@@ -1123,7 +1126,6 @@ function checkJava.checkProgram( programTree, level )
 	variables = {}
 	userMethods = {}
 	eventMethodsDefined = {}
-	isInstanceVar = {}
 	localNameStack = {}
 	beforeStart = true
 
@@ -1148,7 +1150,7 @@ function checkJava.checkProgram( programTree, level )
 	beforeStart = false
 	if funcs then
 		for _, func in ipairs( funcs ) do
-			checkBlock( func.stmts, func.params )
+			checkBlock( func.stmts, func.paramVars )
 		end
 	end
 
@@ -1162,7 +1164,9 @@ function checkJava.checkProgram( programTree, level )
 	end
 end
 
--- TODO: Make checkJava functions local
+-- TODO: 
+-- Make checkJava functions local
+-- Can't assign to e.g. Math.pi, etc.
 
 
 ------------------------------------------------------------------------------

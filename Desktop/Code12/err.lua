@@ -75,6 +75,7 @@ end
 
 -- Make and return a loc record using the extent of the given parse tree or structure node
 local function errLocFromNode( node )
+	assert( type(node) == "table" )
 	local loc = {}
 	expandLocToNode( loc, node )
 	return loc
@@ -210,7 +211,11 @@ function err.setErrNodeAndRef( node, refNode, strErr, ... )
 	assert( refNode == nil or type(refNode) == "table" )
 	assert( type(strErr) == "string" )
 
-	err.setErr( errLocFromNode( node ), errLocFromNode( refNode ), strErr, ... )
+	if refNode then
+		err.setErr( errLocFromNode( node ), errLocFromNode( refNode ), strErr, ... )
+	else
+		err.setErr( errLocFromNode( node ), nil, strErr, ... )
+	end
 end
 
 -- Record an error with:
@@ -225,19 +230,17 @@ function err.setErrNode( node, strErr, ... )
 end
 
 -- Record an error with:
---      firstToken    first token for location of the error
---      lastToken     last token for token span containing the error
+--      firstNode     first node for location of the error
+--      lastNode      last node for token span containing the error
 --      strErr        error message string
 --      ...           optional params to send to string.format( strErr, ... )
-function err.setErrTokenSpan( firstToken, lastToken, strErr, ... )
-	assert( type(firstToken) == "table" )
-	assert( firstToken.tt )
-	assert( type(lastToken) == "table" )
-	assert( lastToken.tt )
+function err.setErrNodeSpan( firstNode, lastNode, strErr, ... )
+	assert( type(firstNode) == "table" )
+	assert( type(lastNode) == "table" )
 	assert( type(strErr) == "string" )
 
-	local loc = errLocFromNode( firstToken )
-	expandLocToNode( loc, lastToken  )
+	local loc = errLocFromNode( firstNode )
+	expandLocToNode( loc, lastNode  )
 	err.setErr( loc, nil, strErr, ... )
 end
 

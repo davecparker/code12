@@ -804,7 +804,7 @@ class ErrorTest extends Code12Program
 		objVar.setText("circle", "green");
 
 		// ERROR "Integer divide"
-		int k = i / 2;
+		int k = 3 / 2;
 		// ERROR "Integer divide"
 		ct.random( intVar / intVar, intVar );
 		// ERROR "Undefined variable x"
@@ -888,29 +888,29 @@ class ErrorTest extends Code12Program
 		// ERROR "Can only apply "--" to numeric types"
 		objVar--;
 
-		// ERROR "The source variable in a for-each loop must be an array"
+		// ERROR "A for-each loop must operate on an array"
 		for (int x : intVar)
 			voidFunc();
-		// ERROR "The source variable in a for-each loop must be an array"
+		// ERROR "A for-each loop must operate on an array"
 		for (double x : dblVar)
 			voidFunc();
-		// ERROR "The source variable in a for-each loop must be an array"
+		// ERROR "A for-each loop must operate on an array"
 		for (boolean x : boolVar)
 			voidFunc();
-		// ERROR "The source variable in a for-each loop must be an array"
+		// ERROR "A for-each loop must operate on an array"
 		for (String x : strVar)
 			voidFunc();
-		// ERROR "The source variable in a for-each loop must be an array"
+		// ERROR "A for-each loop must operate on an array"
 		for (GameObj x : objVar)
 			voidFunc();
-		// ERROR "The source variable in a for-each loop must be an array"
+		// ERROR "A for-each loop must operate on an array"
 		for (GameObj x : strVar)
 			voidFunc();
 		
-		// ERROR "Array "intArr" contains elements of type int"
+		// ERROR "The loop array contains elements of type int"
 		for (double x : intArr)
 			voidFunc();
-		// ERROR "Array "objArr" contains elements of type GameObj"
+		// ERROR "The loop array contains elements of type GameObj"
 		for (String x : objArr)
 			voidFunc();
 
@@ -1121,9 +1121,9 @@ class ErrorTest extends Code12Program
 		// ERROR "Undefined function"
 		setHeight(150);
 
-		// ERROR "Invalid function or method name"
+		// ERROR "Invalid function name"
 		intFunc[0]();
-		// ERROR "Invalid function or method name"
+		// ERROR "Invalid function name"
 		dblFuncIntDbl[intVar](0, 0.1);
 
 		// ERROR "Cannot call methods directly on class GameObj"
@@ -1176,7 +1176,7 @@ class ErrorTest extends Code12Program
 		ct.print("intVar =", intVar);
 		// ERROR "Too many parameters passed"
 		Math.atan(4,3);
-		// ERROR "Parameter 1 of ct.logm expects type String, but int was passed"
+		// ERROR "expects type String, but int was passed"
 		ct.logm(intVar, objVar);
 
 		String indent = "2 Tabs";

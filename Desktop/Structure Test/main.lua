@@ -27,14 +27,15 @@ function _fn.start()
 	y = X
 	this.ball = ct.circle(X, y, 30)
 	this.frameCount = _fn.foo(this.LIMIT, this.speed * 2)
+	ct.println("Program started")
 end
 
-function _fn.foo(i, d)
+function _fn.foo()
 
 	return 0
 end
 
-function _fn.test(i, d)
+function _fn.test()
 
 	if i < 0 then
 		return i + 1
@@ -81,7 +82,7 @@ function _fn.update()
 	_fn.moveBall(false)
 end
 
-function _fn.onMousePress(obj, x, y)
+function _fn.onMousePress()
 end
 
 
@@ -93,7 +94,7 @@ end
 
 
 
-function _fn.moveBall(wrap)
+function _fn.moveBall()
 
 	this.ball.x = this.ball.x + 1
 	if wrap then

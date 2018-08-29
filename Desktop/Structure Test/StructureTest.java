@@ -27,6 +27,7 @@ class StructureTest extends Code12Program
 		y = X;
 		ball = ct.circle( X, y, 30 );
 		frameCount = foo( LIMIT, speed * 2 );
+		System.out.println("Program started");
 	}
 
 	int foo(int i, double d)

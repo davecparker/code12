@@ -24,39 +24,50 @@ local parseProgram = {}
 -- program: 
 --     { s = "program", nameID, vars, funcs }
 --
--- var:  (Type checking adds a vt field)
---     { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal, initExpr }
+-- var:  (Semantic analysis adds vt and assigned fields)
+--     { s = "var", iLine, typeID, nameID, isArray, isConst, isGlobal, initExpr }
 --
--- func: 
---     { s = "func", iLine, typeID, nameID, isArray, isPublic, params, stmts }
--- 
--- param: 
---     { s = "param", typeID, nameID, isArray }
+-- func:  (Semantic analysis adds a vt field)
+--     { s = "func", iLine, typeID, nameID, isArray, isPublic, paramVars, stmts }
 --
 -- stmt:
---     { s = "var", iLine, typeID, nameID, isArray, isConst, isLocal, initExpr }
---     { s = "call", iLine, lValue, exprs }
+--     { s = "var", iLine, typeID, nameID, isArray, isConst, isGlobal, initExpr }
+--     { s = "call", iLine, lValue, nameID, exprs }
 --     { s = "assign", iLine, lValue, op, expr }     -- op.tt: =, +=, -=, *=, /=, ++, --
 --     { s = "if", iLine, expr, stmts, elseStmts }
 --     { s = "while", iLine, expr, stmts }
 --     { s = "doWhile", iLine, expr, stmts }
 --     { s = "for", iLine, initStmt, expr, nextStmt, stmts }
---     { s = "forArray", iLine, typeID, varID, arrayID, stmts }
+--     { s = "forArray", iLine, var, expr, stmts }
 --     { s = "break", iLine }
 --     { s = "return", iLine, expr }
 --
--- lValue:  (Type checking adds vtObj, vt, and isLocal fields)
+-- lValue:  (Semantic analysis adds isGlobal and vt fields)
 --     { s = "lValue", varID, indexExpr, fieldID }
 -- 
--- expr:  (Type checking adds a vt field)
+-- expr:  (Semantic analysis adds a vt field)
 --     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
---     { s = "call", lValue, exprs }
+--     { s = "call", iLine, lValue, nameID, exprs }
 --     { s = "lValue", lValue }
 --     { s = "parens", expr }
 --     { s = "unaryOp", op, expr }         -- op.tt: -, !
 --     { s = "binOp", left, op, right }    -- op.tt: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
 --     { s = "newArray", typeID, lengthExpr }
 --     { s = "arrayInit", exprs }
+--
+-- There are several types of calls possible. Examples at increasing syntax level:
+--    level                         lValue          nameID
+--    -----                         ---------       ------
+--    (1)    ct.circle()            ct              circle
+--    (1)    System.out.println()   System.out      println
+--    (7)    ball.delete()          ball            delete
+--    (7)    str.equals()           str             equals
+--    (7)    Math.sin()             Math            sin
+--    (7)    b.group.equals()       b.group         equals
+--    (9)    foo()                                  foo
+--    (12)   a[3].delete()          a[3]            delete
+--    (12)   s[3].equals()          s[3]            equals
+--    (12)   a[3].group.equals()    a[3].group      equals
 
 
 -- Parsing structures
@@ -179,7 +190,7 @@ end
 
 -- Make and return a var given the parsed fields.
 -- If there is an error then set the error state and return nil.
-local function makeVar( isLocal, typeID, nameID, initExpr, isArray, isConst )
+local function makeVar( isGlobal, typeID, nameID, initExpr, isArray, isConst )
 	return {
 		s = "var",
 		iLine = typeID.iLine,
@@ -187,34 +198,34 @@ local function makeVar( isLocal, typeID, nameID, initExpr, isArray, isConst )
 		nameID = nameID,
 		isArray = isArray,
 		isConst = isConst,
-		isLocal = isLocal,
+		isGlobal = isGlobal,
 		initExpr = makeExpr( initExpr )
 	}
 end
 
 -- Check for a variable declaration or initialization for line pattern p and 
 -- the parse nodes, and add variable(s) to the structure array structs.
--- The variable(s) are local if isLocal is included and true.
+-- The variable(s) are global if isGlobal is included and true.
 -- Return true if the pattern was a variable pattern, else false.
-local function getVar( p, nodes, structs, isLocal )
+local function getVar( p, nodes, structs, isGlobal )
 	if p == "varInit" then
 		-- e.g. int x = 10;
-		structs[#structs + 1] = makeVar( isLocal, nodes[1], nodes[2], nodes[4] )
+		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], nodes[4] )
 	elseif p == "varDecl" then
 		-- e.g. int x, y;
 		for _, nameID in ipairs( nodes[2].nodes ) do
-			structs[#structs + 1] = makeVar( isLocal, nodes[1], nameID )
+			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nameID )
 		end
 	elseif p == "constInit" then
 		-- e.g. final int LIMIT = 100;
-		structs[#structs + 1] = makeVar( isLocal, nodes[2], nodes[3], nodes[5], nil, true )			
+		structs[#structs + 1] = makeVar( isGlobal, nodes[2], nodes[3], nodes[5], nil, true )			
 	elseif p == "arrayInit" then
 		-- e.g. int[] a = { 1, 2, 3 };   or   int[] a = new int[10];
-		structs[#structs + 1] = makeVar( isLocal, nodes[1], nodes[4], nodes[6], true )						
+		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[4], nodes[6], true )						
 	elseif p == "arrayDecl" then
 		-- e.g. GameObj[] coins, walls;
 		for _, nameID in ipairs( nodes[4].nodes ) do
-			structs[#structs + 1] = makeVar( isLocal, nodes[1], nameID, nil, true )
+			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nameID, nil, true )
 		end	
 	else
 		return false   -- not a variable pattern
@@ -222,30 +233,62 @@ local function getVar( p, nodes, structs, isLocal )
 	return true
 end	
 
--- Make and return an lValue structure from an ID token, lValue parse node, 
--- or fnValue parse node
+-- Make and return an lValue structure from the parse node parts.
+-- The indexd and field can be nil 
+local function makeLValueFromNodes( varID, index, field )
+	local indexExpr = nil
+	if index and index.p == "index" then
+		indexExpr = makeExpr( index.nodes[2] )
+	end
+	local fieldID = nil
+	if field and field.p ~= "empty" then
+		fieldID = field.nodes[2]
+	end
+	return { s = "lValue", varID = varID, 
+			indexExpr = indexExpr, fieldID = fieldID }
+end
+
+-- Make and return an lValue structure from an ID token or lValue parse node 
 local function makeLValue( node )
 	if node.tt == "ID" then
 		return { s = "lValue", varID = node }
 	end
-	assert( node.t == "lValue" or node.t == "fnValue" )
+	assert( node.t == "lValue" )
 	local nodes = node.nodes
-	local indexExpr = nil
-	local indexNode = nodes[2]
-	if indexNode.p == "index" then
-		indexExpr = makeExpr( indexNode.nodes[2] )
-	end
-	local fieldID = nil
-	local fieldNode = nodes[3]
-	if fieldNode.p ~= "empty" then
-		fieldID = fieldNode.nodes[2]
-	end
-	return { s = "lValue", varID = nodes[1], 
-			indexExpr = indexExpr, fieldID = fieldID }
+	return makeLValueFromNodes( nodes[1], nodes[2], nodes[3] )
 end
 
--- Make and return a call structure from a call parse tree's nodes array
+-- Make and return a call structure from a call parse tree's nodes array.
+-- Return nil if there was an error.
 local function makeCall( nodes )
+	-- Determine the lValue and nameID
+	local lValue, nameID
+	local fnValue = nodes[1]
+	local ns = fnValue.nodes  -- ID, index, member, member
+	local firstID = ns[1]
+	local index = ns[2]
+	local member1 = ns[3]
+	local member2 = ns[4]
+	if member2.p == "member" then
+		-- e.g. System.out.println(), b.group.equals(), a[3].group.equals()
+		lValue = makeLValueFromNodes( firstID, index, member1 )
+		nameID = member2.nodes[2]
+	elseif member1.p == "member" then
+		-- e.g.  ct.circle(), ball.delete(), str.equals(), Math.sin(), 
+		-- a[3].delete(), s[3].equals()
+		lValue = makeLValueFromNodes( firstID, index )
+		nameID = member1.nodes[2]
+	elseif index.p == "index" then
+		-- ERROR e.g. foo[3]()
+		err.setErrNodeSpan( firstID, index, "Invalid function name" )
+		return nil
+	else
+		-- e.g. foo()
+		lValue = nil
+		nameID = firstID
+	end
+
+	-- Make the exprs
 	local exprs = nil
 	local exprNodes = nodes[3].nodes
 	if #exprNodes > 0 then
@@ -254,7 +297,9 @@ local function makeCall( nodes )
 			exprs[#exprs + 1] = makeExpr( exprNodes[i] )
 		end
 	end
-	return { s = "call", lValue = makeLValue( nodes[1] ), exprs = exprs }
+
+	-- Make the call structure
+	return { s = "call", lValue = lValue, nameID = nameID, exprs = exprs }
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
@@ -334,8 +379,12 @@ local function getForStmt( forControl )
 	local nodes = forControl.nodes
 	if forControl.p == "array" then
 		-- for (typeID nameID : arrayID) controlledStmts
-		return { s = "forArray", typeID = nodes[1], varID = nodes[2], 
-				arrayID = nodes[4], stmts = getControlledStmts() }
+		return { 
+			s = "forArray", 
+			var = makeVar( false, nodes[1], nodes[2] ),
+			expr = makeExpr( nodes[4] ), 
+			stmts = getControlledStmts() 
+		}
 	else
 		-- for (init; expr; next) controlledStmts
 		local stmt = { s = "for", stmts = getControlledStmts() }
@@ -344,7 +393,7 @@ local function getForStmt( forControl )
 		local forInit = nodes[1]
 		if forInit.p == "varInit" then
 			local ns = forInit.nodes
-			stmt.initStmt = makeVar( true, ns[1], ns[2], ns[4] )
+			stmt.initStmt = makeVar( false, ns[1], ns[2], ns[4] )
 		elseif forInit.p == "stmt" then
 			stmt.initStmt = getStmt( forInit.nodes[1] )
 		end
@@ -378,7 +427,7 @@ function getLineStmts( tree, stmts )
 	local nodes = tree.nodes
 
 	-- Look for var decls
-	if getVar( p, nodes, stmts, true ) then
+	if getVar( p, nodes, stmts ) then
 		return true
 	end
 
@@ -531,18 +580,15 @@ end
 -- including the contained statements, and move iTree past it.
 -- If there is an error then set the error state and return nil.
 local function getFunc( typeID, isArray, nameID, isPublic, paramList )
-	-- Build the param array
-	local params = {}
+	-- Build the paramVars array
+	local paramVars = {}
 	for _, node in ipairs( paramList.nodes ) do
 		local nodes = node.nodes
-		local param = { s = "param", typeID = nodes[1] }
 		if node.p == "array" then
-			param.nameID = nodes[4]
-			param.isArray = true
+			paramVars[#paramVars + 1] = makeVar( false, nodes[1], nodes[4], nil, true )
 		else
-			param.nameID = nodes[2]
+			paramVars[#paramVars + 1] = makeVar( false, nodes[1], nodes[2] )
 		end
-		params[#params + 1] = param
 	end
 
 	-- Get the stmts array
@@ -559,7 +605,7 @@ local function getFunc( typeID, isArray, nameID, isPublic, paramList )
 		nameID = nameID,
 		isArray = isArray,
 		isPublic = isPublic,
-		params = params, 
+		paramVars = paramVars, 
 		stmts = stmts,
 	}
 end
@@ -580,7 +626,7 @@ local function getMembers()
 		local ok = not tree.isError
 		iTree = iTree + 1
 
-		if ok and getVar( p, nodes, vars ) then
+		if ok and getVar( p, nodes, vars, true ) then
 			-- Added instance variable(s)
 			-- Code12 does not allow instance variables to follow member functions,
 			-- because it greatly complicates keeping Java and Lua line numbers in sync.
@@ -670,7 +716,7 @@ local function printStructureTree( node, indentLevel, file, label )
 	local first = true
 	for field, value in pairs( node ) do
 		local fieldStr = nil
-		if field == "vt" or field == "vtObj" then
+		if field == "vt" then
 			fieldStr = field .. " = " .. javaTypes.typeNameFromVt( value )
 		elseif field ~= "s" and field ~= "iLine" and field ~= "nameID" and field ~= "op" then
 			if type(value) == "table" then

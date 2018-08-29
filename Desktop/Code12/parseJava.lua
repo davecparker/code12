@@ -153,15 +153,15 @@ local lValue = { t = "lValue",
 	{ 3, 12, "lValue",			"ID", index, field		},
 }
 
--- A method reference or empty
-local method = { t = "method",
-	{ 1, 12, "method",			".", "ID"				},
+-- A member reference or empty
+local member = { t = "member",
+	{ 1, 12, "member",			".", "ID"				},
 	{ 1, 12, "empty",									},
 }
 
 -- A function value
 local fnValue = { t = "fnValue",
-	{ 1, 12, "fnValue",			"ID", index, method,	},
+	{ 1, 12, "fnValue",			"ID", index, member, member		},
 }
 
 -- A return type for a procedure/function definition
@@ -261,7 +261,7 @@ local forNext = { t = "forNext",
 -- The control part of a for loop (inside the parens)
 local forControl = { t = "forControl",
 	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
-	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
+	{ 12, 12, "array",			"ID", "ID", ":", expr 						},
 	-- Common Errors
 	{ 11, 0, "three",			forInit, ",", 0,	 						iNode = 2 },
 	{ 11, 0, "three",			forInit, ";", forExpr, ",", 0,				iNode = 4, 
@@ -295,7 +295,7 @@ local line = { t = "line",
 	{ 12, 12, "arrayDecl",		"ID", "[", "]", idList, ";",					"END" },
 	-- Boilerplate lines
 	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",					"END" },
-	{ 1, 12, "class",			"class", "ID", 									"END" },
+	{ 1, 12, "class",			"class", "ID",									"END" },
 	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",			"END" },
 	{ 1, 12, "main",			"public", "static", "ID", "ID", 
 									"(", "ID", "[", "]", "ID", ")",				"END" },
@@ -528,10 +528,10 @@ local function parseCurrentLine( level )
 		iToken = 1
 		parseTree = parseGrammar( line )
 		if parseTree then
-			-- Report error with minimum level required
 			err.clearErr( iLine )   -- in case we matched a common error
+			-- Report level error with minimum level required
 			local lastToken = tokens[#tokens - 1]  -- not counting the END
-			err.setErrTokenSpan( tokens[1], lastToken,
+			err.setErrNodeSpan( tokens[1], lastToken,
 					"Use of %s requires syntax level %d",
 					syntaxFeatures[tryLevel], tryLevel )
 			return nil
@@ -542,7 +542,7 @@ local function parseCurrentLine( level )
 
 	-- Make a generic syntax error to use if a more specific error was not set
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
-	err.setErrTokenSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
+	err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
 	return nil
 end
 

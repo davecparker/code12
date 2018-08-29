@@ -654,7 +654,6 @@ for( int x; arr ) 		// using ; instead of :
 for( int[] x : arr )
 for( int x : arr[] )
 for( arr : int x )
-for (String x : "string literal")
 double foo(x, y, z) 	// missing variable types for arguments in function definition
 double foo[i]()			// index on function identifier
 ct.println; 			// missing parenteses for function call without arguments
@@ -679,7 +678,6 @@ import java.io.PrintWriter;   // import other than Code12.*
 int time = (int)( sec );      // type casting
 time %= 3600;                 // %= operator
 int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-System.out.println("Hello world"); // classes other than GameObj and String
 char ch = 'a'; 	// char type
 while(foo) { 	// opening { in control structure not on it's own line
 i++; } 			// closing } not on it's own line
@@ -691,7 +689,7 @@ double getVariable() { return variable; } // {} must start and end on their own 
 switch (choice)
 continue;
 a[i++] = b[i++]; 	// increment/decrement only supported as statements 
-obj.group.equals("targets"); 		// indexing more than one level at a time
+foo.obj.group.equals("targets"); 		// more than 2 chained fields
 input.toLowerCase().equals("quit"); // indexing after function call
 newBullet().ySpeed = 0;
 final int N; 	// constant declaration without initialization

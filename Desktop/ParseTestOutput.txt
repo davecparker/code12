@@ -55,8 +55,9 @@ line (stmt)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (setHeight)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (150)
@@ -67,8 +68,9 @@ line (stmt)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (setBackImage)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("underwater.jpg")
@@ -98,8 +100,9 @@ line (if)
             fnValue (fnValue)
                 ID (ct)
                 index (empty)
-                method (method)
+                member (member)
                     ID (random)
+                member (empty)
             exprList (list)
                 expr (NUM)
                     NUM (1)
@@ -119,8 +122,9 @@ line (varInit)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (random)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (0)
@@ -136,8 +140,9 @@ line (varInit)
             fnValue (fnValue)
                 ID (ct)
                 index (empty)
-                method (method)
+                member (member)
                     ID (getHeight)
+                member (empty)
             exprList (empty)
         expr (NUM)
             NUM (25)
@@ -150,8 +155,9 @@ line (varInit)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (random)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (5)
@@ -172,8 +178,9 @@ line (varInit)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (image)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("bubble.png")
@@ -786,8 +793,9 @@ line (varInit)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (abs)
+                member (empty)
             exprList (list)
                 expr (-)
                     expr (lValue)
@@ -867,8 +875,9 @@ line (varInit)
         fnValue (fnValue)
             ID (greeting2)
             index (empty)
-            method (method)
+            member (member)
                 ID (substring)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (0)
@@ -914,8 +923,9 @@ line (stmt)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (println)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("He said 'Hello'")
@@ -936,8 +946,9 @@ line (stmt)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (println)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("I\tneed\tmy\tspace")
@@ -953,8 +964,9 @@ line (stmt)
             fnValue (fnValue)
                 ID (input)
                 index (empty)
-                method (method)
+                member (member)
                     ID (toUpperCase)
+                member (empty)
             exprList (empty)
 
 83. i_dont_like_camel_case = "butItTakesLessKeystrokes"; // variable identifier with underscores
@@ -1190,7 +1202,11 @@ line (for)
     forControl (array)
         ID (GameObj)
         ID (bullet)
-        ID (bullets)
+        expr (lValue)
+            lValue (lValue)
+                ID (bullets)
+                index (empty)
+                field (empty)
 
 94. 
 
@@ -1575,8 +1591,9 @@ line (stmt)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (println)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("Hello world")
@@ -1587,8 +1604,9 @@ line (stmt)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (println)
+            member (empty)
         exprList (list)
             expr (+)
                 expr (STR)
@@ -1605,8 +1623,9 @@ line (stmt)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (println)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("Hello\nWorld")
@@ -1622,7 +1641,8 @@ line (stmt)
             fnValue (fnValue)
                 ID (add)
                 index (empty)
-                method (empty)
+                member (empty)
+                member (empty)
             exprList (list)
                 expr (NUM)
                     NUM (3)
@@ -1640,7 +1660,8 @@ line (stmt)
             fnValue (fnValue)
                 ID (mean)
                 index (empty)
-                method (empty)
+                member (empty)
+                member (empty)
             exprList (list)
                 expr (NUM)
                     NUM (1.2)
@@ -1661,7 +1682,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (lValue)
                 lValue (lValue)
@@ -1775,7 +1797,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (empty)
 
 166. foo.bar();
@@ -1784,8 +1807,9 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (method)
+            member (member)
                 ID (bar)
+            member (empty)
         exprList (empty)
 
 167. foo[i].bar();
@@ -1799,8 +1823,9 @@ line (stmt)
                         ID (i)
                         index (empty)
                         field (empty)
-            method (method)
+            member (member)
                 ID (bar)
+            member (empty)
         exprList (empty)
 
 168. // -- -- exprList "list"
@@ -1811,7 +1836,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (123)
@@ -1822,7 +1848,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (12.345)
@@ -1833,7 +1860,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (1.234e56)
@@ -1844,7 +1872,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (1.234e+56)
@@ -1855,7 +1884,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (1.234e-56)
@@ -1866,7 +1896,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (.234e56)
@@ -1877,7 +1908,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (.234e+56)
@@ -1888,7 +1920,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (.234e-56)
@@ -1899,7 +1932,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (BOOL)
                 BOOL (true)
@@ -1910,7 +1944,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (BOOL)
                 BOOL (false)
@@ -1921,7 +1956,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NULL)
                 NULL (null)
@@ -1932,7 +1968,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("string literal")
@@ -1943,13 +1980,15 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (call)
                 fnValue (fnValue)
                     ID (bar)
                     index (empty)
-                    method (empty)
+                    member (empty)
+                    member (empty)
                 exprList (empty)
 
 182. foo(bar(123));
@@ -1958,13 +1997,15 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (call)
                 fnValue (fnValue)
                     ID (bar)
                     index (empty)
-                    method (empty)
+                    member (empty)
+                    member (empty)
                 exprList (list)
                     expr (NUM)
                         NUM (123)
@@ -1975,7 +2016,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (lValue)
                 lValue (lValue)
@@ -1989,7 +2031,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (lValue)
                 lValue (lValue)
@@ -2004,7 +2047,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (lValue)
                 lValue (lValue)
@@ -2023,7 +2067,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (lValue)
                 lValue (lValue)
@@ -2043,7 +2088,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (NUM)
                 NUM (123)
@@ -2054,7 +2100,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (neg)
                 expr (NUM)
@@ -2066,7 +2113,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (neg)
                 expr (NUM)
@@ -2078,7 +2126,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (neg)
                 expr (lValue)
@@ -2094,7 +2143,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (!)
                 expr (BOOL)
@@ -2106,7 +2156,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (!)
                 expr (BOOL)
@@ -2118,7 +2169,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (!)
                 expr (lValue)
@@ -2133,7 +2185,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (newArray)
                 ID (int)
@@ -2146,7 +2199,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (newArray)
                 ID (GameObj)
@@ -2162,7 +2216,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (newArray)
                 ID (GameObj)
@@ -2183,7 +2238,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (+)
                 expr (NUM)
@@ -2201,7 +2257,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (-)
                 expr (+)
@@ -2227,7 +2284,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (-)
                 expr (NUM)
@@ -2249,7 +2307,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (-)
                 expr (exprParens)
@@ -2275,7 +2334,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (/)
                 expr (exprParens)
@@ -2301,7 +2361,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (/)
                 expr (exprParens)
@@ -2337,7 +2398,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (lValue)
                 lValue (lValue)
@@ -2367,7 +2429,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (lValue)
                 lValue (lValue)
@@ -2391,7 +2454,8 @@ line (stmt)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (+)
                 expr (lValue)
@@ -2430,8 +2494,9 @@ line (stmt)
                                 ID (i)
                                 index (empty)
                                 field (empty)
-                    method (method)
+                    member (member)
                         ID (m)
+                    member (empty)
                 exprList (list)
                     expr (*)
                         expr (lValue)
@@ -2639,7 +2704,8 @@ line (stmt)
             fnValue (fnValue)
                 ID (foo)
                 index (empty)
-                method (empty)
+                member (empty)
+                member (empty)
             exprList (empty)
 
 231. x = foo.bar(123);
@@ -2653,8 +2719,9 @@ line (stmt)
             fnValue (fnValue)
                 ID (foo)
                 index (empty)
-                method (method)
+                member (member)
                     ID (bar)
+                member (empty)
             exprList (list)
                 expr (NUM)
                     NUM (123)
@@ -4575,8 +4642,9 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (+)
                     expr (*)
@@ -4613,16 +4681,18 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (+)
                     expr (call)
                         fnValue (fnValue)
                             ID (Math)
                             index (empty)
-                            method (method)
+                            member (member)
                                 ID (pow)
+                            member (empty)
                         exprList (list)
                             expr (lValue)
                                 lValue (lValue)
@@ -4635,8 +4705,9 @@ line (stmt)
                         fnValue (fnValue)
                             ID (Math)
                             index (empty)
-                            method (method)
+                            member (member)
                                 ID (pow)
+                            member (empty)
                         exprList (list)
                             expr (lValue)
                                 lValue (lValue)
@@ -4657,8 +4728,9 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (+)
                     expr (*)
@@ -4731,16 +4803,18 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (+)
                     expr (call)
                         fnValue (fnValue)
                             ID (Math)
                             index (empty)
-                            method (method)
+                            member (member)
                                 ID (pow)
+                            member (empty)
                         exprList (list)
                             expr (-)
                                 expr (lValue)
@@ -4761,8 +4835,9 @@ line (stmt)
                         fnValue (fnValue)
                             ID (Math)
                             index (empty)
-                            method (method)
+                            member (member)
                                 ID (pow)
+                            member (empty)
                         exprList (list)
                             expr (-)
                                 expr (lValue)
@@ -4791,8 +4866,9 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (-)
                     expr (/)
@@ -5562,7 +5638,8 @@ line (stmt)
                     fnValue (fnValue)
                         ID (foo)
                         index (empty)
-                        method (empty)
+                        member (empty)
+                        member (empty)
                     exprList (empty)
             expr (>=)
                 expr (lValue)
@@ -5579,8 +5656,9 @@ line (stmt)
                                     ID (i)
                                     index (empty)
                                     field (empty)
-                        method (method)
+                        member (member)
                             ID (bar)
+                        member (empty)
                     exprList (list)
                         expr (lValue)
                             lValue (lValue)
@@ -5611,8 +5689,9 @@ line (stmt)
                     fnValue (fnValue)
                         ID (y)
                         index (empty)
-                        method (method)
+                        member (member)
                             ID (bar)
+                        member (empty)
                     exprList (empty)
             expr (exprParens)
                 expr (||)
@@ -5698,7 +5777,8 @@ line (stmt)
             fnValue (fnValue)
                 ID (foo)
                 index (empty)
-                method (empty)
+                member (empty)
+                member (empty)
             exprList (list)
                 expr (lValue)
                     lValue (lValue)
@@ -5804,8 +5884,9 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (+)
                     expr (*)
@@ -5923,16 +6004,18 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (+)
                     expr (call)
                         fnValue (fnValue)
                             ID (Math)
                             index (empty)
-                            method (method)
+                            member (member)
                                 ID (pow)
+                            member (empty)
                         exprList (list)
                             expr (-)
                                 expr (lValue)
@@ -5963,8 +6046,9 @@ line (stmt)
                         fnValue (fnValue)
                             ID (Math)
                             index (empty)
-                            method (method)
+                            member (member)
                                 ID (pow)
+                            member (empty)
                         exprList (list)
                             expr (-)
                                 expr (lValue)
@@ -6072,7 +6156,8 @@ line (stmt)
             fnValue (fnValue)
                 ID (foo)
                 index (empty)
-                method (empty)
+                member (empty)
+                member (empty)
             exprList (list)
                 expr (lValue)
                     lValue (lValue)
@@ -6183,8 +6268,9 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (+)
                     expr (*)
@@ -6303,16 +6389,18 @@ line (stmt)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (+)
                     expr (call)
                         fnValue (fnValue)
                             ID (Math)
                             index (empty)
-                            method (method)
+                            member (member)
                                 ID (pow)
+                            member (empty)
                         exprList (list)
                             expr (-)
                                 expr (lValue)
@@ -6343,8 +6431,9 @@ line (stmt)
                         fnValue (fnValue)
                             ID (Math)
                             index (empty)
-                            method (method)
+                            member (member)
                                 ID (pow)
+                            member (empty)
                         exprList (list)
                             expr (-)
                                 expr (lValue)
@@ -6604,7 +6693,8 @@ line (varInit)
         fnValue (fnValue)
             ID (foo)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (empty)
 
 407. double y = bar("foo");
@@ -6615,7 +6705,8 @@ line (varInit)
         fnValue (fnValue)
             ID (bar)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("foo")
@@ -6839,7 +6930,8 @@ line (varInit)
             fnValue (fnValue)
                 ID (sum)
                 index (empty)
-                method (empty)
+                member (empty)
+                member (empty)
             exprList (list)
                 expr (lValue)
                     lValue (lValue)
@@ -6876,16 +6968,18 @@ line (varInit)
         fnValue (fnValue)
             ID (Math)
             index (empty)
-            method (method)
+            member (member)
                 ID (sqrt)
+            member (empty)
         exprList (list)
             expr (+)
                 expr (call)
                     fnValue (fnValue)
                         ID (Math)
                         index (empty)
-                        method (method)
+                        member (member)
                             ID (pow)
+                        member (empty)
                     exprList (list)
                         expr (-)
                             expr (lValue)
@@ -6906,8 +7000,9 @@ line (varInit)
                     fnValue (fnValue)
                         ID (Math)
                         index (empty)
-                        method (method)
+                        member (member)
                             ID (pow)
+                        member (empty)
                     exprList (list)
                         expr (-)
                             expr (lValue)
@@ -7060,7 +7155,8 @@ line (constInit)
         fnValue (fnValue)
             ID (max)
             index (empty)
-            method (empty)
+            member (empty)
+            member (empty)
         exprList (list)
             expr (lValue)
                 lValue (lValue)
@@ -7152,8 +7248,9 @@ line (constInit)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (getWidth)
+            member (empty)
         exprList (empty)
 
 442. final int X0 = x[0];
@@ -7188,8 +7285,9 @@ line (constInit)
             fnValue (fnValue)
                 ID (Math)
                 index (empty)
-                method (method)
+                member (member)
                     ID (sqrt)
+                member (empty)
             exprList (list)
                 expr (lValue)
                     lValue (lValue)
@@ -7581,7 +7679,11 @@ line (for)
     forControl (array)
         ID (GameObj)
         ID (g)
-        ID (gameObjs)
+        expr (lValue)
+            lValue (lValue)
+                ID (gameObjs)
+                index (empty)
+                field (empty)
 
 498. 
 
@@ -7750,8 +7852,9 @@ line (stmt)
         fnValue (fnValue)
             ID (obj)
             index (empty)
-            method (method)
+            member (member)
                 ID (delete)
+            member (empty)
         exprList (empty)
 
 535. ct.sound("pop.wav");
@@ -7760,8 +7863,9 @@ line (stmt)
         fnValue (fnValue)
             ID (ct)
             index (empty)
-            method (method)
+            member (member)
                 ID (sound)
+            member (empty)
         exprList (list)
             expr (STR)
                 STR ("pop.wav")
@@ -8130,234 +8234,228 @@ Comma not supported
 656. for( arr : int x )
 *** Line 656 chars 1-18: Syntax error (unrecognized code)
 
-657. for (String x : "string literal")
-*** Line 657 chars 1-33: Syntax error (unrecognized code)
+657. double foo(x, y, z) 	// missing variable types for arguments in function definition
+*** Line 657 chars 1-19: Syntax error (unrecognized code)
 
-658. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Line 658 chars 1-19: Syntax error (unrecognized code)
+658. double foo[i]()			// index on function identifier
+*** Line 658 chars 1-15: Syntax error (unrecognized code)
 
-659. double foo[i]()			// index on function identifier
-*** Line 659 chars 1-15: Syntax error (unrecognized code)
+659. ct.println; 			// missing parenteses for function call without arguments
+*** Line 659 chars 1-11: Syntax error (unrecognized code)
 
-660. ct.println; 			// missing parenteses for function call without arguments
-*** Line 660 chars 1-11: Syntax error (unrecognized code)
+660. foo(int x, double y, GameObj z) 	// missing return type in function definition
+*** Line 660 chars 1-31: Syntax error (unrecognized code)
 
-661. foo(int x, double y, GameObj z) 	// missing return type in function definition
-*** Line 661 chars 1-31: Syntax error (unrecognized code)
+661. foo(int x, double y, GameObj z); 	// supplying variable types in function call
+*** Line 661 chars 1-32: Syntax error (unrecognized code)
 
-662. foo(int x, double y, GameObj z); 	// supplying variable types in function call
-*** Line 662 chars 1-32: Syntax error (unrecognized code)
+662. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
+*** Line 662 char 40: function header should not end with a semicolon
 
-663. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
-*** Line 663 char 40: function header should not end with a semicolon
+663. String s = 'Hello'; 	// '' in place of "" for strings
+*** Line 663 char 12: char type not supported, use double quotes
 
-664. String s = 'Hello'; 	// '' in place of "" for strings
-*** Line 664 char 12: char type not supported, use double quotes
+664. String s = "A long string
+*** Line 664 chars 12-25: Unclosed string literal
 
-665. String s = "A long string
-*** Line 665 chars 12-25: Unclosed string literal
+665. on more than one line";
+*** Line 665 chars 34-35: Unclosed string literal
 
-666. on more than one line";
-*** Line 666 chars 34-35: Unclosed string literal
+666. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
+*** Line 666 chars 1-30: Syntax error (unrecognized code)
 
-667. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Line 667 chars 1-30: Syntax error (unrecognized code)
+667. newObj() = oldObj; 				// assigning to a function value
+*** Line 667 chars 1-18: Syntax error (unrecognized code)
 
-668. newObj() = oldObj; 				// assigning to a function value
-*** Line 668 chars 1-18: Syntax error (unrecognized code)
+668. f = void foo()					// mixing assignment and function declaration
+*** Line 668 chars 1-14: Syntax error (unrecognized code)
 
-669. f = void foo()					// mixing assignment and function declaration
-*** Line 669 chars 1-14: Syntax error (unrecognized code)
+669. def func(x):					// Python syntax
+*** Line 669 chars 1-12: Syntax error (unrecognized code)
 
-670. def func(x):					// Python syntax
-*** Line 670 chars 1-12: Syntax error (unrecognized code)
+670. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
+*** Line 670 chars 1-39: Syntax error (unrecognized code)
 
-671. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
-*** Line 671 chars 1-39: Syntax error (unrecognized code)
+671. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
+*** Line 671 chars 1-19: Syntax error (unrecognized code)
 
-672. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
-*** Line 672 chars 1-19: Syntax error (unrecognized code)
+672. int intArr = {1, 2, 3}; // missing []
+*** Line 672 chars 1-23: Syntax error (unrecognized code)
 
-673. int intArr = {1, 2, 3}; // missing []
-*** Line 673 chars 1-23: Syntax error (unrecognized code)
+673. 
 
-674. 
+674. // Unsupported Java syntax
 
-675. // Unsupported Java syntax
+675. // --------------------------------------------------------------------------------
 
-676. // --------------------------------------------------------------------------------
+676. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+*** Line 676: Code12 requires each variable initialization to be on its own line
 
-677. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Line 677: Code12 requires each variable initialization to be on its own line
+677. import java.io.PrintWriter;   // import other than Code12.*
+*** Line 677: import should be "Code12.*;"
 
-678. import java.io.PrintWriter;   // import other than Code12.*
-*** Line 678: import should be "Code12.*;"
+678. int time = (int)( sec );      // type casting
+*** Line 678 chars 1-24: Syntax error (unrecognized code)
 
-679. int time = (int)( sec );      // type casting
-*** Line 679 chars 1-24: Syntax error (unrecognized code)
+679. time %= 3600;                 // %= operator
+*** Line 679 chars 1-13: Syntax error (unrecognized code)
 
-680. time %= 3600;                 // %= operator
-*** Line 680 chars 1-13: Syntax error (unrecognized code)
+680. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+*** Line 680 char 32: Invalid character (The "? :" operator is not supported by Code12)
 
-681. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-*** Line 681 char 32: Invalid character (The "? :" operator is not supported by Code12)
+681. char ch = 'a'; 	// char type
+*** Line 681 char 11: char type not supported, use double quotes
 
-682. System.out.println("Hello world"); // classes other than GameObj and String
-*** Line 682 chars 1-34: Syntax error (unrecognized code)
+682. while(foo) { 	// opening { in control structure not on it's own line
+*** Line 682 chars 1-12: Syntax error (unrecognized code)
 
-683. char ch = 'a'; 	// char type
-*** Line 683 char 11: char type not supported, use double quotes
+683. i++; } 			// closing } not on it's own line
+*** Line 683 chars 1-6: Syntax error (unrecognized code)
 
-684. while(foo) { 	// opening { in control structure not on it's own line
-*** Line 684 chars 1-12: Syntax error (unrecognized code)
+684. String s = "A long string" +
+*** Line 684 char 29: Expected expression after + operator
+*** Reference Line 684 char 28
 
-685. i++; } 			// closing } not on it's own line
-*** Line 685 chars 1-6: Syntax error (unrecognized code)
+685. "on more than one line using concatenation";
+*** Line 685 chars 12-55: Syntax error (unrecognized code)
 
-686. String s = "A long string" +
-*** Line 686 char 29: Expected expression after + operator
-*** Reference Line 686 char 28
+686. x = a; y = b; 	// more than one statement on a single line
+*** Line 686: Code12 only allows one statement per line
 
-687. "on more than one line using concatenation";
-*** Line 687 chars 12-55: Syntax error (unrecognized code)
+687. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
+*** Line 687 chars 4-11: if statement test must be in parentheses
 
-688. x = a; y = b; 	// more than one statement on a single line
-*** Line 688: Code12 only allows one statement per line
+688. double getVariable() { return variable; } // {} must start and end on their own lines
+*** Line 688 chars 1-41: Syntax error (unrecognized code)
 
-689. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
-*** Line 689 chars 4-11: if statement test must be in parentheses
+689. switch (choice)
+*** Line 689 chars 1-6: Unsupported reserved word "switch"
 
-690. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Line 690 chars 1-41: Syntax error (unrecognized code)
+690. continue;
+*** Line 690 chars 1-8: Unsupported reserved word "continue"
 
-691. switch (choice)
-*** Line 691 chars 1-6: Unsupported reserved word "switch"
+691. a[i++] = b[i++]; 	// increment/decrement only supported as statements
+*** Line 691 chars 1-16: Syntax error (unrecognized code)
 
-692. continue;
-*** Line 692 chars 1-8: Unsupported reserved word "continue"
+692. foo.obj.group.equals("targets"); 		// more than 2 chained fields
+*** Line 692 chars 1-32: Syntax error (unrecognized code)
 
-693. a[i++] = b[i++]; 	// increment/decrement only supported as statements
-*** Line 693 chars 1-16: Syntax error (unrecognized code)
+693. input.toLowerCase().equals("quit"); // indexing after function call
+*** Line 693 chars 1-35: Syntax error (unrecognized code)
 
-694. obj.group.equals("targets"); 		// indexing more than one level at a time
-*** Line 694 chars 1-28: Syntax error (unrecognized code)
+694. newBullet().ySpeed = 0;
+*** Line 694 chars 1-23: Syntax error (unrecognized code)
 
-695. input.toLowerCase().equals("quit"); // indexing after function call
-*** Line 695 chars 1-35: Syntax error (unrecognized code)
+695. final int N; 	// constant declaration without initialization
+*** Line 695 chars 1-12: Syntax error (unrecognized code)
 
-696. newBullet().ySpeed = 0;
-*** Line 696 chars 1-23: Syntax error (unrecognized code)
-
-697. final int N; 	// constant declaration without initialization
-*** Line 697 chars 1-12: Syntax error (unrecognized code)
-
-698. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
-*** Line 698 char 15: for loop parts should be separated by semicolons (;)
+696. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
+*** Line 696 char 15: for loop parts should be separated by semicolons (;)
 Comma not supported
 
-699. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
-*** Line 699 chars 1-20: Syntax error (unrecognized code)
+697. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
+*** Line 697 chars 1-20: Syntax error (unrecognized code)
 
-700. int _var; // variable indentifiers starting with underscore
-*** Line 700 chars 5-8: Names cannot start with an underscore in Code12
+698. int _var; // variable indentifiers starting with underscore
+*** Line 698 chars 5-8: Names cannot start with an underscore in Code12
 
-701. int $var; // $
-*** Line 701 char 5: The $ character is not allowed in Code12
+699. int $var; // $
+*** Line 699 char 5: The $ character is not allowed in Code12
 
-702. double pay$;
-*** Line 702 char 11: The $ character is not allowed in Code12
+700. double pay$;
+*** Line 700 char 11: The $ character is not allowed in Code12
 
-703. int x[];	// arrays must be declared with [] between type and identifier
-*** Line 703 chars 1-8: Syntax error (unrecognized code)
+701. int x[];	// arrays must be declared with [] between type and identifier
+*** Line 701 chars 1-8: Syntax error (unrecognized code)
 
-704. int _func() // function names starting with underscore
-*** Line 704 chars 5-9: Names cannot start with an underscore in Code12
+702. int _func() // function names starting with underscore
+*** Line 702 chars 5-9: Names cannot start with an underscore in Code12
 
-705. public abstract class Account
-*** Line 705 chars 8-15: Unsupported reserved word "abstract"
+703. public abstract class Account
+*** Line 703 chars 8-15: Unsupported reserved word "abstract"
 
-706. assert x != null : "x variable is null";
-*** Line 706 chars 1-6: Unsupported reserved word "assert"
+704. assert x != null : "x variable is null";
+*** Line 704 chars 1-6: Unsupported reserved word "assert"
 
-707. case 0 :
-*** Line 707 chars 1-4: Unsupported reserved word "case"
+705. case 0 :
+*** Line 705 chars 1-4: Unsupported reserved word "case"
 
-708. catch(Exception e)
-*** Line 708 chars 1-5: Unsupported reserved word "catch"
+706. catch(Exception e)
+*** Line 706 chars 1-5: Unsupported reserved word "catch"
 
-709. continue;
-*** Line 709 chars 1-8: Unsupported reserved word "continue"
+707. continue;
+*** Line 707 chars 1-8: Unsupported reserved word "continue"
 
-710. default :
-*** Line 710 chars 1-7: Unsupported reserved word "default"
+708. default :
+*** Line 708 chars 1-7: Unsupported reserved word "default"
 
-711. enum WeekDays
-*** Line 711 chars 1-4: Unsupported reserved word "enum"
+709. enum WeekDays
+*** Line 709 chars 1-4: Unsupported reserved word "enum"
 
-712. goto
-*** Line 712 chars 1-4: Unsupported reserved word "goto"
+710. goto
+*** Line 710 chars 1-4: Unsupported reserved word "goto"
 
-713. finally
-*** Line 713 chars 1-7: Unsupported reserved word "finally"
+711. finally
+*** Line 711 chars 1-7: Unsupported reserved word "finally"
 
-714. public class C implements I
-*** Line 714 chars 16-25: Unsupported reserved word "implements"
+712. public class C implements I
+*** Line 712 chars 16-25: Unsupported reserved word "implements"
 
-715. if (x instanceof y)
-*** Line 715 chars 7-16: Unsupported reserved word "instanceof"
+713. if (x instanceof y)
+*** Line 713 chars 7-16: Unsupported reserved word "instanceof"
 
-716. public interface I
-*** Line 716 chars 8-16: Unsupported reserved word "interface"
+714. public interface I
+*** Line 714 chars 8-16: Unsupported reserved word "interface"
 
-717. native void foo()
-*** Line 717 chars 1-6: Unsupported reserved word "native"
+715. native void foo()
+*** Line 715 chars 1-6: Unsupported reserved word "native"
 
-718. package P;
-*** Line 718 chars 1-7: Unsupported reserved word "package"
+716. package P;
+*** Line 716 chars 1-7: Unsupported reserved word "package"
 
-719. private int x;
-*** Line 719 chars 1-7: Unsupported reserved word "private"
+717. private int x;
+*** Line 717 chars 1-7: Unsupported reserved word "private"
 
-720. protected int x;
-*** Line 720 chars 1-9: Unsupported reserved word "protected"
+718. protected int x;
+*** Line 718 chars 1-9: Unsupported reserved word "protected"
 
-721. static int x = 10;
-*** Line 721 chars 1-18: Syntax error (unrecognized code)
+719. static int x = 10;
+*** Line 719 chars 1-18: Syntax error (unrecognized code)
 
-722. strictfp void foo()
-*** Line 722 chars 1-8: Unsupported reserved word "strictfp"
+720. strictfp void foo()
+*** Line 720 chars 1-8: Unsupported reserved word "strictfp"
 
-723. super.foo();
-*** Line 723 chars 1-5: Unsupported reserved word "super"
+721. super.foo();
+*** Line 721 chars 1-5: Unsupported reserved word "super"
 
-724. switch (x)
-*** Line 724 chars 1-6: Unsupported reserved word "switch"
+722. switch (x)
+*** Line 722 chars 1-6: Unsupported reserved word "switch"
 
-725. synchronized(sync_object)
-*** Line 725 chars 1-12: Unsupported reserved word "synchronized"
+723. synchronized(sync_object)
+*** Line 723 chars 1-12: Unsupported reserved word "synchronized"
 
-726. this.x = x;
-*** Line 726 chars 1-4: Unsupported reserved word "this"
+724. this.x = x;
+*** Line 724 chars 1-4: Unsupported reserved word "this"
 
-727. throw e;
-*** Line 727 chars 1-5: Unsupported reserved word "throw"
+725. throw e;
+*** Line 725 chars 1-5: Unsupported reserved word "throw"
 
-728. void foo() throws Exception
-*** Line 728 chars 12-17: Unsupported reserved word "throws"
+726. void foo() throws Exception
+*** Line 726 chars 12-17: Unsupported reserved word "throws"
 
-729. transient int x;
-*** Line 729 chars 1-9: Unsupported reserved word "transient"
+727. transient int x;
+*** Line 727 chars 1-9: Unsupported reserved word "transient"
 
-730. try
-*** Line 730 chars 1-3: Unsupported reserved word "try"
+728. try
+*** Line 728 chars 1-3: Unsupported reserved word "try"
 
-731. volatile int x = 10;
-*** Line 731 chars 1-8: Unsupported reserved word "volatile"
+729. volatile int x = 10;
+*** Line 729 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 93 ms
+729 lines processed in 110 ms
 
 0 unexpected errors
-0 uncaught errors (182 expected errors)
+0 uncaught errors (180 expected errors)
 
 SUCCESS

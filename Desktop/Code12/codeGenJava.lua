@@ -2,14 +2,13 @@
 --
 -- codeGenJava.lua
 --
--- Generates Lua code from Java Parse trees for the Code 12 Desktop app
+-- Generates Lua code from a Code12 Program Tree structure for the Code 12 Desktop app
 --
 -- (c)Copyright 2018 by David C. Parker 
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
 local javalex = require( "javalex" )
-local checkJava = require( "checkJava" )
 
 
 -- The codeGen module
@@ -147,38 +146,40 @@ end
 
 --- Expression Generation Functions ------------------------------------------
 
--- Return Lua code for a variable name
-local function varNameCode( varName )
+-- Return Lua code for a variable name, which is global if isGlobal
+local function varNameCode( varName, isGlobal )
 	local luaName = nameFromLuaReservedWord[varName] or varName
-	-- TODO: make lValue reference the var instead of varID so we can use var.isLocal
-	if checkJava.isInstanceVarName( varName ) then
-		return thisPrefix .. luaName    -- instance var, so use this.name
+	if isGlobal then
+		return thisPrefix .. luaName    -- this.name
+	else
+		return luaName
 	end
-	return luaName
 end
 
--- Return Lua code for a variable idNode with an optional array index indexNode. 
+-- Return Lua code for the variable with optional array index part of an lValue. 
 -- If assigned then the lValue is being assigned to, otherwise it is being read.  
-local function varIndexCode( varID, indexExpr, assigned )
-	local varCode = varNameCode( varID.str )
-	if indexExpr then
-		-- Generate calls to special runtime functions that do array index checks
-		local indexStr = exprCode( indexExpr )
-		if assigned then
-			return table.concat{ "ct.checkArrayIndex(", varCode, ", ", indexStr, "); ",
-						varCode, "[1+(", indexStr, ")]" }
-		else
-			return "ct.indexArray(" .. varCode .. ", " .. indexStr .. ")"
-		end
-	else
+local function varIndexCode( lValue, assigned )
+	-- Get code for the variable
+	local varCode = varNameCode( lValue.varID.str, lValue.isGlobal )
+	local indexExpr = lValue.indexExpr
+	if indexExpr == nil then
 		return varCode
+	end
+
+	-- Generate calls to special runtime functions that do array index checks
+	local indexStr = exprCode( indexExpr )
+	if assigned then
+		return table.concat{ "ct.checkArrayIndex(", varCode, ", ", indexStr, "); ",
+					varCode, "[1+(", indexStr, ")]" }
+	else
+		return "ct.indexArray(" .. varCode .. ", " .. indexStr .. ")"
 	end
 end
 
 -- Return Lua code for an lValue. 
 -- If assigned then the lValue is being assigned to, otherwise it is being read. 
 local function lValueCode( lValue, assigned )
-	local code = varIndexCode( lValue.varID, lValue.indexExpr, assigned )
+	local code = varIndexCode( lValue, assigned )
 	if lValue.fieldID then
 		local fieldName = lValue.fieldID.str
 		if lValue.varID.str == "Math" then
@@ -233,52 +234,45 @@ local function literalCode( expr )
 	end
 end
 
--- Return the Lua code string for a function or method call on lValue 
--- passing exprs. For example:
---     ct.circle( x, y, d )
---     bird.setFillColor( "red" )
---     stars[i].delete()
---	   foo()
-local function callCode( lValue, exprs )
+-- Return the Lua code string for a function or method call given
+-- the lValue, nameID, and exprs of the call structure.
+local function callCode( lValue, nameID, exprs )
 	local parts   -- array of strings for a table.concat
-	local varID = lValue.varID
-	local fieldID = lValue.fieldID
 	local numExprs = (exprs and #exprs) or 0
-	if fieldID == nil then
+	if lValue == nil then
 		-- User-defined function call
-		parts = { fnNameCode( varID.str ), "(" }   -- e.g. _fn.updateScore(
+		parts = { fnNameCode( nameID.str ), "(" }   -- e.g. _fn.updateScore(
 	else
 		-- Method call
-		local objName = varID.str
-		local methodName = fieldID.str
-		if objName == "ct" then
+		local varID = lValue.varID
+		local varName = varID.str
+		local methodName = nameID.str
+		if varName == "ct" or varName == "System" then
+			-- Note that System.out.xxx maps to ct.xxx
 			-- Check special case: ct.println() with no params needs to generate ct.println("")
 			if methodName == "println" and numExprs == 0 then
 				return 'ct.println( "" )'
 			end
-			parts = { ctPrefix, methodName, "(" }         -- e.g. ct.circle(
-		elseif objName == "Math" then 
+			parts = { ctPrefix, methodName, "(" }    -- e.g. ct.circle(
+		elseif varName == "Math" then 
 			-- Lua math.xxx is the same as Java Math.xxx for all supported methods :)
 			parts = { "math.", methodName, "(" }
-		else
-			-- Check for supported String methods
-			if lValue.vtObj == "String" then
-				if methodName == "equals" then
-					-- Lua can compare strings directly with ==
-					return "(" .. varIndexCode( varID, lValue.indexExpr ) 
-							.. " == " .. exprCode( exprs[1] ) .. ")"
-				else
-					-- Map to corresponding global Lua function, passing the object.  
-					parts = { luaFnFromJavaStringMethod[methodName], "(", 
-							varIndexCode( varID, lValue.indexExpr ) }
-					if numExprs > 0 then
-						parts[#parts + 1] = ", "
-					end
-				end
-			else
-				-- GameObj method, e.g. obj:delete(
-				parts = { varIndexCode( varID, lValue.indexExpr ), ":", methodName, "(" }
+		elseif lValue.vt == "String" then
+			-- String methods
+			if methodName == "equals" then
+				-- Lua can compare strings directly with ==
+				return "(" .. varIndexCode( lValue ) 
+						.. " == " .. exprCode( exprs[1] ) .. ")"
 			end
+			-- Map to corresponding global Lua function, passing the object.  
+			parts = { luaFnFromJavaStringMethod[methodName], "(", 
+					varIndexCode( lValue ) }
+			if numExprs > 0 then
+				parts[#parts + 1] = ", "
+			end
+		else
+			-- GameObj method, e.g. obj:delete(
+			parts = { varIndexCode( lValue ), ":", methodName, "(" }
 		end
 	end
 
@@ -295,7 +289,7 @@ end
 
 -- Return the Lua code string for a call expr
 local function callExprCode( expr )
-	return callCode( expr.lValue, expr.exprs )
+	return callCode( expr.lValue, expr.nameID, expr.exprs )
 end
 
 -- Return the Lua code string for a parens expr
@@ -382,8 +376,12 @@ end
 -- Generate a var structure
 local function generateVar( var )
 	-- Generate the variable declaration
-	beginLuaLine( var.iLine, (var.isLocal and "local ") or nil )
-	addLua( varNameCode( var.nameID.str ) )
+	if var.isGlobal then
+		beginLuaLine( var.iLine, varNameCode( var.nameID.str, true ) )
+	else
+		beginLuaLine( var.iLine, "local " )
+		addLua( varNameCode( var.nameID.str ) )
+	end
 
 	-- Generate the initialization. If no initExpr is given, then init to
 	-- a default value so the Lua var doesn't start out nil (also needed
@@ -398,7 +396,7 @@ end
 
 -- Generate Lua code for the given call stmt
 local function generateCall( stmt )
-	beginLuaLine( stmt.iLine, callCode( stmt.lValue, stmt.exprs ) )
+	beginLuaLine( stmt.iLine, callCode( stmt.lValue, stmt.nameID, stmt.exprs ) )
 end
 
 -- Generate Lua code for the given assign stmt
@@ -499,9 +497,9 @@ end
 -- Generate Lua code for the given forArray stmt
 local function generateForArray( stmt )
 	beginLuaLine( stmt.iLine, "for _, " )
-	addLua( varNameCode( stmt.varID.str ) )
+	addLua( varNameCode( stmt.var.nameID.str ) )
 	addLua( " in ipairs(" )
-	addLua( varNameCode( stmt.arrayID.str ) )
+	addLua( exprCode( stmt.expr ) )
 	addLua( ") do" )
 	generateStmts( stmt.stmts, true)
 end
@@ -547,10 +545,12 @@ local function generateFunc( func )
 	addLua( fnNameCode( func.nameID.str ) )
 	addLua( "(" )
 	local params = func.params
-	for i = 1, #params do
-		addLua( params[i].nameID.str )
-		if i < #params then
-			addLua( ", ")
+	if params then
+		for i = 1, #params do
+			addLua( params[i].nameID.str )
+			if i < #params then
+				addLua( ", ")
+			end
 		end
 	end
 	addLua( ")" )
