@@ -69,8 +69,8 @@ function _fn.test()
 	local j = i; while j < 10 do
 
 		d = d + (i)
-		i = i - 1
-	j = j + 1; end
+		i = i - 1; j = j + 1
+	end
 
 	i = 0
 

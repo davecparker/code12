@@ -21,6 +21,9 @@ local parseProgram = {}
 -- It is made up of the following structure nodes, tokens, nested structures, 
 -- and arrays (plural names), with the following named fields:
 --
+-- In addition, any structure node may add firstToken and/or lastToken fields to
+-- extend the span of tokens referenced by that strucure for error reporting.
+--
 -- program: 
 --     { s = "program", nameID, vars, funcs }
 --
@@ -47,7 +50,7 @@ local parseProgram = {}
 -- 
 -- expr:  (Semantic analysis adds a vt field)
 --     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
---     { s = "call", iLine, lValue, nameID, exprs }
+--     { s = "call", lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "parens", expr }
 --     { s = "unaryOp", op, expr }         -- op.tt: -, !
@@ -194,6 +197,7 @@ local function makeVar( isGlobal, typeID, nameID, initExpr, isArray, isConst )
 	return {
 		s = "var",
 		iLine = nameID.iLine,
+		firstToken = typeID,
 		nameID = nameID,
 		vt = javaTypes.vtFromVarType( typeID, isArray ),
 		isConst = isConst,
@@ -349,6 +353,7 @@ local function getElseStmts()
 end
 
 -- Get and return a stmt structure for the given stmt parse tree.
+-- The iLine field must be assigned by the caller.
 -- Return nil if there is an error.
 local function getStmt( node )
 	local p = node.p
@@ -367,26 +372,31 @@ local function getStmt( node )
 	elseif p == "postInc" or p == "postDec" then
 		return { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2] }
 	elseif p == "break" then
-		return { s = "break" }
+		return { s = "break", firstToken = nodes[1] }
 	end
 	error( "Unexpected stmt pattern " .. p )
 end
 
--- Get and return a for or forArray structure given the forControl parse tree node.
+-- Get and return a for or forArray structure given the line parse tree nodes.
 -- Return nil if there is an error.
-local function getForStmt( forControl )
-	local nodes = forControl.nodes
+local function getForStmt( nodes )
+	local firstToken = nodes[1]
+	local iLine = firstToken.iLine
+	local forControl = nodes[3]
+	nodes = forControl.nodes
 	if forControl.p == "array" then
 		-- for (typeID nameID : arrayID) controlledStmts
 		return { 
 			s = "forArray", 
 			var = makeVar( false, nodes[1], nodes[2] ),
 			expr = makeExpr( nodes[4] ), 
-			stmts = getControlledStmts() 
+			stmts = getControlledStmts(),
+			firstToken = firstToken, 
 		}
 	else
 		-- for (init; expr; next) controlledStmts
-		local stmt = { s = "for", stmts = getControlledStmts() }
+		local stmt = { s = "for", stmts = getControlledStmts(), 
+				firstToken = firstToken }
 
 		-- Add the initStmt if any
 		local forInit = nodes[1]
@@ -395,6 +405,7 @@ local function getForStmt( forControl )
 			stmt.initStmt = makeVar( false, ns[1], ns[2], ns[4] )
 		elseif forInit.p == "stmt" then
 			stmt.initStmt = getStmt( forInit.nodes[1] )
+			stmt.initStmt.iLine = iLine
 		end
 
 		-- Add the expr if any
@@ -407,6 +418,7 @@ local function getForStmt( forControl )
 		local forNext = nodes[5]
 		if forNext.p == "stmt" then
 			stmt.nextStmt = getStmt( forNext.nodes[1] )
+			stmt.nextStmt.iLine = iLine
 		end
 		return stmt
 	end
@@ -439,7 +451,7 @@ function getLineStmts( tree, stmts )
 		-- if (expr) controlledStmts [else controlledStmts]
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts() }
+				elseStmts = getElseStmts(), firstToken = nodes[1] }
 	elseif p == "elseif" or p == "else" then
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
@@ -447,10 +459,10 @@ function getLineStmts( tree, stmts )
 		return false
 	elseif p == "return" then
 		-- TODO: Remember to check for return being only at end of a block
-		stmt = { s = "return", expr = makeExpr( nodes[2] ) }
+		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
 	elseif p == "do" then
 		-- do controlledStmts while (expr);
-		stmt = { s = "doWhile", stmts = getControlledStmts() }
+		stmt = { s = "doWhile", stmts = getControlledStmts(), firstToken = nodes[1] }
 		if stmt.stmts == nil then
 			return nil
 		end
@@ -475,10 +487,11 @@ function getLineStmts( tree, stmts )
 			err.setErrNode( whileEnd, "while loop header should not end with a semicolon" )
 			return nil
 		end
-		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts() }
+		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts(),
+				firstToken = nodes[1] }
 	elseif p == "for" then
 		-- for loop variants
-		stmt = getForStmt( nodes[3] )
+		stmt = getForStmt( nodes )
 	else
 		-- Invalid line pattern
 		if p == "func" or p == "main" then
@@ -541,14 +554,16 @@ function makeExpr( node )
 
 	-- Handle arrayInit nodes
 	if node.t == "arrayInit" then
+		local nodes = node.nodes
 		if node.p == "list" then
 			local exprs = {}
-			for _, exprNode in ipairs( node.nodes[2].nodes ) do
+			for _, exprNode in ipairs( nodes[2].nodes ) do
 				exprs[#exprs + 1] = makeExpr( exprNode )
 			end	
-			return { s = "arrayInit", exprs = exprs }
+			return { s = "arrayInit", exprs = exprs, 
+					firstToken = nodes[1], lastToken = nodes[3] }
 		else
-			node = node.nodes[1]
+			node = nodes[1]
 		end
 	end
 
@@ -568,7 +583,8 @@ function makeExpr( node )
 		return { s = "unaryOp", op = nodes[1], expr = makeExpr( nodes[2] ) }
 	elseif p == "newArray" then
 		return { s = "newArray", vt = javaTypes.vtFromVarType( nodes[2] ), 
-				lengthExpr = makeExpr( nodes[4] ) }
+				lengthExpr = makeExpr( nodes[4] ), firstToken = nodes[1],
+				lastToken = nodes[5] }
 	else
 		-- Binary op
 		return { s = "binOp", op = nodes[2], left = makeExpr( nodes[1] ),
@@ -600,7 +616,8 @@ local function getFunc( typeID, isArray, nameID, isPublic, paramList )
 	-- Make the func
 	return { 
 		s = "func",
-		iLine = nameID.iLine, 
+		iLine = nameID.iLine,
+		firstToken = typeID, 
 		nameID = nameID,
 		vt = javaTypes.vtFromType( typeID, isArray ),
 		isPublic = isPublic,

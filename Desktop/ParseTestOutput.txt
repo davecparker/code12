@@ -8453,7 +8453,7 @@ Comma not supported
 *** Line 729 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-729 lines processed in 110 ms
+729 lines processed in 100 ms
 
 0 unexpected errors
 0 uncaught errors (180 expected errors)

@@ -115,7 +115,7 @@ local function beginLuaLine( iLine, strCode )
 	if iLine == nil then
 		luaCodeStrs[#luaCodeStrs + 1] = "\n"
 		luaLineNum = luaLineNum + 1
-	elseif iLine == luaLineNum then
+	elseif iLine <= luaLineNum then
 		luaCodeStrs[#luaCodeStrs + 1] = "; "
 		indent = false
 	else
@@ -488,10 +488,8 @@ local function generateFor( stmt )
 	generateStmts( stmt.stmts )
 	if stmt.nextStmt then
 		generateStmt( stmt.nextStmt )
-		addLua( "; end" )
-	else
-		beginLuaLine( nil, "end" )
 	end
+	beginLuaLine( nil, "end" )
 end
 
 -- Generate Lua code for the given forArray stmt
