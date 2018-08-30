@@ -39,9 +39,12 @@ local blockLevel              -- Current indent level (begin/end block level) fo
 local exprCode
 local generateStmt
 
--- Map unaryOp, binOp, and assign op strings to Lua operator code (Lua op plus spaces)
-local luaOpFromOp = {
-	-- unaryOp and binOp ops used in expr structures
+-- Map unaryOp, binOp, and assign opType strings to Lua operator code (Lua op plus spaces)
+local luaOpFromOpType = {
+	-- unaryOp
+	["neg"] = " -",
+	["not"] = " not ",
+	-- binOp
 	["*"]	= " * ",
 	["/"]	= " / ",
 	["%"]	= " % ",
@@ -55,8 +58,7 @@ local luaOpFromOp = {
 	["!="]	= " ~= ",
 	["&&"]	= " and ",
 	["||"]	= " or ",
-	["!"]   = " not ",
-	-- assign structure ops
+	-- assign
 	["="]   = " = ",
 	["+="]	= " + ",
 	["-="]	= " - ",
@@ -299,19 +301,19 @@ end
 
 -- Return the Lua code string for a unaryOp expr
 local function unaryOpCode( expr )
-	return luaOpFromOp[expr.op.tt] .. exprCode( expr.expr )
+	return luaOpFromOpType[expr.opType] .. exprCode( expr.expr )
 end
 
 -- Return the Lua code string for a binOp expr
 local function binOpCode( expr )
-	local op = luaOpFromOp[expr.op.tt]
-	if op == nil then
-		return "nil"    -- unknown or unsupported operator
-	elseif op == "+" and expr.vt == "String" then
+	local luaOp = luaOpFromOpType[expr.opType]
+	if luaOp == nil then
+		return "nil"   -- unsupported operator (may be continuing on errors)
+	elseif luaOp == "+" and expr.vt == "String" then
 		-- String concat, not add. Promote left and right to string as needed.
 		return stringExprCode( expr.left ) .. " .. " .. stringExprCode( expr.right )
 	end
-	return exprCode( expr.left ) .. op .. exprCode( expr.right )
+	return exprCode( expr.left ) .. luaOp .. exprCode( expr.right )
 end
 
 -- Return the Lua code string for a newArray expr
@@ -406,15 +408,15 @@ local function generateAssign( stmt )
 	addLua( " = " )
 
 	-- Generate the right side
-	local op = stmt.op.tt
-	if op == "=" then
+	local opType = stmt.opType
+	if opType == "=" then
 		addLua( exprCode( stmt.expr ) )
-	elseif op == "++" or op == "--" then
+	elseif opType == "++" or opType == "--" then
 		addLua( lValueCode( stmt.lValue ) )
-		addLua( luaOpFromOp[op] )
+		addLua( luaOpFromOpType[opType] )
 	else   -- +=, -=, *=, /=
 		addLua( lValueCode( stmt.lValue ) )
-		addLua( luaOpFromOp[op] )
+		addLua( luaOpFromOpType[opType] )
 		addLua( "(" )
 		addLua( exprCode( stmt.expr ) )
 		addLua( ")" )

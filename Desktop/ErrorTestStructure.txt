@@ -104,7 +104,7 @@
                         initExpr: literal { token = 3 }
  80.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: unaryOp (-)
+                        expr: unaryOp (neg)
                             expr: literal { token = 5 }
  81.                assign (++)
                         lValue: lValue { varID = i }
@@ -175,11 +175,11 @@
                         expr: literal { token = .12e0 }
 101.                assign (=)
                         lValue: lValue { varID = d }
-                        expr: unaryOp (-)
+                        expr: unaryOp (neg)
                             expr: literal { token = .123e-456 }
 102.                assign (=)
                         lValue: lValue { varID = d }
-                        expr: unaryOp (-)
+                        expr: unaryOp (neg)
                             expr: literal { token = .5 }
 103.                assign (=)
                         lValue: lValue { varID = d }
@@ -226,7 +226,7 @@
                         expr: literal { token = .5e+1 }
 115.                assign (=)
                         lValue: lValue { varID = y2 }
-                        expr: unaryOp (-)
+                        expr: unaryOp (neg)
                             expr: literal { token = .5e-1 }
 116.                var eps { vt = double, firstToken = double }
                         initExpr: literal { token = 1e-4 }
@@ -565,7 +565,7 @@
                         expr: lValue { varID = b }
 192.                assign (=)
                         lValue: lValue { varID = b }
-                        expr: unaryOp (!)
+                        expr: unaryOp (not)
                             expr: lValue { varID = b }
 193.                assign (=)
                         lValue: lValue { varID = b }
@@ -972,7 +972,7 @@
                                     right: literal { token = 0 }
                                     left: lValue { varID = yVar }
 295.                            initStmt: var dy { vt = double, isGlobal = false, firstToken = double }
-                                    initExpr: unaryOp (-)
+                                    initExpr: unaryOp (neg)
                                         expr: literal { token = .5 }
 295.                            nextStmt: assign (+=)
                                     lValue: lValue { varID = yVar }
@@ -2270,7 +2270,7 @@
 550.                call setLayer { #exprs = 1 }
                         lValue: lValue { varID = img }
                         exprs:
-                            unaryOp (-)
+                            unaryOp (neg)
                                 expr: literal { token = 42 }
 551.                call delete
                         lValue: lValue { varID = img }
@@ -2335,7 +2335,7 @@
                         expr: call acos { #exprs = 1 }
                             lValue: lValue { varID = Math }
                             exprs:
-                                unaryOp (-)
+                                unaryOp (neg)
                                     expr: literal { token = 0.5 }
 563.                assign (=)
                         lValue: lValue { varID = d }
@@ -2409,7 +2409,7 @@
                         expr: call floor { #exprs = 1 }
                             lValue: lValue { varID = Math }
                             exprs:
-                                unaryOp (-)
+                                unaryOp (neg)
                                     expr: literal { token = 1.67 }
 571.                assign (=)
                         lValue: lValue { varID = d }
@@ -3253,11 +3253,11 @@
                         initExpr: lValue { varID = intVar, fieldID = size }
 1057.                assign (=)
                         lValue: lValue { varID = objVar }
-                        expr: unaryOp (-)
+                        expr: unaryOp (neg)
                             expr: lValue { varID = objVar }
 1060.                assign (=)
                         lValue: lValue { varID = objVar, fieldID = visible }
-                        expr: unaryOp (!)
+                        expr: unaryOp (not)
                             expr: lValue { varID = intVar }
 1063.                assign (=)
                         lValue: lValue { varID = strVar }
@@ -3272,7 +3272,7 @@
 1068.                assign (=)
                         lValue: lValue { varID = boolVar }
                         expr: (+)
-                            right: unaryOp (!)
+                            right: unaryOp (not)
                                 expr: lValue { varID = boolVar }
                             left: lValue { varID = boolVar }
 1070.                assign (=)

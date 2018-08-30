@@ -36,7 +36,7 @@ local parseProgram = {}
 -- stmt:
 --     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 --     { s = "call", iLine, lValue, nameID, exprs }
---     { s = "assign", iLine, lValue, op, expr }     -- op.tt: =, +=, -=, *=, /=, ++, --
+--     { s = "assign", iLine, lValue, opToken, opType, expr }   -- opType: =, +=, -=, *=, /=, ++, --
 --     { s = "if", iLine, expr, stmts, elseStmts }
 --     { s = "while", iLine, expr, stmts }
 --     { s = "doWhile", iLine, expr, stmts }
@@ -53,8 +53,8 @@ local parseProgram = {}
 --     { s = "call", lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "parens", expr }
---     { s = "unaryOp", op, expr }         -- op.tt: -, !
---     { s = "binOp", left, op, right }    -- op.tt: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
+--     { s = "unaryOp", opToken, opType, expr }        -- opType: neg, not
+--     { s = "binOp", left, opToken, opType, right }   -- opType: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
 --     { s = "newArray", vt, lengthExpr }
 --     { s = "arrayInit", exprs }
 --
@@ -362,15 +362,21 @@ local function getStmt( node )
 	if p == "call" then
 		return makeCall( nodes )
 	elseif p == "assign" then
-		return { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2], 
-				expr = makeExpr( nodes[3] ) }
+		return { s = "assign", lValue = makeLValue( nodes[1] ), opToken = nodes[2], 
+				opType = "=", expr = makeExpr( nodes[3] ) }
 	elseif p == "opAssign" then
-		return { s = "assign", lValue = makeLValue( nodes[1] ),  op = nodes[2].nodes[1], 
+		local opAssignOp = nodes[2]
+		return { s = "assign", lValue = makeLValue( nodes[1] ),  
+				opToken = opAssignOp.nodes[1], opType = opAssignOp.p, 
 				expr = makeExpr( nodes[3] ) }
 	elseif p == "preInc" or p == "preDec" then
-		return { s = "assign", lValue = makeLValue( nodes[2] ), op = nodes[1] }
+		local opToken = nodes[1]
+		return { s = "assign", lValue = makeLValue( nodes[2] ), opToken = opToken,
+				opType = opToken.str }
 	elseif p == "postInc" or p == "postDec" then
-		return { s = "assign", lValue = makeLValue( nodes[1] ), op = nodes[2] }
+		local opToken = nodes[2]
+		return { s = "assign", lValue = makeLValue( nodes[1] ), opToken = opToken,
+				opType = opToken.str }
 	elseif p == "break" then
 		return { s = "break", firstToken = nodes[1] }
 	end
@@ -579,16 +585,17 @@ function makeExpr( node )
 		return makeLValue( nodes[1] )
 	elseif p == "exprParens" then
 		return { s = "parens", expr = makeExpr( nodes[2] ) }
-	elseif p == "neg" or p == "!" then
-		return { s = "unaryOp", op = nodes[1], expr = makeExpr( nodes[2] ) }
+	elseif p == "neg" or p == "not" then
+		return { s = "unaryOp", opToken = nodes[1], opType = p, 
+				expr = makeExpr( nodes[2] ) }
 	elseif p == "newArray" then
 		return { s = "newArray", vt = javaTypes.vtFromVarType( nodes[2] ), 
 				lengthExpr = makeExpr( nodes[4] ), firstToken = nodes[1],
 				lastToken = nodes[5] }
 	else
-		-- Binary op
-		return { s = "binOp", op = nodes[2], left = makeExpr( nodes[1] ),
-				right = makeExpr( nodes[3] ) }
+		local opToken = nodes[2]
+		return { s = "binOp", opToken = opToken, opType = opToken.str,
+				left = makeExpr( nodes[1] ), right = makeExpr( nodes[3] ) }
 	end
 end
 
@@ -716,11 +723,11 @@ local function printStructureTree( node, indentLevel, file, label )
 		str = str .. label .. ": "
 	end
 	if node.s == "binOp" then
-		str = str .. "(" .. node.op.str .. ")"
+		str = str .. "(" .. node.opType .. ")"
 	else
 		str = str .. node.s
-		if node.op then
-			str = str .. " (" .. node.op.str .. ")"
+		if node.opType then
+			str = str .. " (" .. node.opType .. ")"
 		end
 	end
 	if node.nameID and node.nameID.str then
@@ -734,7 +741,8 @@ local function printStructureTree( node, indentLevel, file, label )
 		local fieldStr = nil
 		if field == "vt" then
 			fieldStr = field .. " = " .. javaTypes.typeNameFromVt( value )
-		elseif field ~= "s" and field ~= "iLine" and field ~= "nameID" and field ~= "op" then
+		elseif field ~= "s" and field ~= "iLine" and field ~= "nameID" 
+				and field ~= "opToken" and field ~= "opType" then
 			if type(value) == "table" then
 				if value.tt then  
 					-- A token

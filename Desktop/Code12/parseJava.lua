@@ -209,7 +209,7 @@ primaryExpr = { t = "expr",
 	{ 3, 12, "lValue",			lValue								},
 	{ 4, 12, "exprParens",		"(", expr, ")"						},
 	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
-	{ 4, 12, "!",				"!", parsePrimaryExpr 				},
+	{ 4, 12, "not",				"!", parsePrimaryExpr 				},
 	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
 }
 

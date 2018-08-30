@@ -413,7 +413,7 @@ end
 local function vtExprNeg( node )
 	local vt = vtSetExprNode( node.expr )
 	if type(vt) ~= "number" then
-		err.setErrNodeAndRef( node.op, node.expr, 
+		err.setErrNodeAndRef( node.opToken, node.expr, 
 				"The negate operator (-) can only apply to numbers" )
 		return nil
 	end
@@ -424,7 +424,7 @@ end
 local function vtExprNot( node )
 	local vt = vtSetExprNode( node.expr )
 	if vt ~= true then
-		err.setErrNodeAndRef( node.op, node.expr, 
+		err.setErrNodeAndRef( node.opToken, node.expr, 
 				"The not operator (!) can only apply to boolean values" )
 		return nil
 	end
@@ -496,7 +496,7 @@ local function vtExprPlus( node )
 			vtOther = vtLeft
 		end
 		if type(vtOther) == "table" then
-			err.setErrNodeAndRef( node.op, exprOther, 
+			err.setErrNodeAndRef( node.opToken, exprOther, 
 					"The (+) operator cannot be applied to arrays" ) 
 		end
 		return "String"   -- all primitive types can promote to a string 
@@ -508,7 +508,7 @@ local function vtExprPlus( node )
 		else
 			exprOther = node.left
 		end
-		err.setErrNodeAndRef( node.op, exprOther, 
+		err.setErrNodeAndRef( node.opToken, exprOther, 
 				"The (+) operator can only apply to numbers or Strings" )
 	end
 	return nil
@@ -523,8 +523,8 @@ local function vtExprNumeric( node )
 		return vtNumber( vtLeft, vtRight )
 	end
 	local exprErr = ((type(vtLeft) ~= "number" and node.left) or node.right)
-	err.setErrNodeAndRef( node.op, exprErr, 
-			"Numeric operator (%s) can only apply to numbers", node.op.str )
+	err.setErrNodeAndRef( node.opToken, exprErr, 
+			"Numeric operator (%s) can only apply to numbers", node.opToken.str )
 	return nil
 end
 
@@ -563,8 +563,8 @@ local function vtExprLogical( node )
 		return true
 	end
 	local exprErr = ((vtLeft ~= true and node.left) or node.right)
-	err.setErrNodeAndRef( node.op, exprErr, 
-			"Logical operator (%s) can only apply to boolean values", node.op.str )
+	err.setErrNodeAndRef( node.opToken, exprErr, 
+			"Logical operator (%s) can only apply to boolean values", node.opToken.str )
 	return nil
 end
 
@@ -577,8 +577,8 @@ local function vtExprInequality( node )
 		return true
 	end
 	local exprErr = ((type(vtLeft) ~= "number" and node.left) or node.right)
-	err.setErrNodeAndRef( node.op, exprErr, 
-			"Inequality operator (%s) can only apply to numbers", node.op.str )
+	err.setErrNodeAndRef( node.opToken, exprErr, 
+			"Inequality operator (%s) can only apply to numbers", node.opToken.str )
 	return nil
 end
 
@@ -590,10 +590,10 @@ local function vtExprEquality( node )
 		-- Don't allow comparing Strings with ==
 		if vtLeft == "String" and vtRight == "String" then
 			if syntaxLevel >= 7 then
-				err.setErrNodeAndRef( node.op, node.left,
+				err.setErrNodeAndRef( node.opToken, node.left,
 						"Use str1.equals( str2 ) to compare two String values" )
 			else
-				err.setErrNodeAndRef( node.op, node.left,
+				err.setErrNodeAndRef( node.opToken, node.left,
 						"Strings cannot be compared with ==. You must use the equals method, which requires level 7" )
 			end
 			return nil
@@ -607,7 +607,7 @@ end
 
 -- expr pattern: = (incorrect use of = as a binary operator) 
 local function vtExprBadEquality( node )
-	err.setErrNodeAndRef( node.op, node.left,
+	err.setErrNodeAndRef( node.opToken, node.left,
 					"Use == to compare for equality (= is for assignment)" )
 	return nil
 end
@@ -622,7 +622,7 @@ local fnVtExprVariations = {
 	["STR"]         = vtExprSTR,
 	-- unary operators
 	["neg"]         = vtExprNeg,
-	["!"]           = vtExprNot,
+	["not"]         = vtExprNot,
 	-- binary operators
 	["+"]           = vtExprPlus,
 	["-"]           = vtExprNumeric,
@@ -655,21 +655,15 @@ function vtSetExprNode( node )
 	local fnVt
 	if s == "literal" then
 		fnVt = fnVtExprVariations[node.token.tt]
-	elseif s == "unaryOp" then
-		local op = node.op.tt
-		if op == "-" then
-			op = "neg"   -- distinguish from binary minus
-		end
-		fnVt = fnVtExprVariations[op]
-	elseif s == "binOp" then
-		fnVt = fnVtExprVariations[node.op.tt]
+	elseif s == "unaryOp" or s == "binOp" then
+		fnVt = fnVtExprVariations[node.opType]
 	else
 		fnVt = fnVtExprVariations[s]
 	end
 
 	-- Dispatch to the function
 	if fnVt == nil then
-		err.setErrNode( node, "Unsupported operator " .. node.op.tt )  -- TODO: improve
+		err.setErrNode( node, "Unsupported operator " .. node.opToken.str )  -- TODO: improve
 		return nil
 	end
 	local vt = fnVt( node )
@@ -1019,12 +1013,12 @@ function checkStmt( stmt )
 		-- { s = "call", iLine, className, objLValue, nameID, exprs }
 		checkJava.vtCheckCall( stmt )
 	elseif s == "assign" then
-		-- { s = "assign", iLine, lValue, op, expr }   op.tt: =, +=, -=, *=, /=, ++, --	
+		-- { s = "assign", iLine, lValue, opToken, opType, expr }   opType: =, +=, -=, *=, /=, ++, --	
 		local lValue = stmt.lValue
-		local opNode = stmt.op	
-		local opType = opNode.tt
+		local opNode = stmt.opToken	
+		local opType = stmt.opType
 		if opType == "=" then
-			-- Check for simple assignment, which marks the variable as assigned
+			-- Check for simple variable assignment, which marks the variable as assigned
 			if lValue.indexExpr == nil and lValue.fieldID == nil then
 				local varID = lValue.varID
 				if checkJava.canAssignToVarNode( varID, stmt.expr ) then

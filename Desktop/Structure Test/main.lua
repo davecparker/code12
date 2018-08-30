@@ -12,7 +12,7 @@ this.gameOver = false
 this.LIMIT = 120 + 4
 this.speed = 0.3
 this.frameCount = 0
-this.newCount = this.frameCount + 2 *  - this.frameCount
+this.newCount = this.frameCount + 2 *  -this.frameCount
 this.str = "Testing"
 
 
@@ -48,7 +48,7 @@ function _fn.test()
 	if d == i then
 		d = i
 	elseif d < i then
-		d =  - i
+		d =  -i
 	else
 		i = 0
 	end
