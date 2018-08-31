@@ -532,11 +532,14 @@ function getBlockStmts()
 	end
 
 	-- Check block is indented from beginning {
-	local prevTree = parseTrees[iTree]
-	local blockIndent = javalex.indentLevelForLine( prevTree.iLineStart )
-	if prevTree.p ~= "end" and blockIndent <= javalex.indentLevelForLine( iLineStart ) then
-		err.setErrLineNumAndRefLineNum( prevTree.iLineStart, iLineStart,
-				"A block should be indented more than its beginning {" )
+	local prevTree, blockIndent
+	if iTree <= numParseTrees then
+		prevTree = parseTrees[iTree]
+		blockIndent = javalex.indentLevelForLine( prevTree.iLineStart )
+		if prevTree.p ~= "end" and blockIndent <= javalex.indentLevelForLine( iLineStart ) then
+			err.setErrLineNumAndRefLineNum( prevTree.iLineStart, iLineStart,
+					"Lines within { } brackets should be indented" )
+		end
 	end
 
 	-- Get all lines until we get a matching end for the block begin
