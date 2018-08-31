@@ -3,25 +3,25 @@ import Code12.*;
 class level10 extends Code12Program
 {
    //Global variables
-      boolean startPhase = false;
-      boolean mainPhase = true;
+      boolean startPhase = true;
+      boolean mainPhase = false;
       boolean endPhase = false;
       int updates = 0;
-      double screenWidth;
       double screenHeight;
+      double screenWidth;
       //Player character
       GameObj ghostBird;
       GameObj bird;
       String flap = "downflap";
       String filename;
-      final int BIRDHIEGHT = 10;
+      final int BIRDHIEGHT = 8;
       double birdX;
       double birdY;
       boolean movingUp = true;
       //Score
       GameObj scoreObj;
       double scoreX;
-      double scoreY;
+      double scoreY; 
       int score;
       int scoreHeight = 5;
       int highScore = 0;
@@ -45,6 +45,7 @@ class level10 extends Code12Program
       GameObj pipeUp2;
       GameObj pipeDown2;
       //End Screen
+      double endY;
       GameObj gameOverImg;
       GameObj endScoreText;
       GameObj endScoreImg;
@@ -59,12 +60,14 @@ class level10 extends Code12Program
    }
    
    public void start()
-   {  
+   {   
+      ct.setScreen( "Main" ); //Names the main screen and stores everything after this to the Main screen
+
       //sets the height of the sceen to match the height of the background
-      screenHeight = 128; //sets h to 128 (the height of the screen)
-      ct.setHeight( screenHeight );
-      screenWidth = ct.getWidth(); //sets w to 100 (the width of the screen)   
-      
+      ct.setHeight(128);
+      screenHeight = 128; //sets h to 128 (the height of the screen) 
+      screenWidth = ct.getWidth(); //sets w to 100 (the width of the screen)  
+
       back1 = ct.image("background-day.png", screenWidth / 2, screenHeight / 2, screenWidth );
       back2 = ct.image("background-day.png", 1.5*screenWidth, screenHeight / 2, screenWidth );
       back1.setLayer(0);
@@ -82,8 +85,8 @@ class level10 extends Code12Program
       ghostBird.ySpeed = 0.5;
       //draws the count
       //the value of x does not change (the x position of the bird and number are equal)
-      scoreY = screenHeight / 8.0; //sets y to 16 (the y position of the number)
-      scoreX = birdX;
+      scoreX = birdX; //sets y to 16 (the y position of the number)
+      scoreY  = screenHeight / 8.0;
       scoreObj = ct.image( scoreImgFile, scoreX, scoreY, scoreHeight ); 
       scoreObj.setLayer(3);
       score = 0;
@@ -127,10 +130,29 @@ class level10 extends Code12Program
       pipeDown2 = ct.image("pipe_green_down.png", goal2.x, goal2.y-75, 10.5);
       pipeDown2.xSpeed = -0.5;
       pipeDown2.setLayer(2);
+
+      //End screen variables
+      endY = scoreY + 8;
+
+      ct.setScreen( "Start" ); //Names the start screen
+
+      ct.image("background-day.png", screenWidth / 2, screenHeight / 2, screenWidth );
+      ct.image("message.png", screenWidth / 2, 50, 50 );
+
    }
 
    public void update( )
    {      
+      //Checks for click to start game
+      if( startPhase )
+      {
+         if( ct.clicked() || ct.charTyped(" ") )
+         {
+            startPhase = false;
+            mainPhase = true;
+            ct.setScreen( "Main" );
+         }
+      }
       //game updates only trigger if not on the star menu or end game screen
       if( mainPhase )
       {
@@ -283,41 +305,96 @@ class level10 extends Code12Program
 
             //Draws the endgame score and highscore screen
             scoreObj.delete();
-            scoreY += 12;
-            gameOverImg = ct.image("gameover.png", scoreX, scoreY, 35 );
+            gameOverImg = ct.image("gameover.png", scoreX, endY, 45 );
             gameOverImg.setLayer(4);
-            endScoreText = ct.text("Score", scoreX, scoreY+8, 5, "white" );
+
+            endScoreText = ct.text("Score", scoreX, endY+10, 8, "white" );
             endScoreText.setLayer(4);
+
             scoreImgFile = ct.formatInt( score ) + ".png";
-            endScoreImg = ct.image( scoreImgFile, scoreX, scoreY + 16, scoreHeight );
+            endScoreImg = ct.image( scoreImgFile, scoreX, endY + 20, scoreHeight );
             endScoreImg.setLayer(4);
-            endBestText = ct.text("HighScore", scoreX, scoreY + 24, 5, "white" );
+
+            endBestText = ct.text("HighScore", scoreX, endY + 30, 8, "white" );
             endBestText.setLayer(4);
+
             scoreImgFile = ct.formatInt( highScore ) + ".png";
-            endScoreImg = ct.image( scoreImgFile, scoreX, scoreY + 32, scoreHeight );
-            endScoreImg.setLayer(4);
-            restartText = ct.text("Restart", scoreX, scoreY + 42, 8, "white" );
+            endBestImg = ct.image( scoreImgFile, scoreX, endY + 38, scoreHeight );
+            endBestImg.setLayer(4);
+
+            restartText = ct.text("Restart", scoreX, endY + 48, 10, "white" );
             restartText.setLayer(4);
+
             restartText.clickable = false;
-            restartBox = ct.rect( scoreX, scoreY + 42, 24, 8, "orange");
+            restartBox = ct.rect( scoreX, endY + 48, 30, 10, "orange");
             restartBox.setLayer(3);
          }
       }  
       if( endPhase )
       {
-         if( restartBox.clicked() )
-         {
+         if( restartBox.clicked() ) //Restarts the game
+         {            
+            //Sets Phase flags
             mainPhase = true;
             endPhase = false;
+
+            //Deletes Endscreen 
+            gameOverImg.delete();
+            endScoreText.delete();
+            endScoreImg.delete();
+            endBestText.delete();
+            endBestImg.delete();
+            restartText.delete();
+            restartBox.delete();
 
             //Back
             back1.xSpeed = -0.5;
             back2.xSpeed = -0.5;
 
+            //Bird
+            birdY = screenHeight / 2.0;
+            ghostBird.y = birdY;
+            ghostBird.ySpeed = 0.5;
+
+            //Score
+            score = 0;
+            scoreImgFile = "0.png";
+            scoreHeight = 5; //resets the score height in case the player scored over 10
+            scoreObj = ct.image( scoreImgFile, scoreX, scoreY, scoreHeight ); 
+            scoreObj.setLayer(3);
+
+            //Goals
+            randY = ct.random( 38, 90 );
+            goal1.x = screenWidth + 40;
+            goal1.y = randY;
+            goal1.xSpeed = -0.5;
+
+            randY = ct.random( 38, 90 );
+            goal2.x = screenWidth + 110;
+            goal2.y = randY;
+            goal2.xSpeed = -0.5;
+
+            //Sets hit flags
+            hit1 = false;
+            hit2 = false;
+
+            //Pipes
+            pipeUp1.x = goal1.x;
+            pipeUp1.y = goal1.y+75;
+            pipeUp1.xSpeed = -0.5;
+
+            pipeDown1.x = goal1.x;
+            pipeDown1.y = goal1.y-75;
+            pipeDown1.xSpeed = -0.5;
 
 
+            pipeUp2.x = goal2.x;
+            pipeUp2.y = goal2.y+75;
+            pipeUp2.xSpeed = -0.5;
 
-
+            pipeDown2.x = goal2.x;
+            pipeDown2.y = goal2.y-75;
+            pipeDown2.xSpeed = -0.5;
          }
       }
    }    

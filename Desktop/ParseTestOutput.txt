@@ -1,14 +1,14 @@
 ======= Test Started ==========================================
 
 1. import Code12.*;
-line (importCode12)
+line (importAll)
     ID (Code12)
 
 2. 
-line (blank)
 
 3. class BubblePop extends Code12Program
 line (classUser)
+    access (empty)
     ID (BubblePop)
     ID (Code12Program)
 
@@ -34,7 +34,6 @@ line (Code12Run)
 line (end)
 
 9. 
-line (blank)
 
 10. public void start()
 line (func)
@@ -47,8 +46,6 @@ line (func)
 line (begin)
 
 12. // Make the background
-line (comment)
-    COMMENT ( Make the background )
 
 13. ct.setHeight(150);
 line (stmt)
@@ -78,7 +75,6 @@ line (stmt)
 line (end)
 
 16. 
-line (blank)
 
 17. public void update()
 line (func)
@@ -91,8 +87,6 @@ line (func)
 line (begin)
 
 19. // Make bubbles at random times, positions, and sizes
-line (comment)
-    COMMENT ( Make bubbles at random times, positions, and sizes)
 
 20. if (ct.random(1, 20) == 1)
 line (if)
@@ -656,11 +650,8 @@ line (stmt)
                 NUM (12)
 
 59. 
-line (blank)
 
 60. // relational operators and if/else
-line (comment)
-    COMMENT ( relational operators and if/else)
 
 61. if (count == 0)
 line (if)
@@ -750,11 +741,8 @@ line (varInit)
                 field (empty)
 
 68. 
-line (blank)
 
 69. // Strings
-line (comment)
-    COMMENT ( Strings)
 
 70. String greeting; //  declaration without initialization - String type
 line (varDecl)
@@ -893,11 +881,8 @@ line (stmt)
             STR ("butItTakesLessKeystrokes")
 
 84. 
-line (blank)
 
 85. // loops
-line (comment)
-    COMMENT ( loops)
 
 86. for (int i = 0; i < 10; i++)
 line (for)
@@ -1109,7 +1094,6 @@ line (for)
         ID (bullets)
 
 94. 
-line (blank)
 
 95. while (j < 100)
 line (while)
@@ -1226,11 +1210,8 @@ line (while)
     whileEnd (while)
 
 102. 
-line (blank)
 
 103. // arrays
-line (comment)
-    COMMENT ( arrays)
 
 104. int[] a;
 line (arrayDecl)
@@ -1401,11 +1382,8 @@ line (stmt)
                 field (empty)
 
 120. 
-line (blank)
 
 121. // function definitions
-line (comment)
-    COMMENT ( function definitions)
 
 122. void foo()
 line (func)
@@ -1481,11 +1459,8 @@ line (func)
             ID (z)
 
 128. 
-line (blank)
 
 129. // function calls
-line (comment)
-    COMMENT ( function calls)
 
 130. ct.println("Hello world");
 line (stmt)
@@ -1592,54 +1567,33 @@ line (stmt)
                     field (empty)
 
 138. 
-line (blank)
 
 139. // multiline comments
-line (comment)
-    COMMENT ( multiline comments)
 
 140. /* this is a multiline comment
-line (comment)
-    COMMENT ( this is a multiline comment)
 
 141. * this is the second line
-line (blank)
 
 142. * this is the third line
-line (blank)
 
 143. */
-line (blank)
 
 144. }
 line (end)
 
 145. // -------------------------------------------------------------
-line (comment)
-    COMMENT ( -------------------------------------------------------------)
 
 146. // Parsing white box tests
-line (comment)
-    COMMENT ( Parsing white box tests)
 
 147. // -------------------------------------------------------------
-line (comment)
-    COMMENT ( -------------------------------------------------------------)
 
 148. // "blank"
-line (comment)
-    COMMENT ( "blank")
 
 149. 
-line (blank)
 
 150. // "comment"
-line (comment)
-    COMMENT ( "comment")
 
 151. // single comment line
-line (comment)
-    COMMENT ( single comment line)
 
 152. while ( x < 100 ) // comment at end of line of code
 line (while)
@@ -1654,18 +1608,12 @@ line (while)
     whileEnd (while)
 
 153. /* block comment line 1
-line (comment)
-    COMMENT ( block comment line 1)
 
 154. * block comment line 2
-line (blank)
 
 155. */
-line (blank)
 
 156. /* block comment with /* nested comment */ */
-line (comment)
-    COMMENT ( block comment with /* nested comment */ )
 
 157. int x = 0; /* block comment after code on same line */
 line (varInit)
@@ -1682,8 +1630,6 @@ line (varInit)
         NUM (3.14)
 
 159. // block comments inside line of code
-line (comment)
-    COMMENT ( block comments inside line of code)
 
 160. double foo(int i /*fee*/, double db /*fi*/, boolean boo /*fo*/)
 line (func)
@@ -1703,19 +1649,12 @@ line (func)
             ID (boo)
 
 161. 
-line (blank)
 
 162. // "stmt",       stmt, ";"
-line (comment)
-    COMMENT ( "stmt",       stmt, ";")
 
 163. // -- stmt "call"      fnValue, "(", exprList, ")"
-line (comment)
-    COMMENT ( -- stmt "call"      fnValue, "(", exprList, ")")
 
 164. // -- -- exprList "empty"
-line (comment)
-    COMMENT ( -- -- exprList "empty")
 
 165. foo();
 line (stmt)
@@ -1752,8 +1691,6 @@ line (stmt)
         exprList (empty)
 
 168. // -- -- exprList "list"
-line (comment)
-    COMMENT ( -- -- exprList "list")
 
 169. foo(123); // "NUM"
 line (stmt)
@@ -2126,8 +2063,6 @@ line (stmt)
                         NUM (2)
 
 197. // -- -- exprList "list" (1 non-primary expr)
-line (comment)
-    COMMENT ( -- -- exprList "list" (1 non-primary expr))
 
 198. foo(123 + obj.x);
 line (stmt)
@@ -2282,8 +2217,6 @@ line (stmt)
                     NUM (3)
 
 204. // -- -- exprList "list" (multiple exprs)
-line (comment)
-    COMMENT ( -- -- exprList "list" (multiple exprs))
 
 205. foo(x, why, zee);
 line (stmt)
@@ -2407,12 +2340,8 @@ line (stmt)
                                         field (empty)
 
 210. // -- stmt "varAssign"      "ID", "=", expr
-line (comment)
-    COMMENT ( -- stmt "varAssign"      "ID", "=", expr)
 
 211. // -- -- valid "ID"s
-line (comment)
-    COMMENT ( -- -- valid "ID"s)
 
 212. x = 0;
 line (stmt)
@@ -2457,8 +2386,6 @@ line (stmt)
             NUM (0)
 
 218. // x = primaryExpr
-line (comment)
-    COMMENT ( x = primaryExpr)
 
 219. var = 12.345; 			// "NUM"
 line (stmt)
@@ -2690,8 +2617,6 @@ line (stmt)
                     field (empty)
 
 244. // x = complex expr
-line (comment)
-    COMMENT ( x = complex expr)
 
 245. x = x * y;
 line (stmt)
@@ -5176,8 +5101,6 @@ line (stmt)
                             NUM (7)
 
 354. // -- stmt "assign"      lValue, "=", expr
-line (comment)
-    COMMENT ( -- stmt "assign"      lValue, "=", expr)
 
 355. obj.x = -0.5;
 line (stmt)
@@ -5537,8 +5460,6 @@ line (stmt)
                                 NUM (2)
 
 365. // -- stmt "opAssign"
-line (comment)
-    COMMENT ( -- stmt "opAssign")
 
 366. i += 1;
 line (stmt)
@@ -5919,8 +5840,6 @@ line (stmt)
                                 NUM (2)
 
 377. // -- stmt "preInc"
-line (comment)
-    COMMENT ( -- stmt "preInc")
 
 378. ++x;
 line (stmt)
@@ -5967,8 +5886,6 @@ line (stmt)
                 ID (x)
 
 382. // -- stmt "preDec"
-line (comment)
-    COMMENT ( -- stmt "preDec")
 
 383. --x;
 line (stmt)
@@ -6015,8 +5932,6 @@ line (stmt)
                 ID (x)
 
 387. // -- stmt "postInc"
-line (comment)
-    COMMENT ( -- stmt "postInc")
 
 388. x++;
 line (stmt)
@@ -6063,8 +5978,6 @@ line (stmt)
                 ID (x)
 
 392. // -- stmt "postDec"
-line (comment)
-    COMMENT ( -- stmt "postDec")
 
 393. x--;
 line (stmt)
@@ -6111,23 +6024,16 @@ line (stmt)
                 ID (x)
 
 397. // -- break
-line (comment)
-    COMMENT ( -- break)
 
 398. break;
 line (stmt)
     stmt (break)
 
 399. 
-line (blank)
 
 400. // "varInit",       "ID", "ID", "=", expr, ";"
-line (comment)
-    COMMENT ( "varInit",       "ID", "ID", "=", expr, ";")
 
 401. // -- expr is a primaryExpr
-line (comment)
-    COMMENT ( -- expr is a primaryExpr)
 
 402. int i = 0;
 line (varInit)
@@ -6264,8 +6170,6 @@ line (varInit)
                 field (empty)
 
 415. // -- expr is not a primaryExpr
-line (comment)
-    COMMENT ( -- expr is not a primaryExpr)
 
 416. int m = (s + e) / 2;
 line (varInit)
@@ -6551,11 +6455,8 @@ line (varInit)
                                 field (empty)
 
 425. 
-line (blank)
 
 426. // "varDecl",       "ID", idList, ";"
-line (comment)
-    COMMENT ( "varDecl",       "ID", idList, ";")
 
 427. int x;
 line (varDecl)
@@ -6595,11 +6496,8 @@ line (varDecl)
         ID (zip)
 
 432. 
-line (blank)
 
 433. // "constInit",      "final", "ID", "ID", "=", expr, ";"
-line (comment)
-    COMMENT ( "constInit",      "final", "ID", "ID", "=", expr, ";")
 
 434. final int MAX_VALUE = 100;
 line (constInit)
@@ -6767,11 +6665,8 @@ line (constInit)
                         field (empty)
 
 444. 
-line (blank)
 
 445. // "func", 		access, retType, "ID", "(", paramList, ")"
-line (comment)
-    COMMENT ( "func", 		access, retType, "ID", "(", paramList, ")")
 
 446. public void foo()
 line (func)
@@ -6949,31 +6844,22 @@ line (func)
             ID (objs)
 
 461. 
-line (blank)
 
 462. // "begin",			"{"
-line (comment)
-    COMMENT ( "begin",			"{")
 
 463. {
 line (begin)
 
 464. 
-line (blank)
 
 465. // "end",			"}"
-line (comment)
-    COMMENT ( "end",			"}")
 
 466. }
 line (end)
 
 467. 
-line (blank)
 
 468. // "if",			"if", "(", expr, ")"
-line (comment)
-    COMMENT ( "if",			"if", "(", expr, ")")
 
 469. if (true)
 line (if)
@@ -6981,11 +6867,8 @@ line (if)
         BOOL (true)
 
 470. 
-line (blank)
 
 471. // "elseif",		"else", "if", "(", expr, ")"
-line (comment)
-    COMMENT ( "elseif",		"else", "if", "(", expr, ")")
 
 472. else if ( true )
 line (elseif)
@@ -6993,21 +6876,15 @@ line (elseif)
         BOOL (true)
 
 473. 
-line (blank)
 
 474. // "else"
-line (comment)
-    COMMENT ( "else")
 
 475. else
 line (else)
 
 476. 
-line (blank)
 
 477. // "return",			"return", expr, ";"
-line (comment)
-    COMMENT ( "return",			"return", expr, ";")
 
 478. return 0;
 line (return)
@@ -7015,21 +6892,15 @@ line (return)
         NUM (0)
 
 479. 
-line (blank)
 
 480. // "do"
-line (comment)
-    COMMENT ( "do")
 
 481. do
 line (do)
 
 482. 
-line (blank)
 
 483. // "while",				"while", "(", expr, whileEnd
-line (comment)
-    COMMENT ( "while",				"while", "(", expr, whileEnd)
 
 484. while (true)
 line (while)
@@ -7044,15 +6915,10 @@ line (while)
     whileEnd (do-while)
 
 486. 
-line (blank)
 
 487. // "for",				"for", "(", forControl, ")"
-line (comment)
-    COMMENT ( "for",				"for", "(", forControl, ")")
 
 488. // -- forControl "three"
-line (comment)
-    COMMENT ( -- forControl "three")
 
 489. for ( i = 0 ; i < n ; i++ )
 line (for)
@@ -7168,8 +7034,6 @@ line (for)
         forNext (empty)
 
 496. // -- forControl "array"
-line (comment)
-    COMMENT ( -- forControl "array")
 
 497. for ( GameObj g : gameObjs )
 line (for)
@@ -7179,11 +7043,8 @@ line (for)
         ID (gameObjs)
 
 498. 
-line (blank)
 
 499. // "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";"
-line (comment)
-    COMMENT ( "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";")
 
 500. int[] a = {};
 line (arrayInit)
@@ -7225,11 +7086,8 @@ line (arrayInit)
                 NUM (100)
 
 504. 
-line (blank)
 
 505. // "arrayDecl",		"ID", "[", "]", idList, ";"
-line (comment)
-    COMMENT ( "arrayDecl",		"ID", "[", "]", idList, ";")
 
 506. String[] a;
 line (arrayDecl)
@@ -7246,57 +7104,44 @@ line (arrayDecl)
         ID (c)
 
 508. 
-line (blank)
 
 509. // "importCode12",	"import", "ID", ".", "*", ";"
-line (comment)
-    COMMENT ( "importCode12",	"import", "ID", ".", "*", ";")
 
 510. import Code12.*;
-line (importCode12)
+line (importAll)
     ID (Code12)
 
 511. 
-line (blank)
 
 512. // "class",			"class", "ID",
-line (comment)
-    COMMENT ( "class",			"class", "ID",)
 
 513. class Foo
 line (class)
     ID (Foo)
 
 514. 
-line (blank)
 
 515. // "classUser",		"class", "ID", "extends", "ID"
-line (comment)
-    COMMENT ( "classUser",		"class", "ID", "extends", "ID")
 
 516. class TestProgram extends Code12Program
 line (classUser)
+    access (empty)
     ID (TestProgram)
     ID (Code12Program)
 
 517. 
-line (blank)
 
 518. // "classUserPub",	"public", "class", "ID", "extends", "ID"
-line (comment)
-    COMMENT ( "classUserPub",	"public", "class", "ID", "extends", "ID")
 
 519. public class TestProgram extends Code12Program
-line (classUserPub)
+line (classUser)
+    access (public)
     ID (TestProgram)
     ID (Code12Program)
 
 520. 
-line (blank)
 
 521. // "main",			"public", "static", "void", "ID", "(", "ID", "[", "]", "ID", ")"
-line (comment)
-    COMMENT ( "main",			"public", "static", "void", "ID", "(", "ID", "[", "]", "ID", ")")
 
 522. public static void main(String[] args)
 line (main)
@@ -7305,11 +7150,8 @@ line (main)
     ID (args)
 
 523. 
-line (blank)
 
 524. // "Code12Run",		"ID", ".", "ID", "(", "new", "ID", "(", ")", ")", ";"
-line (comment)
-    COMMENT ( "Code12Run",		"ID", ".", "ID", "(", "new", "ID", "(", ")", ")", ";")
 
 525. Code12.run(new TestProgram());
 line (Code12Run)
@@ -7318,13 +7160,11 @@ line (Code12Run)
     ID (TestProgram)
 
 526. 
-line (blank)
 
 527. }
 line (end)
 
 528. 
-line (blank)
 
 529. public void onMousePress(GameObj obj, double x, double y)
 line (func)
@@ -7346,8 +7186,6 @@ line (func)
 line (begin)
 
 531. // Pop bubbles that get clicked
-line (comment)
-    COMMENT ( Pop bubbles that get clicked)
 
 532. if (obj != null)
 line (if)
@@ -7395,600 +7233,586 @@ line (end)
 line (end)
 
 539. 
-line (blank)
 
 540. ////////////////////////////////////////////////////////////////////
-line (comment)
-    COMMENT (//////////////////////////////////////////////////////////////////)
 
 541. ERRORS
 ************** Beginning of Expected Errors Section **************
 
 542. 
-line (blank)
 
 543. // Lexical errors
-line (comment)
-    COMMENT ( Lexical errors)
 
 544. @               // invalid character
-*** Location 544.1 to 544.1: Invalid character
+*** Line 544 char 1: Invalid character
 
 545. foo('a');       // char literals not supported
-*** Location 545.5 to 545.5: char type not supported, use double quotes
+*** Line 545 char 5: char type not supported, use double quotes
 
 546. foo(" );        // unclosed string literal
-*** Location 546.5 to 546.43: Unclosed string literal
+*** Line 546 chars 5-43: Unclosed string literal
 
 547. foo("\);        // unclosed string literal ending in backslash
-*** Location 547.6 to 547.7: Unsupported or illegal escape sequence
+*** Line 547 chars 6-7: Unsupported or illegal escape sequence
 
 548. s = "\          // unclosed string literal ending in backslash
-*** Location 548.6 to 548.7: Unsupported or illegal escape sequence
+*** Line 548 chars 6-7: Unsupported or illegal escape sequence
 
 549. s = "\";        // unclosed string literal from escaped double quote
-*** Location 549.5 to 549.68: Unclosed string literal
+*** Line 549 chars 5-68: Unclosed string literal
 
 550. s = "\ ";       // illegal escape character
-*** Location 550.6 to 550.7: Unsupported or illegal escape sequence
+*** Line 550 chars 6-7: Unsupported or illegal escape sequence
 
 551. s = "\r";       // unsupported escape sequence
-*** Location 551.6 to 551.7: Unsupported or illegal escape sequence
+*** Line 551 chars 6-7: Unsupported or illegal escape sequence
 
 552. interface foo   // unsupported reserved word
-*** Location 552.1 to 552.9: Unsupported reserved word "interface"
+*** Line 552 chars 1-9: Unsupported reserved word "interface"
 
 553. double 1stNumber; // variable name starting with a number
-*** Location 553.1 to 553.17: Syntax Error
+*** Line 553: Syntax error (unrecognized code)
 
 554. x = obj.1stNumber; // field name starting with a number
-*** Location 554.1 to 554.18: Syntax Error
+*** Line 554: Syntax error (unrecognized code)
 
 555. // Using reserved words as identifiers
-line (comment)
-    COMMENT ( Using reserved words as identifiers)
 
 556. int abstract;
-*** Location 556.5 to 556.12: Unsupported reserved word "abstract"
+*** Line 556 chars 5-12: Unsupported reserved word "abstract"
 
 557. int break;
-*** Location 557.1 to 557.10: Syntax Error
+*** Line 557: Syntax error (unrecognized code)
 
 558. int case;
-*** Location 558.5 to 558.8: Unsupported reserved word "case"
+*** Line 558 chars 5-8: Unsupported reserved word "case"
 
 559. int catch;
-*** Location 559.5 to 559.9: Unsupported reserved word "catch"
+*** Line 559 chars 5-9: Unsupported reserved word "catch"
 
 560. double class;
-*** Location 560.1 to 560.13: Syntax Error
+*** Line 560: Syntax error (unrecognized code)
 
 561. boolean const;
-*** Location 561.1 to 561.14: Syntax Error
+*** Line 561: Syntax error (unrecognized code)
 
 562. boolean continue;
-*** Location 562.9 to 562.16: Unsupported reserved word "continue"
+*** Line 562 chars 9-16: Unsupported reserved word "continue"
 
 563. boolean default;
-*** Location 563.9 to 563.15: Unsupported reserved word "default"
+*** Line 563 chars 9-15: Unsupported reserved word "default"
 
 564. String do;
-*** Location 564.1 to 564.10: Syntax Error
+*** Line 564: Syntax error (unrecognized code)
 
 565. GameObj else;
-*** Location 565.1 to 565.13: Syntax Error
+*** Line 565: Syntax error (unrecognized code)
 
 566. GameObj enum;
-*** Location 566.9 to 566.12: Unsupported reserved word "enum"
+*** Line 566 chars 9-12: Unsupported reserved word "enum"
 
 567. int[] extends;
-*** Location 567.1 to 567.14: Syntax Error
+*** Line 567: Syntax error (unrecognized code)
 
 568. double final;
-*** Location 568.1 to 568.13: Syntax Error
+*** Line 568: Syntax error (unrecognized code)
 
 569. double finally();
-*** Location 569.8 to 569.14: Unsupported reserved word "finally"
+*** Line 569 chars 8-14: Unsupported reserved word "finally"
 
 570. boolean foo(int for);
-*** Location 570.1 to 570.21: Syntax Error
+*** Line 570: Syntax error (unrecognized code)
 
 571. for(int do = 0; do < 10; do++)
-*** Location 571.1 to 571.30: Syntax Error
+*** Line 571: Syntax error (unrecognized code)
 
 572. String goto;
-*** Location 572.8 to 572.11: Unsupported reserved word "goto"
+*** Line 572 chars 8-11: Unsupported reserved word "goto"
 
 573. String if;
-*** Location 573.1 to 573.10: Syntax Error
+*** Line 573: Syntax error (unrecognized code)
 
 574. GameObj implements;
-*** Location 574.9 to 574.18: Unsupported reserved word "implements"
+*** Line 574 chars 9-18: Unsupported reserved word "implements"
 
 575. int import;
-*** Location 575.1 to 575.11: Syntax Error
+*** Line 575: Syntax error (unrecognized code)
 
 576. int instanceof;
-*** Location 576.5 to 576.14: Unsupported reserved word "instanceof"
+*** Line 576 chars 5-14: Unsupported reserved word "instanceof"
 
 577. int interface;
-*** Location 577.5 to 577.13: Unsupported reserved word "interface"
+*** Line 577 chars 5-13: Unsupported reserved word "interface"
 
 578. int native;
-*** Location 578.5 to 578.10: Unsupported reserved word "native"
+*** Line 578 chars 5-10: Unsupported reserved word "native"
 
 579. int new;
-*** Location 579.1 to 579.8: Syntax Error
+*** Line 579: Syntax error (unrecognized code)
 
 580. int package;
-*** Location 580.5 to 580.11: Unsupported reserved word "package"
+*** Line 580 chars 5-11: Unsupported reserved word "package"
 
 581. int private;
-*** Location 581.5 to 581.11: Unsupported reserved word "private"
+*** Line 581 chars 5-11: Unsupported reserved word "private"
 
 582. int protected;
-*** Location 582.5 to 582.13: Unsupported reserved word "protected"
+*** Line 582 chars 5-13: Unsupported reserved word "protected"
 
 583. int public;
-*** Location 583.1 to 583.11: Syntax Error
+*** Line 583: Syntax error (unrecognized code)
 
 584. int return()
-*** Location 584.1 to 584.12: Syntax Error
+*** Line 584: Syntax error (unrecognized code)
 
 585. int static;
-*** Location 585.1 to 585.11: Syntax Error
+*** Line 585: Syntax error (unrecognized code)
 
 586. int strictfp;
-*** Location 586.5 to 586.12: Unsupported reserved word "strictfp"
+*** Line 586 chars 5-12: Unsupported reserved word "strictfp"
 
 587. int super;
-*** Location 587.5 to 587.9: Unsupported reserved word "super"
+*** Line 587 chars 5-9: Unsupported reserved word "super"
 
 588. int switch;
-*** Location 588.5 to 588.10: Unsupported reserved word "switch"
+*** Line 588 chars 5-10: Unsupported reserved word "switch"
 
 589. int synchronized;
-*** Location 589.5 to 589.16: Unsupported reserved word "synchronized"
+*** Line 589 chars 5-16: Unsupported reserved word "synchronized"
 
 590. int this;
-*** Location 590.5 to 590.8: Unsupported reserved word "this"
+*** Line 590 chars 5-8: Unsupported reserved word "this"
 
 591. int throw;
-*** Location 591.5 to 591.9: Unsupported reserved word "throw"
+*** Line 591 chars 5-9: Unsupported reserved word "throw"
 
 592. int throws;
-*** Location 592.5 to 592.10: Unsupported reserved word "throws"
+*** Line 592 chars 5-10: Unsupported reserved word "throws"
 
 593. int transient;
-*** Location 593.5 to 593.13: Unsupported reserved word "transient"
+*** Line 593 chars 5-13: Unsupported reserved word "transient"
 
 594. int try;
-*** Location 594.5 to 594.7: Unsupported reserved word "try"
+*** Line 594 chars 5-7: Unsupported reserved word "try"
 
 595. int void;
-*** Location 595.1 to 595.9: Syntax Error
+*** Line 595: Syntax error (unrecognized code)
 
 596. int volatile;
-*** Location 596.5 to 596.12: Unsupported reserved word "volatile"
+*** Line 596 chars 5-12: Unsupported reserved word "volatile"
 
 597. int while;
-*** Location 597.1 to 597.10: Syntax Error
+*** Line 597: Syntax error (unrecognized code)
 
 598. boolean true;
-*** Location 598.1 to 598.13: Syntax Error
+*** Line 598: Syntax error (unrecognized code)
 
 599. boolean false;
-*** Location 599.1 to 599.14: Syntax Error
+*** Line 599: Syntax error (unrecognized code)
 
 600. int null;
-*** Location 600.1 to 600.9: Syntax Error
+*** Line 600: Syntax error (unrecognized code)
 
 601. 
-line (blank)
 
 602. void foo.x()    // function definition with . as part of identifier
-*** Location 602.1 to 602.12: Syntax Error
+*** Line 602: Syntax error (unrecognized code)
 
 603. x = 10          // missing ; in stmt
-*** Location 603.37 to 603.37: Statement should end with a semicolon (;)
+*** Line 603 char 37: Statement should end with a semicolon (;)
 
 604. int x = 10		// missing ; in varInit
-*** Location 604.36 to 604.36: Variable initialization should end with a semicolon (;)
+*** Line 604 char 36: Variable initialization should end with a semicolon (;)
 
 605. int x 			// missing ; in varDecl
-*** Location 605.33 to 605.33: Variable declaration should end with a semicolon (;)
+*** Line 605 char 33: Variable declaration should end with a semicolon (;)
 
 606. final int x = 10 // missing ; in constInit
-*** Location 606.11 to 606.11: Variable declaration should end with a semicolon (;)
+*** Line 606 char 43: Variable initialization should end with a semicolon (;)
 
 607. foo(x, );       // missing expr in exprList
-*** Location 607.1 to 607.9: Syntax Error
+*** Line 607: Syntax error (unrecognized code)
 
 608. f00()++;		// ++ applied to non-lvalue
-*** Location 608.1 to 608.8: Syntax Error
+*** Line 608: Syntax error (unrecognized code)
 
 609. --x.foo();		// -- applied to non-lvalue
-*** Location 609.1 to 609.10: Syntax Error
+*** Line 609: Syntax error (unrecognized code)
 
 610. x = / b;		// missing expr before binary op
-*** Location 610.1 to 610.8: Syntax Error
+*** Line 610: Syntax error (unrecognized code)
 
 611. x = a + ;       // missing expr after binary op
-*** Location 611.9 to 611.9: Expected expression after + operator
-*** Reference 611.7 to 611.7
+*** Line 611 char 9: Expected expression after + operator
+*** Reference Line 611 char 7
 
 612. x = a ++ b;     // unexpected token after unary op
-*** Location 612.1 to 612.11: Syntax Error
+*** Line 612: Syntax error (unrecognized code)
 
 613. x = a ** b;     // missing expression between binary ops
-*** Location 613.8 to 613.8: Expected expression after * operator
-*** Reference 613.7 to 613.7
+*** Line 613 char 8: Expected expression after * operator
+*** Reference Line 613 char 7
 
 614. x = a + b * ;   // missing expr after higher precedence binary op
-*** Location 614.13 to 614.13: Expected expression after * operator
-*** Reference 614.11 to 614.11
+*** Line 614 char 13: Expected expression after * operator
+*** Reference Line 614 char 11
 
 615. x = a * b + ;   // missing expr after lower precedence binary op
-*** Location 615.13 to 615.13: Expected expression after + operator
-*** Reference 615.11 to 615.11
+*** Line 615 char 13: Expected expression after + operator
+*** Reference Line 615 char 11
 
 616. x = ();         // missing expr in parentheses
-*** Location 616.1 to 616.7: Syntax Error
+*** Line 616: Syntax error (unrecognized code)
 
 617. x = 10 + ! ;    // missing expr after unary op
-*** Location 617.10 to 617.10: Expected expression after + operator
-*** Reference 617.8 to 617.8
+*** Line 617 char 10: Expected expression after + operator
+*** Reference Line 617 char 8
 
 618. x = obj.3;      // expected ID after .
-*** Location 618.1 to 618.10: Syntax Error
+*** Line 618: Syntax error (unrecognized code)
 
 619. x = 3.obj;      // ID expected before .
-*** Location 619.1 to 619.10: Syntax Error
+*** Line 619: Syntax error (unrecognized code)
 
 620. if x == 3       // required next token in pattern doesn't match
-*** Location 620.4 to 620.9: if statement test must be in parentheses
+*** Line 620 chars 4-9: if statement test must be in parentheses
 
 621. while i < max   // required next token in pattern doesn't match
-*** Location 621.1 to 621.13: Syntax Error
+*** Line 621: Syntax error (unrecognized code)
 
 622. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
-*** Location 622.1 to 622.21: Syntax Error
+*** Line 622: Syntax error (unrecognized code)
 
 623. x + 3;          // no matching pattern
-*** Location 623.1 to 623.6: Syntax Error
+*** Line 623: Syntax error (unrecognized code)
 
 624. x = 1,000;      // commas in numbers
-*** Location 624.1 to 624.10: Syntax Error
+*** Line 624: Syntax error (unrecognized code)
 
 625. x = 1.23.45;    // too many decimal points
-*** Location 625.1 to 625.12: Syntax Error
+*** Line 625: Syntax error (unrecognized code)
 
 626. x = 3.14e1.0;   // exponential notation with decimal point in exponent
-*** Location 626.1 to 626.13: Syntax Error
+*** Line 626: Syntax error (unrecognized code)
 
 627. x = 3.14e;      // Invalid exponential notation
-*** Location 627.5 to 627.10: Invalid exponential notation
+*** Line 627 chars 5-10: Invalid exponential notation
 
 628. x = 3.141e+;    // Invalid exponential notation
-*** Location 628.5 to 628.12: Invalid exponential notation
+*** Line 628 chars 5-12: Invalid exponential notation
 
 629. x = 3.1415e-;   // Invalid exponential notation
-*** Location 629.5 to 629.13: Invalid exponential notation
+*** Line 629 chars 5-13: Invalid exponential notation
 
 630. x = 3.14159e+exponent; // Invalid exponential notation
-*** Location 630.5 to 630.14: Invalid exponential notation
+*** Line 630 chars 5-14: Invalid exponential notation
 
 631. x = 3.141592ee0;// Invalid exponential notation
-*** Location 631.5 to 631.14: Invalid exponential notation
+*** Line 631 chars 5-14: Invalid exponential notation
 
 632. x = 3.141592EE0;// Invalid exponential notation
-*** Location 632.5 to 632.14: Invalid exponential notation
+*** Line 632 chars 5-14: Invalid exponential notation
 
 633. x = 3e; 		// Invalid exponential notation
-*** Location 633.5 to 633.7: Invalid exponential notation
+*** Line 633 chars 5-7: Invalid exponential notation
 
 634. x = .3E; 		// Invalid exponential notation
-*** Location 634.5 to 634.8: Invalid exponential notation
+*** Line 634 chars 5-8: Invalid exponential notation
 
 635. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
 636. y)              // missing ;
-*** Location 636.29 to 636.29: Statement should end with a semicolon (;)
+*** Line 636 char 29: Statement should end with a semicolon (;)
 
 637. x = (a + b + c / 3; 	// missing closing parenthesis
-*** Location 637.1 to 637.19: Syntax Error
+*** Line 637: Syntax error (unrecognized code)
 
 638. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
-*** Location 638.1 to 638.21: Syntax Error
+*** Line 638: Syntax error (unrecognized code)
 
 639. x = a + b + c ) / 3; 	// missing openning parenthesis
-*** Location 639.1 to 639.20: Syntax Error
+*** Line 639: Syntax error (unrecognized code)
 
 640. if ( i == 1 	// missing closing parenthesis with if
-*** Location 640.1 to 640.11: Syntax Error
+*** Line 640: Syntax error (unrecognized code)
 
 641. if ( i == 1 ); 	// if statment ended by ;
-*** Location 641.14 to 641.14: if statement should not end with a semicolon
+*** Line 641 char 14: if statement should not end with a semicolon
 
 642. for ( i=0; i<n; i++); 	// for() followed directly by ;
-*** Location 642.1 to 642.21: Syntax Error
+*** Line 642: Syntax error (unrecognized code)
 
 643. x + 1 = x; 		// confusing left hand side an right hand side of assignment
-*** Location 643.1 to 643.10: Syntax Error
+*** Line 643: Syntax error (unrecognized code)
 
 644. 1000 = count; 	// confusing left hand side an right hand side of assignment
-*** Location 644.1 to 644.13: Syntax Error
+*** Line 644: Syntax error (unrecognized code)
 
 645. if ( x => 3 ) 	// => instead of <=
-*** Location 645.8 to 645.9: Invalid operator. Did you mean >= ?
+*** Line 645 chars 8-9: Invalid operator. Did you mean >= ?
 
 646. if ( x =< 5 ) 	// =< instead of >=.
-*** Location 646.8 to 646.9: Invalid operator. Did you mean <= ?
+*** Line 646 chars 8-9: Invalid operator. Did you mean <= ?
 
 647. elseif( x > 2 ) // elseif instead of else if
-*** Location 647.45 to 647.45: Statement should end with a semicolon (;)
+*** Line 647 char 45: Statement should end with a semicolon (;)
 
 648. for(int i=0, i<n, i++) 	// commas in place of semicolons
-*** Location 648.12 to 648.12: for loop parts should be separated by semicolons (;)
+*** Line 648 char 12: for loop parts should be separated by semicolons (;)
 Comma not supported
 
 649. for(int i=0; i<n, i++) 	// comma in place of semicolon
-*** Location 649.17 to 649.17: for loop parts should be separated by semicolons (;)
+*** Line 649 char 17: for loop parts should be separated by semicolons (;)
 Comma not supported
 
 650. for(int i=0: i<n: i++) 	// colons in place of semicolons
-*** Location 650.1 to 650.22: Syntax Error
+*** Line 650: Syntax error (unrecognized code)
 
 651. for{int i=0; i<n; i++} 	// {} in place of ()
-*** Location 651.1 to 651.22: Syntax Error
+*** Line 651: Syntax error (unrecognized code)
 
 652. for (int i==0; i<n; i++)// == instead of =
-*** Location 652.1 to 652.24: Syntax Error
+*** Line 652: Syntax error (unrecognized code)
 
 653. for( x : arr ) 			// forgetting variable type
-*** Location 653.1 to 653.14: Syntax Error
+*** Line 653: Syntax error (unrecognized code)
 
 654. for( int x; arr ) 		// using ; instead of :
-*** Location 654.1 to 654.17: Syntax Error
+*** Line 654: Syntax error (unrecognized code)
 
 655. for( int[] x : arr )
-*** Location 655.1 to 655.20: Syntax Error
+*** Line 655: Syntax error (unrecognized code)
 
 656. for( int x : arr[] )
-*** Location 656.1 to 656.20: Syntax Error
+*** Line 656: Syntax error (unrecognized code)
 
 657. for( arr : int x )
-*** Location 657.1 to 657.18: Syntax Error
+*** Line 657: Syntax error (unrecognized code)
 
 658. for (String x : "string literal")
-*** Location 658.1 to 658.33: Syntax Error
+*** Line 658: Syntax error (unrecognized code)
 
 659. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Location 659.1 to 659.19: Syntax Error
+*** Line 659: Syntax error (unrecognized code)
 
 660. double foo[i]()			// index on function identifier
-*** Location 660.1 to 660.15: Syntax Error
+*** Line 660: Syntax error (unrecognized code)
 
 661. ct.println; 			// missing parenteses for function call without arguments
-*** Location 661.1 to 661.11: Syntax Error
+*** Line 661: Syntax error (unrecognized code)
 
 662. foo(int x, double y, GameObj z) 	// missing return type in function definition
-*** Location 662.1 to 662.31: Syntax Error
+*** Line 662: Syntax error (unrecognized code)
 
 663. foo(int x, double y, GameObj z); 	// supplying variable types in function call
-*** Location 663.1 to 663.32: Syntax Error
+*** Line 663: Syntax error (unrecognized code)
 
 664. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
-*** Location 664.1 to 664.40: Syntax Error
+*** Line 664 char 40: function header should not end with a semicolon
 
 665. String s = 'Hello'; 	// '' in place of "" for strings
-*** Location 665.12 to 665.12: char type not supported, use double quotes
+*** Line 665 char 12: char type not supported, use double quotes
 
 666. String s = "A long string
-*** Location 666.12 to 666.25: Unclosed string literal
+*** Line 666 chars 12-25: Unclosed string literal
 
 667. on more than one line";
-*** Location 667.34 to 667.35: Unclosed string literal
+*** Line 667 chars 34-35: Unclosed string literal
 
 668. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Location 668.1 to 668.30: Syntax Error
+*** Line 668: Syntax error (unrecognized code)
 
 669. newObj() = oldObj; 				// assigning to a function value
-*** Location 669.1 to 669.18: Syntax Error
+*** Line 669: Syntax error (unrecognized code)
 
 670. f = void foo()					// mixing assignment and function declaration
-*** Location 670.1 to 670.14: Syntax Error
+*** Line 670: Syntax error (unrecognized code)
 
 671. def func(x):					// Python syntax
-*** Location 671.1 to 671.12: Syntax Error
+*** Line 671: Syntax error (unrecognized code)
 
 672. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
-*** Location 672.1 to 672.39: Syntax Error
+*** Line 672: Syntax error (unrecognized code)
 
 673. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
-*** Location 673.1 to 673.19: Syntax Error
+*** Line 673: Syntax error (unrecognized code)
 
 674. int intArr = {1, 2, 3}; // missing []
-*** Location 674.1 to 674.23: Syntax Error
+*** Line 674: Syntax error (unrecognized code)
 
 675. 
-line (blank)
 
 676. // Unsupported Java syntax
-line (comment)
-    COMMENT ( Unsupported Java syntax)
 
 677. // --------------------------------------------------------------------------------
-line (comment)
-    COMMENT ( --------------------------------------------------------------------------------)
 
 678. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Location 678.1 to 678.24: Syntax Error
+*** Line 678: Code12 requires each variable initialization to be on its own line
 
 679. import java.io.PrintWriter;   // import other than Code12.*
-*** Location 679.1 to 679.27: Syntax Error
+*** Line 679: import should be "Code12.*;"
 
 680. int time = (int)( sec );      // type casting
-*** Location 680.1 to 680.24: Syntax Error
+*** Line 680: Syntax error (unrecognized code)
 
 681. time %= 3600;                 // %= operator
-*** Location 681.1 to 681.13: Syntax Error
+*** Line 681: Syntax error (unrecognized code)
 
 682. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-*** Location 682.32 to 682.32: Invalid character (The "? :" operator is not supported by Code12)
+*** Line 682 char 32: Invalid character (The "? :" operator is not supported by Code12)
 
 683. System.out.println("Hello world"); // classes other than GameObj and String
-*** Location 683.1 to 683.34: Syntax Error
+*** Line 683: Syntax error (unrecognized code)
 
 684. char ch = 'a'; 	// char type
-*** Location 684.11 to 684.11: char type not supported, use double quotes
+*** Line 684 char 11: char type not supported, use double quotes
 
 685. while(foo) { 	// opening { in control structure not on it's own line
-*** Location 685.1 to 685.12: Syntax Error
+*** Line 685: Syntax error (unrecognized code)
 
 686. i++; } 			// closing } not on it's own line
-*** Location 686.1 to 686.6: Syntax Error
+*** Line 686: Syntax error (unrecognized code)
 
 687. String s = "A long string" +
-*** Location 687.29 to 687.29: Expected expression after + operator
-*** Reference 687.28 to 687.28
+*** Line 687 char 29: Expected expression after + operator
+*** Reference Line 687 char 28
 
 688. "on more than one line using concatenation";
-*** Location 688.12 to 688.55: Syntax Error
+*** Line 688: Syntax error (unrecognized code)
 
 689. x = a; y = b; 	// more than one statement on a single line
-*** Location 689.1 to 689.13: Syntax Error
+*** Line 689: Code12 only allows one statement per line
 
 690. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
-*** Location 690.1 to 690.36: Syntax Error
+*** Line 690 chars 4-11: if statement test must be in parentheses
 
 691. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Location 691.1 to 691.41: Syntax Error
+*** Line 691: Syntax error (unrecognized code)
 
 692. switch (choice)
-*** Location 692.1 to 692.6: Unsupported reserved word "switch"
+*** Line 692 chars 1-6: Unsupported reserved word "switch"
 
 693. continue;
-*** Location 693.1 to 693.8: Unsupported reserved word "continue"
+*** Line 693 chars 1-8: Unsupported reserved word "continue"
 
 694. a[i++] = b[i++]; 	// increment/decrement only supported as statements
-*** Location 694.1 to 694.16: Syntax Error
+*** Line 694: Syntax error (unrecognized code)
 
 695. obj.group.equals("targets"); 		// indexing more than one level at a time
-*** Location 695.1 to 695.28: Syntax Error
+*** Line 695: Syntax error (unrecognized code)
 
 696. input.toLowerCase().equals("quit"); // indexing after function call
-*** Location 696.1 to 696.35: Syntax Error
+*** Line 696: Syntax error (unrecognized code)
 
 697. newBullet().ySpeed = 0;
-*** Location 697.1 to 697.23: Syntax Error
+*** Line 697: Syntax error (unrecognized code)
 
 698. final int N; 	// constant declaration without initialization
-*** Location 698.1 to 698.12: Syntax Error
+*** Line 698: Syntax error (unrecognized code)
 
 699. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
-*** Location 699.15 to 699.15: for loop parts should be separated by semicolons (;)
+*** Line 699 char 15: for loop parts should be separated by semicolons (;)
 Comma not supported
 
 700. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
-*** Location 700.1 to 700.20: Syntax Error
+*** Line 700: Syntax error (unrecognized code)
 
 701. int _var; // variable indentifiers starting with underscore
-*** Location 701.5 to 701.8: Names cannot start with an underscore in Code12
+*** Line 701 chars 5-8: Names cannot start with an underscore in Code12
 
 702. int $var; // $
-*** Location 702.5 to 702.5: The $ character is not allowed in Code12
+*** Line 702 char 5: The $ character is not allowed in Code12
 
 703. double pay$;
-*** Location 703.11 to 703.11: The $ character is not allowed in Code12
+*** Line 703 char 11: The $ character is not allowed in Code12
 
 704. int x[];	// arrays must be declared with [] between type and identifier
-*** Location 704.1 to 704.8: Syntax Error
+*** Line 704: Syntax error (unrecognized code)
 
 705. public abstract class Account
-*** Location 705.8 to 705.15: Unsupported reserved word "abstract"
+*** Line 705 chars 8-15: Unsupported reserved word "abstract"
 
 706. assert x != null : "x variable is null";
-*** Location 706.1 to 706.6: Unsupported reserved word "assert"
+*** Line 706 chars 1-6: Unsupported reserved word "assert"
 
 707. case 0 :
-*** Location 707.1 to 707.4: Unsupported reserved word "case"
+*** Line 707 chars 1-4: Unsupported reserved word "case"
 
 708. catch(Exception e)
-*** Location 708.1 to 708.5: Unsupported reserved word "catch"
+*** Line 708 chars 1-5: Unsupported reserved word "catch"
 
 709. continue;
-*** Location 709.1 to 709.8: Unsupported reserved word "continue"
+*** Line 709 chars 1-8: Unsupported reserved word "continue"
 
 710. default :
-*** Location 710.1 to 710.7: Unsupported reserved word "default"
+*** Line 710 chars 1-7: Unsupported reserved word "default"
 
 711. enum WeekDays
-*** Location 711.1 to 711.4: Unsupported reserved word "enum"
+*** Line 711 chars 1-4: Unsupported reserved word "enum"
 
 712. goto
-*** Location 712.1 to 712.4: Unsupported reserved word "goto"
+*** Line 712 chars 1-4: Unsupported reserved word "goto"
 
 713. finally
-*** Location 713.1 to 713.7: Unsupported reserved word "finally"
+*** Line 713 chars 1-7: Unsupported reserved word "finally"
 
 714. public class C implements I
-*** Location 714.16 to 714.25: Unsupported reserved word "implements"
+*** Line 714 chars 16-25: Unsupported reserved word "implements"
 
 715. if (x instanceof y)
-*** Location 715.7 to 715.16: Unsupported reserved word "instanceof"
+*** Line 715 chars 7-16: Unsupported reserved word "instanceof"
 
 716. public interface I
-*** Location 716.8 to 716.16: Unsupported reserved word "interface"
+*** Line 716 chars 8-16: Unsupported reserved word "interface"
 
 717. native void foo()
-*** Location 717.1 to 717.6: Unsupported reserved word "native"
+*** Line 717 chars 1-6: Unsupported reserved word "native"
 
 718. package P;
-*** Location 718.1 to 718.7: Unsupported reserved word "package"
+*** Line 718 chars 1-7: Unsupported reserved word "package"
 
 719. private int x;
-*** Location 719.1 to 719.7: Unsupported reserved word "private"
+*** Line 719 chars 1-7: Unsupported reserved word "private"
 
 720. protected int x;
-*** Location 720.1 to 720.9: Unsupported reserved word "protected"
+*** Line 720 chars 1-9: Unsupported reserved word "protected"
 
 721. static int x = 10;
-*** Location 721.1 to 721.18: Syntax Error
+*** Line 721: Syntax error (unrecognized code)
 
 722. strictfp void foo()
-*** Location 722.1 to 722.8: Unsupported reserved word "strictfp"
+*** Line 722 chars 1-8: Unsupported reserved word "strictfp"
 
 723. super.foo();
-*** Location 723.1 to 723.5: Unsupported reserved word "super"
+*** Line 723 chars 1-5: Unsupported reserved word "super"
 
 724. switch (x)
-*** Location 724.1 to 724.6: Unsupported reserved word "switch"
+*** Line 724 chars 1-6: Unsupported reserved word "switch"
 
 725. synchronized(sync_object)
-*** Location 725.1 to 725.12: Unsupported reserved word "synchronized"
+*** Line 725 chars 1-12: Unsupported reserved word "synchronized"
 
 726. this.x = x;
-*** Location 726.1 to 726.4: Unsupported reserved word "this"
+*** Line 726 chars 1-4: Unsupported reserved word "this"
 
 727. throw e;
-*** Location 727.1 to 727.5: Unsupported reserved word "throw"
+*** Line 727 chars 1-5: Unsupported reserved word "throw"
 
 728. void foo() throws Exception
-*** Location 728.12 to 728.17: Unsupported reserved word "throws"
+*** Line 728 chars 12-17: Unsupported reserved word "throws"
 
 729. transient int x;
-*** Location 729.1 to 729.9: Unsupported reserved word "transient"
+*** Line 729 chars 1-9: Unsupported reserved word "transient"
 
 730. try
-*** Location 730.1 to 730.3: Unsupported reserved word "try"
+*** Line 730 chars 1-3: Unsupported reserved word "try"
 
 731. volatile int x = 10;
-*** Location 731.1 to 731.8: Unsupported reserved word "volatile"
+*** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 477 ms
+731 lines processed in 181 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)

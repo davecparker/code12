@@ -18,17 +18,23 @@ require("Code12.runtime")
 -- or nil if the event was sent to the background object. 
 -- Return true if the event was handled.
 local function clickEvent(event, gameObj)
+	-- No matter what the program or input state is, if the click is ending here 
+	-- then make sure the touch focus is released.
+	local phase = event.phase
+	if phase == "ended" or phase == "cancelled" then
+		g.setFocusObj(nil)
+	end
+
 	-- Ignore events if the game is not supposed to be getting them now
 	if g.modalDialog or g.blocked or g.stopped then
 		return false
 	end
 
 	-- Get logical click location 
-	local xP, yP = g.mainGroup:contentToLocal( event.x, event.y )
+	local xP, yP = g.mainGroup:contentToLocal(event.x, event.y)
 	local x = xP / g.scale + g.screen.originX
 	local y = yP / g.scale + g.screen.originY
 
-	local phase = event.phase
 	if phase == "began" then
 		-- Ignore click if not in the game area
 		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
@@ -42,13 +48,18 @@ local function clickEvent(event, gameObj)
 			for i = 1, objs.numChildren do
 				local gObj = objs[i].code12GameObj
 				if gObj.clickable and gObj._code12.typeName == "line" then
-					if gObj:lineContainsPoint( x, y ) then
+					if gObj:lineContainsPoint(x, y) then
 						gameObj = gObj
 						focusObj = objs[i]
 						break
 					end
 				end
 			end
+		end
+
+		-- Ignore click if it is on a non-clickable object
+		if gameObj and not gameObj.clickable then
+			return false
 		end
 
 		-- Set last click state
@@ -77,9 +88,6 @@ local function clickEvent(event, gameObj)
 		-- Call client event
 		g.eventFunctionYielded(_fn.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
-		-- Release touch focus if any
-		g.setFocusObj(nil)
-
 		-- Call client event, forcing the final point inside the game area
 		x = g.pinValue(x, 0, g.WIDTH)
 		y = g.pinValue(y, 0, g.height)
@@ -100,7 +108,7 @@ end
 -- Handle a Corona touch event on a GameObj
 function g.onTouchGameObj(event)
 	local gameObj = event.target.code12GameObj
-	if gameObj and gameObj.clickable then
+	if gameObj then
 		return clickEvent(event, gameObj)
 	end
 	return false

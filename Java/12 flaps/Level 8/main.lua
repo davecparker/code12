@@ -3,18 +3,18 @@ package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Cod
 require('Code12.api')
     
     --Global variables
-    this.startPhase = false
-    this.mainPhase = true
+    this.startPhase = true
+    this.mainPhase = false
     this.endPhase = false
     this.updates = 0
-    this.screenWidth = 0; 
     this.screenHeight = 0; 
+    this.screenWidth = 0; 
     --Player character
     this.ghostBird = nil; 
     this.bird = nil; 
     this.flap = "downflap"
     this.filename = nil; 
-    this.BIRDHIEGHT = 10
+    this.BIRDHIEGHT = 8
     this.birdX = 0; 
     this.birdY = 0; 
     this.movingUp = true
@@ -45,6 +45,7 @@ require('Code12.api')
     this.pipeUp2 = nil; 
     this.pipeDown2 = nil; 
     --End Screen
+    this.endY = 0; 
     this.gameOverImg = nil; 
     this.endScoreText = nil; 
     this.endScoreImg = nil; 
@@ -60,9 +61,11 @@ require('Code12.api')
     
     function _fn.start()
         
+        ct.setScreen("Main")
+        
         --sets the height of the sceen to match the height of the background
+        ct.setHeight(128)
         this.screenHeight = 128
-        ct.setHeight(this.screenHeight)
         this.screenWidth = ct.getWidth()
         
         this.back1 = ct.image("background-day.png", this.screenWidth / 2, this.screenHeight / 2, this.screenWidth)
@@ -82,8 +85,8 @@ require('Code12.api')
         this.ghostBird.ySpeed = 0.5
         --draws the count
         --the value of x does not change (the x position of the bird and number are equal)
-        this.scoreY = this.screenHeight / 8.0
         this.scoreX = this.birdX
+        this.scoreY = this.screenHeight / 8.0
         this.scoreObj = ct.image(this.scoreImgFile, this.scoreX, this.scoreY, this.scoreHeight)
         this.scoreObj:setLayer(3)
         this.score = 0
@@ -127,10 +130,29 @@ require('Code12.api')
         this.pipeDown2 = ct.image("pipe_green_down.png", this.goal2.x, this.goal2.y - 75, 10.5)
         this.pipeDown2.xSpeed = -0.5
         this.pipeDown2:setLayer(2)
+        
+        --End screen variables
+        this.endY = this.scoreY + 8
+        
+        ct.setScreen("Start")
+        
+        ct.image("background-day.png", this.screenWidth / 2, this.screenHeight / 2, this.screenWidth)
+        ct.image("message.png", this.screenWidth / 2, 50, 50)
+        
     end
     
     function _fn.update()
         
+        --Checks for click to start game
+        if this.startPhase then
+            
+            if ct.clicked() or ct.charTyped(" ") then
+                
+                this.startPhase = false
+                this.mainPhase = true
+                ct.setScreen("Main")
+            end
+        end
         --game updates only trigger if not on the star menu or end game screen
         if this.mainPhase then
             
@@ -283,23 +305,28 @@ require('Code12.api')
                 
                 --Draws the endgame score and highscore screen
                 this.scoreObj:delete()
-                this.scoreY = this.scoreY + (12)
-                this.gameOverImg = ct.image("gameover.png", this.scoreX, this.scoreY, 35)
+                this.gameOverImg = ct.image("gameover.png", this.scoreX, this.endY, 45)
                 this.gameOverImg:setLayer(4)
-                this.endScoreText = ct.text("Score", this.scoreX, this.scoreY + 8, 5, "white")
+                
+                this.endScoreText = ct.text("Score", this.scoreX, this.endY + 10, 8, "white")
                 this.endScoreText:setLayer(4)
+                
                 this.scoreImgFile = ct.formatInt(this.score)..".png"
-                this.endScoreImg = ct.image(this.scoreImgFile, this.scoreX, this.scoreY + 16, this.scoreHeight)
+                this.endScoreImg = ct.image(this.scoreImgFile, this.scoreX, this.endY + 20, this.scoreHeight)
                 this.endScoreImg:setLayer(4)
-                this.endBestText = ct.text("HighScore", this.scoreX, this.scoreY + 24, 5, "white")
+                
+                this.endBestText = ct.text("HighScore", this.scoreX, this.endY + 30, 8, "white")
                 this.endBestText:setLayer(4)
+                
                 this.scoreImgFile = ct.formatInt(this.highScore)..".png"
-                this.endScoreImg = ct.image(this.scoreImgFile, this.scoreX, this.scoreY + 32, this.scoreHeight)
-                this.endScoreImg:setLayer(4)
-                this.restartText = ct.text("Restart", this.scoreX, this.scoreY + 42, 8, "white")
+                this.endBestImg = ct.image(this.scoreImgFile, this.scoreX, this.endY + 38, this.scoreHeight)
+                this.endBestImg:setLayer(4)
+                
+                this.restartText = ct.text("Restart", this.scoreX, this.endY + 48, 10, "white")
                 this.restartText:setLayer(4)
+                
                 this.restartText.clickable = false
-                this.restartBox = ct.rect(this.scoreX, this.scoreY + 42, 24, 8, "orange")
+                this.restartBox = ct.rect(this.scoreX, this.endY + 48, 30, 10, "orange")
                 this.restartBox:setLayer(3)
             end
         end
@@ -307,17 +334,67 @@ require('Code12.api')
             
             if this.restartBox:clicked() then
                 
+                --Sets Phase flags
                 this.mainPhase = true
                 this.endPhase = false
+                
+                --Deletes Endscreen 
+                this.gameOverImg:delete()
+                this.endScoreText:delete()
+                this.endScoreImg:delete()
+                this.endBestText:delete()
+                this.endBestImg:delete()
+                this.restartText:delete()
+                this.restartBox:delete()
                 
                 --Back
                 this.back1.xSpeed = -0.5
                 this.back2.xSpeed = -0.5
                 
+                --Bird
+                this.birdY = this.screenHeight / 2.0
+                this.ghostBird.y = this.birdY
+                this.ghostBird.ySpeed = 0.5
+                
+                --Score
+                this.score = 0
+                this.scoreImgFile = "0.png"
+                this.scoreHeight = 5
+                this.scoreObj = ct.image(this.scoreImgFile, this.scoreX, this.scoreY, this.scoreHeight)
+                this.scoreObj:setLayer(3)
+                
+                --Goals
+                this.randY = ct.random(38, 90)
+                this.goal1.x = this.screenWidth + 40
+                this.goal1.y = this.randY
+                this.goal1.xSpeed = -0.5
+                
+                this.randY = ct.random(38, 90)
+                this.goal2.x = this.screenWidth + 110
+                this.goal2.y = this.randY
+                this.goal2.xSpeed = -0.5
+                
+                --Sets hit flags
+                this.hit1 = false
+                this.hit2 = false
+                
+                --Pipes
+                this.pipeUp1.x = this.goal1.x
+                this.pipeUp1.y = this.goal1.y + 75
+                this.pipeUp1.xSpeed = -0.5
+                
+                this.pipeDown1.x = this.goal1.x
+                this.pipeDown1.y = this.goal1.y - 75
+                this.pipeDown1.xSpeed = -0.5
                 
                 
+                this.pipeUp2.x = this.goal2.x
+                this.pipeUp2.y = this.goal2.y + 75
+                this.pipeUp2.xSpeed = -0.5
                 
-                
+                this.pipeDown2.x = this.goal2.x
+                this.pipeDown2.y = this.goal2.y - 75
+                this.pipeDown2.xSpeed = -0.5
             end
         end
     end
