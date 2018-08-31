@@ -7,7 +7,7 @@ import Code12.*;
 
 public class DuckHunt extends Code12Program
 {
-public static void main( String[] args )
+	public static void main( String[] args )
 	{
 		Code12.run( new DuckHunt() ); 
 	}
@@ -88,13 +88,13 @@ public static void main( String[] args )
 			double duckYStart = duckYStartsArr[j];
 			if ( duck.x < 0 )
 			{
-			deleteDuck(j);
-			ducksMissed++;
+				deleteDuck(j);
+				ducksMissed++;
 			}
 			else
 			{
-			//duck.ySpeed = ct.random( -1, 1 ) / 4.0;
-			duck.y = duckYStartsArr[j] + amplitude * Math.sin( 2 * Math.PI / period * duck.x );
+				//duck.ySpeed = ct.random( -1, 1 ) / 4.0;
+				duck.y = duckYStartsArr[j] + amplitude * Math.sin( 2 * Math.PI / period * duck.x );
 			}
 		}
 
@@ -105,10 +105,10 @@ public static void main( String[] args )
 			// Delete bullet if it has gone off screen
 			if ( bullet.y < 0 )
 			{
-			deleteBullet(i);
-			bulletsMissed++;
-			// Don't check this bullet hitting ducks
-			break;
+				deleteBullet(i);
+				bulletsMissed++;
+				// Don't check this bullet hitting ducks
+				break;
 			}
 			// Check for bullet hitting any ducks
 			for ( int j = ducksCount - 1; j >= 0; j-- )
