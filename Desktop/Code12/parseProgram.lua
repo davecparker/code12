@@ -839,9 +839,10 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	end
 
 	-- Add sentinel parse tree at the end
-	parseTrees[#parseTrees + 1] = 
-			{ t = "line", p = "EOF", nodes = {}, iLine = numSourceLines + 1 }
 	numParseTrees = #parseTrees
+	parseTrees[#parseTrees + 1] = 
+			{ t = "line", p = "EOF", nodes = {}, 
+				iLine = numSourceLines + 1, iLineStart = numSourceLines + 1 }
 
 	-- Check for the required program header then get the member vars and funcs
 	iTree = 1
