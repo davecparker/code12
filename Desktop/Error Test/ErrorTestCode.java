@@ -337,6 +337,9 @@ class ErrorTest extends Code12Program
 		ct.println(name);
 		ct.println("Hello" + " " + name);
 		ct.println(circleObj);
+		ct.log(i);
+		ct.log(d);
+		ct.log(b);
 		ct.log(circleObj);
 		GameObj obj2 = circleObj;
 		GameObj obj3 = obj2;
@@ -358,7 +361,7 @@ class ErrorTest extends Code12Program
 		double x = ct.inputNumber("enter a number: ");
 		x = ct.inputNumber("enter a number: ");
 		x = ct.inputNumber(message);
-		boolean quit = ct.inputYesNo("Quit?"); // Crashes Error Test/main.lua
+		boolean quit = ct.inputYesNo("Quit?");
 		quit = ct.inputYesNo(message);
 		String inputStr = ct.inputString("Quit?");
 		inputStr = ct.inputString("Quit?");
@@ -633,7 +636,7 @@ class ErrorTest extends Code12Program
 	{
 	}	
 	// ERROR "Names are case-sensitive"
-	void anotherfunc() // crash
+	void anotherfunc()
 	{
 	}
 
@@ -801,11 +804,11 @@ class ErrorTest extends Code12Program
 		int k = i / 2;
 		// ERROR "Integer divide"
 		ct.random( intVar / intVar, intVar );
-		// ERROR "Undefined variable"
+		// ERROR "Undefined variable x"
 		x = x + 1;
-		// ERROR "Undefined variable"
+		// ERROR "Undefined variable x"
 		for (x = 0; x < 1; x++) 
-		// ERROR "Undefined function"
+		// ERROR "Undefined function foo"
 		foo();
 		// ERROR "already defined"
 		int j = 3;
@@ -949,8 +952,31 @@ class ErrorTest extends Code12Program
 		Double d = 100.0;
 		// ERROR "The Boolean type is not supported by Code12. Use boolean instead."
 		Boolean b = false;
+
 		// ERROR "+= can only be applied to numbers"
 		strVar += "hello";
+		// ERROR "-= can only be applied to numbers"
+		boolVar -= 1;
+		// ERROR "*= can only be applied to numbers"
+		objVar *= objVar;
+		// ERROR "/= can only be applied to numbers"
+		objVar /= 3.14;
+		// ERROR "Expression for += must be numeric"
+		intVar += "hello";
+		// ERROR "Expression for -= must be numeric"
+		dblVar -= ct.rect(0,0,1,2);
+		// ERROR "Expression for *= must be numeric"
+		intVar *= false;
+		// ERROR "Expression for /= must be numeric"
+		dblVar /= true;
+		// ERROR "Cannot combine double with int"
+		intVar += dblVar;
+		// ERROR "Cannot combine double with int"
+		intVar -= dblVar;
+		// ERROR "Cannot combine double with int"
+		intVar *= dblVar;
+		// ERROR "Cannot combine double with int"
+		intVar /= dblVar;
 		// ERROR "Use str1.equals( str2 ) to compare two String values"
 		if (strVar == "s")
 		// ERROR "Unsupported operator"
@@ -1059,8 +1085,75 @@ class ErrorTest extends Code12Program
 		// ERROR "Variable objArr was already defined"
 		GameObj[] objArr = new GameObj[10];
 
-		// ERROR "Method call on invalid type"
+		// ERROR "Calling event functions directly is not allowed"
+		update();
+		// ERROR "Calling event functions directly is not allowed"
+		start();
+		// ERROR "Calling event functions directly is not allowed"
+		onMousePress(0,0);
+
+		// ERROR "Undefined function"
+		println("Hello world");
+		// ERROR "Undefined function"
+		setHeight(150);
+
+		// ERROR "Invalid function or method name"
+		intFunc[0]();
+		// ERROR "Invalid function or method name"
+		dblFuncIntDbl[intVar](0, 0.1);
+
+		// ERROR "Cannot call methods directly on class GameObj"
+		GameObj.foo();
+		// ERROR "Cannot call methods directly on class String"
+		String.foo();
+		// ERROR "Cannot call methods directly on class Code12Program"
+		Code12Program.foo();
+		// ERROR "Cannot call methods directly on class Code12Program"
+		Code12Program.foo();
+
+		// ERROR "Array index can only apply to array types"
+		ct[0].log(objVar);
+		// ERROR "Array index can only apply to array types"
+		dblVar = Math[intVar].tan(0);
+		
+		// ERROR "Method call on invalid type (array of int)"
 		intArr.voidFunc();
+		
+		// ERROR "Method call on invalid type (int)"
+		intArr[0].voidFunc();
+		// ERROR "Method call on invalid type (boolean)"
+		boolVar.foo();
+
+		// ERROR "Unknown API function"
+		ct.prnitln();
+		// ERROR "Unknown API function"
+		ct.circ(0,0,10);
+
+		// ERROR "Unknown method"
+		objArr[0].foo();
+		// ERROR "Unknown method"
+		Math.foo();
+		
+		// ERROR "requires 1 parameter"
+		intFuncInt();
+		// ERROR "requires 2 parameters"
+		dblFuncIntDbl();
+		// ERROR "requires 1 parameter"
+		ct.log();
+		// ERROR "requires 2 parameters"
+		Math.atan2();
+		// ERROR "Not enough parameters passed"
+		boolFuncBoolStringGameObj(false, "");
+		// ERROR "Not enough parameters passed"
+		ct.rect(0,0,10);
+		// ERROR "Too many parameters passed"
+		voidFunc(intVar);
+		// ERROR "Too many parameters passed"
+		ct.print("intVar =", intVar);
+		// ERROR "Too many parameters passed"
+		Math.atan(4,3);
+		// ERROR "Parameter 1 of ct.logm expects type String, but int was passed"
+		ct.logm(intVar, objVar);
 
 		String indent = "2 Tabs";
 		// ERROR "Mix of tabs and spaces"
@@ -1098,7 +1191,7 @@ class ErrorTest extends Code12Program
 	}
 
 	// ERROR "Wrong number of parameters for function"
-	void onKeyRelease( ) // crash
+	void onKeyRelease( )
 	{
 	}
 
