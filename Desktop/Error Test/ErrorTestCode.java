@@ -786,6 +786,7 @@ class ErrorTest extends Code12Program
 		
 		// ERROR "requires 1 parameter"
 		if (intFuncInt() > 0)
+			voidFunc();
 		// ERROR "requires 2 parameters"
 		dblFuncIntDbl();
 		// ERROR "requires 3 parameters"
@@ -811,6 +812,7 @@ class ErrorTest extends Code12Program
 		x = x + 1;
 		// ERROR "Undefined variable x"
 		for (x = 0; x < 1; x++) 
+			voidFunc();
 		// ERROR "Undefined function foo"
 		foo();
 		// ERROR "already defined"
@@ -854,10 +856,12 @@ class ErrorTest extends Code12Program
 		objVar = NULL;
 		// ERROR "Incorrect case for constant"
 		while(True)
+			voidFunc();
 		// ERROR "Incorrect case for constant"
 		boolVar = TRUE;
 		// ERROR "Incorrect case for constant"
 		if (False)
+			voidFunc();
 		// ERROR "Incorrect case for constant"
 		objVar.clickable = FALSE;
 
@@ -1188,10 +1192,6 @@ class ErrorTest extends Code12Program
         indent = "8 Spaces";
 		// ERROR "Mix of tabs and spaces"
 		indent = "2 Tabs";
-		if (true)
-			ct.println();
-			if (true)
-				ct.println();
 		// ERROR "Mix of tabs and spaces"
     	indent = "4 Spaces + 1 Tab";
 	// ERROR "Mix of tabs and spaces"

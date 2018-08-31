@@ -181,6 +181,29 @@ function err.setErrLineNum( iLine, strErr, ... )
 end
 
 -- Record an error with:
+--      iLine         line number for the error (entire line)
+--      iLineRef      line number for the line to reference (entire line)
+--      strErr        error message string
+--      ...           optional params to send to string.format( strErr, ... )
+function err.setErrLineNumAndRefLineNum( iLine, iLineRef, strErr, ... )
+	assert( type(iLine) == "number" )
+	assert( type(iLineRef) == "number" )
+	assert( type(strErr) == "string" )
+
+	-- Make a loc that indicates the entire line
+	local loc = {
+		iLine = iLine,
+		iLineEnd = iLine,
+	}
+	-- Make a loc that indicates the entire ref line
+	local refLoc = {
+		iLine = iLineRef,
+		iLineEnd = iLineRef,
+	}
+	err.setErr( loc, refLoc, strErr, ... )
+end
+
+-- Record an error with:
 --      iLine         line number for the error
 --      iCharStart    starting char index
 --      iCharEnd      ending char index

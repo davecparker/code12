@@ -434,7 +434,7 @@ local function vtCheckLValue( lValue, assigned )
 
 	-- If assigning then check if the object is assignable
 	if assigned and isClass then
-		err.setErrNode( lValue, "This is not a variable that be assigned to" )
+		err.setErrNode( lValue, "This is not a variable that can be assigned to" )
 	end
 	
 	-- Store the vt in the lValue and return it
