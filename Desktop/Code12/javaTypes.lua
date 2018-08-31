@@ -81,68 +81,59 @@ local knownTypes = {
 
 --- Module Functions ---------------------------------------------------------
 
--- Return the value type (vt) for a variable type ID node,
+
+-- Return the value type (vt) for a typeID token and optional isArray flag,
 -- or return nil and set the error state if the type is invalid.
-function javaTypes.vtFromVarType( node )
-	assert( node.tt == "ID" )     -- varType nodes should be IDs
-	local typeName = node.str
+function javaTypes.vtFromType( typeID, isArray )
+	assert( typeID.tt == "ID" )
+	local typeName = typeID.str
 	local vt = mapTypeNameToVt[typeName]
 	if vt then
-		return vt  -- known valid type
+		-- known non-void type
+		if isArray then
+			return { vt = vt }
+		end
+		return vt
 	end
 
-	-- Invalid type
+	-- Check for void type
 	if vt == false then
-		-- Variables can't be void (void return type is handled in vtFromRetType)
-		err.setErrNode( node, "Variables cannot have void type" )
-	else
-		-- Unknown or unsupported type
-		local subType = substituteType[typeName]
-		if subType then
-			err.setErrNode( node, "The %s type is not supported by Code12. Use %s instead.",
-					typeName, subType )
-		else
-			-- Unknown type. See if the case is wrong.
-			local typeNameLower = string.lower( typeName )
-			for name, _ in pairs( mapTypeNameToVt ) do
-				if string.lower( name ) == typeNameLower then
-					err.setErrNode( node, 
-						"Names are case-sensitive, known name is \"%s\"", name )
-					return nil
-				end
-			end
-			err.setErrNode( node, "Unknown variable type \"%s\"", typeName )
+		if isArray then
+			err.setErrNode( typeID, "Invalid type: array of void" )
+			return nil
 		end
+		return false  -- void
+	end
+
+	-- Unknown or unsupported type
+	local subType = substituteType[typeName]
+	if subType then
+		err.setErrNode( typeID, "The %s type is not supported by Code12. Use %s instead.",
+				typeName, subType )
+	else
+		-- Unknown type. See if the case is wrong.
+		local typeNameLower = string.lower( typeName )
+		for name, _ in pairs( mapTypeNameToVt ) do
+			if string.lower( name ) == typeNameLower then
+				err.setErrNode( typeID, 
+					"Names are case-sensitive, known name is \"%s\"", name )
+				return nil
+			end
+		end
+		err.setErrNode( typeID, "Unknown type name \"%s\"", typeName )
 	end
 	return nil
 end
 
--- Return the value type (vt) for a retType node
+-- Return the value type (vt) for a variable typeID token and optional isArray flag,
 -- or return nil and set the error state if the type is invalid.
-function javaTypes.vtFromRetType( retType )
-	local p = retType.p
-	if p == "void" then
-		return false
+function javaTypes.vtFromVarType( typeID, isArray )
+	local vt = javaTypes.vtFromType( typeID, isArray )
+	if vt == false then
+		err.setErrNode( typeID, "Variables cannot have void type" )
+		return nil
 	end
-	local vt = javaTypes.vtFromVarType( retType.nodes[1] )
-	if p == "array" and vt ~= nil then
-		vt = { vt = vt }   -- array of specified type
-	end
-	return vt  -- normal or unknown type
-end
-
--- Return (vt, name) for a param node
--- or return nil and set the error state if the type is invalid.
-function javaTypes.vtAndNameFromParam( param )
-	assert( param.t == "param" )
-	local vt = javaTypes.vtFromVarType( param.nodes[1] )
-	if param.p == "array" then
-		if vt == nil then
-			return nil
-		end
-		return { vt = vt }, param.nodes[4].str
-	end
-	return vt, param.nodes[2].str
+	return vt
 end
 
 -- Return the type name of the given value type (vt)
@@ -187,16 +178,6 @@ function javaTypes.canCompareVts( vt1, vt2 )
 		return t1.vt == t2.vt    -- can compare arrays of same type
 	end	
 	return false
-end
-
--- Return the default (if unitialized) value for a vt.
-function javaTypes.defaultValueForVt( vt )
-	if type(vt) == "number" then
-		return 0
-	elseif vt == true then
-		return false
-	end
-	return nil
 end
 
 -- Return true if name is the name of a supported class with public static members
