@@ -26,12 +26,14 @@ class StructureTest extends Code12Program
 		int y;
 		y = X;
 		ball = ct.circle( X, y, 30 );
+		ball.setFillColor( "blue" );
 		frameCount = foo( LIMIT, speed * 2 );
 		System.out.println("Program started");
 	}
 
 	int foo(int i, double d)
 	{
+		i = 8;
 		return 0;
 	}
 

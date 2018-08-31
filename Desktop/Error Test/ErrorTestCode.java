@@ -1148,9 +1148,9 @@ class ErrorTest extends Code12Program
 		// ERROR "Method call on invalid type (boolean)"
 		boolVar.foo();
 
-		// ERROR "Unknown API function"
+		// ERROR "misspelled API function"
 		ct.prnitln();
-		// ERROR "Unknown API function"
+		// ERROR "misspelled API function"
 		ct.circ(0,0,10);
 
 		// ERROR "Unknown method"

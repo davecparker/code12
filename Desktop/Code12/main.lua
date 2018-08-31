@@ -195,7 +195,7 @@ function app.processUserFile()
 	end
 
 	-- Do Semantic Analysis on the parse trees
-	parseProgram.printProgramTree( programTree )
+	-- parseProgram.printProgramTree( programTree )
 	checkJava.checkProgram( programTree, app.syntaxLevel )
 	-- parseProgram.printProgramTree( programTree )
 	if err.rec then

@@ -26,12 +26,14 @@ function _fn.start()
 	local y = 0
 	y = X
 	this.ball = ct.circle(X, y, 30)
+	this.ball:setFillColor("blue")
 	this.frameCount = _fn.foo(this.LIMIT, this.speed * 2)
 	ct.println("Program started")
 end
 
 function _fn.foo()
 
+	i = 8
 	return 0
 end
 

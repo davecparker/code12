@@ -132,5 +132,53 @@ function app.iCharToICol( strLine, iCharStart, iCharEnd )
 	end
 	return iColStart, iColEnd
 end
+
+-- Return the lower-case version of the given ASCII code
+local function lowerASCII( code )
+	if code >= 65 and code <= 90 then  -- A to Z
+		return code + 32
+	end
+	return code
+end
+
+-- Return a number from 0 to 1 representing a partial match of 
+-- str1 to str2 (1.0 if they match exactly).
+function app.partialMatchString( str1, str2 )
+	-- Simple method for now: Count number of chars matching from front
+	-- and again from back and return weighted average.
+	local len1 = string.len( str1 )
+	local len2 = string.len( str2 )
+	local shorterLen, longerLen
+	if len1 > len2 then
+		shorterLen, longerLen = len2, len1
+	else
+		shorterLen, longerLen = len1, len2
+	end
+	local front = 0
+	local matchVal = 1
+	for i = 1, shorterLen do
+		if lowerASCII( string.byte( str1, i ) )
+				 == lowerASCII( string.byte( str2, i ) ) then
+			front = front + matchVal
+			matchVal = 1
+		else
+			matchVal = 0.5  -- half match when streak was broken
+		end
+	end
+	local back = 0
+	matchVal = 1
+	for i = 1, shorterLen do
+		if lowerASCII( string.byte( str1, len1 + 1 - i ) )
+				== lowerASCII( string.byte( str2, len2 + 1 - i ) ) then
+			back = back + matchVal
+			matchVal = 1
+		else
+			matchVal = 0.5  -- half match when streak was broken
+		end
+	end
+	return (front + back) / (2 * longerLen)
+end
+
+
 ------------------------------------------------------------------------------
 return app

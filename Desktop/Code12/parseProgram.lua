@@ -302,7 +302,8 @@ local function makeCall( nodes )
 	end
 
 	-- Make the call structure
-	return { s = "call", lValue = lValue, nameID = nameID, exprs = exprs }
+	return { s = "call", lValue = lValue, nameID = nameID, 
+			exprs = exprs, lastToken = nodes[4] }
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
@@ -742,7 +743,8 @@ local function printStructureTree( node, indentLevel, file, label )
 		if field == "vt" then
 			fieldStr = field .. " = " .. javaTypes.typeNameFromVt( value )
 		elseif field ~= "s" and field ~= "iLine" and field ~= "nameID" 
-				and field ~= "opToken" and field ~= "opType" then
+				and field ~= "opToken" and field ~= "opType" 
+				and field ~= "firstToken" and field ~= "lastToken" then
 			if type(value) == "table" then
 				if value.tt then  
 					-- A token
