@@ -55,7 +55,7 @@ local parseProgram = {}
 
 -- Parsing structures
 local parseTrees        -- array of parse trees for each source line
-local programTree       -- structure tree for the prgoram (see above)
+local programTree       -- structure tree for the program (see above)
 
 -- Parsing state
 local numSourceLines    -- number of source code lines
@@ -98,8 +98,42 @@ local function indentErrBlockBegin( tree, prevTree )
 	end
 end
 
-local function indentErrorBlockBody( )
-	-- body
+-- Return a string describing the given patern p
+local function patternDesc( p )
+	if p == "varInit" then
+		return "variable initialization"
+	elseif p == "varDecl" then 
+		return "variable declaration"
+	elseif p == "arrayInit" then
+		return "array initialization"
+	elseif p == "func" then
+		return "function definition" 
+	elseif p == "call" then
+		return "function call"
+	end
+	return ""
+end
+
+-- Check indentation for multi-line var decls, function defs, and calls
+local function checkMultiLineIndent( tree )
+	if tree.iLineStart ~= tree.iLine then
+		local startIndent = javalex.indentLevelForLine( tree.iLineStart )
+		local prevIndent
+		for lineNum = tree.iLineStart + 1, tree.iLine do
+			local lineIndent = javalex.indentLevelForLine( lineNum )
+			if prevIndent and prevIndent ~= lineIndent then
+				err.setErrLineNumAndRefLineNum( lineNum, lineNum - 1, 
+						"After the first line, all the lines of a multi-line %s should have the same indentation", patternDesc( tree.p ) )
+				break
+			elseif lineIndent <= startIndent then
+				err.setErrLineNumAndRefLineNum( lineNum, tree.iLineStart, 
+						"The lines after the first line of a multi-line %s should be further indented", patternDesc( tree.p ) )
+				break
+			else
+				prevIndent = lineIndent
+			end
+		end
+	end
 end
 
 -- Check for the correct Code12 import and move iTree past all imports.
@@ -183,6 +217,8 @@ end
 -- If there is an error then set the error state and return false.
 -- Return true if succesful.
 local function checkMain()
+	local iLineBlockBegin = parseTrees[iTree].iLineStart
+	local beginIndent = javalex.indentLevelForLine( iLineBlockBegin )
 	if not checkBlockBegin() then
 		return false
 	end
@@ -212,6 +248,9 @@ local function checkMain()
 		err.overrideErrLineParseTree( tree,
 				"Expected }" )
 		return false
+	elseif javalex.indentLevelForLine( tree.iLine ) ~= beginIndent then
+		err.setErrLineNumAndRefLineNum( tree.iLine, iLineBlockBegin, 
+				"main functions's ending } should have the same indentation as its beginning {" )
 	end	
 	iTree = iTree + 1
 	return true
@@ -432,16 +471,33 @@ function getLineStmts( tree, stmts )
 
 	-- Look for var decls
 	if getVar( p, nodes, stmts, true ) then
+		checkMultiLineIndent( tree )
 		return true
 	end
-
-	-- Store indent level
-	local indentLevel = javalex.indentLevelForLine( tree.iLineStart )
 
 	-- Handle the line patterns
 	local stmt = nil
 	if p == "stmt" then
 		-- stmt ;
+		-- Check indentation for multi-line function call
+		if tree.iLineStart ~= tree.iLine then
+			local startIndent = javalex.indentLevelForLine( tree.iLineStart )
+			local prevIndent
+			for lineNum = tree.iLineStart + 1, tree.iLine do
+				local lineIndent = javalex.indentLevelForLine( lineNum )
+				if prevIndent and prevIndent ~= lineIndent then
+					err.setErrLineNumAndRefLineNum( lineNum, lineNum - 1, 
+							"After the first line, all the lines of a multi-line function call should have the same indentation" )
+					break
+				elseif lineIndent <= startIndent then
+					err.setErrLineNumAndRefLineNum( lineNum, tree.iLineStart, 
+							"The lines after the first line of a multi-line function call should be further indented" )
+					break
+				else
+					prevIndent = lineIndent
+				end
+			end
+		end
 		stmt = getStmt( nodes[1] )
 	elseif p == "if" then
 		-- if (expr) controlledStmts [else controlledStmts]
@@ -475,7 +531,7 @@ function getLineStmts( tree, stmts )
 					"while statement at end of do-while loop must end with a semicolon" )
 			return nil
 		end
-		if javalex.indentLevelForLine( endTree.iLineStart ) ~= indentLevel then
+		if javalex.indentLevelForLine( endTree.iLineStart ) ~= javalex.indentLevelForLine( tree.iLineStart ) then
 			err.setErrNodeAndRef( endTree, tree, "This while statement should have the same indentation as its \"do\"" )
 		end
 		stmt.expr = makeExpr( endTree.nodes[3] )
@@ -515,24 +571,22 @@ end
 function getBlockStmts()
 	-- Block must start with a {
 	local iLineBlockBegin = parseTrees[iTree].iLine
+	local beginIndent = javalex.indentLevelForLine( iLineBlockBegin )
 	if not checkBlockBegin() then
 		return false
 	end
 
 	-- Check block is indented from beginning {
-	local tree = parseTrees[iTree]
-	local beginIndent = javalex.indentLevelForLine( iLineBlockBegin )
-	local iLineFirstBlockStmt = tree.iLineStart
-	local blockIndent = javalex.indentLevelForLine( iLineFirstBlockStmt)
-	if blockIndent <= beginIndent and tree.p ~= "end" then
-		err.setErrLineNumAndRefLineNum( parseTrees[iTree].iLineStart, iLineBlockBegin,
+	local prevTree = parseTrees[iTree]
+	local blockIndent = javalex.indentLevelForLine( prevTree.iLineStart )
+	if prevTree.p ~= "end" and blockIndent <= javalex.indentLevelForLine( iLineBlockBegin ) then
+		err.setErrLineNumAndRefLineNum( prevTree.iLineStart, iLineBlockBegin,
 				"A block should be indented more than its beginning {" )
 	end
 
 	-- Get all lines until we get a matching end for the block begin
 	local stmts = {}
 	while iTree <= numParseTrees do
-		local prevTree = tree
 		local tree = parseTrees[iTree]
 		local p = tree.p
 		local currIndent = javalex.indentLevelForLine( tree.iLineStart )
@@ -552,6 +606,8 @@ function getBlockStmts()
 			if currIndent ~= blockIndent then
 				err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
 						"Unexpected change in indentation (Missing/misplaced curly brackets?)" )
+			else
+				prevTree = tree
 			end
 			getLineStmts( tree, stmts )
 		end
@@ -694,6 +750,7 @@ local function getMembers()
 				end
 				local isPublic = (nodes[1].p == "public") or nil
 				funcs[#funcs + 1] = getFunc( typeID, isArray, nodes[3], isPublic, nodes[5] )
+				checkMultiLineIndent( tree )
 			else
 				getBlockStmts()  -- skip body of invalid function defintion
 			end
