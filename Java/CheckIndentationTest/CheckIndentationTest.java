@@ -2,21 +2,18 @@ import Code12.*;
 
 class IndentCheckTests extends Code12Program
 {
-/*<--
-// ERROR "Class member variable declarations and function definitions should be indented"
-int unindentedFirstMemberVar;
-//-->*/
-
-/*<--
-// ERROR "Class member variable declarations and function definitions should be indented"
-public void unindentedFirstMemberFunc()
-{
-}
-//-->*/
-	public static void main(String[] args)
-	{
-		Code12.run(new IndentCheckTests());
-	}
+	int a, b;
+	int c, d,
+		e, f,
+		g;
+	GameObj[] coins, 
+			  walls;
+	final int LIMIT = 100;
+	int[] arr1 = { 1, 2, 3 };
+	int[] arr2 = new int[10];
+	int[] arr3 = { 1,
+				   2, 
+				   3 };
 /*<--	
 		// ERROR "Class member variable declarations and function definitions should all have the same indentation"
 		int overIndentedMemberVar;
@@ -25,6 +22,46 @@ public void unindentedFirstMemberFunc()
 // ERROR "Class member variable declarations and function definitions should all have the same indentation"
 int underIndentedMemberVar;
 //-->*/
+
+	public static void main(String[] args)
+	{
+		Code12.run(new IndentCheckTests());
+	}
+
+	boolean areEqual(int i, int j)
+	{
+		return i == j;
+	}
+
+	public void onMousePress( GameObj obj, 
+			double x, double y )
+	{
+		if ( obj != null )
+			ct.log( obj, ct.random( 1,
+									100 ),
+					x, y );
+
+		ct.println("Mouse pressed");
+	}
+
+	public void onMouseRelease( GameObj obj, 
+			double x, 
+			double y )
+	{
+		int[] arr4 = { 1,
+			   2, 
+			   ct.random(1,
+			   		2) };
+
+		int[] arr5 = { 1,
+					   2, 
+					   ct.random( 1,
+					              100 ),
+					   4 };
+
+		ct.println("Mouse released");
+
+	}
 /*<--
 		// ERROR "Class member variable declarations and function definitions should all have the same indentation"
 		void overIndentedMemberFunc()
@@ -355,23 +392,12 @@ void underIndentedMemberFunc()
 		x2,
 		x3;
 //-->*/
-/*<--
-		int y1,
-			y2, y3,
-				y4, y5,
-					y6;
-//-->*/
 		// multi-line variable initializations
 		// -------------------------------------------------------------------------------------------
 /*<--
 		GameObj circle = ct.circle( 0,
 		0,
 		10);
-//-->*/
-/*<--
-		GameObj rectangle = ct.rect( 0, 0,
-			20, 
-				10);
 //-->*/
 		// multi-line function calls
 		// -------------------------------------------------------------------------------------------
@@ -381,11 +407,6 @@ void underIndentedMemberFunc()
 		3);
 //-->*/
 /*<--
-		ct.log( 1,
-			2,
-				3);
-//-->*/
-/*<--		
 		ct.log( 1, ct.circle( 0,
 		0,
 		10) );
@@ -410,11 +431,6 @@ void underIndentedMemberFunc()
 		2,
 		3 };
 //-->*/
-/*<--
-		int[] multiLineArrInit2 = { 1,
-			2,
-				3 };
-//-->*/
 		ct.println("end of start function");
 	}
 /*<--
@@ -424,61 +440,5 @@ void underIndentedMemberFunc()
 	{
 	}
 //-->*/
-/*<--
-	void multiLineFuncDef2( double d,
-		int i, int j, int k,
-			int a, int b, int c )
-	{
-	}
-//-->*/
-	// Okay indentation
-	// ----------------------------------------------------------------
-	int a, b;
-	int c, d,
-		e, f,
-		g;
-	GameObj[] coins, 
-			  walls;
-	final int LIMIT = 100;
-	int[] arr = { 1, 2, 3 };
-	int[] arr2 = new int[10];
-	int[] arr3 = { 1,
-				   2, 
-				   3 };
-
-	boolean areEqual(int i, int j)
-	{
-		return i == j;
-	}
-
-	public void onMousePress( GameObj obj, 
-			double x, double y )
-	{
-		// if ( obj != null )
-		// 	ct.log( obj, ct.random( 1,
-		// 							100 ),
-		// 			x, y );
-
-		ct.println("Mouse pressed");
-	}
-
-	public void onMouseRelease( GameObj obj, 
-			double x, 
-			double y )
-	{
-		// int[] arr1 = { 1,
-		// 	   2, 
-		// 	   ct.random(1,
-		// 	   		2) };
-
-		// int[] arr2 = { 1,
-		// 			   2, 
-		// 			   ct.random( 1,
-		// 			              100 ),
-		// 			   4 };
-
-		ct.println("Mouse released");
-
-	}
 
 }
