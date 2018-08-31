@@ -161,16 +161,6 @@ local function defineVar( var )
 	return true
 end
 
--- Check a var structure and define the variable.
--- If there is an initExpr then check it and mark the var as assigned.
-local function checkVar( var )
-	-- { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
-	defineVar( var )
-	if var.initExpr then
-		checkJava.canAssignToVarNode( var.nameID, var.initExpr )
-	end
-end
-
 -- Return the variable table entry for the given variable name node.
 -- If the variable is undefined then set the error state and return nil.
 -- Unless unassignedOK is passed and true then also check to make sure the
@@ -193,18 +183,6 @@ local function getVariable( varNode, unassignedOK )
 		end
 	end
 	return varFound
-end
-
--- Return the value type (vt) for the given variable name node.
--- If the variable is undefined then set the error state and return nil.
--- Unless unassignedOK is passed and true then also check to make sure the
--- variable has been assigned and if not then set the error state and return nil. 
-local function vtVarNode( varNode, unassignedOK )
-	local varFound = getVariable( varNode, unassignedOK )
-	if varFound then
-		return varFound.vt
-	end
-	return nil
 end
 
 -- Process a method definition header, but not the body.
@@ -280,9 +258,6 @@ local function defineMethod( func )
 	end
 end
 
-
---- Misc Type Functions ------------------------------------------------------
-
 -- Return the resulting numeric vt for an operation on vt1 and vt2 (both numeric)
 local function vtNumber( vt1, vt2 )
 	local vt = vt1 + vt2    -- int promotes to double
@@ -292,50 +267,100 @@ local function vtNumber( vt1, vt2 )
 	return vt
 end
 
--- Check that the indexExpr is an integer and the vtArray is an array,
--- and return the vt type of an array element.
--- If there is an error then set the error state and return nil.
-local function vtArrayElement( arrayNode, vtArray, indexExpr )
-	if type(vtArray) ~= "table" then
-		err.setErrNodeAndRef( indexExpr, arrayNode, 
-				"An index in [brackets] can only be applied to an array" )
-		return nil
-	elseif vtSetExprNode( indexExpr ) ~= 0 then
-		err.setErrNode( indexExpr, "Array index must be an integer value" )
-		return nil
+
+--- Structure Checking ---------------------------------------------------------
+
+-- If the target node of type vtTarget can be assigned to the expr node of type
+-- vtExpr then return true, otherwise set the error state and return false.
+local function canAssign( target, vtTarget, expr, vtExpr )
+	if javaTypes.vtCanAcceptVtExpr( vtTarget, vtExpr ) then
+		return true
 	end
-	return vtArray.vt   -- element type of the array
+
+	-- Check for various type mismatch combinations
+	local str
+	if vtExpr == 1 and vtTarget == 0 then          -- double assigned to int
+		str = "Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()"
+	elseif vtExpr == 1 and vtTarget == "String" then   -- double assigned to String
+		str = "Value of type double cannot be assigned to a String, consider using ct.formatDecimal()"
+	elseif vtExpr == 0 and vtTarget == "String" then   -- int assigned to String
+		str = "Integer value cannot be assigned to a String, consider using ct.formatInt()"
+	elseif vtExpr == "String" and vtTarget == 1 then   -- String assigned to double
+		str = "A String cannot be assigned to a double, consider using ct.parseNumber()"
+	elseif vtExpr == "String" and vtTarget == 0 then   -- String assigned to int
+		str = "A String cannot be assigned to an int, consider using ct.parseInt()"
+	elseif vtExpr == "GameObj" and vtTarget == "String" then
+		str = "A GameObj cannot be assigned to a String, consider using the toString() method"
+	else
+		str = string.format( "Value of type %s cannot be assigned to type %s",
+					javaTypes.typeNameFromVt( vtExpr ), 
+					javaTypes.typeNameFromVt( vtTarget ) )
+	end
+	err.setErrNodeAndRef( target, expr, str )
+	return false
+end	
+
+-- Check a var structure and define the variable.
+-- If there is an initExpr then check it and mark the var as assigned.
+local function checkVar( var )
+	-- { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
+	local expr = var.initExpr
+	if expr then
+		local vtExpr = vtSetExprNode( expr ) 
+		local assignmentOK = canAssign( var.nameID, var.vt, expr, vtExpr )
+		defineVar( var )
+		if assignmentOK then
+			var.assigned = true
+		end
+	else
+		defineVar( var )
+	end
 end
 
--- Return the value type (vt) for an lValue structure, and 
--- store the corresponding isGlobal and vt fields in the lValue.
+-- Check an lValue structure, which is being assigned if assigned.
+-- Store the isGlobal and vt fields in the lValue, and return the vt. 
 -- If there is an error, then set the error state and return nil.
-local function vtLValueNode( lValue )
+local function vtCheckLValue( lValue, assigned )
 	assert( lValue.s == "lValue" )
-
-	-- Get the variable and its type, and store the var if any
 	local varNode = lValue.varID
+	local indexExpr = lValue.indexExpr
+	local fieldID = lValue.fieldID
 	local varName = varNode.str
+
+	-- Is this a simple variable assignment?
+	local isVarAssign = assigned and (indexExpr == nil and fieldID == nil)
+
+	-- Get the variable and its type, and store isGlobal in the lValue
+	-- mark the variable assigned as appropriate.
 	local vt = nil
 	local isClass = javaTypes.isClassWithStaticMembers( varName )  --  e.g. Math.PI
 	if not isClass then
-		local varFound = getVariable( varNode )
+		local varFound = getVariable( varNode, isVarAssign )
 		if varFound == nil then
 			return nil
 		end
 		lValue.isGlobal = varFound.isGlobal
 		vt = varFound.vt
+		if isVarAssign then
+			varFound.assigned = true
+		end
 	end
 
 	-- Check array index if any, and get the element type
-	local indexExpr = lValue.indexExpr
 	if indexExpr then
-		vt = vtArrayElement( varNode, vt, indexExpr )
+		if type(vt) ~= "table" then
+			err.setErrNodeAndRef( indexExpr, varNode, 
+					"An index in [brackets] can only be applied to an array" )
+			return nil
+		elseif vtSetExprNode( indexExpr ) ~= 0 then
+			err.setErrNode( indexExpr, "Array index must be an integer value" )
+			return nil
+		end
+		vt = vt.vt   -- get element type of the array
 	end
 
 	-- Check field type if any, and get the field type.
 	-- Public field access is only possible with Math or GameObj, or array.length
-	local fieldID = lValue.fieldID
 	if fieldID then
 		-- Determine the class
 		local className
@@ -375,11 +400,374 @@ local function vtLValueNode( lValue )
 	return vt
 end
 
+-- Find a user-defined method with the given nameID node.
+-- Return the entry in the userMethods table if found.
+-- If not found then set the error state and return nil.
+local function findUserMethod( nameID )
+	assert( nameID.tt == "ID" )
+	if isInvalidName( nameID, "function" ) then
+		return nil
+	end
+	local method = lookupID( nameID, userMethods )
+	if method == nil then
+		-- User function not found
+		if lookupID( nameID, apiTables["Code12Program"].methods ) then
+			-- Trying to call a Code12 event
+			err.setErrNode( nameID, "Calling event functions directly is not allowed")
+		elseif lookupID( nameID, apiTables["ct"].methods ) then
+			-- Looks like the user left off "ct." of a known Code API 
+			err.setErrNode( nameID, 'The Code12 function name is "%s"', 
+					"ct." .. nameID.str )
+		else
+			-- TODO: Check for close but misspelled API names
+			err.setErrNode( nameID, "Undefined function %s", nameID.str )
+		end
+		return nil
+	end
+	return method
+end
+
+-- If the lValue and nameID from a call match a supported System.out method,
+-- then return the entry in the apiTables. If there is an error then
+-- set the error state and return nil. Just return nil if no match.
+local function findSystemOutMethod( lValue, nameID )
+	if lValue.fieldID == nil then
+		return nil
+	end
+	local varName = lValue.varID.str
+	if string.lower( varName ) ~= "system" then
+		return nil
+	end
+	local fieldName = lValue.fieldID.str
+	if string.lower( fieldName ) ~= "out" or lValue.indexExpr then
+		err.setErrNodeSpan( lValue, nameID, "Invalid function name" )
+		return nil
+	end
+	if varName ~= "System" or fieldName ~= "out" then
+		err.setErrNode( lValue, 
+				'Names are case-sensitive. The correct case is "System.out"' )
+		return nil
+	end
+	return lookupID( nameID, apiTables["PrintStream"].methods )
+end
+
+-- Return (method table entry, class name, method display name) for the
+-- given lValue and nameID in a call structure. The class name will be nil
+-- for user-defined methods. If the method is not found then return nil.
+local function findMethod( lValue, nameID )
+	assert( lValue == nil or lValue.s == "lValue" )
+	assert( nameID.tt )
+	local nameStr = nameID.str
+
+	-- Is this a call to a user-defined function?
+	if lValue == nil then
+		return findUserMethod( nameID ), nil, nameStr
+	end
+
+	-- Check for System.out methods
+	local method = findSystemOutMethod( lValue, nameID )
+	if method then
+		return method, "PrintStream", "System.out." .. nameStr
+	end
+
+	-- Determine the className and class API entry
+	local className
+	local class = lookupID( lValue.varID, apiTables )
+	if class then
+		-- Static method call
+		if lValue.indexExpr then
+			err.setErrNode( lValue.indexExpr,
+					"An index in [brackets] can only be applied to an array" )
+			return nil
+		end
+		local varName = lValue.varID.str
+		if javaTypes.isClassWithStaticMembers( varName ) then
+			className = varName    -- ct or Math
+		else
+			-- Error: e.g. GameObj.delete(), String.equals()
+			err.setErrNodeSpan( lValue, nameID,
+					"Cannot call methods directly on class %s", varName );
+			return nil
+		end
+	else
+		-- Instance method call
+		local vt = vtCheckLValue( lValue )
+		if vt == "String" or vt == "GameObj" then
+			className = vt
+			class = apiTables[className]
+		else
+			-- Error: e.g. intVar.delete()
+			err.setErrNodeSpan( lValue, nameID, 
+					"Method call on invalid type (%s)",
+					javaTypes.typeNameFromVt( vt ) )
+			return nil
+		end
+	end
+
+	-- Look up the method
+	method = lookupID( nameID, class.methods )
+	if method == nil then
+		if className == "ct" then
+			err.setErrNodeSpan( lValue, nameID, "Unknown API function" )
+		else
+			err.setErrNodeAndRef( nameID, lValue,
+					'Unknown method "%s" for class %s',
+					nameStr, className )
+		end
+		return nil
+	end
+
+	-- Return results
+	return method, className, className .. "." .. nameStr
+end
+
+-- Check a call stmt or expr structure.
+-- If there is an error then set the error state and return nil, 
+-- otherwise return the vt for the return type vt if successful.
+local function vtCheckCall( call )
+	-- { s = "call", lValue, nameID, exprs }
+	local lValue = call.lValue
+	local nameID = call.nameID
+	local exprs = call.exprs
+
+	-- Find the method
+	local method, className, fnName = findMethod( lValue, nameID )
+	if method == nil then
+		return nil
+	end
+	local refFunc = method.func   -- for user-defined methods, nil for API
+
+	-- Code12 does not allow calling ct or user-defined methods before start()
+	if beforeStart then
+		if lValue == nil then
+			err.setErrNode( call, "User-defined functions cannot be called before start()" )
+			return nil
+		elseif className == "ct" then
+			err.setErrNode( call, "Code12 API functions cannot be called before start()" )
+			return nil
+		end
+	end
+
+	-- Check parameter count
+	local numExprs = (exprs and #exprs) or 0
+	local numParams = #method.params
+	local min = method.min or numParams
+	if numExprs < min then
+		if numExprs == 0 then
+			err.setErrNodeAndRef( call, refFunc, "%s requires %d parameter%s", 
+					fnName, min, (min ~= 1 and "s") or "" )
+		else
+			err.setErrNodeAndRef( call, refFunc, 
+					"Not enough parameters passed to %s (requires %d)", 
+					fnName, min )
+		end
+		return nil
+	elseif not method.variadic and numExprs > numParams then
+		err.setErrNodeAndRef( call, refFunc, 
+				"Too many parameters passed to %s", fnName )
+		return nil
+	end
+
+	-- Get the exprs types and the check special case for overloaded Math methods:
+	-- If all parameters are int then it returns int (only apples to Math methods).
+	if exprs then
+		local allExprsAreInt = true
+		for _, expr in ipairs( exprs ) do
+			local vt = vtSetExprNode( expr )
+			if vt ~= 0 then
+				allExprsAreInt = false
+			end
+		end
+		if method.overloaded and allExprsAreInt then
+			return 0   -- e.g. Math.max(int, int) returns int
+		end
+	end
+
+	-- Check parameter types for validity and match with the API
+	for i = 1, numExprs do
+		if i > numParams then
+			assert( method.variadic )
+			break    -- variadic function can take any types after those specified
+		end
+		local expr = exprs[i]
+		local vtPassed = expr.vt
+		local vtNeeded = method.params[i].vt
+		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
+			err.setErrNodeAndRef( expr, refFunc, 
+					"Parameter %d (%s) of %s expects type %s, but %s was passed",
+					i, method.params[i].name, fnName, javaTypes.typeNameFromVt( vtNeeded ), 
+					javaTypes.typeNameFromVt( vtPassed ) )
+			return nil
+		end
+	end
+
+	-- Result is the method's return type
+	return method.vt
+end
+
+-- Begin a new local variable block, then if paramVars then define 
+-- the formal parameters as local variables.
+local function beginLocalBlock( paramVars )
+	localNameStack[#localNameStack + 1] = ""   -- push special sentinel marking block start
+	if paramVars then
+		for _, var in ipairs( paramVars ) do
+			checkVar( var )
+			var.assigned = true
+		end
+	end
+end
+
+-- End a local variable block, discarding any definitions in the top block
+local function endLocalBlock()
+	local iTop = #localNameStack
+	while iTop > 0 do
+		-- Pop a name off the localNameStack
+		local varName = localNameStack[iTop]
+		localNameStack[iTop] = nil
+		iTop = iTop - 1
+
+		-- Is this the end of block sentinel? 
+		if varName == "" then
+			break
+		end
+
+		-- Remove the definition of this variable and lowercase version too
+		variables[varName] = nil
+		variables[string.lower( varName )] = nil
+	end
+end
+
+-- If stmts then check the block of stmts. If paramVars is included then define 
+-- these formal parameters at the beginning of the block.
+local function checkBlock( stmts, paramVars )
+	if stmts then
+		beginLocalBlock( paramVars )
+		for _, stmt in ipairs( stmts ) do
+			checkStmt( stmt )
+		end
+		endLocalBlock()
+	end
+end
+
+-- Check that the loop test expr is boolean
+local function checkLoopExpr( expr )
+	if vtSetExprNode( expr ) ~= true then
+		err.setErrNode( expr, "Loop test must evaluate to a boolean (true or false)" )
+	end
+end
+
+-- If expr then type check it, otherwise assume the type is int (++ or --),
+-- then check the lValue, then return true if the type can be op-assigned 
+-- (e.g. +=) to lValue, otherwise set the error state and return false.
+local function canOpAssign( lValue, opNode, expr )
+	-- Make sure the lValue is numeric
+	local vtLValue = vtCheckLValue( lValue )   -- is read before assigned
+	if type(vtLValue) ~= "number" then
+		err.setErrNodeAndRef( opNode, lValue, 
+				"%s can only be applied to numbers", opNode.str )
+		return false
+	end
+
+	-- Check the expr if any
+	if expr then
+		local vtExpr = vtSetExprNode( expr )
+		if type(vtExpr) ~= "number" then
+			err.setErrNodeAndRef( expr, opNode, 
+					"Expression for %s must be numeric", opNode.str )
+			return false
+		elseif vtExpr == 1 and vtLValue == 0 then
+			err.setErrNodeAndRef( expr, lValue, 
+					"Value of type double cannot be assigned to int" )
+			return false
+		end
+	end
+	return true
+end
+
+-- Check a stmt structure. Set the error state if there is an error.
+function checkStmt( stmt )
+	local s = stmt.s
+	if s == "var" then
+		-- { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
+		checkVar( stmt )
+	elseif s == "call" then
+		-- { s = "call", iLine, className, objLValue, nameID, exprs }
+		vtCheckCall( stmt )
+	elseif s == "assign" then
+		-- { s = "assign", iLine, lValue, opToken, opType, expr }   opType: =, +=, -=, *=, /=, ++, --	
+		local lValue = stmt.lValue
+		local opNode = stmt.opToken	
+		local opType = stmt.opType
+		local expr = stmt.expr
+		if opType == "=" then
+			local vtExpr = vtSetExprNode( expr )
+			local vtLValue = vtCheckLValue( lValue, true )
+			canAssign( lValue, vtLValue, expr, vtExpr )
+		else
+			canOpAssign( lValue, opNode, expr )
+		end
+	elseif s == "if" then
+		-- { s = "if", iLine, expr, stmts, elseStmts }
+		if vtSetExprNode( stmt.expr ) ~= true then
+			err.setErrNode( stmt.expr, "Conditional test must be boolean (true or false)" )
+		end
+		checkBlock( stmt.stmts )
+		checkBlock( stmt.elseStmts )
+	elseif s == "while" then
+		-- { s = "while", iLine, expr, stmts }
+		checkLoopExpr( stmt.expr )
+		checkBlock( stmt.stmts )
+	elseif s == "doWhile" then
+		-- { s = "doWhile", iLine, expr, stmts }
+		checkBlock( stmt.stmts )
+		checkLoopExpr( stmt.expr )
+	elseif s == "for" then
+		-- { s = "for", iLine, initStmt, expr, nextStmt, stmts }
+		local initStmt = stmt.initStmt
+		if initStmt then
+			beginLocalBlock()  -- extra block to contain the loop var
+			checkStmt( initStmt )
+		end
+		if stmt.expr then
+			checkLoopExpr( stmt.expr )
+		end
+		if stmt.nextStmt then
+			checkStmt( stmt.nextStmt )
+		end
+		checkBlock( stmt.stmts )
+		if initStmt then
+			endLocalBlock()
+		end
+	elseif s == "forArray" then
+		-- { s = "forArray", iLine, var, expr, stmts }
+		beginLocalBlock()  -- extra block to contain the loop var
+		local var = stmt.var
+		checkVar( var )
+		local vtExpr = vtSetExprNode( stmt.expr )
+		if type(vtExpr) ~= "table" then
+			err.setErrNode( stmt.expr, "A for-each loop must operate on an array" )
+		elseif vtExpr.vt ~= var.vt then
+			err.setErrNodeAndRef( var, stmt.expr,
+					"The loop array contains elements of type %s",
+					javaTypes.typeNameFromVt( vtExpr.vt ) )
+		else
+			var.assigned = true
+			checkBlock( stmt.stmts )
+		end
+		endLocalBlock()
+	elseif s == "return" then
+		-- { s = "return", iLine, expr }
+		vtSetExprNode( stmt.expr )    -- TODO: Check that matches function return type
+	elseif s ~= "break" then
+		error( "Unknown stmt structure " .. s )
+	end
+end
+
 
 --- Type Analysis of expressions  --------------------------------------------
 
 -- The following local functions are all hashed into from the fnVtExprVariations
--- table below. They all return the vt of a particular expr structure type
+-- table below. They all check the expr node recursively then return the result vt.
 -- If there is an error, they set the error state and return nil.
 
 -- literal: NUM
@@ -409,7 +797,7 @@ local function vtExprExprParens( node )
 	return vtSetExprNode( node.expr )
 end
 
--- unaryOp: neg (-)
+-- unaryOp: neg
 local function vtExprNeg( node )
 	local vt = vtSetExprNode( node.expr )
 	if type(vt) ~= "number" then
@@ -420,7 +808,7 @@ local function vtExprNeg( node )
 	return vt
 end
 
--- unaryOp: !
+-- unaryOp: not
 local function vtExprNot( node )
 	local vt = vtSetExprNode( node.expr )
 	if vt ~= true then
@@ -429,11 +817,6 @@ local function vtExprNot( node )
 		return nil
 	end
 	return vt
-end
-
--- call
-local function vtExprCall( node )
-	return checkJava.vtCheckCall( node )
 end
 
 -- newArray
@@ -605,7 +988,7 @@ local function vtExprEquality( node )
 	return nil
 end
 
--- expr pattern: = (incorrect use of = as a binary operator) 
+-- binOp: = (incorrect use of = as a binary operator) 
 local function vtExprBadEquality( node )
 	err.setErrNodeAndRef( node.opToken, node.left,
 					"Use == to compare for equality (= is for assignment)" )
@@ -613,7 +996,8 @@ local function vtExprBadEquality( node )
 end
 
 
--- Since there are so many expr variations, we hash them to functions
+-- Since there are so many expr variations, we hash them to functions by their
+-- structure name (s), opType, or literal token tt.
 local fnVtExprVariations = {
 	-- literal patterns
 	["NUM"]         = vtExprNUM,
@@ -639,8 +1023,8 @@ local fnVtExprVariations = {
 	["!="]          = vtExprEquality,
 	["="]           = vtExprBadEquality,
 	-- other expr patterns
-	["call"]        = vtExprCall,
-	["lValue"]      = vtLValueNode,
+	["call"]        = vtCheckCall,
+	["lValue"]      = vtCheckLValue,
 	["parens"]      = vtExprExprParens,
 	["newArray"]	= vtExprNewArray,
 	["arrayInit"]   = vtExprArrayInit,
@@ -661,443 +1045,25 @@ function vtSetExprNode( node )
 		fnVt = fnVtExprVariations[s]
 	end
 
-	-- Dispatch to the function
+	-- Check for unsupported operator or other unexpected index
 	if fnVt == nil then
-		err.setErrNode( node, "Unsupported operator " .. node.opToken.str )  -- TODO: improve
+		if node.opToken then
+			err.setErrNode( node.opToken, 
+					"The %s operator is not supported by Code12 ", node.opToken.str )
+		else
+			err.setErrNode( node, "Unrecognized expression type" )  -- shouldn't happen
+		end
 		return nil
 	end
-	local vt = fnVt( node )
 
-	-- Store and return the result
+	-- Dispatch to the function, store and return the result
+	local vt = fnVt( node )
 	node.vt = vt       
 	return vt
 end
 
 
 --- Module Functions ---------------------------------------------------------
-
--- Begin a new local variable block, then if paramVars then define 
--- the formal parameters as local variables.
-function checkJava.beginLocalBlock( paramVars )
-	localNameStack[#localNameStack + 1] = ""   -- push special sentinel marking block start
-	if paramVars then
-		for _, var in ipairs( paramVars ) do
-			checkVar( var )
-			var.assigned = true
-		end
-	end
-end
-
--- End a local variable block, discarding any definitions in the top block
-function checkJava.endLocalBlock()
-	local iTop = #localNameStack
-	while iTop > 0 do
-		-- Pop a name off the localNameStack
-		local varName = localNameStack[iTop]
-		localNameStack[iTop] = nil
-		iTop = iTop - 1
-
-		-- Is this the end of block sentinel? 
-		if varName == "" then
-			break
-		end
-
-		-- Remove the definition of this variable and lowercase version too
-		variables[varName] = nil
-		variables[string.lower( varName )] = nil
-	end
-end
-
--- Type check expr then return true if expr can be assigned to the given vt at node.
--- If the types are not compatible then set the error state and return false.
-function checkJava.canAssignToVt( node, vt, expr )
-	local vtExpr = vtSetExprNode( expr )
-	if javaTypes.vtCanAcceptVtExpr( vt, vtExpr ) then
-		return true
-	end
-
-	-- Check for various type mismatch combinations
-	local str
-	if vtExpr == 1 and vt == 0 then          -- double assigned to int
-		str = "Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()"
-	elseif vtExpr == 1 and vt == "String" then   -- double assigned to String
-		str = "Value of type double cannot be assigned to a String, consider using ct.formatDecimal()"
-	elseif vtExpr == 0 and vt == "String" then   -- int assigned to String
-		str = "Integer value cannot be assigned to a String, consider using ct.formatInt()"
-	elseif vtExpr == "String" and vt == 1 then   -- String assigned to double
-		str = "A String cannot be assigned to a double, consider using ct.parseNumber()"
-	elseif vtExpr == "String" and vt == 0 then   -- String assigned to int
-		str = "A String cannot be assigned to an int, consider using ct.parseInt()"
-	elseif vtExpr == "GameObj" and vt == "String" then
-		str = "A GameObj cannot be assigned to a String, consider using the toString() method"
-	else
-		str = string.format( "Value of type %s cannot be assigned to type %s",
-					javaTypes.typeNameFromVt( vtExpr ), javaTypes.typeNameFromVt( vt ) )
-	end
-	err.setErrNodeAndRef( node, expr, str )
-	return false
-end	
-
--- Type check expr then return true if expr can be assigned to the variable node.
--- If the types are not compatible then set the error state and return false.
--- Otherwise mark the variable as assigned and return true.
-function checkJava.canAssignToVarNode( varNode, expr )
-	local vt = vtVarNode( varNode, true )
-	if not checkJava.canAssignToVt( varNode, vt, expr ) then
-		return false
-	end
-	local var = variables[varNode.str]
-	if type(var) == "table" then
-		var.assigned = true
-	end
-	return true
-end
-
--- Type check expr then return true if expr can be assigned to the lValue node.
--- If the types are not compatible then set the error state and return false.
-function checkJava.canAssignToLValue( lValue, expr )
-	assert( lValue.s == "lValue" )
-	return checkJava.canAssignToVt( lValue, vtLValueNode( lValue ), expr )
-end
-
--- Type check expr then return true if expr can be op-assigned (e.g. +=) to the lValue.
--- If the types are not compatible then set the error state and return false.
-function checkJava.canOpAssignToLValue( lValue, opNode, expr )
-	-- Both sides must be numeric and compatible
-	local vtLValue = lValue.vt
-	local vtExpr = vtSetExprNode( expr )
-	if type(vtLValue) ~= "number" then
-		err.setErrNodeAndRef( opNode, lValue, 
-				"%s can only be applied to numbers", opNode.tt )
-		return false
-	elseif type(vtExpr) ~= "number" then
-		err.setErrNodeAndRef( expr, opNode, 
-				"Expression for %s must be numeric", opNode.tt )
-		return false
-	elseif vtLValue == 0 and vtExpr == 1 then
-		err.setErrNodeAndRef( expr, lValue, 
-				"Cannot combine double with int" )
-		return false
-	end
-	return true
-end
-
--- Find a user-defined method with the given nameID node.
--- Return the entry in the userMethods table if found.
--- If not found then set the error state and return nil.
-local function findUserMethod( nameID )
-	assert( nameID.tt == "ID" )
-	if isInvalidName( nameID, "function" ) then
-		return nil
-	end
-	local method = lookupID( nameID, userMethods )
-	if method == nil then
-		-- User function not found
-		-- Trying to call an event?
-		local event = lookupID( nameID, apiTables["Code12Program"].methods )
-		if event then
-			err.setErrNode( nameID, "Calling event functions directly is not allowed")
-			return nil
-		end
-		-- TODO: Check for missing "ct." and other common errors
-		err.setErrNode( nameID, "Undefined function %s", nameID.str )
-		return nil
-	end
-	return method
-end
-
--- If the lValue and nameID from a call match a supported System.out method,
--- then return the entry in the apiTables. If there is an error then
--- set the error state and return nil. Just return nil if no match.
-local function findSystemOutMethod( lValue, nameID )
-	if lValue.fieldID == nil then
-		return nil
-	end
-	local varName = lValue.varID.str
-	if string.lower( varName ) ~= "system" then
-		return nil
-	end
-	local fieldName = lValue.fieldID.str
-	if string.lower( fieldName ) ~= "out" or lValue.indexExpr then
-		err.setErrNodeSpan( lValue, nameID, "Invalid function name" )
-		return nil
-	end
-	if varName ~= "System" or fieldName ~= "out" then
-		err.setErrNode( lValue, 
-				'Names are case-sensitive. The correct case is "System.out"' )
-		return nil
-	end
-	return lookupID( nameID, apiTables["PrintStream"].methods )
-end
-
--- Return (method table entry, class name, method display name) for the
--- given lValue and nameID in a call structure. The class name will be nil
--- for user-defined methods. If the method is not found then return nil.
-local function findMethod( lValue, nameID )
-	assert( lValue == nil or lValue.s == "lValue" )
-	assert( nameID.tt )
-	local nameStr = nameID.str
-
-	-- Is this a call to a user-defined function?
-	if lValue == nil then
-		return findUserMethod( nameID ), nil, nameStr
-	end
-
-	-- Check for System.out methods
-	local method = findSystemOutMethod( lValue, nameID )
-	if method then
-		return method, "PrintStream", "System.out." .. nameStr
-	end
-
-	-- Determine the className and class API entry
-	local className
-	local class = lookupID( lValue.varID, apiTables )
-	if class then
-		-- Static method call
-		if lValue.indexExpr then
-			err.setErrNode( lValue.indexExpr,
-					"An index in [brackets] can only be applied to an array" )
-			return nil
-		end
-		local varName = lValue.varID.str
-		if javaTypes.isClassWithStaticMembers( varName ) then
-			className = varName    -- ct or Math
-		else
-			-- Error: e.g. GameObj.delete(), String.equals()
-			err.setErrNodeSpan( lValue, nameID,
-					"Cannot call methods directly on class %s", varName );
-			return nil
-		end
-	else
-		-- Instance method call
-		local vt = vtLValueNode( lValue )
-		if vt == "String" or vt == "GameObj" then
-			className = vt
-			class = apiTables[className]
-		else
-			-- Error: e.g. intVar.delete()
-			err.setErrNodeSpan( lValue, nameID, 
-					"Method call on invalid type (%s)",
-					javaTypes.typeNameFromVt( vt ) )
-			return nil
-		end
-	end
-
-	-- Look up the method
-	method = lookupID( nameID, class.methods )
-	if method == nil then
-		if className == "ct" then
-			err.setErrNodeSpan( lValue, nameID, "Unknown API function" )
-		else
-			err.setErrNodeAndRef( nameID, lValue,
-					'Unknown method "%s" for class %s',
-					nameStr, className )
-		end
-		return nil
-	end
-
-	-- Return results
-	return method, className, className .. "." .. nameStr
-end
-
--- Check a call stmt or expr structure.
--- If there is an error then set the error state and return nil, 
--- otherwise return the vt for the return type vt if successful.
-function checkJava.vtCheckCall( call )
-	-- { s = "call", lValue, nameID, exprs }
-	local lValue = call.lValue
-	local nameID = call.nameID
-	local exprs = call.exprs
-
-	-- Find the method
-	local method, className, fnName = findMethod( lValue, nameID )
-	if method == nil then
-		return nil
-	end
-	local refFunc = method.func   -- for user-defined methods, nil for API
-
-	-- Code12 does not allow calling ct or user-defined methods before start()
-	if beforeStart then
-		if lValue == nil then
-			err.setErrNode( call, "User-defined functions cannot be called before start()" )
-			return nil
-		elseif className == "ct" then
-			err.setErrNode( call, "Code12 API functions cannot be called before start()" )
-			return nil
-		end
-	end
-
-	-- Check parameter count
-	local numExprs = (exprs and #exprs) or 0
-	local numParams = #method.params
-	local min = method.min or numParams
-	if numExprs < min then
-		if numExprs == 0 then
-			err.setErrNodeAndRef( call, refFunc, "%s requires %d parameter%s", 
-					fnName, min, (min ~= 1 and "s") or "" )
-		else
-			err.setErrNodeAndRef( call, refFunc, 
-					"Not enough parameters passed to %s (requires %d)", 
-					fnName, min )
-		end
-		return nil
-	elseif not method.variadic and numExprs > numParams then
-		err.setErrNodeAndRef( call, refFunc, 
-				"Too many parameters passed to %s", fnName )
-		return nil
-	end
-
-	-- Get the exprs types and the check special case for overloaded Math methods:
-	-- If all parameters are int then it returns int (only apples to Math methods).
-	if exprs then
-		local allExprsAreInt = true
-		for _, expr in ipairs( exprs ) do
-			local vt = vtSetExprNode( expr )
-			if vt ~= 0 then
-				allExprsAreInt = false
-			end
-		end
-		if method.overloaded and allExprsAreInt then
-			return 0   -- e.g. Math.max(int, int) returns int
-		end
-	end
-
-	-- Check parameter types for validity and match with the API
-	for i = 1, numExprs do
-		if i > numParams then
-			assert( method.variadic )
-			break    -- variadic function can take any types after those specified
-		end
-		local expr = exprs[i]
-		local vtPassed = expr.vt
-		local vtNeeded = method.params[i].vt
-		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
-			err.setErrNodeAndRef( expr, refFunc, 
-					"Parameter %d (%s) of %s expects type %s, but %s was passed",
-					i, method.params[i].name, fnName, javaTypes.typeNameFromVt( vtNeeded ), 
-					javaTypes.typeNameFromVt( vtPassed ) )
-			return nil
-		end
-	end
-
-	-- Result is the method's return type
-	return method.vt
-end
-
--- If stmts then check the block of stmts. If paramVars is included then define 
--- these formal parameters at the beginning of the block.
-local function checkBlock( stmts, paramVars )
-	if stmts then
-		checkJava.beginLocalBlock( paramVars )
-		for _, stmt in ipairs( stmts ) do
-			checkStmt( stmt )
-		end
-		checkJava.endLocalBlock()
-	end
-end
-
--- Check that the loop test expr is boolean
-local function checkLoopExpr( expr )
-	if vtSetExprNode( expr ) ~= true then
-		err.setErrNode( expr, "Loop test must evaluate to a boolean (true or false)" )
-	end
-end
-
--- Check a stmt. Set the error state if there is an error.
-function checkStmt( stmt )
-	local s = stmt.s
-	if s == "var" then
-		-- { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
-		checkVar( stmt )
-	elseif s == "call" then
-		-- { s = "call", iLine, className, objLValue, nameID, exprs }
-		checkJava.vtCheckCall( stmt )
-	elseif s == "assign" then
-		-- { s = "assign", iLine, lValue, opToken, opType, expr }   opType: =, +=, -=, *=, /=, ++, --	
-		local lValue = stmt.lValue
-		local opNode = stmt.opToken	
-		local opType = stmt.opType
-		if opType == "=" then
-			-- Check for simple variable assignment, which marks the variable as assigned
-			if lValue.indexExpr == nil and lValue.fieldID == nil then
-				local varID = lValue.varID
-				if checkJava.canAssignToVarNode( varID, stmt.expr ) then
-					local var = variables[varID.str]
-					if type(var) == "table" then
-						lValue.isGlobal = var.isGlobal    -- TODO: Find cleaner way to do this
-					end
-				end
-			else
-				-- The variable must already be defined
-				vtSetExprNode( lValue )
-				checkJava.canAssignToLValue( lValue, stmt.expr )
-			end
-		elseif opType == "++" or opType == "--" then
-			local vtLValue = vtSetExprNode( lValue )
-			if type(vtLValue) ~= "number" then
-				err.setErrNodeAndRef( opNode, lValue, 
-					"Can only apply \"%s\" to numeric types", opType )
-			end
-		else  -- +=, -=, *=, /=
-			vtSetExprNode( lValue )
-			checkJava.canOpAssignToLValue( lValue, opNode, stmt.expr )
-		end
-	elseif s == "if" then
-		-- { s = "if", iLine, expr, stmts, elseStmts }
-		if vtSetExprNode( stmt.expr ) ~= true then
-			err.setErrNode( stmt.expr, "Conditional test must be boolean (true or false)" )
-		end
-		checkBlock( stmt.stmts )
-		checkBlock( stmt.elseStmts )
-	elseif s == "while" then
-		-- { s = "while", iLine, expr, stmts }
-		checkLoopExpr( stmt.expr )
-		checkBlock( stmt.stmts )
-	elseif s == "doWhile" then
-		-- { s = "doWhile", iLine, expr, stmts }
-		checkBlock( stmt.stmts )
-		checkLoopExpr( stmt.expr )
-	elseif s == "for" then
-		-- { s = "for", iLine, initStmt, expr, nextStmt, stmts }
-		local initStmt = stmt.initStmt
-		if initStmt then
-			checkJava.beginLocalBlock()  -- extra block to contain the loop var
-			checkStmt( initStmt )
-		end
-		if stmt.expr then
-			checkLoopExpr( stmt.expr )
-		end
-		if stmt.nextStmt then
-			checkStmt( stmt.nextStmt )
-		end
-		checkBlock( stmt.stmts )
-		if initStmt then
-			checkJava.endLocalBlock()
-		end
-	elseif s == "forArray" then
-		-- { s = "forArray", iLine, var, expr, stmts }
-		checkJava.beginLocalBlock()  -- extra block to contain the loop var
-		local var = stmt.var
-		checkVar( var )
-		local vtExpr = vtSetExprNode( stmt.expr )
-		if type(vtExpr) ~= "table" then
-			err.setErrNode( stmt.expr, "A for-each loop must operate on an array" )
-		elseif vtExpr.vt ~= var.vt then
-			err.setErrNodeAndRef( var, stmt.expr,
-					"The loop array contains elements of type %s",
-					javaTypes.typeNameFromVt( vtExpr.vt ) )
-		else
-			var.assigned = true
-			checkBlock( stmt.stmts )
-		end
-		checkJava.endLocalBlock()
-	elseif s == "return" then
-		-- { s = "return", iLine, expr }
-		vtSetExprNode( stmt.expr )    -- TODO: Check that matches function return type
-	elseif s ~= "break" then
-		error( "Unknown stmt structure " .. s )
-	end
-end
 
 -- Do semantic checking on the programTree at the given syntax level.
 -- Record any error(s) in the error state.
@@ -1146,7 +1112,6 @@ function checkJava.checkProgram( programTree, level )
 end
 
 -- TODO: 
--- Make checkJava functions local
 -- Can't assign to e.g. Math.pi, etc.
 
 

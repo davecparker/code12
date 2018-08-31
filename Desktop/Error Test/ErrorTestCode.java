@@ -875,17 +875,17 @@ class ErrorTest extends Code12Program
 		// ERROR "Array count must be an integer"
 		intArr = new int[1.5];
 
-		// ERROR "Can only apply "++" to numeric types"
+		// ERROR "can only be applied to numbers"
 		boolVar++;
-		// ERROR "Can only apply "++" to numeric types"
+		// ERROR "can only be applied to numbers"
 		strVar++;
-		// ERROR "Can only apply "++" to numeric types"
+		// ERROR "can only be applied to numbers"
 		objVar++;
-		// ERROR "Can only apply "--" to numeric types"
+		// ERROR "can only be applied to numbers"
 		boolVar--;
-		// ERROR "Can only apply "--" to numeric types"
+		// ERROR "can only be applied to numbers"
 		strVar--;
-		// ERROR "Can only apply "--" to numeric types"
+		// ERROR "can only be applied to numbers"
 		objVar--;
 
 		// ERROR "A for-each loop must operate on an array"
@@ -990,29 +990,29 @@ class ErrorTest extends Code12Program
 		intVar *= false;
 		// ERROR "Expression for /= must be numeric"
 		dblVar /= true;
-		// ERROR "Cannot combine double with int"
+		// ERROR "double cannot be assigned to int"
 		intVar += dblVar;
-		// ERROR "Cannot combine double with int"
+		// ERROR "double cannot be assigned to int"
 		intVar -= dblVar;
-		// ERROR "Cannot combine double with int"
+		// ERROR "double cannot be assigned to int"
 		intVar *= dblVar;
-		// ERROR "Cannot combine double with int"
+		// ERROR "double cannot be assigned to int"
 		intVar /= dblVar;
 		// ERROR "Use str1.equals( str2 ) to compare two String values"
 		if (strVar == "s")
 			voidFunc();
 
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i ^ i;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i & i;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i | i;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i >> 2;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i << 2;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i >>> 2;
 
 		// ERROR "is reserved for use by the system"
@@ -1116,9 +1116,9 @@ class ErrorTest extends Code12Program
 		// ERROR "Calling event functions directly is not allowed"
 		onMousePress(0,0);
 
-		// ERROR "Undefined function"
+		// ERROR "Code12 function name is"
 		println("Hello world");
-		// ERROR "Undefined function"
+		// ERROR "Code12 function name is"
 		setHeight(150);
 
 		// ERROR "Invalid function name"
