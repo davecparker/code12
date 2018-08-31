@@ -240,15 +240,18 @@ end
 -- The indexd and field can be nil 
 local function makeLValueFromNodes( varID, index, field )
 	local indexExpr = nil
+	local lastToken = nil
 	if index and index.p == "index" then
 		indexExpr = makeExpr( index.nodes[2] )
+		lastToken = index.nodes[3]
 	end
 	local fieldID = nil
 	if field and field.p ~= "empty" then
 		fieldID = field.nodes[2]
+		lastToken = nil   -- don't need this anymore
 	end
 	return { s = "lValue", varID = varID, 
-			indexExpr = indexExpr, fieldID = fieldID }
+			indexExpr = indexExpr, fieldID = fieldID, lastToken = lastToken }
 end
 
 -- Make and return an lValue structure from an ID token or lValue parse node 
@@ -348,7 +351,8 @@ local function getElseStmts()
 		iTree = iTree + 1
 		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
 				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts() } }
+				elseStmts = getElseStmts(),
+				firstToken = tree.nodes[2] } }
 	end
 	return nil	
 end
