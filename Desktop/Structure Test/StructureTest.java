@@ -9,6 +9,7 @@ class StructureTest extends Code12Program
 	boolean gameOver = false;
 
 	// More instance variables
+
 	final int LIMIT = 120 + 4;
 	double speed = 0.3;
 	int frameCount = 0;
@@ -25,6 +26,7 @@ class StructureTest extends Code12Program
 		final int X = 50;
 		int y;
 		y = X;
+		/* comment */
 		ball = ct.circle( X, y, 30 );
 		ball.setFillColor( "blue" );
 		frameCount = foo( LIMIT, speed * 2 );
@@ -80,7 +82,7 @@ class StructureTest extends Code12Program
 
 		return 0;
 	}
-
+ 
 	public void update()
 	{
 		moveBall( false );

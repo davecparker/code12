@@ -9,6 +9,7 @@ this.count = 0; this.total = 0
 this.gameOver = false
 
 
+
 this.LIMIT = 120 + 4
 this.speed = 0.3
 this.frameCount = 0
@@ -25,6 +26,7 @@ function _fn.start()
 	local X = 50
 	local y = 0
 	y = X
+
 	this.ball = ct.circle(X, y, 30)
 	this.ball:setFillColor("blue")
 	this.frameCount = _fn.foo(this.LIMIT, this.speed * 2)

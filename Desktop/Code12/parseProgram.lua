@@ -401,7 +401,8 @@ local function getControlledStmts()
 		return nil
 	else
 		-- Single controlled stmt
-		if javalex.indentLevelForLine( tree.iLineStart ) <= javalex.indentLevelForLine( parseTrees[iTree - 1].iLineStart ) then
+		if javalex.indentLevelForLine( tree.iLineStart ) 
+				<= javalex.indentLevelForLine( parseTrees[iTree - 1].iLineStart ) then
 			local prevTree = parseTrees[iTree - 1]
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
 					"This line should be indented more than its controlling \"%s\"", prevTree.p )
@@ -736,11 +737,11 @@ local function getFunc( nodes )
 	-- Build the paramVars array
 	local paramVars = {}
 	for _, node in ipairs( paramList.nodes ) do
-		local nodes = node.nodes
+		local ns = node.nodes
 		if node.p == "array" then
-			paramVars[#paramVars + 1] = makeVar( false, nodes[1], nodes[4], nil, true )
+			paramVars[#paramVars + 1] = makeVar( false, ns[1], ns[4], nil, true )
 		else
-			paramVars[#paramVars + 1] = makeVar( false, nodes[1], nodes[2] )
+			paramVars[#paramVars + 1] = makeVar( false, ns[1], ns[2] )
 		end
 	end
 
@@ -982,6 +983,13 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 			end
 			iLineStart = nil
 		end
+	end
+
+	-- Check for unclosed block comment
+	local iLineComment = javalex.iLineStartOfUnclosedBlockComment()
+	if iLineComment then
+		err.setErrLineNum( iLineComment, "Comment started with /* was not closed with */" )
+		return nil
 	end
 
 	-- Add sentinel parse tree at the end

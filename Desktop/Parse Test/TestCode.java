@@ -153,7 +153,7 @@ class BubblePop extends Code12Program
 	/* block comment line 1
 	* block comment line 2
 	*/
-	/* block comment with /* nested comment */ */
+	/* block comment with // slash slash comment */
 	int x = 0; /* block comment after code on same line */
 	/* block comment before code on same line */ double pi = 3.14;
 	// block comments inside line of code
@@ -541,6 +541,8 @@ class BubblePop extends Code12Program
 ERRORS
 
 // Lexical errors
+*/              // close comment without open
+int i; /* /* */ // nested block comments
 @               // invalid character
 foo('a');       // char literals not supported
 foo(" );        // unclosed string literal 

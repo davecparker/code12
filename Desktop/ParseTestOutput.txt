@@ -1748,7 +1748,7 @@ line (while)
 
 155. */
 
-156. /* block comment with /* nested comment */ */
+156. /* block comment with // slash slash comment */
 
 157. int x = 0; /* block comment after code on same line */
 line (varInit)
@@ -7900,572 +7900,579 @@ line (end)
 
 543. // Lexical errors
 
-544. @               // invalid character
-*** Line 544 char 1: Invalid character
+544. */              // close comment without open
+*** Line 544 chars 1-2: Close of comment without matching opening /*
 
-545. foo('a');       // char literals not supported
-*** Line 545 char 5: char type not supported, use double quotes
+545. int i; /* /* */ // nested block comments
+*** Line 545: Java does not allow nesting comments within comments using /* */
+*** Reference Line 545
 
-546. foo(" );        // unclosed string literal
-*** Line 546 chars 5-43: Unclosed string literal
+546. @               // invalid character
+*** Line 546 char 1: Invalid character
 
-547. foo("\);        // unclosed string literal ending in backslash
-*** Line 547 chars 6-7: Unsupported or illegal escape sequence
+547. foo('a');       // char literals not supported
+*** Line 547 char 5: char type not supported, use double quotes
 
-548. s = "\          // unclosed string literal ending in backslash
-*** Line 548 chars 6-7: Unsupported or illegal escape sequence
+548. foo(" );        // unclosed string literal
+*** Line 548 chars 5-43: Unclosed string literal
 
-549. s = "\";        // unclosed string literal from escaped double quote
-*** Line 549 chars 5-68: Unclosed string literal
+549. foo("\);        // unclosed string literal ending in backslash
+*** Line 549 chars 6-7: Unsupported or illegal escape sequence
 
-550. s = "\ ";       // illegal escape character
+550. s = "\          // unclosed string literal ending in backslash
 *** Line 550 chars 6-7: Unsupported or illegal escape sequence
 
-551. s = "\r";       // unsupported escape sequence
-*** Line 551 chars 6-7: Unsupported or illegal escape sequence
+551. s = "\";        // unclosed string literal from escaped double quote
+*** Line 551 chars 5-68: Unclosed string literal
 
-552. interface foo   // unsupported reserved word
-*** Line 552 chars 1-9: Unsupported reserved word "interface"
+552. s = "\ ";       // illegal escape character
+*** Line 552 chars 6-7: Unsupported or illegal escape sequence
 
-553. double 1stNumber; // variable name starting with a number
-*** Line 553 chars 1-17: Syntax error (unrecognized code)
+553. s = "\r";       // unsupported escape sequence
+*** Line 553 chars 6-7: Unsupported or illegal escape sequence
 
-554. x = obj.1stNumber; // field name starting with a number
-*** Line 554 chars 1-18: Syntax error (unrecognized code)
+554. interface foo   // unsupported reserved word
+*** Line 554 chars 1-9: Unsupported reserved word "interface"
 
-555. // Using reserved words as identifiers
+555. double 1stNumber; // variable name starting with a number
+*** Line 555 chars 1-17: Syntax error (unrecognized code)
 
-556. int abstract;
-*** Line 556 chars 5-12: Unsupported reserved word "abstract"
+556. x = obj.1stNumber; // field name starting with a number
+*** Line 556 chars 1-18: Syntax error (unrecognized code)
 
-557. int break;
-*** Line 557 chars 1-10: Syntax error (unrecognized code)
+557. // Using reserved words as identifiers
 
-558. int case;
-*** Line 558 chars 5-8: Unsupported reserved word "case"
+558. int abstract;
+*** Line 558 chars 5-12: Unsupported reserved word "abstract"
 
-559. int catch;
-*** Line 559 chars 5-9: Unsupported reserved word "catch"
+559. int break;
+*** Line 559 chars 1-10: Syntax error (unrecognized code)
 
-560. double class;
-*** Line 560 chars 1-13: Syntax error (unrecognized code)
+560. int case;
+*** Line 560 chars 5-8: Unsupported reserved word "case"
 
-561. boolean const;
-*** Line 561 chars 1-14: Syntax error (unrecognized code)
+561. int catch;
+*** Line 561 chars 5-9: Unsupported reserved word "catch"
 
-562. boolean continue;
-*** Line 562 chars 9-16: Unsupported reserved word "continue"
+562. double class;
+*** Line 562 chars 1-13: Syntax error (unrecognized code)
 
-563. boolean default;
-*** Line 563 chars 9-15: Unsupported reserved word "default"
+563. boolean const;
+*** Line 563 chars 1-14: Syntax error (unrecognized code)
 
-564. String do;
-*** Line 564 chars 1-10: Syntax error (unrecognized code)
+564. boolean continue;
+*** Line 564 chars 9-16: Unsupported reserved word "continue"
 
-565. GameObj else;
-*** Line 565 chars 1-13: Syntax error (unrecognized code)
+565. boolean default;
+*** Line 565 chars 9-15: Unsupported reserved word "default"
 
-566. GameObj enum;
-*** Line 566 chars 9-12: Unsupported reserved word "enum"
+566. String do;
+*** Line 566 chars 1-10: Syntax error (unrecognized code)
 
-567. int[] extends;
-*** Line 567 chars 1-14: Syntax error (unrecognized code)
+567. GameObj else;
+*** Line 567 chars 1-13: Syntax error (unrecognized code)
 
-568. double final;
-*** Line 568 chars 1-13: Syntax error (unrecognized code)
+568. GameObj enum;
+*** Line 568 chars 9-12: Unsupported reserved word "enum"
 
-569. double finally();
-*** Line 569 chars 8-14: Unsupported reserved word "finally"
+569. int[] extends;
+*** Line 569 chars 1-14: Syntax error (unrecognized code)
 
-570. boolean foo(int for);
-*** Line 570 chars 1-21: Syntax error (unrecognized code)
+570. double final;
+*** Line 570 chars 1-13: Syntax error (unrecognized code)
 
-571. for(int do = 0; do < 10; do++)
-*** Line 571 chars 1-30: Syntax error (unrecognized code)
+571. double finally();
+*** Line 571 chars 8-14: Unsupported reserved word "finally"
 
-572. String goto;
-*** Line 572 chars 8-11: Unsupported reserved word "goto"
+572. boolean foo(int for);
+*** Line 572 chars 1-21: Syntax error (unrecognized code)
 
-573. String if;
-*** Line 573 chars 1-10: Syntax error (unrecognized code)
+573. for(int do = 0; do < 10; do++)
+*** Line 573 chars 1-30: Syntax error (unrecognized code)
 
-574. GameObj implements;
-*** Line 574 chars 9-18: Unsupported reserved word "implements"
+574. String goto;
+*** Line 574 chars 8-11: Unsupported reserved word "goto"
 
-575. int import;
-*** Line 575 chars 1-11: Syntax error (unrecognized code)
+575. String if;
+*** Line 575 chars 1-10: Syntax error (unrecognized code)
 
-576. int instanceof;
-*** Line 576 chars 5-14: Unsupported reserved word "instanceof"
+576. GameObj implements;
+*** Line 576 chars 9-18: Unsupported reserved word "implements"
 
-577. int interface;
-*** Line 577 chars 5-13: Unsupported reserved word "interface"
+577. int import;
+*** Line 577 chars 1-11: Syntax error (unrecognized code)
 
-578. int native;
-*** Line 578 chars 5-10: Unsupported reserved word "native"
+578. int instanceof;
+*** Line 578 chars 5-14: Unsupported reserved word "instanceof"
 
-579. int new;
-*** Line 579 chars 1-8: Syntax error (unrecognized code)
+579. int interface;
+*** Line 579 chars 5-13: Unsupported reserved word "interface"
 
-580. int package;
-*** Line 580 chars 5-11: Unsupported reserved word "package"
+580. int native;
+*** Line 580 chars 5-10: Unsupported reserved word "native"
 
-581. int private;
-*** Line 581 chars 5-11: Unsupported reserved word "private"
+581. int new;
+*** Line 581 chars 1-8: Syntax error (unrecognized code)
 
-582. int protected;
-*** Line 582 chars 5-13: Unsupported reserved word "protected"
+582. int package;
+*** Line 582 chars 5-11: Unsupported reserved word "package"
 
-583. int public;
-*** Line 583 chars 1-11: Syntax error (unrecognized code)
+583. int private;
+*** Line 583 chars 5-11: Unsupported reserved word "private"
 
-584. int return()
-*** Line 584 chars 1-12: Syntax error (unrecognized code)
+584. int protected;
+*** Line 584 chars 5-13: Unsupported reserved word "protected"
 
-585. int static;
+585. int public;
 *** Line 585 chars 1-11: Syntax error (unrecognized code)
 
-586. int strictfp;
-*** Line 586 chars 5-12: Unsupported reserved word "strictfp"
+586. int return()
+*** Line 586 chars 1-12: Syntax error (unrecognized code)
 
-587. int super;
-*** Line 587 chars 5-9: Unsupported reserved word "super"
+587. int static;
+*** Line 587 chars 1-11: Syntax error (unrecognized code)
 
-588. int switch;
-*** Line 588 chars 5-10: Unsupported reserved word "switch"
+588. int strictfp;
+*** Line 588 chars 5-12: Unsupported reserved word "strictfp"
 
-589. int synchronized;
-*** Line 589 chars 5-16: Unsupported reserved word "synchronized"
+589. int super;
+*** Line 589 chars 5-9: Unsupported reserved word "super"
 
-590. int this;
-*** Line 590 chars 5-8: Unsupported reserved word "this"
+590. int switch;
+*** Line 590 chars 5-10: Unsupported reserved word "switch"
 
-591. int throw;
-*** Line 591 chars 5-9: Unsupported reserved word "throw"
+591. int synchronized;
+*** Line 591 chars 5-16: Unsupported reserved word "synchronized"
 
-592. int throws;
-*** Line 592 chars 5-10: Unsupported reserved word "throws"
+592. int this;
+*** Line 592 chars 5-8: Unsupported reserved word "this"
 
-593. int transient;
-*** Line 593 chars 5-13: Unsupported reserved word "transient"
+593. int throw;
+*** Line 593 chars 5-9: Unsupported reserved word "throw"
 
-594. int try;
-*** Line 594 chars 5-7: Unsupported reserved word "try"
+594. int throws;
+*** Line 594 chars 5-10: Unsupported reserved word "throws"
 
-595. int volatile;
-*** Line 595 chars 5-12: Unsupported reserved word "volatile"
+595. int transient;
+*** Line 595 chars 5-13: Unsupported reserved word "transient"
 
-596. int while;
-*** Line 596 chars 1-10: Syntax error (unrecognized code)
+596. int try;
+*** Line 596 chars 5-7: Unsupported reserved word "try"
 
-597. boolean true;
-*** Line 597 chars 1-13: Syntax error (unrecognized code)
+597. int volatile;
+*** Line 597 chars 5-12: Unsupported reserved word "volatile"
 
-598. boolean false;
-*** Line 598 chars 1-14: Syntax error (unrecognized code)
+598. int while;
+*** Line 598 chars 1-10: Syntax error (unrecognized code)
 
-599. int null;
-*** Line 599 chars 1-9: Syntax error (unrecognized code)
+599. boolean true;
+*** Line 599 chars 1-13: Syntax error (unrecognized code)
 
-600. 
+600. boolean false;
+*** Line 600 chars 1-14: Syntax error (unrecognized code)
 
-601. void foo.x()    // function definition with . as part of identifier
-*** Line 601 chars 1-12: Syntax error (unrecognized code)
+601. int null;
+*** Line 601 chars 1-9: Syntax error (unrecognized code)
 
-602. x = 10          // missing ; in stmt
-*** Line 602 char 37: Statement should end with a semicolon (;)
+602. 
 
-603. int x = 10		// missing ; in varInit
-*** Line 603 char 36: Variable initialization should end with a semicolon (;)
+603. void foo.x()    // function definition with . as part of identifier
+*** Line 603 chars 1-12: Syntax error (unrecognized code)
 
-604. int x 			// missing ; in varDecl
-*** Line 604 char 33: Variable declaration should end with a semicolon (;)
+604. x = 10          // missing ; in stmt
+*** Line 604 char 37: Statement should end with a semicolon (;)
 
-605. final int x = 10 // missing ; in constInit
-*** Line 605 char 43: Variable initialization should end with a semicolon (;)
+605. int x = 10		// missing ; in varInit
+*** Line 605 char 36: Variable initialization should end with a semicolon (;)
 
-606. foo(x, );       // missing expr in exprList
-*** Line 606 chars 1-9: Syntax error (unrecognized code)
+606. int x 			// missing ; in varDecl
+*** Line 606 char 33: Variable declaration should end with a semicolon (;)
 
-607. f00()++;		// ++ applied to non-lvalue
-*** Line 607 chars 1-8: Syntax error (unrecognized code)
+607. final int x = 10 // missing ; in constInit
+*** Line 607 char 43: Variable initialization should end with a semicolon (;)
 
-608. --x.foo();		// -- applied to non-lvalue
-*** Line 608 chars 1-10: Syntax error (unrecognized code)
+608. foo(x, );       // missing expr in exprList
+*** Line 608 chars 1-9: Syntax error (unrecognized code)
 
-609. x = / b;		// missing expr before binary op
+609. f00()++;		// ++ applied to non-lvalue
 *** Line 609 chars 1-8: Syntax error (unrecognized code)
 
-610. x = a + ;       // missing expr after binary op
-*** Line 610 char 9: Expected expression after + operator
-*** Reference Line 610 char 7
+610. --x.foo();		// -- applied to non-lvalue
+*** Line 610 chars 1-10: Syntax error (unrecognized code)
 
-611. x = a ++ b;     // unexpected token after unary op
-*** Line 611 chars 1-11: Syntax error (unrecognized code)
+611. x = / b;		// missing expr before binary op
+*** Line 611 chars 1-8: Syntax error (unrecognized code)
 
-612. x = a ** b;     // missing expression between binary ops
-*** Line 612 char 8: Expected expression after * operator
+612. x = a + ;       // missing expr after binary op
+*** Line 612 char 9: Expected expression after + operator
 *** Reference Line 612 char 7
 
-613. x = a + b * ;   // missing expr after higher precedence binary op
-*** Line 613 char 13: Expected expression after * operator
-*** Reference Line 613 char 11
+613. x = a ++ b;     // unexpected token after unary op
+*** Line 613 chars 1-11: Syntax error (unrecognized code)
 
-614. x = a * b + ;   // missing expr after lower precedence binary op
-*** Line 614 char 13: Expected expression after + operator
-*** Reference Line 614 char 11
+614. x = a ** b;     // missing expression between binary ops
+*** Line 614 char 8: Expected expression after * operator
+*** Reference Line 614 char 7
 
-615. x = ();         // missing expr in parentheses
-*** Line 615 chars 1-7: Syntax error (unrecognized code)
+615. x = a + b * ;   // missing expr after higher precedence binary op
+*** Line 615 char 13: Expected expression after * operator
+*** Reference Line 615 char 11
 
-616. x = 10 + ! ;    // missing expr after unary op
-*** Line 616 char 10: Expected expression after + operator
-*** Reference Line 616 char 8
+616. x = a * b + ;   // missing expr after lower precedence binary op
+*** Line 616 char 13: Expected expression after + operator
+*** Reference Line 616 char 11
 
-617. x = obj.3;      // expected ID after .
-*** Line 617 chars 1-10: Syntax error (unrecognized code)
+617. x = ();         // missing expr in parentheses
+*** Line 617 chars 1-7: Syntax error (unrecognized code)
 
-618. x = 3.obj;      // ID expected before .
-*** Line 618 chars 1-10: Syntax error (unrecognized code)
+618. x = 10 + ! ;    // missing expr after unary op
+*** Line 618 char 10: Expected expression after + operator
+*** Reference Line 618 char 8
 
-619. if x == 3       // required next token in pattern doesn't match
-*** Line 619 chars 4-9: if statement test must be in parentheses
+619. x = obj.3;      // expected ID after .
+*** Line 619 chars 1-10: Syntax error (unrecognized code)
 
-620. while i < max   // required next token in pattern doesn't match
-*** Line 620 chars 1-13: Syntax error (unrecognized code)
+620. x = 3.obj;      // ID expected before .
+*** Line 620 chars 1-10: Syntax error (unrecognized code)
 
-621. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
-*** Line 621 chars 1-21: Syntax error (unrecognized code)
+621. if x == 3       // required next token in pattern doesn't match
+*** Line 621 chars 4-9: if statement test must be in parentheses
 
-622. x + 3;          // no matching pattern
-*** Line 622 chars 1-6: Syntax error (unrecognized code)
+622. while i < max   // required next token in pattern doesn't match
+*** Line 622 chars 1-13: Syntax error (unrecognized code)
 
-623. x = 1,000;      // commas in numbers
-*** Line 623 chars 1-10: Syntax error (unrecognized code)
+623. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
+*** Line 623 chars 1-21: Syntax error (unrecognized code)
 
-624. x = 1.23.45;    // too many decimal points
-*** Line 624 chars 1-12: Syntax error (unrecognized code)
+624. x + 3;          // no matching pattern
+*** Line 624 chars 1-6: Syntax error (unrecognized code)
 
-625. x = 3.14e1.0;   // exponential notation with decimal point in exponent
-*** Line 625 chars 1-13: Syntax error (unrecognized code)
+625. x = 1,000;      // commas in numbers
+*** Line 625 chars 1-10: Syntax error (unrecognized code)
 
-626. x = 3.14e;      // Invalid exponential notation
-*** Line 626 chars 5-10: Invalid exponential notation
+626. x = 1.23.45;    // too many decimal points
+*** Line 626 chars 1-12: Syntax error (unrecognized code)
 
-627. x = 3.141e+;    // Invalid exponential notation
-*** Line 627 chars 5-12: Invalid exponential notation
+627. x = 3.14e1.0;   // exponential notation with decimal point in exponent
+*** Line 627 chars 1-13: Syntax error (unrecognized code)
 
-628. x = 3.1415e-;   // Invalid exponential notation
-*** Line 628 chars 5-13: Invalid exponential notation
+628. x = 3.14e;      // Invalid exponential notation
+*** Line 628 chars 5-10: Invalid exponential notation
 
-629. x = 3.14159e+exponent; // Invalid exponential notation
-*** Line 629 chars 5-14: Invalid exponential notation
+629. x = 3.141e+;    // Invalid exponential notation
+*** Line 629 chars 5-12: Invalid exponential notation
 
-630. x = 3.141592ee0;// Invalid exponential notation
-*** Line 630 chars 5-14: Invalid exponential notation
+630. x = 3.1415e-;   // Invalid exponential notation
+*** Line 630 chars 5-13: Invalid exponential notation
 
-631. x = 3.141592EE0;// Invalid exponential notation
+631. x = 3.14159e+exponent; // Invalid exponential notation
 *** Line 631 chars 5-14: Invalid exponential notation
 
-632. x = 3e; 		// Invalid exponential notation
-*** Line 632 chars 5-7: Invalid exponential notation
+632. x = 3.141592ee0;// Invalid exponential notation
+*** Line 632 chars 5-14: Invalid exponential notation
 
-633. x = .3E; 		// Invalid exponential notation
-*** Line 633 chars 5-8: Invalid exponential notation
+633. x = 3.141592EE0;// Invalid exponential notation
+*** Line 633 chars 5-14: Invalid exponential notation
 
-634. foo(x,          // (incomplete line continued below)
+634. x = 3e; 		// Invalid exponential notation
+*** Line 634 chars 5-7: Invalid exponential notation
+
+635. x = .3E; 		// Invalid exponential notation
+*** Line 635 chars 5-8: Invalid exponential notation
+
+636. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
 
-635. y)              // missing ;
-*** Line 635 char 29: Statement should end with a semicolon (;)
+637. y)              // missing ;
+*** Line 637 char 29: Statement should end with a semicolon (;)
 
-636. x = (a + b + c / 3; 	// missing closing parenthesis
-*** Line 636 chars 1-19: Syntax error (unrecognized code)
+638. x = (a + b + c / 3; 	// missing closing parenthesis
+*** Line 638 chars 1-19: Syntax error (unrecognized code)
 
-637. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
-*** Line 637 chars 1-21: Syntax error (unrecognized code)
+639. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
+*** Line 639 chars 1-21: Syntax error (unrecognized code)
 
-638. x = a + b + c ) / 3; 	// missing openning parenthesis
-*** Line 638 chars 1-20: Syntax error (unrecognized code)
+640. x = a + b + c ) / 3; 	// missing openning parenthesis
+*** Line 640 chars 1-20: Syntax error (unrecognized code)
 
-639. if ( i == 1 	// missing closing parenthesis with if
-*** Line 639 chars 1-11: Syntax error (unrecognized code)
+641. if ( i == 1 	// missing closing parenthesis with if
+*** Line 641 chars 1-11: Syntax error (unrecognized code)
 
-640. if ( i == 1 ); 	// if statment ended by ;
-*** Line 640 char 14: if statement should not end with a semicolon
+642. if ( i == 1 ); 	// if statment ended by ;
+*** Line 642 char 14: if statement should not end with a semicolon
 
-641. for ( i=0; i<n; i++); 	// for() followed directly by ;
-*** Line 641 chars 1-21: Syntax error (unrecognized code)
+643. for ( i=0; i<n; i++); 	// for() followed directly by ;
+*** Line 643 chars 1-21: Syntax error (unrecognized code)
 
-642. x + 1 = x; 		// confusing left hand side an right hand side of assignment
-*** Line 642 chars 1-10: Syntax error (unrecognized code)
+644. x + 1 = x; 		// confusing left hand side an right hand side of assignment
+*** Line 644 chars 1-10: Syntax error (unrecognized code)
 
-643. 1000 = count; 	// confusing left hand side an right hand side of assignment
-*** Line 643 chars 1-13: Syntax error (unrecognized code)
+645. 1000 = count; 	// confusing left hand side an right hand side of assignment
+*** Line 645 chars 1-13: Syntax error (unrecognized code)
 
-644. if ( x => 3 ) 	// => instead of <=
-*** Line 644 chars 8-9: Invalid operator. Did you mean >= ?
+646. if ( x => 3 ) 	// => instead of <=
+*** Line 646 chars 8-9: Invalid operator. Did you mean >= ?
 
-645. if ( x =< 5 ) 	// =< instead of >=.
-*** Line 645 chars 8-9: Invalid operator. Did you mean <= ?
+647. if ( x =< 5 ) 	// =< instead of >=.
+*** Line 647 chars 8-9: Invalid operator. Did you mean <= ?
 
-646. elseif( x > 2 ) // elseif instead of else if
-*** Line 646 char 45: Statement should end with a semicolon (;)
+648. elseif( x > 2 ) // elseif instead of else if
+*** Line 648 char 45: Statement should end with a semicolon (;)
 
-647. for(int i=0, i<n, i++) 	// commas in place of semicolons
-*** Line 647 char 12: for loop parts should be separated by semicolons (;)
+649. for(int i=0, i<n, i++) 	// commas in place of semicolons
+*** Line 649 char 12: for loop parts should be separated by semicolons (;)
 Comma not supported
 
-648. for(int i=0; i<n, i++) 	// comma in place of semicolon
-*** Line 648 char 17: for loop parts should be separated by semicolons (;)
+650. for(int i=0; i<n, i++) 	// comma in place of semicolon
+*** Line 650 char 17: for loop parts should be separated by semicolons (;)
 Comma not supported
 
-649. for(int i=0: i<n: i++) 	// colons in place of semicolons
-*** Line 649 chars 1-22: Syntax error (unrecognized code)
+651. for(int i=0: i<n: i++) 	// colons in place of semicolons
+*** Line 651 chars 1-22: Syntax error (unrecognized code)
 
-650. for{int i=0; i<n; i++} 	// {} in place of ()
-*** Line 650 chars 1-22: Syntax error (unrecognized code)
+652. for{int i=0; i<n; i++} 	// {} in place of ()
+*** Line 652 chars 1-22: Syntax error (unrecognized code)
 
-651. for (int i==0; i<n; i++)// == instead of =
-*** Line 651 chars 1-24: Syntax error (unrecognized code)
+653. for (int i==0; i<n; i++)// == instead of =
+*** Line 653 chars 1-24: Syntax error (unrecognized code)
 
-652. for( x : arr ) 			// forgetting variable type
-*** Line 652 chars 1-14: Syntax error (unrecognized code)
+654. for( x : arr ) 			// forgetting variable type
+*** Line 654 chars 1-14: Syntax error (unrecognized code)
 
-653. for( int x; arr ) 		// using ; instead of :
-*** Line 653 chars 1-17: Syntax error (unrecognized code)
+655. for( int x; arr ) 		// using ; instead of :
+*** Line 655 chars 1-17: Syntax error (unrecognized code)
 
-654. for( int[] x : arr )
-*** Line 654 chars 1-20: Syntax error (unrecognized code)
+656. for( int[] x : arr )
+*** Line 656 chars 1-20: Syntax error (unrecognized code)
 
-655. for( int x : arr[] )
-*** Line 655 chars 1-20: Syntax error (unrecognized code)
+657. for( int x : arr[] )
+*** Line 657 chars 1-20: Syntax error (unrecognized code)
 
-656. for( arr : int x )
-*** Line 656 chars 1-18: Syntax error (unrecognized code)
+658. for( arr : int x )
+*** Line 658 chars 1-18: Syntax error (unrecognized code)
 
-657. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Line 657 chars 1-19: Syntax error (unrecognized code)
+659. double foo(x, y, z) 	// missing variable types for arguments in function definition
+*** Line 659 chars 1-19: Syntax error (unrecognized code)
 
-658. double foo[i]()			// index on function identifier
-*** Line 658 chars 1-15: Syntax error (unrecognized code)
+660. double foo[i]()			// index on function identifier
+*** Line 660 chars 1-15: Syntax error (unrecognized code)
 
-659. ct.println; 			// missing parenteses for function call without arguments
-*** Line 659 chars 1-11: Syntax error (unrecognized code)
+661. ct.println; 			// missing parenteses for function call without arguments
+*** Line 661 chars 1-11: Syntax error (unrecognized code)
 
-660. foo(int x, double y, GameObj z) 	// missing return type in function definition
-*** Line 660 chars 1-31: Syntax error (unrecognized code)
+662. foo(int x, double y, GameObj z) 	// missing return type in function definition
+*** Line 662 chars 1-31: Syntax error (unrecognized code)
 
-661. foo(int x, double y, GameObj z); 	// supplying variable types in function call
-*** Line 661 chars 1-32: Syntax error (unrecognized code)
+663. foo(int x, double y, GameObj z); 	// supplying variable types in function call
+*** Line 663 chars 1-32: Syntax error (unrecognized code)
 
-662. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
-*** Line 662 char 40: function header should not end with a semicolon
+664. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
+*** Line 664 char 40: function header should not end with a semicolon
 
-663. String s = 'Hello'; 	// '' in place of "" for strings
-*** Line 663 char 12: char type not supported, use double quotes
+665. String s = 'Hello'; 	// '' in place of "" for strings
+*** Line 665 char 12: char type not supported, use double quotes
 
-664. String s = "A long string
-*** Line 664 chars 12-25: Unclosed string literal
+666. String s = "A long string
+*** Line 666 chars 12-25: Unclosed string literal
 
-665. on more than one line";
-*** Line 665 chars 34-35: Unclosed string literal
+667. on more than one line";
+*** Line 667 chars 34-35: Unclosed string literal
 
-666. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Line 666 chars 1-30: Syntax error (unrecognized code)
+668. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
+*** Line 668 chars 1-30: Syntax error (unrecognized code)
 
-667. newObj() = oldObj; 				// assigning to a function value
-*** Line 667 chars 1-18: Syntax error (unrecognized code)
+669. newObj() = oldObj; 				// assigning to a function value
+*** Line 669 chars 1-18: Syntax error (unrecognized code)
 
-668. f = void foo()					// mixing assignment and function declaration
-*** Line 668 chars 1-14: Syntax error (unrecognized code)
+670. f = void foo()					// mixing assignment and function declaration
+*** Line 670 chars 1-14: Syntax error (unrecognized code)
 
-669. def func(x):					// Python syntax
-*** Line 669 chars 1-12: Syntax error (unrecognized code)
+671. def func(x):					// Python syntax
+*** Line 671 chars 1-12: Syntax error (unrecognized code)
 
-670. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
-*** Line 670 chars 1-39: Syntax error (unrecognized code)
+672. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
+*** Line 672 chars 1-39: Syntax error (unrecognized code)
 
-671. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
-*** Line 671 chars 1-19: Syntax error (unrecognized code)
+673. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
+*** Line 673 chars 1-19: Syntax error (unrecognized code)
 
-672. int intArr = {1, 2, 3}; // missing []
-*** Line 672 chars 1-23: Syntax error (unrecognized code)
+674. int intArr = {1, 2, 3}; // missing []
+*** Line 674 chars 1-23: Syntax error (unrecognized code)
 
-673. 
+675. 
 
-674. // Unsupported Java syntax
+676. // Unsupported Java syntax
 
-675. // --------------------------------------------------------------------------------
+677. // --------------------------------------------------------------------------------
 
-676. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
-*** Line 676: Code12 requires each variable initialization to be on its own line
+678. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+*** Line 678: Code12 requires each variable initialization to be on its own line
 
-677. import java.io.PrintWriter;   // import other than Code12.*
-*** Line 677: import should be "Code12.*;"
+679. import java.io.PrintWriter;   // import other than Code12.*
+*** Line 679: import should be "Code12.*;"
 
-678. private int secretVar;        // private instance variable
-*** Line 678 chars 1-7: Unsupported reserved word "private"
+680. private int secretVar;        // private instance variable
+*** Line 680 chars 1-7: Unsupported reserved word "private"
 
-679. time %= 3600;                 // %= operator
-*** Line 679 chars 1-13: Syntax error (unrecognized code)
+681. time %= 3600;                 // %= operator
+*** Line 681 chars 1-13: Syntax error (unrecognized code)
 
-680. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-*** Line 680 char 32: Invalid character (The "? :" operator is not supported by Code12)
+682. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
+*** Line 682 char 32: Invalid character (The "? :" operator is not supported by Code12)
 
-681. char ch = 'a'; 	// char type
-*** Line 681 char 11: char type not supported, use double quotes
+683. char ch = 'a'; 	// char type
+*** Line 683 char 11: char type not supported, use double quotes
 
-682. while(foo) { 	// opening { in control structure not on it's own line
-*** Line 682 chars 1-12: Syntax error (unrecognized code)
+684. while(foo) { 	// opening { in control structure not on it's own line
+*** Line 684 chars 1-12: Syntax error (unrecognized code)
 
-683. i++; } 			// closing } not on it's own line
-*** Line 683 chars 1-6: Syntax error (unrecognized code)
+685. i++; } 			// closing } not on it's own line
+*** Line 685 chars 1-6: Syntax error (unrecognized code)
 
-684. String s = "A long string" +
-*** Line 684 char 29: Expected expression after + operator
-*** Reference Line 684 char 28
+686. String s = "A long string" +
+*** Line 686 char 29: Expected expression after + operator
+*** Reference Line 686 char 28
 
-685. "on more than one line using concatenation";
-*** Line 685 chars 12-55: Syntax error (unrecognized code)
+687. "on more than one line using concatenation";
+*** Line 687 chars 12-55: Syntax error (unrecognized code)
 
-686. x = a; y = b; 	// more than one statement on a single line
-*** Line 686: Code12 only allows one statement per line
+688. x = a; y = b; 	// more than one statement on a single line
+*** Line 688: Code12 only allows one statement per line
 
-687. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
-*** Line 687 chars 4-11: if statement test must be in parentheses
+689. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
+*** Line 689 chars 4-11: if statement test must be in parentheses
 
-688. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Line 688 chars 1-41: Syntax error (unrecognized code)
+690. double getVariable() { return variable; } // {} must start and end on their own lines
+*** Line 690 chars 1-41: Syntax error (unrecognized code)
 
-689. switch (choice)
-*** Line 689 chars 1-6: Unsupported reserved word "switch"
+691. switch (choice)
+*** Line 691 chars 1-6: Unsupported reserved word "switch"
 
-690. continue;
-*** Line 690 chars 1-8: Unsupported reserved word "continue"
+692. continue;
+*** Line 692 chars 1-8: Unsupported reserved word "continue"
 
-691. a[i++] = b[i++]; 	// increment/decrement only supported as statements
-*** Line 691 chars 1-16: Syntax error (unrecognized code)
+693. a[i++] = b[i++]; 	// increment/decrement only supported as statements
+*** Line 693 chars 1-16: Syntax error (unrecognized code)
 
-692. foo.obj.group.equals("targets"); 		// more than 2 chained fields
-*** Line 692 chars 1-32: Syntax error (unrecognized code)
+694. foo.obj.group.equals("targets"); 		// more than 2 chained fields
+*** Line 694 chars 1-32: Syntax error (unrecognized code)
 
-693. input.toLowerCase().equals("quit"); // indexing after function call
-*** Line 693 chars 1-35: Syntax error (unrecognized code)
+695. input.toLowerCase().equals("quit"); // indexing after function call
+*** Line 695 chars 1-35: Syntax error (unrecognized code)
 
-694. newBullet().ySpeed = 0;
-*** Line 694 chars 1-23: Syntax error (unrecognized code)
+696. newBullet().ySpeed = 0;
+*** Line 696 chars 1-23: Syntax error (unrecognized code)
 
-695. final int N; 	// constant declaration without initialization
-*** Line 695 chars 1-12: Syntax error (unrecognized code)
+697. final int N; 	// constant declaration without initialization
+*** Line 697 chars 1-12: Syntax error (unrecognized code)
 
-696. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
-*** Line 696 char 15: for loop parts should be separated by semicolons (;)
+698. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
+*** Line 698 char 15: for loop parts should be separated by semicolons (;)
 Comma not supported
 
-697. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
-*** Line 697 chars 1-20: Syntax error (unrecognized code)
+699. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
+*** Line 699 chars 1-20: Syntax error (unrecognized code)
 
-698. int _var; // variable indentifiers starting with underscore
-*** Line 698 chars 5-8: Names cannot start with an underscore in Code12
+700. int _var; // variable indentifiers starting with underscore
+*** Line 700 chars 5-8: Names cannot start with an underscore in Code12
 
-699. int $var; // $
-*** Line 699 char 5: The $ character is not allowed in Code12
+701. int $var; // $
+*** Line 701 char 5: The $ character is not allowed in Code12
 
-700. double pay$;
-*** Line 700 char 11: The $ character is not allowed in Code12
+702. double pay$;
+*** Line 702 char 11: The $ character is not allowed in Code12
 
-701. int x[];	// arrays must be declared with [] between type and identifier
-*** Line 701 chars 1-8: Syntax error (unrecognized code)
+703. int x[];	// arrays must be declared with [] between type and identifier
+*** Line 703 chars 1-8: Syntax error (unrecognized code)
 
-702. int _func() // function names starting with underscore
-*** Line 702 chars 5-9: Names cannot start with an underscore in Code12
+704. int _func() // function names starting with underscore
+*** Line 704 chars 5-9: Names cannot start with an underscore in Code12
 
-703. public abstract class Account
-*** Line 703 chars 8-15: Unsupported reserved word "abstract"
+705. public abstract class Account
+*** Line 705 chars 8-15: Unsupported reserved word "abstract"
 
-704. assert x != null : "x variable is null";
-*** Line 704 chars 1-6: Unsupported reserved word "assert"
+706. assert x != null : "x variable is null";
+*** Line 706 chars 1-6: Unsupported reserved word "assert"
 
-705. case 0 :
-*** Line 705 chars 1-4: Unsupported reserved word "case"
+707. case 0 :
+*** Line 707 chars 1-4: Unsupported reserved word "case"
 
-706. catch(Exception e)
-*** Line 706 chars 1-5: Unsupported reserved word "catch"
+708. catch(Exception e)
+*** Line 708 chars 1-5: Unsupported reserved word "catch"
 
-707. continue;
-*** Line 707 chars 1-8: Unsupported reserved word "continue"
+709. continue;
+*** Line 709 chars 1-8: Unsupported reserved word "continue"
 
-708. default :
-*** Line 708 chars 1-7: Unsupported reserved word "default"
+710. default :
+*** Line 710 chars 1-7: Unsupported reserved word "default"
 
-709. enum WeekDays
-*** Line 709 chars 1-4: Unsupported reserved word "enum"
+711. enum WeekDays
+*** Line 711 chars 1-4: Unsupported reserved word "enum"
 
-710. goto
-*** Line 710 chars 1-4: Unsupported reserved word "goto"
+712. goto
+*** Line 712 chars 1-4: Unsupported reserved word "goto"
 
-711. finally
-*** Line 711 chars 1-7: Unsupported reserved word "finally"
+713. finally
+*** Line 713 chars 1-7: Unsupported reserved word "finally"
 
-712. public class C implements I
-*** Line 712 chars 16-25: Unsupported reserved word "implements"
+714. public class C implements I
+*** Line 714 chars 16-25: Unsupported reserved word "implements"
 
-713. if (x instanceof y)
-*** Line 713 chars 7-16: Unsupported reserved word "instanceof"
+715. if (x instanceof y)
+*** Line 715 chars 7-16: Unsupported reserved word "instanceof"
 
-714. public interface I
-*** Line 714 chars 8-16: Unsupported reserved word "interface"
+716. public interface I
+*** Line 716 chars 8-16: Unsupported reserved word "interface"
 
-715. native void foo()
-*** Line 715 chars 1-6: Unsupported reserved word "native"
+717. native void foo()
+*** Line 717 chars 1-6: Unsupported reserved word "native"
 
-716. package P;
-*** Line 716 chars 1-7: Unsupported reserved word "package"
+718. package P;
+*** Line 718 chars 1-7: Unsupported reserved word "package"
 
-717. private int x;
-*** Line 717 chars 1-7: Unsupported reserved word "private"
+719. private int x;
+*** Line 719 chars 1-7: Unsupported reserved word "private"
 
-718. protected int x;
-*** Line 718 chars 1-9: Unsupported reserved word "protected"
+720. protected int x;
+*** Line 720 chars 1-9: Unsupported reserved word "protected"
 
-719. static int x = 10;
-*** Line 719 chars 1-18: Syntax error (unrecognized code)
+721. static int x = 10;
+*** Line 721 chars 1-18: Syntax error (unrecognized code)
 
-720. strictfp void foo()
-*** Line 720 chars 1-8: Unsupported reserved word "strictfp"
+722. strictfp void foo()
+*** Line 722 chars 1-8: Unsupported reserved word "strictfp"
 
-721. super.foo();
-*** Line 721 chars 1-5: Unsupported reserved word "super"
+723. super.foo();
+*** Line 723 chars 1-5: Unsupported reserved word "super"
 
-722. switch (x)
-*** Line 722 chars 1-6: Unsupported reserved word "switch"
+724. switch (x)
+*** Line 724 chars 1-6: Unsupported reserved word "switch"
 
-723. synchronized(sync_object)
-*** Line 723 chars 1-12: Unsupported reserved word "synchronized"
+725. synchronized(sync_object)
+*** Line 725 chars 1-12: Unsupported reserved word "synchronized"
 
-724. this.x = x;
-*** Line 724 chars 1-4: Unsupported reserved word "this"
+726. this.x = x;
+*** Line 726 chars 1-4: Unsupported reserved word "this"
 
-725. throw e;
-*** Line 725 chars 1-5: Unsupported reserved word "throw"
+727. throw e;
+*** Line 727 chars 1-5: Unsupported reserved word "throw"
 
-726. void foo() throws Exception
-*** Line 726 chars 12-17: Unsupported reserved word "throws"
+728. void foo() throws Exception
+*** Line 728 chars 12-17: Unsupported reserved word "throws"
 
-727. transient int x;
-*** Line 727 chars 1-9: Unsupported reserved word "transient"
+729. transient int x;
+*** Line 729 chars 1-9: Unsupported reserved word "transient"
 
-728. try
-*** Line 728 chars 1-3: Unsupported reserved word "try"
+730. try
+*** Line 730 chars 1-3: Unsupported reserved word "try"
 
-729. volatile int x = 10;
-*** Line 729 chars 1-8: Unsupported reserved word "volatile"
+731. volatile int x = 10;
+*** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-729 lines processed in 98 ms
+731 lines processed in 100 ms
 
 0 unexpected errors
-0 uncaught errors (180 expected errors)
+0 uncaught errors (182 expected errors)
 
 SUCCESS
