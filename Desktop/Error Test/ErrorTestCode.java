@@ -635,6 +635,7 @@ class ErrorTest extends Code12Program
 	void FUNC()
 	{
 	}
+	// ERROR "should start with a lower-case letter"
 	void AnotherFunc()
 	{
 	}	

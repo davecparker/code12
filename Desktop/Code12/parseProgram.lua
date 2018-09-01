@@ -22,8 +22,9 @@ local parseProgram = {}
 -- It is made up of the following structure nodes, tokens, nested structures, 
 -- and arrays (plural names), with the following named fields:
 --
--- In addition, any structure node may add firstToken and/or lastToken fields to
--- extend the span of tokens referenced by that strucure for error reporting.
+-- In addition, for error hilighting, any structure node may add firstToken 
+-- and/or lastToken fields to extend the span of tokens referenced by that strucure,
+-- or a entireLine = true field to reference the entire source line.
 --
 -- program: 
 --     { s = "program", nameID, vars, funcs }
@@ -424,7 +425,7 @@ local function getElseStmts( ifTree )
 		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
 				stmts = getControlledStmts(), 
 				elseStmts = getElseStmts( ifTree ),
-				firstToken = tree.nodes[2] } }
+				entireLine = true } }
 	end
 	return nil	
 end
@@ -463,8 +464,7 @@ end
 -- Get and return a for or forArray structure given the line parse tree nodes.
 -- Return nil if there is an error.
 local function getForStmt( nodes )
-	local firstToken = nodes[1]
-	local iLine = firstToken.iLine
+	local iLine = nodes[1].iLine
 	local forControl = nodes[3]
 	nodes = forControl.nodes
 	if forControl.p == "array" then
@@ -474,12 +474,15 @@ local function getForStmt( nodes )
 			var = makeVar( false, nodes[1], nodes[2] ),
 			expr = makeExpr( nodes[4] ), 
 			stmts = getControlledStmts(),
-			firstToken = firstToken, 
+			entireLine = true, 
 		}
 	else
 		-- for (init; expr; next) controlledStmts
-		local stmt = { s = "for", stmts = getControlledStmts(), 
-				firstToken = firstToken }
+		local stmt = { 
+			s = "for", 
+			stmts = getControlledStmts(), 
+			entireLine = true 
+		}
 
 		-- Add the initStmt if any
 		local forInit = nodes[1]
@@ -536,7 +539,7 @@ function getLineStmts( tree, stmts )
 		-- if (expr) controlledStmts [else controlledStmts]
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts( tree ), firstToken = nodes[1] }
+				elseStmts = getElseStmts( tree ), entireLine = true }
 	elseif p == "elseif" or p == "else" then
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
@@ -547,7 +550,7 @@ function getLineStmts( tree, stmts )
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
 	elseif p == "do" then
 		-- do controlledStmts while (expr);
-		stmt = { s = "doWhile", stmts = getControlledStmts(), firstToken = nodes[1] }
+		stmt = { s = "doWhile", stmts = getControlledStmts(), entireLine = true }
 		if stmt.stmts == nil then
 			return nil
 		end
@@ -576,7 +579,7 @@ function getLineStmts( tree, stmts )
 			return nil
 		end
 		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts(),
-				firstToken = nodes[1] }
+				entireLine = true }
 	elseif p == "for" then
 		-- for loop variants
 		stmt = getForStmt( nodes )
@@ -707,7 +710,14 @@ end
 -- Make and return a function member given the parsed fields,
 -- including the contained statements, and move iTree past it.
 -- If there is an error then set the error state and return nil.
-local function getFunc( typeID, isArray, nameID, isPublic, paramList )
+local function getFunc( nodes )
+	local nameID = nodes[3]
+	local isPublic = (nodes[1].p == "public") or nil
+	local retType = nodes[2]
+	local typeID = retType.nodes[1]
+	local isArray = (retType.p == "array") or nil
+	local paramList = nodes[5]
+
 	-- Build the paramVars array
 	local paramVars = {}
 	for _, node in ipairs( paramList.nodes ) do
@@ -729,12 +739,12 @@ local function getFunc( typeID, isArray, nameID, isPublic, paramList )
 	return { 
 		s = "func",
 		iLine = nameID.iLine,
-		firstToken = typeID, 
 		nameID = nameID,
 		vt = javaTypes.vtFromType( typeID, isArray ),
 		isPublic = isPublic,
 		paramVars = paramVars, 
 		stmts = stmts,
+		entireLine = true, 
 	}
 end
 
@@ -783,11 +793,7 @@ local function getMembers()
 		elseif p == "func" then
 			-- User function or event definition
 			if ok then
-				local isPublic = (nodes[1].p == "public") or nil
-				local retType = nodes[2]
-				local typeID = retType.nodes[1]
-				local isArray = (retType.p == "array") or nil
-				funcs[#funcs + 1] = getFunc( typeID, isArray, nodes[3], isPublic, nodes[5] )
+				funcs[#funcs + 1] = getFunc( nodes )
 				checkMultiLineIndent( tree )
 			else
 				getBlockStmts()  -- skip body of invalid function defintion
@@ -872,7 +878,8 @@ local function printStructureTree( node, indentLevel, file, label )
 			fieldStr = field .. " = " .. javaTypes.typeNameFromVt( value )
 		elseif field ~= "s" and field ~= "iLine" and field ~= "nameID" 
 				and field ~= "opToken" and field ~= "opType" 
-				and field ~= "firstToken" and field ~= "lastToken" then
+				and field ~= "firstToken" and field ~= "lastToken" 
+				and field ~= "entireLine" then
 			if type(value) == "table" then
 				if value.tt then  
 					-- A token

@@ -73,9 +73,17 @@ local function expandLocToNode( loc, node )
 	end
 end
 
+-- Return a loc representing the entire source line at iLine
+local function locEntireLine( iLine )
+	return { iLine = iLine, iLineEnd = iLine }
+end
+
 -- Make and return a loc record using the extent of the given parse tree or structure node
 local function errLocFromNode( node )
 	assert( type(node) == "table" )
+	if node.s and node.entireLine and node.iLine then
+		return locEntireLine( node.iLine )
+	end
 	local loc = {}
 	expandLocToNode( loc, node )
 	return loc
@@ -133,7 +141,6 @@ end
 -- Mark the given line number as incomplete (tokens were forward to the next line)
 function err.markIncompleteLine( iLine )
 	assert( type(iLine) == "number" )
-
 	incompleteLines[iLine] = true
 end
 
@@ -173,11 +180,7 @@ function err.setErrLineNum( iLine, strErr, ... )
 	assert( type(strErr) == "string" )
 
 	-- Make a loc that indicates the entire line
-	local loc = {
-		iLine = iLine,
-		iLineEnd = iLine,
-	}
-	err.setErr( loc, nil, strErr, ... )
+	err.setErr( locEntireLine( iLine ), nil, strErr, ... )
 end
 
 -- Record an error with:
@@ -190,17 +193,8 @@ function err.setErrLineNumAndRefLineNum( iLine, iLineRef, strErr, ... )
 	assert( type(iLineRef) == "number" )
 	assert( type(strErr) == "string" )
 
-	-- Make a loc that indicates the entire line
-	local loc = {
-		iLine = iLine,
-		iLineEnd = iLine,
-	}
-	-- Make a loc that indicates the entire ref line
-	local refLoc = {
-		iLine = iLineRef,
-		iLineEnd = iLineRef,
-	}
-	err.setErr( loc, refLoc, strErr, ... )
+	-- Make locs that indicates the entire lines
+	err.setErr( locEntireLine( iLine ), locEntireLine( iLineRef ), strErr, ... )
 end
 
 -- Record an error with:
