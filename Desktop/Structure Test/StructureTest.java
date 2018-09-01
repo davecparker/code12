@@ -33,6 +33,7 @@ class StructureTest extends Code12Program
 
 	int foo(int i, double d)
 	{
+		// Scanner scanner = new Scanner(System.in);
 		i = 8;
 		return 0;
 	}
@@ -67,6 +68,7 @@ class StructureTest extends Code12Program
 		}
 
 		d = 24;
+		d = d * (1.0 - (int)Math.pow(d / d, i));
 
 		for (int j = i; j < 10; j++)
 		{
@@ -74,7 +76,7 @@ class StructureTest extends Code12Program
 			i--;
 		}
 
-		i = 0;
+		i = (int) Math.PI * foo(1, 3.1);
 
 		return 0;
 	}

@@ -241,7 +241,7 @@ class BubblePop extends Code12Program
 	x = !false;
 	x = !paused;
 	x = new GameObj [numBullets]; // "newArray"
-	// x = complex expr
+	x = (int) 3.14;         // "cast"
 	x = x * y;
 	x = x / y;
 	x = x % y;
@@ -675,7 +675,7 @@ int intArr = {1, 2, 3}; // missing []
 // --------------------------------------------------------------------------------
 int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
 import java.io.PrintWriter;   // import other than Code12.*
-int time = (int)( sec );      // type casting
+private int secretVar;        // private instance variable
 time %= 3600;                 // %= operator
 int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
 char ch = 'a'; 	// char type

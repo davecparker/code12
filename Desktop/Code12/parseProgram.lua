@@ -54,6 +54,7 @@ local parseProgram = {}
 --     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
 --     { s = "call", lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
+--     { s = "cast", vt, expr }
 --     { s = "parens", expr }
 --     { s = "unaryOp", opToken, opType, expr }        -- opType: neg, not
 --     { s = "binOp", left, opToken, opType, right }   -- opType: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
@@ -344,12 +345,12 @@ local function makeCall( nodes )
 		-- a[3].delete(), s[3].equals()
 		lValue = makeLValueFromNodes( firstID, index )
 		nameID = member1.nodes[2]
-	elseif index.p == "index" then
-		-- ERROR e.g. foo[3]()
-		err.setErrNodeSpan( firstID, index, "Invalid function name" )
-		return nil
 	else
 		-- e.g. foo()
+		if index.p == "index" then
+			-- ERROR e.g. foo[3]()
+			err.setErrNodeSpan( firstID, index, "Invalid function name" )
+		end
 		lValue = nil
 		nameID = firstID
 	end
@@ -367,6 +368,18 @@ local function makeCall( nodes )
 	-- Make the call structure
 	return { s = "call", lValue = lValue, nameID = nameID, 
 			exprs = exprs, lastToken = nodes[4] }
+end
+
+-- Make and return a cast structure given the parse tree nodes. 
+-- The only supported type cast is currently (int). 
+-- In other cases, set the error state.
+-- Note this means that some parses involving (varName) are not allowed.
+local function makeCast( nodes )
+	local typeID = nodes[2]
+	if typeID.str ~= "int" then
+		err.setErrNode( typeID, "The only type cast supported by Code12 is (int)" )
+	end
+	return { s = "cast", vt = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
@@ -691,6 +704,8 @@ function makeExpr( node )
 		return makeCall( nodes )
 	elseif p == "lValue" then
 		return makeLValue( nodes[1] )
+	elseif p == "cast" then
+		return makeCast( nodes )
 	elseif p == "exprParens" then
 		return { s = "parens", expr = makeExpr( nodes[2] ) }
 	elseif p == "neg" or p == "not" then

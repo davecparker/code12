@@ -867,6 +867,21 @@ local function vtExprSTR()
 	return "String"
 end
 
+-- cast
+local function vtExprCast( node )
+	-- The only cast currently supported is (int) doubleExpr
+	assert( node.vt == 0 )  -- (int) enforced by parseProgram
+	local vtExpr = vtSetExprNode( node.expr )
+	if vtExpr == 1 then
+		return 0   -- proper cast of double to int
+	elseif vtExpr == 0 then
+		err.setErrNode( node, "Type cast is not necessary: expression is already of type int" )
+	else
+		err.setErrNode( node, "(int) type cast can only be applied to type double" )
+	end
+	return nil
+end
+
 -- parens
 local function vtExprExprParens( node )
 	return vtSetExprNode( node.expr )
@@ -1100,6 +1115,7 @@ local fnVtExprVariations = {
 	-- other expr patterns
 	["call"]        = vtCheckCall,
 	["lValue"]      = vtCheckLValue,
+	["cast"]        = vtExprCast,
 	["parens"]      = vtExprExprParens,
 	["newArray"]	= vtExprNewArray,
 	["arrayInit"]   = vtExprArrayInit,

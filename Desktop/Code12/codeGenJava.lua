@@ -294,6 +294,12 @@ local function callExprCode( expr )
 	return callCode( expr.lValue, expr.nameID, expr.exprs )
 end
 
+-- Return the Lua code string for a type cast
+local function castCode( expr )
+	-- The only supported type cast is (int) doubleExpr
+	return "ct.toInt(" .. exprCode( expr.expr ) .. ")"
+end
+
 -- Return the Lua code string for a parens expr
 local function parensCode( expr )
 	return "(" .. exprCode( expr.expr ) .. ")"
@@ -340,6 +346,7 @@ local fnGenerateExpr = {
 	["literal"]    = literalCode,
 	["call"]       = callExprCode,
 	["lValue"]     = lValueCode,
+	["cast"]       = castCode,
 	["parens"]     = parensCode,
 	["unaryOp"]    = unaryOpCode,
 	["binOp"]      = binOpCode,

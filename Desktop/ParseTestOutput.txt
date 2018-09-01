@@ -2889,7 +2889,17 @@ line (stmt)
                     index (empty)
                     field (empty)
 
-244. // x = complex expr
+244. x = (int) 3.14;         // "cast"
+line (stmt)
+    stmt (assign)
+        lValue (lValue)
+            ID (x)
+            index (empty)
+            field (empty)
+        expr (cast)
+            ID (int)
+            expr (NUM)
+                NUM (3.14)
 
 245. x = x * y;
 line (stmt)
@@ -8294,8 +8304,8 @@ Comma not supported
 677. import java.io.PrintWriter;   // import other than Code12.*
 *** Line 677: import should be "Code12.*;"
 
-678. int time = (int)( sec );      // type casting
-*** Line 678 chars 1-24: Syntax error (unrecognized code)
+678. private int secretVar;        // private instance variable
+*** Line 678 chars 1-7: Unsupported reserved word "private"
 
 679. time %= 3600;                 // %= operator
 *** Line 679 chars 1-13: Syntax error (unrecognized code)
@@ -8453,7 +8463,7 @@ Comma not supported
 *** Line 729 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-729 lines processed in 186 ms
+729 lines processed in 98 ms
 
 0 unexpected errors
 0 uncaught errors (180 expected errors)

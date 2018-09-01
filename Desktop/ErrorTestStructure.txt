@@ -505,8 +505,7 @@
                                     right: lValue { varID = d }
                                     left: lValue { varID = d }
                                 left: (*)
-                                    right: parens
-                                        expr: lValue { varID = i }
+                                    right: lValue { varID = i }
                                     left: lValue { varID = i }
 181.                assign (=)
                         lValue: lValue { varID = s }
@@ -2573,7 +2572,7 @@
 635.        func FUNC { #paramVars = 0, vt = void, #stmts = 0 }
 639.        func AnotherFunc { #paramVars = 0, vt = void, #stmts = 0 }
 643.        func anotherfunc { #paramVars = 0, vt = void, #stmts = 0 }
-647.        func expectedErrors { #paramVars = 0, vt = void, #stmts = 229 }
+647.        func expectedErrors { #paramVars = 0, vt = void, #stmts = 231 }
                 stmts:
 649.                var intVar { vt = int }
                         initExpr: literal { token = 1 }
@@ -3373,6 +3372,11 @@
 1127.                call setHeight { #exprs = 1 }
                         exprs:
                             literal { token = 150 }
+1130.                call intFunc
+1132.                call dblFuncIntDbl { #exprs = 2 }
+                        exprs:
+                            literal { token = 0 }
+                            literal { token = 0.1 }
 1135.                call foo
                         lValue: lValue { varID = GameObj }
 1137.                call foo
