@@ -3,10 +3,10 @@ import Code12.*;
 class StructureTest extends Code12Program
 {
 	// instance variables
-	GameObj fish, ball, bigBall;
+	private GameObj fish, ball, bigBall;
 	// GameObj[] moreBalls = new GameObj[10];
 	int count, total;
-	boolean gameOver = false;
+	public boolean gameOver = false;
 
 	// More instance variables
 
@@ -33,7 +33,7 @@ class StructureTest extends Code12Program
 		System.out.println("Program started");
 	}
 
-	int foo(int i, double d)
+	private int foo(int i, double d)
 	{
 		// Scanner scanner = new Scanner(System.in);
 		i = 8;

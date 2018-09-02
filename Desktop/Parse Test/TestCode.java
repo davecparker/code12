@@ -677,7 +677,7 @@ int intArr = {1, 2, 3}; // missing []
 // --------------------------------------------------------------------------------
 int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
 import java.io.PrintWriter;   // import other than Code12.*
-private int secretVar;        // private instance variable
+protected int secretVar;        // protected access
 time %= 3600;                 // %= operator
 int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
 char ch = 'a'; 	// char type
@@ -716,7 +716,7 @@ if (x instanceof y)
 public interface I
 native void foo()
 package P;
-private int x;
+public static int x;
 protected int x;
 static int x = 10;
 strictfp void foo()

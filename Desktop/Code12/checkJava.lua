@@ -276,6 +276,11 @@ local function defineMethod( func )
 					return
 				end
 			end
+			if not func.isPublic then 
+				err.setErrNode( func, 
+						'The %s function must be declared starting with "public"', 
+						fnName )
+			end
 		end
 		-- Remember that the user defined this event
 		eventMethodsDefined[nameNode.str] = true
