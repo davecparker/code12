@@ -22,8 +22,9 @@ local parseProgram = {}
 -- It is made up of the following structure nodes, tokens, nested structures, 
 -- and arrays (plural names), with the following named fields:
 --
--- In addition, any structure node may add firstToken and/or lastToken fields to
--- extend the span of tokens referenced by that strucure for error reporting.
+-- In addition, for error hilighting, any structure node may add firstToken 
+-- and/or lastToken fields to extend the span of tokens referenced by that strucure,
+-- or a entireLine = true field to reference the entire source line.
 --
 -- program: 
 --     { s = "program", nameID, vars, funcs }
@@ -53,6 +54,7 @@ local parseProgram = {}
 --     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
 --     { s = "call", lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
+--     { s = "cast", vt, expr }
 --     { s = "parens", expr }
 --     { s = "unaryOp", opToken, opType, expr }        -- opType: neg, not
 --     { s = "binOp", left, opToken, opType, right }   -- opType: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
@@ -178,10 +180,24 @@ end
 local function checkClassHeader()
 	local tree = parseTrees[iTree]
 	if tree.p == "classUser" and tree.nodes[5].str == "Code12Program" then
+		-- access class ID extends ID
 		if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
 			err.setErrLineNum( tree.iLine, "The class header shouldn't be indented" )
 		end
-		programTree.nameID = tree.nodes[3]  -- class name
+		-- Get class name and make sure it is valid
+		local nameID = tree.nodes[3]
+		local className = nameID.str
+		local chFirst = string.byte( className, 1 )
+		if javaTypes.isKnownClassName( className ) then
+			err.setErrNode( nameID,
+					"The class name %s is already defined. Choose another name.", className )
+			return false
+		elseif chFirst < 65 or chFirst > 90 then    -- A to Z
+			err.setErrNode( nameID, 
+					"By convention, class names should start with an upper-case letter" )
+			return false
+		end
+		programTree.nameID = nameID
 		iTree = iTree + 1
 		return true
 	end
@@ -343,12 +359,12 @@ local function makeCall( nodes )
 		-- a[3].delete(), s[3].equals()
 		lValue = makeLValueFromNodes( firstID, index )
 		nameID = member1.nodes[2]
-	elseif index.p == "index" then
-		-- ERROR e.g. foo[3]()
-		err.setErrNodeSpan( firstID, index, "Invalid function name" )
-		return nil
 	else
 		-- e.g. foo()
+		if index.p == "index" then
+			-- ERROR e.g. foo[3]()
+			err.setErrNodeSpan( firstID, index, "Invalid function name" )
+		end
 		lValue = nil
 		nameID = firstID
 	end
@@ -366,6 +382,18 @@ local function makeCall( nodes )
 	-- Make the call structure
 	return { s = "call", lValue = lValue, nameID = nameID, 
 			exprs = exprs, lastToken = nodes[4] }
+end
+
+-- Make and return a cast structure given the parse tree nodes. 
+-- The only supported type cast is currently (int). 
+-- In other cases, set the error state.
+-- Note this means that some parses involving (varName) are not allowed.
+local function makeCast( nodes )
+	local typeID = nodes[2]
+	if typeID.str ~= "int" then
+		err.setErrNode( typeID, "The only type cast supported by Code12 is (int)" )
+	end
+	return { s = "cast", vt = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
@@ -387,7 +415,8 @@ local function getControlledStmts()
 		return nil
 	else
 		-- Single controlled stmt
-		if javalex.indentLevelForLine( tree.iLineStart ) <= javalex.indentLevelForLine( parseTrees[iTree - 1].iLineStart ) then
+		if javalex.indentLevelForLine( tree.iLineStart ) 
+				<= javalex.indentLevelForLine( parseTrees[iTree - 1].iLineStart ) then
 			local prevTree = parseTrees[iTree - 1]
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
 					"This line should be indented more than its controlling \"%s\"", prevTree.p )
@@ -424,7 +453,7 @@ local function getElseStmts( ifTree )
 		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
 				stmts = getControlledStmts(), 
 				elseStmts = getElseStmts( ifTree ),
-				firstToken = tree.nodes[2] } }
+				entireLine = true } }
 	end
 	return nil	
 end
@@ -463,8 +492,7 @@ end
 -- Get and return a for or forArray structure given the line parse tree nodes.
 -- Return nil if there is an error.
 local function getForStmt( nodes )
-	local firstToken = nodes[1]
-	local iLine = firstToken.iLine
+	local iLine = nodes[1].iLine
 	local forControl = nodes[3]
 	nodes = forControl.nodes
 	if forControl.p == "array" then
@@ -474,12 +502,15 @@ local function getForStmt( nodes )
 			var = makeVar( false, nodes[1], nodes[2] ),
 			expr = makeExpr( nodes[4] ), 
 			stmts = getControlledStmts(),
-			firstToken = firstToken, 
+			entireLine = true, 
 		}
 	else
 		-- for (init; expr; next) controlledStmts
-		local stmt = { s = "for", stmts = getControlledStmts(), 
-				firstToken = firstToken }
+		local stmt = { 
+			s = "for", 
+			stmts = getControlledStmts(), 
+			entireLine = true 
+		}
 
 		-- Add the initStmt if any
 		local forInit = nodes[1]
@@ -536,7 +567,7 @@ function getLineStmts( tree, stmts )
 		-- if (expr) controlledStmts [else controlledStmts]
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts( tree ), firstToken = nodes[1] }
+				elseStmts = getElseStmts( tree ), entireLine = true }
 	elseif p == "elseif" or p == "else" then
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
@@ -547,7 +578,7 @@ function getLineStmts( tree, stmts )
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
 	elseif p == "do" then
 		-- do controlledStmts while (expr);
-		stmt = { s = "doWhile", stmts = getControlledStmts(), firstToken = nodes[1] }
+		stmt = { s = "doWhile", stmts = getControlledStmts(), entireLine = true }
 		if stmt.stmts == nil then
 			return nil
 		end
@@ -576,7 +607,7 @@ function getLineStmts( tree, stmts )
 			return nil
 		end
 		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts(),
-				firstToken = nodes[1] }
+				entireLine = true }
 	elseif p == "for" then
 		-- for loop variants
 		stmt = getForStmt( nodes )
@@ -688,6 +719,8 @@ function makeExpr( node )
 		return makeCall( nodes )
 	elseif p == "lValue" then
 		return makeLValue( nodes[1] )
+	elseif p == "cast" then
+		return makeCast( nodes )
 	elseif p == "exprParens" then
 		return { s = "parens", expr = makeExpr( nodes[2] ) }
 	elseif p == "neg" or p == "not" then
@@ -707,15 +740,22 @@ end
 -- Make and return a function member given the parsed fields,
 -- including the contained statements, and move iTree past it.
 -- If there is an error then set the error state and return nil.
-local function getFunc( typeID, isArray, nameID, isPublic, paramList )
+local function getFunc( nodes )
+	local nameID = nodes[3]
+	local isPublic = (nodes[1].p == "public") or nil
+	local retType = nodes[2]
+	local typeID = retType.nodes[1]
+	local isArray = (retType.p == "array") or nil
+	local paramList = nodes[5]
+
 	-- Build the paramVars array
 	local paramVars = {}
 	for _, node in ipairs( paramList.nodes ) do
-		local nodes = node.nodes
+		local ns = node.nodes
 		if node.p == "array" then
-			paramVars[#paramVars + 1] = makeVar( false, nodes[1], nodes[4], nil, true )
+			paramVars[#paramVars + 1] = makeVar( false, ns[1], ns[4], nil, true )
 		else
-			paramVars[#paramVars + 1] = makeVar( false, nodes[1], nodes[2] )
+			paramVars[#paramVars + 1] = makeVar( false, ns[1], ns[2] )
 		end
 	end
 
@@ -729,12 +769,12 @@ local function getFunc( typeID, isArray, nameID, isPublic, paramList )
 	return { 
 		s = "func",
 		iLine = nameID.iLine,
-		firstToken = typeID, 
 		nameID = nameID,
 		vt = javaTypes.vtFromType( typeID, isArray ),
 		isPublic = isPublic,
 		paramVars = paramVars, 
 		stmts = stmts,
+		entireLine = true, 
 	}
 end
 
@@ -783,11 +823,7 @@ local function getMembers()
 		elseif p == "func" then
 			-- User function or event definition
 			if ok then
-				local isPublic = (nodes[1].p == "public") or nil
-				local retType = nodes[2]
-				local typeID = retType.nodes[1]
-				local isArray = (retType.p == "array") or nil
-				funcs[#funcs + 1] = getFunc( typeID, isArray, nodes[3], isPublic, nodes[5] )
+				funcs[#funcs + 1] = getFunc( nodes )
 				checkMultiLineIndent( tree )
 			else
 				getBlockStmts()  -- skip body of invalid function defintion
@@ -872,7 +908,8 @@ local function printStructureTree( node, indentLevel, file, label )
 			fieldStr = field .. " = " .. javaTypes.typeNameFromVt( value )
 		elseif field ~= "s" and field ~= "iLine" and field ~= "nameID" 
 				and field ~= "opToken" and field ~= "opType" 
-				and field ~= "firstToken" and field ~= "lastToken" then
+				and field ~= "firstToken" and field ~= "lastToken" 
+				and field ~= "entireLine" then
 			if type(value) == "table" then
 				if value.tt then  
 					-- A token
@@ -960,6 +997,13 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 			end
 			iLineStart = nil
 		end
+	end
+
+	-- Check for unclosed block comment
+	local iLineComment = javalex.iLineStartOfUnclosedBlockComment()
+	if iLineComment then
+		err.setErrLineNum( iLineComment, "Comment started with /* was not closed with */" )
+		return nil
 	end
 
 	-- Add sentinel parse tree at the end

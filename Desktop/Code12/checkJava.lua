@@ -88,6 +88,17 @@ local function isInvalidName( nameNode, usage )
 	return false
 end
 
+-- If the name does not start with a lower-case letter, then set the error state.
+-- The usage should be a description of how the name is being used 
+-- (e.g. "variable", "function"). 
+local function checkLowerCaseStart( nameNode, usage )
+	local chFirst = string.byte( nameNode.str, 1 )
+	if chFirst < 97 or chFirst > 122 then    -- a to z
+		err.setErrNode( nameNode, 
+				"By convention, %s names should start with a lower-case letter", usage )
+	end
+end
+
 -- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
 -- If the name is found and the entry is a record (table) then return the record.
 -- If an entry has an index (name) differing only in case, then set the error state 
@@ -133,7 +144,7 @@ local function findMisspelledName( nameStr, nameTable )
 	for entryStr, entry in pairs( nameTable ) do
 		if type(entry) == "table" then
 			local match = app.partialMatchString( nameStr, entryStr )
-			print( nameStr, entryStr, match )
+			-- print( nameStr, entryStr, match )
 			if match > bestMatch then
 				bestMatch = match
 				bestMatchStr = entryStr
@@ -151,6 +162,7 @@ end
 -- Define the variable with the given var structure.
 -- Return true if successful, false if error.
 local function defineVar( var )
+	-- Check to make sure the name is valid
 	local vt = var.vt
 	local nameNode = var.nameID
 	if vt == nil or isInvalidName( nameNode, "variable" ) then
@@ -161,15 +173,20 @@ local function defineVar( var )
 	local varName = nameNode.str
 	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
 	if varFound then
-		err.setErrNodeAndRef( nameNode, varFound.nameID, 
+		err.setErrNodeAndRef( var, varFound, 
 				"Variable %s was already defined", varName )
 		return false
 	elseif varCorrectCase then
 		err.clearErr( nameNode.iLine )
-		err.setErrNodeAndRef( nameNode, varCorrectCase.nameID, 
+		err.setErrNodeAndRef( var, varCorrectCase, 
 				"Variable %s differs only by upper/lower case from existing variable %s", 
 				varName, nameCorrectCase )
 		return false
+	end
+
+	-- Enforce case convention
+	if not var.isConst then
+		checkLowerCaseStart( nameNode, "variable" )
 	end
 
 	-- Define it and the case-insensitive lower-case version as well if necessary
@@ -235,6 +252,7 @@ local function defineMethod( func )
 		if isInvalidName( nameID, "parameter" ) then
 			return
 		end
+		checkLowerCaseStart( nameID, "parameter" )
 		params[#params + 1] = { name = nameID.str, vt = var.vt }
 	end
 
@@ -268,16 +286,19 @@ local function defineMethod( func )
 	local methodFound, methodCorrectCase, nameCorrectCase 
 			= lookupID( nameNode, userMethods )
 	if methodFound then
-		err.setErrNodeAndRef( nameNode, methodFound.node, 
+		err.setErrNodeAndRef( func, methodFound.func, 
 				"Function %s was already defined", fnName )
 		return
 	elseif methodCorrectCase then
 		err.clearErr( nameNode.iLine )
-		err.setErrNodeAndRef( nameNode, methodCorrectCase.node, 
+		err.setErrNodeAndRef( func, methodCorrectCase.func, 
 				"Function %s differs only by upper/lower case from existing function %s", 
 				fnName, nameCorrectCase )
 		return
 	end
+
+	-- Enforce case convention
+	checkLowerCaseStart( nameNode, "function" )
 
 	-- Add entry to userMethods table and lowercase mapping if different
 	userMethods[fnName] = { vt = func.vt, func = func, params = params }
@@ -846,6 +867,21 @@ local function vtExprSTR()
 	return "String"
 end
 
+-- cast
+local function vtExprCast( node )
+	-- The only cast currently supported is (int) doubleExpr
+	assert( node.vt == 0 )  -- (int) enforced by parseProgram
+	local vtExpr = vtSetExprNode( node.expr )
+	if vtExpr == 1 then
+		return 0   -- proper cast of double to int
+	elseif vtExpr == 0 then
+		err.setErrNode( node, "Type cast is not necessary: expression is already of type int" )
+	else
+		err.setErrNode( node, "(int) type cast can only be applied to type double" )
+	end
+	return nil
+end
+
 -- parens
 local function vtExprExprParens( node )
 	return vtSetExprNode( node.expr )
@@ -1079,6 +1115,7 @@ local fnVtExprVariations = {
 	-- other expr patterns
 	["call"]        = vtCheckCall,
 	["lValue"]      = vtCheckLValue,
+	["cast"]        = vtExprCast,
 	["parens"]      = vtExprExprParens,
 	["newArray"]	= vtExprNewArray,
 	["arrayInit"]   = vtExprArrayInit,

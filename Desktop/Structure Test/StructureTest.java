@@ -9,6 +9,7 @@ class StructureTest extends Code12Program
 	boolean gameOver = false;
 
 	// More instance variables
+
 	final int LIMIT = 120 + 4;
 	double speed = 0.3;
 	int frameCount = 0;
@@ -25,6 +26,7 @@ class StructureTest extends Code12Program
 		final int X = 50;
 		int y;
 		y = X;
+		/* comment */
 		ball = ct.circle( X, y, 30 );
 		ball.setFillColor( "blue" );
 		frameCount = foo( LIMIT, speed * 2 );
@@ -33,6 +35,7 @@ class StructureTest extends Code12Program
 
 	int foo(int i, double d)
 	{
+		// Scanner scanner = new Scanner(System.in);
 		i = 8;
 		return 0;
 	}
@@ -67,6 +70,7 @@ class StructureTest extends Code12Program
 		}
 
 		d = 24;
+		d = d * (1.0 - (int)Math.pow(d / d, i));
 
 		for (int j = i; j < 10; j++)
 		{
@@ -74,11 +78,11 @@ class StructureTest extends Code12Program
 			i--;
 		}
 
-		i = 0;
+		i = (int) Math.PI * foo(1, 3.1);
 
 		return 0;
 	}
-
+ 
 	public void update()
 	{
 		moveBall( false );

@@ -177,7 +177,7 @@ class ErrorTest extends Code12Program
 		d = i - i + i * i;
 		d = d + i * i - i;
 		d = i * i - d * d;
-		d = (i * (i) - d * d);
+		d = (i * i - d * d);
 		s = s + s;
 		s = s + s + "s";
 		s = s + i;
@@ -635,6 +635,7 @@ class ErrorTest extends Code12Program
 	void FUNC()
 	{
 	}
+	// ERROR "should start with a lower-case letter"
 	void AnotherFunc()
 	{
 	}	

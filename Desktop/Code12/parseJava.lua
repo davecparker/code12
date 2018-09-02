@@ -207,10 +207,14 @@ primaryExpr = { t = "expr",
 	{ 1, 12, "STR",				"STR" 								},
 	{ 5, 12, "call",			fnValue, "(", exprList, ")" 		},
 	{ 3, 12, "lValue",			lValue								},
+	{ 4, 12, "cast",			"(", "ID", ")", parsePrimaryExpr	},
 	{ 4, 12, "exprParens",		"(", expr, ")"						},
 	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
 	{ 4, 12, "not",				"!", parsePrimaryExpr 				},
 	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
+	-- Common Errors
+	{ 1, 0, "new",				"new", "ID", "(", 0,				iNode = 1, 
+			strErr = "Code12 does not support making objects with new" },
 }
 
 -- Shortcut "operate and assign" operators 
