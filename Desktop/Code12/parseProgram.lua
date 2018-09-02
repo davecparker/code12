@@ -180,10 +180,24 @@ end
 local function checkClassHeader()
 	local tree = parseTrees[iTree]
 	if tree.p == "classUser" and tree.nodes[5].str == "Code12Program" then
+		-- access class ID extends ID
 		if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
 			err.setErrLineNum( tree.iLine, "The class header shouldn't be indented" )
 		end
-		programTree.nameID = tree.nodes[3]  -- class name
+		-- Get class name and make sure it is valid
+		local nameID = tree.nodes[3]
+		local className = nameID.str
+		local chFirst = string.byte( className, 1 )
+		if javaTypes.isKnownClassName( className ) then
+			err.setErrNode( nameID,
+					"The class name %s is already defined. Choose another name.", className )
+			return false
+		elseif chFirst < 65 or chFirst > 90 then    -- A to Z
+			err.setErrNode( nameID, 
+					"By convention, class names should start with an upper-case letter" )
+			return false
+		end
+		programTree.nameID = nameID
 		iTree = iTree + 1
 		return true
 	end

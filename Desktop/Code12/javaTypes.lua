@@ -78,6 +78,37 @@ local knownTypes = {
 	["integer"]  = "Integer",
 }
 
+-- Known class names
+local isKnownClassName = {
+	-- Code12 names
+	["Code12"]         = true,
+	["Code12Program"]  = true,
+	["ct"]             = true,
+	["GameObj"]        = true,
+	-- Standard Java classes used by Code12
+	["Math"]           = true,
+	["Object"]         = true,
+	["String"]         = true,
+	["PrintStream"]    = true,
+	-- Selection of other common Java classes in java.lang
+	["Boolean"]        = true,
+	["Byte"]           = true,
+	["Character"]      = true,
+	["Class"]          = true,
+	["Double"]         = true,
+	["Enum"]           = true,
+	["Float"]          = true,
+	["Integer"]        = true,
+	["Long"]           = true,
+	["Number"]         = true,
+	["Package"]        = true,
+	["Runtime"]        = true,
+	["Short"]          = true,
+	["System"]         = true,
+	["Throwable"]      = true,
+	["Void"]           = true,
+}
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -178,6 +209,11 @@ function javaTypes.canCompareVts( vt1, vt2 )
 		return t1.vt == t2.vt    -- can compare arrays of same type
 	end	
 	return false
+end
+
+-- Return true if name is a pre-defined class name known by Code12
+function javaTypes.isKnownClassName( name )
+	return isKnownClassName[name]
 end
 
 -- Return true if name is the name of a supported class with public static members
