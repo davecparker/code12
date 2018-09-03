@@ -7,6 +7,10 @@ class ErrorTest extends Code12Program
 	GameObj button = ct.text("START", 0, 0, 10);
 	// ERROR "cannot be called before start()"
 	int intResult = intFunc();
+	// ERROR "Class-level variable and function definitions should all have the same indentation"
+		int overIndentedInstanceVar;
+	// ERROR "Class-level variable and function definitions should all have the same indentation"
+int underIndentedInstanceVar;
 	// TODO: Need more tests involving instance (class-level) variables
 
 	public static void main(String[] args)
@@ -68,13 +72,19 @@ class ErrorTest extends Code12Program
 			return 0;
 		return 1 + recursiveFunc(i - 1);
 	}
+	void multiLineFuncDecl( int arg1,
+							double arg2,
+							boolean arg3 )
+	{
+		ct.log(arg1, arg2, arg3);
+	}
 
-	
 	// ERROR "Return type of start function should be void"
 	public int start()
 	{
 		// These line are all OK
-
+		// constants
+		final int LIMIT = 100;
 		// int, double, boolean, and String variable declarations and assignments;
 		int i = 3;
 		i=-5;
@@ -98,7 +108,7 @@ class ErrorTest extends Code12Program
 		d = 1.2345e6;
 		d = 1.2345e+67;
 		d = .12e0;
-		d = -.123e-456;
+		d = -.123e-123;
 		d=-.5;
 		d = d / 2;
 		d ++;
@@ -121,7 +131,6 @@ class ErrorTest extends Code12Program
 		String s = "A string variable";
 		s = s;
 		s = null;
-
 		// arrays
 		String[] colors = { "black", "white", "red", "green", "blue" };
 		i = 100;
@@ -135,7 +144,6 @@ class ErrorTest extends Code12Program
 		double[] dblArr2 = new double[100];
 		dblArr = dblArr2;
 		GameObj[] gObjArr = new GameObj[i * 2];
-
 		// user defined functions
 		voidFunc();
 		i = intFunc();
@@ -148,7 +156,6 @@ class ErrorTest extends Code12Program
 		d = dblFuncIntDbl(i, d);
 		b = boolFuncBoolStringGameObj(b, s, gObj);
 		i = recursiveFunc(2);
-
 		// expressions
 		i = 5 / 1;
 		i = 100 / 20;
@@ -229,7 +236,6 @@ class ErrorTest extends Code12Program
 		b = i % 2 == 0;
 		b = (b || b) && b;
 		b = (1 + 1 == 2) && (Math.PI - 3.14159 < 0.0001);
-
 		// if statements
 		if (i == 0)
 			ct.setBackColor(colors[i]);
@@ -257,7 +263,6 @@ class ErrorTest extends Code12Program
 		}
 		if ( ct.isError(Math.tan(d)) && ct.distance(x1, y1, x2, y2) <= eps)
 			ct.println("oops");
-
 		// for loops
 		for(;false;)
 			for(;;)
@@ -266,7 +271,6 @@ class ErrorTest extends Code12Program
 						for(;;i++)
 							for(;b;)
 								d = 0;
-
 		for (int ii = 0; ii < 10; ii++)
 		{
 			for (int jj = 0; jj != 10; jj+=1)
@@ -274,7 +278,6 @@ class ErrorTest extends Code12Program
 					break;
 			break;
 		}
-
 		for (int ii = 0; ii < 10; ii++)
 		{
 			for (int jj = 0; jj != 10; jj+=1)
@@ -288,38 +291,31 @@ class ErrorTest extends Code12Program
 			}
 			break;
 		}
-
 		double xVar = 0;
 		double yVar = 1;
 		for (double dx = .1; xVar < 1; xVar += dx)
 			for(double dy=-.5;yVar>0;yVar+=dy)
 				d = xVar + dx - yVar / dy;
-
 		intArr = new int[1];
 		for (int a : intArr)
 			a = 0;
-
 		// while loops
 		while(b)
 			b = false;
-
 		while ( b )
 		{
 			voidFunc();
 			i++;
 			b = false;
 		}
-
 		do
 			b = false;
 		while (b);
-
 		do
 		{
 			b = false;
 		}
 		while (b);
-
 		// Code12 API -- Text Output
 		ct.print("Hello world");
 		ct.print("Hello" + " " + "world");
@@ -357,7 +353,6 @@ class ErrorTest extends Code12Program
 		ct.setOutputFile("output/nameList.txt");
 		String outputFilename = "output.txt";
 		ct.setOutputFile(outputFilename);
-
 		// Code12 API -- Alerts and Input Dialogs
 		ct.showAlert("alert meassage");
 		String message = "alert!";
@@ -373,7 +368,6 @@ class ErrorTest extends Code12Program
 		String inputStr = ct.inputString("Quit?");
 		inputStr = ct.inputString("Quit?");
 		inputStr = ct.inputString(message);
-
 		// Code12 API -- Screen Management
 		ct.setTitle("Title");
 		String title = "Title";
@@ -590,8 +584,22 @@ class ErrorTest extends Code12Program
 		s = s.toLowerCase();
 		s = s.toUpperCase();
 		s = s.trim();
+		// multi-line statements
+		GameObj[] coins, 
+				  walls;
+		int[] multilineArrayInit = { 1,
+									 2, 
+									 3 };
+		ct.log( 1,
+				2,
+				3 );
+		if ( ct.random( 1,
+						2 ) == 1 )
+			ct.println("heads");
+		ct.log( 1, ct.random( 1,
+							  100 ),
+				3, 4 );
 	}
-
 
 	// ERROR "Class-level variables must be defined at the beginning of the class"
 	double newWidth = ct.getWidth();
@@ -1195,14 +1203,183 @@ class ErrorTest extends Code12Program
 		indent = "2 Tabs";
 		// ERROR "Mix of tabs and spaces"
     	indent = "4 Spaces + 1 Tab";
-	// ERROR "Mix of tabs and spaces"
-	} // 1 Tab for indent
+		// ERROR "Mix of tabs and spaces"
+		indent = "2 Tabs";
+		// ERROR "Unexpected change in indentation"
+			if (false)
+			{
+				voidFunc();
+			}
+		if (false)
+		// ERROR "line should be indented more than its controlling "if""
+		voidFunc();
+		if (false)
+		{
+		// ERROR "Lines within { } brackets should be indented"
+		voidFunc();
+		voidFunc();
+		}
+		if (false)
+			voidFunc();
+		// ERROR "Unexpected change in indentation"
+			voidFunc();
+		if (false)
+		{
+			voidFunc();
+		// ERROR "Unexpected change in indentation"
+		voidFunc();
+		}
+		if (false)
+		// ERROR "The { after an if statement should have the same indentation as the "if""
+			{
+				voidFunc();
+			}
+		if (false)
+		{
+			voidFunc();
+			// ERROR "A block's ending } should have the same indentation as its beginning {"
+			}
+		if (false)
+			voidFunc();
+		else
+		// ERROR "line should be indented more than its controlling "else""
+		voidFunc();
+		if (false)
+			voidFunc();
+		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+			else
+				voidFunc();
+		if (false)
+			voidFunc();
+		else
+			voidFunc();
+			// ERROR "Unexpected change in indentation"
+			voidFunc();
+		if (false)
+			voidFunc();
+		else
+			// ERROR "The { after an "else" should have the same indentation as the "else""
+				{
+					voidFunc();
+				}
+		if (false)
+			voidFunc();
+		else if (false)
+		// ERROR "This line should be indented more than its controlling "elseif""
+		voidFunc();
+		if (false)
+			voidFunc();
+		else if (false)
+		// ERROR "The { after an else if statement should have the same indentation as the "else if""
+				{
+					voidFunc();
+				}
+		if (false)
+			voidFunc();
+		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it
+			else if (false)
+				voidFunc();
+		else
+			voidFunc();
+		if (false)
+			voidFunc();
+		else if (false)
+			voidFunc();
+		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+			else
+				voidFunc();
+		if (false)
+			voidFunc();
+		else if (false)
+			voidFunc();
+		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it"
+			else if (false)
+				voidFunc();
+		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+			else
+				voidFunc();
+		if (false)
+			if (false)
+					voidFunc();
+			// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		else
+			voidFunc();
+		if (false)
+		{
+			if (false)
+			{
+				voidFunc();
+			}
+			else
+			{
+				voidFunc();
+			}
+			// ERROR "A block's ending } should have the same indentation as its beginning {"
+			}
+		if (false)
+			if (false)
+				voidFunc();
+		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it"
+		else if (false)
+			voidFunc();
+		for (int ii = 0; ii < 100; ii++)
+		// ERROR "This line should be indented more than its controlling "for""
+		voidFunc();
+		for (int ii = 0; ii < 100; ii++)
+		{
+		// ERROR "Lines within { } brackets should be indented"
+		voidFunc();
+		}
+		for (int ii = 0; ii < 100; ii++)
+		// ERROR "The { after a for loop header should have the same indentation as the "for""
+			{
+				voidFunc();
+			}
+		while (false)
+		// ERROR "This line should be indented more than its controlling "while""
+		voidFunc();
+		while (false)
+		// ERROR "The { after a while loop header should have the same indentation as the "while""
+			{
+				voidFunc();
+			}
+		while (false)
+			voidFunc();
+		// ERROR "Unexpected change in indentation"
+			voidFunc();
+		do
+		// ERROR "This line should be indented more than its controlling "do""
+		voidFunc();
+		while (false);
+		do
+		// ERROR "The { after a "do" should have the same indentation as the "do""		
+			{
+				voidFunc();
+			}
+		while (false);
+		do
+			voidFunc();
+		// ERROR "This while statement should have the same indentation as its "do""
+			while (false);
+		int x1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		x2,	x3;
+		GameObj circle = ct.circle( 0, 0,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		10);
+		ct.log( 1,
+			2,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		3);
+		int[] multiLineArrInit = { 1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2 };
+	}
 
 	// ERROR "Variable myVar was already defined"
 	void myFunc(int myVar)
 	{
 	}
-
 	// ERROR "Return type of update function should be void"
 	GameObj update()
 	{
@@ -1219,41 +1396,51 @@ class ErrorTest extends Code12Program
 	void onKeyPress( GameObj obj, double x, double y )
 	{
 	}
-
 	// ERROR "Wrong number of parameters for function"
 	void onKeyRelease( )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 1 of function onMousePress"
 	void onMousePress( boolean obj, double x, double y )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 2 of function onMouseDrag"
 	void onMouseDrag( GameObj obj, int x, double y )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 3 of function"
 	void onMouseRelease( GameObj obj, double x, String y )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 1 of function"
 	void onKeyPress( double keyName )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 1 of function"
 	void onKeyRelease( int keyName )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 1 of function"
 	void onCharTyped( GameObj keyName )
 	{
 	}
-
+	// ERROR "Class-level variable and function definitions should all have the same indentation"
+		void overIndentedFunc()
+		{
+		}
+	// ERROR "Class-level variable and function definitions should all have the same indentation"
+void underIndentedFunc()
+{
+}
+	int funcWithUnindentedBody()
+	{
+	// ERROR "Lines within { } brackets should be indented"
+	return 0;
+	}
+	void multiLineFuncDef( int arg1,
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	int arg2 )
+	{
+	}
 }
 
