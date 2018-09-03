@@ -310,7 +310,7 @@ local function getVar( p, nodes, structs, isGlobal )
 									nodes[5], nodes[7], true )						
 	elseif p == "arrayDecl" then
 		-- e.g. GameObj[] coins, walls;
-		for _, nameID in ipairs( nodes[4].nodes ) do
+		for _, nameID in ipairs( nodes[5].nodes ) do
 			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
 										nameID, nil, true )
 		end	
