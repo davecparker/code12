@@ -601,7 +601,7 @@ function getLineStmts( tree, stmts )
 			return nil
 		end
 		local whileEnd = endTree.nodes[4]
-		if whileEnd.p ~= "do-while" then
+		if whileEnd.p ~= "doWhile" then
 			err.setErrNodeAndRef( whileEnd, tree, 
 					"while statement at end of do-while loop must end with a semicolon" )
 			return nil

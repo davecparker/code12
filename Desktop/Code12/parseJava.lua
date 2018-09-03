@@ -239,7 +239,7 @@ local stmt = { t = "stmt",
 
 -- The end of a while statement, either with a ; (for do-while) or not
 local whileEnd = { t = "whileEnd",
-	{ 11, 12, "do-while",		")", ";"		},
+	{ 11, 12, "doWhile",		")", ";"		},
 	{ 11, 12, "while",			")"				},
 }
 
@@ -307,14 +307,12 @@ local line = { t = "line",
 									"(", "ID", "[", "]", "ID", ")",					"END" },
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
 									"ID", "(", ")", ")", ";",						"END" },
-	-- Common errors
+	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
 	{ 9, 0, "returnVal", 	"return", expr, "END", 									iNode = 3 }, 
 	{ 9, 0, "return", 		"return", "END", 										iNode = 2 },
 	{ 11, 0, "break",		"break", "END",											iNode = 2,
 			strErr = "Statement should end with a semicolon (;)" },
-	{ 1, 0, "stmt", 		stmt, ";", 2,
-			strErr = "Code12 only allows one statement per line" },
 	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, "END",					iNode = 6 }, 
 	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, "END",			iNode = 7 }, 
 	{ 12, 0, "arrayInit",	access, "ID", "[", "]", "ID", "=", arrayInit, "END", 	iNode = 8,
@@ -322,11 +320,9 @@ local line = { t = "line",
 	{ 3, 0, "varDecl",		access, "ID", idList, "END",							iNode = 4 }, 
 	{ 12, 0, "arrayDecl",	access, "ID", "[", "]", idList, "END",					iNode = 6,
 			strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ",",	"ID", "=", 1 },
-	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ";",	"ID", "ID", "=", 1 },
-	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
-	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ";", "ID", "ID", "=", 1, 
-			strErr = "Code12 requires each variable initialization to be on its own line" },
+	-- Common errors: incorrect semicolon
+	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END",	iNode = 7,
+			strErr = "function header should not end with a semicolon" },
 	{ 8, 0, "if",			"if", "(", expr, ")", ";", 0,							iNode = 5 },
 	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,					iNode = 6,
 			strErr = "if statement should not end with a semicolon" },
@@ -334,13 +330,30 @@ local line = { t = "line",
 			strErr = "else statement should not end with a semicolon" },
 	{ 11, 0, "do",			"do", ";", 0,											iNode = 2, 
 			strErr = "do statement should not end with a semicolon" },
-	{ 8, 0, "if",			"if", expr, 0,											iNode = 2 }, 
-	{ 8, 0, "elseif",		"else", "if", expr, 0,									iNode = 3, 
-			strErr = "if statement test must be in parentheses" },
-	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END",	iNode = 7,
-			strErr = "function header should not end with a semicolon" },
+	{ 11, 0, "for",			"for", "(", forControl, ")", ";", 0,	 				iNode = 5,
+			strErr = "for loop header should not end with a semicolon" },
+	-- Common errors: unsupported bracket style
+	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	"{", 0,		iNode = 7 },
+	{ 8, 0, "if",			"if", "(", expr, ")", "{", 0,							iNode = 5 },
+	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", "{", 0,					iNode = 6 },
+	{ 8, 0, "else",			"else", "{", 0,											iNode = 2 },
+	{ 11, 0, "do",			"do", "{", 0,											iNode = 2 },
+	{ 11, 0, "while",		"while", "(", expr, whileEnd, "{", 0,					iNode = 5 },
+	{ 11, 0, "for",			"for", "(", forControl, ")", "{", 0,					iNode = 5,
+			strErr = "In Code12, each { to start a new block must be on its own line" },
+	{ 1, 0, "end",			"}", 1,
+			strErr = "In Code12, each } to end a block must be on its own line" },
+	-- Common errors: malformed boilerplate lines
 	{ 1, 0, "import",		"import", "ID", 0, 
 			strErr = "import should be \"Code12.*;\"" },
+	-- Common errors: multiple statements per line
+	{ 1, 0, "stmt", 		stmt, ";", 2,
+			strErr = "Code12 only allows one statement per line" },
+	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ",",	"ID", "=", 1 },
+	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ";",	"ID", "ID", "=", 1 },
+	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
+	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ";", "ID", "ID", "=", 1, 
+			strErr = "Code12 requires each variable initialization to be on its own line" },
 
 }
 
@@ -549,6 +562,8 @@ local function parseCurrentLine( level )
 			return nil
 		end
 	end
+
+	-- TODO: Try two lines (line without END)
 
 	-- TODO: Try modified patterns to isolate the error
 
