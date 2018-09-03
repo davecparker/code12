@@ -6602,10 +6602,10 @@ Comma not supported
 *** Line 687 chars 12-55: Syntax error (unrecognized code)
 
 688. x = a; y = b; 	// more than one statement on a single line
-*** Line 688: Code12 only allows one statement per line
+*** Line 688: Code12 requires each statement to be on its own line
 
 689. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
-*** Line 689 chars 1-36: Syntax error (unrecognized code)
+*** Line 689 chars 13-36: Code12 requires code after an if statement to be on its own line
 
 690. double getVariable() { return variable; } // {} must start and end on their own lines
 *** Line 690 char 22: In Code12, each { to start a new block must be on its own line
@@ -6735,7 +6735,7 @@ Comma not supported
 *** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 113 ms
+731 lines processed in 118 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)
