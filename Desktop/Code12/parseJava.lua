@@ -37,6 +37,7 @@ local syntaxFeatures = {
 local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
+local sourceLine        -- the current source code line
 local tokens     	    -- array of tokens
 local iToken            -- index of current token in tokens
 local syntaxLevel	    -- the syntax level for parsing
@@ -239,7 +240,7 @@ local stmt = { t = "stmt",
 
 -- The end of a while statement, either with a ; (for do-while) or not
 local whileEnd = { t = "whileEnd",
-	{ 11, 12, "do-while",		")", ";"		},
+	{ 11, 12, "doWhile",		")", ";"		},
 	{ 11, 12, "while",			")"				},
 }
 
@@ -299,6 +300,7 @@ local line = { t = "line",
 	{ 11, 12, "break",			"break", ";",										"END" },
 	{ 12, 12, "arrayInit",		access, "ID", "[", "]", "ID", "=", arrayInit, ";",	"END" },
 	{ 12, 12, "arrayDecl",		access, "ID", "[", "]", idList, ";",				"END" },
+
 	-- Boilerplate lines
 	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",						"END" },
 	{ 1, 12, "class",			"class", "ID",										"END" },
@@ -307,40 +309,77 @@ local line = { t = "line",
 									"(", "ID", "[", "]", "ID", ")",					"END" },
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
 									"ID", "(", ")", ")", ";",						"END" },
-	-- Common errors
+	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
 	{ 9, 0, "returnVal", 	"return", expr, "END", 									iNode = 3 }, 
 	{ 9, 0, "return", 		"return", "END", 										iNode = 2 },
 	{ 11, 0, "break",		"break", "END",											iNode = 2,
 			strErr = "Statement should end with a semicolon (;)" },
-	{ 1, 0, "stmt", 		stmt, ";", 2,
-			strErr = "Code12 only allows one statement per line" },
+
 	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, "END",					iNode = 6 }, 
 	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, "END",			iNode = 7 }, 
 	{ 12, 0, "arrayInit",	access, "ID", "[", "]", "ID", "=", arrayInit, "END", 	iNode = 8,
 			strErr = "Variable initialization should end with a semicolon (;)" },
+
 	{ 3, 0, "varDecl",		access, "ID", idList, "END",							iNode = 4 }, 
 	{ 12, 0, "arrayDecl",	access, "ID", "[", "]", idList, "END",					iNode = 6,
 			strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ",",	"ID", "=", 1 },
-	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ";",	"ID", "ID", "=", 1 },
-	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
-	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ";", "ID", "ID", "=", 1, 
-			strErr = "Code12 requires each variable initialization to be on its own line" },
+
+	-- Common errors: incorrect semicolon
+	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END",	iNode = 7,
+			strErr = "function header should not end with a semicolon" },
+
 	{ 8, 0, "if",			"if", "(", expr, ")", ";", 0,							iNode = 5 },
 	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,					iNode = 6,
 			strErr = "if statement should not end with a semicolon" },
+
 	{ 8, 0, "else",			"else", ";", 0,											iNode = 2, 
 			strErr = "else statement should not end with a semicolon" },
+
 	{ 11, 0, "do",			"do", ";", 0,											iNode = 2, 
 			strErr = "do statement should not end with a semicolon" },
-	{ 8, 0, "if",			"if", expr, 0,											iNode = 2 }, 
-	{ 8, 0, "elseif",		"else", "if", expr, 0,									iNode = 3, 
-			strErr = "if statement test must be in parentheses" },
-	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END",	iNode = 7,
-			strErr = "function header should not end with a semicolon" },
+
+	{ 11, 0, "for",			"for", "(", forControl, ")", ";", 0,	 				iNode = 5,
+			strErr = "for loop header should not end with a semicolon" },
+
+	-- Common errors: unsupported bracket style
+	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	"{", 0,		iNode = 7 },
+	{ 8, 0, "if",			"if", "(", expr, ")", "{", 0,							iNode = 5 },
+	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", "{", 0,					iNode = 6 },
+	{ 8, 0, "else",			"else", "{", 0,											iNode = 2 },
+	{ 11, 0, "do",			"do", "{", 0,											iNode = 2 },
+	{ 11, 0, "while",		"while", "(", expr, whileEnd, "{", 0,					iNode = 5 },
+	{ 11, 0, "for",			"for", "(", forControl, ")", "{", 0,					iNode = 5,
+			strErr = "In Code12, each { to start a new block must be on its own line" },
+
+	{ 1, 0, "end",			"}", 1,
+			strErr = "In Code12, each } to end a block must be on its own line" },
+
+	-- Common errors: malformed boilerplate lines
 	{ 1, 0, "import",		"import", "ID", 0, 
 			strErr = "import should be \"Code12.*;\"" },
+
+	-- Common errors: multiple statements per line
+	{ 1, 0, "stmt", 		stmt, ";", 2,
+			strErr = "Code12 requires each statement to be on its own line" },
+
+	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ",",	"ID", "=", 1 },
+	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ";",	2 },
+	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
+	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ";", 2, 
+			strErr = "Code12 requires each variable initialization to be on its own line" },
+
+	{ 8, 0, "if",			"if", "(", expr, ")", 2, 								iNode = 5, toEnd = true },
+	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", 2,						iNode = 6, toEnd = true,
+			strErr = "Code12 requires code after an if statement to be on its own line" },
+
+	{ 8, 0, "else",			"else", 2,												iNode = 2, toEnd = true,
+			strErr = "Code12 requires code after an else to be on its own line" },
+
+	{ 11, 0, "do",			"do", 2,												iNode = 2, toEnd = true	},
+	{ 11, 0, "while",		"while", "(", expr, whileEnd, 2,						iNode = 5, toEnd = true },
+	{ 11, 0, "for",			"for", "(", forControl, ")", 2,							iNode = 5, toEnd = true,
+			strErr = "Code12 requires the contents of a loop to start on its own line" },
 
 }
 
@@ -417,10 +456,12 @@ function parseGrammar( grammar )
 						strErr = patErr.strErr
 					end
 					local iNode = pattern.iNode
-					if iNode then
-						err.setErrNode( nodes[iNode], strErr )
-					else
+					if iNode == nil then
 						err.setErrLineNum( tokens[1].iLine, strErr )
+					elseif pattern.toEnd then
+						err.setErrNodeSpan( nodes[iNode], tokens[#tokens - 1], strErr )
+					else
+						err.setErrNode( nodes[iNode], strErr )
 					end
 				end
 
@@ -552,9 +593,22 @@ local function parseCurrentLine( level )
 
 	-- TODO: Try modified patterns to isolate the error
 
-	-- Make a generic syntax error to use if a more specific error was not set
+	-- Make a generic syntax error to use if a more specific error was not found
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
 	err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
+
+	-- Append the source line to our log of generic syntax errors if this
+	-- is an abortable error (i.e. we are not running a bulk error test)
+	if err.shouldStop() then
+		local logFile = io.open( "../SyntaxErrors.txt", "a" )
+		if logFile then
+			logFile:write( sourceLine )
+			logFile:write( "\n" )
+			io.close( logFile )
+		end
+	end
+
+	-- Return failure
 	return nil
 end
 
@@ -573,8 +627,9 @@ end
 -- The given lineNumber will be assigned to the tokens found and the resulting tree.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
-function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
+function parseJava.parseLine( strLine, lineNumber, startTokens, level )
 	-- Run lexical analysis to get the tokens array
+	sourceLine = strLine
 	tokens = javalex.getTokens( sourceLine, lineNumber )
 	if tokens == nil then
 		return nil

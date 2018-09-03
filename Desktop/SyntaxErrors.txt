@@ -1,0 +1,8 @@
+This file is a log of generic syntax errors detected by the Code12 parser.
+It is appended to each time a generic syntax error is found. 
+Conflicts in this file should be resolved by preserving the union of all the lines.
+ 
+		ct.circle;
+		ct.circle X, y, 20
+		ct.circle X, y, 20;
+		ct.circle = (10, 20, 30);
