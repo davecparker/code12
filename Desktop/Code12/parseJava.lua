@@ -37,6 +37,7 @@ local syntaxFeatures = {
 local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
+local sourceLine        -- the current source code line
 local tokens     	    -- array of tokens
 local iToken            -- index of current token in tokens
 local syntaxLevel	    -- the syntax level for parsing
@@ -590,13 +591,24 @@ local function parseCurrentLine( level )
 		end
 	end
 
-	-- TODO: Try two lines (line without END)
-
 	-- TODO: Try modified patterns to isolate the error
 
-	-- Make a generic syntax error to use if a more specific error was not set
+	-- Make a generic syntax error to use if a more specific error was not found
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
 	err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
+
+	-- Append the source line to our log of generic syntax errors if this
+	-- is an abortable error (i.e. we are not running a bulk error test)
+	if err.shouldStop() then
+		local logFile = io.open( "../SyntaxErrors.txt", "a" )
+		if logFile then
+			logFile:write( sourceLine )
+			logFile:write( "\n" )
+			io.close( logFile )
+		end
+	end
+
+	-- Return failure
 	return nil
 end
 
@@ -615,8 +627,9 @@ end
 -- The given lineNumber will be assigned to the tokens found and the resulting tree.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
-function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
+function parseJava.parseLine( strLine, lineNumber, startTokens, level )
 	-- Run lexical analysis to get the tokens array
+	sourceLine = strLine
 	tokens = javalex.getTokens( sourceLine, lineNumber )
 	if tokens == nil then
 		return nil
