@@ -310,7 +310,7 @@ local function getVar( p, nodes, structs, isGlobal )
 									nodes[5], nodes[7], true )						
 	elseif p == "arrayDecl" then
 		-- e.g. GameObj[] coins, walls;
-		for _, nameID in ipairs( nodes[4].nodes ) do
+		for _, nameID in ipairs( nodes[5].nodes ) do
 			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
 										nameID, nil, true )
 		end	
@@ -601,7 +601,7 @@ function getLineStmts( tree, stmts )
 			return nil
 		end
 		local whileEnd = endTree.nodes[4]
-		if whileEnd.p ~= "do-while" then
+		if whileEnd.p ~= "doWhile" then
 			err.setErrNodeAndRef( whileEnd, tree, 
 					"while statement at end of do-while loop must end with a semicolon" )
 			return nil

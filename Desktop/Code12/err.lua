@@ -81,7 +81,7 @@ end
 -- Make and return a loc record using the extent of the given parse tree or structure node
 local function errLocFromNode( node )
 	assert( type(node) == "table" )
-	if node.s and node.entireLine and node.iLine then
+	if node.isError or (node.s and node.entireLine and node.iLine) then
 		return locEntireLine( node.iLine )
 	end
 	local loc = {}

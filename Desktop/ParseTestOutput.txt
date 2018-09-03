@@ -1001,7 +1001,7 @@ line (while)
                 ID (j)
         expr (NUM)
             NUM (100)
-    whileEnd (do-while)
+    whileEnd (doWhile)
 
 98. while (j < foo && i != bar);
 line (while)
@@ -1020,7 +1020,7 @@ line (while)
             expr (lValue)
                 lValue (lValue)
                     ID (bar)
-    whileEnd (do-while)
+    whileEnd (doWhile)
 
 99. while (j >= 100);
 line (while)
@@ -1030,7 +1030,7 @@ line (while)
                 ID (j)
         expr (NUM)
             NUM (100)
-    whileEnd (do-while)
+    whileEnd (doWhile)
 
 100. while (j <= foo && i != bar);
 line (while)
@@ -1049,7 +1049,7 @@ line (while)
             expr (lValue)
                 lValue (lValue)
                     ID (bar)
-    whileEnd (do-while)
+    whileEnd (doWhile)
 
 101. while (i < max && notFound)
 line (while)
@@ -5864,7 +5864,7 @@ line (while)
 line (while)
     expr (BOOL)
         BOOL (true)
-    whileEnd (do-while)
+    whileEnd (doWhile)
 
 486. 
 
@@ -6401,7 +6401,7 @@ line (end)
 *** Line 620 chars 1-10: Syntax error (unrecognized code)
 
 621. if x == 3       // required next token in pattern doesn't match
-*** Line 621 chars 4-9: if statement test must be in parentheses
+*** Line 621 chars 1-9: Syntax error (unrecognized code)
 
 622. while i < max   // required next token in pattern doesn't match
 *** Line 622 chars 1-13: Syntax error (unrecognized code)
@@ -6467,7 +6467,7 @@ line (end)
 *** Line 642 char 14: if statement should not end with a semicolon
 
 643. for ( i=0; i<n; i++); 	// for() followed directly by ;
-*** Line 643 chars 1-21: Syntax error (unrecognized code)
+*** Line 643 char 21: for loop header should not end with a semicolon
 
 644. x + 1 = x; 		// confusing left hand side an right hand side of assignment
 *** Line 644 chars 1-10: Syntax error (unrecognized code)
@@ -6589,7 +6589,7 @@ Comma not supported
 *** Line 683 char 11: char type not supported, use double quotes
 
 684. while(foo) { 	// opening { in control structure not on it's own line
-*** Line 684 chars 1-12: Syntax error (unrecognized code)
+*** Line 684 char 12: In Code12, each { to start a new block must be on its own line
 
 685. i++; } 			// closing } not on it's own line
 *** Line 685 chars 1-6: Syntax error (unrecognized code)
@@ -6602,13 +6602,13 @@ Comma not supported
 *** Line 687 chars 12-55: Syntax error (unrecognized code)
 
 688. x = a; y = b; 	// more than one statement on a single line
-*** Line 688: Code12 only allows one statement per line
+*** Line 688: Code12 requires each statement to be on its own line
 
 689. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
-*** Line 689 chars 4-11: if statement test must be in parentheses
+*** Line 689 chars 13-36: Code12 requires code after an if statement to be on its own line
 
 690. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Line 690 chars 1-41: Syntax error (unrecognized code)
+*** Line 690 char 22: In Code12, each { to start a new block must be on its own line
 
 691. switch (choice)
 *** Line 691 chars 1-6: Unsupported reserved word "switch"
@@ -6735,7 +6735,7 @@ Comma not supported
 *** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 115 ms
+731 lines processed in 118 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)
