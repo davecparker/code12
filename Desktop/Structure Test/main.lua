@@ -55,7 +55,7 @@ function _fn.test()
 	elseif d < i then
 		d =  -i
 	else
-		i = 0
+		return 0
 	end
 	repeat
 		i = i + 1
@@ -66,7 +66,9 @@ function _fn.test()
 	while i > 10 do
 
 		i = i - 1
-		i = i + 1
+		if i > 10 then
+			break
+		end; i = i + 1
 	end
 
 	d = 24
@@ -86,6 +88,7 @@ end
 function _fn.update()
 
 	_fn.moveBall(false)
+	return 
 end
 
 function _fn.onMousePress()
@@ -109,7 +112,7 @@ function _fn.moveBall()
 		if this.ball.x > 100 then
 			this.ball.x = 0
 		end
-	end; return this.ball.x
+	end; return ct.toInt(this.ball.x)
 end
 
 function _fn.makeCircles()

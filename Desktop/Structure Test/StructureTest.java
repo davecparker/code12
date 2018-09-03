@@ -55,7 +55,7 @@ class StructureTest extends Code12Program
 		else if (d < i)
 			d = -i;
 		else
-			i = 0;
+			return 0;
 
 		do
 			i++;
@@ -66,6 +66,8 @@ class StructureTest extends Code12Program
 		while (i > 10)
 		{
 			i--;
+			if (i > 10)
+				break;
 			i++;
 		}
 
@@ -86,6 +88,7 @@ class StructureTest extends Code12Program
 	public void update()
 	{
 		moveBall( false );
+		return;
 	}
 
 	public void onMousePress( GameObj obj, double x, double y )
@@ -109,7 +112,7 @@ class StructureTest extends Code12Program
 			if (ball.x > 100)
 				ball.x = 0;
 		}
-		return ball.x;
+		return (int) ball.x;
 	}
 
 	GameObj[] makeCircles()

@@ -492,8 +492,6 @@ local function getStmt( node )
 		local opToken = nodes[2]
 		return { s = "assign", lValue = makeLValue( nodes[1] ), opToken = opToken,
 				opType = opToken.str }
-	elseif p == "break" then
-		return { s = "break", firstToken = nodes[1] }
 	end
 	error( "Unexpected stmt pattern " .. p )
 end
@@ -582,9 +580,13 @@ function getLineStmts( tree, stmts )
 		-- so an else here is without a matching if.
 		err.setErrNode( tree, "else without matching if (misplaced { } brackets?)")
 		return false
-	elseif p == "return" then
-		-- TODO: Remember to check for return being only at end of a block
+	elseif p == "returnVal" then
+		-- return expr ;
+		-- TODO: Check for return being only at end of a block
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
+	elseif p == "return" then
+		-- return ;
+		stmt = { s = "return", firstToken = nodes[1] }
 	elseif p == "do" then
 		-- do controlledStmts while (expr);
 		stmt = { s = "doWhile", stmts = getControlledStmts(), entireLine = true }
@@ -620,6 +622,9 @@ function getLineStmts( tree, stmts )
 	elseif p == "for" then
 		-- for loop variants
 		stmt = getForStmt( nodes )
+	elseif p == "break" then
+		-- break ;
+		stmt = { s = "break", firstToken = nodes[1] }
 	else
 		-- Invalid line pattern
 		if p == "func" or p == "main" then

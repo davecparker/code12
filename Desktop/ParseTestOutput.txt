@@ -5094,8 +5094,7 @@ line (stmt)
 397. // -- break
 
 398. break;
-line (stmt)
-    stmt (break)
+line (break)
 
 399. 
 
@@ -5840,7 +5839,7 @@ line (else)
 477. // "return",			"return", expr, ";"
 
 478. return 0;
-line (return)
+line (returnVal)
     expr (NUM)
         NUM (0)
 
@@ -6736,7 +6735,7 @@ Comma not supported
 *** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 112 ms
+731 lines processed in 115 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)
