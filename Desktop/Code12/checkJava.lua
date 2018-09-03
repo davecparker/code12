@@ -41,8 +41,10 @@ local eventMethodsDefined = {}
 -- Stack of local variable names, with an empty name "" marking the beginning of each block
 local localNameStack = {}
 
--- Other processing state
-local beforeStart      -- true when checking code that will run before start() 
+-- Program processing state
+local beforeStart       -- true when checking code that will run before start()
+local currentFunc		-- the func body currently being checked or nil if none
+local currentLoop       -- the loop body currently being checked or nil if none 
 
 -- Forward declarations for recursion
 local vtSetExprNode
@@ -275,6 +277,11 @@ local function defineMethod( func )
 							i, fnName )
 					return
 				end
+			end
+			if not func.isPublic then 
+				err.setErrNode( func, 
+						'The %s function must be declared starting with "public"', 
+						fnName )
 			end
 		end
 		-- Remember that the user defined this event
@@ -759,6 +766,14 @@ local function canOpAssign( lValue, opNode, expr )
 	return true
 end
 
+-- Check the stmt block for the given loop stmt
+local function checkLoopBlock( stmt )
+	local currentLoopSav = currentLoop
+	currentLoop = stmt
+	checkBlock( stmt.stmts )
+	currentLoop = currentLoopSav
+end
+
 -- Check a stmt structure. Set the error state if there is an error.
 function checkStmt( stmt )
 	local s = stmt.s
@@ -791,10 +806,10 @@ function checkStmt( stmt )
 	elseif s == "while" then
 		-- { s = "while", iLine, expr, stmts }
 		checkLoopExpr( stmt.expr )
-		checkBlock( stmt.stmts )
+		checkLoopBlock( stmt )
 	elseif s == "doWhile" then
 		-- { s = "doWhile", iLine, expr, stmts }
-		checkBlock( stmt.stmts )
+		checkLoopBlock( stmt )
 		checkLoopExpr( stmt.expr )
 	elseif s == "for" then
 		-- { s = "for", iLine, initStmt, expr, nextStmt, stmts }
@@ -809,7 +824,7 @@ function checkStmt( stmt )
 		if stmt.nextStmt then
 			checkStmt( stmt.nextStmt )
 		end
-		checkBlock( stmt.stmts )
+		checkLoopBlock( stmt )
 		if initStmt then
 			endLocalBlock()
 		end
@@ -827,13 +842,34 @@ function checkStmt( stmt )
 					javaTypes.typeNameFromVt( vtExpr.vt ) )
 		else
 			var.assigned = true
-			checkBlock( stmt.stmts )
+			checkLoopBlock( stmt )
 		end
 		endLocalBlock()
 	elseif s == "return" then
 		-- { s = "return", iLine, expr }
-		vtSetExprNode( stmt.expr )    -- TODO: Check that matches function return type
-	elseif s ~= "break" then
+		local vtFunc = currentFunc.vt
+		if stmt.expr then
+			local vtExpr = vtSetExprNode( stmt.expr )
+			if vtFunc == false then   -- function is void
+				err.setErrNodeAndRef( stmt, currentFunc,
+						"void functions cannot return a value" )
+			elseif not javaTypes.vtCanAcceptVtExpr( vtFunc, vtExpr ) then
+				err.setErrNodeAndRef( stmt, currentFunc,
+						"Incorrect return value type (%s) for function %s (requires %s)",
+						javaTypes.typeNameFromVt( vtExpr ), currentFunc.nameID.str,
+						javaTypes.typeNameFromVt( vtFunc ) )
+			end
+		elseif vtFunc ~= false then  -- missing return value
+			err.setErrNodeAndRef( stmt, currentFunc,
+				"Function %s requires a return value of type %s",
+				 currentFunc.nameID.str, javaTypes.typeNameFromVt( vtFunc ) )
+		end
+	elseif s == "break" then
+		-- { s = "break" }
+		if currentLoop == nil then
+			err.setErrNode( stmt, "break statements are only allowed inside loops" )
+		end
+	else
 		error( "Unknown stmt structure " .. s )
 	end
 end
@@ -1166,6 +1202,8 @@ function checkJava.checkProgram( programTree, level )
 	eventMethodsDefined = {}
 	localNameStack = {}
 	beforeStart = true
+	currentFunc = nil
+	currentLoop = nil
 
 	-- Get method definitions first, since vars can forward reference them
 	assert( programTree.s == "program" )
@@ -1188,9 +1226,11 @@ function checkJava.checkProgram( programTree, level )
 	beforeStart = false
 	if funcs then
 		for _, func in ipairs( funcs ) do
+			currentFunc = func
 			checkBlock( func.stmts, func.paramVars )
 		end
 	end
+	currentFunc = nil
 
 	-- Do some overall post-checks if there are no other errors
 	if not err.shouldStop() then

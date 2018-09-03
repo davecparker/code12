@@ -519,7 +519,9 @@ end
 -- Generate Lua code for the given return stmt
 local function generateReturn( stmt )
 	beginLuaLine( stmt.iLine, "return " )
-	addLua( exprCode( stmt.expr ) )
+	if stmt.expr then
+		addLua( exprCode( stmt.expr ) )
+	end
 end
 
 -- Functions to generate the various stmt types

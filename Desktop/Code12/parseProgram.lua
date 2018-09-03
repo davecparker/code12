@@ -267,8 +267,13 @@ local function checkMainBody()
 end
 
 -- Make and return a var given the parsed fields.
--- If there is an error then set the error state and return nil.
-local function makeVar( isGlobal, typeID, nameID, initExpr, isArray, isConst )
+-- If there is an error then set the error state.
+local function makeVar( isGlobal, access, typeID, nameID, initExpr, isArray, isConst )
+	-- Access is optional and ignored for instance variables, not allowed otherwise
+	if not isGlobal and access and access.p ~= "empty" then
+		err.setErrNode( access, "Access specifiers are only allowed on class-level variables" )
+	end
+
 	return {
 		s = "var",
 		iLine = nameID.iLine,
@@ -288,22 +293,26 @@ end
 local function getVar( p, nodes, structs, isGlobal )
 	if p == "varInit" then
 		-- e.g. int x = 10;
-		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], nodes[4] )
+		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
+									nodes[3], nodes[5] )
 	elseif p == "varDecl" then
 		-- e.g. int x, y;
-		for _, nameID in ipairs( nodes[2].nodes ) do
-			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nameID )
+		for _, nameID in ipairs( nodes[3].nodes ) do
+			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], nameID )
 		end
 	elseif p == "constInit" then
 		-- e.g. final int LIMIT = 100;
-		structs[#structs + 1] = makeVar( isGlobal, nodes[2], nodes[3], nodes[5], nil, true )			
+		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[3], 
+									nodes[4], nodes[6], nil, true )			
 	elseif p == "arrayInit" then
 		-- e.g. int[] a = { 1, 2, 3 };   or   int[] a = new int[10];
-		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[4], nodes[6], true )						
+		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
+									nodes[5], nodes[7], true )						
 	elseif p == "arrayDecl" then
 		-- e.g. GameObj[] coins, walls;
 		for _, nameID in ipairs( nodes[4].nodes ) do
-			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nameID, nil, true )
+			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
+										nameID, nil, true )
 		end	
 	else
 		return false   -- not a variable pattern
@@ -483,8 +492,6 @@ local function getStmt( node )
 		local opToken = nodes[2]
 		return { s = "assign", lValue = makeLValue( nodes[1] ), opToken = opToken,
 				opType = opToken.str }
-	elseif p == "break" then
-		return { s = "break", firstToken = nodes[1] }
 	end
 	error( "Unexpected stmt pattern " .. p )
 end
@@ -499,7 +506,7 @@ local function getForStmt( nodes )
 		-- for (typeID nameID : arrayID) controlledStmts
 		return { 
 			s = "forArray", 
-			var = makeVar( false, nodes[1], nodes[2] ),
+			var = makeVar( false, nil, nodes[1], nodes[2] ),
 			expr = makeExpr( nodes[4] ), 
 			stmts = getControlledStmts(),
 			entireLine = true, 
@@ -514,9 +521,9 @@ local function getForStmt( nodes )
 
 		-- Add the initStmt if any
 		local forInit = nodes[1]
-		if forInit.p == "varInit" then
+		if forInit.p == "var" then
 			local ns = forInit.nodes
-			stmt.initStmt = makeVar( false, ns[1], ns[2], ns[4] )
+			stmt.initStmt = makeVar( false, nil, ns[1], ns[2], ns[4] )
 		elseif forInit.p == "stmt" then
 			stmt.initStmt = getStmt( forInit.nodes[1] )
 			stmt.initStmt.iLine = iLine
@@ -573,9 +580,13 @@ function getLineStmts( tree, stmts )
 		-- so an else here is without a matching if.
 		err.setErrNode( tree, "else without matching if (misplaced { } brackets?)")
 		return false
-	elseif p == "return" then
-		-- TODO: Remember to check for return being only at end of a block
+	elseif p == "returnVal" then
+		-- return expr ;
+		-- TODO: Check for return being only at end of a block
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
+	elseif p == "return" then
+		-- return ;
+		stmt = { s = "return", firstToken = nodes[1] }
 	elseif p == "do" then
 		-- do controlledStmts while (expr);
 		stmt = { s = "doWhile", stmts = getControlledStmts(), entireLine = true }
@@ -611,6 +622,9 @@ function getLineStmts( tree, stmts )
 	elseif p == "for" then
 		-- for loop variants
 		stmt = getForStmt( nodes )
+	elseif p == "break" then
+		-- break ;
+		stmt = { s = "break", firstToken = nodes[1] }
 	else
 		-- Invalid line pattern
 		if p == "func" or p == "main" then
@@ -753,9 +767,9 @@ local function getFunc( nodes )
 	for _, node in ipairs( paramList.nodes ) do
 		local ns = node.nodes
 		if node.p == "array" then
-			paramVars[#paramVars + 1] = makeVar( false, ns[1], ns[4], nil, true )
+			paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[4], nil, true )
 		else
-			paramVars[#paramVars + 1] = makeVar( false, ns[1], ns[2] )
+			paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[2] )
 		end
 	end
 
