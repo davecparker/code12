@@ -811,7 +811,7 @@ class ErrorTest extends Code12Program
 		ct.random( intVar / intVar, intVar );
 		// ERROR "Undefined variable x"
 		x = x + 1;
-		// ERROR "Undefined variable x"
+		// ERROR "must be declared with a type before being assigned"
 		for (x = 0; x < 1; x++) 
 			voidFunc();
 		// ERROR "Undefined function foo"
