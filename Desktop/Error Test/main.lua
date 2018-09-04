@@ -170,7 +170,7 @@ local function checkTestCode()
 
 	-- Get the program structure tree and parse tree array
 	local startTime = system.getTimer()
-	local programTree, parseTrees = parseProgram.getProgramTree( 
+	local programTree = parseProgram.getProgramTree( 
 								sourceFile.strLines, syntaxLevel )
 	local parseTime = system.getTimer() - startTime
 
@@ -183,12 +183,12 @@ local function checkTestCode()
 
 	-- Do Semantic Analysis
 	startTime = system.getTimer()
-	checkJava.initProgram( parseTrees, syntaxLevel )
+	checkJava.checkProgram( programTree, syntaxLevel )
 	local semCheckTime = system.getTimer() - startTime
 
 	-- Do Code Generation
 	startTime = system.getTimer()
-	codeGenJava.getLuaCode( parseTrees )
+	codeGenJava.getLuaCode( programTree )
 	local codeGenTime = system.getTimer() - startTime
 
 	-- Check the results

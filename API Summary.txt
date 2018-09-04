@@ -171,6 +171,14 @@ class String
 	String   trim()
 }
 
+class PrintStream
+{
+	// Special support for System.out.print() and System.out.println()
+	//----------------------------------------------------------------
+	void print( Object value )
+	void println( Object value )
+}
+
 class Code12Program
 {
 	// Events in Code12Program

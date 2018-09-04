@@ -2,6 +2,17 @@ import Code12.*;
 
 class ErrorTest extends Code12Program
 {
+	int myVar = 1;
+	// ERROR "Code12 API functions cannot be called before start()"
+	GameObj button = ct.text("START", 0, 0, 10);
+	// ERROR "cannot be called before start()"
+	int intResult = intFunc();
+	// ERROR "Class-level variable and function definitions should all have the same indentation"
+		int overIndentedInstanceVar;
+	// ERROR "Class-level variable and function definitions should all have the same indentation"
+int underIndentedInstanceVar;
+	// TODO: Need more tests involving instance (class-level) variables
+
 	public static void main(String[] args)
 	{ 
 		Code12.run(new ErrorTest()); 
@@ -61,13 +72,19 @@ class ErrorTest extends Code12Program
 			return 0;
 		return 1 + recursiveFunc(i - 1);
 	}
+	void multiLineFuncDecl( int arg1,
+							double arg2,
+							boolean arg3 )
+	{
+		ct.log(arg1, arg2, arg3);
+	}
 
-	
 	// ERROR "Return type of start function should be void"
 	public int start()
 	{
 		// These line are all OK
-
+		// constants
+		final int LIMIT = 100;
 		// int, double, boolean, and String variable declarations and assignments;
 		int i = 3;
 		i=-5;
@@ -91,7 +108,7 @@ class ErrorTest extends Code12Program
 		d = 1.2345e6;
 		d = 1.2345e+67;
 		d = .12e0;
-		d = -.123e-456;
+		d = -.123e-123;
 		d=-.5;
 		d = d / 2;
 		d ++;
@@ -114,7 +131,6 @@ class ErrorTest extends Code12Program
 		String s = "A string variable";
 		s = s;
 		s = null;
-
 		// arrays
 		String[] colors = { "black", "white", "red", "green", "blue" };
 		i = 100;
@@ -128,7 +144,6 @@ class ErrorTest extends Code12Program
 		double[] dblArr2 = new double[100];
 		dblArr = dblArr2;
 		GameObj[] gObjArr = new GameObj[i * 2];
-
 		// user defined functions
 		voidFunc();
 		i = intFunc();
@@ -141,7 +156,6 @@ class ErrorTest extends Code12Program
 		d = dblFuncIntDbl(i, d);
 		b = boolFuncBoolStringGameObj(b, s, gObj);
 		i = recursiveFunc(2);
-
 		// expressions
 		i = 5 / 1;
 		i = 100 / 20;
@@ -170,7 +184,7 @@ class ErrorTest extends Code12Program
 		d = i - i + i * i;
 		d = d + i * i - i;
 		d = i * i - d * d;
-		d = (i * (i) - d * d);
+		d = (i * i - d * d);
 		s = s + s;
 		s = s + s + "s";
 		s = s + i;
@@ -222,7 +236,6 @@ class ErrorTest extends Code12Program
 		b = i % 2 == 0;
 		b = (b || b) && b;
 		b = (1 + 1 == 2) && (Math.PI - 3.14159 < 0.0001);
-
 		// if statements
 		if (i == 0)
 			ct.setBackColor(colors[i]);
@@ -250,7 +263,6 @@ class ErrorTest extends Code12Program
 		}
 		if ( ct.isError(Math.tan(d)) && ct.distance(x1, y1, x2, y2) <= eps)
 			ct.println("oops");
-
 		// for loops
 		for(;false;)
 			for(;;)
@@ -259,7 +271,6 @@ class ErrorTest extends Code12Program
 						for(;;i++)
 							for(;b;)
 								d = 0;
-
 		for (int ii = 0; ii < 10; ii++)
 		{
 			for (int jj = 0; jj != 10; jj+=1)
@@ -267,7 +278,6 @@ class ErrorTest extends Code12Program
 					break;
 			break;
 		}
-
 		for (int ii = 0; ii < 10; ii++)
 		{
 			for (int jj = 0; jj != 10; jj+=1)
@@ -281,38 +291,31 @@ class ErrorTest extends Code12Program
 			}
 			break;
 		}
-
 		double xVar = 0;
 		double yVar = 1;
 		for (double dx = .1; xVar < 1; xVar += dx)
 			for(double dy=-.5;yVar>0;yVar+=dy)
 				d = xVar + dx - yVar / dy;
-
 		intArr = new int[1];
 		for (int a : intArr)
 			a = 0;
-
 		// while loops
 		while(b)
 			b = false;
-
 		while ( b )
 		{
 			voidFunc();
 			i++;
 			b = false;
 		}
-
 		do
 			b = false;
 		while (b);
-
 		do
 		{
 			b = false;
 		}
 		while (b);
-
 		// Code12 API -- Text Output
 		ct.print("Hello world");
 		ct.print("Hello" + " " + "world");
@@ -337,6 +340,9 @@ class ErrorTest extends Code12Program
 		ct.println(name);
 		ct.println("Hello" + " " + name);
 		ct.println(circleObj);
+		ct.log(i);
+		ct.log(d);
+		ct.log(b);
 		ct.log(circleObj);
 		GameObj obj2 = circleObj;
 		GameObj obj3 = obj2;
@@ -347,7 +353,6 @@ class ErrorTest extends Code12Program
 		ct.setOutputFile("output/nameList.txt");
 		String outputFilename = "output.txt";
 		ct.setOutputFile(outputFilename);
-
 		// Code12 API -- Alerts and Input Dialogs
 		ct.showAlert("alert meassage");
 		String message = "alert!";
@@ -358,12 +363,11 @@ class ErrorTest extends Code12Program
 		double x = ct.inputNumber("enter a number: ");
 		x = ct.inputNumber("enter a number: ");
 		x = ct.inputNumber(message);
-		boolean quit = ct.inputYesNo("Quit?"); // Crashes Error Test/main.lua
+		boolean quit = ct.inputYesNo("Quit?");
 		quit = ct.inputYesNo(message);
 		String inputStr = ct.inputString("Quit?");
 		inputStr = ct.inputString("Quit?");
 		inputStr = ct.inputString(message);
-
 		// Code12 API -- Screen Management
 		ct.setTitle("Title");
 		String title = "Title";
@@ -580,22 +584,32 @@ class ErrorTest extends Code12Program
 		s = s.toLowerCase();
 		s = s.toUpperCase();
 		s = s.trim();
+		// multi-line statements
+		GameObj[] coins, 
+				  walls;
+		int[] multilineArrayInit = { 1,
+									 2, 
+									 3 };
+		ct.log( 1,
+				2,
+				3 );
+		if ( ct.random( 1,
+						2 ) == 1 )
+			ct.println("heads");
+		ct.log( 1, ct.random( 1,
+							  100 ),
+				3, 4 );
 	}
 
-	// ERROR "Code12 API functions cannot be called before start()"
-	GameObj button = ct.text("START", 0, 0, 10);
-	// ERROR "Code12 API functions cannot be called before start()"
-	double WIDTH = ct.getWidth();
+	// ERROR "Class-level variables must be defined at the beginning of the class"
+	double newWidth = ct.getWidth();
+
 	// ERROR "is reserved for use by the system"
 	void ct()
 	{
 		ct.println("Hello world");
 	}
-	// ERROR "Names cannot start with an underscore in Code12"
-	int _fn()
-	{
-		return 0;
-	}
+
 	// ERROR "int is a type name, expected a function name here"
 	double int()
 	{
@@ -629,11 +643,12 @@ class ErrorTest extends Code12Program
 	void FUNC()
 	{
 	}
+	// ERROR "should start with a lower-case letter"
 	void AnotherFunc()
 	{
 	}	
 	// ERROR "Names are case-sensitive"
-	void anotherfunc() // crash
+	void anotherfunc()
 	{
 	}
 
@@ -780,6 +795,7 @@ class ErrorTest extends Code12Program
 		
 		// ERROR "requires 1 parameter"
 		if (intFuncInt() > 0)
+			voidFunc();
 		// ERROR "requires 2 parameters"
 		dblFuncIntDbl();
 		// ERROR "requires 3 parameters"
@@ -798,14 +814,15 @@ class ErrorTest extends Code12Program
 		objVar.setText("circle", "green");
 
 		// ERROR "Integer divide"
-		int k = i / 2;
+		int k = 3 / 2;
 		// ERROR "Integer divide"
 		ct.random( intVar / intVar, intVar );
-		// ERROR "Undefined variable"
+		// ERROR "Undefined variable x"
 		x = x + 1;
-		// ERROR "Undefined variable"
+		// ERROR "Undefined variable x"
 		for (x = 0; x < 1; x++) 
-		// ERROR "Undefined function"
+			voidFunc();
+		// ERROR "Undefined function foo"
 		foo();
 		// ERROR "already defined"
 		int j = 3;
@@ -813,13 +830,14 @@ class ErrorTest extends Code12Program
 		int uninitializedVar;
 		// ERROR "must be assigned before it is used"
 		if (uninitializedVar < 0)
+			uninitializedVar = 0;
 		GameObj g;
 		// ERROR "must be assigned before it is used"
 		g.xSpeed = 1;
 
-		// ERROR "Unknown variable type"
+		// ERROR "Unknown type name"
 		integer n = 100;
-		// ERROR "Unknown variable type"
+		// ERROR "Unknown type name"
 		bool gameOver = false;
 		// ERROR "Unknown API function"
 		GameObj r = ct.rectangle(0,0,10,10);
@@ -847,76 +865,95 @@ class ErrorTest extends Code12Program
 		objVar = NULL;
 		// ERROR "Incorrect case for constant"
 		while(True)
+			voidFunc();
 		// ERROR "Incorrect case for constant"
 		boolVar = TRUE;
 		// ERROR "Incorrect case for constant"
 		if (False)
+			voidFunc();
 		// ERROR "Incorrect case for constant"
 		objVar.clickable = FALSE;
 
 		// ERROR "Use == to compare for equality"
 		if (i = 0)
-		// ERROR "Array element type does not match the array type"
+			i = 0;
+		// ERROR "cannot be assigned"
 		int[] intArr2 = {1, 2, 3.14};
-		// ERROR "Array element type does not match the array type"
+		// ERROR "Array initializers must all be the same type"
 		double[] dblArr = {1, "two", 3.14};
-		// ERROR "Cannot initialize array of String with type array of GameObj"
+		// ERROR "cannot be assigned"
 		String[] strArr = new GameObj[100];
-		// ERROR "Cannot initialize array of boolean with type array of int"
+		// ERROR "cannot be assigned"
 		boolean[] boolArr = intArrFuncInt(10);
 		// ERROR "Array count must be an integer"
 		intArr = new int[1.5];
 
-		// ERROR "Can only apply "++" to numeric types"
+		// ERROR "can only be applied to numbers"
 		boolVar++;
-		// ERROR "Can only apply "++" to numeric types"
+		// ERROR "can only be applied to numbers"
 		strVar++;
-		// ERROR "Can only apply "++" to numeric types"
+		// ERROR "can only be applied to numbers"
 		objVar++;
-		// ERROR "Can only apply "--" to numeric types"
+		// ERROR "can only be applied to numbers"
 		boolVar--;
-		// ERROR "Can only apply "--" to numeric types"
+		// ERROR "can only be applied to numbers"
 		strVar--;
-		// ERROR "Can only apply "--" to numeric types"
+		// ERROR "can only be applied to numbers"
 		objVar--;
 
-		// ERROR "The source variable in a for-each loop must be an array"
+		// ERROR "A for-each loop must operate on an array"
 		for (int x : intVar)
-		// ERROR "The source variable in a for-each loop must be an array"
+			voidFunc();
+		// ERROR "A for-each loop must operate on an array"
 		for (double x : dblVar)
-		// ERROR "The source variable in a for-each loop must be an array"
+			voidFunc();
+		// ERROR "A for-each loop must operate on an array"
 		for (boolean x : boolVar)
-		// ERROR "The source variable in a for-each loop must be an array"
+			voidFunc();
+		// ERROR "A for-each loop must operate on an array"
 		for (String x : strVar)
-		// ERROR "The source variable in a for-each loop must be an array"
+			voidFunc();
+		// ERROR "A for-each loop must operate on an array"
 		for (GameObj x : objVar)
-		// ERROR "The source variable in a for-each loop must be an array"
+			voidFunc();
+		// ERROR "A for-each loop must operate on an array"
 		for (GameObj x : strVar)
+			voidFunc();
 		
-		// ERROR "Array "intArr" contains elements of type int"
+		// ERROR "The loop array contains elements of type int"
 		for (double x : intArr)
-		// ERROR "Array "objArr" contains elements of type GameObj"
+			voidFunc();
+		// ERROR "The loop array contains elements of type GameObj"
 		for (String x : objArr)
-		
+			voidFunc();
+
 		// ERROR "Loop test must evaluate to a boolean"
 		for ( ; intVar ; )
+			voidFunc();
 		// ERROR "Loop test must evaluate to a boolean"
 		for ( ; dblVar ; )
+			voidFunc();
 		// ERROR "Loop test must evaluate to a boolean"
 		for ( ; strVar ; )
+			voidFunc();
 		// ERROR "Loop test must evaluate to a boolean"
 		for ( ; objVar ; )
+			voidFunc();
 
 		do
 			voidFunc();
-		// ERROR "Loop test must be boolean"
+		// ERROR "Loop test must evaluate to a boolean"
 		while(intVar);
-		// ERROR "Loop test must be boolean"
+
+		// ERROR "Loop test must evaluate to a boolean"
 		while(dblVar)
-		// ERROR "Loop test must be boolean"
+			voidFunc();
+		// ERROR "Loop test must evaluate to a boolean"
 		while(strVar)
-		// ERROR "Loop test must be boolean"
+			voidFunc();
+		// ERROR "Loop test must evaluate to a boolean"
 		while(objVar)
+			voidFunc();
 
 		// ERROR "Conditional test must be boolean"
 		if(intVar)
@@ -949,27 +986,50 @@ class ErrorTest extends Code12Program
 		Double d = 100.0;
 		// ERROR "The Boolean type is not supported by Code12. Use boolean instead."
 		Boolean b = false;
+
 		// ERROR "+= can only be applied to numbers"
 		strVar += "hello";
+		// ERROR "-= can only be applied to numbers"
+		boolVar -= 1;
+		// ERROR "*= can only be applied to numbers"
+		objVar *= objVar;
+		// ERROR "/= can only be applied to numbers"
+		objVar /= 3.14;
+		// ERROR "Expression for += must be numeric"
+		intVar += "hello";
+		// ERROR "Expression for -= must be numeric"
+		dblVar -= ct.rect(0,0,1,2);
+		// ERROR "Expression for *= must be numeric"
+		intVar *= false;
+		// ERROR "Expression for /= must be numeric"
+		dblVar /= true;
+		// ERROR "double cannot be assigned to int"
+		intVar += dblVar;
+		// ERROR "double cannot be assigned to int"
+		intVar -= dblVar;
+		// ERROR "double cannot be assigned to int"
+		intVar *= dblVar;
+		// ERROR "double cannot be assigned to int"
+		intVar /= dblVar;
 		// ERROR "Use str1.equals( str2 ) to compare two String values"
 		if (strVar == "s")
-		// ERROR "Unsupported operator"
+			voidFunc();
+
+		// ERROR "operator is not supported"
 		i = i ^ i;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i & i;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i | i;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i >> 2;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i << 2;
-		// ERROR "Unsupported operator"
+		// ERROR "operator is not supported"
 		i = i >>> 2;
 
 		// ERROR "is reserved for use by the system"
 		String ct;
-		// ERROR "Names cannot start with an underscore in Code12"
-		GameObj _fn;
 		// ERROR " is a type name, expected a variable name here"
 		int String;
 		// ERROR " is a type name, expected a variable name here"
@@ -1042,10 +1102,13 @@ class ErrorTest extends Code12Program
 
 		// ERROR "Inequality operator (<) can only apply to numbers"
 		if (boolVar < boolVar)
+			voidFunc();
 		// ERROR "Inequality operator (>) can only apply to numbers"
 		boolVar = objVar > dblVar;
 		// ERROR "Inequality operator (<=) can only apply to numbers"
 		while( boolVar <= intVar )
+			voidFunc();
+
 		// ERROR "Inequality operator (>=) can only apply to numbers"
 		dblVar = dblVar >= intArr;
 
@@ -1059,8 +1122,75 @@ class ErrorTest extends Code12Program
 		// ERROR "Variable objArr was already defined"
 		GameObj[] objArr = new GameObj[10];
 
-		// ERROR "Method call on invalid type"
+		// ERROR "Calling event functions directly is not allowed"
+		update();
+		// ERROR "Calling event functions directly is not allowed"
+		start();
+		// ERROR "Calling event functions directly is not allowed"
+		onMousePress(0,0);
+
+		// ERROR "Code12 function name is"
+		println("Hello world");
+		// ERROR "Code12 function name is"
+		setHeight(150);
+
+		// ERROR "Invalid function name"
+		intFunc[0]();
+		// ERROR "Invalid function name"
+		dblFuncIntDbl[intVar](0, 0.1);
+
+		// ERROR "Cannot call methods directly on class GameObj"
+		GameObj.foo();
+		// ERROR "Cannot call methods directly on class String"
+		String.foo();
+		// ERROR "Cannot call methods directly on class Code12Program"
+		Code12Program.foo();
+		// ERROR "Cannot call methods directly on class Code12Program"
+		Code12Program.foo();
+
+		// ERROR "An index in [brackets] can only be applied to an array"
+		ct[0].log(objVar);
+		// ERROR "An index in [brackets] can only be applied to an array"
+		dblVar = Math[intVar].tan(0);
+		
+		// ERROR "Method call on invalid type (array of int)"
 		intArr.voidFunc();
+		
+		// ERROR "Method call on invalid type (int)"
+		intArr[0].voidFunc();
+		// ERROR "Method call on invalid type (boolean)"
+		boolVar.foo();
+
+		// ERROR "misspelled API function"
+		ct.prnitln();
+		// ERROR "misspelled API function"
+		ct.circ(0,0,10);
+
+		// ERROR "Unknown method"
+		objArr[0].foo();
+		// ERROR "Unknown method"
+		Math.foo();
+		
+		// ERROR "requires 1 parameter"
+		intFuncInt();
+		// ERROR "requires 2 parameters"
+		dblFuncIntDbl();
+		// ERROR "requires 1 parameter"
+		ct.log();
+		// ERROR "requires 2 parameters"
+		Math.atan2();
+		// ERROR "Not enough parameters passed"
+		boolFuncBoolStringGameObj(false, "");
+		// ERROR "Not enough parameters passed"
+		ct.rect(0,0,10);
+		// ERROR "Too many parameters passed"
+		voidFunc(intVar);
+		// ERROR "Too many parameters passed"
+		ct.print("intVar =", intVar);
+		// ERROR "Too many parameters passed"
+		Math.atan(4,3);
+		// ERROR "expects type String, but int was passed"
+		ct.logm(intVar, objVar);
 
 		String indent = "2 Tabs";
 		// ERROR "Mix of tabs and spaces"
@@ -1071,15 +1201,185 @@ class ErrorTest extends Code12Program
         indent = "8 Spaces";
 		// ERROR "Mix of tabs and spaces"
 		indent = "2 Tabs";
-		if (true)
-			ct.println();
-			if (true)
-				ct.println();
 		// ERROR "Mix of tabs and spaces"
     	indent = "4 Spaces + 1 Tab";
-	// ERROR "Mix of tabs and spaces"
-	} // 1 Tab for indent
+		// ERROR "Mix of tabs and spaces"
+		indent = "2 Tabs";
+		// ERROR "Unexpected change in indentation"
+			if (false)
+			{
+				voidFunc();
+			}
+		if (false)
+		// ERROR "line should be indented more than its controlling "if""
+		voidFunc();
+		if (false)
+		{
+		// ERROR "Lines within { } brackets should be indented"
+		voidFunc();
+		voidFunc();
+		}
+		if (false)
+			voidFunc();
+		// ERROR "Unexpected change in indentation"
+			voidFunc();
+		if (false)
+		{
+			voidFunc();
+		// ERROR "Unexpected change in indentation"
+		voidFunc();
+		}
+		if (false)
+		// ERROR "The { after an if statement should have the same indentation as the "if""
+			{
+				voidFunc();
+			}
+		if (false)
+		{
+			voidFunc();
+			// ERROR "A block's ending } should have the same indentation as its beginning {"
+			}
+		if (false)
+			voidFunc();
+		else
+		// ERROR "line should be indented more than its controlling "else""
+		voidFunc();
+		if (false)
+			voidFunc();
+		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+			else
+				voidFunc();
+		if (false)
+			voidFunc();
+		else
+			voidFunc();
+			// ERROR "Unexpected change in indentation"
+			voidFunc();
+		if (false)
+			voidFunc();
+		else
+			// ERROR "The { after an "else" should have the same indentation as the "else""
+				{
+					voidFunc();
+				}
+		if (false)
+			voidFunc();
+		else if (false)
+		// ERROR "This line should be indented more than its controlling "elseif""
+		voidFunc();
+		if (false)
+			voidFunc();
+		else if (false)
+		// ERROR "The { after an else if statement should have the same indentation as the "else if""
+				{
+					voidFunc();
+				}
+		if (false)
+			voidFunc();
+		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it
+			else if (false)
+				voidFunc();
+		else
+			voidFunc();
+		if (false)
+			voidFunc();
+		else if (false)
+			voidFunc();
+		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+			else
+				voidFunc();
+		if (false)
+			voidFunc();
+		else if (false)
+			voidFunc();
+		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it"
+			else if (false)
+				voidFunc();
+		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+			else
+				voidFunc();
+		if (false)
+			if (false)
+					voidFunc();
+			// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		else
+			voidFunc();
+		if (false)
+		{
+			if (false)
+			{
+				voidFunc();
+			}
+			else
+			{
+				voidFunc();
+			}
+			// ERROR "A block's ending } should have the same indentation as its beginning {"
+			}
+		if (false)
+			if (false)
+				voidFunc();
+		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it"
+		else if (false)
+			voidFunc();
+		for (int ii = 0; ii < 100; ii++)
+		// ERROR "This line should be indented more than its controlling "for""
+		voidFunc();
+		for (int ii = 0; ii < 100; ii++)
+		{
+		// ERROR "Lines within { } brackets should be indented"
+		voidFunc();
+		}
+		for (int ii = 0; ii < 100; ii++)
+		// ERROR "The { after a for loop header should have the same indentation as the "for""
+			{
+				voidFunc();
+			}
+		while (false)
+		// ERROR "This line should be indented more than its controlling "while""
+		voidFunc();
+		while (false)
+		// ERROR "The { after a while loop header should have the same indentation as the "while""
+			{
+				voidFunc();
+			}
+		while (false)
+			voidFunc();
+		// ERROR "Unexpected change in indentation"
+			voidFunc();
+		do
+		// ERROR "This line should be indented more than its controlling "do""
+		voidFunc();
+		while (false);
+		do
+		// ERROR "The { after a "do" should have the same indentation as the "do""		
+			{
+				voidFunc();
+			}
+		while (false);
+		do
+			voidFunc();
+		// ERROR "This while statement should have the same indentation as its "do""
+			while (false);
+		int x1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		x2,	x3;
+		GameObj circle = ct.circle( 0, 0,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		10);
+		ct.log( 1,
+			2,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		3);
+		int[] multiLineArrInit = { 1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2 };
+	}
 
+	// ERROR "Variable myVar was already defined"
+	void myFunc(int myVar)
+	{
+	}
 	// ERROR "Return type of update function should be void"
 	GameObj update()
 	{
@@ -1096,47 +1396,51 @@ class ErrorTest extends Code12Program
 	void onKeyPress( GameObj obj, double x, double y )
 	{
 	}
-
 	// ERROR "Wrong number of parameters for function"
-	void onKeyRelease( ) // crash
+	void onKeyRelease( )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 1 of function onMousePress"
 	void onMousePress( boolean obj, double x, double y )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 2 of function onMouseDrag"
 	void onMouseDrag( GameObj obj, int x, double y )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 3 of function"
 	void onMouseRelease( GameObj obj, double x, String y )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 1 of function"
 	void onKeyPress( double keyName )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 1 of function"
 	void onKeyRelease( int keyName )
 	{
 	}
-
 	// ERROR "Wrong type for parameter 1 of function"
 	void onCharTyped( GameObj keyName )
 	{
 	}
-
-	int myVar = 1;
-	// ERROR "Variable myVar was already defined"
-	void myFunc(int myVar)
+	// ERROR "Class-level variable and function definitions should all have the same indentation"
+		void overIndentedFunc()
+		{
+		}
+	// ERROR "Class-level variable and function definitions should all have the same indentation"
+void underIndentedFunc()
+{
+}
+	int funcWithUnindentedBody()
+	{
+	// ERROR "Lines within { } brackets should be indented"
+	return 0;
+	}
+	void multiLineFuncDef( int arg1,
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	int arg2 )
 	{
 	}
-
 }
 

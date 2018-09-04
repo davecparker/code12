@@ -212,6 +212,18 @@ return {
     }
 },
 
+["printstream"] = "PrintStream",
+
+["PrintStream"] = {
+    name = "PrintStream",
+    fields = {
+    },
+    methods = {
+        ["print"] = { vt = false, params = {{ name = "value", vt = nil}} },
+        ["println"] = { vt = false, params = {{ name = "value", vt = nil}} },
+    }
+},
+
 ["code12program"] = "Code12Program",
 
 ["Code12Program"] = {

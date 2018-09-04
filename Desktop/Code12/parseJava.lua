@@ -37,6 +37,7 @@ local syntaxFeatures = {
 local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
+local sourceLine        -- the current source code line
 local tokens     	    -- array of tokens
 local iToken            -- index of current token in tokens
 local syntaxLevel	    -- the syntax level for parsing
@@ -153,27 +154,27 @@ local lValue = { t = "lValue",
 	{ 3, 12, "lValue",			"ID", index, field		},
 }
 
--- A method reference or empty
-local method = { t = "method",
-	{ 1, 12, "method",			".", "ID"				},
+-- A member reference or empty
+local member = { t = "member",
+	{ 1, 12, "member",			".", "ID"				},
 	{ 1, 12, "empty",									},
 }
 
 -- A function value
 local fnValue = { t = "fnValue",
-	{ 1, 12, "fnValue",			"ID", index, method,	},
+	{ 1, 12, "fnValue",			"ID", index, member, member		},
 }
 
 -- A return type for a procedure/function definition
 local retType = { t = "retType",
-	{ 1, 12, "void",			"void" 					},
 	{ 12, 12, "array",			"ID", "[", "]"			},
-	{ 9, 12, "value",			"ID"					},
+	{ 1, 12, "simple",			"ID"					},
 }
 
 -- An access permission specifier
 local access = { t = "access",
 	{ 1, 12, "public",			"public"				},
+	{ 3, 12, "private",			"private"				},
 	{ 1, 12, "empty",									},
 }
 
@@ -208,10 +209,14 @@ primaryExpr = { t = "expr",
 	{ 1, 12, "STR",				"STR" 								},
 	{ 5, 12, "call",			fnValue, "(", exprList, ")" 		},
 	{ 3, 12, "lValue",			lValue								},
+	{ 4, 12, "cast",			"(", "ID", ")", parsePrimaryExpr	},
 	{ 4, 12, "exprParens",		"(", expr, ")"						},
 	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
-	{ 4, 12, "!",				"!", parsePrimaryExpr 				},
+	{ 4, 12, "not",				"!", parsePrimaryExpr 				},
 	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
+	-- Common Errors
+	{ 1, 0, "new",				"new", "ID", "(", 0,				iNode = 1, 
+			strErr = "Code12 does not support making objects with new" },
 }
 
 -- Shortcut "operate and assign" operators 
@@ -225,25 +230,23 @@ local opAssignOp = { t = "opAssignOp",
 -- A statement
 local stmt = { t = "stmt",
 	{ 1, 12, "call",			fnValue, "(", exprList, ")" 		},
-	{ 3, 12, "varAssign",		"ID", "=", expr 					},
 	{ 3, 12, "assign",			lValue, "=", expr 					},
 	{ 4, 12, "opAssign",		lValue, opAssignOp, expr 			},
 	{ 4, 12, "preInc",			"++", lValue 						},
 	{ 4, 12, "preDec",			"--", lValue						},
 	{ 4, 12, "postInc",			lValue, "++" 						},
 	{ 4, 12, "postDec",			lValue, "--"						},
-	{ 11, 12, "break",			"break"								},
 }
 
 -- The end of a while statement, either with a ; (for do-while) or not
 local whileEnd = { t = "whileEnd",
-	{ 11, 12, "do-while",		")", ";"		},
+	{ 11, 12, "doWhile",		")", ";"		},
 	{ 11, 12, "while",			")"				},
 }
 
 -- The init part of a for loop
 local forInit = { t = "forInit",
-	{ 11, 12, "varInit",		"ID", "ID", "=", expr				},
+	{ 11, 12, "var",			"ID", "ID", "=", expr				},
 	{ 11, 12, "stmt",			stmt								},
 	{ 11, 12, "empty",												},
 }
@@ -263,7 +266,7 @@ local forNext = { t = "forNext",
 -- The control part of a for loop (inside the parens)
 local forControl = { t = "forControl",
 	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
-	{ 12, 12, "array",			"ID", "ID", ":", "ID" 						},
+	{ 12, 12, "array",			"ID", "ID", ":", expr 						},
 	-- Common Errors
 	{ 11, 0, "three",			forInit, ",", 0,	 						iNode = 2 },
 	{ 11, 0, "three",			forInit, ";", forExpr, ",", 0,				iNode = 4, 
@@ -278,59 +281,105 @@ local arrayInit = { t = "arrayInit",
 
 -- A line of code
 local line = { t = "line",
-	{ 1, 12, "blank",															"END" },
-	{ 1, 12, "stmt",			stmt, ";",										"END" },
-	{ 3, 12, "varInit",			"ID", "ID", "=", expr, ";",						"END" },
-	{ 3, 12, "varDecl",			"ID", idList, ";",								"END" },
-	{ 3, 12, "constInit", 		"final", "ID", "ID", "=", expr, ";",			"END" },
-	{ 1, 12, "func",			access, retType, "ID", "(", paramList, ")",		"END" },
-	{ 1, 12, "begin",			"{",											"END" },
-	{ 1, 12, "end",				"}",											"END" },
-	{ 8, 12, "if",				"if", "(", expr, ")",							"END" },
-	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",					"END" },
-	{ 8, 12, "else",			"else", 										"END" },
-	{ 9, 12, "return",			"return", expr, ";",							"END" },
-	{ 11, 12, "do",				"do", 											"END" },
-	{ 11, 12, "while",			"while", "(", expr, whileEnd,					"END" },
-	{ 11, 12, "for",			"for", "(", forControl, ")",					"END" },
-	{ 12, 12, "arrayInit",		"ID", "[", "]", "ID", "=", arrayInit, ";",		"END" },
-	{ 12, 12, "arrayDecl",		"ID", "[", "]", idList, ";",					"END" },
+	{ 1, 12, "blank",																"END" },
+	{ 1, 12, "stmt",			stmt, ";",											"END" },
+	{ 3, 12, "varInit",			access, "ID", "ID", "=", expr, ";",					"END" },
+	{ 3, 12, "varDecl",			access, "ID", idList, ";",							"END" },
+	{ 3, 12, "constInit", 		access, "final", "ID", "ID", "=", expr, ";",		"END" },
+	{ 1, 12, "func",			access, retType, "ID", "(", paramList, ")",			"END" },
+	{ 1, 12, "begin",			"{",												"END" },
+	{ 1, 12, "end",				"}",												"END" },
+	{ 8, 12, "if",				"if", "(", expr, ")",								"END" },
+	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",						"END" },
+	{ 8, 12, "else",			"else", 											"END" },
+	{ 9, 12, "returnVal",		"return", expr, ";",								"END" },
+	{ 9, 12, "return",			"return", ";",										"END" },
+	{ 11, 12, "do",				"do", 												"END" },
+	{ 11, 12, "while",			"while", "(", expr, whileEnd,						"END" },
+	{ 11, 12, "for",			"for", "(", forControl, ")",						"END" },
+	{ 11, 12, "break",			"break", ";",										"END" },
+	{ 12, 12, "arrayInit",		access, "ID", "[", "]", "ID", "=", arrayInit, ";",	"END" },
+	{ 12, 12, "arrayDecl",		access, "ID", "[", "]", idList, ";",				"END" },
+
 	-- Boilerplate lines
-	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",					"END" },
-	{ 1, 12, "class",			"class", "ID", 									"END" },
-	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",			"END" },
-	{ 1, 12, "main",			"public", "static", "void", "ID", 
-									"(", "ID", "[", "]", "ID", ")",				"END" },
+	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",						"END" },
+	{ 1, 12, "class",			"class", "ID",										"END" },
+	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",				"END" },
+	{ 1, 12, "main",			"public", "static", "ID", "ID", 
+									"(", "ID", "[", "]", "ID", ")",					"END" },
 	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
-									"ID", "(", ")", ")", ";",					"END" },
-	-- Common errors
-	{ 1, 0, "stmt", 		stmt, "END", 										iNode = 2 }, 
-	{ 9, 0, "return", 		"return", expr, "END", 								iNode = 3, 
+									"ID", "(", ")", ")", ";",						"END" },
+	-- Common errors: missing semicolon
+	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
+	{ 9, 0, "returnVal", 	"return", expr, "END", 									iNode = 3 }, 
+	{ 9, 0, "return", 		"return", "END", 										iNode = 2 },
+	{ 11, 0, "break",		"break", "END",											iNode = 2,
 			strErr = "Statement should end with a semicolon (;)" },
-	{ 1, 0, "stmt", 		stmt, ";", 2,
-			strErr = "Code12 only allows one statement per line" },
-	{ 3, 0, "varInit",		"ID", "ID", "=", expr, "END",						iNode = 5 }, 
-	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, "END",				iNode = 6 }, 
-	{ 12, 0, "arrayInit",	"ID", "[", "]", "ID", "=", arrayInit, "END", 		iNode = 7,
+
+	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, "END",					iNode = 6 }, 
+	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, "END",			iNode = 7 }, 
+	{ 12, 0, "arrayInit",	access, "ID", "[", "]", "ID", "=", arrayInit, "END", 	iNode = 8,
 			strErr = "Variable initialization should end with a semicolon (;)" },
-	{ 3, 0, "varDecl",		"ID", idList, "END",								iNode = 3 }, 
-	{ 12, 0, "arrayDecl",	"ID", "[", "]", idList, "END",						iNode = 5,
+
+	{ 3, 0, "varDecl",		access, "ID", idList, "END",							iNode = 4 }, 
+	{ 12, 0, "arrayDecl",	access, "ID", "[", "]", idList, "END",					iNode = 6,
 			strErr = "Variable declaration should end with a semicolon (;)" },
-	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ",",	"ID", "=", 1 },
-	{ 3, 0, "varInit",		"ID", "ID", "=", expr, ";",	"ID", "ID", "=", 1 },
-	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
-	{ 3, 0, "constInit", 	"final", "ID", "ID", "=", expr, ";", "ID", "ID", "=", 1, 
-			strErr = "Code12 requires each variable initialization to be on its own line" },
-	{ 8, 0, "if",			"if", "(", expr, ")", ";", 0,						iNode = 5 },
-	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,				iNode = 6,
-			strErr = "if statement should not end with a semicolon" },
-	{ 8, 0, "if",			"if", expr, 0,										iNode = 2 }, 
-	{ 8, 0, "elseif",		"else", "if", expr, 0,								iNode = 3, 
-			strErr = "if statement test must be in parentheses" },
-	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END", iNode = 7,
+
+	-- Common errors: incorrect semicolon
+	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END",	iNode = 7,
 			strErr = "function header should not end with a semicolon" },
+
+	{ 8, 0, "if",			"if", "(", expr, ")", ";", 0,							iNode = 5 },
+	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,					iNode = 6,
+			strErr = "if statement should not end with a semicolon" },
+
+	{ 8, 0, "else",			"else", ";", 0,											iNode = 2, 
+			strErr = "else statement should not end with a semicolon" },
+
+	{ 11, 0, "do",			"do", ";", 0,											iNode = 2, 
+			strErr = "do statement should not end with a semicolon" },
+
+	{ 11, 0, "for",			"for", "(", forControl, ")", ";", 0,	 				iNode = 5,
+			strErr = "for loop header should not end with a semicolon" },
+
+	-- Common errors: unsupported bracket style
+	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	"{", 0,		iNode = 7 },
+	{ 8, 0, "if",			"if", "(", expr, ")", "{", 0,							iNode = 5 },
+	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", "{", 0,					iNode = 6 },
+	{ 8, 0, "else",			"else", "{", 0,											iNode = 2 },
+	{ 11, 0, "do",			"do", "{", 0,											iNode = 2 },
+	{ 11, 0, "while",		"while", "(", expr, whileEnd, "{", 0,					iNode = 5 },
+	{ 11, 0, "for",			"for", "(", forControl, ")", "{", 0,					iNode = 5,
+			strErr = "In Code12, each { to start a new block must be on its own line" },
+
+	{ 1, 0, "end",			"}", 1,
+			strErr = "In Code12, each } to end a block must be on its own line" },
+
+	-- Common errors: malformed boilerplate lines
 	{ 1, 0, "import",		"import", "ID", 0, 
 			strErr = "import should be \"Code12.*;\"" },
+
+	-- Common errors: multiple statements per line
+	{ 1, 0, "stmt", 		stmt, ";", 2,
+			strErr = "Code12 requires each statement to be on its own line" },
+
+	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ",",	"ID", "=", 1 },
+	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ";",	2 },
+	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
+	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ";", 2, 
+			strErr = "Code12 requires each variable initialization to be on its own line" },
+
+	{ 8, 0, "if",			"if", "(", expr, ")", 2, 								iNode = 5, toEnd = true },
+	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", 2,						iNode = 6, toEnd = true,
+			strErr = "Code12 requires code after an if statement to be on its own line" },
+
+	{ 8, 0, "else",			"else", 2,												iNode = 2, toEnd = true,
+			strErr = "Code12 requires code after an else to be on its own line" },
+
+	{ 11, 0, "do",			"do", 2,												iNode = 2, toEnd = true	},
+	{ 11, 0, "while",		"while", "(", expr, whileEnd, 2,						iNode = 5, toEnd = true },
+	{ 11, 0, "for",			"for", "(", forControl, ")", 2,							iNode = 5, toEnd = true,
+			strErr = "Code12 requires the contents of a loop to start on its own line" },
 
 }
 
@@ -407,10 +456,12 @@ function parseGrammar( grammar )
 						strErr = patErr.strErr
 					end
 					local iNode = pattern.iNode
-					if iNode then
-						err.setErrNode( nodes[iNode], strErr )
-					else
+					if iNode == nil then
 						err.setErrLineNum( tokens[1].iLine, strErr )
+					elseif pattern.toEnd then
+						err.setErrNodeSpan( nodes[iNode], tokens[#tokens - 1], strErr )
+					else
+						err.setErrNode( nodes[iNode], strErr )
 					end
 				end
 
@@ -530,10 +581,10 @@ local function parseCurrentLine( level )
 		iToken = 1
 		parseTree = parseGrammar( line )
 		if parseTree then
-			-- Report error with minimum level required
 			err.clearErr( iLine )   -- in case we matched a common error
+			-- Report level error with minimum level required
 			local lastToken = tokens[#tokens - 1]  -- not counting the END
-			err.setErrTokenSpan( tokens[1], lastToken,
+			err.setErrNodeSpan( tokens[1], lastToken,
 					"Use of %s requires syntax level %d",
 					syntaxFeatures[tryLevel], tryLevel )
 			return nil
@@ -542,9 +593,22 @@ local function parseCurrentLine( level )
 
 	-- TODO: Try modified patterns to isolate the error
 
-	-- Make a generic syntax error to use if a more specific error was not set
+	-- Make a generic syntax error to use if a more specific error was not found
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
-	err.setErrTokenSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
+	err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
+
+	-- Append the source line to our log of generic syntax errors if this
+	-- is an abortable error (i.e. we are not running a bulk error test)
+	if err.shouldStop() then
+		local logFile = io.open( "../SyntaxErrors.txt", "a" )
+		if logFile then
+			logFile:write( sourceLine )
+			logFile:write( "\n" )
+			io.close( logFile )
+		end
+	end
+
+	-- Return failure
 	return nil
 end
 
@@ -563,8 +627,9 @@ end
 -- The given lineNumber will be assigned to the tokens found and the resulting tree.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
-function parseJava.parseLine( sourceLine, lineNumber, startTokens, level )
+function parseJava.parseLine( strLine, lineNumber, startTokens, level )
 	-- Run lexical analysis to get the tokens array
+	sourceLine = strLine
 	tokens = javalex.getTokens( sourceLine, lineNumber )
 	if tokens == nil then
 		return nil
@@ -618,6 +683,8 @@ function parseJava.printParseTree( node, indentLevel, file )
 				return
 			end
 			s = s .. node.tt .. " (" .. node.str .. ")"
+		elseif node.p == "empty" then 
+			return   -- empty optional parse node
 		else
 			-- Sub-tree node
 			s = s .. node.t 

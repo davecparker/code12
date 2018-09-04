@@ -31,7 +31,7 @@ local charTypes = {}  -- built in initCharTypes()
 --    false if reserved word not supported by Code12
 --    nil if not reserved word, or not treated as a reserved word.
 -- The following reserved words (primitive types) are treated as normal IDs:
---    byte, boolean, char, double, float, int, long, short
+--    byte, boolean, char, double, float, int, long, short, void
 local reservedWordTokens = {
 	["abstract"]		= false,	
 	["assert"] 			= false,	
@@ -58,7 +58,7 @@ local reservedWordTokens = {
 	["native"] 			= false,	
 	["new"] 			= "new",	
 	["package"] 		= false,	
-	["private"] 		= false,	
+	["private"] 		= "private",	
 	["protected"] 		= false,
 	["public"] 			= "public",	
 	["return"] 			= "return",	
@@ -72,7 +72,6 @@ local reservedWordTokens = {
 	["throws"] 			= false,	
 	["transient"] 		= false,
 	["try"] 			= false,	
-	["void"] 			= "void",	
 	["volatile"] 		= false,	
 	["while"] 			= "while",
 
@@ -87,7 +86,7 @@ local source    		   -- the source string
 local chars     		   -- array of ASCII codes for the source string
 local lineNumber           -- the line number for the source string
 local iChar     		   -- index to current char in chars
-local commentLevel		   -- current nesting level for block comments (/* */)
+local iLineBlockComment    -- line number for start of block comment (/* */) or nil if none
 local commentForLine       -- array of end-of-line comments indexed by line number
 local indentLevelForLine   -- array of indent levels indexed by line number
 local prevIndentStr        -- previous (non blank/comment) line of code's indent string
@@ -263,26 +262,29 @@ local function starToken()
 	if charNext == 61 then   --  =
 		iChar = iChar + 1
 		return "*="
+	elseif charNext == 47 then  -- /
+		setTokenErr( iChar - 1, iChar, 
+				"Close of comment without matching opening /*" )
+		return nil
 	end
 	return "*"
 end
 
--- Read through a block comment (/*  */), handling nesting.
--- The current comment level is tracked in commentLevel.
--- Before the initial call to this function, commentLevel should
--- be set to 1 and iChar should be just past the initial /*
+-- Read through a block comment (/*  */), disallowing nesting per Java.
+-- If the comment is closed on this line then set iLineBlockComment = nil.
+-- Return false if an error is encountered, else true.
 local function skipBlockComment()
+	assert( iLineBlockComment )
 	while true do
 		local ch = chars[iChar]
 		if ch == 42 and chars[iChar + 1] == 47 then  -- */
 			iChar = iChar + 2
-			commentLevel = commentLevel - 1
-			if commentLevel == 0 then
-				return
-			end
+			iLineBlockComment = nil   -- comment closed
+			return
 		elseif ch == 47 and chars[iChar + 1] == 42 then  -- /*
-			iChar = iChar + 2
-			commentLevel = commentLevel + 1
+			err.setErrLineNumAndRefLineNum( lineNumber, iLineBlockComment, 
+					"Java does not allow nesting comments within comments using /* */" )
+			iChar = iChar + 2   -- pass the 2nd /* and keep going per Java
 		elseif ch == nil then
 			return    -- unclosed comment continues to next line
 		else
@@ -303,9 +305,9 @@ local function slashToken()
 		iChar = #chars + 1
 		return "COMMENT", str
 	elseif charNext == 42 then  -- *
-		-- Block comment
+		-- Start of block comment
 		iChar = iChar + 1
-		commentLevel = 1
+		iLineBlockComment = lineNumber
 		skipBlockComment()
 		return "COMMENT"
 	elseif charNext == 61 then   --  =
@@ -450,7 +452,7 @@ end
 
 -- Init the state of the lexer for a program
 function javalex.initProgram()
-	commentLevel = 0
+	iLineBlockComment = nil
 	commentForLine = {}
 	indentLevelForLine = {}
 	prevIndentStr = nil
@@ -483,8 +485,8 @@ function javalex.getTokens( sourceStr, lineNum )
 	local tokens = {}
 
 	-- Are we inside a block comment that started on a previous line?
-	if commentLevel > 0 then
-		skipBlockComment()  -- don't generate tokens for block comments 
+	if iLineBlockComment then
+		skipBlockComment()
 	end
 
 	-- Scan the chars array
@@ -573,6 +575,12 @@ end
 -- assuming a tab stop of 8 spaces
 function javalex.indentLevelForLine( lineNum )
 	return indentLevelForLine[lineNum]
+end
+
+-- If the parsing state is inside an unclosed block comment then return the 
+-- line number where the comment started, otherwise return nil.
+function javalex.iLineStartOfUnclosedBlockComment()
+	return iLineBlockComment
 end
 
 
