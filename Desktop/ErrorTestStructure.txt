@@ -110,7 +110,7 @@
                             lValue { varID = arg1 }
                             lValue { varID = arg2 }
                             lValue { varID = arg3 }
- 83.        func start { #paramVars = 0, vt = int, isPublic = true, #stmts = 410 }
+ 83.        func start { #paramVars = 0, vt = int, isPublic = true, #stmts = 412 }
                 stmts:
  87.                var LIMIT { vt = int, isConst = true }
                         initExpr: literal { token = 100 }
@@ -2547,6 +2547,8 @@
                         lValue: lValue { varID = s }
                         expr: call trim
                             lValue: lValue { varID = s }
+588.                var coins { vt = array of GameObj }
+589.                var walls { vt = array of GameObj }
 590.                var multilineArrayInit { vt = array of int }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
@@ -2622,7 +2624,7 @@
 643.        func FUNC { #paramVars = 0, vt = void, #stmts = 0 }
 647.        func AnotherFunc { #paramVars = 0, vt = void, #stmts = 0 }
 651.        func anotherfunc { #paramVars = 0, vt = void, #stmts = 0 }
-655.        func expectedErrors { #paramVars = 0, vt = void, #stmts = 269 }
+655.        func expectedErrors { #paramVars = 0, vt = void, #stmts = 281 }
                 stmts:
 657.                var intVar { vt = int }
                         initExpr: literal { token = 1 }
@@ -3739,59 +3741,99 @@
                             exprs:
                                 literal { token = 1 }
                                 literal { token = 2 }
-1380.        func myFunc { #paramVars = 1, vt = void, #stmts = 0 }
+1377.                if { #stmts = 1 }
+                        expr: literal { token = false }
+                        stmts:
+1378.                        call voidFunc
+1380.                call voidFunc
+1381.                if { #elseStmts = 1, #stmts = 1 }
+                        expr: literal { token = false }
+                        elseStmts:
+1384.                        call voidFunc
+                        stmts:
+1382.                        call voidFunc
+1386.                call voidFunc
+1387.                if { #elseStmts = 1, #stmts = 1 }
+                        expr: literal { token = false }
+                        elseStmts:
+                            if { #stmts = 1 }
+                                expr: literal { token = false }
+                                stmts:
+1390.                                call voidFunc
+                        stmts:
+1388.                        call voidFunc
+1392.                call voidFunc
+1393.                if { #stmts = 1 }
+                        expr: literal { token = false }
+                        stmts:
+1394.                        call voidFunc
+1396.                while { #stmts = 1 }
+                        expr: literal { token = false }
+                        stmts:
+1397.                        call voidFunc
+1398.                for { #stmts = 1 }
+                        expr: literal { token = false }
+                        stmts:
+1399.                        call voidFunc
+1401.                call voidFunc
+1402.                while { #stmts = 1 }
+                        expr: literal { token = false }
+                        stmts:
+1403.                        call voidFunc
+1405.                call voidFunc
+1417.        func myFunc { #paramVars = 1, vt = void, #stmts = 0 }
                 paramVars:
-1380.                var myVar { vt = int, isGlobal = false }
-1384.        func update { #paramVars = 0, vt = GameObj, #stmts = 0 }
-1388.        func onMousePress { #paramVars = 3, vt = String, #stmts = 0 }
+1417.                var myVar { vt = int, isGlobal = false }
+1421.        func update { #paramVars = 0, vt = GameObj, #stmts = 0 }
+1425.        func onMousePress { #paramVars = 3, vt = String, #stmts = 0 }
                 paramVars:
-1388.                var obj { vt = GameObj, isGlobal = false }
-1388.                var x { vt = double, isGlobal = false }
-1388.                var y { vt = double, isGlobal = false }
-1392.        func onMousePress { #paramVars = 2, vt = void, #stmts = 0 }
+1425.                var obj { vt = GameObj, isGlobal = false }
+1425.                var x { vt = double, isGlobal = false }
+1425.                var y { vt = double, isGlobal = false }
+1429.        func onMousePress { #paramVars = 2, vt = void, #stmts = 0 }
                 paramVars:
-1392.                var x { vt = double, isGlobal = false }
-1392.                var y { vt = double, isGlobal = false }
-1396.        func onKeyPress { #paramVars = 3, vt = void, #stmts = 0 }
+1429.                var x { vt = double, isGlobal = false }
+1429.                var y { vt = double, isGlobal = false }
+1433.        func onKeyPress { #paramVars = 3, vt = void, #stmts = 0 }
                 paramVars:
-1396.                var obj { vt = GameObj, isGlobal = false }
-1396.                var x { vt = double, isGlobal = false }
-1396.                var y { vt = double, isGlobal = false }
-1400.        func onKeyRelease { #paramVars = 0, vt = void, #stmts = 0 }
-1404.        func onMousePress { #paramVars = 3, vt = void, #stmts = 0 }
+1433.                var obj { vt = GameObj, isGlobal = false }
+1433.                var x { vt = double, isGlobal = false }
+1433.                var y { vt = double, isGlobal = false }
+1437.        func onKeyRelease { #paramVars = 0, vt = void, #stmts = 0 }
+1441.        func onMousePress { #paramVars = 3, vt = void, #stmts = 0 }
                 paramVars:
-1404.                var obj { vt = boolean, isGlobal = false }
-1404.                var x { vt = double, isGlobal = false }
-1404.                var y { vt = double, isGlobal = false }
-1408.        func onMouseDrag { #paramVars = 3, vt = void, #stmts = 0 }
+1441.                var obj { vt = boolean, isGlobal = false }
+1441.                var x { vt = double, isGlobal = false }
+1441.                var y { vt = double, isGlobal = false }
+1445.        func onMouseDrag { #paramVars = 3, vt = void, #stmts = 0 }
                 paramVars:
-1408.                var obj { vt = GameObj, isGlobal = false }
-1408.                var x { vt = int, isGlobal = false }
-1408.                var y { vt = double, isGlobal = false }
-1412.        func onMouseRelease { #paramVars = 3, vt = void, #stmts = 0 }
+1445.                var obj { vt = GameObj, isGlobal = false }
+1445.                var x { vt = int, isGlobal = false }
+1445.                var y { vt = double, isGlobal = false }
+1449.        func onMouseRelease { #paramVars = 3, vt = void, #stmts = 0 }
                 paramVars:
-1412.                var obj { vt = GameObj, isGlobal = false }
-1412.                var x { vt = double, isGlobal = false }
-1412.                var y { vt = String, isGlobal = false }
-1416.        func onKeyPress { #paramVars = 1, vt = void, #stmts = 0 }
+1449.                var obj { vt = GameObj, isGlobal = false }
+1449.                var x { vt = double, isGlobal = false }
+1449.                var y { vt = String, isGlobal = false }
+1453.        func onKeyPress { #paramVars = 1, vt = void, #stmts = 0 }
                 paramVars:
-1416.                var keyName { vt = double, isGlobal = false }
-1420.        func onKeyRelease { #paramVars = 1, vt = void, #stmts = 0 }
+1453.                var keyName { vt = double, isGlobal = false }
+1457.        func onKeyRelease { #paramVars = 1, vt = void, #stmts = 0 }
                 paramVars:
-1420.                var keyName { vt = int, isGlobal = false }
-1424.        func onCharTyped { #paramVars = 1, vt = void, #stmts = 0 }
+1457.                var keyName { vt = int, isGlobal = false }
+1461.        func onCharTyped { #paramVars = 1, vt = void, #stmts = 0 }
                 paramVars:
-1424.                var keyName { vt = GameObj, isGlobal = false }
-1428.        func overIndentedFunc { #paramVars = 0, vt = void, #stmts = 0 }
-1432.        func underIndentedFunc { #paramVars = 0, vt = void, #stmts = 0 }
-1435.        func funcWithUnindentedBody { #paramVars = 0, vt = int, #stmts = 1 }
+1461.                var keyName { vt = GameObj, isGlobal = false }
+1465.        func overIndentedFunc { #paramVars = 0, vt = void, #stmts = 0 }
+1469.        func underIndentedFunc { #paramVars = 0, vt = void, #stmts = 0 }
+1472.        func funcWithUnindentedBody { #paramVars = 0, vt = int, #stmts = 1 }
                 stmts:
-1438.                return
+1475.                return
                         expr: literal { token = 0 }
-1440.        func multiLineFuncDef { #paramVars = 2, vt = void, #stmts = 0 }
+1477.        func multiLineFuncDef { #paramVars = 2, vt = void, #stmts = 0 }
                 paramVars:
-1440.                var arg1 { vt = int, isGlobal = false }
-1442.                var arg2 { vt = int, isGlobal = false }
+1477.                var arg1 { vt = int, isGlobal = false }
+1479.                var arg2 { vt = int, isGlobal = false }
         vars:
   5.        var myVar { vt = int, isGlobal = true }
                 initExpr: literal { token = 1 }

@@ -1221,7 +1221,7 @@ int underIndentedInstanceVar;
 		}
 		if (false)
 			voidFunc();
-		// ERROR "Unexpected change in indentation"
+		// ERROR "This line is not controlled by the highlighted "if" above it."
 			voidFunc();
 		if (false)
 		{
@@ -1253,7 +1253,7 @@ int underIndentedInstanceVar;
 			voidFunc();
 		else
 			voidFunc();
-			// ERROR "Unexpected change in indentation"
+		// ERROR "This line is not controlled by the highlighted "else" above it."
 			voidFunc();
 		if (false)
 			voidFunc();
@@ -1301,7 +1301,7 @@ int underIndentedInstanceVar;
 		if (false)
 			if (false)
 					voidFunc();
-			// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
 		else
 			voidFunc();
 		if (false)
@@ -1314,7 +1314,7 @@ int underIndentedInstanceVar;
 			{
 				voidFunc();
 			}
-			// ERROR "A block's ending } should have the same indentation as its beginning {"
+		// ERROR "A block's ending } should have the same indentation as its beginning {"
 			}
 		if (false)
 			if (false)
@@ -1345,7 +1345,7 @@ int underIndentedInstanceVar;
 			}
 		while (false)
 			voidFunc();
-		// ERROR "Unexpected change in indentation"
+		// ERROR "This line is not controlled by the highlighted "while" above it."
 			voidFunc();
 		do
 		// ERROR "This line should be indented more than its controlling "do""
@@ -1374,6 +1374,43 @@ int underIndentedInstanceVar;
 		int[] multiLineArrInit = { 1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		2 };
+		if (false)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "if" above it"
+			voidFunc();
+		if (false)
+			voidFunc();
+		else
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "else" above it"
+			voidFunc();
+		if (false)
+			voidFunc();
+		else if (false)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "elseif" above it"
+			voidFunc();
+		if (false)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "if" above it"
+			while (false)
+				voidFunc();
+		for (;false;)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "for" above it"
+			voidFunc();	
+		while (false)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "while" above it"
+			voidFunc();
+		do
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "do" above it"
+			voidFunc();
+		do
+			voidFunc();
+			// ERROR This line is not controlled by the highlighted "do" above it"
+			while (false)
 	}
 
 	// ERROR "Variable myVar was already defined"

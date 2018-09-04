@@ -411,6 +411,8 @@ end
 -- of stmts until the matching block end, otherwise get a single stmt. 
 -- Return nil if there was an error.
 local function getControlledStmts()
+	local ctrlTree = parseTrees[iTree - 1] -- tree for the controlling statement
+	local ctrlIndent = javalex.indentLevelForLine( ctrlTree.iLineStart )
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "begin" then
@@ -424,15 +426,29 @@ local function getControlledStmts()
 		return nil
 	else
 		-- Single controlled stmt
-		if javalex.indentLevelForLine( tree.iLineStart ) 
-				<= javalex.indentLevelForLine( parseTrees[iTree - 1].iLineStart ) then
-			local prevTree = parseTrees[iTree - 1]
-			err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
-					"This line should be indented more than its controlling \"%s\"", prevTree.p )
+		local stmtIndent = javalex.indentLevelForLine( tree.iLineStart )
+		if stmtIndent <= ctrlIndent then
+			err.setErrLineNumAndRefLineNum( tree.iLineStart, ctrlTree.iLineStart, 
+					"This line should be indented more than its controlling \"%s\"", ctrlTree.p )
 		end
 		iTree = iTree + 1  -- pass the controlled stmt as expected by getLineStmts
 		local stmts = {}
 		if getLineStmts( tree, stmts ) then
+			-- Check if indentation implies missing { or stray } after controlling stmt
+			if iTree <= numParseTrees then
+				local nextTree = parseTrees[iTree]
+				local nextP = nextTree.p
+				local nextIndent = javalex.indentLevelForLine( nextTree.iLineStart )
+				if nextP == "end" then
+					if nextIndent >= ctrlIndent then
+						err.setErrLineNum( nextTree.iLineStart, "Unexpected indentation. Stray closing } bracket?" )
+					end
+				elseif nextIndent == stmtIndent and nextIndent ~= ctrlIndent
+						and not (ctrlTree.p == "do" and nextTree.p == "while" and nextTree.nodes[4].p == "doWhile") then
+					err.setErrLineNum( nextTree.iLineStart, 
+							"This line is not controlled by the highlighted \"%s\" above it. Missing curly bracket(s) or improperly indented?", ctrlTree.p )
+				end
+			end
 			return stmts
 		end
 	end
