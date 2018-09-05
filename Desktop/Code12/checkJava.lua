@@ -87,6 +87,13 @@ local function isInvalidName( nameNode, usage )
 		end
 		return true
 	end
+
+	-- Check for known classes
+	if javaTypes.isKnownClassName( name ) then
+		err.setErrNode( nameNode, 
+				"%s is a pre-defined class name, expected a %s name here", name, usage )
+		return true
+	end
 	return false
 end
 
@@ -206,29 +213,29 @@ local function defineVar( var )
 end
 
 -- Return the variable table entry for the given variable name node.
+-- If isVarAssign is true then the variable is being assigned, otherwise read.
 -- If the variable is undefined then set the error state and return nil.
--- Unless unassignedOK is passed and true then also check to make sure the
--- variable has been assigned and if not then set the error state and return nil. 
-local function getVariable( varNode, unassignedOK )
+-- If isVarAssign is not true then also check to make sure the variable has 
+-- been assigned and if not then set the error state. 
+local function getVariable( varNode, isVarAssign )
 	assert( varNode.tt == "ID" )
 	if isInvalidName( varNode, "variable" ) then
 		return nil
 	end
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
-		if varNode.str == "System" then
-			err.setErrNode( varNode, "Invalid use of Java System class" )
+		if isVarAssign then
+			err.setErrNode( varNode, 
+					"Variable %s must be declared with a type before being assigned",
+					varNode.str )
 		else
-			err.setErrNode( varNode,  "Undefined variable %s", varNode.str )
+			err.setErrNode( varNode, "Undefined variable %s", varNode.str )
 		end
 		return nil
 	end
-	if unassignedOK ~= true then
-		if not varFound.assigned then
-			err.setErrNode( varNode,  
-				"Variable %s must be assigned before it is used", varNode.str )
-			return nil
-		end
+	if not isVarAssign and not varFound.assigned then
+		err.setErrNode( varNode,  
+			"Variable %s must be assigned before it is used", varNode.str )
 	end
 	return varFound
 end
@@ -1236,7 +1243,8 @@ function checkJava.checkProgram( programTree, level )
 	if not err.shouldStop() then
 		-- Make sure that a start function was defined
 		if not eventMethodsDefined["start"] then
-			err.setErrLineNum( programTree.nameID.iLine,
+			local iLine = (programTree.nameID and programTree.nameID.iLine) or 1
+			err.setErrLineNum( iLine,
 					"A Code12 program must define a \"start\" function" )
 		end
 	end

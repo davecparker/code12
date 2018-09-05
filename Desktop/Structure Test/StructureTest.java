@@ -27,6 +27,7 @@ class StructureTest extends Code12Program
 		int y;
 		y = X;
 		/* comment */
+		ct.rect( X, 10, 50, 10 );
 		ball = ct.circle( X, y, 30 );
 		ball.setFillColor( "blue" );
 		frameCount = foo( LIMIT, speed * 2 );
@@ -42,6 +43,7 @@ class StructureTest extends Code12Program
 
 	int test(int i, double d)
 	{
+		i = foo( 3, 4 );
 		if (i < 0)
 			return i + 1;
 		else

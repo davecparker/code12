@@ -639,7 +639,7 @@ int underIndentedInstanceVar;
 	void func()
 	{
 	}
-	// ERROR "Names are case-sensitive"
+	// ERROR "differs only by upper/lower case from existing function"
 	void FUNC()
 	{
 	}
@@ -647,7 +647,7 @@ int underIndentedInstanceVar;
 	void AnotherFunc()
 	{
 	}	
-	// ERROR "Names are case-sensitive"
+	// ERROR "differs only by upper/lower case from existing function"
 	void anotherfunc()
 	{
 	}
@@ -819,7 +819,7 @@ int underIndentedInstanceVar;
 		ct.random( intVar / intVar, intVar );
 		// ERROR "Undefined variable x"
 		x = x + 1;
-		// ERROR "Undefined variable x"
+		// ERROR "must be declared with a type before being assigned"
 		for (x = 0; x < 1; x++) 
 			voidFunc();
 		// ERROR "Undefined function foo"
@@ -1036,10 +1036,10 @@ int underIndentedInstanceVar;
 		double GameObj;
 
 		int lowercasefirst = 1;
-		// ERROR "Names are case-sensitive, known name is"
+		// ERROR "differs only by upper/lower case from existing variable"
 		int lowerCaseFirst = 10;
 		GameObj upperCaseFirst = objVar;
-		// ERROR "Names are case-sensitive, known name is"
+		// ERROR "differs only by upper/lower case from existing variable"
 		GameObj uppercasefirst = null;
 		// ERROR "Names are case-sensitive, known name is"
 		dblVar = dblvar + 1;

@@ -6,3 +6,15 @@ Conflicts in this file should be resolved by preserving the union of all the lin
 		ct.circle X, y, 20
 		ct.circle X, y, 20;
 		ct.circle = (10, 20, 30);
+		ct.rect( 50, 10, 50; 10 );
+		if (d == i]
+		if (d == i
+		if (d == i))
+		i = foo( 3, 4);;
+		i = foo( 3, 4]
+		i += ;
+		ct.circle = 300, 200, 30;
+		ct.circle(20;; 30);
+		ct.circle(20[] 30);
+		ct.circle(20[ 30);
+		ct.circle{20 30};
