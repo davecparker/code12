@@ -322,6 +322,9 @@ end
 function err.clearErr( iLine )
 	assert( type(iLine) == "number" )
 
+	if errRecForLine then
+		errRecForLine[iLineRankFromILine( iLine )] = nil
+	end
 	if err.rec and err.rec.iLineRank == iLineRankFromILine( iLine ) then  
 		err.rec = nil
 	end
@@ -336,7 +339,12 @@ end
 function err.getLoggedErrForLine( iLine )
 	assert( type(iLine) == "number" )
 
-	return errRecForLine[iLine]
+	if errRecForLine then
+		return errRecForLine[iLineRankFromILine( iLine )]
+	elseif err.rec and err.rec.iLineRank == iLineRankFromILine( iLine ) then
+		return err.rec
+	end
+	return nil
 end
 
 -- Return true if there is an error that should stop further processing

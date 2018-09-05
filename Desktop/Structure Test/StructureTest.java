@@ -43,7 +43,7 @@ class StructureTest extends Code12Program
 
 	int test(int i, double d)
 	{
-		i = foo( 3, 4);
+		i = foo( 3, 4 );
 		if (i < 0)
 			return i + 1;
 		else

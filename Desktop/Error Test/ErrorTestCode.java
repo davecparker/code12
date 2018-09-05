@@ -631,7 +631,7 @@ class ErrorTest extends Code12Program
 	void func()
 	{
 	}
-	// ERROR "Names are case-sensitive"
+	// ERROR "differs only by upper/lower case from existing function"
 	void FUNC()
 	{
 	}
@@ -639,7 +639,7 @@ class ErrorTest extends Code12Program
 	void AnotherFunc()
 	{
 	}	
-	// ERROR "Names are case-sensitive"
+	// ERROR "differs only by upper/lower case from existing function"
 	void anotherfunc()
 	{
 	}
@@ -1028,10 +1028,10 @@ class ErrorTest extends Code12Program
 		double GameObj;
 
 		int lowercasefirst = 1;
-		// ERROR "Names are case-sensitive, known name is"
+		// ERROR "differs only by upper/lower case from existing variable"
 		int lowerCaseFirst = 10;
 		GameObj upperCaseFirst = objVar;
-		// ERROR "Names are case-sensitive, known name is"
+		// ERROR "differs only by upper/lower case from existing variable"
 		GameObj uppercasefirst = null;
 		// ERROR "Names are case-sensitive, known name is"
 		dblVar = dblvar + 1;

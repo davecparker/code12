@@ -43,6 +43,7 @@ local tokens     	    -- array of tokens
 local iToken            -- index of current token in tokens
 local syntaxLevel	    -- the syntax level for parsing
 local maxSyntaxLevel    -- max syntax level or 0 to match common errors
+local iTokenMax         -- farthest token parsed on a line or nil if not tracking this
 
 -- Forward function declarations necessary due to mutual recursion or 
 -- use in the grammar tables below
@@ -103,23 +104,33 @@ local binaryOpPrecedence = {
 }
 
 
------ Parse Tree Utilities  --------------------------------------------------
+----- Parsing Utilities  --------------------------------------------------
 
 -- A parse tree is either:
 -- 		a token node, for example:
 --          { tt = "ID", str = "foo", iLine = 10, iChar = 23 }
 --      or a tree node, for example:
---          { t = "line", p = "stmt", nodes = {...}, info = {} }
+--          { t = "line", p = "stmt", nodes = {...} }
 --      where t is the grammar or function name, p is the pattern name if any,
---      info is an initially empty table where semantic info can be stored,
 --		and nodes is an array of children nodes.
 
 -- Create and return a parse tree node with the given type (t), pattern (p), 
 -- and children nodes
 local function makeParseTreeNode( t, p, nodes )
 	-- TODO: Get from pool
-	return { t = t, p = p, nodes = nodes, info = {} }
+	return { t = t, p = p, nodes = nodes }
 end	
+
+
+-- Set an error at token on the current line being parsed, or at the END
+-- token if token is nil.
+local function setTokenMismatchError( token )
+	err.clearErr( lineNumber )   -- replacing prev error on this line if any
+	if token == nil then
+		token = tokens[#tokens]  -- unexpected end of line, so highlight the END
+	end
+	err.setErrNode( token, 'Syntax Error "%s"', token.str )
+end
 
 
 ----- Special parsing functions used in the grammar tables below  ------------
@@ -513,7 +524,7 @@ function parseGrammar( grammar )
 end
 
 -- Attempt to parse the given list pattern, with results per parsePattern().
-function parseListPattern( pattern )
+local function parseListPattern( pattern )
 	local nodes = {}         -- node array to build
 	local item = pattern[4]  -- build a list of this item
 	local t = type(item)     -- list patterns always repeat a single item
@@ -532,6 +543,11 @@ function parseListPattern( pattern )
 		if t == "string" then
 			-- Token: compare to next token
 			if token == nil or token.tt ~= item then
+				-- Required next token type doesn't match
+				if iTokenMax and iToken > iTokenMax then   -- new farthest error
+					setTokenMismatchError( token )
+					iTokenMax = iToken
+				end
 				return nil    -- required next token type doesn't match
 			end
 			node = token
@@ -590,7 +606,12 @@ function parsePattern( pattern )
 			-- Token: compare to next token
 			local token = tokens[iToken]
 			if token == nil or token.tt ~= item then
-				return nil    -- required next token type doesn't match
+				-- Required next token type doesn't match
+				if iTokenMax and iToken > iTokenMax then   -- new farthest error
+					setTokenMismatchError( token )
+					iTokenMax = iToken
+				end
+				return nil
 			end
 			node = token
 			trace("Matched token " .. iToken .. " \"" .. token.str .. "\"")
@@ -631,9 +652,10 @@ end
 -- If parsing failed at this level but would succeed at a higher level, 
 -- then set the error state to indicate this.
 local function parseCurrentLine( level )
-	-- Try at the requested syntax level first
+	-- Try normal parse at the requested syntax level first
 	syntaxLevel = level
 	maxSyntaxLevel = level
+	iTokenMax = nil    -- don't bother tracking the farthest error
 	iToken = 1
 	local parseTree = parseGrammar( line )
 	if parseTree then
@@ -641,8 +663,7 @@ local function parseCurrentLine( level )
 	end
 
 	-- Try common errors at the given syntax level
-	local iLine = tokens[1].iLine
-	err.clearErr( iLine )
+	err.clearErr( lineNumber )
 	maxSyntaxLevel = 0   -- causes common errors to also be considered
 	iToken = 1
 	parseTree = parseGrammar( line )
@@ -651,15 +672,14 @@ local function parseCurrentLine( level )
 		return parseTree
 	end	
 
-	-- Try parsing at higher levels
+	-- Try parsing at higher levels, including common errors
 	for tryLevel = level + 1, numSyntaxLevels do
-		err.clearErr( iLine )
+		err.clearErr( lineNumber )
 		syntaxLevel = tryLevel
-		maxSyntaxLevel = 0   -- also match common errors
 		iToken = 1
 		parseTree = parseGrammar( line )
 		if parseTree then
-			err.clearErr( iLine )   -- in case we matched a common error
+			err.clearErr( lineNumber )   -- in case we matched a common error
 			-- Report level error with minimum level required
 			local lastToken = tokens[#tokens - 1]  -- not counting the END
 			err.setErrNodeSpan( tokens[1], lastToken,
@@ -670,18 +690,25 @@ local function parseCurrentLine( level )
 	end
 
 	-- If we set a known error at the max syntax level including common error
-	-- patterns, then report it.
-	if err.shouldStop() then
+	-- patterns, then fail with this error state.
+	if err.getLoggedErrForLine( lineNumber ) then
 		return nil
 	end
 
-	-- TODO: Try modified patterns to isolate the error
+	-- Parse again at the user's level to try to determine the error
+	-- at the parse point that used the most tokens on the line.
+	syntaxLevel = level
+	maxSyntaxLevel = level
+	iTokenMax = 0
+	iToken = 1
+	parseGrammar( line )
+	if err.getLoggedErrForLine( lineNumber ) == nil then
+		-- Make a generic syntax error to use since a more specific error was not found
+		local lastToken = tokens[#tokens - 1]  -- not counting the END
+		err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
+	end
 
-	-- Make a generic syntax error to use if a more specific error was not found
-	local lastToken = tokens[#tokens - 1]  -- not counting the END
-	err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
-
-	-- Append the source line to our log of generic syntax errors if this
+	-- Append the source line to our log of syntax errors if this
 	-- is an abortable error (i.e. we are not running a bulk error test)
 	if err.shouldStop() then
 		local logFile = io.open( "../SyntaxErrors.txt", "a" )

@@ -118,8 +118,8 @@ local function buildTables()
 			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable }
 		elseif p == "varDecl" then
 			-- Add field record(s)
-			local vt = javaTypes.vtFromVarType( tree.nodes[1] )
-			local idList = nodes[2].nodes
+			local vt = javaTypes.vtFromVarType( tree.nodes[2] )
+			local idList = nodes[3].nodes
 			for j = 1, #idList do
 				local idNode = idList[j]
 				class.fields[#class.fields + 1] = { name = idNode.str, vt = vt }
