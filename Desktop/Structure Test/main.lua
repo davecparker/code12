@@ -27,6 +27,7 @@ function _fn.start()
 	local y = 0
 	y = X
 
+	ct.rect(X, 10, 50, 10)
 	this.ball = ct.circle(X, y, 30)
 	this.ball:setFillColor("blue")
 	this.frameCount = _fn.foo(this.LIMIT, this.speed * 2)
@@ -42,6 +43,7 @@ end
 
 function _fn.test()
 
+	i = _fn.foo(3, 4)
 	if i < 0 then
 		return i + 1
 	else

@@ -6357,7 +6357,7 @@ line (end)
 *** Line 607 char 43: Variable initialization should end with a semicolon (;)
 
 608. foo(x, );       // missing expr in exprList
-*** Line 608 chars 1-9: Syntax error (unrecognized code)
+*** Line 608 char 6: Missing list item or extra comma
 
 609. f00()++;		// ++ applied to non-lvalue
 *** Line 609 chars 1-8: Syntax error (unrecognized code)
@@ -6526,10 +6526,10 @@ Comma not supported
 *** Line 661 chars 1-11: Syntax error (unrecognized code)
 
 662. foo(int x, double y, GameObj z) 	// missing return type in function definition
-*** Line 662 chars 1-31: Syntax error (unrecognized code)
+*** Line 662 char 8: Function parameter values must be separated by commas
 
 663. foo(int x, double y, GameObj z); 	// supplying variable types in function call
-*** Line 663 chars 1-32: Syntax error (unrecognized code)
+*** Line 663 char 8: Function parameter values must be separated by commas
 
 664. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
 *** Line 664 char 40: function header should not end with a semicolon
@@ -6544,7 +6544,7 @@ Comma not supported
 *** Line 667 chars 34-35: Unclosed string literal
 
 668. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Line 668 chars 1-30: Syntax error (unrecognized code)
+*** Line 668 char 21: Function parameter values must be separated by commas
 
 669. newObj() = oldObj; 				// assigning to a function value
 *** Line 669 chars 1-18: Syntax error (unrecognized code)
@@ -6735,7 +6735,7 @@ Comma not supported
 *** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 118 ms
+731 lines processed in 134 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)

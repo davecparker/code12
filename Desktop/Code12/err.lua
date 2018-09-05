@@ -246,6 +246,24 @@ function err.setErrNode( node, strErr, ... )
 	err.setErr( errLocFromNode( node ), nil, strErr, ... )
 end
 
+-- Record an error for missing code with:
+--      node          parse or structure node right after the missing code
+--      strErr        error message string
+--      ...           optional params to send to string.format( strErr, ... )
+function err.setErrNodeMissing( node, strErr, ... )
+	assert( type(node) == "table" )
+	assert( type(strErr) == "string" )
+
+	local loc = errLocFromNode( node )
+	local iCharNode = loc.iCharStart
+	if iCharNode then
+		-- Try to hilight the space/char before the node
+		loc.iCharStart = math.max( 1, iCharNode - 1 )
+		loc.iCharEnd = loc.iCharStart
+	end 
+	err.setErr( loc, nil, strErr, ... )
+end
+
 -- Record an error with:
 --      firstNode     first node for location of the error
 --      lastNode      last node for token span containing the error
