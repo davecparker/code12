@@ -340,7 +340,7 @@ function err.getLoggedErrForLine( iLine )
 	assert( type(iLine) == "number" )
 
 	if errRecForLine then
-		return errRecForLine[iLineRankFromILine( iLine )]
+		return errRecForLine[iLine]
 	elseif err.rec and err.rec.iLineRank == iLineRankFromILine( iLine ) then
 		return err.rec
 	end
