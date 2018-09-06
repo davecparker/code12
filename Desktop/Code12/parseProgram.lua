@@ -473,6 +473,7 @@ local function getElseStmts( ifTree )
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, ifTree.iLineStart, 
 					"This \"else if\" should have the same indentation as the highlighted \"if\" above it" )
 		end
+		checkMultiLineIndent( tree );
 		-- Controlled stmts is a single stmt, which is the following if
 		iTree = iTree + 1
 		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
@@ -588,6 +589,7 @@ function getLineStmts( tree, stmts )
 		stmt = getStmt( nodes[1] )
 	elseif p == "if" then
 		-- if (expr) controlledStmts [else controlledStmts]
+		checkMultiLineIndent( tree )
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
 				elseStmts = getElseStmts( tree ), entireLine = true }
@@ -599,6 +601,7 @@ function getLineStmts( tree, stmts )
 	elseif p == "returnVal" then
 		-- return expr ;
 		-- TODO: Check for return being only at end of a block
+		checkMultiLineIndent( tree )
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
 	elseif p == "return" then
 		-- return ;
@@ -625,6 +628,7 @@ function getLineStmts( tree, stmts )
 		if javalex.indentLevelForLine( endTree.iLineStart ) ~= javalex.indentLevelForLine( tree.iLineStart ) then
 			err.setErrNodeAndRef( endTree, tree, "This while statement should have the same indentation as its \"do\"" )
 		end
+		checkMultiLineIndent( endTree )
 		stmt.expr = makeExpr( endTree.nodes[3] )
 	elseif p == "while" then
 		-- while (expr) controlledStmts
@@ -633,10 +637,12 @@ function getLineStmts( tree, stmts )
 			err.setErrNode( whileEnd, "while loop header should not end with a semicolon" )
 			return nil
 		end
+		checkMultiLineIndent( tree )
 		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts(),
 				entireLine = true }
 	elseif p == "for" then
 		-- for loop variants
+		checkMultiLineIndent( tree )
 		stmt = getForStmt( nodes )
 	elseif p == "break" then
 		-- break ;
@@ -850,6 +856,7 @@ local function getMembers()
 			if gotFunc then
 				err.setErrNode( tree, "Class-level variables must be defined at the beginning of the class" )
 			end 
+			checkMultiLineIndent( tree )
 		elseif p == "func" then
 			-- User function or event definition
 			if ok then
