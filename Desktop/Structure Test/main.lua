@@ -16,11 +16,6 @@ this.frameCount = 0
 this.newCount = this.frameCount + 2 *  -this.frameCount
 this.str = "Testing" .. tostring(3)
 
-function _fn.start()
-end
-
-
-
 
 
 
@@ -98,15 +93,21 @@ function _fn.update()
 end
 
 function _fn.onMousePress(obj, x, y)
+
+	ct.logm("Press", obj, x, y)
+end   -- if (obj != null)
+
+
+
+
+
+
+
+
+function _fn.onMouseRelease(obj, x, y)
+
+	ct.logm("Release", obj, x, y)
 end
-
-
-
-
-
-
-
-
 
 
 function _fn.moveBall(wrap)

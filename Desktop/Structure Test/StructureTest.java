@@ -94,6 +94,7 @@ class StructureTest extends Code12Program
 
 	public void onMousePress( GameObj obj, double x, double y )
 	{
+		ct.logm("Press", obj, x, y);
 		// if (obj != null)
 		// {
 		// 	obj.xSpeed = .1;
@@ -101,6 +102,11 @@ class StructureTest extends Code12Program
 		// }
 		// else
 		// 	ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
+	}
+
+	public void onMouseRelease( GameObj obj, double x, double y )
+	{
+		ct.logm("Release", obj, x, y);
 	}
 
 	// Move the ball
