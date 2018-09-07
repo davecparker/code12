@@ -203,7 +203,7 @@ end
 
 -- Return Lua code for expr promoted to a string
 local function stringExprCode( expr )
-	local vt = expr.info.vt
+	local vt = expr.vt
 	if vt == "String" then
 		return exprCode( expr )
 	elseif vt == "GameObj" then
@@ -315,7 +315,7 @@ local function binOpCode( expr )
 	local luaOp = luaOpFromOpType[expr.opType]
 	if luaOp == nil then
 		return "nil"   -- unsupported operator (may be continuing on errors)
-	elseif luaOp == "+" and expr.vt == "String" then
+	elseif expr.opType == "+" and expr.vt == "String" then
 		-- String concat, not add. Promote left and right to string as needed.
 		return stringExprCode( expr.left ) .. " .. " .. stringExprCode( expr.right )
 	end
@@ -331,13 +331,16 @@ end
 -- Return the Lua code string for an arrayInit expr
 local function arrayInitCode( expr )
 	local codeStrs = { "{ " }
+	local length = 0
 	if expr.exprs then
 		for _, ex in ipairs( expr.exprs ) do
 			codeStrs[#codeStrs + 1] = exprCode( ex )
 			codeStrs[#codeStrs + 1] = ", "
+			length = length + 1
 		end
 	end
-	codeStrs[#codeStrs + 1] = "}"
+	codeStrs[#codeStrs + 1] = "length = " .. length
+	codeStrs[#codeStrs + 1] = " }"
 	return table.concat( codeStrs )
 end
 
@@ -554,7 +557,7 @@ local function generateFunc( func )
 	beginLuaLine( func.iLine, "function " )
 	addLua( fnNameCode( func.nameID.str ) )
 	addLua( "(" )
-	local params = func.params
+	local params = func.paramVars
 	if params then
 		for i = 1, #params do
 			addLua( params[i].nameID.str )
