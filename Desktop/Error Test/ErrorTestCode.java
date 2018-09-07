@@ -1,6 +1,8 @@
 import Code12.*;
 
-class ErrorTest extends Code12Program
+// ERROR "The class header shouldn't be indented"
+	class ErrorTest extends Code12Program
+// ERROR "The { beginning a block should have the same indentation as the line before it"
 {
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
@@ -11,12 +13,36 @@ class ErrorTest extends Code12Program
 		int overIndentedInstanceVar;
 	// ERROR "Class-level variable and function definitions should all have the same indentation"
 int underIndentedInstanceVar;
+	int[] classLevelMultilineIntArray1 = { 1,
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	2 };
+	int[] classLevelMultilineIntArray2 = { 1,
+		2,
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	3 };
+	int[] classLevelMultilineIntArray3 = new int[ Math.max(1,
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	2) ];
+	// ERROR "double cannot be assigned to an int"
+	int classLevelVarTypeMismatchIntDouble = 0.1;
+	// Error-free class-level variables
+	final int MAX_ENEMIES = 100;
+	int numEnemies = Math.min(1000, MAX_ENEMIES);
+	double[] doubleArr = { 1.0,
+		2.0,
+		3.0 };
+	GameObj leftWall, rightWall, topWall, bottomWall;
+	GameObj[] enemies;
+	public GameObj[] friends = new GameObj[MAX_ENEMIES];
+	private int myPrivateVar;
 	// TODO: Need more tests involving instance (class-level) variables
 
 	public static void main(String[] args)
 	{ 
-		Code12.run(new ErrorTest()); 
-	}
+	// ERROR "The body of a function should be indented more than its opening {"
+	Code12.run(new ErrorTest());
+	// ERROR "main functions's ending } should have the same indentation as its beginning {"
+		}
 
 	// user defined functions
 	void emptyFunc()
@@ -1374,6 +1400,30 @@ int underIndentedInstanceVar;
 		int[] multiLineArrInit = { 1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		2 };
+		int[] multiLineArrDec = new int[ct.random(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		10)];
+		if ( ct.random(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2) > 3 )
+			voidFunc();
+		else if ( ct.random(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2) > 3 )
+			voidFunc();
+		while ( ct.random(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2) > 3 )
+			voidFunc();
+		do
+			voidFunc();
+		while( Math.max(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		0) < 0 );
+		for (;Math.max(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		0) < 0; )
+			voidFunc();
 		if (false)
 			voidFunc();
 		// ERROR This line is not controlled by the highlighted "if" above it"
@@ -1411,6 +1461,58 @@ int underIndentedInstanceVar;
 			voidFunc();
 			// ERROR This line is not controlled by the highlighted "do" above it"
 			while (false)
+		// ERROR "Access specifiers are only allowed on class-level variables"
+		private int privateInt = 0;
+		// ERROR "Access specifiers are only allowed on class-level variables"
+		public double publicDouble = 0;
+		// ERROR "The only type cast supported by Code12 is (int)"
+		double halfIntVar = (double) intVar / 2;
+		if (false)
+		// ERROR "Variable declarations are not allowed here"
+			int bogusVarInit = 0;
+		if (false)
+			voidFunc();
+		else if (false)
+		// ERROR "Variable declarations are not allowed here"
+			int bogusVarDecl;
+		if (false)
+			voidFunc();
+		else
+		// ERROR "Variable declarations are not allowed here"
+			int[] bogusArrayInit = { 0 };	
+		while (false)
+		// ERROR "Variable declarations are not allowed here"
+			int[] bogusArrayDecl;
+		// ERROR "else without matching if (misplaced { } brackets?)"
+		else
+		do
+			voidFunc();
+		// ERROR "Expected while statement to end do-while loop"
+		voidFunc();
+		do
+		{
+			voidFunc();
+		}
+		// ERROR "Expected while statement to end do-while loop"
+		voidFunc();
+		do
+			voidFunc();
+		// ERROR "while statement at end of do-while loop must end with a semicolon"
+		while (false)
+		do
+		{
+			voidFunc();
+		}
+		// ERROR "while statement at end of do-while loop must end with a semicolon"
+		while (false)
+		// ERROR "while loop header should not end with a semicolon"
+		while (false);
+		// ERROR "Function definitions cannot occur inside a statement block"
+		void misplacedFunc()
+		// ERROR "Function definitions cannot occur inside a statement block"
+		public static void main(String[] args)
+		// ERROR "Unexpected statement"
+		import Code12.*;
 	}
 
 	// ERROR "Variable myVar was already defined"
@@ -1479,5 +1581,16 @@ void underIndentedFunc()
 	int arg2 )
 	{
 	}
-}
-
+	int multilineReturnFunc()
+	{
+		return Math.max(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2);
+	}
+	void missingCurlyBracketFunc()
+	// ERROR "Expected {"
+	void lastFunc()
+	{
+	}
+	// ERROR "The ending } of the program class should not be indented"
+	}

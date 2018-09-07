@@ -44,3 +44,6 @@ Conflicts in this file should be resolved by preserving the union of all the lin
 		ct.circle( 
 		ct.circle
 		foo bar!
+		if ( ct.random(1
+		2) > 3 )
+		for ( x : doubleArr )
