@@ -133,78 +133,98 @@ local function checkMultiLineIndent( tree )
 	end
 end
 
--- Check for the correct Code12 import and move iTree past all imports.
--- Return true if succesful, else set the error state and return false.
-local function checkImport()
-	-- Check all imports that we find
-	local foundCode12Import = false
-	while iTree <= numParseTrees do
-		local tree = parseTrees[iTree]
-		local p = tree.p
-		if p == "importAll" then
-			if tree.nodes[2].str == "Code12" then
-				foundCode12Import = true
-				if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
-					err.setErrLineNum( tree.iLine, "\"import Code12.*;\" shouldn't be indented" )
+-- Parse the required program header directly from sourceLines and return
+-- (programTree, lineNum) where programTree is the initial programTree structure 
+-- and lineNum is the next line number after the lines processed.
+-- Return nil if there is an unrecoverable error.
+local function parseHeader( sourceLines )
+	-- "import", "ID", ".", "*", ";", "END"     (ID = "Code12")
+	local lineNum = 1
+	local nameID = nil
+	local numSourceLines = #sourceLines
+	local iLineImport = nil
+	while lineNum < numSourceLines do
+		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+		if tokens and #tokens > 1 then  -- skip if blank or lexical error
+			if tokens[1].tt == "import" then
+				if #tokens == 6 and tokens[2].str == "Code12" 
+						and tokens[3].tt == "." and tokens[4].tt == "*" 
+						and tokens[5].tt == ";" then
+					iLineImport = lineNum
+				else
+					err.setErrLineNum( lineNum, 
+							"Code12 programs should import only Code12.*" )
 				end
-			else   -- a package but not Code12
-				err.setErrLineParseTree( tree, 
-						"Code12 programs should import only Code12.*" )	
-				return false
+			else
+				break
 			end
-		elseif tree.isError and p == "import" then
-			local node = tree.nodes[2]
-			if node and node.str == "Code12" then   -- Code12 but wrong syntax
-				err.overrideErrLineParseTree( tree, 
-						"Code12 programs must start with:\n\"import Code12.*;\"" )
-			else   -- not Code12
-				err.overrideErrLineParseTree( tree, 
-						"Code12 programs should import only Code12.*" )
-			end
-			return false
-		else   -- Not an import
-			if foundCode12Import then
-				return true
-			end
-			err.overrideErrLineParseTree( tree,
-					"Code12 programs must start with:\n\"import Code12.*;\"" )
-			return false
 		end
-		iTree = iTree + 1
+		lineNum = lineNum + 1
 	end
-	return false  -- sentinel should prevent getting here
-end
+	if iLineImport then
+		-- print( "Got import" )
+	else
+		err.setErrLineNum( lineNum, 
+			'Code12 programs must start with:\n"import Code12.*;"' )
+	end
 
--- Check for the correct class header, store the class name in 
--- programTree.classID, and move iTree past it. 
--- Return true if succesful, else set the error state and return false.
-local function checkClassHeader()
-	local tree = parseTrees[iTree]
-	if tree.p == "classUser" and tree.nodes[5].str == "Code12Program" then
-		-- access class ID extends ID
-		if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
-			err.setErrLineNum( tree.iLine, "The class header shouldn't be indented" )
+	-- "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
+	local iLineClass = nil
+	while lineNum < numSourceLines do
+		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+		if tokens and #tokens > 1 then  -- skip if blank or lexical error
+			if tokens[1].tt == "class" then
+				if iLineClass then
+					err.setErrLineNumAndRefLineNum( lineNum, iLineClass,
+							"There should be only one class declaration" )
+				else
+					iLineClass = lineNum
+					if #tokens == 5 and tokens[2].tt == "ID" 
+							and tokens[3].tt == "extends" 
+							and tokens[4].str == "Code12Program" then
+						-- Get the class name
+						nameID = tokens[2]
+						-- TODO: Check that nameID is valid (not a defined class)
+						-- TODO: Check for initial upper case letter in name
+						-- TODO: What about extra code after 5 tokens, e.g. {
+					else
+						err.setErrLineNum( lineNum,
+								'A Code12 class declaration should be:\n"class YourName extends Code12Program"' )
+					end
+				end
+			else
+				break
+			end
 		end
-		-- Get class name and make sure it is valid
-		local nameID = tree.nodes[3]
-		local className = nameID.str
-		local chFirst = string.byte( className, 1 )
-		if javaTypes.isKnownClassName( className ) then
-			err.setErrNode( nameID,
-					"The class name %s is already defined. Choose another name.", className )
-			return false
-		elseif chFirst < 65 or chFirst > 90 then    -- A to Z
-			err.setErrNode( nameID, 
-					"By convention, class names should start with an upper-case letter" )
-			return false
-		end
-		programTree.nameID = nameID
-		iTree = iTree + 1
-		return true
+		lineNum = lineNum + 1
 	end
-	err.overrideErrLineParseTree( tree,
-			"Code12 programs must start with:\n\"class YourName extends Code12Program\"" )	
-	return false
+	if iLineClass then
+		-- print( "Got class" )
+	else
+		err.setErrLineNum( lineNum,
+				'Code12 programs must start with:\n"class YourName extends Code12Program"' )
+	end
+
+	-- Beginning { for the class
+	local iLineBegin = nil
+	while lineNum < numSourceLines do
+		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+		if tokens and #tokens > 1 then  -- skip if blank or lexical error
+			if #tokens == 2 and tokens[1].tt == "{" then
+				iLineBegin = lineNum
+			end
+			break
+		end
+		lineNum = lineNum + 1
+	end
+	if iLineBegin then
+		-- Success or good enough to continue
+		-- print( "Got begin" )
+		local program = { s = "program", nameID = nameID, vars = {}, funcs = {} }
+		return program, lineNum + 1
+	end
+	err.setErrLineNum( lineNum, "Your class should start with a { on its own line" )
+	return nil   -- probably not good to keep parsing after this
 end
 
 -- Check for a block begin and move iTree past it.
@@ -959,81 +979,6 @@ local function printStructureTree( node, indentLevel, file, label )
 	end
 end
 
--- Parse the required program header directly from sourceLines and return
--- (programTree, lineNum) where programTree is the initial programTree structure 
--- and lineNum is the next line number after the lines processed.
--- Return nil if there is an unrecoverable error.
-local function parseHeader( sourceLines )
-	--  "import", "ID", ".", "*", ";", "END"     (ID = "Code12")
-	-- local lineNum = 1
-	-- local nameID = nil
-	-- local numSourceLines = #sourceLines
-	-- local iLineImport = nil
-	-- while lineNum < numSourceLines do
-	-- 	local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
-	-- 	if tokens and #tokens > 0 then  -- skip if blank or lexical error
-	-- 		if tokens[1].tt == "import" then
-	-- 			if tokens[2].str == "Code12" and tokens[3].tt == "." 
-	-- 					and tokens[4].tt == "*" and tokens[5].tt == ";"
-	-- 					and tokens[6].tt == "END" then
-	-- 				iLineImport = lineNum
-	-- 			else
-	-- 				err.setErrLineNum( lineNum, 
-	-- 						"Code12 programs should import only Code12.*" )
-	-- 			end
-	-- 		else
-	-- 			break
-	-- 		end
-	-- 	end
-	-- 	lineNum = lineNum + 1
-	-- end
-	-- if not iLineImport then
-	-- 	err.setErrLineNum( lineNum, 
-	-- 		'Code12 programs must start with:\n"import Code12.*;"' )
-	-- end
-
-	-- --  "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
-	-- --  "{"
-	-- local iLineClass = nil
-	-- while lineNum < numSourceLines do
-	-- 	local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
-	-- 	if tokens and #tokens > 0 then  -- skip if blank or lexical error
-	-- 		if tt == "class" then
-	-- 			if iLineClass then
-	-- 				err.setErrLineNumAndRefLineNum( lineNum, iLineClass,
-	-- 						"There should be only one class declaration" )
-	-- 			else
-	-- 				iLineClass = lineNum
-	-- 				if tokens[2].tt == "ID" and tokens[3].tt == "extends" 
-	-- 						and tokens[4].str == "Code12Program" 
-	-- 						and tokens[5].tt == "END" then
-	-- 					local nameID = tokens[2]
-	-- 					-- TODO: Check that nameID is valid
-	-- 					program.nameID = nameID
-	-- 				else
-	-- 					err.setErrLineNum( lineNum,
-	-- 							'A Code12 class declaration should be:\n"class YourName extends Code12Program"' )
-	-- 				end
-	-- 			end
-	-- 		elseif tt == "{" then	
-	-- 			if not iLineImport then
-	-- 				err.setErrLineNum( lineNum, 
-	-- 						'Code12 programs must start with:\n"import Code12.*;"' )
-	-- 			elseif not iLineClass then
-	-- 				err.setErrLineNum( lineNum,
-	-- 						'A Code12 program must start with:\n"class YourName extends Code12Program"' )
-	-- 			end
-	-- 			return { s = "program", vars = {}, funcs = {} }, lineNum + 1
-	-- 		else
-	-- 			-- TODO
-	-- 		end
-	-- 	end
-	-- end
-
-	-- TODO
-	return { s = "program", vars = {}, funcs = {} }, 1
-end
-
 
 --- Module Functions ---------------------------------------------------------
 
@@ -1048,6 +993,9 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	-- Parse the required program header
 	local lineNum
 	programTree, lineNum = parseHeader( sourceLines )
+	if programTree == nil then
+		return nil
+	end
 
 	-- Parse the remaining lines and build the parseTrees array
 	local startTokens = nil
@@ -1091,16 +1039,14 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 			{ t = "line", p = "EOF", nodes = {}, 
 				iLine = numSourceLines + 1, iLineStart = numSourceLines + 1 }
 
-	-- Check for the required program header then get the member vars and funcs
+	-- Get the member vars and funcs
 	iTree = 1
-	if checkImport() and checkClassHeader() and checkBlockBegin() then
-		if getMembers() then
-			-- We should be at the EOF now
-			if parseTrees[iTree].p ~= "EOF" then
-				err.overrideErrLineParseTree( parseTrees[iTree],
-						"Unexpected line after end of class -- mismatched { } brackets?" )
-				return nil
-			end
+	if getMembers() then
+		-- We should be at the EOF now
+		if parseTrees[iTree].p ~= "EOF" then
+			err.overrideErrLineParseTree( parseTrees[iTree],
+					"Unexpected line after end of class -- mismatched { } brackets?" )
+			return nil
 		end
 	end
 
