@@ -3,13 +3,13 @@
 
 Semantic Error Test:
 
-    1534 lines processed
-    143 ms Parse time
+    1596 lines processed
+    150 ms Parse time
     8 ms Semantic check time
-    3 ms Code Generation time
-    155 ms Total time
+    4 ms Code Generation time
+    162 ms Total time
 
 0 unexpected errors
-0 uncaught errors (308 expected errors)
+0 uncaught errors (330 expected errors)
 
 SUCCESS

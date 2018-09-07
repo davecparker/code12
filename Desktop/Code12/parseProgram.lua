@@ -445,7 +445,7 @@ local function getControlledStmts()
 					end
 				elseif nextIndent == stmtIndent and nextIndent ~= ctrlIndent
 						and not (ctrlTree.p == "do" and nextTree.p == "while" and nextTree.nodes[4].p == "doWhile") then
-					err.setErrLineNum( nextTree.iLineStart, 
+					err.setErrLineNumAndRefLineNum( nextTree.iLineStart, ctrlTree.iLineStart,
 							"This line is not controlled by the highlighted \"%s\" above it. Missing curly bracket(s) or improperly indented?", ctrlTree.p )
 				end
 			end

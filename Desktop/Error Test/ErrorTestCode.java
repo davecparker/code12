@@ -1,6 +1,8 @@
 import Code12.*;
 
-class ErrorTest extends Code12Program
+// ERROR "The class header shouldn't be indented"
+	class ErrorTest extends Code12Program
+// ERROR "The { beginning a block should have the same indentation as the line before it"
 {
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
@@ -31,13 +33,16 @@ int underIndentedInstanceVar;
 		3.0 };
 	GameObj leftWall, rightWall, topWall, bottomWall;
 	GameObj[] enemies;
-	GameObj[] friends = new GameObj[MAX_ENEMIES];
+	public GameObj[] friends = new GameObj[MAX_ENEMIES];
+	private int myPrivateVar;
 	// TODO: Need more tests involving instance (class-level) variables
 
 	public static void main(String[] args)
 	{ 
-		Code12.run(new ErrorTest()); 
-	}
+	// ERROR "The body of a function should be indented more than its opening {"
+	Code12.run(new ErrorTest());
+	// ERROR "main functions's ending } should have the same indentation as its beginning {"
+		}
 
 	// user defined functions
 	void emptyFunc()
@@ -1456,6 +1461,58 @@ int underIndentedInstanceVar;
 			voidFunc();
 			// ERROR This line is not controlled by the highlighted "do" above it"
 			while (false)
+		// ERROR "Access specifiers are only allowed on class-level variables"
+		private int privateInt = 0;
+		// ERROR "Access specifiers are only allowed on class-level variables"
+		public double publicDouble = 0;
+		// ERROR "The only type cast supported by Code12 is (int)"
+		double halfIntVar = (double) intVar / 2;
+		if (false)
+		// ERROR "Variable declarations are not allowed here"
+			int bogusVarInit = 0;
+		if (false)
+			voidFunc();
+		else if (false)
+		// ERROR "Variable declarations are not allowed here"
+			int bogusVarDecl;
+		if (false)
+			voidFunc();
+		else
+		// ERROR "Variable declarations are not allowed here"
+			int[] bogusArrayInit = { 0 };	
+		while (false)
+		// ERROR "Variable declarations are not allowed here"
+			int[] bogusArrayDecl;
+		// ERROR "else without matching if (misplaced { } brackets?)"
+		else
+		do
+			voidFunc();
+		// ERROR "Expected while statement to end do-while loop"
+		voidFunc();
+		do
+		{
+			voidFunc();
+		}
+		// ERROR "Expected while statement to end do-while loop"
+		voidFunc();
+		do
+			voidFunc();
+		// ERROR "while statement at end of do-while loop must end with a semicolon"
+		while (false)
+		do
+		{
+			voidFunc();
+		}
+		// ERROR "while statement at end of do-while loop must end with a semicolon"
+		while (false)
+		// ERROR "while loop header should not end with a semicolon"
+		while (false);
+		// ERROR "Function definitions cannot occur inside a statement block"
+		void misplacedFunc()
+		// ERROR "Function definitions cannot occur inside a statement block"
+		public static void main(String[] args)
+		// ERROR "Unexpected statement"
+		import Code12.*;
 	}
 
 	// ERROR "Variable myVar was already defined"
@@ -1530,5 +1587,10 @@ void underIndentedFunc()
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		2);
 	}
-}
-
+	void missingCurlyBracketFunc()
+	// ERROR "Expected {"
+	void lastFunc()
+	{
+	}
+	// ERROR "The ending } of the program class should not be indented"
+	}
