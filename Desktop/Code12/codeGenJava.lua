@@ -325,19 +325,23 @@ end
 -- Return the Lua code string for a newArray expr
 local function newArrayCode( expr )
 	return "{ length = " .. exprCode( expr.lengthExpr )
-			.. ", default = " ..  defaultValueCodeForVt( expr.vt ) .. " }"
+			.. ", default = " ..  defaultValueCodeForVt( expr.vt.vt ) .. " }"
 end
 
 -- Return the Lua code string for an arrayInit expr
 local function arrayInitCode( expr )
 	local codeStrs = { "{ " }
+	local length = 0
 	if expr.exprs then
 		for _, ex in ipairs( expr.exprs ) do
 			codeStrs[#codeStrs + 1] = exprCode( ex )
 			codeStrs[#codeStrs + 1] = ", "
+			length = length + 1
 		end
 	end
-	codeStrs[#codeStrs + 1] = "}"
+	codeStrs[#codeStrs + 1] = "length = " .. length
+	codeStrs[#codeStrs + 1] = ", default = " .. defaultValueCodeForVt( expr.vt.vt )
+	codeStrs[#codeStrs + 1] = " }"
 	return table.concat( codeStrs )
 end
 
@@ -553,7 +557,7 @@ local function generateFunc( func )
 	beginLuaLine( func.iLine, "function " )
 	addLua( fnNameCode( func.nameID.str ) )
 	addLua( "(" )
-	local params = func.params
+	local params = func.paramVars
 	if params then
 		for i = 1, #params do
 			addLua( params[i].nameID.str )
