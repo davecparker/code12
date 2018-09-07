@@ -307,13 +307,6 @@ local retType = { t = "retType",
 	{ 1, 12, "simple",			"ID"					},
 }
 
--- An access permission specifier
-local access = { t = "access",
-	{ 1, 12, "public",			"public"				},
-	{ 3, 12, "private",			"private"				},
-	{ 1, 12, "empty",									},
-}
-
 -- A formal parameter (in a function definition)
 local param = { t = "param",
 	{ 12, 12, "array",			"ID", "[", "]", "ID"		},
