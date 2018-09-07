@@ -964,21 +964,15 @@ end
 -- and lineNum is the next line number after the lines processed.
 -- Return nil if there is an unrecoverable error.
 local function parseHeader( sourceLines )
-	-- We should find:
-	--      "import", "ID", ".", "*", ";", "END"     (ID = "Code12")
-	--      "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
-	--      "{"
-	local program = { s = "program", vars = {}, funcs = {} }
-	return program, 1
-
-	-- local iLineImport = nil
-	-- local iLineClass = nil
+	--  "import", "ID", ".", "*", ";", "END"     (ID = "Code12")
 	-- local lineNum = 1
-	-- while lineNum < #sourceLines do
-	-- 	tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+	-- local nameID = nil
+	-- local numSourceLines = #sourceLines
+	-- local iLineImport = nil
+	-- while lineNum < numSourceLines do
+	-- 	local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 	-- 	if tokens and #tokens > 0 then  -- skip if blank or lexical error
-	-- 		local tt = tokens[1].tt
-	-- 		if tt == "import" then
+	-- 		if tokens[1].tt == "import" then
 	-- 			if tokens[2].str == "Code12" and tokens[3].tt == "." 
 	-- 					and tokens[4].tt == "*" and tokens[5].tt == ";"
 	-- 					and tokens[6].tt == "END" then
@@ -987,11 +981,25 @@ local function parseHeader( sourceLines )
 	-- 				err.setErrLineNum( lineNum, 
 	-- 						"Code12 programs should import only Code12.*" )
 	-- 			end
-	-- 		elseif tt == "class" then
-	-- 			if not iLineImport then
-	-- 				err.setErrLineNum( lineNum, 
-	-- 						'Code12 programs must start with:\n"import Code12.*;"' )
-	-- 			elseif iLineClass then
+	-- 		else
+	-- 			break
+	-- 		end
+	-- 	end
+	-- 	lineNum = lineNum + 1
+	-- end
+	-- if not iLineImport then
+	-- 	err.setErrLineNum( lineNum, 
+	-- 		'Code12 programs must start with:\n"import Code12.*;"' )
+	-- end
+
+	-- --  "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
+	-- --  "{"
+	-- local iLineClass = nil
+	-- while lineNum < numSourceLines do
+	-- 	local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+	-- 	if tokens and #tokens > 0 then  -- skip if blank or lexical error
+	-- 		if tt == "class" then
+	-- 			if iLineClass then
 	-- 				err.setErrLineNumAndRefLineNum( lineNum, iLineClass,
 	-- 						"There should be only one class declaration" )
 	-- 			else
@@ -1015,15 +1023,15 @@ local function parseHeader( sourceLines )
 	-- 				err.setErrLineNum( lineNum,
 	-- 						'A Code12 program must start with:\n"class YourName extends Code12Program"' )
 	-- 			end
-	-- 			return program, lineNum + 1
+	-- 			return { s = "program", vars = {}, funcs = {} }, lineNum + 1
 	-- 		else
 	-- 			-- TODO
 	-- 		end
 	-- 	end
 	-- end
 
-	-- -- TODO
-	-- return nil
+	-- TODO
+	return { s = "program", vars = {}, funcs = {} }, 1
 end
 
 
