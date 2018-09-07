@@ -122,6 +122,6 @@ function _fn.makeCircles()
 	local circles = { length = 10, default = nil }
 	for _, c in ipairs(circles) do
 		c:setFillColor("black")
-	end; local scores = { 10, 20, 30, }
+	end; local scores = { 10, 20, 30, length = 3, default = 0 }
 	return circles
 end
