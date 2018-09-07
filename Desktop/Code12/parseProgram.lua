@@ -788,7 +788,8 @@ local function getFunc( nodes )
 	return func
 end
 
--- Check and build the members.
+-- Check and build the members, ending with and including the } at 
+-- the end of the program class.
 -- If there is an error then set the error state and return false.
 -- Return true if succesful.
 local function getMembers()
@@ -958,6 +959,73 @@ local function printStructureTree( node, indentLevel, file, label )
 	end
 end
 
+-- Parse the required program header directly from sourceLines and return
+-- (programTree, lineNum) where programTree is the initial programTree structure 
+-- and lineNum is the next line number after the lines processed.
+-- Return nil if there is an unrecoverable error.
+local function parseHeader( sourceLines )
+	-- We should find:
+	--      "import", "ID", ".", "*", ";", "END"     (ID = "Code12")
+	--      "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
+	--      "{"
+	local program = { s = "program", vars = {}, funcs = {} }
+	return program, 1
+
+	-- local iLineImport = nil
+	-- local iLineClass = nil
+	-- local lineNum = 1
+	-- while lineNum < #sourceLines do
+	-- 	tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+	-- 	if tokens and #tokens > 0 then  -- skip if blank or lexical error
+	-- 		local tt = tokens[1].tt
+	-- 		if tt == "import" then
+	-- 			if tokens[2].str == "Code12" and tokens[3].tt == "." 
+	-- 					and tokens[4].tt == "*" and tokens[5].tt == ";"
+	-- 					and tokens[6].tt == "END" then
+	-- 				iLineImport = lineNum
+	-- 			else
+	-- 				err.setErrLineNum( lineNum, 
+	-- 						"Code12 programs should import only Code12.*" )
+	-- 			end
+	-- 		elseif tt == "class" then
+	-- 			if not iLineImport then
+	-- 				err.setErrLineNum( lineNum, 
+	-- 						'Code12 programs must start with:\n"import Code12.*;"' )
+	-- 			elseif iLineClass then
+	-- 				err.setErrLineNumAndRefLineNum( lineNum, iLineClass,
+	-- 						"There should be only one class declaration" )
+	-- 			else
+	-- 				iLineClass = lineNum
+	-- 				if tokens[2].tt == "ID" and tokens[3].tt == "extends" 
+	-- 						and tokens[4].str == "Code12Program" 
+	-- 						and tokens[5].tt == "END" then
+	-- 					local nameID = tokens[2]
+	-- 					-- TODO: Check that nameID is valid
+	-- 					program.nameID = nameID
+	-- 				else
+	-- 					err.setErrLineNum( lineNum,
+	-- 							'A Code12 class declaration should be:\n"class YourName extends Code12Program"' )
+	-- 				end
+	-- 			end
+	-- 		elseif tt == "{" then	
+	-- 			if not iLineImport then
+	-- 				err.setErrLineNum( lineNum, 
+	-- 						'Code12 programs must start with:\n"import Code12.*;"' )
+	-- 			elseif not iLineClass then
+	-- 				err.setErrLineNum( lineNum,
+	-- 						'A Code12 program must start with:\n"class YourName extends Code12Program"' )
+	-- 			end
+	-- 			return program, lineNum + 1
+	-- 		else
+	-- 			-- TODO
+	-- 		end
+	-- 	end
+	-- end
+
+	-- -- TODO
+	-- return nil
+end
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -965,16 +1033,19 @@ end
 -- and return the program structure tree (see above).
 -- If there is an error then set the error state and return nil.
 function parseProgram.getProgramTree( sourceLines, syntaxLevel )
-	-- Init the parse structures
-	parseTrees = {}
-	programTree = { s = "program", vars = {}, funcs = {} }
-
-	-- Parse the lines and build the parseTrees array
+	-- Init the parse state
 	parseJava.initProgram()
+	parseTrees = {}
+
+	-- Parse the required program header
+	local lineNum
+	programTree, lineNum = parseHeader( sourceLines )
+
+	-- Parse the remaining lines and build the parseTrees array
 	local startTokens = nil
 	local iLineStart = nil
 	numSourceLines = #sourceLines
-	for lineNum = 1, numSourceLines do
+	while lineNum <= numSourceLines do
 		local tree, tokens = parseJava.parseLine( sourceLines[lineNum], 
 									lineNum, startTokens, syntaxLevel )
 		if tree == false then
@@ -996,6 +1067,7 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 			end
 			iLineStart = nil
 		end
+		lineNum = lineNum + 1
 	end
 
 	-- Check for unclosed block comment
