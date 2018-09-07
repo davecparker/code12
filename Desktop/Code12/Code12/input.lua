@@ -21,6 +21,7 @@ local function clickEvent(event, gameObj)
 	-- No matter what the program or input state is, if the click is ending here 
 	-- then make sure the touch focus is released.
 	local phase = event.phase
+	local focusObj = g.getFocusObj()
 	if phase == "ended" or phase == "cancelled" then
 		g.setFocusObj(nil)
 	end
@@ -73,7 +74,7 @@ local function clickEvent(event, gameObj)
 
 		-- Call client event
 		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
-	elseif event.target ~= g.getFocusObj() then
+	elseif event.target ~= focusObj then
 		return false    -- click did not begin on this object
 	elseif phase == "moved" then
 		-- Ignore this drag point if not in the game area
