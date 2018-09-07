@@ -18,3 +18,29 @@ Conflicts in this file should be resolved by preserving the union of all the lin
 		ct.circle(20[] 30);
 		ct.circle(20[ 30);
 		ct.circle{20 30};
+		int x = = 3;
+		circle 20, 40;
+		circle.ct 20, 40;
+		circle.ct( 20 +, 40);
+		circle.ct( + );
+		circle.ct( 3 + );
+		circle.ct( 20 ] );
+		^ circle.ct( 20  );
+		= circle.ct( 20  );
+		circle.ct( 20 )  );
+		if x < 0 then
+		if x < 0 
+		if (x < 0 
+		if (x
+		if (x []
+		if (x [
+		if (x ]
+		if 
+		if ()
+		ct.circle( 20 ) p
+		3
+		*
+		ct.circle( 20, 9 
+		ct.circle( 
+		ct.circle
+		foo bar!

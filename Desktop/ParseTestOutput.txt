@@ -6200,10 +6200,10 @@ line (end)
 *** Line 554 chars 1-9: Unsupported reserved word "interface"
 
 555. double 1stNumber; // variable name starting with a number
-*** Line 555 char 8: Syntax Error "1"
+*** Line 555 chars 8-16: This is not a valid number or name
 
 556. x = obj.1stNumber; // field name starting with a number
-*** Line 556 chars 8-9: Syntax Error ".1"
+*** Line 556 chars 8-17: This is not a valid number or name
 
 557. // Using reserved words as identifiers
 
@@ -6211,7 +6211,7 @@ line (end)
 *** Line 558 chars 5-12: Unsupported reserved word "abstract"
 
 559. int break;
-*** Line 559 chars 5-9: Syntax Error "break"
+*** Line 559 chars 5-9: Syntax Error: "break" was unexpected here
 
 560. int case;
 *** Line 560 chars 5-8: Unsupported reserved word "case"
@@ -6220,10 +6220,10 @@ line (end)
 *** Line 561 chars 5-9: Unsupported reserved word "catch"
 
 562. double class;
-*** Line 562 chars 8-12: Syntax Error "class"
+*** Line 562 chars 8-12: Syntax Error: "class" was unexpected here
 
 563. boolean const;
-*** Line 563 chars 9-13: Syntax Error "const"
+*** Line 563 chars 9-13: Syntax Error: "const" was unexpected here
 
 564. boolean continue;
 *** Line 564 chars 9-16: Unsupported reserved word "continue"
@@ -6232,40 +6232,40 @@ line (end)
 *** Line 565 chars 9-15: Unsupported reserved word "default"
 
 566. String do;
-*** Line 566 chars 8-9: Syntax Error "do"
+*** Line 566 chars 8-9: Syntax Error: "do" was unexpected here
 
 567. GameObj else;
-*** Line 567 chars 9-12: Syntax Error "else"
+*** Line 567 chars 9-12: Syntax Error: "else" was unexpected here
 
 568. GameObj enum;
 *** Line 568 chars 9-12: Unsupported reserved word "enum"
 
 569. int[] extends;
-*** Line 569 chars 7-13: Syntax Error "extends"
+*** Line 569 chars 7-13: Syntax Error: "extends" was unexpected here
 
 570. double final;
-*** Line 570 chars 8-12: Syntax Error "final"
+*** Line 570 chars 8-12: Syntax Error: "final" was unexpected here
 
 571. double finally();
 *** Line 571 chars 8-14: Unsupported reserved word "finally"
 
 572. boolean foo(int for);
-*** Line 572 chars 17-19: Syntax Error "for"
+*** Line 572 chars 17-19: Syntax Error: "for" was unexpected here
 
 573. for(int do = 0; do < 10; do++)
-*** Line 573 chars 9-10: Syntax Error "do"
+*** Line 573 chars 9-10: Syntax Error: "do" was unexpected here
 
 574. String goto;
 *** Line 574 chars 8-11: Unsupported reserved word "goto"
 
 575. String if;
-*** Line 575 chars 8-9: Syntax Error "if"
+*** Line 575 chars 8-9: Syntax Error: "if" was unexpected here
 
 576. GameObj implements;
 *** Line 576 chars 9-18: Unsupported reserved word "implements"
 
 577. int import;
-*** Line 577 chars 5-10: Syntax Error "import"
+*** Line 577 chars 5-10: Syntax Error: "import" was unexpected here
 
 578. int instanceof;
 *** Line 578 chars 5-14: Unsupported reserved word "instanceof"
@@ -6277,25 +6277,25 @@ line (end)
 *** Line 580 chars 5-10: Unsupported reserved word "native"
 
 581. int new;
-*** Line 581 chars 5-7: Syntax Error "new"
+*** Line 581 chars 5-7: Syntax Error: "new" was unexpected here
 
 582. int package;
 *** Line 582 chars 5-11: Unsupported reserved word "package"
 
 583. int private;
-*** Line 583 chars 5-11: Syntax Error "private"
+*** Line 583 chars 5-11: Syntax Error: "private" was unexpected here
 
 584. int protected;
 *** Line 584 chars 5-13: Unsupported reserved word "protected"
 
 585. int public;
-*** Line 585 chars 5-10: Syntax Error "public"
+*** Line 585 chars 5-10: Syntax Error: "public" was unexpected here
 
 586. int return()
-*** Line 586 chars 5-10: Syntax Error "return"
+*** Line 586 chars 5-10: Syntax Error: "return" was unexpected here
 
 587. int static;
-*** Line 587 chars 5-10: Syntax Error "static"
+*** Line 587 chars 5-10: Syntax Error: "static" was unexpected here
 
 588. int strictfp;
 *** Line 588 chars 5-12: Unsupported reserved word "strictfp"
@@ -6328,52 +6328,52 @@ line (end)
 *** Line 597 chars 5-12: Unsupported reserved word "volatile"
 
 598. int while;
-*** Line 598 chars 5-9: Syntax Error "while"
+*** Line 598 chars 5-9: Syntax Error: "while" was unexpected here
 
 599. boolean true;
-*** Line 599 chars 9-12: Syntax Error "true"
+*** Line 599 chars 9-12: Syntax Error: "true" was unexpected here
 
 600. boolean false;
-*** Line 600 chars 9-13: Syntax Error "false"
+*** Line 600 chars 9-13: Syntax Error: "false" was unexpected here
 
 601. int null;
-*** Line 601 chars 5-8: Syntax Error "null"
+*** Line 601 chars 5-8: Syntax Error: null was unexpected here
 
 602. 
 
 603. void foo.x()    // function definition with . as part of identifier
-*** Line 603 char 9: Syntax Error "."
+*** Line 603 char 9: Syntax Error: "." was unexpected here
 
 604. x = 10          // missing ; in stmt
 *** Line 604 char 37: Statement should end with a semicolon (;)
 
 605. int x = 10		// missing ; in varInit
-*** Line 605 char 36: Variable initialization should end with a semicolon (;)
+*** Line 605 char 36: Statement should end with a semicolon (;)
 
 606. int x 			// missing ; in varDecl
-*** Line 606 char 33: Variable declaration should end with a semicolon (;)
+*** Line 606 char 33: Statement should end with a semicolon (;)
 
 607. final int x = 10 // missing ; in constInit
-*** Line 607 char 43: Variable initialization should end with a semicolon (;)
+*** Line 607 char 43: Statement should end with a semicolon (;)
 
 608. foo(x, );       // missing expr in exprList
 *** Line 608 char 6: Missing list item or extra comma
 
 609. f00()++;		// ++ applied to non-lvalue
-*** Line 609 chars 6-7: Syntax Error "++"
+*** Line 609 chars 6-7: Syntax Error: expected ";"
 
 610. --x.foo();		// -- applied to non-lvalue
-*** Line 610 char 8: Syntax Error "("
+*** Line 610 char 8: Syntax Error: expected ";"
 
 611. x = / b;		// missing expr before binary op
-*** Line 611 char 5: Syntax Error "/"
+*** Line 611 char 5: Syntax Error: "/" was unexpected here
 
 612. x = a + ;       // missing expr after binary op
 *** Line 612 char 9: Expected expression after + operator
 *** Reference Line 612 char 7
 
 613. x = a ++ b;     // unexpected token after unary op
-*** Line 613 chars 7-8: Syntax Error "++"
+*** Line 613 chars 7-8: Syntax Error: "++" was unexpected here
 
 614. x = a ** b;     // missing expression between binary ops
 *** Line 614 char 8: Expected expression after * operator
@@ -6388,38 +6388,38 @@ line (end)
 *** Reference Line 616 char 11
 
 617. x = ();         // missing expr in parentheses
-*** Line 617 char 6: Syntax Error ")"
+*** Line 617 char 6: Syntax Error: ")" was unexpected here
 
 618. x = 10 + ! ;    // missing expr after unary op
 *** Line 618 char 10: Expected expression after + operator
 *** Reference Line 618 char 8
 
 619. x = obj.3;      // expected ID after .
-*** Line 619 chars 8-9: Syntax Error ".3"
+*** Line 619 chars 8-9: Syntax Error: a number was unexpected here
 
 620. x = 3.obj;      // ID expected before .
-*** Line 620 chars 7-9: Syntax Error "obj"
+*** Line 620 chars 5-9: This is not a valid number or name
 
 621. if x == 3       // required next token in pattern doesn't match
-*** Line 621 char 4: Syntax Error "x"
+*** Line 621 char 4: Syntax Error: expected "("
 
 622. while i < max   // required next token in pattern doesn't match
-*** Line 622 char 7: Syntax Error "i"
+*** Line 622 char 7: Syntax Error: expected "("
 
 623. for i=0; i<num; i=i+1 // required next token in pattern doesn't match
-*** Line 623 char 5: Syntax Error "i"
+*** Line 623 char 5: Syntax Error: expected "("
 
 624. x + 3;          // no matching pattern
-*** Line 624 char 3: Syntax Error "+"
+*** Line 624 char 3: Syntax Error: "+" was unexpected here
 
 625. x = 1,000;      // commas in numbers
-*** Line 625 char 6: Syntax Error ","
+*** Line 625 char 6: Syntax Error: expected ";"
 
 626. x = 1.23.45;    // too many decimal points
-*** Line 626 chars 9-11: Syntax Error ".45"
+*** Line 626 chars 9-11: Syntax Error: expected ";"
 
 627. x = 3.14e1.0;   // exponential notation with decimal point in exponent
-*** Line 627 chars 11-12: Syntax Error ".0"
+*** Line 627 chars 11-12: Syntax Error: expected ";"
 
 628. x = 3.14e;      // Invalid exponential notation
 *** Line 628 chars 5-10: Invalid exponential notation
@@ -6452,16 +6452,16 @@ line (end)
 *** Line 637 char 29: Statement should end with a semicolon (;)
 
 638. x = (a + b + c / 3; 	// missing closing parenthesis
-*** Line 638 char 19: Syntax Error ";"
+*** Line 638 char 19: Syntax Error: expected ")"
 
 639. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
-*** Line 639 char 21: Syntax Error ";"
+*** Line 639 char 21: Syntax Error: ";" was unexpected here
 
 640. x = a + b + c ) / 3; 	// missing openning parenthesis
-*** Line 640 char 15: Syntax Error ")"
+*** Line 640 char 15: Syntax Error: ")" was unexpected here
 
 641. if ( i == 1 	// missing closing parenthesis with if
-*** Line 641 char 52: Syntax Error " "
+*** Line 641 char 52: Syntax Error: expected ")"
 
 642. if ( i == 1 ); 	// if statment ended by ;
 *** Line 642 char 14: if statement should not end with a semicolon
@@ -6470,10 +6470,10 @@ line (end)
 *** Line 643 char 21: for loop header should not end with a semicolon
 
 644. x + 1 = x; 		// confusing left hand side an right hand side of assignment
-*** Line 644 char 3: Syntax Error "+"
+*** Line 644 char 3: Syntax Error: "+" was unexpected here
 
 645. 1000 = count; 	// confusing left hand side an right hand side of assignment
-*** Line 645 chars 1-4: Syntax Error "1000"
+*** Line 645 chars 1-4: Syntax Error: a number was unexpected here
 
 646. if ( x => 3 ) 	// => instead of <=
 *** Line 646 chars 8-9: Invalid operator. Did you mean >= ?
@@ -6493,37 +6493,37 @@ Comma not supported
 Comma not supported
 
 651. for(int i=0: i<n: i++) 	// colons in place of semicolons
-*** Line 651 chars 20-21: Syntax Error "++"
+*** Line 651 char 12: Syntax Error: expected ";"
 
 652. for{int i=0; i<n; i++} 	// {} in place of ()
-*** Line 652 char 4: Syntax Error "{"
+*** Line 652 char 4: Syntax Error: expected "("
 
 653. for (int i==0; i<n; i++)// == instead of =
-*** Line 653 chars 11-12: Syntax Error "=="
+*** Line 653 chars 11-12: Syntax Error: "==" was unexpected here
 
 654. for( x : arr ) 			// forgetting variable type
-*** Line 654 char 8: Syntax Error ":"
+*** Line 654 char 8: Syntax Error: ":" was unexpected here
 
 655. for( int x; arr ) 		// using ; instead of :
-*** Line 655 char 11: Syntax Error ";"
+*** Line 655 char 11: Syntax Error: ";" was unexpected here
 
 656. for( int[] x : arr )
-*** Line 656 char 10: Syntax Error "]"
+*** Line 656 char 10: Syntax Error: "]" was unexpected here
 
 657. for( int x : arr[] )
-*** Line 657 char 18: Syntax Error "]"
+*** Line 657 char 18: Syntax Error: "]" was unexpected here
 
 658. for( arr : int x )
-*** Line 658 char 10: Syntax Error ":"
+*** Line 658 char 10: Syntax Error: ":" was unexpected here
 
 659. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Line 659 char 13: Syntax Error ","
+*** Line 659 char 13: Syntax Error: "," was unexpected here
 
 660. double foo[i]()			// index on function identifier
-*** Line 660 char 11: Syntax Error "["
+*** Line 660 char 11: Syntax Error: "[" was unexpected here
 
 661. ct.println; 			// missing parenteses for function call without arguments
-*** Line 661 char 11: Syntax Error ";"
+*** Line 661 char 11: Syntax Error: ";" was unexpected here
 
 662. foo(int x, double y, GameObj z) 	// missing return type in function definition
 *** Line 662 char 8: Function parameter values must be separated by commas
@@ -6547,22 +6547,22 @@ Comma not supported
 *** Line 668 char 21: Function parameter values must be separated by commas
 
 669. newObj() = oldObj; 				// assigning to a function value
-*** Line 669 char 10: Syntax Error "="
+*** Line 669 char 10: Syntax Error: expected ";"
 
 670. f = void foo()					// mixing assignment and function declaration
-*** Line 670 chars 10-12: Syntax Error "foo"
+*** Line 670 chars 10-12: Syntax Error: a name was unexpected here
 
 671. def func(x):					// Python syntax
-*** Line 671 char 11: Syntax Error ")"
+*** Line 671 char 11: Syntax Error: ")" was unexpected here
 
 672. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
-*** Line 672 char 24: Syntax Error "."
+*** Line 672 char 24: Syntax Error: expected "["
 
 673. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
-*** Line 673 char 10: Syntax Error "{"
+*** Line 673 char 10: Syntax Error: "{" was unexpected here
 
 674. int intArr = {1, 2, 3}; // missing []
-*** Line 674 char 14: Syntax Error "{"
+*** Line 674 char 14: Syntax Error: "{" was unexpected here
 
 675. 
 
@@ -6580,7 +6580,7 @@ Comma not supported
 *** Line 680 chars 1-9: Unsupported reserved word "protected"
 
 681. time %= 3600;                 // %= operator
-*** Line 681 chars 6-7: Syntax Error "%="
+*** Line 681 chars 6-7: Syntax Error: "%=" was unexpected here
 
 682. int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
 *** Line 682 char 32: Invalid character (The "? :" operator is not supported by Code12)
@@ -6592,14 +6592,14 @@ Comma not supported
 *** Line 684 char 12: In Code12, each { to start a new block must be on its own line
 
 685. i++; } 			// closing } not on it's own line
-*** Line 685 char 6: Syntax Error "}"
+*** Line 685 char 6: Syntax Error: expected end of line
 
 686. String s = "A long string" +
 *** Line 686 char 29: Expected expression after + operator
 *** Reference Line 686 char 28
 
 687. "on more than one line using concatenation";
-*** Line 687 chars 12-54: Syntax Error ""on more than one line using concatenation""
+*** Line 687 chars 12-54: Syntax Error: a string was unexpected here
 
 688. x = a; y = b; 	// more than one statement on a single line
 *** Line 688: Code12 requires each statement to be on its own line
@@ -6617,26 +6617,26 @@ Comma not supported
 *** Line 692 chars 1-8: Unsupported reserved word "continue"
 
 693. a[i++] = b[i++]; 	// increment/decrement only supported as statements
-*** Line 693 chars 4-5: Syntax Error "++"
+*** Line 693 chars 4-5: Syntax Error: "++" was unexpected here
 
 694. foo.obj.group.equals("targets"); 		// more than 2 chained fields
-*** Line 694 char 14: Syntax Error "."
+*** Line 694 char 14: Syntax Error: expected "("
 
 695. input.toLowerCase().equals("quit"); // indexing after function call
-*** Line 695 char 20: Syntax Error "."
+*** Line 695 char 20: Syntax Error: expected ";"
 
 696. newBullet().ySpeed = 0;
-*** Line 696 char 12: Syntax Error "."
+*** Line 696 char 12: Syntax Error: expected ";"
 
 697. final int N; 	// constant declaration without initialization
-*** Line 697 char 12: Syntax Error ";"
+*** Line 697 char 12: Syntax Error: expected "="
 
 698. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
 *** Line 698 char 15: for loop parts should be separated by semicolons (;)
 Comma not supported
 
 699. for ( ; ; i++, j++ ) 	// Comma in forInit, forNext
-*** Line 699 char 14: Syntax Error ","
+*** Line 699 char 14: Syntax Error: expected ")"
 
 700. int _var; // variable indentifiers starting with underscore
 *** Line 700 chars 5-8: Names cannot start with an underscore in Code12
@@ -6648,7 +6648,7 @@ Comma not supported
 *** Line 702 char 11: The $ character is not allowed in Code12
 
 703. int x[];	// arrays must be declared with [] between type and identifier
-*** Line 703 char 6: Syntax Error "["
+*** Line 703 char 6: Syntax Error: "[" was unexpected here
 
 704. int _func() // function names starting with underscore
 *** Line 704 chars 5-9: Names cannot start with an underscore in Code12
@@ -6696,13 +6696,13 @@ Comma not supported
 *** Line 718 chars 1-7: Unsupported reserved word "package"
 
 719. public static int x;
-*** Line 719 char 20: Syntax Error ";"
+*** Line 719 char 20: Syntax Error: expected "("
 
 720. protected int x;
 *** Line 720 chars 1-9: Unsupported reserved word "protected"
 
 721. static int x = 10;
-*** Line 721 chars 1-6: Syntax Error "static"
+*** Line 721 chars 1-6: Syntax Error: "static" was unexpected here
 
 722. strictfp void foo()
 *** Line 722 chars 1-8: Unsupported reserved word "strictfp"
@@ -6735,7 +6735,7 @@ Comma not supported
 *** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 132 ms
+731 lines processed in 162 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)
