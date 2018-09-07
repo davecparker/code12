@@ -203,7 +203,7 @@ end
 
 -- Return Lua code for expr promoted to a string
 local function stringExprCode( expr )
-	local vt = expr.info.vt
+	local vt = expr.vt
 	if vt == "String" then
 		return exprCode( expr )
 	elseif vt == "GameObj" then
@@ -315,7 +315,7 @@ local function binOpCode( expr )
 	local luaOp = luaOpFromOpType[expr.opType]
 	if luaOp == nil then
 		return "nil"   -- unsupported operator (may be continuing on errors)
-	elseif luaOp == "+" and expr.vt == "String" then
+	elseif expr.opType == "+" and expr.vt == "String" then
 		-- String concat, not add. Promote left and right to string as needed.
 		return stringExprCode( expr.left ) .. " .. " .. stringExprCode( expr.right )
 	end
@@ -325,7 +325,7 @@ end
 -- Return the Lua code string for a newArray expr
 local function newArrayCode( expr )
 	return "{ length = " .. exprCode( expr.lengthExpr )
-			.. ", default = " ..  defaultValueCodeForVt( expr.vt.vt ) .. " }"
+			.. ", default = " ..  defaultValueCodeForVt( expr.vt ) .. " }"
 end
 
 -- Return the Lua code string for an arrayInit expr
@@ -340,7 +340,6 @@ local function arrayInitCode( expr )
 		end
 	end
 	codeStrs[#codeStrs + 1] = "length = " .. length
-	codeStrs[#codeStrs + 1] = ", default = " .. defaultValueCodeForVt( expr.vt.vt )
 	codeStrs[#codeStrs + 1] = " }"
 	return table.concat( codeStrs )
 end

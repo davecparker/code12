@@ -14,7 +14,7 @@ class StructureTest extends Code12Program
 	double speed = 0.3;
 	int frameCount = 0;
 	int newCount = frameCount + 2 * -frameCount;
-	String str = "Testing";
+	String str = "Testing" + 3;
 
 	public static void main(String[] args)
 	{ 
@@ -26,7 +26,6 @@ class StructureTest extends Code12Program
 		final int X = 50;
 		int y;
 		y = X;
-		/* comment */
 		ct.rect( X, 10, 50, 10 );
 		ball = ct.circle( X, y, 30 );
 		ball.setFillColor( "blue" );
@@ -125,5 +124,6 @@ class StructureTest extends Code12Program
 		int[] scores = { 10, 20, 30 };
 		return circles;
 	}
+
 }
 
