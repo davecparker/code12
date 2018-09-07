@@ -14,7 +14,12 @@ this.LIMIT = 120 + 4
 this.speed = 0.3
 this.frameCount = 0
 this.newCount = this.frameCount + 2 *  -this.frameCount
-this.str = "Testing"
+this.str = "Testing" .. tostring(3)
+
+function _fn.start()
+end
+
+
 
 
 
@@ -26,7 +31,6 @@ function _fn.start()
 	local X = 50
 	local y = 0
 	y = X
-
 	ct.rect(X, 10, 50, 10)
 	this.ball = ct.circle(X, y, 30)
 	this.ball:setFillColor("blue")
@@ -122,6 +126,6 @@ function _fn.makeCircles()
 	local circles = { length = 10, default = nil }
 	for _, c in ipairs(circles) do
 		c:setFillColor("black")
-	end; local scores = { 10, 20, 30, length = 3, default = 0 }
+	end; local scores = { 10, 20, 30, length = 3 }
 	return circles
 end
