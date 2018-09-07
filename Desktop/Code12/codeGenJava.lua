@@ -553,7 +553,7 @@ local function generateFunc( func )
 	beginLuaLine( func.iLine, "function " )
 	addLua( fnNameCode( func.nameID.str ) )
 	addLua( "(" )
-	local params = func.params
+	local params = func.paramVars
 	if params then
 		for i = 1, #params do
 			addLua( params[i].nameID.str )

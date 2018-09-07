@@ -34,14 +34,14 @@ function _fn.start()
 	ct.println("Program started")
 end
 
-function _fn.foo()
+function _fn.foo(i, d)
 
 
 	i = 8
 	return 0
 end
 
-function _fn.test()
+function _fn.test(i, d)
 
 	i = _fn.foo(3, 4)
 	if i < 0 then
@@ -93,7 +93,7 @@ function _fn.update()
 	return 
 end
 
-function _fn.onMousePress()
+function _fn.onMousePress(obj, x, y)
 end
 
 
@@ -105,7 +105,7 @@ end
 
 
 
-function _fn.moveBall()
+function _fn.moveBall(wrap)
 
 	this.ball.x = this.ball.x + 1
 	if wrap then
