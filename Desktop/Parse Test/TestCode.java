@@ -716,7 +716,7 @@ if (x instanceof y)
 public interface I
 native void foo()
 package P;
-public static int x;
+private static int x;
 protected int x;
 static int x = 10;
 strictfp void foo()

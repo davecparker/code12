@@ -39,9 +39,9 @@ int underIndentedInstanceVar;
 
 	public static void main(String[] args)
 	{ 
-	// ERROR "The body of a function should be indented more than its opening {"
+	// ERROR "should be indented"
 	Code12.run(new ErrorTest());
-	// ERROR "main functions's ending } should have the same indentation as its beginning {"
+	// ERROR "ending } should have the same indentation as its beginning {"
 		}
 
 	// user defined functions
@@ -1247,7 +1247,7 @@ int underIndentedInstanceVar;
 		}
 		if (false)
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "if" above it."
+		// ERROR "This line is not controlled by the "if" above it"
 			voidFunc();
 		if (false)
 		{
@@ -1279,7 +1279,7 @@ int underIndentedInstanceVar;
 			voidFunc();
 		else
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "else" above it."
+		// ERROR "This line is not controlled by the "else" above it"
 			voidFunc();
 		if (false)
 			voidFunc();
@@ -1371,7 +1371,7 @@ int underIndentedInstanceVar;
 			}
 		while (false)
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "while" above it."
+		// ERROR "This line is not controlled by the "while" above it"
 			voidFunc();
 		do
 		// ERROR "This line should be indented more than its controlling "do""

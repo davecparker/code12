@@ -175,6 +175,14 @@ function javaTypes.typeNameFromVt( vt )
 	return mapVtToTypeName[vt] or "(unknown)"
 end
 
+-- Return true if vt1 and vt2 are the same type.
+function javaTypes.vtsEqual( vt1, vt2 )
+	if type(vt1) == "table" and type(vt2) == "table" then
+		return javaTypes.vtsEqual( vt1.vt, vt2.vt )
+	end
+	return vt1 == vt2
+end
+
 -- Return true if vtExpr can be passed or assigned to a variable of type vt.
 function javaTypes.vtCanAcceptVtExpr( vt, vtExpr )
 	if vtExpr == nil then

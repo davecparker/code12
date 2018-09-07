@@ -35,8 +35,8 @@ local variables = {}
 -- that map a lowercase version of the name to the name with the correct case.
 local userMethods = {}
 
--- Set of strings for names of event methods that the user has defined (overridden)
-local eventMethodsDefined = {}
+-- Set of funcs for names of event methods that the user has defined (overridden)
+local eventMethodFuncs = {}
 
 -- Stack of local variable names, with an empty name "" marking the beginning of each block
 local localNameStack = {}
@@ -278,7 +278,7 @@ local function defineMethod( func )
 					"Wrong number of parameters for function %s ", fnName )
 		else
 			for i = 1, numParams do
-				if params[i].vt ~= event.params[i].vt then
+				if not javaTypes.vtsEqual( params[i].vt, event.params[i].vt ) then
 					err.setErrNodeAndRef( paramVars[i], nameNode,
 							"Wrong type for parameter %d of function %s",
 							i, fnName )
@@ -290,9 +290,24 @@ local function defineMethod( func )
 						'The %s function must be declared starting with "public"', 
 						fnName )
 			end
+			if fnName == "main" then
+				if not func.isStatic then
+					err.setErrNode( func, 
+						'The main function must be declared as "public static"' )
+				end
+			elseif func.isStatic then
+				err.setErrNode( func, 
+						"The %s function should not be declared static", fnName )
+			end
 		end
+
 		-- Remember that the user defined this event
-		eventMethodsDefined[nameNode.str] = true
+		local funcFound = eventMethodFuncs[fnName]
+		if funcFound then
+			err.setErrNodeAndRef( func, funcFound, 
+					"The %s function was already defined", fnName )
+		end
+		eventMethodFuncs[fnName] = func
 		return
 	end
 
@@ -962,6 +977,12 @@ local function vtExprNewArray( node )
 	return { vt = node.vt }  -- array of element type
 end
 
+-- new
+local function vtExprNew( node )
+	err.setErrNode( node, "Code12 does not support making objects with new" )
+	return nil
+end
+
 -- arrayInit
 local function vtExprArrayInit( node )
 	local exprs = node.exprs
@@ -1161,6 +1182,7 @@ local fnVtExprVariations = {
 	["cast"]        = vtExprCast,
 	["parens"]      = vtExprExprParens,
 	["newArray"]	= vtExprNewArray,
+	["new"]         = vtExprNew,
 	["arrayInit"]   = vtExprArrayInit,
 }
 
@@ -1206,7 +1228,7 @@ function checkJava.checkProgram( programTree, level )
 	syntaxLevel = level
 	variables = {}
 	userMethods = {}
-	eventMethodsDefined = {}
+	eventMethodFuncs = {}
 	localNameStack = {}
 	beforeStart = true
 	currentFunc = nil
@@ -1233,8 +1255,12 @@ function checkJava.checkProgram( programTree, level )
 	beforeStart = false
 	if funcs then
 		for _, func in ipairs( funcs ) do
-			currentFunc = func
-			checkBlock( func.stmts, func.paramVars )
+			if func.nameID.str == "main" then
+				-- checkMainBody( func.stmts )
+			else
+				currentFunc = func
+				checkBlock( func.stmts, func.paramVars )
+			end
 		end
 	end
 	currentFunc = nil
@@ -1242,7 +1268,7 @@ function checkJava.checkProgram( programTree, level )
 	-- Do some overall post-checks if there are no other errors
 	if not err.shouldStop() then
 		-- Make sure that a start function was defined
-		if not eventMethodsDefined["start"] then
+		if not eventMethodFuncs["start"] then
 			local iLine = (programTree.nameID and programTree.nameID.iLine) or 1
 			err.setErrLineNum( iLine,
 					"A Code12 program must define a \"start\" function" )

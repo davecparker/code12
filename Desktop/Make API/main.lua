@@ -110,9 +110,13 @@ local function buildTables()
 			local params = nodes[5].nodes
 			for j = 1, #params do
 				local param = params[j]
-				assert( param.p == "var" )
-				local vtParam = javaTypes.vtFromType( param.nodes[1] )
-				paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
+				if param.p == "array" then
+					local vtParam = javaTypes.vtFromType( param.nodes[1], true )
+					paramTable[#paramTable + 1] = { name = param.nodes[4].str, vt = vtParam }
+				else
+					local vtParam = javaTypes.vtFromType( param.nodes[1] )
+					paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
+				end
 			end
 			-- Add the method record
 			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable }
@@ -141,6 +145,8 @@ local function vtStr( vt )
 		return "true"
 	elseif type(vt) == "string" then
 		return "\"" .. vt .. "\""
+	elseif type(vt) == "table" then
+		return "{ vt = " .. vtStr( vt.vt ) .. " }"
 	else
 		return "nil"  -- might be "Object"
 	end

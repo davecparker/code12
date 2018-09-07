@@ -60,7 +60,6 @@ local findError           -- nil if not trying to find errors, or a table with:
 -- use in the grammar tables below
 local parseGrammar
 local parsePattern
-local parseOpExpr
 local primaryExpr
 
 
@@ -163,7 +162,7 @@ end
 local function trackUnexpectedToken( ttExpected )
 	local iTokenMax = findError.iTokenMax or 0
 	if iToken >= iTokenMax then
-		local token = tokens[iToken] or token[#tokens]   -- use END if past end
+		local token = tokens[iToken] or tokens[#tokens]   -- use END if past end
 		err.clearErr( lineNumber )   -- replace previous error on this line if any
 		if iToken > iTokenMax then
 			-- This partial parse made it the farthest so far
@@ -189,9 +188,53 @@ end
 
 ----- Special parsing functions used in the grammar tables below  ------------
 
+-- Unless otherwise specified, parsing functions parse the tokens array starting 
+-- at iToken, considering only patterns that are defined within the syntaxLevel.
+-- They return a parse tree, or nil if failure.
+
+
 -- Parse the primaryExpr grammar (function version, for recursion)
 local function parsePrimaryExpr()
 	return parseGrammar( primaryExpr )
+end
+
+-- Parse the rest of an expression after leftSide using Precedence Climbing.
+-- See https://en.wikipedia.org/wiki/Operator-precedence_parser
+local function parseOpExpr( leftSide, minPrecedence )
+	-- Check for binary operator
+	local token = tokens[iToken]
+	local prec = binaryOpPrecedence[token.tt]
+	-- Build nodes and recurse in the correct direction depending on prec
+	while prec and prec >= minPrecedence do
+		local op = token   -- the binary op
+		local opPrec = prec
+		iToken = iToken + 1
+		local rightSide = parseGrammar( primaryExpr )
+		if rightSide == nil then
+			err.setErrNodeAndRef( tokens[iToken], op,
+					"Expected expression after %s operator", op.str )
+			return nil
+		end
+		-- Check for another op after this op's expr and compare precedence
+		token = tokens[iToken]
+		prec = binaryOpPrecedence[token.tt]
+		while prec and prec > opPrec do
+			-- Higher precedence op follows, so recurse to the right
+			rightSide = parseOpExpr( rightSide, prec )
+			if rightSide == nil then
+				return nil  -- expected expression after binary op, err set above
+			end
+			-- Keep looking for the next op
+			token = tokens[iToken]
+			prec = binaryOpPrecedence[token.tt]
+		end
+		-- Build the node for this op
+		leftSide = makeParseTreeNode( "expr", op.tt, { leftSide, op, rightSide } )
+		if rightSide.isError then
+			leftSide.isError = true   -- propagate error up to parent
+		end
+	end
+	return leftSide
 end
 
 -- Parse an expression 
@@ -204,6 +247,27 @@ local function expr()
 		return leftSide
 	end
 	return parseOpExpr( leftSide, 0 )  -- include binary operators
+end
+
+-- Parse an access specifier (as a function for efficiency).
+-- The resulting valid patterns are "public", "publicStatic",
+-- "private", and "empty".
+local function access()
+	local token = tokens[iToken]
+	local tt = token.tt
+	if tt == "public" then
+		iToken = iToken + 1
+		local token2 = tokens[iToken]
+		if token2.tt == "static" then
+			iToken = iToken + 1
+			return makeParseTreeNode( "access", "publicStatic", { token, token2 } )
+		end
+		return makeParseTreeNode( "access", "public", { token } )
+	elseif tt == "private" or tt == "protected" then
+		iToken = iToken + 1
+		return makeParseTreeNode( "access", "private", { token } )
+	end
+	return makeParseTreeNode( "access", "empty", {} )
 end
 
 
@@ -295,9 +359,7 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
 	{ 4, 12, "not",				"!", parsePrimaryExpr 				},
 	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
-	-- Other Common Errors
-	{ 1, 0, "new",				"new", "ID", "(", 0,				iNode = 1, 
-			strErr = "Code12 does not support making objects with new" },
+	{ 1, 12, "new",				"new", "ID", "(", exprList, ")",	}, 
 }
 
 -- Shortcut "operate and assign" operators 
@@ -385,14 +447,11 @@ local line = { t = "line",
 	{ 12, 12, "arrayInit",		access, "ID", "[", "]", "ID", "=", arrayInit, ";",	"END" },
 	{ 12, 12, "arrayDecl",		access, "ID", "[", "]", idList, ";",				"END" },
 
-	-- Boilerplate lines
+	-- Boilerplate lines (TODO: remove)
 	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",						"END" },
 	{ 1, 12, "class",			"class", "ID",										"END" },
 	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",				"END" },
-	{ 1, 12, "main",			"public", "static", "ID", "ID", 
-									"(", "ID", "[", "]", "ID", ")",					"END" },
-	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
-									"ID", "(", ")", ")", ";",						"END" },
+
 	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
 	{ 9, 0, "returnVal", 	"return", expr, "END", 									iNode = 3 }, 
@@ -464,51 +523,7 @@ local line = { t = "line",
 }
 
 
------ Parsing Functions --------------------------------------------------------
-
--- Unless otherwise specified, parsing functions parse the tokens array starting 
--- at iToken, considering only patterns that are defined within the syntaxLevel.
--- They return a parse tree, or nil if failure.
-
-
--- Parse the rest of an expression after leftSide using Precedence Climbing.
--- See https://en.wikipedia.org/wiki/Operator-precedence_parser
-function parseOpExpr( leftSide, minPrecedence )
-	-- Check for binary operator
-	local token = tokens[iToken]
-	local prec = binaryOpPrecedence[token.tt]
-	-- Build nodes and recurse in the correct direction depending on prec
-	while prec and prec >= minPrecedence do
-		local op = token   -- the binary op
-		local opPrec = prec
-		iToken = iToken + 1
-		local rightSide = parseGrammar( primaryExpr )
-		if rightSide == nil then
-			err.setErrNodeAndRef( tokens[iToken], op,
-					"Expected expression after %s operator", op.str )
-			return nil
-		end
-		-- Check for another op after this op's expr and compare precedence
-		token = tokens[iToken]
-		prec = binaryOpPrecedence[token.tt]
-		while prec and prec > opPrec do
-			-- Higher precedence op follows, so recurse to the right
-			rightSide = parseOpExpr( rightSide, prec )
-			if rightSide == nil then
-				return nil  -- expected expression after binary op, err set above
-			end
-			-- Keep looking for the next op
-			token = tokens[iToken]
-			prec = binaryOpPrecedence[token.tt]
-		end
-		-- Build the node for this op
-		leftSide = makeParseTreeNode( "expr", op.tt, { leftSide, op, rightSide } )
-		if rightSide.isError then
-			leftSide.isError = true   -- propagate error up to parent
-		end
-	end
-	return leftSide
-end
+----- Grammar Parsing Functions ----------------------------------------------
 
 -- Attempt to parse the given grammar table. 
 -- Return the parseTree if sucessful or nil if failure.

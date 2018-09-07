@@ -15,20 +15,29 @@ line (classUser)
 line (begin)
 
 5. public static void main(String[] args)
-line (main)
-    ID (void)
+line (func)
+    access (publicStatic)
+    retType (simple)
+        ID (void)
     ID (main)
-    ID (String)
-    ID (args)
+    paramList (list)
+        param (array)
+            ID (String)
+            ID (args)
 
 6. {
 line (begin)
 
 7. Code12.run(new BubblePop());
-line (Code12Run)
-    ID (Code12)
-    ID (run)
-    ID (BubblePop)
+line (stmt)
+    stmt (call)
+        fnValue (fnValue)
+            ID (Code12)
+            member (member)
+                ID (run)
+        exprList (list)
+            expr (new)
+                ID (BubblePop)
 
 8. }
 line (end)
@@ -6069,21 +6078,30 @@ line (classUser)
 521. // "main",			"public", "static", "void", "ID", "(", "ID", "[", "]", "ID", ")"
 
 522. public static void main(String[] args)
-line (main)
-    ID (void)
+line (func)
+    access (publicStatic)
+    retType (simple)
+        ID (void)
     ID (main)
-    ID (String)
-    ID (args)
+    paramList (list)
+        param (array)
+            ID (String)
+            ID (args)
 
 523. 
 
 524. // "Code12Run",		"ID", ".", "ID", "(", "new", "ID", "(", ")", ")", ";"
 
 525. Code12.run(new TestProgram());
-line (Code12Run)
-    ID (Code12)
-    ID (run)
-    ID (TestProgram)
+line (stmt)
+    stmt (call)
+        fnValue (fnValue)
+            ID (Code12)
+            member (member)
+                ID (run)
+        exprList (list)
+            expr (new)
+                ID (TestProgram)
 
 526. 
 
@@ -6556,7 +6574,7 @@ Comma not supported
 *** Line 671 char 11: Syntax Error: ")" was unexpected here
 
 672. GameObj circle = new ct.circle(0,0,10); // new keyword not needed
-*** Line 672 char 24: Syntax Error: expected "["
+*** Line 672 char 24: Syntax Error: "." was unexpected here
 
 673. intArr = {1, 2, 3}; // trying to assign value to array using initialization syntax
 *** Line 673 char 10: Syntax Error: "{" was unexpected here
@@ -6695,8 +6713,8 @@ Comma not supported
 718. package P;
 *** Line 718 chars 1-7: Unsupported reserved word "package"
 
-719. public static int x;
-*** Line 719 char 20: Syntax Error: expected "("
+719. private static int x;
+*** Line 719 chars 9-14: Syntax Error: "static" was unexpected here
 
 720. protected int x;
 *** Line 720 chars 1-9: Unsupported reserved word "protected"
@@ -6735,7 +6753,7 @@ Comma not supported
 *** Line 731 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-731 lines processed in 162 ms
+731 lines processed in 155 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)
