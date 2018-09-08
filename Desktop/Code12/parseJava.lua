@@ -37,12 +37,12 @@ local syntaxFeatures = {
 local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
-local sourceLine        -- the current source code line
-local lineNumber        -- the line number for sourceLine
-local tokens     	    -- array of tokens
-local iToken            -- index of current token in tokens
-local syntaxLevel	    -- the syntax level for parsing
-local maxSyntaxLevel    -- max syntax level or 0 to match common errors
+local sourceLine          -- the current source code line
+local lineNumber          -- the line number for sourceLine
+local tokens              -- array of tokens
+local iToken              -- index of current token in tokens
+local syntaxLevel         -- the syntax level for parsing
+local matchCommonErrors   -- true to consider common error patterns
 
 -- State for attempting to locate syntax errors
 local findError           -- nil if not trying to find errors, or a table with:
@@ -440,11 +440,6 @@ local line = { t = "line",
 	{ 12, 12, "arrayInit",		access, "ID", "[", "]", "ID", "=", arrayInit, ";",	"END" },
 	{ 12, 12, "arrayDecl",		access, "ID", "[", "]", idList, ";",				"END" },
 
-	-- Boilerplate lines (TODO: remove)
-	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",						"END" },
-	{ 1, 12, "class",			"class", "ID",										"END" },
-	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",				"END" },
-
 	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
 	{ 9, 0, "returnVal", 	"return", expr, "END", 									iNode = 3 }, 
@@ -487,10 +482,6 @@ local line = { t = "line",
 	{ 1, 0, "end",			"}", 1,
 			strErr = "In Code12, each } to end a block must be on its own line" },
 
-	-- Common errors: malformed boilerplate lines
-	{ 1, 0, "import",		"import", "ID", 0, 
-			strErr = "import should be \"Code12.*;\"" },
-
 	-- Common errors: multiple statements per line
 	{ 1, 0, "stmt", 		stmt, ";", 2,
 			strErr = "Code12 requires each statement to be on its own line" },
@@ -512,7 +503,6 @@ local line = { t = "line",
 	{ 11, 0, "while",		"while", "(", expr, whileEnd, 2,						iNode = 5, toEnd = true },
 	{ 11, 0, "for",			"for", "(", forControl, ")", 2,							iNode = 5, toEnd = true,
 			strErr = "Code12 requires the contents of a loop to start on its own line" },
-
 }
 
 
@@ -541,7 +531,8 @@ function parseGrammar( grammar )
 		-- Consider only patterns defined for the syntaxLevel
 		local patternMinLevel = pattern[1]
 		local patternMaxLevel = pattern[2]
-		if syntaxLevel >= patternMinLevel and maxSyntaxLevel <= patternMaxLevel then
+		if syntaxLevel >= patternMinLevel 
+				and (syntaxLevel <= patternMaxLevel or matchCommonErrors) then
 			-- Try to match this pattern within the grammer table
 			trace("Trying " .. grammar.t .. "[" .. i .. "] (" .. p .. ")")
 			traceIndentLevel = traceIndentLevel + 1
@@ -671,6 +662,7 @@ function parsePattern( pattern )
 	local nodes = {}   -- node array to build
 	for iItem = 4, #pattern do   -- start after minLevel, maxLevel, patternName
 		local item = pattern[iItem]
+
 		-- Is this pattern item a token, grammar table, parsing function, or token count?
 		local node = nil
 		local t = type(item)
@@ -725,7 +717,7 @@ end
 local function parseCurrentLine( level )
 	-- Try normal parse at the requested syntax level first
 	syntaxLevel = level
-	maxSyntaxLevel = level
+	matchCommonErrors = false
 	findError = nil    -- don't try to find errors (optimize for success)
 	iToken = 1
 	local parseTree = parseGrammar( line )
@@ -735,10 +727,11 @@ local function parseCurrentLine( level )
 
 	-- Try common errors at the given syntax level
 	err.clearErr( lineNumber )
-	maxSyntaxLevel = 0   -- causes common errors to also be considered
+	matchCommonErrors = true
 	iToken = 1
 	parseTree = parseGrammar( line )
 	if parseTree then
+		print(parseTree.t, parseTree.s, #parseTree.nodes)
 		assert( parseTree.isError )  -- matched a common error
 		return parseTree
 	end	
@@ -763,7 +756,7 @@ local function parseCurrentLine( level )
 	-- Parse again at the user's level to look for basic parse errors.
 	err.clearErr( lineNumber )
 	syntaxLevel = level
-	maxSyntaxLevel = level
+	matchCommonErrors = false
 	iToken = 1
 	parseGrammar( line )
 	if err.getLoggedErrForLine( lineNumber ) then

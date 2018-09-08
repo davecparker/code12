@@ -1,6 +1,6 @@
-import Code12.*;
+// import Code12.*;
 
-class BubblePop extends Code12Program
+// class BubblePop extends Code12Program
 {
 	public static void main(String[] args)
 	{ 
@@ -505,19 +505,7 @@ class BubblePop extends Code12Program
 	// "arrayDecl",		"ID", "[", "]", idList, ";"
 	String[] a;
 	int[] a, b, c;
-	
-	// "importCode12",	"import", "ID", ".", "*", ";"
-	import Code12.*;
-	
-	// "class",			"class", "ID",
-	class Foo
-	
-	// "classUser",		"class", "ID", "extends", "ID"
-	class TestProgram extends Code12Program
-	
-	// "classUserPub",	"public", "class", "ID", "extends", "ID"
-	public class TestProgram extends Code12Program
-	
+		
 	// "main",			"public", "static", "void", "ID", "(", "ID", "[", "]", "ID", ")"
 	public static void main(String[] args)
 	

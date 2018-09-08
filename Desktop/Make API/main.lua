@@ -12,6 +12,7 @@
 -- Code12 modules
 package.path = package.path .. ';../Code12/?.lua'
 local javaTypes = require( "javaTypes" )
+local javalex = require( "javalex" )
 local parseJava = require( "parseJava" )
 local err = require( "err" )
 
@@ -30,9 +31,6 @@ local classes      -- api information for all classes found
 -- Read the input file and store all of its source lines.
 -- Return true if success.
 local function readSourceFile()
-	--local path = system.pathForFile( "API Summary.txt", system.ResourceDirectory )
-	--print(path)
-
 	local file = io.open( apiSummaryFile, "r" )
 	if file then
 		strLines = {}   -- delete previous contents if any
@@ -51,33 +49,37 @@ local function readSourceFile()
 	return false
 end
 
--- Trim whitespace from a string (http://lua-users.org/wiki/StringTrim)
-local function trim1(s)
-	return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
 -- Parse the input file and build the parseTrees
 local function parseFile()
 	parseJava.initProgram()
 	parseTrees = {}
 	for lineNum = 1, #strLines do
-		-- Parse this line
+		-- Look for the special pattern "class ID" first, and
+		-- make a "class" line pattern not found in normal grammar
 		local strCode = strLines[lineNum]
-		local tree = parseJava.parseLine( strCode, lineNum )
-		if tree == false then
-			print( "*** Unexpected incomplete line at line " .. lineNum )
-			return false
-		end
-		if tree == nil then
-			print( "*** Syntax error on line " .. lineNum )
-			if err.hasErr() then
-				print( err.getErrString() )
-			else
-				print( "Unknown error (no error state)" )
+		local tokens = javalex.getTokens( strCode, lineNum )
+		if tokens and #tokens == 3 and tokens[1].tt == "class"
+				and tokens[2].tt == "ID" then
+			parseTrees[lineNum] = { t == "line", p = "class", 
+				nodes = { tokens[1], tokens[2] } }
+		else
+			-- Parse the line using the normal line grammar
+			local tree = parseJava.parseLine( strCode, lineNum )
+			if tree == false then
+				print( "*** Unexpected incomplete line at line " .. lineNum )
+				return false
 			end
-			return false
+			if tree == nil then
+				print( "*** Syntax error on line " .. lineNum )
+				if err.shouldStop() then
+					print( err.getErrString() )
+				else
+					print( "Unknown error (no error state)" )
+				end
+				return false
+			end
+			parseTrees[lineNum] = tree
 		end
-		parseTrees[lineNum] = tree
 	end
 	return true
 end

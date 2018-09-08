@@ -1511,8 +1511,8 @@ int underIndentedInstanceVar;
 		void misplacedFunc()
 		// ERROR "Function definitions cannot occur inside a statement block"
 		public static void main(String[] args)
-		// ERROR "Unexpected statement"
-		import Code12.*;
+		// ERROR "Function definitions cannot occur inside a statement block"
+		public void update()
 	}
 
 	// ERROR "Variable myVar was already defined"
