@@ -164,21 +164,25 @@ The title will not display on mobile devices.
 ```
 ct.setHeight( double height )
 ```
-Set the height of the application window, relative to its width,
-to `height`, as a percent.
-The width of the application window in display units is always 100,
-so this function determines the maximum y-coordinate value inside the window.
-The default height is 100 if not set (resulting in a square window).
+Set the height of the application window in coordinate units.
+The width of the application window in display units is always 100.0
+by definition, so this function sets the height relative to its width 
+as a percent. The default height is 100.0, resulting in a square window.
+
+> Coordinate units are not pixels, because the Code12 graphics window 
+> scales your game up and down automatically when the window size changes.
+> You can think of coordinate units as a percent of the window width,
+> so an x-coordiante of 50 is always horizontally centered in the window.
 
 > **Note**: On some platforms, you may have limited or no control over the
-> window size. On mobile devices, the application will always fill the entire
-> device screen. In this case, this function will determine whether the
-> application runs in portrait or landscape orientation.
+> window size or aspect ratio. On mobile devices, the application will always 
+> fill the entire device screen. In this case, `ct.setHeight()` will determine 
+> whether the application runs in portrait or landscape orientation.
 > If `height` is less than 100 then the application will run in landscape mode,
 > otherwise portrait mode.
 
 > After calling `ct.setHeight()`, you can call `ct.getHeight()` to determine the
-> actual height of the window (and thus the maximum y-coordinate).
+> actual height of the window.
 
 ##### Examples
 ```
@@ -194,15 +198,13 @@ double ct.getWidth( )
 ```
 This function always returns 100.0, which is the width of the
 application window in coordinate units by definition.
-This is the maximum x-coordinate that is inside the window
-(the right edge).
 
 ### ct.getHeight()
 ```
 double ct.getHeight( )
 ```
-Return the maximum y-coordinate value that is inside
-the application window (the bottom edge).
+Return the height of the the application window in coordinate units.
+This is 100.0 by default, unless it is changed by `ct.setHeight()`.
 
 ### ct.getPixelsPerUnit()
 ```

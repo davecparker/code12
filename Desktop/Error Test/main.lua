@@ -2,7 +2,7 @@
 --
 -- main.lua
 --
--- Test driver for Code12's Semantic Error Checking and Code Generation Errors
+-- Test driver for Code12's High-level parsing and Semantic Error Checking
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
@@ -11,13 +11,14 @@
 -- Code12 modules
 package.path = package.path .. ';../Code12/?.lua'
 local err = require( "err" )
-local parseJava = require( "parseJava" )
+local parseProgram = require( "parseProgram" )
 local checkJava = require( "checkJava" )
 local codeGenJava = require( "codeGenJava" )
 
 
 -- Input and output files
 local javaFilename = "ErrorTestCode.java"
+local structureFilename = "../ErrorTestStructure.txt"   -- in parent so Corona won't trigger re-run
 local outputFilename = "../ErrorTestOutput.txt"   -- in parent so Corona won't trigger re-run
 local outFile
 
@@ -26,13 +27,12 @@ local sourceFile = {
 	path = nil,              -- full pathname to the file
 	strLines = {},           -- array of source code lines when read
 }
+local syntaxLevel = 12       -- test at max syntax level
 
 -- Error data
-local syntaxLevel = 12
 local numUnexpectedErrors = 0
 local numExpectedErrors = 0
 local numUncaughtErrors = 0
-local strErrorFromLineNum = {}     -- err received at each line number
 local errLast                      -- the last error reported
 
 -- Text objects in the app window
@@ -85,19 +85,6 @@ local function trim1(s)
 	return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
--- Handle an error reported by Code12's error checking
-local function onLogError( errRecord )
-	-- Only log the first error on each line
-	if errLast and errLast.loc.first.iLine == errRecord.loc.first.iLine then
-		return
-	end
-	errLast = errRecord
-
-	-- Store the error in our array of errors by line number
-	local lineNum = errRecord.loc.first.iLine
-	strErrorFromLineNum[lineNum] = errRecord.strErr
-end
-
 -- Return the expected error text for the given lineNum,
 -- or "" if unspecified, or nil if none.
 local function strErrExpected( lineNum )
@@ -122,12 +109,13 @@ end
 local function checkErrorResults()
 	for lineNum = 1, #sourceFile.strLines do
 		local strCode = sourceFile.strLines[lineNum]
-		local strErr = strErrorFromLineNum[lineNum]
+		local errRec = err.getLoggedErrForLine( lineNum )
 		local strExpected = strErrExpected( lineNum )
 
 		-- Did we get an error on this line?
-		if strErr then
+		if errRec then
 			-- We got an error. Was it what we expected? 
+			local strErr = errRec.strErr
 			if strExpected then
 				if strExpected == "" then
 					-- Unspecified error (fine)
@@ -175,40 +163,33 @@ local function checkTestCode()
 	numUnexpectedErrors = 0
 	numExpectedErrors = 0
 	numUncaughtErrors = 0
-	strErrorFromLineNum = {}
 	local startTime = system.getTimer()
 
-	-- Install special Code12 hook to log errors and continue instead of stopping
-	err.setFnLogErr( onLogError )
+	-- Tell Code12 to log all errors instead of stopping
+	err.logAllErrors()
 
-	-- Create parse tree array
+	-- Get the program structure tree and parse tree array
 	local startTime = system.getTimer()
-	local parseTrees = {}
-	local startTokens = nil
-	parseJava.init()
-	local lineNum = 1
-	while lineNum <= #sourceFile.strLines do
-		local strCode = sourceFile.strLines[lineNum]
-		local tree, tokens = parseJava.parseLine( strCode, 
-									lineNum, startTokens, syntaxLevel )
-		if tree == false then
-			-- Line is incomplete, carry tokens forward to next line
-			startTokens = tokens
-		else
-			startTokens = nil
-			parseTrees[#parseTrees + 1] = tree
-		end
-		lineNum = lineNum + 1
+	local programTree = parseProgram.getProgramTree( 
+								sourceFile.strLines, syntaxLevel )
+	local parseTime = system.getTimer() - startTime
+
+	-- Output the structure tree
+	local structureFile = io.open( structureFilename, "w" )
+	if structureFile then
+		parseProgram.printProgramTree( programTree, structureFile )
+		io.close( structureFile )
 	end
-	local endParseTime = system.getTimer()
 
-	-- Do Semantic Analysis and Code Generation on the parse trees
-	err.clearErr()
-	checkJava.initProgram( parseTrees, syntaxLevel )
-	local endCheckTime = system.getTimer()
-	err.clearErr()
-	codeGenJava.getLuaCode( parseTrees )
-	local endCodeGenTime = system.getTimer()
+	-- Do Semantic Analysis
+	startTime = system.getTimer()
+	checkJava.checkProgram( programTree, syntaxLevel )
+	local semCheckTime = system.getTimer() - startTime
+
+	-- Do Code Generation
+	startTime = system.getTimer()
+	codeGenJava.getLuaCode( programTree )
+	local codeGenTime = system.getTimer() - startTime
 
 	-- Check the results
 	checkErrorResults()
@@ -218,11 +199,11 @@ local function checkTestCode()
 	output( "" )
 	outputAndDisplay( "Semantic Error Test:" )
 	outputAndDisplay( "" )
-	outputAndDisplay( string.format( "    %d lines processed", lineNum - 1 ) )
-	outputAndDisplay( string.format( "    %d ms Parse time", endParseTime - startTime ) )
-	outputAndDisplay( string.format( "    %d ms Semantic check time", endCheckTime - endParseTime ) )
-	outputAndDisplay( string.format( "    %d ms Code Generation time", endCodeGenTime - endCheckTime ) )
-	outputAndDisplay( string.format( "    %d ms Total time", endCodeGenTime - startTime ) )
+	outputAndDisplay( string.format( "    %d lines processed", #sourceFile.strLines ) )
+	outputAndDisplay( string.format( "    %d ms Parse time", parseTime ) )
+	outputAndDisplay( string.format( "    %d ms Semantic check time", semCheckTime ) )
+	outputAndDisplay( string.format( "    %d ms Code Generation time", codeGenTime ) )
+	outputAndDisplay( string.format( "    %d ms Total time",  parseTime + semCheckTime + codeGenTime) )
 	outputAndDisplay( "" )
 	outputAndDisplay( string.format( "%d unexpected errors", numUnexpectedErrors ) )
 	outputAndDisplay( string.format( "%d uncaught errors (%d expected errors)", 

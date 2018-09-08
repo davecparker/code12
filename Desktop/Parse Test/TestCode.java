@@ -153,7 +153,7 @@ class BubblePop extends Code12Program
 	/* block comment line 1
 	* block comment line 2
 	*/
-	/* block comment with /* nested comment */ */
+	/* block comment with // slash slash comment */
 	int x = 0; /* block comment after code on same line */
 	/* block comment before code on same line */ double pi = 3.14;
 	// block comments inside line of code
@@ -241,7 +241,7 @@ class BubblePop extends Code12Program
 	x = !false;
 	x = !paused;
 	x = new GameObj [numBullets]; // "newArray"
-	// x = complex expr
+	x = (int) 3.14;         // "cast"
 	x = x * y;
 	x = x / y;
 	x = x % y;
@@ -541,6 +541,8 @@ class BubblePop extends Code12Program
 ERRORS
 
 // Lexical errors
+*/              // close comment without open
+int i; /* /* */ // nested block comments
 @               // invalid character
 foo('a');       // char literals not supported
 foo(" );        // unclosed string literal 
@@ -592,7 +594,6 @@ int throw;
 int throws;	
 int transient;
 int try;	
-int void;	
 int volatile;	
 int while;
 boolean true;
@@ -655,7 +656,6 @@ for( int x; arr ) 		// using ; instead of :
 for( int[] x : arr )
 for( int x : arr[] )
 for( arr : int x )
-for (String x : "string literal")
 double foo(x, y, z) 	// missing variable types for arguments in function definition
 double foo[i]()			// index on function identifier
 ct.println; 			// missing parenteses for function call without arguments
@@ -677,10 +677,9 @@ int intArr = {1, 2, 3}; // missing []
 // --------------------------------------------------------------------------------
 int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
 import java.io.PrintWriter;   // import other than Code12.*
-int time = (int)( sec );      // type casting
+protected int secretVar;        // protected access
 time %= 3600;                 // %= operator
 int numberOfDucks = (turboMode ? 100 : 1); // ?: operator
-System.out.println("Hello world"); // classes other than GameObj and String
 char ch = 'a'; 	// char type
 while(foo) { 	// opening { in control structure not on it's own line
 i++; } 			// closing } not on it's own line
@@ -692,7 +691,7 @@ double getVariable() { return variable; } // {} must start and end on their own 
 switch (choice)
 continue;
 a[i++] = b[i++]; 	// increment/decrement only supported as statements 
-obj.group.equals("targets"); 		// indexing more than one level at a time
+foo.obj.group.equals("targets"); 		// more than 2 chained fields
 input.toLowerCase().equals("quit"); // indexing after function call
 newBullet().ySpeed = 0;
 final int N; 	// constant declaration without initialization
@@ -702,6 +701,7 @@ int _var; // variable indentifiers starting with underscore
 int $var; // $
 double pay$;
 int x[];	// arrays must be declared with [] between type and identifier
+int _func() // function names starting with underscore
 public abstract class Account 
 assert x != null : "x variable is null";
 case 0 :
@@ -716,7 +716,7 @@ if (x instanceof y)
 public interface I
 native void foo()
 package P;
-private int x;
+public static int x;
 protected int x;
 static int x = 10;
 strictfp void foo()

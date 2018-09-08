@@ -43,11 +43,13 @@ local app =  {
 		path = nil,              -- full pathname to the file
 		timeLoaded = 0,          -- time this file was loaded or 0 if not loaded
 		timeModLast = 0,         -- last modification time or 0 if unknown
+		updated = false,         -- set to true when file update is detected
 		strLines = {},           -- array of source code lines when read
 	},
 
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
+	tabWidth = 4,                -- current tab width
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
@@ -60,6 +62,121 @@ local app =  {
 function app.getWindowSize()
 	app.width = display.actualContentWidth
 	app.height = display.actualContentHeight
+end
+
+-- Print str to file if file is not nil, else to the console
+function app.printDebugStr( str, file )
+	if file then
+		file:write( str )
+		file:write( "\n" )
+	else 
+		print( str )
+	end
+end
+
+-- Return a detabbed version of string strLine
+function app.detabLine( strLine )
+	local chars = { string.byte( strLine, 1, string.len(strLine) ) }
+	local numChars = #chars
+	local charsDetabbed = {}
+	local tabWidth = app.tabWidth
+	local col = 1
+	for i = 1, numChars do
+		local ch = chars[i]
+		if ch == 9 then -- Tab
+			-- Insert spaces to replace the tab
+			local numSpaces = tabWidth - (col - 1) % tabWidth
+			for _ = 1, numSpaces do
+				charsDetabbed[col] = 32 -- Space
+				col = col + 1
+			end	
+		else
+			-- Copy the non-tab character
+			charsDetabbed[col] = ch
+			col = col + 1
+		end
+	end
+	return string.char( unpack( charsDetabbed ) )
+end
+
+-- Return corresponding column indices iColStart and iColEndFor the given string
+-- strLine and character indices iCharStart and iCharEnd (if iCharEnd is not
+-- given, iColEnd will correspond to the end of strLine)
+function app.iCharToICol( strLine, iCharStart, iCharEnd )
+	local chars = { string.byte( strLine, 1, string.len(strLine) ) }
+	local numChars = #chars
+	local iColStart = iCharStart
+	local iColEnd
+	if iCharEnd then
+		iColEnd = iCharEnd
+	else
+		iColEnd = numChars
+	end
+	local tabWidth = app.tabWidth
+	local col = 1
+	for i = 1, numChars do
+		local ch = chars[i]
+		if ch == 9 then -- Tab
+			local numSpaces = tabWidth - (col - 1) % tabWidth
+			-- if needed, increment iColStart and iColEnd
+			if col < iColStart then
+				iColStart = iColStart + numSpaces - 1
+				iColEnd = iColEnd + numSpaces - 1
+			elseif col <= iColEnd then
+				iColEnd = iColEnd + numSpaces - 1
+			end
+			col = col + numSpaces
+		else
+			col = col + 1
+		end
+	end
+	return iColStart, iColEnd
+end
+
+-- Return the lower-case version of the given ASCII code
+local function lowerASCII( code )
+	if code >= 65 and code <= 90 then  -- A to Z
+		return code + 32
+	end
+	return code
+end
+
+-- Return a number from 0 to 1 representing a partial match of 
+-- str1 to str2 (1.0 if they match exactly).
+function app.partialMatchString( str1, str2 )
+	-- Simple method for now: Count number of chars matching from front
+	-- and again from back and return weighted average.
+	local len1 = string.len( str1 )
+	local len2 = string.len( str2 )
+	local shorterLen, longerLen
+	if len1 > len2 then
+		shorterLen, longerLen = len2, len1
+	else
+		shorterLen, longerLen = len1, len2
+	end
+	local front = 0
+	local matchVal = 1
+	for i = 1, shorterLen do
+		if lowerASCII( string.byte( str1, i ) )
+				 == lowerASCII( string.byte( str2, i ) ) then
+			front = front + matchVal
+			matchVal = 1
+		else
+			matchVal = 0.5  -- half match when streak was broken
+		end
+	end
+	local back = 0
+	matchVal = 1
+	for i = 1, shorterLen do
+		if lowerASCII( string.byte( str1, len1 + 1 - i ) )
+				== lowerASCII( string.byte( str2, len2 + 1 - i ) ) then
+			back = back + matchVal
+			matchVal = 1
+		else
+			matchVal = 0.5  -- half match when streak was broken
+		end
+	end
+	return (front + back) / (2 * longerLen)
 end
 
 

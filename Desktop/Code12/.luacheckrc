@@ -3,7 +3,8 @@
 
 -- Warnings to ignore
 ignore = { 
-        "611", "612", "614"      -- trailing whitespace
+        "611", "612", "614",     -- trailing whitespace
+	"542",                   -- empty if branch
         -- "212",                -- unused argument
 }
 self = false                -- OOP methods have implicit self that may be unused  

@@ -58,7 +58,7 @@ end
 
 -- Parse the input file and build the parseTrees
 local function parseFile()
-	parseJava.init()
+	parseJava.initProgram()
 	parseTrees = {}
 	for lineNum = 1, #strLines do
 		-- Parse this line
@@ -95,8 +95,7 @@ local function buildTables()
 		local nodes = tree.nodes
 		if p == "class" then
 			-- Begin a new class table
-			local className = nodes[2].str
-			classes[#classes + 1] = { name = className, fields = {}, methods = {} }
+			classes[#classes + 1] = { name = nodes[2].str, fields = {}, methods = {} }
 			class = classes[#classes]
 		elseif p == "func" then
 			-- Get the method name and return type
@@ -105,21 +104,22 @@ local function buildTables()
 				return false
 			end
 			local methodName = nodes[3].str
-			local vtReturn = javaTypes.vtFromRetType( nodes[2] )
+			local vtReturn = javaTypes.vtFromType( nodes[2].nodes[1] )
 			-- Build the parameter table
 			local paramTable = {}
 			local params = nodes[5].nodes
 			for j = 1, #params do
 				local param = params[j]
-				local vtParam, name = javaTypes.vtAndNameFromParam( param )
-				paramTable[#paramTable + 1] = { name = name, vt = vtParam }
+				assert( param.p == "var" )
+				local vtParam = javaTypes.vtFromType( param.nodes[1] )
+				paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
 			end
 			-- Add the method record
 			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable }
 		elseif p == "varDecl" then
 			-- Add field record(s)
-			local vt = javaTypes.vtFromVarType( tree.nodes[1] )
-			local idList = nodes[2].nodes
+			local vt = javaTypes.vtFromVarType( tree.nodes[2] )
+			local idList = nodes[3].nodes
 			for j = 1, #idList do
 				local idNode = idList[j]
 				class.fields[#class.fields + 1] = { name = idNode.str, vt = vt }

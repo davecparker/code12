@@ -8,69 +8,123 @@
 -----------------------------------------------------------------------------------------
 
 -- The err module
-local err = {}
+local err = {
+	-- Public error record for the earliest error, or nil if none.
+	rec = nil,
+}
 
-
--- The error state. We only detect and store the first error in the program.
--- The errRecord is a table as follows:
+-- An error rec contains the following fields:
 -- {
--- 	   strErr = "Error text",
---     loc = {     -- error location
---         first = { iLine = lineNumber, iChar = charIndex },
---         last  = { iLine = lineNumber, iChar = charIndex },
+--     iLineRank,        -- line number to use for determining the "first" error
+--     strErr,           -- error message text
+--     loc = {           -- Source code location of the error
+--	       iLine,        -- line number of the start of the error
+--	       iLineEnd,     -- ending line number (error may spans multiple lines)
+--	       iCharStart,   -- char index of start of error, or nil for whole line
+--	       iCharEnd,     -- last char index for the error, or nil for end of line
 --     },
---     refLoc = {   -- other referenced location or nil if none
---         first = { iLine = lineNumber, iChar = charIndex },
---         last  = { iLine = lineNumber, iChar = charIndex },
---     },
+--     refLoc,           -- reference location if any (same fields as loc above)
 -- }
-local errRecord
 
--- Diagnostic error logging function. If set, errors are sent here instead of
--- being recorded in the errRecord
-local fnLogErr
+-- In diagnostic error logging mode, we keep an error for each source line
+local errRecForLine = nil    -- array mapping iLine to err record if logging
+
+-- A set of lines that were found to be incomplete (map lineNumber to true).
+-- The err.iLineRank is determined by the first line that is not incomplete.
+local incompleteLines = {}
 
 
 --- Utility Functions -------------------------------------------------------
 
--- Find the bounds of the location spanned by node and store it in errLoc
--- (see err.makeErrLoc) 
-local function findNodeLoc( node, errLoc )
-	-- Is this a token or a parse tree?
+-- Expand loc as necessary to contain the location spanned by node,
+-- which can be a token, parse tree node, or strucure node.
+local function expandLocToNode( loc, node )
+	assert( type(node) == "table" )
 	if node.tt then
-		-- Token
-		-- Update first position if this token is before
-		if errLoc.first.iLine == nil or node.iLine < errLoc.first.iLine then
-			errLoc.first.iLine = node.iLine
-			errLoc.first.iChar = nil
+		-- Token: update start position if this token is before
+		if loc.iLine == nil or node.iLine < loc.iLine then
+			loc.iLine = node.iLine
+			loc.iCharStart = nil
+			loc.iCharEnd = nil
 		end
-		if errLoc.first.iChar == nil or node.iChar < errLoc.first.iChar then
-			errLoc.first.iChar = node.iChar
+		if loc.iCharStart == nil or node.iChar < loc.iCharStart then
+			loc.iCharStart = node.iChar
 		end
-		-- Update last position if this token is after
-		if errLoc.last.iLine == nil or node.iLine > errLoc.last.iLine then
-			errLoc.last.iLine = node.iLine
-			errLoc.last.iChar = nil
+		-- Update end position if this token is after
+		if loc.iLineEnd == nil or node.iLine > loc.iLineEnd then
+			loc.iLineEnd = node.iLine
 		end
-		local iCharLast = node.iChar + string.len( node.str ) - 1
-		if errLoc.last.iChar == nil or iCharLast > errLoc.last.iChar then
-			errLoc.last.iChar = iCharLast
+		local iCharEnd = node.iChar + string.len( node.str ) - 1
+		if loc.iCharEnd == nil or iCharEnd > loc.iCharEnd then
+			loc.iCharEnd = iCharEnd
 		end
-	else
-		-- Non-token, search all children
-		local nodes = node.nodes
-		for i = 1, #nodes do
-			findNodeLoc( nodes[i], errLoc ) 
+	elseif node.t then
+		-- Parse tree node: expand to all children
+		for _, child in ipairs(node.nodes) do
+			expandLocToNode( loc, child ) 
+		end
+	elseif node.s or #node then
+		-- Structure node or array: expand to all children
+		for _, child in pairs(node) do
+			if type(child) == "table" then
+				expandLocToNode( loc, child )
+			end
 		end
 	end
 end
 
--- Make and return an errLoc (see err.makeErrLoc) using the extent of the given
--- parse tree node for the location.
+-- Return a loc representing the entire source line at iLine
+local function locEntireLine( iLine )
+	return { iLine = iLine, iLineEnd = iLine }
+end
+
+-- Make and return a loc record using the extent of the given parse tree or structure node
 local function errLocFromNode( node )
-	local errLoc = { first = {}, last = {} }
-	findNodeLoc( node, errLoc )
-	return errLoc
+	assert( type(node) == "table" )
+	if node.isError or (node.s and node.entireLine and node.iLine) then
+		return locEntireLine( node.iLine )
+	end
+	local loc = {}
+	expandLocToNode( loc, node )
+	return loc
+end
+
+-- Make and return an err rec using:
+--      iLineRank     line number to rank this error by
+--      loc           errLoc for main location of the error
+--      refLoc        errLoc for an addition location to reference, or nil if none.
+--      strErr        error message string
+--      ...           optional params to send to string.format( strErr, ... )
+local function makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+	return {
+		iLineRank = iLineRank,
+		strErr = string.format( strErr, ... ),
+		loc = loc,
+		refLoc = refLoc,
+	}
+end
+
+-- Return the line number used to rank an error on iLine 
+-- (incomplete lines are forwarded and reported on the final line).
+local function iLineRankFromILine( iLine )
+	while incompleteLines[iLine] do
+		iLine = iLine + 1
+	end
+	return iLine
+end
+
+-- Return a string describing the given loc
+function err.getLocString( loc )
+	if loc.iLineEnd ~= loc.iLine then   -- Multi-line
+		return string.format( "Lines %d-%d", loc.iLine, loc.iLineEnd )
+	elseif loc.iCharStart == nil then   -- Whole line
+		return string.format( "Line %d", loc.iLine )
+	elseif loc.iCharStart == loc.iCharEnd then   -- Single char
+		return string.format( "Line %d char %d", loc.iLine, loc.iCharStart ) 
+	else   -- Char range
+		return string.format( "Line %d chars %d-%d",
+					loc.iLine, loc.iCharStart, loc.iCharEnd ) 
+	end
 end
 
 
@@ -79,142 +133,224 @@ end
 
 -- Init the error state for a new program
 function err.initProgram()
-	errRecord = nil
+	err.rec = nil
+	errRecForLine = nil
+	incompleteLines = {}
 end
 
--- Make and return a srcLoc record from the given fields.
--- A srcLoc (source code location) is a table with the following named fields:
---      iLine      source code line number
---      iChar      character index in the source line
-function err.makeSrcLoc( iLine, iChar )
+-- Mark the given line number as incomplete (tokens were forward to the next line)
+function err.markIncompleteLine( iLine )
 	assert( type(iLine) == "number" )
-	assert( type(iChar) == "number" )
-	return { iLine = iLine, iChar = iChar }
+	incompleteLines[iLine] = true
 end
 
--- Make and return an errLoc with the given fields.
--- An errLoc (error location) is a table with the following named fields:
---      first      srcLoc of first part of affected code
---      last       srcLoc of last part of affected code, or nil for whole line
-function err.makeErrLoc( first, last )
-	-- print( string.format( "makeErrLoc  %d.%d  to  %d.%d", first.iLine, first.iChar, last.iLine, last.iChar ) )
-	return { first = first, last = last }
-end
-
--- If there is not already an error recorded, then set the error state with:
+-- Record an error with:
 --      loc           errLoc for main location of the error
 --      refLoc        errLoc for an addition location to reference, or nil if none.
---      strErr        string message for the error
+--      strErr        error message string
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErr( loc, refLoc, strErr, ... )
-	assert( type(loc) == "table" and loc.first ~= nil )
-	if refLoc then
-		assert( type(refLoc) == "table" and refLoc.first ~= nil )
-	end
+	assert( type(loc) == "table" )
+	assert( refLoc == nil or type(refLoc) == "table" )
 	assert( type(strErr) == "string" )
 
-	local errNew = { strErr = string.format( strErr, ...), loc = loc, refLoc = refLoc }
-	if fnLogErr then
-		-- In diagnostic mode, report every error but don't store the error state 
-		-- in errRecord (force checking to continue). 
-		fnLogErr( errNew )
-	else
-		-- Only set the error state if not already set (take the first error only)
-		if errRecord == nil then
-			errRecord = errNew
+	-- Determine the line number that we are ranking this error with 
+	local iLineRank = iLineRankFromILine( loc.iLine )
+
+	-- Are we keeping an error for each line?
+	if errRecForLine then
+		-- Keep only the first error on each line
+		if errRecForLine[iLineRank] == nil then
+			errRecForLine[iLineRank] = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
 		end
+	end
+
+	-- Make err.rec keep the first error for the lowest ranked line number
+	if err.rec == nil or iLineRank < err.rec.iLineRank then
+		err.rec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
 	end
 end
 
--- If there is not already an error recorded, then set the error state with:
+-- Record an error with:
 --      iLine         line number for the error (entire line)
---      strErr        string message for the error
+--      strErr        error message string
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErrLineNum( iLine, strErr, ... )
-	err.setErr( err.makeErrLoc( err.makeSrcLoc( iLine, 1 ) ), nil, strErr, ... )
+	assert( type(iLine) == "number" )
+	assert( type(strErr) == "string" )
+
+	-- Make a loc that indicates the entire line
+	err.setErr( locEntireLine( iLine ), nil, strErr, ... )
 end
 
--- If there is not already an error recorded, then set the error state with:
---      node          parse tree for main location of the error
---      refNode       parse tree for an addition location to reference, or nil if none.
---      strErr        string message for the error
+-- Record an error with:
+--      iLine         line number for the error (entire line)
+--      iLineRef      line number for the line to reference (entire line)
+--      strErr        error message string
+--      ...           optional params to send to string.format( strErr, ... )
+function err.setErrLineNumAndRefLineNum( iLine, iLineRef, strErr, ... )
+	assert( type(iLine) == "number" )
+	assert( type(iLineRef) == "number" )
+	assert( type(strErr) == "string" )
+
+	-- Make locs that indicates the entire lines
+	err.setErr( locEntireLine( iLine ), locEntireLine( iLineRef ), strErr, ... )
+end
+
+-- Record an error with:
+--      iLine         line number for the error
+--      iCharStart    starting char index
+--      iCharEnd      ending char index
+--      strErr        error message string
+--      ...           optional params to send to string.format( strErr, ... )
+function err.setErrCharRange( iLine, iCharStart, iCharEnd, strErr, ... )
+	assert( type(iLine) == "number" )
+	assert( type(iCharStart) == "number" )
+	assert( type(iCharEnd) == "number" )
+	assert( type(strErr) == "string" )
+
+	local loc = {
+		iLine = iLine,
+		iLineEnd = iLine,
+		iCharStart = iCharStart,
+		iCharEnd = iCharEnd,
+	}
+	err.setErr( loc, nil, strErr, ... )
+end
+
+-- Record an error with:
+--      node          parse or structure node for main location of the error
+--      refNode       parse or structure node for addition loc to reference, or nil if none.
+--      strErr        error message string
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErrNodeAndRef( node, refNode, strErr, ... )
 	assert( type(node) == "table" )
-	if refNode then
-		assert( type(refNode) == "table" )
-	end
+	assert( refNode == nil or type(refNode) == "table" )
 	assert( type(strErr) == "string" )
-	err.setErr( errLocFromNode( node ), errLocFromNode( refNode ), strErr, ... )
+
+	if refNode then
+		err.setErr( errLocFromNode( node ), errLocFromNode( refNode ), strErr, ... )
+	else
+		err.setErr( errLocFromNode( node ), nil, strErr, ... )
+	end
 end
 
--- If there is not already an error recorded, then set the error state with:
---      node          parse tree for location of the error
---      strErr        string message for the error
+-- Record an error with:
+--      node          parse or structure node for location of the error
+--      strErr        error message string
 --      ...           optional params to send to string.format( strErr, ... )
 function err.setErrNode( node, strErr, ... )
 	assert( type(node) == "table" )
 	assert( type(strErr) == "string" )
+
 	err.setErr( errLocFromNode( node ), nil, strErr, ... )
 end
 
--- If there is not already an error recorded, then set the error state with:
---      firstToken    first token for location of the error
---      lastToken     last token for token span containing the error
---      strErr        string message for the error
+-- Record an error for missing code with:
+--      node          parse or structure node right after the missing code
+--      strErr        error message string
 --      ...           optional params to send to string.format( strErr, ... )
-function err.setErrTokenSpan( firstToken, lastToken, strErr, ... )
-	assert( type(firstToken) == "table" )
-	assert( firstToken.tt )
-	assert( type(lastToken) == "table" )
-	assert( lastToken.tt )
+function err.setErrNodeMissing( node, strErr, ... )
+	assert( type(node) == "table" )
 	assert( type(strErr) == "string" )
-	local locStart = err.makeSrcLoc( firstToken.iLine, firstToken.iChar )
-	local iCharLast = lastToken.iChar + string.len( lastToken.str ) - 1
-	local locEnd = err.makeSrcLoc( lastToken.iLine, iCharLast )
-	err.setErr( err.makeErrLoc( locStart, locEnd ), nil, strErr, ... )
+
+	local loc = errLocFromNode( node )
+	local iCharNode = loc.iCharStart
+	if iCharNode then
+		-- Try to hilight the space/char before the node
+		loc.iCharStart = math.max( 1, iCharNode - 1 )
+		loc.iCharEnd = loc.iCharStart
+	end 
+	err.setErr( loc, nil, strErr, ... )
 end
 
--- Return true if there is an error in the error state.
-function err.hasErr()
-	return (errRecord ~= nil)
+-- Record an error with:
+--      firstNode     first node for location of the error
+--      lastNode      last node for token span containing the error
+--      strErr        error message string
+--      ...           optional params to send to string.format( strErr, ... )
+function err.setErrNodeSpan( firstNode, lastNode, strErr, ... )
+	assert( type(firstNode) == "table" )
+	assert( type(lastNode) == "table" )
+	assert( type(strErr) == "string" )
+
+	local loc = errLocFromNode( firstNode )
+	expandLocToNode( loc, lastNode  )
+	err.setErr( loc, nil, strErr, ... )
 end
 
--- Return the error record (nil if no error)
-function err.getErrRecord()
-	return errRecord
+-- Record an error with:
+--      tree          A line parse tree
+--      strErr        error message string
+--      ...           optional params to send to string.format( strErr, ... )
+function err.setErrLineParseTree( tree, strErr, ... )
+	assert( type(tree) == "table" )
+	local iLine = tree.iLine
+	assert( type(iLine) == "number" )
+	assert( type(strErr) == "string" )
+
+	err.setErrLineNum( iLine, strErr, ... )
 end
 
--- Return a string describing the error state, or return nil if no error
-function err.getErrString()
-	if errRecord then
-		local str = string.format( "*** Location %d.%d to %d.%d: %s", 
-						errRecord.loc.first.iLine, errRecord.loc.first.iChar, 
-						errRecord.loc.last.iLine, errRecord.loc.last.iChar, 
-						errRecord.strErr ) 
-		if errRecord.refLoc then
-			str = str .. string.format( "\n*** Reference %d.%d to %d.%d", 
-							errRecord.refLoc.first.iLine, errRecord.refLoc.first.iChar, 
-							errRecord.refLoc.last.iLine, errRecord.refLoc.last.iChar )
-		end
-		return str
+-- Override any error currently on the tree's line and record an error with:
+--      tree          A line parse tree
+--      strErr        error message string
+--      ...           optional params to send to string.format( strErr, ... )
+function err.overrideErrLineParseTree( tree, strErr, ... )
+	assert( type(tree) == "table" )
+	local iLine = tree.iLine
+	assert( type(iLine) == "number" )
+	assert( type(strErr) == "string" )
+
+	err.clearErr( iLine )
+	err.setErrLineNum( iLine, strErr, ... )
+end
+
+-- Return a string describing the given error rec, or return nil if no error
+function err.getErrString( rec )
+	if rec == nil then
+		return nil
+	end
+	local str = "*** " .. err.getLocString( rec.loc ) .. ": " .. rec.strErr
+	if rec.refLoc then
+		str = str .. "\n*** Reference " .. err.getLocString( rec.refLoc )
+	end
+	return str
+end
+
+-- Clear the error for the given line number, if any
+function err.clearErr( iLine )
+	assert( type(iLine) == "number" )
+
+	if errRecForLine then
+		errRecForLine[iLineRankFromILine( iLine )] = nil
+	end
+	if err.rec and err.rec.iLineRank == iLineRankFromILine( iLine ) then  
+		err.rec = nil
+	end
+end
+
+-- Set the error logging mode that keeps an error for each line
+function err.logAllErrors()
+	errRecForLine = {}
+end
+
+-- Return the logged error for the given line number, or nil if none.
+function err.getLoggedErrForLine( iLine )
+	assert( type(iLine) == "number" )
+
+	if errRecForLine then
+		return errRecForLine[iLine]
+	elseif err.rec and err.rec.iLineRank == iLineRankFromILine( iLine ) then
+		return err.rec
 	end
 	return nil
 end
 
--- Clear the error state
-function err.clearErr()
-	errRecord = nil
-end
-
--- Set the error logging function
-function err.setFnLogErr( fn )
-	fnLogErr = fn
-end
-
--- Return true if we should stop on errors
-function err.stopOnErrors()
-	return fnLogErr == nil
+-- Return true if there is an error that should stop further processing
+function err.shouldStop()
+	-- Only stop if there is an error and we are not logging all errors
+	return err.rec and errRecForLine == nil
 end
 
 
