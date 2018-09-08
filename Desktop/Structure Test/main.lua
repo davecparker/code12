@@ -14,7 +14,12 @@ this.LIMIT = 120 + 4
 this.speed = 0.3
 this.frameCount = 0
 this.newCount = this.frameCount + 2 *  -this.frameCount
-this.str = "Testing"
+this.str = "Testing" .. tostring(3)
+
+function _fn.start()
+end
+
+
 
 
 
@@ -26,7 +31,6 @@ function _fn.start()
 	local X = 50
 	local y = 0
 	y = X
-
 	ct.rect(X, 10, 50, 10)
 	this.ball = ct.circle(X, y, 30)
 	this.ball:setFillColor("blue")
@@ -34,14 +38,14 @@ function _fn.start()
 	ct.println("Program started")
 end
 
-function _fn.foo()
+function _fn.foo(i, d)
 
 
 	i = 8
 	return 0
 end
 
-function _fn.test()
+function _fn.test(i, d)
 
 	i = _fn.foo(3, 4)
 	if i < 0 then
@@ -93,7 +97,7 @@ function _fn.update()
 	return 
 end
 
-function _fn.onMousePress()
+function _fn.onMousePress(obj, x, y)
 end
 
 
@@ -105,7 +109,7 @@ end
 
 
 
-function _fn.moveBall()
+function _fn.moveBall(wrap)
 
 	this.ball.x = this.ball.x + 1
 	if wrap then
@@ -122,6 +126,6 @@ function _fn.makeCircles()
 	local circles = { length = 10, default = nil }
 	for _, c in ipairs(circles) do
 		c:setFillColor("black")
-	end; local scores = { 10, 20, 30, }
+	end; local scores = { 10, 20, 30, length = 3 }
 	return circles
 end
