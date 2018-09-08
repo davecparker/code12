@@ -4,7 +4,6 @@ import Code12.*;
 public class Game extends Code12Program
 {
     GameObj player, goal, score;
-    GameObj[] enemies;
     double enemyCount = 0;
     int scoreCount = 0;
 
@@ -17,40 +16,26 @@ public class Game extends Code12Program
     {
         ct.setBackColor("gray");
 
-        player = ct.circle(( ct.toInt(ct.getWidth() / 2)), (3 * ct.toInt(ct.getHeight() / 4)), 5, "white");
+        player = ct.circle(50, 75, 5, "white");
         player.setLineColor("white");
 
-        goal = ct.circle(ct.random(0, ct.toInt(ct.getWidth())), ct.random(ct.toInt(ct.getHeight() / 3), ct.toInt(ct.getHeight())), 3, "light green");
+        goal = ct.circle(ct.random(0, 100), ct.random(33, 100), 3, "light green");
         goal.setLineColor("light green");
 
-        score = ct.text("Score: " + scoreCount + "    Goal: 10", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 25), 5, "dark gray");
-
-        enemies = new GameObj[10];
-        for (int i = 0; i < enemies.length; i++)
-        {
-            enemies[i] = ct.rect(ct.random(0, ct.toInt(ct.getWidth())), -2, 3, 3, "dark gray");
-            enemies[i].setLineColor("dark gray");
-            enemies[i].group = "enemies";
-        }
+        score = ct.text("Score: 0    Goal: 10", 50, 4, 5, "dark gray");
     }
 
     public void update()
     {
-        if (isBeyondLeftBoundary(player))
-            player.x = ct.getWidth();
-        else if (isBeyondRightBoundary(player))
+        if (isBeyondLeftBoundary())
+            player.x = 100;
+        else if (isBeyondRightBoundary())
             player.x = 0;
 
-        if (isBeyondUpperBoundary(player))
-            preventPassingUpperBoundary(player);
-        else if (isBeyondLowerBoundary(player))
-            preventPassingLowerBoundary(player);
-
-        for (int i = 0; i < enemies.length; i++)
-        {
-            if (isBeyondLowerBoundary(enemies[i]))
-                randomizeEnemyPosition(enemies[i]);
-        }
+        if (isBeyondUpperBoundary())
+            preventPassingUpperBoundary();
+        else if (isBeyondLowerBoundary())
+            preventPassingLowerBoundary();
 
         if (player.hit(goal))
         {
@@ -58,63 +43,53 @@ public class Game extends Code12Program
             incrementScore("++");
         }
 
-        for (int i = 0; i < enemies.length; i++)
+        GameObj objHit = player.objectHitInGroup("enemies");
+        if (objHit != null && player.visible)
         {
-            if (player.hit(enemies[i]))
-            {
-                randomizeEnemyPosition(enemies[i]);
-                incrementScore("--");
-            }
+            objHit.delete();
+            incrementScore("--");
         }
 
         if (scoreCount < 0)
-            winningAction();
-        else if (scoreCount == 10)
             losingAction();
     }
 
-    public boolean isBeyondLeftBoundary(GameObj object)
+    public boolean isBeyondLeftBoundary()
     {
-        return object.x + (object.width / 2) <= 0;
+        return player.x + player.width / 2 <= 0;
     }
 
-    public boolean isBeyondRightBoundary(GameObj object)
+    public boolean isBeyondRightBoundary()
     {
-        return object.x - (object.width / 2) >= ct.getWidth();
+        return player.x - player.width / 2 >= 100;
     }
 
-    public boolean isBeyondUpperBoundary(GameObj object)
+    public boolean isBeyondUpperBoundary()
     {
-        return player.y - (player.height / 2) <= 0;
+        return player.y - player.height / 2 <= 0;
     }
 
-    public boolean isBeyondLowerBoundary(GameObj object)
+    public boolean isBeyondLowerBoundary()
     {
-        return object.y + (object.height / 2) >= ct.getHeight();
+        return player.y + player.height / 2 >= 100;
     }
 
-    public void preventPassingUpperBoundary(GameObj object)
+    public void preventPassingUpperBoundary()
     {
-        object.y++;
-        object.ySpeed = 0;
+        player.y++;
+        player.ySpeed = 0;
     }
 
-    public void preventPassingLowerBoundary(GameObj object)
+    public void preventPassingLowerBoundary()
     {
-        object.y--;
-        object.ySpeed = 0;
-    }
-
-    public void randomizeEnemyPosition(GameObj enemy)
-    {
-        enemy.x = ct.random(0, ct.toInt(ct.getWidth()));
-        enemy.y = -2;
+        player.y--;
+        player.ySpeed = 0;
     }
 
     public void randomizeGoalPosition()
     {
-        goal.x = ct.random(0, ct.toInt(ct.getWidth()));
-        goal.y = ct.random(ct.toInt(ct.getHeight() / 3), ct.toInt(ct.getHeight()));
+        goal.x = ct.random(0, 100);
+        goal.y = ct.random(33, 100);
     }
 
     public void incrementScore(String increment)
@@ -126,20 +101,11 @@ public class Game extends Code12Program
         score.setText("Score: " + scoreCount + "    Goal: 10");
     }
 
-    public void winningAction()
-    {
-        ct.text("You Lost", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 2), 10, "dark gray");
-        player.delete();
-        goal.delete();
-        ct.clearGroup("enemies");
-    }
-
     public void losingAction()
     {
-        ct.text("You Won!", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 2), 10, "dark gray");
-        player.delete();
-        goal.delete();
-        ct.clearGroup("enemies");
+        ct.text("You Lost", 50, 50, 10, "dark gray");
+        goal.visible = false;
+        player.visible = false;
     }
 
     public void onKeyPress(String key)
@@ -153,9 +119,12 @@ public class Game extends Code12Program
         else if (key.equals("right"))
             player.xSpeed = 2;
 
-        enemyCount++;
-        if (enemyCount < enemies.length)
-            enemies[ct.random(0, enemies.length - 1)].ySpeed = 1;
+        GameObj enemy = ct.rect(ct.random(0, 100), -1, 3, 3, "dark gray");
+        enemy.setLineColor("dark gray");
+        enemy.setLayer(0);
+        enemy.ySpeed = 1;
+        enemy.autoDelete = true;
+        enemy.group = "enemies";
     }
 
     public void onKeyRelease(String key)

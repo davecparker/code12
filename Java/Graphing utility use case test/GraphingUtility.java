@@ -18,11 +18,9 @@ public class GraphingUtility extends Code12Program
     public void start()
     {
         ct.setBackColor("light gray");
-        xAxis = ct.line(0, ct.getHeight() / 2, ct.getWidth(), ct.getHeight() / 2, "white");
-        xAxis.align("center", true);
-        yAxis = ct.line(ct.getWidth() / 2, 0, ct.getWidth() / 2, ct.getHeight(), "white");
-        yAxis.align("center", true);
-        equationText = ct.text("", ct.getWidth() / 20, 7*ct.getHeight() / 8 + 2, 2, "white");
+        xAxis = ct.line(0, 50, 100, 50, "white");
+        yAxis = ct.line(50, 0, 50, 100, "white");
+        equationText = ct.text("", 5, 89.5, 2, "white");
         equationText.align("left", true);
         equationText.setLayer(2);
 
@@ -33,7 +31,8 @@ public class GraphingUtility extends Code12Program
 
     public void onMouseRelease(GameObj obj, double x, double y)
     {
-        if (obj == buttons[16] || obj == buttonTexts[16])
+        String equationString = equationText.getText();
+        if (obj == buttons[16] || obj == buttonTexts[16] && equationString.length() > 0)
             backspaceAction();
         for (int i = 0; i < buttons.length - 1; i++)
         {
@@ -48,7 +47,8 @@ public class GraphingUtility extends Code12Program
 
     public void onKeyRelease(String keyName)
     {
-        if (keyName.equals("backspace"))
+        String equationString = equationText.getText();
+        if (keyName.equals("backspace") && equationString.length() > 0)
             backspaceAction();
     }
 
@@ -78,13 +78,13 @@ public class GraphingUtility extends Code12Program
 
     public void defineLines()
     {
-        double y = -parse(-50) + ct.getHeight() / 2;
-        double y2 = -parse(-49.99) + ct.getHeight() / 2;
-        for (double x = 0; x < ct.getWidth(); x += 0.01)
+        double y1 = -parse(-50) + 50;
+        double y2 = -parse(-49.9) + 50;
+        for (double x = 0; x < 100; x += 0.1)
         {
-            defineLine(x, y, x + 0.01, y2);
-            y = y2;
-            y2 = -parse((x + 0.01) - 50) + ct.getHeight() / 2;
+            defineLine(x, y1, x + 0.1, y2);
+            y1 = y2;
+            y2 = -parse(x - 49.9) + 50;
         }
     }
 
@@ -103,13 +103,12 @@ public class GraphingUtility extends Code12Program
 
     public void defineButton(int i)
     {
-        double x = 25 + 5 * (i % 11) + ct.intDiv(i, 16) * 25;
-        double y = 5*ct.getHeight() / 6 + 10 + ct.intDiv(i, 11) * 5;
+        double x = 5 * i % 55 + ct.intDiv(i, 16) * 25 + 25;
+        double y = 93.33 + ct.intDiv(i, 11) * 5;
         buttons[i] = ct.rect(x, y, 3, 1, "white");
         buttons[i].align("center", true);
         buttons[i].setLayer(2);
         buttonTexts[i] = ct.text(charAt("x0123456789+-*/^<", i), x, y, 1);
-        buttonTexts[i].align("center", true);
         buttonTexts[i].setLayer(2);
     }
 
@@ -189,10 +188,27 @@ public class GraphingUtility extends Code12Program
         {
             deconstructedExpression[count] = "";
             for (; i < expression.length() && isOperand(charAt(expression, i)); i++)
-                deconstructedExpression[count] += charAt(expression, i);
+                deconstructedExpression[count] = deconstructedExpression[count] + charAt(expression, i);
             if (isOperator(charAt(expression, i)))
                 deconstructedExpression[count + 1] = charAt(expression, i);
             count += 2;
+        }
+    }
+
+    public void substituteXVariable(double x)
+    {
+        simplifiedExpression = new String[100];
+        for (int i = 0; i < deconstructedExpression.length && deconstructedExpression[i] != null; i++)
+        {
+            String token = deconstructedExpression[i];
+            if (token.equals("-x") && x > 0)
+                simplifiedExpression[i] = "-" + ct.formatDecimal(x);
+            else if (token.equals("-x") && x <= 0)
+                simplifiedExpression[i] = ct.formatDecimal(Math.abs(x));
+            else if (token.equals("x") || token.equals("-x") && x <= 0)
+                simplifiedExpression[i] = ct.formatDecimal(x);
+            else
+                simplifiedExpression[i] = deconstructedExpression[i];
         }
     }
 
@@ -212,23 +228,6 @@ public class GraphingUtility extends Code12Program
                 solution = Math.pow(solution, ct.parseNumber(simplifiedExpression[i + 1]));
         }
         return solution;
-    }
-
-    public void substituteXVariable(double x)
-    {
-        simplifiedExpression = new String[100];
-        for (int i = 0; i < deconstructedExpression.length && deconstructedExpression[i] != null; i++)
-        {
-            String token = deconstructedExpression[i];
-            if (token.equals("-x") && x > 0)
-                simplifiedExpression[i] = "-" + ct.formatDecimal(x);
-            else if (token.equals("-x") && x <= 0)
-                simplifiedExpression[i] = ct.formatDecimal(Math.abs(x));
-            else if (token.equals("x") || token.equals("-x") && x <= 0)
-                simplifiedExpression[i] = ct.formatDecimal(x);
-            else
-                simplifiedExpression[i] = deconstructedExpression[i];
-        }
     }
 
     public boolean hasEquationChanged()

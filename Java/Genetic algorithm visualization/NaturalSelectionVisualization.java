@@ -1,10 +1,10 @@
 
 import Code12.*;
 
-public class MainProgram extends Code12Program
+public class NaturalSelectionVisualization extends Code12Program
 {
     GameObj goal, timer, maxFitness, gen;
-    GameObj[] dots, obstacles;
+    GameObj[] dots;
     String[] spatialDirections = {"up", "down", "left", "right"};
     String[] directions = new String[(60 * 10) * 50];
     boolean[] killed = new boolean[50];
@@ -13,23 +13,20 @@ public class MainProgram extends Code12Program
 
     public static void main(String[] args)
     {
-        Code12.run(new MainProgram());
+        Code12.run(new NaturalSelectionVisualization());
     }
 
     public void start()
     {
         ct.setBackColor("gray");
-        goal = ct.circle(ct.getWidth() / 2, 2, 1, "white");
-        timer = ct.text("10.0", ct.getWidth() / 20, ct.getHeight() / 20, 5, "white");
-        timer.align("center", true);
+        goal = ct.circle(50, 2, 1, "white");
+        timer = ct.text("10.0", 5, 5, 5, "white");
+        maxFitness = ct.text("0.00", 90, 5, 5, "white");
+        gen = ct.text("Gen 1", 10, 95, 5, "white");
         timer.setLayer(3);
-        time = ct.getTimer();
-        maxFitness = ct.text("0.00", ct.getWidth() - (ct.getWidth() / 10), ct.getHeight() / 20, 5, "white");
-        maxFitness.align("center", true);
         maxFitness.setLayer(3);
-        gen = ct.text("Gen 1", ct.getWidth() / 10, ct.getHeight() - (ct.getHeight() / 20), 5, "white");
-        gen.align("center", true);
         gen.setLayer(3);
+        time = ct.getTimer();
         veteranIndex = 0;
         step = 0;
 
@@ -40,13 +37,10 @@ public class MainProgram extends Code12Program
 
     public void defineObstacles()
     {
-        obstacles = new GameObj[10];
-        for (int i = 0; i < obstacles.length; i++)
+        for (int i = 0; i < 10; i++)
         {
-            int x = ct.random(0, ct.toInt(ct.getWidth()));
-            int y = ct.random(ct.toInt(ct.getHeight() / 5), ct.toInt(ct.getHeight()) - ct.toInt(ct.getHeight() / 5));
-            obstacles[i] = ct.rect(x, y, ct.random(1, 8), ct.random(1, 15), "dark gray");
-            obstacles[i].align("center", true);
+            GameObj obstacle = ct.rect(ct.random(0, 100), ct.random(20, 80), ct.random(1, 8), ct.random(1, 15), "dark gray");
+            obstacle.group = "obstacles";
         }
     }
 
@@ -59,7 +53,7 @@ public class MainProgram extends Code12Program
 
     public void defineDot(int i)
     {
-        dots[i] = ct.circle(ct.getWidth() / 2, ct.getHeight() - (ct.getHeight() / 50), 1, "light blue");
+        dots[i] = ct.circle(50, 98, 1, "light blue");
         dots[i].align("center", true);
     }
 
@@ -163,7 +157,7 @@ public class MainProgram extends Code12Program
 
     public void killOutsideBoundary(int i)
     {
-        if (dots[i].x <= 0 || dots[i].x >= ct.getWidth() || dots[i].y <= 0 || dots[i].y >= ct.getHeight())
+        if (dots[i].x <= 0 || dots[i].x >= 100 || dots[i].y <= 0 || dots[i].y >= 100)
             kill(i);
     }
 
@@ -175,18 +169,8 @@ public class MainProgram extends Code12Program
 
     public void killWithinObstacles(int i)
     {
-        if (isWithinObstacles(i))
+        if (dots[i].objectHitInGroup("obstacles") != null)
             kill(i);
-    }
-
-    public boolean isWithinObstacles(int i)
-    {
-        for (int j = 0; j < obstacles.length; j++)
-        {
-            if (dots[i].hit(obstacles[j]))
-                return true;
-        }
-        return false;
     }
 
     public void killTimerFinished(int i)
