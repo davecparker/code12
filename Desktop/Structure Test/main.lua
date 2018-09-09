@@ -42,6 +42,9 @@ end
 
 function _fn.test(i, d)
 
+	local whILEe = 3
+	local z = 0; local y = 0; local w = 0
+
 	i = _fn.foo(3, 4)
 	if i < 0 then
 		return i + 1
@@ -119,12 +122,14 @@ function _fn.moveBall(wrap)
 		if this.ball.x > 100 then
 			this.ball.x = 0
 		end
-	end; return ct.toInt(this.ball.x)
+	end; local _in = nil
+	return ct.toInt(this.ball.x)
 end
 
 function _fn.makeCircles()
 
 	local circles = { length = 10, default = nil }
+
 	for _, c in ipairs(circles) do
 		c:setFillColor("black")
 	end; local scores = { 10, 20, 30, length = 3 }

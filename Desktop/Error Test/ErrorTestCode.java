@@ -630,29 +630,31 @@ int underIndentedInstanceVar;
 	// ERROR "Class-level variables must be defined at the beginning of the class"
 	double newWidth = ct.getWidth();
 
-	// ERROR "is reserved for use by the system"
-	void ct()
+	// ERROR "cannot start with an underscore"
+	void _fn()
+	// ERROR "Unexpected or extra {"  (because the function header was bad)
 	{
 		ct.println("Hello world");
 	}
 
-	// ERROR "int is a type name, expected a function name here"
-	double int()
+	// ERROR "must be declared starting with"
+	void update()
 	{
+		// ERROR "void functions cannot return a value"
 		return 0;
 	}
-	// ERROR "boolean is a type name"
+	// ERROR "("boolean" is a type name)"
 	double foo(int i, GameObj boolean)
 	{
 		return 0;
 	}
-	// ERROR "Code12 does not allow names that differ only by upper/lower case from known names ("GameObj" is a type name)"
+	// ERROR "("GameObj" is a type name)"
 	boolean bar(String s, GameObj gameObj)
 	{
-		// ERROR "Incorrect case for constant, should be "true""
+		// ERROR "Incorrect case for constant"
 		return TRUE;
 	}
-	// ERROR "Code12 does not allow names that differ only by upper/lower case from known names ("double" is a type name)"
+	// ERROR "("double" is a type name)"
 	int Double(int x)
 	{
 		return 2 * x;
@@ -1054,11 +1056,11 @@ int underIndentedInstanceVar;
 		// ERROR "operator is not supported"
 		i = i >>> 2;
 
-		// ERROR "is reserved for use by the system"
+		// ERROR "was unexpected here"
 		String ct;
-		// ERROR " is a type name, expected a variable name here"
+		// ERROR "("String" is a type name)"
 		int String;
-		// ERROR " is a type name, expected a variable name here"
+		// ERROR "("GameObj" is a type name)"
 		double GameObj;
 
 		int lowercasefirst = 1;
@@ -1165,18 +1167,18 @@ int underIndentedInstanceVar;
 		// ERROR "Invalid function name"
 		dblFuncIntDbl[intVar](0, 0.1);
 
-		// ERROR "Cannot call methods directly on class GameObj"
+		// ERROR "("GameObj" is a type name)"
 		GameObj.foo();
-		// ERROR "Cannot call methods directly on class String"
+		// ERROR "("String" is a type name)"
 		String.foo();
-		// ERROR "Cannot call methods directly on class Code12Program"
+		// ERROR "expected a variable name"
 		Code12Program.foo();
-		// ERROR "Cannot call methods directly on class Code12Program"
+		// ERROR "expected a variable name"
 		Code12Program.foo();
 
 		// ERROR "An index in [brackets] can only be applied to an array"
-		ct[0].log(objVar);
-		// ERROR "An index in [brackets] can only be applied to an array"
+		boolVar[0].log(objVar);
+		// ERROR "was unexpected here"
 		dblVar = Math[intVar].tan(0);
 		
 		// ERROR "Method call on invalid type (array of int)"
@@ -1194,7 +1196,7 @@ int underIndentedInstanceVar;
 
 		// ERROR "Unknown method"
 		objArr[0].foo();
-		// ERROR "Unknown method"
+		// ERROR "Unknown or unsupported Math method"
 		Math.foo();
 		
 		// ERROR "requires 1 parameter"

@@ -26,42 +26,50 @@ local javalex = {}
 --    Chars that lead to possibly multi-char tokens: a token scanning function
 local charTypes = {}  -- built in initCharTypes()
 
--- Reserved word tokens: indexed by string, maps to:
---    string (token tt) if reserved word supported by Code12
---    false if reserved word not supported by Code12
+-- Reserved/known word tokens: indexed by string name, maps to:
+--    the token tt (a string) if reserved word or type known by Code12,
+--    false if reserved word not supported by Code12,
 --    nil if not reserved word, or not treated as a reserved word.
--- The following reserved words (primitive types) are treated as normal IDs:
---    byte, boolean, char, double, float, int, long, short, void
-local reservedWordTokens = {
+local ttForKnownName = {
 	["abstract"]		= false,	
 	["assert"] 			= false,	
-	["break"] 			= "break",	
+	["boolean"]			= "TYPE",	
+	["break"] 			= "break",
+	["byte"]			= "TYPE",	
 	["case"] 			= false,
 	["catch"] 			= false,	
+	["char"]			= "TYPE",	
 	["class"] 			= "class",	
 	["const"] 			= "const",	
 	["continue"] 		= false,
 	["default"] 		= false,
 	["do"] 				= "do",	
+	["double"]			= "TYPE",	
 	["else"] 			= "else",	
 	["enum"] 			= false,	
 	["extends"] 		= "extends",	
+	["false"] 			= "BOOL",
 	["final"] 			= "final",	
 	["finally"] 		= false,	
+	["float"]			= "TYPE",	
 	["for"] 			= "for",	
 	["goto"] 			= false,	
 	["if"] 				= "if",
 	["implements"] 		= false,	
 	["import"] 			= "import",	
 	["instanceof"] 		= false,	
+	["int"]				= "TYPE",	
 	["interface"] 		= false,	
+	["long"]			= "TYPE",	
 	["native"] 			= false,	
 	["new"] 			= "new",	
+	["null"] 			= "NULL",
 	["package"] 		= false,	
 	["private"] 		= "private",	
 	["protected"] 		= false,
 	["public"] 			= "public",	
 	["return"] 			= "return",	
+	["short"]			= "TYPE",	
 	["static"] 			= "static",	
 	["strictfp"]	 	= false,	
 	["super"] 			= false,
@@ -71,15 +79,59 @@ local reservedWordTokens = {
 	["throw"] 			= false,	
 	["throws"] 			= false,	
 	["transient"] 		= false,
+	["true"] 			= "BOOL",	
 	["try"] 			= false,	
+	["void"]			= "void",	
 	["volatile"] 		= false,	
 	["while"] 			= "while",
 
-	-- These reserved words are actually special literals
-	["true"] 			= "BOOL",	
-	["false"] 			= "BOOL",
-	["null"] 			= "NULL",
+	-- The following classes are also recognized as defined types.
+	["GameObj"] 		= "TYPE",
+	["String"] 			= "TYPE",
+
+	-- These core classes are treated as reserved words because they
+	-- can be used for static calls and/or static fields.
+	-- TODO: Add Code12, Code12Program as reserved words
+	["ct"] 				= "ct",
+	["System"] 			= "System",
+	["Math"] 			= "Math",
+
+	-- Standard Java classes in java.lang that we don't want redefined.
+	["Character"]		= "ID",      
+	["Integer"]			= "ID",        
+	["Number"]			= "ID",         
+	["Object"]			= "ID",         
+	["Runtime"]			= "ID",        
+	["Throwable"]		= "ID",
+
+	-- Lowercase versions of the above class names scan as IDs
+	-- but are here for use by javalex.knownName()
+	["gameobj"] 		= "ID",
+	["string"] 			= "ID",
+	["system"] 			= "ID",
+	["math"] 			= "ID",
+	["character"]		= "ID",      
+	["integer"]			= "ID",        
+	["number"]			= "ID",         
+	["object"]			= "ID",         
+	["runtime"]			= "ID",        
+	["throwable"]		= "ID",
 }
+
+-- The correct case for mixed-case known IDs above
+local correctCaseForLowercaseName = {
+	-- Names used by Code12
+	["gameobj"]			= "GameObj",
+	["string"] 			= "String",
+	["system"] 			= "System",
+	["math"] 			= "Math",
+	["character"]		= "Character",      
+	["integer"]			= "Integer",        
+	["number"]			= "Number",         
+	["object"]			= "Object",         
+	["runtime"]			= "Runtime",        
+	["throwable"]		= "Throwable",      
+} 
 
 -- State for the lexer used by token scanning functions
 local source    		   -- the source string
@@ -475,6 +527,7 @@ end
 -- iLine is the given lineNum, str is the text of the token, 
 -- and tt is a string that identifies the token type as follows:
 --     Keywords, operators, and seperators have tt == str (e.g. "for", "++", ";")
+--     "TYPE": a known Java primitive type or class used by Code12
 --     "ID": an identifer that is not a reserved word
 --     "NUM": numeric literal (any numeric type)
 --     "STR": string literal (note that str includes the quotes)
@@ -512,7 +565,7 @@ function javalex.getTokens( sourceStr, lineNum )
 
 		-- Determine what token type to build next
 		if charType == true then    -- ID start char
-			-- Identifier
+			-- Identifier or reserved/known word
 			local iCharStart = iChar
 			repeat
 				iChar = iChar + 1
@@ -520,21 +573,24 @@ function javalex.getTokens( sourceStr, lineNum )
 			until type(charType) ~= "boolean"    -- ID char
 			local iCharEnd = iChar - 1
 			local str = string.sub( source, iCharStart, iCharEnd )
-			local tt = reservedWordTokens[str]
+			local tt = ttForKnownName[str]
 			if tt == nil then
-				-- Not a reserved word, so user-defined ID
+				-- Not a known word, so user-defined ID
 				token.tt = "ID"
 				-- Code12 does not allow IDs to start with an understore
 				if chars[iCharStart] == 95 then   -- _
-					setTokenErr( iCharStart, iCharEnd, "Names cannot start with an underscore in Code12")
+					setTokenErr( iCharStart, iCharEnd, 
+							"Names cannot start with an underscore in Code12")
 					return nil
 				end
 			elseif tt == false then
 				-- Unsupported reserved word
-				setTokenErr( iCharStart, iCharEnd, "Unsupported reserved word \"%s\"", str )
+				setTokenErr( iCharStart, iCharEnd, 
+						"Unsupported reserved word \"%s\"", str )
 				return nil
 			else
-				token.tt = tt   -- reserved word
+				-- A known word (reserved word, type name, etc.)
+				token.tt = tt
 			end
 			token.str = str
 			tokens[#tokens + 1] = token
@@ -574,6 +630,35 @@ function javalex.getTokens( sourceStr, lineNum )
 		end 
 	until false   -- returns internally when end of string is found
 end
+
+-- If nameStr matches a known pre-defined reserved word, type, class, constant
+-- or special ID, ignoring case, then return (tt, strCorrectCase, strUsage),
+-- where tt is the token type, strCorrectCase is the correct case for nameStr,
+-- and usage is a description of the type of word (e.g. "type name").
+-- If there is no match then return (nil, nameStr, nil).
+function javalex.knownName( nameStr )
+	local nameLower = string.lower( nameStr )
+	local tt = ttForKnownName[nameLower]
+	if tt == nil then
+		return nil, nameStr, nil   -- no match
+	end
+	local strCorrectCase = correctCaseForLowercaseName[nameLower] or nameLower
+	tt = ttForKnownName[strCorrectCase]
+
+	local usage
+	if tt == "TYPE" then
+		usage = "type name"
+	elseif tt == "ID" or strCorrectCase == "Math" then
+		usage = "class name"
+	elseif tt == "BOOL" or tt == "NULL" then
+		usage = "constant"
+	elseif tt == false then
+		usage = "Unsupported Java reserved word"
+	else
+		usage = "Reserved word"
+	end
+	return tt, strCorrectCase, usage
+end 
 
 -- Return the comment string at the end of the given line number or nil if none
 function javalex.commentForLine( lineNum )

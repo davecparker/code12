@@ -58,8 +58,7 @@ local function parseFile()
 		-- make a "class" line pattern not found in normal grammar
 		local strCode = strLines[lineNum]
 		local tokens = javalex.getTokens( strCode, lineNum )
-		if tokens and #tokens == 3 and tokens[1].tt == "class"
-				and tokens[2].tt == "ID" then
+		if tokens and #tokens == 3 and tokens[1].tt == "class" then
 			parseTrees[lineNum] = { t == "line", p = "class", 
 				nodes = { tokens[1], tokens[2] } }
 		else
