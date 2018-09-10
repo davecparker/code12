@@ -231,16 +231,6 @@ local function defaultValueCodeForVt( vt )
 	end
 end
 
--- Return the Lua code string for a literal expr
-local function literalCode( expr )
-	local token = expr.token
-	if token.tt == "NULL" then
-		return "nil"
-	else
-		return token.str
-	end
-end
-
 -- Return the Lua code string for a call structure.
 local function callCode( call )
 	local class = call.class
@@ -353,7 +343,6 @@ end
 
 -- Functions to generate code for the various expr types
 local fnGenerateExpr = {
-	["literal"]      = literalCode,
 	["call"]         = callExprCode,
 	["lValue"]       = lValueCode,
 	["staticField"]  = staticFieldCode,
@@ -368,11 +357,18 @@ local fnGenerateExpr = {
 
 -- Return the Lua code for the given expr
 function exprCode( expr )
-	local fn = fnGenerateExpr[expr.s]
-	if fn then
-		return fn( expr )
+	local tt = expr.tt
+	if tt == "NULL" then
+		return "nil"
+	elseif tt then
+		return expr.str
+	else
+		local fn = fnGenerateExpr[expr.s]
+		if fn then
+			return fn( expr )
+		end
+		error( "Unknown expr type " .. expr.s )
 	end
-	error( "Unknown expr type " .. expr.s )
 end
 
 

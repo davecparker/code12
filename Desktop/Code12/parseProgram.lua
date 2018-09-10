@@ -51,7 +51,7 @@ local parseProgram = {}
 --     { s = "lValue", varID, indexExpr, fieldID }
 -- 
 -- expr:  (Semantic analysis adds a vt field)
---     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
+--     (expr nodes can be a single NUM, BOOL, NULL, or STR token node)
 --     { s = "call", class, lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "staticField", class, fieldID }
@@ -731,13 +731,16 @@ function makeExpr( node )
 		return nil
 	end
 
+	-- Expr nodes can be a single token (NUM, BOOL, NULL, or STR)
+	if node.tt then
+		return node
+	end
+
 	-- Handle the different primaryExpr types plus binary operators
 	assert( node.t == "expr" )
 	local p = node.p
 	local nodes = node.nodes
-	if p == "NUM" or p == "BOOL" or p == "NULL" or p == "STR" then
-		return { s = "literal", token = nodes[1] }
-	elseif p == "call" then
+	if p == "call" then
 		return makeCall( nodes )
 	elseif p == "lValue" then
 		return makeLValue( nodes[1] )
@@ -923,7 +926,7 @@ end
 -- Print a structure tree node recursively for debugging, labelled with name if included
 local function printStructureTree( node, indentLevel, file, label )
 	-- Make a label for this node
-	assert( type(node) == "table" and node.s )
+	assert( type(node) == "table" and (node.s or node.tt) )
 	local str
 	if node.iLine then
 		str = string.format( "%3d.%s", node.iLine, string.rep( "    ", indentLevel ) )
@@ -933,7 +936,12 @@ local function printStructureTree( node, indentLevel, file, label )
 	if label then
 		str = str .. label .. ": "
 	end
-	if node.s == "binOp" then
+	if node.tt then
+		-- Leaf token
+		str = str .. "(" .. node.str .. ")"
+		app.printDebugStr( str, file )
+		return
+	elseif node.s == "binOp" then
 		str = str .. "(" .. node.opType .. ")"
 	else
 		str = str .. node.s

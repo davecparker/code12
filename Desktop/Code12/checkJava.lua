@@ -839,28 +839,6 @@ end
 -- table below. They all check the expr node recursively then return the result vt.
 -- If there is an error, they set the error state and return nil.
 
--- literal: NUM
-local function vtExprNUM( node )
-	-- Imitating Java, a number is double if it has a decimal point or
-	-- is in exponential notation, regardless of its value
-	return ((node.token.str:find("[%.eE]") and 1) or 0)   -- double or int
-end
-
--- literal: BOOL
-local function vtExprBOOL()
-	return true
-end
-
--- literal: NULL
-local function vtExprNULL()
-	return "null"
-end
-
--- literal: STR
-local function vtExprSTR()
-	return "String"
-end
-
 -- cast
 local function vtExprCast( node )
 	-- The only cast currently supported is (int) doubleExpr
@@ -1024,11 +1002,10 @@ local function vtExprDivide( node )
 		-- int divide: allow only if dividing constants with no remainder
 		local left = node.left
 		local right = node.right
-		if left.s == "literal" and left.token.tt == "NUM" 
-				and right.s == "literal" and right.token.tt == "NUM" then
+		if left.tt == "NUM" and right.tt == "NUM" then
 			-- Both sides are constant so we can check for a remainder
-			local n = tonumber( left.token.str )
-			local d = tonumber( right.token.str )
+			local n = tonumber( left.str )
+			local d = tonumber( right.str )
 			local r = n / d
 			if r == math.floor( r ) then
 				return 0   -- valid int result
@@ -1102,13 +1079,8 @@ end
 
 
 -- Since there are so many expr variations, we hash them to functions by their
--- structure name (s), opType, or literal token tt.
+-- structure name (s), or opType string.
 local fnVtExprVariations = {
-	-- literal patterns
-	["NUM"]         = vtExprNUM,
-	["BOOL"]        = vtExprBOOL,
-	["NULL"]        = vtExprNULL,
-	["STR"]         = vtExprSTR,
 	-- unary operators
 	["neg"]         = vtExprNeg,
 	["not"]         = vtExprNot,
@@ -1142,30 +1114,47 @@ local fnVtExprVariations = {
 -- Also store the vt into node.vt for future use.
 -- If an error is found, set the error state and return nil.
 function vtSetExprNode( node )
-	-- Determine the function to dispatch to from table above
-	local s = node.s
-	local fnVt
-	if s == "literal" then
-		fnVt = fnVtExprVariations[node.token.tt]
-	elseif s == "unaryOp" or s == "binOp" then
-		fnVt = fnVtExprVariations[node.opType]
-	else
-		fnVt = fnVtExprVariations[s]
-	end
-
-	-- Check for unsupported operator or other unexpected index
-	if fnVt == nil then
-		if node.opToken then
-			err.setErrNode( node.opToken, 
-					"The %s operator is not supported by Code12 ", node.opToken.str )
-		else
-			err.setErrNode( node, "Unrecognized expression type" )  -- shouldn't happen
+	local vt
+	local tt = node.tt
+	if tt then
+		-- Single token node
+		if tt == "NUM" then
+			-- Imitating Java, a number is double if it has a decimal point or
+			-- is in exponential notation, regardless of its value
+			vt = ((node.str:find("[%.eE]") and 1) or 0)   -- double or int
+		elseif tt == "STR" then
+			vt = "String"
+		elseif tt == "BOOL" then
+			vt = true
+		else   -- "NULL"
+			vt = "null"
 		end
-		return nil
+	else
+		-- Determine the function to dispatch to from table above
+		local s = node.s
+		local fnVt
+		if s == "unaryOp" or s == "binOp" then
+			fnVt = fnVtExprVariations[node.opType]
+		else
+			fnVt = fnVtExprVariations[s]
+		end
+
+		-- Check for unsupported operator or other unexpected index
+		if fnVt == nil then
+			if node.opToken then
+				err.setErrNode( node.opToken, 
+						"The %s operator is not supported by Code12 ", node.opToken.str )
+			else
+				err.setErrNode( node, "Unrecognized expression type" )  -- shouldn't happen
+			end
+			return nil
+		end
+
+		-- Dispatch to the function
+		vt = fnVt( node )
 	end
 
-	-- Dispatch to the function, store and return the result
-	local vt = fnVt( node )
+	-- Store the vt in the node and return it
 	node.vt = vt       
 	return vt
 end

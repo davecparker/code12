@@ -3,30 +3,25 @@
  48.        func emptyFunc { #paramVars = 0, vt = void, #stmts = 0 }
  51.        func voidFunc { #paramVars = 0, vt = void, #stmts = 1 }
                 stmts:
- 53.                var i { vt = int }
-                        initExpr: literal { token = 0 }
+ 53.                var i { vt = int, initExpr = 0 }
  55.        func intFunc { #paramVars = 0, vt = int, #stmts = 2 }
                 stmts:
- 57.                var i { vt = int }
-                        initExpr: literal { token = 1 }
+ 57.                var i { vt = int, initExpr = 1 }
  58.                return
                         expr: lValue { varID = i }
  60.        func dblFunc { #paramVars = 0, vt = double, #stmts = 2 }
                 stmts:
- 62.                var d { vt = double }
-                        initExpr: literal { token = 0.0 }
+ 62.                var d { vt = double, initExpr = 0.0 }
  63.                return
                         expr: lValue { varID = d }
  65.        func boolFunc { #paramVars = 0, vt = boolean, #stmts = 2 }
                 stmts:
- 67.                var b { vt = boolean }
-                        initExpr: literal { token = true }
+ 67.                var b { vt = boolean, initExpr = true }
  68.                return
                         expr: lValue { varID = b }
  70.        func strFunc { #paramVars = 0, vt = String, #stmts = 2 }
                 stmts:
- 72.                var s { vt = String }
-                        initExpr: literal { token = "" }
+ 72.                var s { vt = String, initExpr = "" }
  73.                return
                         expr: lValue { varID = s }
  75.        func gObjFunc { #paramVars = 0, vt = GameObj, #stmts = 1 }
@@ -34,9 +29,9 @@
  77.                return
                         expr: call circle { #exprs = 3, class = ct }
                             exprs:
-                                literal { token = 0.0 }
-                                literal { token = 0.0 }
-                                literal { token = 1.0 }
+ 77.                            (0.0)
+ 77.                            (0.0)
+ 77.                            (1.0)
  79.        func intArrFuncInt { #paramVars = 1, vt = array of int, #stmts = 1 }
                 paramVars:
  79.                var n { vt = int, isGlobal = false }
@@ -49,10 +44,8 @@
  83.                var i { vt = int, isGlobal = false }
                 stmts:
  85.                return
-                        expr: (+)
-                            right: literal { token = 1 }
-                            left: (*)
-                                right: literal { token = 2 }
+                        expr: (+) { right = 1 }
+                            left: (*) { right = 2 }
                                 left: lValue { varID = i }
  87.        func dblFuncIntDbl { #paramVars = 2, vt = double, #stmts = 1 }
                 paramVars:
@@ -76,27 +69,23 @@
                                 right: call equals { #exprs = 1 }
                                     lValue: lValue { varID = s }
                                     exprs:
-                                        literal { token = "" }
+ 93.                                    ("")
                                 left: lValue { varID = b }
  95.        func recursiveFunc { #paramVars = 1, vt = int, #stmts = 2 }
                 paramVars:
  95.                var i { vt = int, isGlobal = false }
                 stmts:
  97.                if { #stmts = 1 }
-                        expr: (<=)
-                            right: literal { token = 0 }
+                        expr: (<=) { right = 0 }
                             left: lValue { varID = i }
                         stmts:
- 98.                        return
-                                expr: literal { token = 0 }
+ 98.                        return { expr = 0 }
  99.                return
-                        expr: (+)
+                        expr: (+) { left = 1 }
                             right: call recursiveFunc { #exprs = 1 }
                                 exprs:
-                                    (-)
-                                        right: literal { token = 1 }
+                                    (-) { right = 1 }
                                         left: lValue { varID = i }
-                            left: literal { token = 1 }
 101.        func multiLineFuncDecl { #paramVars = 3, vt = void, #stmts = 1 }
                 paramVars:
 101.                var arg1 { vt = int, isGlobal = false }
@@ -110,33 +99,25 @@
                             lValue { varID = arg3 }
 109.        func start { #paramVars = 0, isPublic = true, vt = int, #stmts = 412 }
                 stmts:
-113.                var LIMIT { vt = int, isConst = true }
-                        initExpr: literal { token = 100 }
-115.                var i { vt = int }
-                        initExpr: literal { token = 3 }
+113.                var LIMIT { vt = int, isConst = true, initExpr = 100 }
+115.                var i { vt = int, initExpr = 3 }
 116.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: unaryOp (neg)
-                            expr: literal { token = 5 }
+                        expr: unaryOp (neg) { expr = 5 }
 117.                assign (++)
                         lValue: lValue { varID = i }
 118.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: (+)
-                            right: literal { token = 1 }
+                        expr: (+) { right = 1 }
                             left: lValue { varID = i }
-119.                assign (+=)
+119.                assign (+=) { expr = 1 }
                         lValue: lValue { varID = i }
-                        expr: literal { token = 1 }
-120.                assign (-=)
+120.                assign (-=) { expr = 2 }
                         lValue: lValue { varID = i }
-                        expr: literal { token = 2 }
-121.                assign (*=)
+121.                assign (*=) { expr = 3 }
                         lValue: lValue { varID = i }
-                        expr: literal { token = 3 }
-122.                assign (/=)
+122.                assign (/=) { expr = 4 }
                         lValue: lValue { varID = i }
-                        expr: literal { token = 4 }
 123.                assign (=)
                         lValue: lValue { varID = i }
                         expr: call intFunc
@@ -145,9 +126,8 @@
                         expr: call intFuncInt { #exprs = 1 }
                             exprs:
                                 (-)
-                                    right: (*)
+                                    right: (*) { left = 345 }
                                         right: lValue { varID = i }
-                                        left: literal { token = 345 }
                                     left: (-)
                                         right: parens
                                             expr: (+)
@@ -155,122 +135,91 @@
                                                 left: lValue { varID = i }
                                         left: lValue { varID = i }
 125.                var foo { vt = int }
-                        initExpr: (+)
-                            right: literal { token = 4 }
+                        initExpr: (+) { right = 4 }
                             left: lValue { varID = i }
-126.                var score { vt = int }
-                        initExpr: literal { token = 500 }
+126.                var score { vt = int, initExpr = 500 }
 127.                var j { vt = int }
 127.                var k { vt = int }
-128.                var exponentialNumberNoDot { vt = double }
-                        initExpr: literal { token = 12e10 }
-129.                var exponentialNumberWithDot { vt = double }
-                        initExpr: literal { token = 3.42e2 }
-130.                var expontialNumberWithDecimalPlaces { vt = double }
-                        initExpr: literal { token = 6.62e-34 }
-131.                var d { vt = double }
-                        initExpr: literal { token = 3.14 }
-132.                assign (=)
+128.                var exponentialNumberNoDot { vt = double, initExpr = 12e10 }
+129.                var exponentialNumberWithDot { vt = double, initExpr = 3.42e2 }
+130.                var expontialNumberWithDecimalPlaces { vt = double, initExpr = 6.62e-34 }
+131.                var d { vt = double, initExpr = 3.14 }
+132.                assign (=) { expr = 100 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = 100 }
-133.                assign (=)
+133.                assign (=) { expr = .5 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = .5 }
-134.                assign (=)
+134.                assign (=) { expr = 1.2345e6 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = 1.2345e6 }
-135.                assign (=)
+135.                assign (=) { expr = 1.2345e+67 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = 1.2345e+67 }
-136.                assign (=)
+136.                assign (=) { expr = .12e0 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = .12e0 }
 137.                assign (=)
                         lValue: lValue { varID = d }
-                        expr: unaryOp (neg)
-                            expr: literal { token = .123e-123 }
+                        expr: unaryOp (neg) { expr = .123e-123 }
 138.                assign (=)
                         lValue: lValue { varID = d }
-                        expr: unaryOp (neg)
-                            expr: literal { token = .5 }
+                        expr: unaryOp (neg) { expr = .5 }
 139.                assign (=)
                         lValue: lValue { varID = d }
-                        expr: (/)
-                            right: literal { token = 2 }
+                        expr: (/) { right = 2 }
                             left: lValue { varID = d }
 140.                assign (++)
                         lValue: lValue { varID = d }
-141.                assign (+=)
+141.                assign (+=) { expr = 0.5 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = 0.5 }
-142.                assign (-=)
+142.                assign (-=) { expr = 7 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = 7 }
-143.                assign (*=)
+143.                assign (*=) { expr = 8 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = 8 }
-144.                assign (/=)
+144.                assign (/=) { expr = 8.0 }
                         lValue: lValue { varID = d }
-                        expr: literal { token = 8.0 }
-145.                var d2 { vt = double }
-                        initExpr: literal { token = 3 }
+145.                var d2 { vt = double, initExpr = 3 }
 146.                var d3 { vt = double }
                         initExpr: (+)
-                            right: (*)
+                            right: (*) { left = 2 }
                                 right: parens
                                     expr: (+)
                                         right: lValue { varID = d }
                                         left: lValue { varID = d2 }
-                                left: literal { token = 2 }
                             left: lValue { varID = d }
 147.                var x1 { vt = double }
 147.                var x2 { vt = double }
 147.                var y1 { vt = double }
 147.                var y2 { vt = double }
-148.                assign (=)
+148.                assign (=) { expr = 1 }
                         lValue: lValue { varID = x1 }
-                        expr: literal { token = 1 }
-149.                assign (=)
+149.                assign (=) { expr = 2.0 }
                         lValue: lValue { varID = x2 }
-                        expr: literal { token = 2.0 }
-150.                assign (=)
+150.                assign (=) { expr = .5e+1 }
                         lValue: lValue { varID = y1 }
-                        expr: literal { token = .5e+1 }
 151.                assign (=)
                         lValue: lValue { varID = y2 }
-                        expr: unaryOp (neg)
-                            expr: literal { token = .5e-1 }
-152.                var eps { vt = double }
-                        initExpr: literal { token = 1e-4 }
-153.                var name { vt = String }
-                        initExpr: literal { token = "Einstein" }
-154.                var b { vt = boolean }
-                        initExpr: literal { token = true }
-155.                var b2 { vt = boolean }
-                        initExpr: literal { token = false }
+                        expr: unaryOp (neg) { expr = .5e-1 }
+152.                var eps { vt = double, initExpr = 1e-4 }
+153.                var name { vt = String, initExpr = "Einstein" }
+154.                var b { vt = boolean, initExpr = true }
+155.                var b2 { vt = boolean, initExpr = false }
 156.                var b3 { vt = boolean }
                         initExpr: (||)
                             right: lValue { varID = b2 }
                             left: lValue { varID = b }
-157.                var s { vt = String }
-                        initExpr: literal { token = "A string variable" }
+157.                var s { vt = String, initExpr = "A string variable" }
 158.                assign (=)
                         lValue: lValue { varID = s }
                         expr: lValue { varID = s }
-159.                assign (=)
+159.                assign (=) { expr = null }
                         lValue: lValue { varID = s }
-                        expr: literal { token = null }
 161.                var colors { vt = array of String }
                         initExpr: arrayInit { #exprs = 5 }
                             exprs:
-                                literal { token = "black" }
-                                literal { token = "white" }
-                                literal { token = "red" }
-                                literal { token = "green" }
-                                literal { token = "blue" }
-162.                assign (=)
+161.                            ("black")
+161.                            ("white")
+161.                            ("red")
+161.                            ("green")
+161.                            ("blue")
+162.                assign (=) { expr = 100 }
                         lValue: lValue { varID = i }
-                        expr: literal { token = 100 }
 163.                var strArr { vt = array of String }
                         initExpr: newArray { vt = String }
                             lengthExpr: lValue { varID = i }
@@ -280,13 +229,12 @@
 165.                var intArr { vt = array of int }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
-                                literal { token = 1 }
-                                literal { token = 2 }
-                                literal { token = 3 }
+165.                            (1)
+165.                            (2)
+165.                            (3)
 166.                assign (=)
                         lValue: lValue { varID = intArr }
-                        expr: newArray { vt = int }
-                            lengthExpr: literal { token = 100 }
+                        expr: newArray { vt = int, lengthExpr = 100 }
 167.                var intArr2 { vt = array of int }
                         initExpr: newArray { vt = int }
                             lengthExpr: call length
@@ -297,19 +245,17 @@
 169.                var dblArr { vt = array of double }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
-                                literal { token = 1.1 }
-                                literal { token = 2.2 }
-                                literal { token = 3.3 }
+169.                            (1.1)
+169.                            (2.2)
+169.                            (3.3)
 170.                var dblArr2 { vt = array of double }
-                        initExpr: newArray { vt = double }
-                            lengthExpr: literal { token = 100 }
+                        initExpr: newArray { vt = double, lengthExpr = 100 }
 171.                assign (=)
                         lValue: lValue { varID = dblArr }
                         expr: lValue { varID = dblArr2 }
 172.                var gObjArr { vt = array of GameObj }
                         initExpr: newArray { vt = GameObj }
-                            lengthExpr: (*)
-                                right: literal { token = 2 }
+                            lengthExpr: (*) { right = 2 }
                                 left: lValue { varID = i }
 174.                call voidFunc
 175.                assign (=)
@@ -353,17 +299,13 @@
                         lValue: lValue { varID = i }
                         expr: call recursiveFunc { #exprs = 1 }
                             exprs:
-                                literal { token = 2 }
+184.                            (2)
 186.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: (/)
-                            right: literal { token = 1 }
-                            left: literal { token = 5 }
+                        expr: (/) { right = 1, left = 5 }
 187.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: (/)
-                            right: literal { token = 20 }
-                            left: literal { token = 100 }
+                        expr: (/) { right = 20, left = 100 }
 188.                assign (=)
                         lValue: lValue { varID = i }
                         expr: (+)
@@ -526,8 +468,7 @@
                             left: lValue { varID = s }
 215.                assign (=)
                         lValue: lValue { varID = s }
-                        expr: (+)
-                            right: literal { token = "s" }
+                        expr: (+) { right = "s" }
                             left: (+)
                                 right: lValue { varID = s }
                                 left: lValue { varID = s }
@@ -734,24 +675,16 @@
                             left: lValue { varID = b }
 257.                assign (=)
                         lValue: lValue { varID = b }
-                        expr: (<)
-                            right: literal { token = 2 }
-                            left: literal { token = 1 }
+                        expr: (<) { right = 2, left = 1 }
 258.                assign (=)
                         lValue: lValue { varID = b }
-                        expr: (<=)
-                            right: literal { token = 2 }
-                            left: literal { token = 1.1 }
+                        expr: (<=) { right = 2, left = 1.1 }
 259.                assign (=)
                         lValue: lValue { varID = b }
-                        expr: (>)
-                            right: literal { token = 2 }
-                            left: literal { token = 1 }
+                        expr: (>) { right = 2, left = 1 }
 260.                assign (=)
                         lValue: lValue { varID = b }
-                        expr: (>=)
-                            right: literal { token = 2.2 }
-                            left: literal { token = 1 }
+                        expr: (>=) { right = 2.2, left = 1 }
 261.                assign (=)
                         lValue: lValue { varID = b2 }
                         expr: (||)
@@ -763,10 +696,8 @@
                             left: lValue { varID = b2 }
 262.                assign (=)
                         lValue: lValue { varID = b }
-                        expr: (==)
-                            right: literal { token = 0 }
-                            left: (%)
-                                right: literal { token = 2 }
+                        expr: (==) { right = 0 }
+                            left: (%) { right = 2 }
                                 left: lValue { varID = i }
 263.                assign (=)
                         lValue: lValue { varID = b }
@@ -780,30 +711,22 @@
                         lValue: lValue { varID = b }
                         expr: (&&)
                             right: parens
-                                expr: (<)
-                                    right: literal { token = 0.0001 }
-                                    left: (-)
-                                        right: literal { token = 3.14159 }
+                                expr: (<) { right = 0.0001 }
+                                    left: (-) { right = 3.14159 }
                                         left: staticField { fieldID = PI, class = Math }
                             left: parens
-                                expr: (==)
-                                    right: literal { token = 2 }
-                                    left: (+)
-                                        right: literal { token = 1 }
-                                        left: literal { token = 1 }
+                                expr: (==) { right = 2 }
+                                    left: (+) { right = 1, left = 1 }
 266.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: (==)
-                            right: literal { token = 0 }
+                        expr: (==) { right = 0 }
                             left: lValue { varID = i }
                         elseStmts:
                             if { #elseStmts = 1, #stmts = 1 }
-                                expr: (<=)
-                                    right: literal { token = 10 }
+                                expr: (<=) { right = 10 }
                                     left: lValue { varID = i }
                                 elseStmts:
-271.                                assign (*=)
+271.                                assign (*=) { expr = 5 }
                                         lValue: lValue { varID = i }
-                                        expr: literal { token = 5 }
                                 stmts:
 269.                                assign (++)
                                         lValue: lValue { varID = i }
@@ -813,42 +736,35 @@
                                     lValue { varID = colors }
                                         indexExpr: lValue { varID = i }
 273.                if { #elseStmts = 1, #stmts = 2 }
-                        expr: (>)
-                            right: literal { token = 0 }
+                        expr: (>) { right = 0 }
                             left: lValue { varID = i }
                         elseStmts:
                             if { #elseStmts = 1, #stmts = 2 }
-                                expr: (<=)
-                                    right: literal { token = 10 }
+                                expr: (<=) { right = 10 }
                                     left: lValue { varID = i }
                                 elseStmts:
                                     if { #elseStmts = 2, #stmts = 1 }
                                         expr: lValue { varID = b }
                                         elseStmts:
-287.                                        var tempStr { vt = String }
-                                                initExpr: literal { token = "I'll be " }
+287.                                        var tempStr { vt = String, initExpr = "I'll be " }
 288.                                        assign (=)
                                                 lValue: lValue { varID = tempStr }
-                                                expr: (+)
-                                                    right: literal { token = "out of scope soon" }
+                                                expr: (+) { right = "out of scope soon" }
                                                     left: lValue { varID = tempStr }
                                         stmts:
 284.                                        assign (++)
                                                 lValue: lValue { varID = i }
                                 stmts:
-280.                                assign (=)
+280.                                assign (=) { expr = 7 }
                                         lValue: lValue { varID = d }
-                                        expr: literal { token = 7 }
 281.                                call setSoundVolume { #exprs = 1, class = ct }
                                         exprs:
-                                            literal { token = 1 }
+281.                                        (1)
                         stmts:
-275.                        assign (=)
+275.                        assign (=) { expr = 0 }
                                 lValue: lValue { varID = j }
-                                expr: literal { token = 0 }
-276.                        assign (=)
+276.                        assign (=) { expr = 0 }
                                 lValue: lValue { varID = k }
-                                expr: literal { token = 0 }
 290.                if { #stmts = 1 }
                         expr: (&&)
                             right: (<=)
@@ -867,20 +783,17 @@
                         stmts:
 291.                        call println { #exprs = 1, class = ct }
                                 exprs:
-                                    literal { token = "oops" }
-293.                for { #stmts = 1 }
-                        expr: literal { token = false }
+291.                                ("oops")
+293.                for { expr = false, #stmts = 1 }
                         stmts:
 294.                        for { #stmts = 1 }
                                 stmts:
 295.                                for { #stmts = 1 }
-295.                                    initStmt: assign (=)
+295.                                    initStmt: assign (=) { expr = 0 }
                                             lValue: lValue { varID = i }
-                                            expr: literal { token = 0 }
                                         stmts:
 296.                                        for { #stmts = 1 }
-                                                expr: (<)
-                                                    right: literal { token = 10 }
+                                                expr: (<) { right = 10 }
                                                     left: lValue { varID = i }
                                                 stmts:
 297.                                                for { #stmts = 1 }
@@ -890,83 +803,63 @@
 298.                                                        for { #stmts = 1 }
                                                                 expr: lValue { varID = b }
                                                                 stmts:
-299.                                                                assign (=)
+299.                                                                assign (=) { expr = 0 }
                                                                         lValue: lValue { varID = d }
-                                                                        expr: literal { token = 0 }
 300.                for { #stmts = 2 }
-300.                    initStmt: var ii { vt = int, isGlobal = false }
-                            initExpr: literal { token = 0 }
-                        expr: (<)
-                            right: literal { token = 10 }
+300.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
+                        expr: (<) { right = 10 }
                             left: lValue { varID = ii }
 300.                    nextStmt: assign (++)
                             lValue: lValue { varID = ii }
                         stmts:
 302.                        for { #stmts = 1 }
-302.                            initStmt: var jj { vt = int, isGlobal = false }
-                                    initExpr: literal { token = 0 }
-                                expr: (!=)
-                                    right: literal { token = 10 }
+302.                            initStmt: var jj { vt = int, isGlobal = false, initExpr = 0 }
+                                expr: (!=) { right = 10 }
                                     left: lValue { varID = jj }
-302.                            nextStmt: assign (+=)
+302.                            nextStmt: assign (+=) { expr = 1 }
                                     lValue: lValue { varID = jj }
-                                    expr: literal { token = 1 }
                                 stmts:
 303.                                if { #stmts = 1 }
                                         expr: (||)
-                                            right: (==)
-                                                right: literal { token = 0 }
+                                            right: (==) { right = 0 }
                                                 left: lValue { varID = jj }
-                                            left: (==)
-                                                right: literal { token = 0 }
+                                            left: (==) { right = 0 }
                                                 left: lValue { varID = ii }
                                         stmts:
 304.                                        break
 305.                        break
 307.                for { #stmts = 2 }
-307.                    initStmt: var ii { vt = int, isGlobal = false }
-                            initExpr: literal { token = 0 }
-                        expr: (<)
-                            right: literal { token = 10 }
+307.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
+                        expr: (<) { right = 10 }
                             left: lValue { varID = ii }
 307.                    nextStmt: assign (++)
                             lValue: lValue { varID = ii }
                         stmts:
 309.                        for { #stmts = 2 }
-309.                            initStmt: var jj { vt = int, isGlobal = false }
-                                    initExpr: literal { token = 0 }
-                                expr: (!=)
-                                    right: literal { token = 10 }
+309.                            initStmt: var jj { vt = int, isGlobal = false, initExpr = 0 }
+                                expr: (!=) { right = 10 }
                                     left: lValue { varID = jj }
-309.                            nextStmt: assign (+=)
+309.                            nextStmt: assign (+=) { expr = 1 }
                                     lValue: lValue { varID = jj }
-                                    expr: literal { token = 1 }
                                 stmts:
 311.                                if { #stmts = 2 }
                                         expr: (&&)
-                                            right: (==)
-                                                right: literal { token = 0 }
+                                            right: (==) { right = 0 }
                                                 left: lValue { varID = jj }
-                                            left: (==)
-                                                right: literal { token = 0 }
+                                            left: (==) { right = 0 }
                                                 left: lValue { varID = ii }
                                         stmts:
-313.                                        assign (=)
+313.                                        assign (=) { expr = 0 }
                                                 lValue: lValue { varID = intArr }
                                                     indexExpr: lValue { varID = ii }
-                                                expr: literal { token = 0 }
 314.                                        break
 316.                                break
 318.                        break
-320.                var xVar { vt = double }
-                        initExpr: literal { token = 0 }
-321.                var yVar { vt = double }
-                        initExpr: literal { token = 1 }
+320.                var xVar { vt = double, initExpr = 0 }
+321.                var yVar { vt = double, initExpr = 1 }
 322.                for { #stmts = 1 }
-322.                    initStmt: var dx { vt = double, isGlobal = false }
-                            initExpr: literal { token = .1 }
-                        expr: (<)
-                            right: literal { token = 1 }
+322.                    initStmt: var dx { vt = double, isGlobal = false, initExpr = .1 }
+                        expr: (<) { right = 1 }
                             left: lValue { varID = xVar }
 322.                    nextStmt: assign (+=)
                             lValue: lValue { varID = xVar }
@@ -974,10 +867,8 @@
                         stmts:
 323.                        for { #stmts = 1 }
 323.                            initStmt: var dy { vt = double, isGlobal = false }
-                                    initExpr: unaryOp (neg)
-                                        expr: literal { token = .5 }
-                                expr: (>)
-                                    right: literal { token = 0 }
+                                    initExpr: unaryOp (neg) { expr = .5 }
+                                expr: (>) { right = 0 }
                                     left: lValue { varID = yVar }
 323.                            nextStmt: assign (+=)
                                     lValue: lValue { varID = yVar }
@@ -994,55 +885,46 @@
                                                 left: lValue { varID = xVar }
 325.                assign (=)
                         lValue: lValue { varID = intArr }
-                        expr: newArray { vt = int }
-                            lengthExpr: literal { token = 1 }
+                        expr: newArray { vt = int, lengthExpr = 1 }
 326.                forArray { #stmts = 1 }
 326.                    var: var a { vt = int, isGlobal = false }
                         expr: lValue { varID = intArr }
                         stmts:
-327.                        assign (=)
+327.                        assign (=) { expr = 0 }
                                 lValue: lValue { varID = a }
-                                expr: literal { token = 0 }
 329.                while { #stmts = 1 }
                         expr: lValue { varID = b }
                         stmts:
-330.                        assign (=)
+330.                        assign (=) { expr = false }
                                 lValue: lValue { varID = b }
-                                expr: literal { token = false }
 331.                while { #stmts = 3 }
                         expr: lValue { varID = b }
                         stmts:
 333.                        call voidFunc
 334.                        assign (++)
                                 lValue: lValue { varID = i }
-335.                        assign (=)
+335.                        assign (=) { expr = false }
                                 lValue: lValue { varID = b }
-                                expr: literal { token = false }
 337.                doWhile { #stmts = 1 }
                         expr: lValue { varID = b }
                         stmts:
-338.                        assign (=)
+338.                        assign (=) { expr = false }
                                 lValue: lValue { varID = b }
-                                expr: literal { token = false }
 340.                doWhile { #stmts = 1 }
                         expr: lValue { varID = b }
                         stmts:
-342.                        assign (=)
+342.                        assign (=) { expr = false }
                                 lValue: lValue { varID = b }
-                                expr: literal { token = false }
 346.                call print { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "Hello world" }
+346.                        ("Hello world")
 347.                call print { #exprs = 1, class = ct }
                         exprs:
-                            (+)
-                                right: literal { token = "world" }
-                                left: (+)
-                                    right: literal { token = " " }
-                                    left: literal { token = "Hello" }
+                            (+) { right = "world" }
+                                left: (+) { right = " ", left = "Hello" }
 348.                call print { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "Hello world\n" }
+348.                        ("Hello world\n")
 349.                call print { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = i }
@@ -1054,14 +936,12 @@
                             lValue { varID = b }
 352.                call print { #exprs = 1, class = ct }
                         exprs:
-                            (+)
+                            (+) { left = "i = " }
                                 right: lValue { varID = i }
-                                left: literal { token = "i = " }
 353.                call print { #exprs = 1, class = ct }
                         exprs:
-                            (+)
+                            (+) { left = "d = " }
                                 right: lValue { varID = d }
-                                left: literal { token = "d = " }
 354.                call print { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = name }
@@ -1069,31 +949,26 @@
                         exprs:
                             (+)
                                 right: lValue { varID = name }
-                                left: (+)
-                                    right: literal { token = " " }
-                                    left: literal { token = "Hello" }
+                                left: (+) { right = " ", left = "Hello" }
 356.                var circleObj { vt = GameObj }
                         initExpr: call circle { #exprs = 3, class = ct }
                             exprs:
-                                literal { token = 50 }
-                                literal { token = 50 }
-                                literal { token = 20 }
+356.                            (50)
+356.                            (50)
+356.                            (20)
 357.                call print { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = circleObj }
 358.                call println { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "Hello world" }
+358.                        ("Hello world")
 359.                call println { #exprs = 1, class = ct }
                         exprs:
-                            (+)
-                                right: literal { token = "world" }
-                                left: (+)
-                                    right: literal { token = " " }
-                                    left: literal { token = "Hello" }
+                            (+) { right = "world" }
+                                left: (+) { right = " ", left = "Hello" }
 360.                call println { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "Hello world\n" }
+360.                        ("Hello world\n")
 361.                call println { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = i }
@@ -1105,14 +980,12 @@
                             lValue { varID = b }
 364.                call println { #exprs = 1, class = ct }
                         exprs:
-                            (+)
+                            (+) { left = "i = " }
                                 right: lValue { varID = i }
-                                left: literal { token = "i = " }
 365.                call println { #exprs = 1, class = ct }
                         exprs:
-                            (+)
+                            (+) { left = "d = " }
                                 right: lValue { varID = d }
-                                left: literal { token = "d = " }
 366.                call println { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = name }
@@ -1120,9 +993,7 @@
                         exprs:
                             (+)
                                 right: lValue { varID = name }
-                                left: (+)
-                                    right: literal { token = " " }
-                                    left: literal { token = "Hello" }
+                                left: (+) { right = " ", left = "Hello" }
 368.                call println { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = circleObj }
@@ -1144,52 +1015,50 @@
                         initExpr: lValue { varID = obj2 }
 375.                call log { #exprs = 9, class = ct }
                         exprs:
-                            literal { token = "circleObj = " }
+375.                        ("circleObj = ")
                             lValue { varID = circleObj }
-                            literal { token = "obj2 = " }
+375.                        ("obj2 = ")
                             lValue { varID = obj2 }
-                            literal { token = "obj3=" }
+375.                        ("obj3=")
                             lValue { varID = obj3 }
-                            literal { token = 3.14 }
+375.                        (3.14)
                             staticField { fieldID = PI, class = Math }
-                            literal { token = 42 }
+375.                        (42)
 376.                call logm { #exprs = 2, class = ct }
                         exprs:
-                            literal { token = "message" }
-                            literal { token = null }
+376.                        ("message")
+376.                        (null)
 377.                call logm { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = "message" }
+377.                        ("message")
                             lValue { varID = obj2 }
                             lValue { varID = obj3 }
 378.                call setOutputFile { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "output.txt" }
+378.                        ("output.txt")
 379.                call setOutputFile { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "output/nameList.txt" }
-380.                var outputFilename { vt = String }
-                        initExpr: literal { token = "output.txt" }
+379.                        ("output/nameList.txt")
+380.                var outputFilename { vt = String, initExpr = "output.txt" }
 381.                call setOutputFile { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = outputFilename }
 383.                call showAlert { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "alert meassage" }
-384.                var message { vt = String }
-                        initExpr: literal { token = "alert!" }
+383.                        ("alert meassage")
+384.                var message { vt = String, initExpr = "alert!" }
 385.                call showAlert { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = message }
 386.                var n { vt = int }
                         initExpr: call inputInt { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "enter a number: " }
+386.                            ("enter a number: ")
 387.                assign (=)
                         lValue: lValue { varID = n }
                         expr: call inputInt { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "enter a number: " }
+387.                            ("enter a number: ")
 388.                assign (=)
                         lValue: lValue { varID = n }
                         expr: call inputInt { #exprs = 1, class = ct }
@@ -1198,12 +1067,12 @@
 389.                var x { vt = double }
                         initExpr: call inputNumber { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "enter a number: " }
+389.                            ("enter a number: ")
 390.                assign (=)
                         lValue: lValue { varID = x }
                         expr: call inputNumber { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "enter a number: " }
+390.                            ("enter a number: ")
 391.                assign (=)
                         lValue: lValue { varID = x }
                         expr: call inputNumber { #exprs = 1, class = ct }
@@ -1212,7 +1081,7 @@
 392.                var quit { vt = boolean }
                         initExpr: call inputYesNo { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "Quit?" }
+392.                            ("Quit?")
 393.                assign (=)
                         lValue: lValue { varID = quit }
                         expr: call inputYesNo { #exprs = 1, class = ct }
@@ -1221,12 +1090,12 @@
 394.                var inputStr { vt = String }
                         initExpr: call inputString { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "Quit?" }
+394.                            ("Quit?")
 395.                assign (=)
                         lValue: lValue { varID = inputStr }
                         expr: call inputString { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "Quit?" }
+395.                            ("Quit?")
 396.                assign (=)
                         lValue: lValue { varID = inputStr }
                         expr: call inputString { #exprs = 1, class = ct }
@@ -1234,9 +1103,8 @@
                                 lValue { varID = message }
 398.                call setTitle { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "Title" }
-399.                var title { vt = String }
-                        initExpr: literal { token = "Title" }
+398.                        ("Title")
+399.                var title { vt = String, initExpr = "Title" }
 400.                call setTitle { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = title }
@@ -1244,8 +1112,7 @@
                         exprs:
                             (+)
                                 right: lValue { varID = i }
-                                left: (+)
-                                    right: literal { token = " " }
+                                left: (+) { right = " " }
                                     left: lValue { varID = title }
 402.                call setTitle { #exprs = 1, class = ct }
                         exprs:
@@ -1254,11 +1121,8 @@
                                 left: lValue { varID = title }
 403.                call setHeight { #exprs = 1, class = ct }
                         exprs:
-                            (/)
-                                right: literal { token = 16 }
-                                left: (*)
-                                    right: literal { token = 9 }
-                                    left: literal { token = 100.0 }
+                            (/) { right = 16 }
+                                left: (*) { right = 9, left = 100.0 }
 404.                call setHeight { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = i }
@@ -1268,9 +1132,7 @@
 406.                call setHeight { #exprs = 1, class = ct }
                         exprs:
                             (+)
-                                right: (*)
-                                    right: literal { token = 4 }
-                                    left: literal { token = 5 }
+                                right: (*) { right = 4, left = 5 }
                                 left: (*)
                                     right: lValue { varID = d }
                                     left: lValue { varID = i }
@@ -1280,10 +1142,8 @@
                         lValue: lValue { varID = height }
                         expr: call getHeight { class = ct }
 409.                var width { vt = double }
-                        initExpr: (-)
-                            right: literal { token = 10 }
-                            left: (*)
-                                right: literal { token = 0.5 }
+                        initExpr: (-) { right = 10 }
+                            left: (*) { right = 0.5 }
                                 left: call getWidth { class = ct }
 410.                assign (=)
                         lValue: lValue { varID = width }
@@ -1313,26 +1173,25 @@
 417.                call clearScreen { class = ct }
 418.                call clearGroup { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "targets" }
+418.                        ("targets")
 419.                call clearGroup { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "" }
+419.                        ("")
 420.                call setBackColor { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "orange" }
+420.                        ("orange")
 421.                call setBackColor { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "light blue" }
-422.                var backColor { vt = String }
-                        initExpr: literal { token = "red" }
+421.                        ("light blue")
+422.                var backColor { vt = String, initExpr = "red" }
 423.                call setBackColor { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = backColor }
 424.                call setBackColorRGB { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = 255 }
-                            literal { token = 0 }
-                            literal { token = 0 }
+424.                        (255)
+424.                        (0)
+424.                        (0)
 425.                call setBackColorRGB { #exprs = 3, class = ct }
                         exprs:
                             lValue { varID = i }
@@ -1340,43 +1199,39 @@
                             lValue { varID = i }
 426.                call setBackImage { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "background.png" }
+426.                        ("background.png")
 427.                call setBackImage { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "C:\\Users\\ben\\Pictures\\landscape.jpg" }
-428.                var filename { vt = String }
-                        initExpr: literal { token = "landscape.png" }
+427.                        ("C:\\Users\\ben\\Pictures\\landscape.jpg")
+428.                var filename { vt = String, initExpr = "landscape.png" }
 429.                call setBackImage { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = filename }
-431.                assign (=)
+431.                assign (=) { expr = 50 }
                         lValue: lValue { varID = x }
-                        expr: literal { token = 50 }
-432.                var y { vt = double }
-                        initExpr: literal { token = 50 }
-433.                var diameter { vt = double }
-                        initExpr: literal { token = 10 }
+432.                var y { vt = double, initExpr = 50 }
+433.                var diameter { vt = double, initExpr = 10 }
 434.                var circle { vt = GameObj }
                         initExpr: call circle { #exprs = 3, class = ct }
                             exprs:
-                                literal { token = 50 }
-                                literal { token = 20 }
-                                literal { token = 10 }
+434.                            (50)
+434.                            (20)
+434.                            (10)
 435.                assign (=)
                         lValue: lValue { varID = circle }
                         expr: call circle { #exprs = 3, class = ct }
                             exprs:
-                                literal { token = 50.0 }
-                                literal { token = 20.0 }
-                                literal { token = 10.0 }
+435.                            (50.0)
+435.                            (20.0)
+435.                            (10.0)
 436.                assign (=)
                         lValue: lValue { varID = circle }
                         expr: call circle { #exprs = 4, class = ct }
                             exprs:
-                                literal { token = 50 }
-                                literal { token = 20 }
-                                literal { token = 10.5 }
-                                literal { token = "blue" }
+436.                            (50)
+436.                            (20)
+436.                            (10.5)
+436.                            ("blue")
 437.                assign (=)
                         lValue: lValue { varID = circle }
                         expr: call circle { #exprs = 3, class = ct }
@@ -1384,8 +1239,7 @@
                                 lValue { varID = x }
                                 lValue { varID = y }
                                 lValue { varID = diameter }
-438.                var color { vt = String }
-                        initExpr: literal { token = "green" }
+438.                var color { vt = String, initExpr = "green" }
 439.                assign (=)
                         lValue: lValue { varID = circle }
                         expr: call circle { #exprs = 4, class = ct }
@@ -1414,19 +1268,19 @@
                         lValue: lValue { varID = rect }
                         expr: call rect { #exprs = 4, class = ct }
                             exprs:
-                                literal { token = 50.0 }
-                                literal { token = 33.3 }
-                                literal { token = 11.2 }
-                                literal { token = 23.890 }
+442.                            (50.0)
+442.                            (33.3)
+442.                            (11.2)
+442.                            (23.890)
 443.                assign (=)
                         lValue: lValue { varID = rect }
                         expr: call rect { #exprs = 5, class = ct }
                             exprs:
-                                literal { token = 50 }
-                                literal { token = 33 }
-                                literal { token = 11 }
-                                literal { token = 23 }
-                                literal { token = "green" }
+443.                            (50)
+443.                            (33)
+443.                            (11)
+443.                            (23)
+443.                            ("green")
 444.                var line { vt = GameObj }
                         initExpr: call line { #exprs = 4, class = ct }
                             exprs:
@@ -1447,19 +1301,19 @@
                         lValue: lValue { varID = line }
                         expr: call line { #exprs = 4, class = ct }
                             exprs:
-                                literal { token = 0.0 }
-                                literal { token = .0 }
-                                literal { token = 100.0 }
-                                literal { token = 95.0 }
+446.                            (0.0)
+446.                            (.0)
+446.                            (100.0)
+446.                            (95.0)
 447.                assign (=)
                         lValue: lValue { varID = line }
                         expr: call line { #exprs = 5, class = ct }
                             exprs:
-                                literal { token = 0 }
-                                literal { token = 0 }
-                                literal { token = 100 }
-                                literal { token = 95 }
-                                literal { token = "red" }
+447.                            (0)
+447.                            (0)
+447.                            (100)
+447.                            (95)
+447.                            ("red")
 448.                var text { vt = GameObj }
                         initExpr: call text { #exprs = 4, class = ct }
                             exprs:
@@ -1480,23 +1334,21 @@
                         lValue: lValue { varID = text }
                         expr: call text { #exprs = 4, class = ct }
                             exprs:
-                                (+)
+                                (+) { left = "Score: " }
                                     right: lValue { varID = score }
-                                    left: literal { token = "Score: " }
-                                literal { token = 20.0 }
-                                literal { token = 90.0 }
-                                literal { token = 10.0 }
+450.                            (20.0)
+450.                            (90.0)
+450.                            (10.0)
 451.                assign (=)
                         lValue: lValue { varID = text }
                         expr: call text { #exprs = 5, class = ct }
                             exprs:
-                                (+)
+                                (+) { left = "Score: " }
                                     right: lValue { varID = score }
-                                    left: literal { token = "Score: " }
-                                literal { token = 20 }
-                                literal { token = 90 }
-                                literal { token = 10 }
-                                literal { token = "purple" }
+451.                            (20)
+451.                            (90)
+451.                            (10)
+451.                            ("purple")
 452.                var img { vt = GameObj }
                         initExpr: call image { #exprs = 4, class = ct }
                             exprs:
@@ -1508,18 +1360,18 @@
                         lValue: lValue { varID = img }
                         expr: call image { #exprs = 4, class = ct }
                             exprs:
-                                literal { token = "car.png" }
-                                literal { token = 42 }
-                                literal { token = 25 }
-                                literal { token = 38.7 }
+453.                            ("car.png")
+453.                            (42)
+453.                            (25)
+453.                            (38.7)
 454.                assign (=)
                         lValue: lValue { varID = img }
                         expr: call image { #exprs = 4, class = ct }
                             exprs:
-                                literal { token = "C:\\Users\\john\\Pictures\\car.jpg" }
-                                literal { token = 42 }
-                                literal { token = 25 }
-                                literal { token = 38 }
+454.                            ("C:\\Users\\john\\Pictures\\car.jpg")
+454.                            (42)
+454.                            (25)
+454.                            (38)
 455.                var objs { vt = array of GameObj }
                         initExpr: arrayInit { #exprs = 5 }
                             exprs:
@@ -1540,8 +1392,7 @@
                                 lValue: lValue { varID = mouseClicked }
                                 expr: call clicked { class = ct }
 461.                if { #stmts = 1 }
-                        expr: (>)
-                            right: literal { token = 50 }
+                        expr: (>) { right = 50 }
                             left: call clickX { class = ct }
                         stmts:
 462.                        assign (=)
@@ -1561,8 +1412,7 @@
 466.                assign (=)
                         lValue: lValue { varID = y }
                         expr: call clickY { class = ct }
-467.                var keyName { vt = String }
-                        initExpr: literal { token = "space" }
+467.                var keyName { vt = String, initExpr = "space" }
 468.                var keyPressed { vt = boolean }
                         initExpr: call keyPressed { #exprs = 1, class = ct }
                             exprs:
@@ -1575,22 +1425,21 @@
 470.                        if { #stmts = 1 }
                                 expr: call keyPressed { #exprs = 1, class = ct }
                                     exprs:
-                                        literal { token = "up" }
+470.                                    ("up")
                                 stmts:
 471.                                assign (=)
                                         lValue: lValue { varID = keyPressed }
                                         expr: call keyPressed { #exprs = 1, class = ct }
                                             exprs:
-                                                literal { token = "up" }
+471.                                            ("up")
 472.                if { #stmts = 1 }
                         expr: call charTyped { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "+" }
+472.                            ("+")
                         stmts:
 473.                        assign (++)
                                 lValue: lValue { varID = x }
-474.                var ch { vt = String }
-                        initExpr: literal { token = "+" }
+474.                var ch { vt = String, initExpr = "+" }
 475.                if { #stmts = 1 }
                         expr: call charTyped { #exprs = 1, class = ct }
                             exprs:
@@ -1600,7 +1449,7 @@
                                 lValue: lValue { varID = b }
                                 expr: call charTyped { #exprs = 1, class = ct }
                                     exprs:
-                                        literal { token = "+" }
+476.                                    ("+")
 477.                assign (=)
                         lValue: lValue { varID = b }
                         expr: call charTyped { #exprs = 1, class = ct }
@@ -1613,15 +1462,15 @@
                                 lValue { varID = filename }
 480.                call loadSound { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = "pow.wav" }
+480.                        ("pow.wav")
 481.                if { #stmts = 1 }
                         expr: call loadSound { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "sounds/ding.mp3" }
+481.                            ("sounds/ding.mp3")
                         stmts:
 482.                        call sound { #exprs = 1, class = ct }
                                 exprs:
-                                    literal { token = "sounds/ding.mp3" }
+482.                                ("sounds/ding.mp3")
 483.                call sound { #exprs = 1, class = ct }
                         exprs:
                             lValue { varID = filename }
@@ -1630,10 +1479,10 @@
                             lValue { varID = d }
 485.                call setSoundVolume { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = 1 }
+485.                        (1)
 486.                call setSoundVolume { #exprs = 1, class = ct }
                         exprs:
-                            literal { token = 0.5 }
+486.                        (0.5)
 488.                assign (=)
                         lValue: lValue { varID = i }
                         expr: call random { #exprs = 2, class = ct }
@@ -1644,8 +1493,8 @@
                         lValue: lValue { varID = i }
                         expr: call random { #exprs = 2, class = ct }
                             exprs:
-                                literal { token = 0 }
-                                literal { token = 100 }
+489.                            (0)
+489.                            (100)
 490.                assign (=)
                         lValue: lValue { varID = i }
                         expr: call round { #exprs = 1, class = ct }
@@ -1660,7 +1509,7 @@
                         lValue: lValue { varID = i }
                         expr: call round { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = 1.62 }
+492.                            (1.62)
 493.                assign (=)
                         lValue: lValue { varID = i }
                         expr: call round { #exprs = 1, class = ct }
@@ -1672,11 +1521,10 @@
                         lValue: lValue { varID = d }
                         expr: call round { #exprs = 1, class = ct }
                             exprs:
-                                (+)
+                                (+) { left = 1 }
                                     right: (*)
                                         right: lValue { varID = i }
                                         left: lValue { varID = d }
-                                    left: literal { token = 1 }
 495.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call round { #exprs = 1, class = ct }
@@ -1697,20 +1545,18 @@
                         lValue: lValue { varID = d }
                         expr: call roundDecimal { #exprs = 2, class = ct }
                             exprs:
-                                (+)
-                                    right: literal { token = 1 }
+                                (+) { right = 1 }
                                     left: (*)
                                         right: lValue { varID = i }
                                         left: lValue { varID = d }
-                                (*)
-                                    right: literal { token = 2 }
+                                (*) { right = 2 }
                                     left: lValue { varID = i }
 498.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call roundDecimal { #exprs = 2, class = ct }
                             exprs:
-                                literal { token = 2.71828182846 }
-                                literal { token = 2 }
+498.                            (2.71828182846)
+498.                            (2)
 499.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call roundDecimal { #exprs = 2, class = ct }
@@ -1721,7 +1567,7 @@
                                         lValue { varID = y1 }
                                         lValue { varID = x2 }
                                         lValue { varID = y2 }
-                                literal { token = 1 }
+499.                            (1)
 500.                assign (=)
                         lValue: lValue { varID = i }
                         expr: call intDiv { #exprs = 2, class = ct }
@@ -1732,8 +1578,8 @@
                         lValue: lValue { varID = i }
                         expr: call intDiv { #exprs = 2, class = ct }
                             exprs:
-                                literal { token = 5 }
-                                literal { token = 2 }
+501.                            (5)
+501.                            (2)
 502.                assign (=)
                         lValue: lValue { varID = b }
                         expr: call isError { #exprs = 1, class = ct }
@@ -1757,9 +1603,7 @@
                         lValue: lValue { varID = b }
                         expr: call isError { #exprs = 1, class = ct }
                             exprs:
-                                (/)
-                                    right: literal { token = 0 }
-                                    left: literal { token = 0.0 }
+                                (/) { right = 0, left = 0.0 }
 506.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call distance { #exprs = 4, class = ct }
@@ -1770,8 +1614,7 @@
                                 lValue { varID = rect, fieldID = y }
 507.                if { #stmts = 1 }
                         expr: (<)
-                            right: (/)
-                                right: literal { token = 2 }
+                            right: (/) { right = 2 }
                                 left: parens
                                     expr: (+)
                                         right: lValue { varID = rect, fieldID = width }
@@ -1813,7 +1656,7 @@
                         lValue: lValue { varID = i }
                         expr: call toInt { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = .707 }
+515.                            (.707)
 516.                assign (=)
                         lValue: lValue { varID = i }
                         expr: call toInt { #exprs = 1, class = ct }
@@ -1823,7 +1666,7 @@
                         lValue: lValue { varID = i }
                         expr: call toInt { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = 6.0221409e+2 }
+517.                            (6.0221409e+2)
 518.                assign (=)
                         lValue: lValue { varID = i }
                         expr: call parseInt { #exprs = 1, class = ct }
@@ -1833,7 +1676,7 @@
                         lValue: lValue { varID = i }
                         expr: call parseInt { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "345" }
+519.                            ("345")
 520.                assign (=)
                         lValue: lValue { varID = b }
                         expr: call canParseInt { #exprs = 1, class = ct }
@@ -1843,7 +1686,7 @@
                         lValue: lValue { varID = b }
                         expr: call canParseInt { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "12345" }
+521.                            ("12345")
 522.                while { #stmts = 1 }
                         expr: call canParseInt { #exprs = 1, class = ct }
                             exprs:
@@ -1856,16 +1699,15 @@
                                         lValue { varID = s }
 524.                assign (=)
                         lValue: lValue { varID = d }
-                        expr: (*)
-                            right: literal { token = 100 }
+                        expr: (*) { right = 100 }
                             left: call parseNumber { #exprs = 1, class = ct }
                                 exprs:
-                                    literal { token = "123.45" }
+524.                                ("123.45")
 525.                assign (=)
                         lValue: lValue { varID = b }
                         expr: call canParseNumber { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "543.210" }
+525.                            ("543.210")
 526.                while { #stmts = 1 }
                         expr: call canParseNumber { #exprs = 1, class = ct }
                             exprs:
@@ -1889,18 +1731,16 @@
                                 lValue { varID = d }
                                 call intDiv { #exprs = 2, class = ct }
                                     exprs:
-                                        (*)
+                                        (*) { left = 2 }
                                             right: lValue { varID = i }
-                                            left: literal { token = 2 }
                                         lValue { varID = i }
 530.                assign (=)
                         lValue: lValue { varID = s }
-                        expr: (+)
-                            right: literal { token = ":00" }
+                        expr: (+) { right = ":00" }
                             left: call formatDecimal { #exprs = 2, class = ct }
                                 exprs:
-                                    literal { token = 6.0221 }
-                                    literal { token = 7 }
+530.                                (6.0221)
+530.                                (7)
 531.                assign (=)
                         lValue: lValue { varID = s }
                         expr: call formatInt { #exprs = 1, class = ct }
@@ -1910,26 +1750,22 @@
                         lValue: lValue { varID = s }
                         expr: call formatInt { #exprs = 2, class = ct }
                             exprs:
-                                (+)
-                                    right: literal { token = 1 }
+                                (+) { right = 1 }
                                     left: lValue { varID = i }
                                 (+)
                                     right: lValue { varID = k }
                                     left: lValue { varID = j }
 534.                assign (=)
                         lValue: lValue { varID = rect, fieldID = x }
-                        expr: (-)
-                            right: literal { token = 10 }
+                        expr: (-) { right = 10 }
                             left: lValue { varID = circle, fieldID = y }
 535.                assign (=)
                         lValue: lValue { varID = circle, fieldID = width }
-                        expr: (*)
-                            right: literal { token = 1.5 }
+                        expr: (*) { right = 1.5 }
                             left: lValue { varID = circle, fieldID = height }
 536.                assign (=)
                         lValue: lValue { varID = rect, fieldID = height }
-                        expr: (*)
-                            right: literal { token = 1.1 }
+                        expr: (*) { right = 1.1 }
                             left: lValue { varID = img, fieldID = height }
 537.                assign (=)
                         lValue: lValue { varID = line, fieldID = x }
@@ -1938,38 +1774,30 @@
                             left: lValue { varID = line, fieldID = x }
 538.                assign (=)
                         lValue: lValue { varID = img, fieldID = width }
-                        expr: (*)
-                            right: literal { token = .9 }
+                        expr: (*) { right = .9 }
                             left: lValue { varID = img, fieldID = width }
-539.                assign (=)
+539.                assign (=) { expr = 0 }
                         lValue: lValue { varID = img, fieldID = xSpeed }
-                        expr: literal { token = 0 }
-540.                assign (=)
+540.                assign (=) { expr = .5 }
                         lValue: lValue { varID = img, fieldID = ySpeed }
-                        expr: literal { token = .5 }
-541.                assign (=)
+541.                assign (=) { expr = 3 }
                         lValue: lValue { varID = line, fieldID = lineWidth }
-                        expr: literal { token = 3 }
 542.                assign (=)
                         lValue: lValue { varID = img, fieldID = lineWidth }
-                        expr: (*)
-                            right: literal { token = 2 }
+                        expr: (*) { right = 2 }
                             left: lValue { varID = line, fieldID = lineWidth }
-543.                assign (=)
+543.                assign (=) { expr = false }
                         lValue: lValue { varID = rect, fieldID = visible }
-                        expr: literal { token = false }
 544.                assign (=)
                         lValue: lValue { varID = circle, fieldID = clickable }
                         expr: lValue { varID = circle, fieldID = visible }
 545.                if { #stmts = 1 }
                         expr: lValue { varID = img, fieldID = visible }
                         stmts:
-546.                        assign (=)
+546.                        assign (=) { expr = true }
                                 lValue: lValue { varID = img, fieldID = clickable }
-                                expr: literal { token = true }
 547.                if { #stmts = 1 }
-                        expr: (!=)
-                            right: literal { token = false }
+                        expr: (!=) { right = false }
                             left: lValue { varID = img, fieldID = clickable }
                         stmts:
 548.                        assign (=)
@@ -1982,8 +1810,7 @@
                         lValue: lValue { varID = line, fieldID = autoDelete }
                         expr: (||)
                             right: (&&)
-                                right: (==)
-                                    right: literal { token = 1 }
+                                right: (==) { right = 1 }
                                     left: call indexOf { #exprs = 1 }
                                         lValue: lValue { varID = s }
                                         exprs:
@@ -1991,37 +1818,34 @@
                                 left: call equals { #exprs = 1 }
                                     lValue: lValue { varID = s }
                                     exprs:
-                                        literal { token = "world" }
+550.                                    ("world")
                             left: call equals { #exprs = 1 }
                                 lValue: lValue { varID = s }
                                 exprs:
-                                    literal { token = "hello" }
+550.                                ("hello")
 552.                assign (=)
                         lValue: lValue { varID = s }
                         expr: call getType
                             lValue: lValue { varID = rect }
 553.                call println { #exprs = 1, class = ct }
                         exprs:
-                            (+)
-                                right: literal { token = "more text" }
+                            (+) { right = "more text" }
                                 left: call getText
                                     lValue: lValue { varID = text }
 554.                call setText { #exprs = 1 }
                         lValue: lValue { varID = img }
                         exprs:
-                            literal { token = "racecar.png" }
+554.                        ("racecar.png")
 555.                call setText { #exprs = 1 }
                         lValue: lValue { varID = text }
                         exprs:
-                            (+)
+                            (+) { left = "Score: " }
                                 right: lValue { varID = d }
-                                left: literal { token = "Score: " }
 556.                call setText { #exprs = 1 }
                         lValue: lValue { varID = text }
                         exprs:
-                            (+)
+                            (+) { left = "Score: " }
                                 right: lValue { varID = i }
-                                left: literal { token = "Score: " }
 557.                call log { #exprs = 1, class = ct }
                         exprs:
                             call toString
@@ -2029,11 +1853,9 @@
 558.                call setSize { #exprs = 2 }
                         lValue: lValue { varID = img }
                         exprs:
-                            (*)
-                                right: literal { token = 1.1 }
+                            (*) { right = 1.1 }
                                 left: lValue { varID = img, fieldID = width }
-                            (*)
-                                right: literal { token = 1.1 }
+                            (*) { right = 1.1 }
                                 left: lValue { varID = img, fieldID = height }
 559.                call align { #exprs = 1 }
                         lValue: lValue { varID = text }
@@ -2043,18 +1865,17 @@
                         lValue: lValue { varID = text }
                         exprs:
                             lValue { varID = s }
-                            literal { token = true }
+560.                        (true)
 561.                call align { #exprs = 2 }
                         lValue: lValue { varID = text }
                         exprs:
                             lValue { varID = s }
-                            literal { token = false }
+561.                        (false)
 562.                call setFillColor { #exprs = 1 }
                         lValue: lValue { varID = circle }
                         exprs:
-                            (+)
+                            (+) { left = "light" }
                                 right: lValue { varID = s }
-                                left: literal { token = "light" }
 563.                call setFillColor { #exprs = 1 }
                         lValue: lValue { varID = circle }
                         exprs:
@@ -2075,10 +1896,9 @@
                         lValue: lValue { varID = rect }
                         exprs:
                             lValue { varID = i }
-                            (-)
+                            (-) { left = 255 }
                                 right: lValue { varID = i }
-                                left: literal { token = 255 }
-                            literal { token = 0 }
+566.                        (0)
 567.                assign (=)
                         lValue: lValue { varID = i }
                         expr: call getLayer
@@ -2097,12 +1917,11 @@
                                         indexExpr: call getLayer
                                             lValue: lValue { varID = rect }
                                     exprs:
-                                        literal { token = "green" }
+569.                                    ("green")
 570.                call setLayer { #exprs = 1 }
                         lValue: lValue { varID = img }
                         exprs:
-                            unaryOp (neg)
-                                expr: literal { token = 42 }
+                            unaryOp (neg) { expr = 42 }
 571.                call delete
                         lValue: lValue { varID = img }
 572.                assign (=)
@@ -2131,8 +1950,7 @@
                                 stmts:
 576.                                assign (=)
                                         lValue: lValue { varID = b }
-                                        expr: (==)
-                                            right: literal { token = true }
+                                        expr: (==) { right = true }
                                             left: call hit { #exprs = 1 }
                                                 lValue: lValue { varID = img }
                                                 exprs:
@@ -2159,26 +1977,23 @@
                         lValue: lValue { varID = d }
                         expr: call acos { #exprs = 1, class = Math }
                             exprs:
-                                unaryOp (neg)
-                                    expr: literal { token = 0.5 }
+                                unaryOp (neg) { expr = 0.5 }
 583.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call asin { #exprs = 1, class = Math }
                             exprs:
-                                (/)
-                                    right: literal { token = 2 }
+                                (/) { right = 2 }
                                     left: call sqrt { #exprs = 1, class = Math }
                                         exprs:
-                                            literal { token = 3 }
+583.                                        (3)
 584.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call atan { #exprs = 1, class = Math }
                             exprs:
-                                (/)
+                                (/) { left = 1 }
                                     right: call sqrt { #exprs = 1, class = Math }
                                         exprs:
-                                            literal { token = 2 }
-                                    left: literal { token = 1 }
+584.                                        (2)
 585.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call atan2 { #exprs = 2, class = Math }
@@ -2198,36 +2013,31 @@
                         lValue: lValue { varID = d }
                         expr: call cos { #exprs = 1, class = Math }
                             exprs:
-                                (/)
-                                    right: literal { token = 2 }
+                                (/) { right = 2 }
                                     left: staticField { fieldID = PI, class = Math }
 588.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call cosh { #exprs = 1, class = Math }
                             exprs:
-                                (*)
-                                    right: literal { token = 2 }
+                                (*) { right = 2 }
                                     left: staticField { fieldID = PI, class = Math }
 589.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call exp { #exprs = 1, class = Math }
                             exprs:
-                                (+)
-                                    right: literal { token = 1 }
-                                    left: (*)
+                                (+) { right = 1 }
+                                    left: (*) { left = 2 }
                                         right: staticField { fieldID = PI, class = Math }
-                                        left: literal { token = 2 }
 590.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call floor { #exprs = 1, class = Math }
                             exprs:
-                                unaryOp (neg)
-                                    expr: literal { token = 1.67 }
+                                unaryOp (neg) { expr = 1.67 }
 591.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call log { #exprs = 1, class = Math }
                             exprs:
-                                literal { token = 32 }
+591.                            (32)
 592.                assign (=)
                         lValue: lValue { varID = d }
                         expr: call log10 { #exprs = 1, class = Math }
@@ -2339,38 +2149,36 @@
 616.                var multilineArrayInit { vt = array of int }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
-                                literal { token = 1 }
-                                literal { token = 2 }
-                                literal { token = 3 }
+616.                            (1)
+617.                            (2)
+618.                            (3)
 621.                call log { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = 1 }
-                            literal { token = 2 }
-                            literal { token = 3 }
+619.                        (1)
+620.                        (2)
+621.                        (3)
 623.                if { #stmts = 1 }
-                        expr: (==)
-                            right: literal { token = 1 }
+                        expr: (==) { right = 1 }
                             left: call random { #exprs = 2, class = ct }
                                 exprs:
-                                    literal { token = 1 }
-                                    literal { token = 2 }
+622.                                (1)
+623.                                (2)
                         stmts:
 624.                        call println { #exprs = 1, class = ct }
                                 exprs:
-                                    literal { token = "heads" }
+624.                                ("heads")
 627.                call log { #exprs = 4, class = ct }
                         exprs:
-                            literal { token = 1 }
+625.                        (1)
                             call random { #exprs = 2, class = ct }
                                 exprs:
-                                    literal { token = 1 }
-                                    literal { token = 100 }
-                            literal { token = 3 }
-                            literal { token = 4 }
+625.                                (1)
+626.                                (100)
+627.                        (3)
+627.                        (4)
 641.        func update { #paramVars = 0, vt = void, #stmts = 1 }
                 stmts:
-644.                return
-                        expr: literal { token = 0 }
+644.                return { expr = 0 }
 652.        func bar { #paramVars = 2, vt = boolean, #stmts = 1 }
                 paramVars:
 652.                var s { vt = String, isGlobal = false }
@@ -2383,9 +2191,8 @@
 658.                var x { vt = int, isGlobal = false }
                 stmts:
 660.                return
-                        expr: (*)
+                        expr: (*) { left = 2 }
                             right: lValue { varID = x }
-                            left: literal { token = 2 }
 664.        func voidFunc { #paramVars = 1, vt = void, #stmts = 0 }
                 paramVars:
 664.                var i { vt = int, isGlobal = false }
@@ -2395,26 +2202,22 @@
 679.        func anotherfunc { #paramVars = 0, vt = void, #stmts = 0 }
 683.        func expectedErrors { #paramVars = 0, vt = void, #stmts = 282 }
                 stmts:
-685.                var intVar { vt = int }
-                        initExpr: literal { token = 1 }
-686.                var dblVar { vt = double }
-                        initExpr: literal { token = 1.0 }
-687.                var boolVar { vt = boolean }
-                        initExpr: literal { token = false }
-688.                var strVar { vt = String }
-                        initExpr: literal { token = "a" }
+685.                var intVar { vt = int, initExpr = 1 }
+686.                var dblVar { vt = double, initExpr = 1.0 }
+687.                var boolVar { vt = boolean, initExpr = false }
+688.                var strVar { vt = String, initExpr = "a" }
 689.                var objVar { vt = GameObj }
                         initExpr: call circle { #exprs = 3, class = ct }
                             exprs:
-                                literal { token = 0 }
-                                literal { token = 0 }
-                                literal { token = 10 }
+689.                            (0)
+689.                            (0)
+689.                            (10)
 690.                var intArr { vt = array of int }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
-                                literal { token = 1 }
-                                literal { token = 2 }
-                                literal { token = 3 }
+690.                            (1)
+690.                            (2)
+690.                            (3)
 691.                var objArr { vt = array of GameObj }
                         initExpr: arrayInit { #exprs = 1 }
                             exprs:
@@ -2424,64 +2227,53 @@
                         expr: call setText { #exprs = 1 }
                             lValue: lValue { varID = objVar }
                             exprs:
-                                literal { token = "circle" }
+694.                            ("circle")
 696.                var screen { vt = double }
                         initExpr: call setScreen { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "menu" }
+696.                            ("menu")
 698.                assign (=)
                         lValue: lValue { varID = boolVar }
                         expr: call setHeight { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = 150 }
+698.                            (150)
 700.                assign (=)
                         lValue: lValue { varID = strVar }
                         expr: call voidFunc
 702.                var title { vt = GameObj }
                         initExpr: call setTitle { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = "title" }
+702.                            ("title")
 705.                assign (=)
                         lValue: lValue { varID = boolVar }
                         expr: lValue { varID = intVar }
 707.                var b { vt = boolean }
                         initExpr: call intFuncInt { #exprs = 1 }
                             exprs:
-                                literal { token = 2 }
-709.                assign (=)
+707.                            (2)
+709.                assign (=) { expr = 0 }
                         lValue: lValue { varID = objVar, fieldID = visible }
-                        expr: literal { token = 0 }
 711.                var s { vt = String }
                         initExpr: lValue { varID = intVar }
 713.                assign (=)
                         lValue: lValue { varID = objVar }
                         expr: lValue { varID = intVar }
-716.                var i { vt = int }
-                        initExpr: literal { token = 3.4 }
-718.                assign (=)
+716.                var i { vt = int, initExpr = 3.4 }
+718.                assign (=) { expr = 1.2 }
                         lValue: lValue { varID = i }
-                        expr: literal { token = 1.2 }
 720.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: (*)
-                            right: literal { token = 3.4 }
-                            left: literal { token = 10 }
+                        expr: (*) { right = 3.4, left = 10 }
 722.                var j { vt = int }
-                        initExpr: (+)
-                            right: literal { token = 3.14 }
-                            left: literal { token = 5 }
-724.                var plancksConst { vt = int }
-                        initExpr: literal { token = 6.62e-34 }
-726.                var exponentialNumberNoDot { vt = int }
-                        initExpr: literal { token = 12e10 }
-728.                var exponentialNumberWithDot { vt = int }
-                        initExpr: literal { token = 3.42e2 }
+                        initExpr: (+) { right = 3.14, left = 5 }
+724.                var plancksConst { vt = int, initExpr = 6.62e-34 }
+726.                var exponentialNumberNoDot { vt = int, initExpr = 12e10 }
+728.                var exponentialNumberWithDot { vt = int, initExpr = 3.42e2 }
 730.                assign (=)
                         lValue: lValue { varID = objVar, fieldID = autoDelete }
                         expr: lValue { varID = dblVar }
-732.                assign (=)
+732.                assign (=) { expr = 3.14 }
                         lValue: lValue { varID = strVar }
-                        expr: literal { token = 3.14 }
 734.                assign (=)
                         lValue: lValue { varID = objVar }
                         expr: lValue { varID = dblVar }
@@ -2491,9 +2283,8 @@
 739.                assign (=)
                         lValue: lValue { varID = objVar, fieldID = x }
                         expr: lValue { varID = boolVar }
-741.                assign (=)
+741.                assign (=) { expr = false }
                         lValue: lValue { varID = objVar, fieldID = xSpeed }
-                        expr: literal { token = false }
 743.                assign (=)
                         lValue: lValue { varID = objVar, fieldID = group }
                         expr: lValue { varID = boolVar }
@@ -2503,14 +2294,12 @@
 748.                assign (=)
                         lValue: lValue { varID = intVar }
                         expr: lValue { varID = objVar, fieldID = group }
-750.                assign (=)
+750.                assign (=) { expr = "fast" }
                         lValue: lValue { varID = objVar, fieldID = ySpeed }
-                        expr: literal { token = "fast" }
 752.                assign (=)
                         lValue: lValue { varID = boolVar }
                         expr: lValue { varID = strVar }
-754.                var score { vt = GameObj }
-                        initExpr: literal { token = "100 pts" }
+754.                var score { vt = GameObj, initExpr = "100 pts" }
 757.                assign (=)
                         lValue: lValue { varID = intVar }
                         expr: lValue { varID = objVar }
@@ -2523,37 +2312,37 @@
 763.                var circle { vt = String }
                         initExpr: call circle { #exprs = 3, class = ct }
                             exprs:
-                                literal { token = 0 }
-                                literal { token = 0 }
-                                literal { token = 10 }
+763.                            (0)
+763.                            (0)
+763.                            (10)
 766.                var y { vt = int }
                         initExpr: call intFuncInt { #exprs = 1 }
                             exprs:
-                                literal { token = 2.3 }
+766.                            (2.3)
 768.                assign (=)
                         lValue: lValue { varID = intVar }
                         expr: call random { #exprs = 2, class = ct }
                             exprs:
-                                literal { token = 0.0 }
-                                literal { token = 10 }
+768.                            (0.0)
+768.                            (10)
 770.                assign (=)
                         lValue: lValue { varID = intVar }
                         expr: call random { #exprs = 2, class = ct }
                             exprs:
-                                literal { token = 0 }
-                                literal { token = false }
+770.                            (0)
+770.                            (false)
 772.                call setBackColorRGB { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = "red" }
-                            literal { token = 0 }
-                            literal { token = 0 }
+772.                        ("red")
+772.                        (0)
+772.                        (0)
 774.                call setLayer { #exprs = 1 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = "front" }
+774.                        ("front")
 776.                call roundDecimal { #exprs = 2, class = ct }
                         exprs:
-                            literal { token = 3.14159 }
+776.                        (3.14159)
                             lValue { varID = objVar }
 778.                call substring { #exprs = 1 }
                         lValue: lValue { varID = strVar }
@@ -2562,11 +2351,11 @@
 781.                call pow { #exprs = 2, class = Math }
                         exprs:
                             lValue { varID = boolVar }
-                            literal { token = 3 }
+781.                        (3)
 783.                call dblFuncIntDbl { #exprs = 2 }
                         exprs:
-                            literal { token = 0 }
-                            literal { token = "pi" }
+783.                        (0)
+783.                        ("pi")
 785.                call containsPoint { #exprs = 2 }
                         lValue: lValue { varID = objVar }
                         exprs:
@@ -2578,8 +2367,8 @@
 790.                call align { #exprs = 2 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = "left" }
-                            literal { token = 0 }
+790.                        ("left")
+790.                        (0)
 792.                call boolFuncBoolStringGameObj { #exprs = 3 }
                         exprs:
                             lValue { varID = dblVar }
@@ -2603,22 +2392,22 @@
                         lValue: lValue { varID = intVar }
                         expr: call parseInt { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = 123 }
+801.                            (123)
 803.                call circle { #exprs = 4, class = ct }
                         exprs:
-                            literal { token = 0 }
-                            literal { token = 0 }
-                            literal { token = 1 }
-                            literal { token = 1 }
+803.                        (0)
+803.                        (0)
+803.                        (1)
+803.                        (1)
 805.                call setText { #exprs = 1 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = 1 }
+805.                        (1)
 807.                assign (=)
                         lValue: lValue { varID = boolVar }
                         expr: call canParseInt { #exprs = 1, class = ct }
                             exprs:
-                                literal { token = 1.0 }
+807.                            (1.0)
 809.                assign (=)
                         lValue: lValue { varID = boolVar }
                         expr: call canParseInt { #exprs = 1, class = ct }
@@ -2627,7 +2416,7 @@
 811.                call align { #exprs = 1 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = true }
+811.                        (true)
 813.                call equals { #exprs = 1 }
                         lValue: lValue { varID = strVar }
                         exprs:
@@ -2636,22 +2425,21 @@
                         exprs:
                             lValue { varID = boolVar }
                             lValue { varID = strVar }
-                            literal { token = 42 }
+816.                        (42)
 818.                call hit { #exprs = 1 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = 0.0 }
+818.                        (0.0)
 820.                call hit { #exprs = 1 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = false }
+820.                        (false)
 822.                call hit { #exprs = 1 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = "the wall" }
+822.                        ("the wall")
 825.                if { #stmts = 1 }
-                        expr: (>)
-                            right: literal { token = 0 }
+                        expr: (>) { right = 0 }
                             left: call intFuncInt
                         stmts:
 826.                        call voidFunc
@@ -2659,34 +2447,32 @@
 830.                call circle { class = ct }
 832.                call rect { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = 0 }
-                            literal { token = 0 }
-                            literal { token = 10 }
+832.                        (0)
+832.                        (0)
+832.                        (10)
 834.                call circle { #exprs = 2, class = ct }
                         exprs:
-                            literal { token = 0 }
-                            literal { token = 0 }
+834.                        (0)
+834.                        (0)
 836.                call voidFunc { #exprs = 1 }
                         exprs:
-                            literal { token = 1 }
+836.                        (1)
 838.                call setBackColor { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = 255 }
-                            literal { token = 0 }
-                            literal { token = 0 }
+838.                        (255)
+838.                        (0)
+838.                        (0)
 840.                call delete { #exprs = 1 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = true }
+840.                        (true)
 842.                call setText { #exprs = 2 }
                         lValue: lValue { varID = objVar }
                         exprs:
-                            literal { token = "circle" }
-                            literal { token = "green" }
+842.                        ("circle")
+842.                        ("green")
 845.                var k { vt = int }
-                        initExpr: (/)
-                            right: literal { token = 2 }
-                            left: literal { token = 3 }
+                        initExpr: (/) { right = 2, left = 3 }
 847.                call random { #exprs = 2, class = ct }
                         exprs:
                             (/)
@@ -2695,53 +2481,45 @@
                             lValue { varID = intVar }
 849.                assign (=)
                         lValue: lValue { varID = x }
-                        expr: (+)
-                            right: literal { token = 1 }
+                        expr: (+) { right = 1 }
                             left: lValue { varID = x }
 851.                for { #stmts = 1 }
-851.                    initStmt: assign (=)
+851.                    initStmt: assign (=) { expr = 0 }
                             lValue: lValue { varID = x }
-                            expr: literal { token = 0 }
-                        expr: (<)
-                            right: literal { token = 1 }
+                        expr: (<) { right = 1 }
                             left: lValue { varID = x }
 851.                    nextStmt: assign (++)
                             lValue: lValue { varID = x }
                         stmts:
 852.                        call voidFunc
 854.                call foo
-856.                var j { vt = int }
-                        initExpr: literal { token = 3 }
+856.                var j { vt = int, initExpr = 3 }
 858.                var uninitializedVar { vt = int }
 860.                if { #stmts = 1 }
-                        expr: (<)
-                            right: literal { token = 0 }
+                        expr: (<) { right = 0 }
                             left: lValue { varID = uninitializedVar }
                         stmts:
-861.                        assign (=)
+861.                        assign (=) { expr = 0 }
                                 lValue: lValue { varID = uninitializedVar }
-                                expr: literal { token = 0 }
 862.                var g { vt = GameObj }
-864.                assign (=)
+864.                assign (=) { expr = 1 }
                         lValue: lValue { varID = g, fieldID = xSpeed }
-                        expr: literal { token = 1 }
 871.                var r { vt = GameObj }
                         initExpr: call rectangle { #exprs = 4, class = ct }
                             exprs:
-                                literal { token = 0 }
-                                literal { token = 0 }
-                                literal { token = 10 }
-                                literal { token = 10 }
-873.                assign (=)
+871.                            (0)
+871.                            (0)
+871.                            (10)
+871.                            (10)
+873.                assign (=) { expr = false }
                         lValue: lValue { varID = objVar, fieldID = isVisible }
-                        expr: literal { token = false }
 875.                call foo
                         lValue: lValue { varID = objVar }
 882.                call Circle { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = 0 }
-                            literal { token = 0 }
-                            literal { token = 10 }
+882.                        (0)
+882.                        (0)
+882.                        (10)
 884.                call atan2 { #exprs = 2 }
                         lValue: lValue { varID = math }
                         exprs:
@@ -2752,9 +2530,8 @@
                                 right: lValue { varID = r, fieldID = y }
                                 left: call clickY { class = ct }
 886.                call voidfunC
-888.                assign (=)
+888.                assign (=) { expr = 2 }
                         lValue: lValue { varID = intvar }
-                        expr: literal { token = 2 }
 891.                assign (=)
                         lValue: lValue { varID = strVar }
                         expr: lValue { varID = Null }
@@ -2776,36 +2553,32 @@
                         lValue: lValue { varID = objVar, fieldID = clickable }
                         expr: lValue { varID = FALSE }
 906.                if { #stmts = 1 }
-                        expr: (=)
-                            right: literal { token = 0 }
+                        expr: (=) { right = 0 }
                             left: lValue { varID = i }
                         stmts:
-907.                        assign (=)
+907.                        assign (=) { expr = 0 }
                                 lValue: lValue { varID = i }
-                                expr: literal { token = 0 }
 909.                var intArr2 { vt = array of int }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
-                                literal { token = 1 }
-                                literal { token = 2 }
-                                literal { token = 3.14 }
+909.                            (1)
+909.                            (2)
+909.                            (3.14)
 911.                var dblArr { vt = array of double }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
-                                literal { token = 1 }
-                                literal { token = "two" }
-                                literal { token = 3.14 }
+911.                            (1)
+911.                            ("two")
+911.                            (3.14)
 913.                var strArr { vt = array of String }
-                        initExpr: newArray { vt = GameObj }
-                            lengthExpr: literal { token = 100 }
+                        initExpr: newArray { vt = GameObj, lengthExpr = 100 }
 915.                var boolArr { vt = array of boolean }
                         initExpr: call intArrFuncInt { #exprs = 1 }
                             exprs:
-                                literal { token = 10 }
+915.                            (10)
 917.                assign (=)
                         lValue: lValue { varID = intArr }
-                        expr: newArray { vt = int }
-                            lengthExpr: literal { token = 1.5 }
+                        expr: newArray { vt = int, lengthExpr = 1.5 }
 920.                assign (++)
                         lValue: lValue { varID = boolVar }
 922.                assign (++)
@@ -2926,35 +2699,29 @@
 1009.                                call voidFunc
                         stmts:
 1006.                        call voidFunc
-1019.                assign (+=)
+1019.                assign (+=) { expr = "hello" }
                         lValue: lValue { varID = strVar }
-                        expr: literal { token = "hello" }
-1021.                assign (-=)
+1021.                assign (-=) { expr = 1 }
                         lValue: lValue { varID = boolVar }
-                        expr: literal { token = 1 }
 1023.                assign (*=)
                         lValue: lValue { varID = objVar }
                         expr: lValue { varID = objVar }
-1025.                assign (/=)
+1025.                assign (/=) { expr = 3.14 }
                         lValue: lValue { varID = objVar }
-                        expr: literal { token = 3.14 }
-1027.                assign (+=)
+1027.                assign (+=) { expr = "hello" }
                         lValue: lValue { varID = intVar }
-                        expr: literal { token = "hello" }
 1029.                assign (-=)
                         lValue: lValue { varID = dblVar }
                         expr: call rect { #exprs = 4, class = ct }
                             exprs:
-                                literal { token = 0 }
-                                literal { token = 0 }
-                                literal { token = 1 }
-                                literal { token = 2 }
-1031.                assign (*=)
+1029.                            (0)
+1029.                            (0)
+1029.                            (1)
+1029.                            (2)
+1031.                assign (*=) { expr = false }
                         lValue: lValue { varID = intVar }
-                        expr: literal { token = false }
-1033.                assign (/=)
+1033.                assign (/=) { expr = true }
                         lValue: lValue { varID = dblVar }
-                        expr: literal { token = true }
 1035.                assign (+=)
                         lValue: lValue { varID = intVar }
                         expr: lValue { varID = dblVar }
@@ -2968,8 +2735,7 @@
                         lValue: lValue { varID = intVar }
                         expr: lValue { varID = dblVar }
 1043.                if { #stmts = 1 }
-                        expr: (==)
-                            right: literal { token = "s" }
+                        expr: (==) { right = "s" }
                             left: lValue { varID = strVar }
                         stmts:
 1044.                        call voidFunc
@@ -2990,43 +2756,33 @@
                             left: lValue { varID = i }
 1053.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: (>>)
-                            right: literal { token = 2 }
+                        expr: (>>) { right = 2 }
                             left: lValue { varID = i }
 1055.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: (<<)
-                            right: literal { token = 2 }
+                        expr: (<<) { right = 2 }
                             left: lValue { varID = i }
 1057.                assign (=)
                         lValue: lValue { varID = i }
-                        expr: (>>>)
-                            right: literal { token = 2 }
+                        expr: (>>>) { right = 2 }
                             left: lValue { varID = i }
-1066.                var lowercasefirst { vt = int }
-                        initExpr: literal { token = 1 }
-1068.                var lowerCaseFirst { vt = int }
-                        initExpr: literal { token = 10 }
+1066.                var lowercasefirst { vt = int, initExpr = 1 }
+1068.                var lowerCaseFirst { vt = int, initExpr = 10 }
 1069.                var upperCaseFirst { vt = GameObj }
                         initExpr: lValue { varID = objVar }
-1071.                var uppercasefirst { vt = GameObj }
-                        initExpr: literal { token = null }
+1071.                var uppercasefirst { vt = GameObj, initExpr = null }
 1073.                assign (=)
                         lValue: lValue { varID = dblVar }
-                        expr: (+)
-                            right: literal { token = 1 }
+                        expr: (+) { right = 1 }
                             left: lValue { varID = dblvar }
 1077.                var DouBle { vt = int }
 1079.                var BooLean { vt = double }
 1081.                var string { vt = boolean }
-1084.                assign (=)
-                        lValue: lValue { varID = intVar }
-                            indexExpr: literal { token = 0 }
-                        expr: literal { token = 1 }
-1087.                assign (=)
+1084.                assign (=) { expr = 1 }
+                        lValue: lValue { varID = intVar, indexExpr = 0 }
+1087.                assign (=) { expr = 1 }
                         lValue: lValue { varID = intArr }
                             indexExpr: lValue { varID = dblVar }
-                        expr: literal { token = 1 }
 1090.                var numObjs { vt = int }
                         initExpr: lValue { varID = objArr, fieldID = Length }
 1093.                var len { vt = int }
@@ -3064,8 +2820,7 @@
                             left: lValue { varID = objVar }
 1113.                assign (=)
                         lValue: lValue { varID = intArr }
-                        expr: (+)
-                            right: literal { token = 1 }
+                        expr: (+) { right = 1 }
                             left: lValue { varID = intArr }
 1115.                assign (=)
                         lValue: lValue { varID = objArr }
@@ -3079,28 +2834,23 @@
                             left: lValue { varID = strVar }
 1120.                assign (=)
                         lValue: lValue { varID = boolVar }
-                        expr: (*)
-                            right: literal { token = 0 }
+                        expr: (*) { right = 0 }
                             left: lValue { varID = boolVar }
 1122.                assign (=)
                         lValue: lValue { varID = objVar }
-                        expr: (/)
-                            right: literal { token = 2 }
+                        expr: (/) { right = 2 }
                             left: lValue { varID = objVar }
 1124.                assign (=)
                         lValue: lValue { varID = intArr }
-                        expr: (%)
-                            right: literal { token = 2 }
+                        expr: (%) { right = 2 }
                             left: lValue { varID = intArr }
 1127.                assign (=)
                         lValue: lValue { varID = intVar }
-                        expr: (&&)
-                            right: literal { token = 1001 }
+                        expr: (&&) { right = 1001 }
                             left: lValue { varID = intVar }
 1129.                assign (=)
                         lValue: lValue { varID = boolVar }
-                        expr: (||)
-                            right: literal { token = 1010 }
+                        expr: (||) { right = 1010 }
                             left: lValue { varID = boolVar }
 1132.                if { #stmts = 1 }
                         expr: (<)
@@ -3126,56 +2876,47 @@
                             left: lValue { varID = dblVar }
 1144.                assign (=)
                         lValue: lValue { varID = intVar }
-                        expr: (/)
-                            right: literal { token = 2 }
-                            left: literal { token = 1 }
+                        expr: (/) { right = 2, left = 1 }
 1146.                assign (=)
                         lValue: lValue { varID = dblVar }
-                        expr: (/)
-                            right: literal { token = 8 }
-                            left: literal { token = 3 }
-1149.                var intVar { vt = int }
-                        initExpr: literal { token = 13 }
+                        expr: (/) { right = 8, left = 3 }
+1149.                var intVar { vt = int, initExpr = 13 }
 1151.                var objArr { vt = array of GameObj }
-                        initExpr: newArray { vt = GameObj }
-                            lengthExpr: literal { token = 10 }
+                        initExpr: newArray { vt = GameObj, lengthExpr = 10 }
 1154.                call update
 1156.                call start
 1158.                call onMousePress { #exprs = 2 }
                         exprs:
-                            literal { token = 0 }
-                            literal { token = 0 }
+1158.                        (0)
+1158.                        (0)
 1161.                call println { #exprs = 1 }
                         exprs:
-                            literal { token = "Hello world" }
+1161.                        ("Hello world")
 1163.                call setHeight { #exprs = 1 }
                         exprs:
-                            literal { token = 150 }
+1163.                        (150)
 1175.                call foo
                         lValue: lValue { varID = Code12Program }
 1177.                call foo
                         lValue: lValue { varID = Code12Program }
 1180.                call log { #exprs = 1 }
-                        lValue: lValue { varID = boolVar }
-                            indexExpr: literal { token = 0 }
+                        lValue: lValue { varID = boolVar, indexExpr = 0 }
                         exprs:
                             lValue { varID = objVar }
 1185.                call voidFunc
                         lValue: lValue { varID = intArr }
 1188.                call voidFunc
-                        lValue: lValue { varID = intArr }
-                            indexExpr: literal { token = 0 }
+                        lValue: lValue { varID = intArr, indexExpr = 0 }
 1190.                call foo
                         lValue: lValue { varID = boolVar }
 1193.                call prnitln { class = ct }
 1195.                call circ { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = 0 }
-                            literal { token = 0 }
-                            literal { token = 10 }
+1195.                        (0)
+1195.                        (0)
+1195.                        (10)
 1198.                call foo
-                        lValue: lValue { varID = objArr }
-                            indexExpr: literal { token = 0 }
+                        lValue: lValue { varID = objArr, indexExpr = 0 }
 1200.                call foo { class = Math }
 1203.                call intFuncInt
 1205.                call dblFuncIntDbl
@@ -3183,152 +2924,123 @@
 1209.                call atan2 { class = Math }
 1211.                call boolFuncBoolStringGameObj { #exprs = 2 }
                         exprs:
-                            literal { token = false }
-                            literal { token = "" }
+1211.                        (false)
+1211.                        ("")
 1213.                call rect { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = 0 }
-                            literal { token = 0 }
-                            literal { token = 10 }
+1213.                        (0)
+1213.                        (0)
+1213.                        (10)
 1215.                call voidFunc { #exprs = 1 }
                         exprs:
                             lValue { varID = intVar }
 1217.                call print { #exprs = 2, class = ct }
                         exprs:
-                            literal { token = "intVar =" }
+1217.                        ("intVar =")
                             lValue { varID = intVar }
 1219.                call atan { #exprs = 2, class = Math }
                         exprs:
-                            literal { token = 4 }
-                            literal { token = 3 }
+1219.                        (4)
+1219.                        (3)
 1221.                call logm { #exprs = 2, class = ct }
                         exprs:
                             lValue { varID = intVar }
                             lValue { varID = objVar }
-1223.                var indent { vt = String }
-                        initExpr: literal { token = "2 Tabs" }
-1225.                assign (=)
+1223.                var indent { vt = String, initExpr = "2 Tabs" }
+1225.                assign (=) { expr = "1 Space + 2 Tabs" }
                         lValue: lValue { varID = indent }
-                        expr: literal { token = "1 Space + 2 Tabs" }
-1227.                assign (=)
+1227.                assign (=) { expr = "2 Tabs" }
                         lValue: lValue { varID = indent }
-                        expr: literal { token = "2 Tabs" }
-1229.                assign (=)
+1229.                assign (=) { expr = "8 Spaces" }
                         lValue: lValue { varID = indent }
-                        expr: literal { token = "8 Spaces" }
-1231.                assign (=)
+1231.                assign (=) { expr = "2 Tabs" }
                         lValue: lValue { varID = indent }
-                        expr: literal { token = "2 Tabs" }
-1233.                assign (=)
+1233.                assign (=) { expr = "4 Spaces + 1 Tab" }
                         lValue: lValue { varID = indent }
-                        expr: literal { token = "4 Spaces + 1 Tab" }
-1235.                assign (=)
+1235.                assign (=) { expr = "2 Tabs" }
                         lValue: lValue { varID = indent }
-                        expr: literal { token = "2 Tabs" }
-1237.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1237.                if { expr = false, #stmts = 1 }
                         stmts:
 1239.                        call voidFunc
-1241.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1241.                if { expr = false, #stmts = 1 }
                         stmts:
 1243.                        call voidFunc
-1244.                if { #stmts = 2 }
-                        expr: literal { token = false }
+1244.                if { expr = false, #stmts = 2 }
                         stmts:
 1247.                        call voidFunc
 1248.                        call voidFunc
-1250.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1250.                if { expr = false, #stmts = 1 }
                         stmts:
 1251.                        call voidFunc
 1253.                call voidFunc
-1254.                if { #stmts = 2 }
-                        expr: literal { token = false }
+1254.                if { expr = false, #stmts = 2 }
                         stmts:
 1256.                        call voidFunc
 1258.                        call voidFunc
-1260.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1260.                if { expr = false, #stmts = 1 }
                         stmts:
 1263.                        call voidFunc
-1265.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1265.                if { expr = false, #stmts = 1 }
                         stmts:
 1267.                        call voidFunc
-1270.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1270.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
 1274.                        call voidFunc
                         stmts:
 1271.                        call voidFunc
-1275.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1275.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
 1279.                        call voidFunc
                         stmts:
 1276.                        call voidFunc
-1280.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1280.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
 1283.                        call voidFunc
                         stmts:
 1281.                        call voidFunc
 1285.                call voidFunc
-1286.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1286.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
 1291.                        call voidFunc
                         stmts:
 1287.                        call voidFunc
-1293.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1293.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #stmts = 1 }
-                                expr: literal { token = false }
+                            if { expr = false, #stmts = 1 }
                                 stmts:
 1297.                                call voidFunc
                         stmts:
 1294.                        call voidFunc
-1298.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1298.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #stmts = 1 }
-                                expr: literal { token = false }
+                            if { expr = false, #stmts = 1 }
                                 stmts:
 1303.                                call voidFunc
                         stmts:
 1299.                        call voidFunc
-1305.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1305.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #elseStmts = 1, #stmts = 1 }
-                                expr: literal { token = false }
+                            if { expr = false, #elseStmts = 1, #stmts = 1 }
                                 elseStmts:
 1311.                                call voidFunc
                                 stmts:
 1309.                                call voidFunc
                         stmts:
 1306.                        call voidFunc
-1312.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1312.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #elseStmts = 1, #stmts = 1 }
-                                expr: literal { token = false }
+                            if { expr = false, #elseStmts = 1, #stmts = 1 }
                                 elseStmts:
 1318.                                call voidFunc
                                 stmts:
 1315.                                call voidFunc
                         stmts:
 1313.                        call voidFunc
-1319.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1319.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #elseStmts = 1, #stmts = 1 }
-                                expr: literal { token = false }
+                            if { expr = false, #elseStmts = 1, #stmts = 1 }
                                 elseStmts:
-                                    if { #elseStmts = 1, #stmts = 1 }
-                                        expr: literal { token = false }
+                                    if { expr = false, #elseStmts = 1, #stmts = 1 }
                                         elseStmts:
 1328.                                        call voidFunc
                                         stmts:
@@ -3337,89 +3049,70 @@
 1322.                                call voidFunc
                         stmts:
 1320.                        call voidFunc
-1329.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1329.                if { expr = false, #stmts = 1 }
                         stmts:
-1330.                        if { #elseStmts = 1, #stmts = 1 }
-                                expr: literal { token = false }
+1330.                        if { expr = false, #elseStmts = 1, #stmts = 1 }
                                 elseStmts:
 1334.                                call voidFunc
                                 stmts:
 1331.                                call voidFunc
-1335.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1335.                if { expr = false, #stmts = 1 }
                         stmts:
-1337.                        if { #elseStmts = 1, #stmts = 1 }
-                                expr: literal { token = false }
+1337.                        if { expr = false, #elseStmts = 1, #stmts = 1 }
                                 elseStmts:
 1343.                                call voidFunc
                                 stmts:
 1339.                                call voidFunc
-1347.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1347.                if { expr = false, #stmts = 1 }
                         stmts:
-1348.                        if { #elseStmts = 1, #stmts = 1 }
-                                expr: literal { token = false }
+1348.                        if { expr = false, #elseStmts = 1, #stmts = 1 }
                                 elseStmts:
-                                    if { #stmts = 1 }
-                                        expr: literal { token = false }
+                                    if { expr = false, #stmts = 1 }
                                         stmts:
 1352.                                        call voidFunc
                                 stmts:
 1349.                                call voidFunc
 1353.                for { #stmts = 1 }
-1353.                    initStmt: var ii { vt = int, isGlobal = false }
-                            initExpr: literal { token = 0 }
-                        expr: (<)
-                            right: literal { token = 100 }
+1353.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
+                        expr: (<) { right = 100 }
                             left: lValue { varID = ii }
 1353.                    nextStmt: assign (++)
                             lValue: lValue { varID = ii }
                         stmts:
 1355.                        call voidFunc
 1356.                for { #stmts = 1 }
-1356.                    initStmt: var ii { vt = int, isGlobal = false }
-                            initExpr: literal { token = 0 }
-                        expr: (<)
-                            right: literal { token = 100 }
+1356.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
+                        expr: (<) { right = 100 }
                             left: lValue { varID = ii }
 1356.                    nextStmt: assign (++)
                             lValue: lValue { varID = ii }
                         stmts:
 1359.                        call voidFunc
 1361.                for { #stmts = 1 }
-1361.                    initStmt: var ii { vt = int, isGlobal = false }
-                            initExpr: literal { token = 0 }
-                        expr: (<)
-                            right: literal { token = 100 }
+1361.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
+                        expr: (<) { right = 100 }
                             left: lValue { varID = ii }
 1361.                    nextStmt: assign (++)
                             lValue: lValue { varID = ii }
                         stmts:
 1364.                        call voidFunc
-1366.                while { #stmts = 1 }
-                        expr: literal { token = false }
+1366.                while { expr = false, #stmts = 1 }
                         stmts:
 1368.                        call voidFunc
-1369.                while { #stmts = 1 }
-                        expr: literal { token = false }
+1369.                while { expr = false, #stmts = 1 }
                         stmts:
 1372.                        call voidFunc
-1374.                while { #stmts = 1 }
-                        expr: literal { token = false }
+1374.                while { expr = false, #stmts = 1 }
                         stmts:
 1375.                        call voidFunc
 1377.                call voidFunc
-1378.                doWhile { #stmts = 1 }
-                        expr: literal { token = false }
+1378.                doWhile { expr = false, #stmts = 1 }
                         stmts:
 1380.                        call voidFunc
-1382.                doWhile { #stmts = 1 }
-                        expr: literal { token = false }
+1382.                doWhile { expr = false, #stmts = 1 }
                         stmts:
 1385.                        call voidFunc
-1388.                doWhile { #stmts = 1 }
-                        expr: literal { token = false }
+1388.                doWhile { expr = false, #stmts = 1 }
                         stmts:
 1389.                        call voidFunc
 1392.                var x1 { vt = int }
@@ -3428,142 +3121,120 @@
 1395.                var circle { vt = GameObj }
                         initExpr: call circle { #exprs = 3, class = ct }
                             exprs:
-                                literal { token = 0 }
-                                literal { token = 0 }
-                                literal { token = 10 }
+1395.                            (0)
+1395.                            (0)
+1397.                            (10)
 1401.                call log { #exprs = 3, class = ct }
                         exprs:
-                            literal { token = 1 }
-                            literal { token = 2 }
-                            literal { token = 3 }
+1398.                        (1)
+1399.                        (2)
+1401.                        (3)
 1402.                var multiLineArrInit { vt = array of int }
                         initExpr: arrayInit { #exprs = 2 }
                             exprs:
-                                literal { token = 1 }
-                                literal { token = 2 }
+1402.                            (1)
+1404.                            (2)
 1405.                var multiLineArrDec { vt = array of int }
                         initExpr: newArray { vt = int }
                             lengthExpr: call random { #exprs = 2, class = ct }
                                 exprs:
-                                    literal { token = 1 }
-                                    literal { token = 10 }
+1405.                                (1)
+1407.                                (10)
 1410.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: (>)
-                            right: literal { token = 3 }
+                        expr: (>) { right = 3 }
                             left: call random { #exprs = 2, class = ct }
                                 exprs:
-                                    literal { token = 1 }
-                                    literal { token = 2 }
+1408.                                (1)
+1410.                                (2)
                         elseStmts:
                             if { #stmts = 1 }
-                                expr: (>)
-                                    right: literal { token = 3 }
+                                expr: (>) { right = 3 }
                                     left: call random { #exprs = 2, class = ct }
                                         exprs:
-                                            literal { token = 1 }
-                                            literal { token = 2 }
+1412.                                        (1)
+1414.                                        (2)
                                 stmts:
 1415.                                call voidFunc
                         stmts:
 1411.                        call voidFunc
 1418.                while { #stmts = 1 }
-                        expr: (>)
-                            right: literal { token = 3 }
+                        expr: (>) { right = 3 }
                             left: call random { #exprs = 2, class = ct }
                                 exprs:
-                                    literal { token = 1 }
-                                    literal { token = 2 }
+1416.                                (1)
+1418.                                (2)
                         stmts:
 1419.                        call voidFunc
 1420.                doWhile { #stmts = 1 }
-                        expr: (<)
-                            right: literal { token = 0 }
+                        expr: (<) { right = 0 }
                             left: call max { #exprs = 2, class = Math }
                                 exprs:
-                                    literal { token = 1 }
-                                    literal { token = 0 }
+1422.                                (1)
+1424.                                (0)
                         stmts:
 1421.                        call voidFunc
 1427.                for { #stmts = 1 }
-                        expr: (<)
-                            right: literal { token = 0 }
+                        expr: (<) { right = 0 }
                             left: call max { #exprs = 2, class = Math }
                                 exprs:
-                                    literal { token = 1 }
-                                    literal { token = 0 }
+1425.                                (1)
+1427.                                (0)
                         stmts:
 1428.                        call voidFunc
-1429.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1429.                if { expr = false, #stmts = 1 }
                         stmts:
 1430.                        call voidFunc
 1432.                call voidFunc
-1433.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1433.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
 1436.                        call voidFunc
                         stmts:
 1434.                        call voidFunc
 1438.                call voidFunc
-1439.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1439.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #stmts = 1 }
-                                expr: literal { token = false }
+                            if { expr = false, #stmts = 1 }
                                 stmts:
 1442.                                call voidFunc
                         stmts:
 1440.                        call voidFunc
 1444.                call voidFunc
-1445.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1445.                if { expr = false, #stmts = 1 }
                         stmts:
 1446.                        call voidFunc
-1448.                while { #stmts = 1 }
-                        expr: literal { token = false }
+1448.                while { expr = false, #stmts = 1 }
                         stmts:
 1449.                        call voidFunc
-1450.                for { #stmts = 1 }
-                        expr: literal { token = false }
+1450.                for { expr = false, #stmts = 1 }
                         stmts:
 1451.                        call voidFunc
 1453.                call voidFunc
-1454.                while { #stmts = 1 }
-                        expr: literal { token = false }
+1454.                while { expr = false, #stmts = 1 }
                         stmts:
 1455.                        call voidFunc
 1457.                call voidFunc
-1467.                var privateInt { vt = int }
-                        initExpr: literal { token = 0 }
-1469.                var publicDouble { vt = double }
-                        initExpr: literal { token = 0 }
+1467.                var privateInt { vt = int, initExpr = 0 }
+1469.                var publicDouble { vt = double, initExpr = 0 }
 1471.                var halfIntVar { vt = double }
-                        initExpr: (/)
-                            right: literal { token = 2 }
+                        initExpr: (/) { right = 2 }
                             left: cast { vt = int }
                                 expr: lValue { varID = intVar }
-1472.                if
-                        expr: literal { token = false }
-1474.                var bogusVarInit { vt = int }
-                        initExpr: literal { token = 0 }
-1475.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: literal { token = false }
+1472.                if { expr = false }
+1474.                var bogusVarInit { vt = int, initExpr = 0 }
+1475.                if { expr = false, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if
-                                expr: literal { token = false }
+                            if { expr = false }
                         stmts:
 1476.                        call voidFunc
 1479.                var bogusVarDecl { vt = int }
-1480.                if { #stmts = 1 }
-                        expr: literal { token = false }
+1480.                if { expr = false, #stmts = 1 }
                         stmts:
 1481.                        call voidFunc
 1484.                var bogusArrayInit { vt = array of int }
                         initExpr: arrayInit { #exprs = 1 }
                             exprs:
-                                literal { token = 0 }
-1485.                while
-                        expr: literal { token = false }
+1484.                            (0)
+1485.                while { expr = false }
 1487.                var bogusArrayDecl { vt = array of int }
 1521.        func myFunc { #paramVars = 1, vt = void, #stmts = 0 }
                 paramVars:
@@ -3612,8 +3283,7 @@
 1573.        func underIndentedFunc { #paramVars = 0, vt = void, #stmts = 0 }
 1576.        func funcWithUnindentedBody { #paramVars = 0, vt = int, #stmts = 1 }
                 stmts:
-1579.                return
-                        expr: literal { token = 0 }
+1579.                return { expr = 0 }
 1581.        func multiLineFuncDef { #paramVars = 2, vt = void, #stmts = 0 }
                 paramVars:
 1581.                var arg1 { vt = int, isGlobal = false }
@@ -3623,20 +3293,19 @@
 1590.                return
                         expr: call max { #exprs = 2, class = Math }
                             exprs:
-                                literal { token = 1 }
-                                literal { token = 2 }
+1588.                            (1)
+1590.                            (2)
 1592.        func missingCurlyBracketFunc { #paramVars = 0, vt = void, stmts = false }
 1594.        func lastFunc { #paramVars = 0, vt = void, #stmts = 0 }
         vars:
-  7.        var myVar { vt = int, isGlobal = true }
-                initExpr: literal { token = 1 }
+  7.        var myVar { vt = int, isGlobal = true, initExpr = 1 }
   9.        var button { vt = GameObj, isGlobal = true }
                 initExpr: call text { #exprs = 4, class = ct }
                     exprs:
-                        literal { token = "START" }
-                        literal { token = 0 }
-                        literal { token = 0 }
-                        literal { token = 10 }
+  9.                    ("START")
+  9.                    (0)
+  9.                    (0)
+  9.                    (10)
  11.        var intResult { vt = int, isGlobal = true }
                 initExpr: call intFunc
  13.        var overIndentedInstanceVar { vt = int, isGlobal = true }
@@ -3644,35 +3313,33 @@
  16.        var classLevelMultilineIntArray1 { vt = array of int, isGlobal = true }
                 initExpr: arrayInit { #exprs = 2 }
                     exprs:
-                        literal { token = 1 }
-                        literal { token = 2 }
+ 16.                    (1)
+ 18.                    (2)
  19.        var classLevelMultilineIntArray2 { vt = array of int, isGlobal = true }
                 initExpr: arrayInit { #exprs = 3 }
                     exprs:
-                        literal { token = 1 }
-                        literal { token = 2 }
-                        literal { token = 3 }
+ 19.                    (1)
+ 20.                    (2)
+ 22.                    (3)
  23.        var classLevelMultilineIntArray3 { vt = array of int, isGlobal = true }
                 initExpr: newArray { vt = int }
                     lengthExpr: call max { #exprs = 2, class = Math }
                         exprs:
-                            literal { token = 1 }
-                            literal { token = 2 }
- 27.        var classLevelVarTypeMismatchIntDouble { vt = int, isGlobal = true }
-                initExpr: literal { token = 0.1 }
- 29.        var MAX_ENEMIES { vt = int, isConst = true, isGlobal = true }
-                initExpr: literal { token = 100 }
+ 23.                        (1)
+ 25.                        (2)
+ 27.        var classLevelVarTypeMismatchIntDouble { vt = int, isGlobal = true, initExpr = 0.1 }
+ 29.        var MAX_ENEMIES { vt = int, isConst = true, isGlobal = true, initExpr = 100 }
  30.        var numEnemies { vt = int, isGlobal = true }
                 initExpr: call min { #exprs = 2, class = Math }
                     exprs:
-                        literal { token = 1000 }
+ 30.                    (1000)
                         lValue { varID = MAX_ENEMIES }
  31.        var doubleArr { vt = array of double, isGlobal = true }
                 initExpr: arrayInit { #exprs = 3 }
                     exprs:
-                        literal { token = 1.0 }
-                        literal { token = 2.0 }
-                        literal { token = 3.0 }
+ 31.                    (1.0)
+ 32.                    (2.0)
+ 33.                    (3.0)
  34.        var leftWall { vt = GameObj, isGlobal = true }
  34.        var rightWall { vt = GameObj, isGlobal = true }
  34.        var topWall { vt = GameObj, isGlobal = true }

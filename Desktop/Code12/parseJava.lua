@@ -225,7 +225,7 @@ local function parsePrimaryExpr()
 	local tt = token.tt
 	if tt == "NUM" or tt == "STR" or tt == "BOOL" or tt == "NULL"  then
 		iToken = iToken + 1
-		return makeParseTreeNode( "expr", tt, { token } )
+		return token    -- expr nodes can also be single token nodes
 	end
 	return parseGrammar( primaryExpr )
 end

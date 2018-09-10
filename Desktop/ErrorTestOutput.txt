@@ -22,10 +22,10 @@
 Semantic Error Test:
 
     1598 lines processed
-    83 ms Parse time
+    85 ms Parse time
     7 ms Semantic check time
-    2 ms Code Generation time
-    93 ms Total time
+    3 ms Code Generation time
+    95 ms Total time
 
 2 unexpected errors
 4 uncaught errors (326 expected errors)
