@@ -244,7 +244,17 @@ local function checkBlockBegin()
 	return false
 end
 
--- Make and return a var given the parsed fields.
+-- Make an arrayInit structure from the nodes of an exprList list pattern
+local function makeArrayInit( nodes )
+	local exprs = {}
+	for _, exprNode in ipairs( nodes[2].nodes ) do
+		exprs[#exprs + 1] = makeExpr( exprNode )
+	end	
+	return { s = "arrayInit", exprs = exprs, 
+			firstToken = nodes[1], lastToken = nodes[3] }
+end 
+
+-- Make and return a var given the parsed fields and optional initExpr structure.
 -- If there is an error then set the error state.
 local function makeVar( isGlobal, access, typeNode, nameID, initExpr, isArray, isConst )
 	-- Access is optional and ignored for instance variables, not allowed otherwise
@@ -260,7 +270,7 @@ local function makeVar( isGlobal, access, typeNode, nameID, initExpr, isArray, i
 		vt = javaTypes.vtFromVarType( typeNode, isArray ),
 		isConst = isConst,
 		isGlobal = isGlobal,
-		initExpr = makeExpr( initExpr )
+		initExpr = initExpr,
 	}
 end
 
@@ -272,7 +282,7 @@ local function getVar( p, nodes, structs, isGlobal )
 	if p == "varInit" then
 		-- e.g. int x = 10;
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
-									nodes[3], nodes[5] )
+									nodes[3], makeExpr( nodes[5] ) )
 	elseif p == "varDecl" then
 		-- e.g. int x, y;
 		for _, nameID in ipairs( nodes[3].nodes ) do
@@ -281,11 +291,18 @@ local function getVar( p, nodes, structs, isGlobal )
 	elseif p == "constInit" then
 		-- e.g. final int LIMIT = 100;
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[3], 
-									nodes[4], nodes[6], nil, true )			
+									nodes[4], makeExpr( nodes[6] ), nil, true )			
 	elseif p == "arrayInit" then
 		-- e.g. int[] a = { 1, 2, 3 };   or   int[] a = new int[10];
+		local initExpr
+		local arrayInit = nodes[7]
+		if arrayInit.p == "list" then
+			initExpr = makeArrayInit( arrayInit.nodes )
+		else
+			initExpr = makeExpr( arrayInit.nodes[1] )
+		end
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
-									nodes[5], nodes[7], true )						
+									nodes[5], initExpr, true )						
 	elseif p == "arrayDecl" then
 		-- e.g. GameObj[] coins, walls;
 		for _, nameID in ipairs( nodes[5].nodes ) do
@@ -524,7 +541,7 @@ local function getForStmt( nodes )
 		local forInit = nodes[1]
 		if forInit.p == "var" then
 			local ns = forInit.nodes
-			stmt.initStmt = makeVar( false, nil, ns[1], ns[2], ns[4] )
+			stmt.initStmt = makeVar( false, nil, ns[1], ns[2], makeExpr( ns[4] ) )
 		elseif forInit.p == "stmt" then
 			stmt.initStmt = getStmt( forInit.nodes[1] )
 			stmt.initStmt.iLine = iLine
@@ -712,21 +729,6 @@ function makeExpr( node )
 	-- No expr or parse error makes nil (e.g. an optional expr field)
 	if node == nil or node.isError then
 		return nil
-	end
-
-	-- Handle arrayInit nodes
-	if node.t == "arrayInit" then
-		local nodes = node.nodes
-		if node.p == "list" then
-			local exprs = {}
-			for _, exprNode in ipairs( nodes[2].nodes ) do
-				exprs[#exprs + 1] = makeExpr( exprNode )
-			end	
-			return { s = "arrayInit", exprs = exprs, 
-					firstToken = nodes[1], lastToken = nodes[3] }
-		else
-			node = nodes[1]
-		end
 	end
 
 	-- Handle the different primaryExpr types plus binary operators

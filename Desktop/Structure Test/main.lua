@@ -133,5 +133,7 @@ function _fn.makeCircles()
 	for _, c in ipairs(circles) do
 		c:setFillColor("black")
 	end; local scores = { 10, 20, 30, length = 3 }
+	local ratios = { 0, 1, 2, length = 3 }
+	local coins = { nil, ct.indexArray(circles, 1), nil, ct.indexArray(circles, 2), length = 4 }
 	return circles
 end

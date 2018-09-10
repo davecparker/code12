@@ -313,7 +313,16 @@ local function canAssign( target, vtTarget, expr, vtExpr )
 		return true
 	end
 
-	-- Check for various type mismatch combinations
+	-- Check special cases for arrayInit which allow automatic promotions
+	if expr.s == "arrayInit" and type(vtExpr) == "table" and type(vtTarget) == "table" then
+		if vtExpr.vt == 0 and vtTarget.vt == 1 then
+			return true    -- list of int assigned to array of double is OK
+		elseif vtExpr.vt == "null" and type(vtTarget.vt) == "string" then
+			return true    -- list of null assigned to array of any object is OK
+		end
+	end
+
+	-- Check for various type mismatch combinations to make the error message
 	local str
 	if vtExpr == 1 and vtTarget == 0 then          -- double assigned to int
 		str = "Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()"
@@ -928,7 +937,7 @@ local function vtExprArrayInit( node )
 		err.setErrNode( node, "Array initializer cannot be empty" )
 		return nil
 	end
-	-- Check that all members are the same type
+	-- Check that all members are the same type, handling possible null entries
 	local vtMembers = nil
 	for i = 1, #exprs do
 		local vt = vtSetExprNode( exprs[i] )
@@ -942,6 +951,10 @@ local function vtExprArrayInit( node )
 		elseif vt ~= vtMembers then
 			if type(vt) == "number" and type(vtMembers) == "number" then
 				vtMembers = vtNumber( vt, vtMembers )
+			elseif vtMembers == "null" and type(vt) == "string" then
+				vtMembers = vt  -- list started with null(s), now we have a type
+			elseif vt == "null" and type(vtMembers) == "string" then
+				-- null is compatible with existing object type
 			else
 				err.setErrNode( node, "Array initializers must all be the same type" )
 				return nil

@@ -133,6 +133,8 @@ class StructureTest extends Code12Program
 		for (GameObj c: circles)
 			c.setFillColor( "black" );
 		int[] scores = { 10, 20, 30 };
+		double[] ratios = { 0, 1, 2 };
+		GameObj[] coins = { null, circles[1], null, circles[2] };
 		return circles;
 	}
 
