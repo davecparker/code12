@@ -1,21 +1,15 @@
 ======= Test Started ==========================================
-4. class ErrorTest extends Code12Program
-*** Uncaught error, expected: The class header shouldn't be indented
-
-6. {
-*** Uncaught error, expected: The { beginning a block should have the same indentation as the line before it
-
 ======= Test Complete =========================================
 
 Semantic Error Test:
 
     1596 lines processed
-    96 ms Parse time
-    6 ms Semantic check time
-    3 ms Code Generation time
-    106 ms Total time
+    139 ms Parse time
+    8 ms Semantic check time
+    4 ms Code Generation time
+    151 ms Total time
 
 0 unexpected errors
-2 uncaught errors (328 expected errors)
+0 uncaught errors (330 expected errors)
 
-FAILED
+SUCCESS

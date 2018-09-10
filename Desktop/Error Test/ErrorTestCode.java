@@ -2,8 +2,8 @@ import Code12.*;
 
 // ERROR "The class header shouldn't be indented"
 	class ErrorTest extends Code12Program
-// ERROR "The { beginning a block should have the same indentation as the line before it"
-{
+// ERROR "The beginning { for the class shouldn't be indented"
+	{
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
 	GameObj button = ct.text("START", 0, 0, 10);

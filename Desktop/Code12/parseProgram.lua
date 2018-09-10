@@ -184,8 +184,20 @@ local function parseHeader( sourceLines )
 							and tokens[4].str == "Code12Program" then
 						-- Get the class name
 						nameID = tokens[2]
-						-- TODO: Check that nameID is valid (not a defined class)
-						-- TODO: Check for initial upper case letter in name
+						-- Check that nameID is valid (not a defined class) and for initial upper case letter in name
+						local className = nameID.str
+						local chFirst = string.byte( className, 1 )
+						if javaTypes.isKnownClassName( className ) then
+							err.setErrNode( nameID,
+									"The class name %s is already defined. Choose another name.", className )
+						elseif chFirst < 65 or chFirst > 90 then
+							err.setErrNode( nameID, 
+									"By convention, class names should start with an upper-case letter" )
+						end
+						-- Check that the class header is not indented
+						if javalex.indentLevelForLine( iLineClass ) ~= 0 then
+							err.setErrLineNum( iLineClass, "The class header shouldn't be indented" )
+						end
 						-- TODO: What about extra code after 5 tokens, e.g. {
 					else
 						err.setErrLineNum( lineNum,
@@ -212,7 +224,10 @@ local function parseHeader( sourceLines )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if #tokens == 2 and tokens[1].tt == "{" then
 				iLineBegin = lineNum
-			end
+				-- Check that beginning { is not indented
+				if javalex.indentLevelForLine( iLineBegin ) ~= 0 then
+					err.setErrLineNum( iLineBegin, "The beginning { for the class shouldn't be indented" )
+				end
 			break
 		end
 		lineNum = lineNum + 1
@@ -220,6 +235,7 @@ local function parseHeader( sourceLines )
 	if iLineBegin then
 		-- Success or good enough to continue
 		-- print( "Got begin" )
+		end
 		local program = { s = "program", nameID = nameID, vars = {}, funcs = {} }
 		return program, lineNum + 1
 	end
@@ -1001,6 +1017,7 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	local startTokens = nil
 	local iLineStart = nil
 	numSourceLines = #sourceLines
+	print(lineNum, numSourceLines)
 	while lineNum <= numSourceLines do
 		local tree, tokens = parseJava.parseLine( sourceLines[lineNum], 
 									lineNum, startTokens, syntaxLevel )
