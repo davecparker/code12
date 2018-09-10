@@ -1017,7 +1017,6 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	local startTokens = nil
 	local iLineStart = nil
 	numSourceLines = #sourceLines
-	print(lineNum, numSourceLines)
 	while lineNum <= numSourceLines do
 		local tree, tokens = parseJava.parseLine( sourceLines[lineNum], 
 									lineNum, startTokens, syntaxLevel )
