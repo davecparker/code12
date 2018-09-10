@@ -219,8 +219,14 @@ end
 -- They return a parse tree, or nil if failure.
 
 
--- Parse the primaryExpr grammar (function version, for recursion)
+-- Parse the primaryExpr grammar plus single token literals (optimization)
 local function parsePrimaryExpr()
+	local token = tokens[iToken]
+	local tt = token.tt
+	if tt == "NUM" or tt == "STR" or tt == "BOOL" or tt == "NULL"  then
+		iToken = iToken + 1
+		return makeParseTreeNode( "expr", tt, { token } )
+	end
 	return parseGrammar( primaryExpr )
 end
 
@@ -235,7 +241,7 @@ local function parseOpExpr( leftSide, minPrecedence )
 		local op = token   -- the binary op
 		local opPrec = prec
 		iToken = iToken + 1
-		local rightSide = parseGrammar( primaryExpr )
+		local rightSide = parsePrimaryExpr()
 		if rightSide == nil then
 			err.setErrNodeAndRef( tokens[iToken], op,
 					"Expected expression after %s operator", op.str )
@@ -266,7 +272,7 @@ end
 -- Parse an expression 
 local function expr()
 	-- Start the recursive Precedence Climbing algorithm
-	local leftSide = parseGrammar( primaryExpr )
+	local leftSide = parsePrimaryExpr()
 	if leftSide == nil then
 		return nil
 	elseif syntaxLevel < 4 or leftSide.isError then
@@ -377,10 +383,6 @@ local exprList1 = { t = "exprList1",
 
 -- A primary expression (no binary operators)
 primaryExpr = { t = "expr",
-	{ 1, 12, "NUM",				"NUM" 								},
-	{ 1, 12, "BOOL",			"BOOL" 								},
-	{ 1, 12, "NULL",			"NULL" 								},
-	{ 1, 12, "STR",				"STR" 								},
 	{ 5, 12, "call",			callHead, exprList, ")" 			},
 	-- Common Error for call (must preceed lValue)
 	{ 5, 0, "call",				callHead, exprList1, expr, 0,	iNode = 4, missing = true,

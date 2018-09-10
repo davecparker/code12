@@ -6632,7 +6632,7 @@ Comma not supported
 *** Line 719 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-719 lines processed in 141 ms
+719 lines processed in 135 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)
