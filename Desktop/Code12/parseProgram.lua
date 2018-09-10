@@ -228,6 +228,7 @@ local function parseHeader( sourceLines )
 				if javalex.indentLevelForLine( iLineBegin ) ~= 0 then
 					err.setErrLineNum( iLineBegin, "The beginning { for the class shouldn't be indented" )
 				end
+			end
 			break
 		end
 		lineNum = lineNum + 1
@@ -235,7 +236,6 @@ local function parseHeader( sourceLines )
 	if iLineBegin then
 		-- Success or good enough to continue
 		-- print( "Got begin" )
-		end
 		local program = { s = "program", nameID = nameID, vars = {}, funcs = {} }
 		return program, lineNum + 1
 	end
