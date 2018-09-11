@@ -593,11 +593,9 @@ function getLineStmts( tree, stmts )
 	local stmt
 	if p == "stmt" then
 		-- stmt ;
-		checkMultiLineIndent( tree )
 		stmt = getStmt( nodes[1] )
 	elseif p == "if" then
 		-- if (expr) controlledStmts [else controlledStmts]
-		checkMultiLineIndent( tree )
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
 				elseStmts = getElseStmts( tree ), entireLine = true }
@@ -609,7 +607,6 @@ function getLineStmts( tree, stmts )
 	elseif p == "returnVal" then
 		-- return expr ;
 		-- TODO: Check for return being only at end of a block
-		checkMultiLineIndent( tree )
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
 	elseif p == "return" then
 		-- return ;
@@ -636,8 +633,8 @@ function getLineStmts( tree, stmts )
 		if javalex.indentLevelForLine( endTree.iLineStart ) ~= javalex.indentLevelForLine( tree.iLineStart ) then
 			err.setErrNodeAndRef( endTree, tree, "This while statement should have the same indentation as its \"do\"" )
 		end
-		checkMultiLineIndent( endTree )
 		stmt.expr = makeExpr( endTree.nodes[3] )
+		checkMultiLineIndent( endTree )
 	elseif p == "while" then
 		-- while (expr) controlledStmts
 		local whileEnd = nodes[4]
@@ -645,12 +642,10 @@ function getLineStmts( tree, stmts )
 			err.setErrNode( whileEnd, "while loop header should not end with a semicolon" )
 			return nil
 		end
-		checkMultiLineIndent( tree )
 		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts(),
 				entireLine = true }
 	elseif p == "for" then
 		-- for loop variants
-		checkMultiLineIndent( tree )
 		stmt = getForStmt( nodes )
 	elseif p == "break" then
 		-- break ;
@@ -669,6 +664,7 @@ function getLineStmts( tree, stmts )
 	if stmt then
 		stmt.iLine = tree.iLine
 		stmts[#stmts + 1] = stmt
+		checkMultiLineIndent( tree )
 		return true
 	end
 	return false
@@ -841,17 +837,8 @@ local function getMembers()
 	local vars = programTree.vars
 	local funcs = programTree.funcs
 	local gotFunc = false     -- set to true when the first func was seen
-
-	-- Save indentation level and line number of first member
+	local iTreeStart = iTree
 	local firstMemberLineNum, firstMemberIndentLevel
-	if iTree <= numParseTrees then
-		firstMemberLineNum = parseTrees[iTree].iLineStart
-		firstMemberIndentLevel = javalex.indentLevelForLine( firstMemberLineNum )
-		if firstMemberIndentLevel == 0 then
-			err.setErrLineNum( parseTrees[iTree].iLineStart,
-					"Class-level variable and function definitions should be indented" )
-		end
-	end
 
 	-- Look for instance variables and functions
 	while iTree <= numParseTrees do
@@ -859,15 +846,12 @@ local function getMembers()
 		local p = tree.p
 		local nodes = tree.nodes
 		local ok = not tree.isError
-		iTree = iTree + 1
-
-		-- Check for consistent indentation of the members
-		if p ~= "end" then
-			if javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
-				err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
-						"Class-level variable and function definitions should all have the same indentation" )
-			end
+		if ok and iTree == iTreeStart then
+			-- Save indentation level and line number of first member
+			firstMemberLineNum = tree.iLineStart
+			firstMemberIndentLevel = javalex.indentLevelForLine( firstMemberLineNum )
 		end
+		iTree = iTree + 1
 
 		if ok and getVar( p, nodes, vars, true ) then
 			-- Added instance variable(s)
@@ -876,12 +860,10 @@ local function getMembers()
 			if gotFunc then
 				err.setErrNode( tree, "Class-level variables must be defined at the beginning of the class" )
 			end 
-			checkMultiLineIndent( tree )
 		elseif p == "func" then
 			-- User function or event definition
 			if ok then
 				funcs[#funcs + 1] = getFunc( nodes )
-				checkMultiLineIndent( tree )
 			else
 				getBlockStmts()  -- skip body of invalid function defintion
 			end
@@ -911,6 +893,17 @@ local function getMembers()
 				err.overrideErrLineParseTree( tree, strErr )
 			end
 			return false
+		end
+		if ok then
+			-- Check indentation of member
+			if firstMemberIndentLevel == 0 then
+				err.setErrLineNum( firstMemberLineNum,
+						"Class-level variable and function definitions should be indented" )
+			elseif javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
+				err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
+						"Class-level variable and function definitions should all have the same indentation" )
+			end
+			checkMultiLineIndent( tree )
 		end
 	end
 
