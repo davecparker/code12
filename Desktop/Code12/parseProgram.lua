@@ -173,7 +173,7 @@ local function parseHeader( sourceLines )
 	while lineNum < numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
-			if tokens[1].tt == "public" then
+			if tokens[1].tt == "public" and tokens[2].tt == "class" then
 				table.remove( tokens, 1 )
 			end
 			if tokens[1].tt == "class" then
@@ -182,7 +182,7 @@ local function parseHeader( sourceLines )
 							"There should be only one class declaration" )
 				else
 					iLineClass = lineNum
-					if #tokens == 5 and tokens[2].tt == "ID" 
+					if #tokens >= 5 and tokens[2].tt == "ID" 
 							and tokens[3].tt == "extends" 
 							and tokens[4].str == "Code12Program" then
 						-- Get the class name
@@ -201,7 +201,13 @@ local function parseHeader( sourceLines )
 						if javalex.indentLevelForLine( iLineClass ) ~= 0 then
 							err.setErrLineNum( iLineClass, "The class header shouldn't be indented" )
 						end
-						-- TODO: What about extra code after 5 tokens, e.g. {
+						-- Check for extra tokens after class header
+						if #tokens == 6 and tokens[5].tt == "{" then					
+							err.setErrNode( tokens[5], "In Code12, the { to start a class must be on its own line" )
+						elseif #tokens > 5 then
+							err.setErrNodeSpan( tokens[5], tokens[#tokens], 
+									'Your class header should end after\n"class %s extends Code12Program"', className )
+						end
 					else
 						err.setErrLineNum( lineNum,
 								'A Code12 class declaration should be:\n"class YourName extends Code12Program"' )
