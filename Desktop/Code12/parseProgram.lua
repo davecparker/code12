@@ -173,6 +173,9 @@ local function parseHeader( sourceLines )
 	while lineNum < numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
+			if tokens[1].tt == "public" then
+				table.remove( tokens, 1 )
+			end
 			if tokens[1].tt == "class" then
 				if iLineClass then
 					err.setErrLineNumAndRefLineNum( lineNum, iLineClass,
