@@ -143,7 +143,7 @@ local function parseHeader( sourceLines )
 	local nameID = nil
 	local numSourceLines = #sourceLines
 	local iLineImport = nil
-	while lineNum < numSourceLines do
+	while lineNum <= numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if tokens[1].tt == "import" then
@@ -170,7 +170,7 @@ local function parseHeader( sourceLines )
 
 	-- "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
 	local iLineClass = nil
-	while lineNum < numSourceLines do
+	while lineNum <= numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if tokens[1].tt == "public" and tokens[2].tt == "class" then
@@ -228,7 +228,7 @@ local function parseHeader( sourceLines )
 
 	-- Beginning { for the class
 	local iLineBegin = nil
-	while lineNum < numSourceLines do
+	while lineNum <= numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if #tokens == 2 and tokens[1].tt == "{" then
@@ -726,7 +726,7 @@ function getBlockStmts()
 	end
 
 	-- Got to EOF before finding matching }
-	err.setErrLineNum( numSourceLines + 1, 
+	err.setErrLineNumAndRefLineNum( numSourceLines + 1, iLineStart,
 		"Missing } to end block starting at line %d", iLineStart )
 	return nil
 end
