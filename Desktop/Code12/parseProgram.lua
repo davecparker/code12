@@ -79,6 +79,7 @@ local parseProgram = {}
 
 -- Parsing structures
 local parseTrees        -- array of parse trees for each source line
+local parseTreeIndexes  -- inverse array of indices for parse trees in parseTrees
 local programTree       -- structure tree for the program (see above)
 
 -- Parsing state
@@ -130,6 +131,21 @@ local function checkMultiLineIndent( tree )
 				break
 			end
 		end
+	end
+end
+
+-- Check that the given rtnTree is at the end of a block and set the error state if it is not
+local function checkIsAtBlockEnd( rtnTree )
+	local iRtnTree = parseTreeIndexes[rtnTree]
+	if iRtnTree < numSourceLines and parseTrees[iRtnTree + 1].p == "end" then
+		-- At end of block
+		return
+	end
+	-- Next line is not a closing }, so previous line must be a control statement in order to be at the end of a block
+	local prevTree = parseTrees[iRtnTree - 1]
+	local p = prevTree.p
+	if p ~= "if" and p ~= "elseif" and p ~= "else" and p ~= "for" and p ~= "while" and p ~= "do" then
+		err.setErrLineNum( rtnTree.iLineStart, "A return statement should only be at the end of a block" )
 	end
 end
 
@@ -608,9 +624,11 @@ function getLineStmts( tree, stmts )
 		-- return expr ;
 		-- TODO: Check for return being only at end of a block
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
+		checkIsAtBlockEnd( tree )
 	elseif p == "return" then
 		-- return ;
 		stmt = { s = "return", firstToken = nodes[1] }
+		checkIsAtBlockEnd( tree )
 	elseif p == "do" then
 		-- do controlledStmts while (expr);
 		stmt = { s = "doWhile", stmts = getControlledStmts(), entireLine = true }
@@ -1056,6 +1074,12 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	parseTrees[#parseTrees + 1] = 
 			{ t = "line", p = "EOF", nodes = {}, 
 				iLine = numSourceLines + 1, iLineStart = numSourceLines + 1 }
+	
+	-- Make inverse index table for parseTrees table
+	parseTreeIndexes = {}
+	for i, v in ipairs( parseTrees ) do
+		parseTreeIndexes[v] = i
+	end
 
 	-- Get the member vars and funcs
 	iTree = 1
