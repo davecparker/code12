@@ -256,6 +256,8 @@ local function saveSettings()
 	-- Update the userSettings
 	userSettings.recentPath = sourceFile.path
 	userSettings.syntaxLevel = app.syntaxLevel 
+	userSettings.tabWidth = app.tabWidth
+	userSettings.editorPath = app.editorPath
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -291,6 +293,21 @@ local function loadSettings()
 				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
 					userSettings.syntaxLevel = level
 					app.syntaxLevel = userSettings.syntaxLevel
+				end
+
+				-- Use the saved tabWidth if valid
+				local tabWidth = t.tabWidth
+				if type(tabWidth) == "number" and tabWidth >=2 and tabWidth <= 8 then
+					app.tabWidth = tabWidth
+				end
+
+				-- Use the saved editorPath if valid
+				if t.editorPath then
+					file = io.open( t.editorPath, "r" )
+					if file then
+						io.close( file )
+						app.editorPath = t.editorPath
+					end
 				end
 			end
 		end

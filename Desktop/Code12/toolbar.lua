@@ -9,6 +9,7 @@
 
 -- Corona modules
 local widget = require( "widget" )
+local composer = require( "composer" )
 
 -- Code12 app modules
 local g = require( "Code12.globals" )
@@ -24,7 +25,8 @@ local toolbar = {}
 local toolbarGroup        -- display group for toolbar
 local bgRect              -- background rect
 local chooseFileBtn       -- Choose File button
-local levelPicker         -- Syntax level picker
+local optionsBtn          -- Options button
+local restartBtn          -- Restart button
 
 
 --- Internal Functions ------------------------------------------------
@@ -46,6 +48,12 @@ local function onChooseFile()
 	timer.performWithDelay( 50, chooseFile )
 end
 
+-- Event handler for the Options button
+local function onOptions()
+	-- composer.gotoScene( "optView", { effect = "slideLeft", time = 500 } )
+	composer.showOverlay( "optView", { isModal = true, effect = "slideLeft", time = 500 } )
+	optionsBtn.isVisible = false
+end
 
 --- Module Functions ------------------------------------------------
 
@@ -71,31 +79,43 @@ function toolbar.create()
 	toolbarGroup:insert( chooseFileBtn )
 	chooseFileBtn.anchorX = 0
 
-	-- Level picker
-	local segmentNames = {}
-	for i = 1, app.numSyntaxLevels do
-		segmentNames[i] = tostring( i )
-	end
-	local segWidth = 25
-	levelPicker = widget.newSegmentedControl{
+	-- Options button 
+	optionsBtn = widget.newButton{
 		x = app.width - app.margin,
 		y = yCenter,
-		segmentWidth = segWidth,
-		segments = segmentNames,
-		defaultSegment = app.syntaxLevel,
-		onPress = 
-			function (event )
-				app.syntaxLevel = event.target.segmentNumber
-				app.processUserFile()
-			end
+		onRelease = onOptions,
+		label = "☰",
+		labelAlign = "right",
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+		width = 25
 	}
-	levelPicker.anchorX = 1
+	toolbarGroup:insert( optionsBtn )
+	optionsBtn.anchorX = 1
+
+	-- Restart button
+	restartBtn = widget.newButton{
+		x = optionsBtn.x - optionsBtn.width, 
+		y = yCenter,
+		onRelease = app.processUserFile,
+		label = "Restart",
+		labelAlign = "right",
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+	}
+	toolbarGroup:insert( restartBtn )
+	restartBtn.anchorX = 1
 end
 
 -- Resize the toolbar
 function toolbar.resize()
 	bgRect.width = app.width
-	levelPicker.x = app.width - app.margin
+	optionsBtn.x = app.width - app.margin
+end
+
+-- Show the options button
+function toolbar.showOptionsButton()
+	optionsBtn.isVisible = true
 end
 
 

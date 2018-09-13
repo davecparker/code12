@@ -10,6 +10,7 @@
 -- Corona modules and plugins
 local lfs = require( "lfs" )
 local fileDialogs = require( "plugin.tinyfiledialogs" )
+local app = require( "app" )
 
 
 -- The env module and public data fields
@@ -24,30 +25,6 @@ local env = {
 local chDirSeperator               -- directory seperator (/ on Mac, \ on Windows)
 local byteDirSeperator             -- byte (ASCII) value of chDirSeperator
 
-
---- Utility Functions ------------------------------------------------
-
--- Return the path to an installed text editor if found, nil otherwise
-local function getEditorPath()
-	local editorPaths
-	if env.isWindows then
-		editorPaths = {
-			[[C:\Program Files\Sublime Text 3\sublime_text.exe]],
-			[[C:\Program Files (x86)\Sublime Text 3\sublime_text.exe]],
-			[[C:\Program Files\Notepad++\notepad++.exe]],
-		}
-	else
-		editorPaths = {}
-	end
-	for i = 1, #editorPaths do
-		local f = io.open( editorPaths[i], "r" )
-		if f then
-			io.close( f )
-			return editorPaths[i]
-		end
-	end
-	return nil
-end
 
 
 --- Module Functions ------------------------------------------------
@@ -117,10 +94,21 @@ function env.pathFromOpenFileDialog( title )
 	return nil
 end
 
--- Open the given source file in the system default editor for it
+-- Open the given source file using app.editorPath if it is valid 
+-- or the system default editor if it is not
 function env.openFileInEditor( path )
 	if path then
-		local editorPath = getEditorPath()
+		local editorPath = app.editorPath
+		if editorPath then
+			-- Check that editorPath is valid
+			local file = io.open( editorPath, "r" )
+			if file then
+				io.close( file )
+			else
+				editorPath = nil
+				app.editorPath = editorPath
+			end
+		end
 		if env.isWindows then
 			if editorPath then
 				os.execute('""' .. editorPath .. '" "' .. path .. '""' )

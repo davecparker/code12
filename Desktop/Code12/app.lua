@@ -50,6 +50,7 @@ local app =  {
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
 	tabWidth = 4,                -- current tab width
+	editorPath = nil,			 -- current text editor
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
