@@ -43,7 +43,7 @@ local function clickEvent(event, gameObj)
 		end
 
 		-- If gameObj is nil, check if a line was clicked
-		local focusObj = event.target
+		focusObj = event.target
 		if gameObj == nil then
 			local objs = g.screen.objs
 			for i = 1, objs.numChildren do

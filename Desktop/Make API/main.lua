@@ -58,8 +58,7 @@ local function parseFile()
 		-- make a "class" line pattern not found in normal grammar
 		local strCode = strLines[lineNum]
 		local tokens = javalex.getTokens( strCode, lineNum )
-		if tokens and #tokens == 3 and tokens[1].tt == "class"
-				and tokens[2].tt == "ID" then
+		if tokens and #tokens == 3 and tokens[1].tt == "class" then
 			parseTrees[lineNum] = { t == "line", p = "class", 
 				nodes = { tokens[1], tokens[2] } }
 		else
@@ -69,7 +68,7 @@ local function parseFile()
 				print( "*** Unexpected incomplete line at line " .. lineNum )
 				return false
 			end
-			if tree == nil then
+			if tree == nil or tree.isError then
 				print( "*** Syntax error on line " .. lineNum )
 				if err.shouldStop() then
 					print( err.getErrString() )
@@ -106,20 +105,34 @@ local function buildTables()
 				return false
 			end
 			local methodName = nodes[3].str
-			local vtReturn = javaTypes.vtFromType( nodes[2].nodes[1] )
+			local retType = nodes[2]
+			local vtReturn
+			if retType.p == "void" then
+				vtReturn = false
+			else
+				vtReturn = javaTypes.vtFromType( retType.nodes[1] )
+			end
+
 			-- Build the parameter table
 			local paramTable = {}
 			local params = nodes[5].nodes
 			for j = 1, #params do
 				local param = params[j]
 				if param.p == "array" then
-					local vtParam = javaTypes.vtFromType( param.nodes[1], true )
+					local vtParam = javaTypes.vtFromVarType( param.nodes[1], true )
 					paramTable[#paramTable + 1] = { name = param.nodes[4].str, vt = vtParam }
 				else
-					local vtParam = javaTypes.vtFromType( param.nodes[1] )
+					local typeNode = param.nodes[1]
+					local vtParam
+					if typeNode.str == "Object" then
+						vtParam = nil
+					else
+						vtParam = javaTypes.vtFromVarType( typeNode )
+					end
 					paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
 				end
 			end
+
 			-- Add the method record
 			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable }
 		elseif p == "varDecl" then

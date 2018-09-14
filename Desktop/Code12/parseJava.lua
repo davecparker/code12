@@ -11,6 +11,7 @@
 local app = require( "app" )
 local err = require( "err" )
 local javalex = require( "javalex" )
+local javaTypes = require( "javaTypes" )
 
 
 -- The parseJava module
@@ -134,6 +135,8 @@ end
 local function tokenTypeDescription( tt )
 	if tt == "ID" then
 		return "a name"
+	elseif tt == "TYPE" then
+		return "a type"
 	elseif tt == "NUM" then
 		return "a number"
 	elseif tt == "STR" then
@@ -185,6 +188,39 @@ local function trackUnexpectedToken( ttExpected )
 	end
 end
 
+-- Set the error state for an invalid variable name node.  
+local function invalidVarName( nameNode )
+	parseJava.isInvalidID( nameNode, "variable" )
+end
+
+-- Set the error state for an invalid parameter name node.  
+local function invalidParamName( nameNode )
+	parseJava.isInvalidID( nameNode, "parameter" )
+end
+
+-- Set the error state for an invalid function name node.  (TODO)
+-- local function invalidFuncName( nameNode )
+-- 	parseJava.isInvalidID( nameNode, "function" )
+-- end
+
+-- Set the error state for an invalid type node.
+local function invalidTypeName( node )
+	if node.tt == "ID" then
+		local strName = node.str
+		local tt, strCorrectCase, usageFound = javalex.knownName( strName )
+		if tt == "TYPE" then
+			err.setErrNode( node, 'Incorrect case for type name "%s"', strCorrectCase )
+		elseif tt ~= nil and strCorrectCase == strName then
+			err.setErrNode( node, 
+					"%s is a %s, expected a type name here", strName, usageFound )
+		else
+			err.setErrNode( node, "Unknown type name" )
+		end
+	else
+		err.setErrNode( node, "Expected a type name here" )
+	end
+end
+
 
 ----- Special parsing functions used in the grammar tables below  ------------
 
@@ -193,8 +229,14 @@ end
 -- They return a parse tree, or nil if failure.
 
 
--- Parse the primaryExpr grammar (function version, for recursion)
+-- Parse the primaryExpr grammar plus single token literals (optimization)
 local function parsePrimaryExpr()
+	local token = tokens[iToken]
+	local tt = token.tt
+	if tt == "NUM" or tt == "STR" or tt == "BOOL" or tt == "NULL"  then
+		iToken = iToken + 1
+		return token    -- expr nodes can also be single token nodes
+	end
 	return parseGrammar( primaryExpr )
 end
 
@@ -209,7 +251,7 @@ local function parseOpExpr( leftSide, minPrecedence )
 		local op = token   -- the binary op
 		local opPrec = prec
 		iToken = iToken + 1
-		local rightSide = parseGrammar( primaryExpr )
+		local rightSide = parsePrimaryExpr()
 		if rightSide == nil then
 			err.setErrNodeAndRef( tokens[iToken], op,
 					"Expected expression after %s operator", op.str )
@@ -240,7 +282,7 @@ end
 -- Parse an expression 
 local function expr()
 	-- Start the recursive Precedence Climbing algorithm
-	local leftSide = parseGrammar( primaryExpr )
+	local leftSide = parsePrimaryExpr()
 	if leftSide == nil then
 		return nil
 	elseif syntaxLevel < 4 or leftSide.isError then
@@ -286,31 +328,42 @@ local field = { t = "field",
 }
 
 -- An lValue (var or expr that can be assigned to)
+-- TODO: parse with a function?
 local lValue = { t = "lValue",
 	{ 3, 12, "lValue",			"ID", index, field		},
 }
 
--- A member reference or empty
-local member = { t = "member",
-	{ 1, 12, "member",			".", "ID"				},
-	{ 1, 12, "empty",									},
-}
-
--- A function value
-local fnValue = { t = "fnValue",
-	{ 1, 12, "fnValue",			"ID", index, member, member		},
+-- The start of a function call
+local callHead = { t = "callHead",
+	{ 1, 12, "ct",				"ct", ".", "ID", "("					},
+	{ 1, 12, "System",			"System", ".", "ID", ".", "ID", "("		},
+	{ 5, 12, "Math",			"Math", ".", "ID", "("					},
+	{ 9, 12, "user",			"ID", "("								},
+	{ 7, 12, "method",			"ID", index, field, field, "("			},
+	-- Common Errors
+	{ 7, 0, "method",			"TYPE", index, field, field, "(",		iNode = 1,
+		strErr = invalidVarName },
 }
 
 -- A return type for a procedure/function definition
 local retType = { t = "retType",
-	{ 12, 12, "array",			"ID", "[", "]"			},
-	{ 1, 12, "simple",			"ID"					},
+	{ 1, 12, "void",			"void"						},
+	{ 12, 12, "array",			"TYPE", "[", "]"			},
+	{ 9, 12, "type",			"TYPE"						},
 }
 
 -- A formal parameter (in a function definition)
 local param = { t = "param",
-	{ 12, 12, "array",			"ID", "[", "]", "ID"		},
-	{ 6, 12, "var",				"ID", "ID"					},
+	{ 12, 12, "array",			"TYPE", "[", "]", "ID"		},
+	{ 10, 12, "var",			"TYPE", "ID"				},
+	-- Common Errors
+	{ 12, 0, "array",			"ID", "[", "]", "ID",		iNode = 1 },
+	{ 10, 0, "var",				"ID", "ID",					iNode = 1,
+			strErr = invalidTypeName },
+	{ 10, 0, "var",				"TYPE", "TYPE",				iNode = 2,
+			strErr = invalidParamName },
+	{ 10, 0, "var",				"ID", "TYPE",
+			strErr = "Function parameters should be a type followed by a name" },
 }
 
 -- A formal parameter list, which can be empty
@@ -321,7 +374,10 @@ local paramList = { t = "paramList",
 
 -- An identifier list (must have a least one)
 local idList = { t = "idList",
-	{ 1, 12, "list",			"ID",	list = true,  		},
+	{ 3, 12, "list",			"ID",	list = true,  		},
+	-- Common Errors
+	{ 3, 0, "list",				"TYPE",	list = true,		iNode = 1,
+			strErr = invalidVarName },
 }
 
 -- An expression list, which can be empty
@@ -337,22 +393,24 @@ local exprList1 = { t = "exprList1",
 
 -- A primary expression (no binary operators)
 primaryExpr = { t = "expr",
-	{ 1, 12, "NUM",				"NUM" 								},
-	{ 1, 12, "BOOL",			"BOOL" 								},
-	{ 1, 12, "NULL",			"NULL" 								},
-	{ 1, 12, "STR",				"STR" 								},
-	{ 5, 12, "call",			fnValue, "(", exprList, ")" 		},
+	{ 5, 12, "call",			callHead, exprList, ")" 			},
 	-- Common Error for call (must preceed lValue)
-	{ 1, 0, "call",				fnValue, "(", exprList1, expr, 0,	iNode = 4, missing = true,
+	{ 5, 0, "call",				callHead, exprList1, expr, 0,	iNode = 4, missing = true,
 			strErr = "Function parameter values must be separated by commas" },
 	-- More valid patterns
 	{ 3, 12, "lValue",			lValue								},
-	{ 4, 12, "cast",			"(", "ID", ")", parsePrimaryExpr	},
+	{ 4, 12, "cast",			"(", "TYPE", ")", parsePrimaryExpr	},
 	{ 4, 12, "exprParens",		"(", expr, ")"						},
 	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
 	{ 4, 12, "not",				"!", parsePrimaryExpr 				},
-	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
-	{ 1, 12, "new",				"new", "ID", "(", exprList, ")",	}, 
+	{ 6, 12, "Math",			"Math", ".", "ID"					},
+	{ 12, 12, "newArray",		"new", "TYPE", "[", expr, "]"		},	
+	{ 12, 12, "new",			"new", "ID", "(", exprList, ")"		},
+	-- More Common Errors
+	{ 12, 0, "new",				"new", "TYPE", "(", expr, ")",
+			strErr = 'The syntax for a new array is "new type[count]"' },
+	{ 12, 0, "new",				"new", "TYPE", "(", exprList, ")",
+			strErr = "Code12 does not support creating objects with new" },
 }
 
 -- Shortcut "operate and assign" operators 
@@ -363,9 +421,9 @@ local opAssignOp = { t = "opAssignOp",
 	{ 4, 12, "/=",				"/=",  		},
 }
 
--- A statement
+-- A simple statement
 local stmt = { t = "stmt",
-	{ 1, 12, "call",			fnValue, "(", exprList, ")" 		},
+	{ 1, 12, "call",			callHead, exprList, ")" 			},
 	{ 3, 12, "assign",			lValue, "=", expr 					},
 	{ 4, 12, "opAssign",		lValue, opAssignOp, expr 			},
 	{ 4, 12, "preInc",			"++", lValue 						},
@@ -373,7 +431,7 @@ local stmt = { t = "stmt",
 	{ 4, 12, "postInc",			lValue, "++" 						},
 	{ 4, 12, "postDec",			lValue, "--"						},
 	-- Common Errors
-	{ 1, 0, "call",				fnValue, "(", exprList1, expr, 0,	iNode = 4, missing = true,
+	{ 1, 0, "call",				callHead, exprList1, expr, 0,	iNode = 4, missing = true,
 			strErr = "Function parameter values must be separated by commas" },
 }
 
@@ -385,7 +443,7 @@ local whileEnd = { t = "whileEnd",
 
 -- The init part of a for loop
 local forInit = { t = "forInit",
-	{ 11, 12, "var",			"ID", "ID", "=", expr				},
+	{ 11, 12, "var",			"TYPE", "ID", "=", expr				},
 	{ 11, 12, "stmt",			stmt								},
 	{ 11, 12, "empty",												},
 }
@@ -405,7 +463,7 @@ local forNext = { t = "forNext",
 -- The control part of a for loop (inside the parens)
 local forControl = { t = "forControl",
 	{ 11, 12, "three",			forInit, ";", forExpr, ";", forNext			},
-	{ 12, 12, "array",			"ID", "ID", ":", expr 						},
+	{ 12, 12, "array",			"TYPE", "ID", ":", expr 					},
 	-- Common Errors
 	{ 11, 0, "three",			forInit, ",", 0,	 						iNode = 2 },
 	{ 11, 0, "three",			forInit, ";", forExpr, ",", 0,				iNode = 4, 
@@ -420,25 +478,39 @@ local arrayInit = { t = "arrayInit",
 
 -- A line of code
 local line = { t = "line",
-	{ 1, 12, "blank",																"END" },
-	{ 1, 12, "stmt",			stmt, ";",											"END" },
-	{ 3, 12, "varInit",			access, "ID", "ID", "=", expr, ";",					"END" },
-	{ 3, 12, "varDecl",			access, "ID", idList, ";",							"END" },
-	{ 3, 12, "constInit", 		access, "final", "ID", "ID", "=", expr, ";",		"END" },
-	{ 1, 12, "func",			access, retType, "ID", "(", paramList, ")",			"END" },
-	{ 1, 12, "begin",			"{",												"END" },
-	{ 1, 12, "end",				"}",												"END" },
-	{ 8, 12, "if",				"if", "(", expr, ")",								"END" },
-	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",						"END" },
-	{ 8, 12, "else",			"else", 											"END" },
-	{ 9, 12, "returnVal",		"return", expr, ";",								"END" },
-	{ 9, 12, "return",			"return", ";",										"END" },
-	{ 11, 12, "do",				"do", 												"END" },
-	{ 11, 12, "while",			"while", "(", expr, whileEnd,						"END" },
-	{ 11, 12, "for",			"for", "(", forControl, ")",						"END" },
-	{ 11, 12, "break",			"break", ";",										"END" },
-	{ 12, 12, "arrayInit",		access, "ID", "[", "]", "ID", "=", arrayInit, ";",	"END" },
-	{ 12, 12, "arrayDecl",		access, "ID", "[", "]", idList, ";",				"END" },
+	{ 1, 12, "blank",																	"END" },
+	{ 1, 12, "begin",			"{",													"END" },
+	{ 1, 12, "end",				"}",													"END" },
+	{ 1, 12, "stmt",			stmt, ";",												"END" },
+	{ 3, 12, "varInit",			access, "TYPE", "ID", "=", expr, ";",					"END" },
+	{ 3, 12, "varDecl",			access, "TYPE", idList, ";",							"END" },
+	{ 3, 12, "constInit", 		access, "final", "TYPE", "ID", "=", expr, ";",			"END" },
+	{ 1, 12, "func",			access, retType, "ID", "(", paramList, ")",				"END" },
+	{ 8, 12, "if",				"if", "(", expr, ")",									"END" },
+	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",							"END" },
+	{ 8, 12, "else",			"else", 												"END" },
+	{ 9, 12, "returnVal",		"return", expr, ";",									"END" },
+	{ 9, 12, "return",			"return", ";",											"END" },
+	{ 11, 12, "do",				"do", 													"END" },
+	{ 11, 12, "while",			"while", "(", expr, whileEnd,							"END" },
+	{ 11, 12, "for",			"for", "(", forControl, ")",							"END" },
+	{ 11, 12, "break",			"break", ";",											"END" },
+	{ 12, 12, "arrayInit",		access, "TYPE", "[", "]", "ID", "=", arrayInit, ";",	"END" },
+	{ 12, 12, "arrayDecl",		access, "TYPE", "[", "]", idList, ";",					"END" },
+
+	-- Common errors: unknown type
+	{ 3, 0, "varInit",			access, "ID", "ID", "=", expr, ";", "END",					iNode = 2 },
+	{ 3, 0, "varDecl",			access, "ID", idList, ";", "END",							iNode = 2 },
+	{ 3, 0, "constInit", 		access, "final", "ID", "ID", "=", expr, ";", "END", 		iNode = 3 },
+	{ 12, 0, "arrayInit",		access, "ID", "[", "]", "ID", "=", arrayInit, ";", "END",	iNode = 2 },
+	{ 12, 0, "arrayDecl",		access, "ID", "[", "]", idList, ";", "END",					iNode = 2,
+			strErr = invalidTypeName },
+
+	-- Common errors: type instead of variable name
+	{ 3, 0, "varInit",			access, "TYPE", "TYPE", "=", expr, ";", "END",					iNode = 3 },
+	{ 3, 0, "constInit", 		access, "final", "TYPE", "TYPE", "=", expr, ";", "END", 		iNode = 4 },
+	{ 12, 0, "arrayInit",		access, "TYPE", "[", "]", "TYPE", "=", arrayInit, ";", "END",	iNode = 5,
+			strErr = invalidVarName },
 
 	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
@@ -486,10 +558,10 @@ local line = { t = "line",
 	{ 1, 0, "stmt", 		stmt, ";", 2,
 			strErr = "Code12 requires each statement to be on its own line" },
 
-	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ",",	"ID", "=", 1 },
-	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, ";",	2 },
-	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ",", "ID", "=", 1 }, 
-	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, ";", 2, 
+	{ 3, 0, "varInit",		access, "TYPE", "ID", "=", expr, ",",	"ID", "=", 1 },
+	{ 3, 0, "varInit",		access, "TYPE", "ID", "=", expr, ";",	2 },
+	{ 3, 0, "constInit", 	access, "final", "TYPE", "ID", "=", expr, ",", "ID", "=", 1 }, 
+	{ 3, 0, "constInit", 	access, "final", "TYPE", "ID", "=", expr, ";", 2, 
 			strErr = "Code12 requires each variable initialization to be on its own line" },
 
 	{ 8, 0, "if",			"if", "(", expr, ")", 2, 								iNode = 5, toEnd = true },
@@ -562,8 +634,10 @@ function parseGrammar( grammar )
 						strErr = patErr.strErr
 					end
 					local iNode = pattern.iNode
-					if iNode == nil then
-						err.setErrLineNum( tokens[1].iLine, strErr )
+					if type(strErr) == "function" then
+						strErr( nodes[iNode] )
+					elseif iNode == nil then
+						err.setErrNode( nodes, strErr )
 					elseif pattern.toEnd then
 						err.setErrNodeSpan( nodes[iNode], tokens[#tokens - 1], strErr )
 					elseif pattern.missing then
@@ -731,9 +805,8 @@ local function parseCurrentLine( level )
 	iToken = 1
 	parseTree = parseGrammar( line )
 	if parseTree then
-		print(parseTree.t, parseTree.s, #parseTree.nodes)
 		assert( parseTree.isError )  -- matched a common error
-		return parseTree
+		return parseTree    -- TODO: Is this too risky?
 	end	
 
 	-- Try parsing at higher levels, including common errors
@@ -802,6 +875,31 @@ end
 -- Init the parsing state for a program
 function parseJava.initProgram()
 	javalex.initProgram()
+end
+
+-- If nameNode is an invalid name ID then set the error state and return true,
+-- otherwise return false. Usage should be a description of how the name is 
+-- being used (e.g. "variable", "function"), and existing is true if the name
+-- is being used as an existing name (false if being defined).
+function parseJava.isInvalidID( nameNode, usage, existing )
+	local strName = nameNode.str
+	local tt, strCorrectCase, usageFound = javalex.knownName( strName )
+	if tt == nil then
+		return false   -- not a variation on a known name
+	end
+	if not existing then
+		err.setErrNode( nameNode, 
+				"Code12 does not allow names that differ only by upper/lower case from known names (\"%s\" is a %s)", 
+				strCorrectCase, usageFound )
+	elseif strCorrectCase == strName then
+		err.setErrNode( nameNode, 
+				"%s is a %s, expected a %s name here", strName, usageFound, usage )
+	elseif usageFound == "constant" then
+		err.setErrNode( nameNode, 'Incorrect case for constant "%s"', strCorrectCase )
+	else
+		err.setErrNode( nameNode, 'Names are case-sensitive, known name is "%s"', strCorrectCase )
+	end
+	return true
 end
 
 -- Parse the given line of code at the given syntax level (default numSyntaxLevels).

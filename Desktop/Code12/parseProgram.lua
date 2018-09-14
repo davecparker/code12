@@ -37,7 +37,7 @@ local parseProgram = {}
 --
 -- stmt:
 --     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
---     { s = "call", iLine, lValue, nameID, exprs }
+--     { s = "call", iLine, class, lValue, nameID, exprs }
 --     { s = "assign", iLine, lValue, opToken, opType, expr }   -- opType: =, +=, -=, *=, /=, ++, --
 --     { s = "if", iLine, expr, stmts, elseStmts }
 --     { s = "while", iLine, expr, stmts }
@@ -51,9 +51,10 @@ local parseProgram = {}
 --     { s = "lValue", varID, indexExpr, fieldID }
 -- 
 -- expr:  (Semantic analysis adds a vt field)
---     { s = "literal", token }       -- token.tt: NUM, BOOL, NULL, STR
---     { s = "call", lValue, nameID, exprs }
+--     (expr nodes can be a single NUM, BOOL, NULL, or STR token node)
+--     { s = "call", class, lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
+--     { s = "staticField", class, fieldID }
 --     { s = "cast", vt, expr }
 --     { s = "parens", expr }
 --     { s = "unaryOp", opToken, opType, expr }        -- opType: neg, not
@@ -63,18 +64,18 @@ local parseProgram = {}
 --     { s = "new", nameID, exprs }
 --
 -- There are several types of calls possible. Examples at increasing syntax level:
---    level                         lValue          nameID
---    -----                         ---------       ------
---    (1)    ct.circle()            ct              circle
---    (1)    System.out.println()   System.out      println
---    (7)    ball.delete()          ball            delete
---    (7)    str.equals()           str             equals
---    (7)    Math.sin()             Math            sin
---    (7)    b.group.equals()       b.group         equals
---    (9)    foo()                                  foo
---    (12)   a[3].delete()          a[3]            delete
---    (12)   s[3].equals()          s[3]            equals
---    (12)   a[3].group.equals()    a[3].group      equals
+--    level                         class       lValue          nameID
+--    -----                         -----       ---------       ------
+--    (1)    ct.circle()            ct                          circle
+--    (1)    System.out.println()   System      out             println
+--    (5)    Math.sin()             Math                        sin
+--    (7)    ball.delete()                      ball            delete
+--    (7)    str.equals()                       str             equals
+--    (7)    b.group.equals()                   b.group         equals
+--    (9)    foo()                                              foo
+--    (12)   a[3].delete()                      a[3]            delete
+--    (12)   s[3].equals()                      s[3]            equals
+--    (12)   a[3].group.equals()                a[3].group      equals
 
 
 -- Parsing structures
@@ -141,7 +142,6 @@ local function parseHeader( sourceLines )
 	-- "import", "ID", ".", "*", ";", "END"     (ID = "Code12")
 	local lineNum = 1
 	local nameID = nil
-	local numSourceLines = #sourceLines
 	local iLineImport = nil
 	while lineNum <= numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
@@ -182,7 +182,7 @@ local function parseHeader( sourceLines )
 							"There should be only one class declaration" )
 				else
 					iLineClass = lineNum
-					if #tokens >= 5 and tokens[2].tt == "ID" 
+					if #tokens >= 5 and (tokens[2].tt == "ID" or tokens[2].tt == "TYPE")
 							and tokens[3].tt == "extends" 
 							and tokens[4].str == "Code12Program" then
 						-- Get the class name
@@ -190,9 +190,10 @@ local function parseHeader( sourceLines )
 						-- Check that nameID is valid (not a defined class) and for initial upper case letter in name
 						local className = nameID.str
 						local chFirst = string.byte( className, 1 )
-						if javaTypes.isKnownClassName( className ) then
+
+						if javalex.knownName( className ) then
 							err.setErrNode( nameID,
-									"The class name %s is already defined. Choose another name.", className )
+									"The name %s is already defined. Choose another name for your class.", className )
 						elseif chFirst < 65 or chFirst > 90 then
 							err.setErrNode( nameID, 
 									"By convention, class names should start with an upper-case letter" )
@@ -257,9 +258,9 @@ end
 -- Return true if succesful.
 local function checkBlockBegin()
 	local tree = parseTrees[iTree]
-	local prevTree = parseTrees[iTree - 1]
 	if tree.p == "begin" then
-		if javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( prevTree.iLineStart ) then
+		local prevTree = parseTrees[iTree - 1]
+		if prevTree and javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( prevTree.iLineStart ) then
 			indentErrBlockBegin( tree, prevTree )
 		end
 		iTree = iTree + 1
@@ -269,9 +270,19 @@ local function checkBlockBegin()
 	return false
 end
 
--- Make and return a var given the parsed fields.
+-- Make an arrayInit structure from the nodes of an exprList list pattern
+local function makeArrayInit( nodes )
+	local exprs = {}
+	for _, exprNode in ipairs( nodes[2].nodes ) do
+		exprs[#exprs + 1] = makeExpr( exprNode )
+	end	
+	return { s = "arrayInit", exprs = exprs, 
+			firstToken = nodes[1], lastToken = nodes[3] }
+end 
+
+-- Make and return a var given the parsed fields and optional initExpr structure.
 -- If there is an error then set the error state.
-local function makeVar( isGlobal, access, typeID, nameID, initExpr, isArray, isConst )
+local function makeVar( isGlobal, access, typeNode, nameID, initExpr, isArray, isConst )
 	-- Access is optional and ignored for instance variables, not allowed otherwise
 	if not isGlobal and access and access.p ~= "empty" then
 		err.setErrNode( access, "Access specifiers are only allowed on class-level variables" )
@@ -280,12 +291,12 @@ local function makeVar( isGlobal, access, typeID, nameID, initExpr, isArray, isC
 	return {
 		s = "var",
 		iLine = nameID.iLine,
-		firstToken = typeID,
+		firstToken = typeNode,
 		nameID = nameID,
-		vt = javaTypes.vtFromVarType( typeID, isArray ),
+		vt = javaTypes.vtFromVarType( typeNode, isArray ),
 		isConst = isConst,
 		isGlobal = isGlobal,
-		initExpr = makeExpr( initExpr )
+		initExpr = initExpr,
 	}
 end
 
@@ -297,7 +308,7 @@ local function getVar( p, nodes, structs, isGlobal )
 	if p == "varInit" then
 		-- e.g. int x = 10;
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
-									nodes[3], nodes[5] )
+									nodes[3], makeExpr( nodes[5] ) )
 	elseif p == "varDecl" then
 		-- e.g. int x, y;
 		for _, nameID in ipairs( nodes[3].nodes ) do
@@ -306,11 +317,18 @@ local function getVar( p, nodes, structs, isGlobal )
 	elseif p == "constInit" then
 		-- e.g. final int LIMIT = 100;
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[3], 
-									nodes[4], nodes[6], nil, true )			
+									nodes[4], makeExpr( nodes[6] ), nil, true )			
 	elseif p == "arrayInit" then
 		-- e.g. int[] a = { 1, 2, 3 };   or   int[] a = new int[10];
+		local initExpr
+		local arrayInit = nodes[7]
+		if arrayInit.p == "list" then
+			initExpr = makeArrayInit( arrayInit.nodes )
+		else
+			initExpr = makeExpr( arrayInit.nodes[1] )
+		end
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
-									nodes[5], nodes[7], true )						
+									nodes[5], initExpr, true )						
 	elseif p == "arrayDecl" then
 		-- e.g. GameObj[] coins, walls;
 		for _, nameID in ipairs( nodes[5].nodes ) do
@@ -368,46 +386,47 @@ end
 -- Make and return a call structure from a call parse tree's nodes array.
 -- Return nil if there was an error.
 local function makeCall( nodes )
-	-- Determine the lValue and nameID
-	local lValue, nameID
-	local fnValue = nodes[1]
-	local ns = fnValue.nodes  -- ID, index, member, member
-	local firstID = ns[1]
-	local index = ns[2]
-	local member1 = ns[3]
-	local member2 = ns[4]
-	if member2.p == "member" then
-		-- e.g. System.out.println(), b.group.equals(), a[3].group.equals()
-		lValue = makeLValueFromNodes( firstID, index, member1 )
-		nameID = member2.nodes[2]
-	elseif member1.p == "member" then
-		-- e.g.  ct.circle(), ball.delete(), str.equals(), Math.sin(), 
-		-- a[3].delete(), s[3].equals()
-		lValue = makeLValueFromNodes( firstID, index )
-		nameID = member1.nodes[2]
+	-- Determine the class, lValue, and nameID
+	local class, lValue, nameID
+	local callHead = nodes[1]
+	local ns = callHead.nodes
+	local p = callHead.p
+	if p == "ct" or p == "Math" then
+		class = ns[1]
+		nameID = ns[3]
+	elseif p == "System" then
+		class = ns[1]
+		lValue = makeLValueFromNodes( ns[3] )
+		nameID = ns[5]
+	elseif p == "user" then
+		nameID = ns[1]
 	else
-		-- e.g. foo()
-		if index.p == "index" then
-			-- ERROR e.g. foo[3]()
-			err.setErrNodeSpan( firstID, index, "Invalid function name" )
+		assert( p == "method" )
+		local field2 = ns[4]
+		if field2.p == "field" then
+			lValue = makeLValueFromNodes( ns[1], ns[2], ns[3] )
+			nameID = field2.nodes[2]
+		elseif ns[3].p == "field" then
+			lValue = makeLValueFromNodes( ns[1], ns[2] )
+			nameID = ns[3].nodes[2]
+		else
+			err.setErrNode( nodes, "Invalid function name" )
+			return nil
 		end
-		lValue = nil
-		nameID = firstID
 	end
 
 	-- Make the call structure
-	return { s = "call", lValue = lValue, nameID = nameID, 
-			exprs = makeExprs( nodes[3] ), lastToken = nodes[4] }
+	return { s = "call", class = class, lValue = lValue, nameID = nameID, 
+			exprs = makeExprs( nodes[2] ), lastToken = nodes[3] }
 end
 
 -- Make and return a cast structure given the parse tree nodes. 
 -- The only supported type cast is currently (int). 
 -- In other cases, set the error state.
--- Note this means that some parses involving (varName) are not allowed.
 local function makeCast( nodes )
-	local typeID = nodes[2]
-	if typeID.str ~= "int" then
-		err.setErrNode( typeID, "The only type cast supported by Code12 is (int)" )
+	local typeNode = nodes[2]
+	if typeNode.str ~= "int" then
+		err.setErrNode( typeNode, "The only type cast supported by Code12 is (int)" )
 	end
 	return { s = "cast", vt = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
 end
@@ -528,7 +547,7 @@ local function getForStmt( nodes )
 	local forControl = nodes[3]
 	nodes = forControl.nodes
 	if forControl.p == "array" then
-		-- for (typeID nameID : arrayID) controlledStmts
+		-- for (typeNode nameID : arrayID) controlledStmts
 		return { 
 			s = "forArray", 
 			var = makeVar( false, nil, nodes[1], nodes[2] ),
@@ -548,7 +567,7 @@ local function getForStmt( nodes )
 		local forInit = nodes[1]
 		if forInit.p == "var" then
 			local ns = forInit.nodes
-			stmt.initStmt = makeVar( false, nil, ns[1], ns[2], ns[4] )
+			stmt.initStmt = makeVar( false, nil, ns[1], ns[2], makeExpr( ns[4] ) )
 		elseif forInit.p == "stmt" then
 			stmt.initStmt = getStmt( forInit.nodes[1] )
 			stmt.initStmt.iLine = iLine
@@ -729,33 +748,21 @@ end
 
 -- Make and return an expr structure from an expr or arrayInit parse node
 function makeExpr( node )
-	-- No expr makes nil (e.g. an optional expr field)
-	if node == nil then
+	-- No expr or parse error makes nil (e.g. an optional expr field)
+	if node == nil or node.isError then
 		return nil
 	end
 
-	-- Handle arrayInit nodes
-	if node.t == "arrayInit" then
-		local nodes = node.nodes
-		if node.p == "list" then
-			local exprs = {}
-			for _, exprNode in ipairs( nodes[2].nodes ) do
-				exprs[#exprs + 1] = makeExpr( exprNode )
-			end	
-			return { s = "arrayInit", exprs = exprs, 
-					firstToken = nodes[1], lastToken = nodes[3] }
-		else
-			node = nodes[1]
-		end
+	-- Expr nodes can be a single token (NUM, BOOL, NULL, or STR)
+	if node.tt then
+		return node
 	end
 
 	-- Handle the different primaryExpr types plus binary operators
 	assert( node.t == "expr" )
 	local p = node.p
 	local nodes = node.nodes
-	if p == "NUM" or p == "BOOL" or p == "NULL" or p == "STR" then
-		return { s = "literal", token = nodes[1] }
-	elseif p == "call" then
+	if p == "call" then
 		return makeCall( nodes )
 	elseif p == "lValue" then
 		return makeLValue( nodes[1] )
@@ -766,6 +773,8 @@ function makeExpr( node )
 	elseif p == "neg" or p == "not" then
 		return { s = "unaryOp", opToken = nodes[1], opType = p, 
 				expr = makeExpr( nodes[2] ) }
+	elseif p == "Math" then
+		return { s = "staticField", class = nodes[1], fieldID = nodes[3] }
 	elseif p == "newArray" then
 		return { s = "newArray", vt = javaTypes.vtFromVarType( nodes[2] ), 
 				lengthExpr = makeExpr( nodes[4] ), firstToken = nodes[1],
@@ -784,14 +793,17 @@ end
 -- including the contained statements, and move iTree past it.
 -- If there is an error then set the error state and return nil.
 local function getFunc( nodes )
-	local accessP = nodes[1].p
+	-- Determine the return type
+	local vt
 	local retType = nodes[2]
-	local typeID = retType.nodes[1]
-	local isArray = (retType.p == "array") or nil
-	local nameID = nodes[3]
-	local paramList = nodes[5]
+	if retType.p == "void" then
+		vt = false
+	else
+		vt = javaTypes.vtFromType( retType.nodes[1], retType.p == "array" )
+	end
 
 	-- Build the paramVars array
+	local paramList = nodes[5]
 	local paramVars = {}
 	for _, node in ipairs( paramList.nodes ) do
 		local ns = node.nodes
@@ -809,17 +821,12 @@ local function getFunc( nodes )
 	end
 
 	-- Make the func
-	local func = { 
-		s = "func",
-		iLine = nameID.iLine,
-		nameID = nameID,
-		vt = javaTypes.vtFromType( typeID, isArray ),
-		paramVars = paramVars, 
-		stmts = stmts,
-		entireLine = true, 
-	}
+	local nameID = nodes[3]
+	local func = { s = "func", iLine = nameID.iLine, nameID = nameID, vt = vt,
+					paramVars = paramVars, stmts = stmts, entireLine = true }
 
 	-- Add the access flags and return it
+	local accessP = nodes[1].p
 	if accessP == "publicStatic" then
 		func.isPublic = true
 		func.isStatic = true
@@ -827,6 +834,37 @@ local function getFunc( nodes )
 		func.isPublic = true
 	end
 	return func
+end
+
+-- Skip a block starting with { until the matching } without checking it
+local function skipBlock()
+	-- Block must start with a {
+	local iLineStart = parseTrees[iTree].iLine
+	if not checkBlockBegin() then
+		return false
+	end
+
+	-- Get all lines until we get a matching end for the block begin
+	local blockLevel = 1
+	while iTree <= numParseTrees do
+		local tree = parseTrees[iTree]
+		local p = tree.p
+		iTree = iTree + 1    -- pass this line
+
+		if p == "begin" then
+			blockLevel = blockLevel + 1
+		elseif p == "end" then
+			blockLevel = blockLevel - 1
+			if blockLevel == 0 then
+				return
+			end
+		end
+	end
+
+	-- Got to EOF before finding matching }
+	err.setErrLineNum( numSourceLines + 1, 
+		"Missing } to end block starting at line %d", iLineStart )
+	return nil
 end
 
 -- Check and build the members, ending with and including the } at 
@@ -837,7 +875,6 @@ local function getMembers()
 	local vars = programTree.vars
 	local funcs = programTree.funcs
 	local gotFunc = false     -- set to true when the first func was seen
-	local iTreeStart = iTree
 	local firstMemberLineNum, firstMemberIndentLevel
 
 	-- Look for instance variables and functions
@@ -845,27 +882,25 @@ local function getMembers()
 		local tree = parseTrees[iTree]
 		local p = tree.p
 		local nodes = tree.nodes
-		local ok = not tree.isError
-		if ok and iTree == iTreeStart then
-			-- Save indentation level and line number of first member
-			firstMemberLineNum = tree.iLineStart
-			firstMemberIndentLevel = javalex.indentLevelForLine( firstMemberLineNum )
-		end
 		iTree = iTree + 1
 
-		if ok and getVar( p, nodes, vars, true ) then
+		if tree.isError then
+			-- Skip lines with syntax errors, but process stmt blocks for bad func headers
+			if p == "func" then
+				getBlockStmts()
+			end
+		elseif getVar( p, nodes, vars, true ) then
 			-- Added instance variable(s)
 			-- Code12 does not allow instance variables to follow member functions,
 			-- because it greatly complicates keeping Java and Lua line numbers in sync.
 			if gotFunc then
 				err.setErrNode( tree, "Class-level variables must be defined at the beginning of the class" )
-			end 
+			end
 		elseif p == "func" then
-			-- User function or event definition
-			if ok then
-				funcs[#funcs + 1] = getFunc( nodes )
+			if nodes[3].str == "main" then
+				skipBlock()    -- skip body of main without checking it
 			else
-				getBlockStmts()  -- skip body of invalid function defintion
+				funcs[#funcs + 1] = getFunc( nodes )
 			end
 			gotFunc = true
 		elseif p == "end" then
@@ -874,37 +909,31 @@ local function getMembers()
 				err.setErrLineNum( tree.iLine, "The ending } of the program class should not be indented" )
 			end
 			return true
+		elseif p == "begin" then
+			-- Ad-hoc blocks are unexpected, but try to process the block anyway
+			err.setErrNode( tree, "Unexpected or extra {" )
+			iTree = iTree - 1   -- back to the { line
+			getBlockStmts()
 		else
 			-- Unexpected line in the class block
-			-- Try to give a decent error message.
-			if ok then
-				local strErr
-				if p == "end" then
-					strErr = [[Extra "}" without a matching "{"]]
-				elseif p == "begin" then
-					strErr = [[Unexpected or extra "{"]]
-				elseif p == "importAll" or p == "import" then
-					strErr = "Imports must be at the very beginning of the program"
-				elseif p == "class" or p == "classUser" then
-					strErr = "Code12 does not support nested or additional classes"
-				else
-					strErr = [[Statement must be inside a function body -- mismatched { } brackets?]]
-				end
-				err.overrideErrLineParseTree( tree, strErr )
-			end
-			return false
+			err.overrideErrLineParseTree( tree, 
+					"Statement must be inside a function body -- mismatched { } brackets?" )
 		end
-		if ok then
-			-- Check indentation of member
+
+		-- Check indentation of members
+		if firstMemberLineNum == nil then
+			-- Save indentation level and line number of first member
+			firstMemberLineNum = tree.iLineStart
+			firstMemberIndentLevel = javalex.indentLevelForLine( firstMemberLineNum )
 			if firstMemberIndentLevel == 0 then
 				err.setErrLineNum( firstMemberLineNum,
 						"Class-level variable and function definitions should be indented" )
-			elseif javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
-				err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
-						"Class-level variable and function definitions should all have the same indentation" )
 			end
-			checkMultiLineIndent( tree )
+		elseif javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
+			err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
+					"Class-level variable and function definitions should all have the same indentation" )
 		end
+		checkMultiLineIndent( tree )
 	end
 
 	-- Reached EOF before finding the end of the class
@@ -915,7 +944,7 @@ end
 -- Print a structure tree node recursively for debugging, labelled with name if included
 local function printStructureTree( node, indentLevel, file, label )
 	-- Make a label for this node
-	assert( type(node) == "table" and node.s )
+	assert( type(node) == "table" and (node.s or node.tt) )
 	local str
 	if node.iLine then
 		str = string.format( "%3d.%s", node.iLine, string.rep( "    ", indentLevel ) )
@@ -925,7 +954,12 @@ local function printStructureTree( node, indentLevel, file, label )
 	if label then
 		str = str .. label .. ": "
 	end
-	if node.s == "binOp" then
+	if node.tt then
+		-- Leaf token
+		str = str .. "(" .. node.str .. ")"
+		app.printDebugStr( str, file )
+		return
+	elseif node.s == "binOp" then
 		str = str .. "(" .. node.opType .. ")"
 	else
 		str = str .. node.s
@@ -1007,6 +1041,7 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	-- Init the parse state
 	parseJava.initProgram()
 	parseTrees = {}
+	numSourceLines = #sourceLines
 
 	-- Parse the required program header
 	local lineNum
@@ -1018,7 +1053,6 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	-- Parse the remaining lines and build the parseTrees array
 	local startTokens = nil
 	local iLineStart = nil
-	numSourceLines = #sourceLines
 	while lineNum <= numSourceLines do
 		local tree, tokens = parseJava.parseLine( sourceLines[lineNum], 
 									lineNum, startTokens, syntaxLevel )
@@ -1031,13 +1065,11 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 			end
 		else
 			startTokens = nil
-			if tree == nil then
-				-- Syntax error: Use stub error tree
-				tree = { isError = true, iLine = lineNum }
-			end 
-			if tree.p ~= "blank" then
+			if tree then
 				tree.iLineStart = iLineStart or lineNum
-				parseTrees[#parseTrees + 1] = tree
+				if tree.p ~= "blank" then
+					parseTrees[#parseTrees + 1] = tree
+				end
 			end
 			iLineStart = nil
 		end
