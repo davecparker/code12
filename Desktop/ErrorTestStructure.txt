@@ -1,5 +1,13 @@
-    program ErrorTest { #funcs = 44, #vars = 20 }
+    program ErrorTest { #funcs = 45, #vars = 20 }
         funcs:
+ 40.        func main { isStatic = true, vt = void, #paramVars = 1, isPublic = true, #stmts = 1 }
+                paramVars:
+ 40.                var args { vt = array of String, isGlobal = false }
+                stmts:
+ 43.                call run { #exprs = 1 }
+                        lValue: lValue { varID = Code12 }
+                        exprs:
+                            new ErrorTest
  48.        func emptyFunc { #paramVars = 0, vt = void, #stmts = 0 }
  51.        func voidFunc { #paramVars = 0, vt = void, #stmts = 1 }
                 stmts:
@@ -110,7 +118,7 @@
                             lValue { varID = arg1 }
                             lValue { varID = arg2 }
                             lValue { varID = arg3 }
-109.        func start { #paramVars = 0, vt = int, isPublic = true, #stmts = 412 }
+109.        func start { #paramVars = 0, isPublic = true, vt = int, #stmts = 412 }
                 stmts:
 113.                var LIMIT { vt = int, isConst = true }
                         initExpr: literal { token = 100 }

@@ -374,7 +374,7 @@ local function stringLiteralToken()
 end
 
 -- Return ("NUM", str) for a numeric literal token starting with a digit
-local function numericLiteralToken(startsWithDot)
+local function numericLiteralToken( startsWithDot )
 	local iCharStart = iChar   -- the first digit char or . if startsWithDot == true
 	iChar = iChar + 1
 	local charType = charTypes[chars[iChar]]
@@ -406,12 +406,21 @@ local function numericLiteralToken(startsWithDot)
 			iChar = iChar + 1
 			charType = charTypes[chars[iChar]]
 		until charType ~= false -- digit chars of exponent
+	elseif charTypes[ch] == true then 
+		-- Error: number immediately followed by a letter, e.g. 123a, 123abc, 123i45
+		repeat   -- get to the end of the string of ID chars
+			iChar = iChar + 1
+			charType = charTypes[chars[iChar]]
+		until type(charType) ~= "boolean"
+		setTokenErr( iCharStart, iChar - 1, "This is not a valid number or name" )
+		return nil
 	end
 	local str = string.sub(source, iCharStart, iChar - 1)
 	return "NUM", str
 end
 
--- Return string for token starting with .  (. or numeric literal token starting with a dot)
+-- Return string for token starting with .  
+-- (dot or a numeric literal token starting with a dot)
 local function  dotToken()
 	if charTypes[chars[iChar + 1]] == false then   -- digit char after dot
 		return numericLiteralToken(true)

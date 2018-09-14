@@ -355,6 +355,7 @@ local fnGenerateExpr = {
 	["binOp"]      = binOpCode,
 	["newArray"]   = newArrayCode,
 	["arrayInit"]  = arrayInitCode,
+	-- "new" is not allowed outside main, which doesn't generate code
 }
 
 -- Return the Lua code for the given expr
@@ -363,7 +364,7 @@ function exprCode( expr )
 	if fn then
 		return fn( expr )
 	end
-	error( "Unknown expr type %s", expr.s )
+	error( "Unknown expr type " .. expr.s )
 end
 
 
@@ -592,7 +593,9 @@ function codeGenJava.getLuaCode( programTree )
 	end
 	if funcs then
 		for _, func in ipairs( funcs ) do
-			generateFunc( func )
+			if func.nameID.str ~= "main" then
+				generateFunc( func )
+			end
 		end
 	end
 

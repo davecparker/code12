@@ -37,19 +37,29 @@ local syntaxFeatures = {
 local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
-local sourceLine        -- the current source code line
-local lineNumber        -- the line number for sourceLine
-local tokens     	    -- array of tokens
-local iToken            -- index of current token in tokens
-local syntaxLevel	    -- the syntax level for parsing
-local maxSyntaxLevel    -- max syntax level or 0 to match common errors
-local iTokenMax         -- farthest token parsed on a line or nil if not tracking this
+local sourceLine          -- the current source code line
+local lineNumber          -- the line number for sourceLine
+local tokens              -- array of tokens
+local iToken              -- index of current token in tokens
+local syntaxLevel         -- the syntax level for parsing
+local matchCommonErrors   -- true to consider common error patterns
+
+-- State for attempting to locate syntax errors
+local findError           -- nil if not trying to find errors, or a table with:
+-- {
+--     lineOrStmtPattern = p,   -- current line or stmt pattern being parsed
+--     iTokenMax = iToken,      -- token index of farthest successful partial parse
+--     parses = array of:       -- for each partial parse that reached iTokenMax
+--         {
+--             stmtPattern = p,    -- the line or stmt pattern for this parse
+--             ttExpected = tt,    -- the token type expected
+--         }
+-- }        
 
 -- Forward function declarations necessary due to mutual recursion or 
 -- use in the grammar tables below
 local parseGrammar
 local parsePattern
-local parseOpExpr
 local primaryExpr
 
 
@@ -100,7 +110,6 @@ local binaryOpPrecedence = {
 	["&&"]	= 4,
 	["||"]	= 3,
 	["?"]	= 2,
-	[":"]	= 2,
 }
 
 
@@ -121,23 +130,111 @@ local function makeParseTreeNode( t, p, nodes )
 	return { t = t, p = p, nodes = nodes }
 end	
 
-
--- Set an error at token on the current line being parsed, or at the END
--- token if token is nil.
-local function setTokenMismatchError( token )
-	err.clearErr( lineNumber )   -- replacing prev error on this line if any
-	if token == nil then
-		token = tokens[#tokens]  -- unexpected end of line, so highlight the END
+-- Return a description of the given token type for syntax errors
+local function tokenTypeDescription( tt )
+	if tt == "ID" then
+		return "a name"
+	elseif tt == "NUM" then
+		return "a number"
+	elseif tt == "STR" then
+		return "a string"
+	elseif tt == "BOOL" then
+		return "a boolean constant"
+	elseif tt == "NULL" then
+		return "null"
+	elseif tt == "END" then
+		return "end of line"
 	end
-	err.setErrNode( token, 'Syntax Error "%s"', token.str )
+	return "\"" .. tt .. "\""   -- "if", "(", "<=", etc.
+end	
+
+-- Return a description of the given token for syntax errors
+local function tokenDescription( token )
+	local tt = token.tt
+	if tt == "BOOL" then
+		return "\"" .. token.str .. "\""   -- "true", "false"
+	end
+	return tokenTypeDescription( tt )
+end	
+
+-- Update the findError tracking state for an unexpected token at the current
+-- parse location when type ttExpected was expected.
+local function trackUnexpectedToken( ttExpected )
+	local iTokenMax = findError.iTokenMax or 0
+	if iToken >= iTokenMax then
+		local token = tokens[iToken] or tokens[#tokens]   -- use END if past end
+		err.clearErr( lineNumber )   -- replace previous error on this line if any
+		if iToken > iTokenMax then
+			-- This partial parse made it the farthest so far
+			findError.iTokenMax = iToken
+			findError.parses = { {    -- first parses entry out this far
+				stmtPattern = findError.lineOrStmtPattern,
+				ttExpected = ttExpected 
+			} }
+			err.setErrNode( token, "Syntax Error: expected %s",
+					tokenTypeDescription( ttExpected ) )
+		else
+			-- This partial parse went to the same token we stopped at before
+			findError.parses[#findError.parses + 1] = { 
+				stmtPattern = findError.lineOrStmtPattern, 
+				ttExpected = ttExpected 
+			}
+			err.setErrNode( token, "Syntax Error: %s was unexpected here",
+					tokenDescription( token ) )
+		end
+	end
 end
 
 
 ----- Special parsing functions used in the grammar tables below  ------------
 
+-- Unless otherwise specified, parsing functions parse the tokens array starting 
+-- at iToken, considering only patterns that are defined within the syntaxLevel.
+-- They return a parse tree, or nil if failure.
+
+
 -- Parse the primaryExpr grammar (function version, for recursion)
 local function parsePrimaryExpr()
 	return parseGrammar( primaryExpr )
+end
+
+-- Parse the rest of an expression after leftSide using Precedence Climbing.
+-- See https://en.wikipedia.org/wiki/Operator-precedence_parser
+local function parseOpExpr( leftSide, minPrecedence )
+	-- Check for binary operator
+	local token = tokens[iToken]
+	local prec = binaryOpPrecedence[token.tt]
+	-- Build nodes and recurse in the correct direction depending on prec
+	while prec and prec >= minPrecedence do
+		local op = token   -- the binary op
+		local opPrec = prec
+		iToken = iToken + 1
+		local rightSide = parseGrammar( primaryExpr )
+		if rightSide == nil then
+			err.setErrNodeAndRef( tokens[iToken], op,
+					"Expected expression after %s operator", op.str )
+			return nil
+		end
+		-- Check for another op after this op's expr and compare precedence
+		token = tokens[iToken]
+		prec = binaryOpPrecedence[token.tt]
+		while prec and prec > opPrec do
+			-- Higher precedence op follows, so recurse to the right
+			rightSide = parseOpExpr( rightSide, prec )
+			if rightSide == nil then
+				return nil  -- expected expression after binary op, err set above
+			end
+			-- Keep looking for the next op
+			token = tokens[iToken]
+			prec = binaryOpPrecedence[token.tt]
+		end
+		-- Build the node for this op
+		leftSide = makeParseTreeNode( "expr", op.tt, { leftSide, op, rightSide } )
+		if rightSide.isError then
+			leftSide.isError = true   -- propagate error up to parent
+		end
+	end
+	return leftSide
 end
 
 -- Parse an expression 
@@ -146,10 +243,31 @@ local function expr()
 	local leftSide = parseGrammar( primaryExpr )
 	if leftSide == nil then
 		return nil
-	elseif leftSide.isError then
+	elseif syntaxLevel < 4 or leftSide.isError then
 		return leftSide
 	end
 	return parseOpExpr( leftSide, 0 )  -- include binary operators
+end
+
+-- Parse an access specifier (as a function for efficiency).
+-- The resulting valid patterns are "public", "publicStatic",
+-- "private", and "empty".
+local function access()
+	local token = tokens[iToken]
+	local tt = token.tt
+	if tt == "public" then
+		iToken = iToken + 1
+		local token2 = tokens[iToken]
+		if token2.tt == "static" then
+			iToken = iToken + 1
+			return makeParseTreeNode( "access", "publicStatic", { token, token2 } )
+		end
+		return makeParseTreeNode( "access", "public", { token } )
+	elseif tt == "private" or tt == "protected" then
+		iToken = iToken + 1
+		return makeParseTreeNode( "access", "private", { token } )
+	end
+	return makeParseTreeNode( "access", "empty", {} )
 end
 
 
@@ -187,13 +305,6 @@ local fnValue = { t = "fnValue",
 local retType = { t = "retType",
 	{ 12, 12, "array",			"ID", "[", "]"			},
 	{ 1, 12, "simple",			"ID"					},
-}
-
--- An access permission specifier
-local access = { t = "access",
-	{ 1, 12, "public",			"public"				},
-	{ 3, 12, "private",			"private"				},
-	{ 1, 12, "empty",									},
 }
 
 -- A formal parameter (in a function definition)
@@ -241,9 +352,7 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
 	{ 4, 12, "not",				"!", parsePrimaryExpr 				},
 	{ 12, 12, "newArray",		"new", "ID", "[", expr, "]"			},
-	-- Other Common Errors
-	{ 1, 0, "new",				"new", "ID", "(", 0,				iNode = 1, 
-			strErr = "Code12 does not support making objects with new" },
+	{ 1, 12, "new",				"new", "ID", "(", exprList, ")",	}, 
 }
 
 -- Shortcut "operate and assign" operators 
@@ -331,29 +440,17 @@ local line = { t = "line",
 	{ 12, 12, "arrayInit",		access, "ID", "[", "]", "ID", "=", arrayInit, ";",	"END" },
 	{ 12, 12, "arrayDecl",		access, "ID", "[", "]", idList, ";",				"END" },
 
-	-- Boilerplate lines
-	{ 1, 12, "importAll",		"import", "ID", ".", "*", ";",						"END" },
-	{ 1, 12, "class",			"class", "ID",										"END" },
-	{ 1, 12, "classUser",		access, "class", "ID", "extends", "ID",				"END" },
-	{ 1, 12, "main",			"public", "static", "ID", "ID", 
-									"(", "ID", "[", "]", "ID", ")",					"END" },
-	{ 1, 12, "Code12Run",		"ID", ".", "ID", "(", "new", 
-									"ID", "(", ")", ")", ";",						"END" },
 	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
 	{ 9, 0, "returnVal", 	"return", expr, "END", 									iNode = 3 }, 
 	{ 9, 0, "return", 		"return", "END", 										iNode = 2 },
-	{ 11, 0, "break",		"break", "END",											iNode = 2,
-			strErr = "Statement should end with a semicolon (;)" },
-
+	{ 11, 0, "break",		"break", "END",											iNode = 2 },
 	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, "END",					iNode = 6 }, 
 	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, "END",			iNode = 7 }, 
-	{ 12, 0, "arrayInit",	access, "ID", "[", "]", "ID", "=", arrayInit, "END", 	iNode = 8,
-			strErr = "Variable initialization should end with a semicolon (;)" },
-
+	{ 12, 0, "arrayInit",	access, "ID", "[", "]", "ID", "=", arrayInit, "END", 	iNode = 8 },
 	{ 3, 0, "varDecl",		access, "ID", idList, "END",							iNode = 4 }, 
 	{ 12, 0, "arrayDecl",	access, "ID", "[", "]", idList, "END",					iNode = 6,
-			strErr = "Variable declaration should end with a semicolon (;)" },
+			strErr = "Statement should end with a semicolon (;)" },
 
 	-- Common errors: incorrect semicolon
 	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END",	iNode = 7,
@@ -385,10 +482,6 @@ local line = { t = "line",
 	{ 1, 0, "end",			"}", 1,
 			strErr = "In Code12, each } to end a block must be on its own line" },
 
-	-- Common errors: malformed boilerplate lines
-	{ 1, 0, "import",		"import", "ID", 0, 
-			strErr = "import should be \"Code12.*;\"" },
-
 	-- Common errors: multiple statements per line
 	{ 1, 0, "stmt", 		stmt, ";", 2,
 			strErr = "Code12 requires each statement to be on its own line" },
@@ -410,76 +503,44 @@ local line = { t = "line",
 	{ 11, 0, "while",		"while", "(", expr, whileEnd, 2,						iNode = 5, toEnd = true },
 	{ 11, 0, "for",			"for", "(", forControl, ")", 2,							iNode = 5, toEnd = true,
 			strErr = "Code12 requires the contents of a loop to start on its own line" },
-
 }
 
 
------ Parsing Functions --------------------------------------------------------
-
--- Unless otherwise specified, parsing functions parse the tokens array starting 
--- at iToken, considering only patterns that are defined within the syntaxLevel.
--- They return a parse tree, or nil if failure.
-
-
--- Parse the rest of an expression after leftSide using Precedence Climbing.
--- See https://en.wikipedia.org/wiki/Operator-precedence_parser
-function parseOpExpr( leftSide, minPrecedence )
-	-- Check for binary operator
-	local token = tokens[iToken]
-	local prec = binaryOpPrecedence[token.tt]
-	-- Build nodes and recurse in the correct direction depending on prec
-	while prec and prec >= minPrecedence do
-		local op = token   -- the binary op
-		local opPrec = prec
-		iToken = iToken + 1
-		local rightSide = parseGrammar( primaryExpr )
-		if rightSide == nil then
-			err.setErrNodeAndRef( tokens[iToken], op,
-					"Expected expression after %s operator", op.str )
-			return nil
-		end
-		-- Check for another op after this op's expr and compare precedence
-		token = tokens[iToken]
-		prec = binaryOpPrecedence[token.tt]
-		while prec and prec > opPrec do
-			-- Higher precedence op follows, so recurse to the right
-			rightSide = parseOpExpr( rightSide, prec )
-			if rightSide == nil then
-				return nil  -- expected expression after binary op, err set above
-			end
-			-- Keep looking for the next op
-			token = tokens[iToken]
-			prec = binaryOpPrecedence[token.tt]
-		end
-		-- Build the node for this op
-		leftSide = makeParseTreeNode( "expr", op.tt, { leftSide, op, rightSide } )
-		if rightSide.isError then
-			leftSide.isError = true   -- propagate error up to parent
-		end
-	end
-	return leftSide
-end
+----- Grammar Parsing Functions ----------------------------------------------
 
 -- Attempt to parse the given grammar table. 
 -- Return the parseTree if sucessful or nil if failure.
 -- If the parse matches a common syntax error, then set the error state
 -- and return a parseTree with the isError field set to true inside it.
 function parseGrammar( grammar )
-	-- Consider each pattern in the grammar table that includes the syntaxLevel range.
+	-- Look at each pattern in the grammar
 	local iStart = iToken
 	for i = 1, #grammar do
 		local pattern = grammar[i]
+		local p = pattern[3]
+
+		-- If tracking with findError then keep track of the current line or stmt 
+		-- pattern being parsed here and during contained grammars. 
+		if findError then
+			local t = grammar.t
+			if t == "line" or t == "stmt" or (t == "expr" and pattern == "call") then
+				findError.lineOrStmtPattern = p
+			end
+		end
+
+		-- Consider only patterns defined for the syntaxLevel
 		local patternMinLevel = pattern[1]
 		local patternMaxLevel = pattern[2]
-		if syntaxLevel >= patternMinLevel and maxSyntaxLevel <= patternMaxLevel then
+		if syntaxLevel >= patternMinLevel 
+				and (syntaxLevel <= patternMaxLevel or matchCommonErrors) then
 			-- Try to match this pattern within the grammer table
-			trace("Trying " .. grammar.t .. "[" .. i .. "] (" .. pattern[3] .. ")")
+			trace("Trying " .. grammar.t .. "[" .. i .. "] (" .. p .. ")")
 			traceIndentLevel = traceIndentLevel + 1
 			local nodes = parsePattern( pattern )
 			traceIndentLevel = traceIndentLevel - 1
 			if nodes then
 				-- This pattern matches, so make a tree node to return
-				local parseTree = makeParseTreeNode( grammar.t, pattern[3], nodes )
+				local parseTree = makeParseTreeNode( grammar.t, p, nodes )
 
 				-- If we matched a common error then set the error state
 				-- and mark the parse tree with isError.
@@ -514,7 +575,7 @@ function parseGrammar( grammar )
 
 				-- Return the parse tree
 				trace( string.format( "== Returning %s[%d] (%s) %s", 
-							grammar.t, i, pattern[3], parseTree.isError and "isError" or "" ) )
+							grammar.t, i, p, parseTree.isError and "isError" or "" ) )
 				return parseTree
 			end
 			iToken = iStart  -- reset position for next pattern to try
@@ -544,9 +605,8 @@ local function parseListPattern( pattern )
 			-- Token: compare to next token
 			if token == nil or token.tt ~= item then
 				-- Required next token type doesn't match
-				if iTokenMax and iToken > iTokenMax then   -- new farthest error
-					setTokenMismatchError( token )
-					iTokenMax = iToken
+				if findError then
+					trackUnexpectedToken( item )
 				end
 				return nil    -- required next token type doesn't match
 			end
@@ -579,6 +639,9 @@ local function parseListPattern( pattern )
 				return nil
 			end
 		else
+			if findError then
+				trackUnexpectedToken( "," )   -- could have expected a comma here
+			end
 			return nodes  -- can't parse any more list items
 		end
 	until false  -- returns internally
@@ -599,6 +662,7 @@ function parsePattern( pattern )
 	local nodes = {}   -- node array to build
 	for iItem = 4, #pattern do   -- start after minLevel, maxLevel, patternName
 		local item = pattern[iItem]
+
 		-- Is this pattern item a token, grammar table, parsing function, or token count?
 		local node = nil
 		local t = type(item)
@@ -607,9 +671,8 @@ function parsePattern( pattern )
 			local token = tokens[iToken]
 			if token == nil or token.tt ~= item then
 				-- Required next token type doesn't match
-				if iTokenMax and iToken > iTokenMax then   -- new farthest error
-					setTokenMismatchError( token )
-					iTokenMax = iToken
+				if findError then
+					trackUnexpectedToken( item )
 				end
 				return nil
 			end
@@ -622,8 +685,8 @@ function parsePattern( pattern )
 			node = parseGrammar( item )   -- sub-grammar
 		elseif t == "number" then
 			-- Matches at least this many of any token until end of line
-			if #tokens - iToken >= item then
-				for _ = iItem, #tokens do
+			if #tokens - iToken >= item then  -- are there enough tokens left?
+				while iToken <= #tokens do
 					nodes[#nodes + 1] = tokens[iToken]
 					iToken = iToken + 1
 				end
@@ -654,8 +717,8 @@ end
 local function parseCurrentLine( level )
 	-- Try normal parse at the requested syntax level first
 	syntaxLevel = level
-	maxSyntaxLevel = level
-	iTokenMax = nil    -- don't bother tracking the farthest error
+	matchCommonErrors = false
+	findError = nil    -- don't try to find errors (optimize for success)
 	iToken = 1
 	local parseTree = parseGrammar( line )
 	if parseTree then
@@ -664,10 +727,11 @@ local function parseCurrentLine( level )
 
 	-- Try common errors at the given syntax level
 	err.clearErr( lineNumber )
-	maxSyntaxLevel = 0   -- causes common errors to also be considered
+	matchCommonErrors = true
 	iToken = 1
 	parseTree = parseGrammar( line )
 	if parseTree then
+		print(parseTree.t, parseTree.s, #parseTree.nodes)
 		assert( parseTree.isError )  -- matched a common error
 		return parseTree
 	end	
@@ -689,20 +753,29 @@ local function parseCurrentLine( level )
 		end
 	end
 
-	-- If we set a known error at the max syntax level including common error
-	-- patterns, then fail with this error state.
+	-- Parse again at the user's level to look for basic parse errors.
+	err.clearErr( lineNumber )
+	syntaxLevel = level
+	matchCommonErrors = false
+	iToken = 1
+	parseGrammar( line )
 	if err.getLoggedErrForLine( lineNumber ) then
 		return nil
 	end
 
-	-- Parse again at the user's level to try to determine the error
-	-- at the parse point that used the most tokens on the line.
-	syntaxLevel = level
-	maxSyntaxLevel = level
-	iTokenMax = 0
+	-- Try at the user's level with findError to try to find the error
+	findError = {}
 	iToken = 1
 	parseGrammar( line )
-	if err.getLoggedErrForLine( lineNumber ) == nil then
+	if findError.iTokenMax then
+		-- Tracking found and reported an error
+		print( string.format( '\nSyntax error at token %d "%s"', 
+				findError.iTokenMax, tokens[findError.iTokenMax].str ) )
+		for _, parse in ipairs( findError.parses ) do
+			print( string.format( "    %s expected %s", 
+					parse.stmtPattern, parse.ttExpected ) )
+		end
+
 		-- Make a generic syntax error to use since a more specific error was not found
 		local lastToken = tokens[#tokens - 1]  -- not counting the END
 		err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )

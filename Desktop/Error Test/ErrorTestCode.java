@@ -2,8 +2,8 @@ import Code12.*;
 
 // ERROR "The class header shouldn't be indented"
 	class ErrorTest extends Code12Program
-// ERROR "The { beginning a block should have the same indentation as the line before it"
-{
+// ERROR "The beginning { for the class shouldn't be indented"
+	{
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
 	GameObj button = ct.text("START", 0, 0, 10);
@@ -39,9 +39,9 @@ int underIndentedInstanceVar;
 
 	public static void main(String[] args)
 	{ 
-	// ERROR "The body of a function should be indented more than its opening {"
+	// ERROR "should be indented"
 	Code12.run(new ErrorTest());
-	// ERROR "main functions's ending } should have the same indentation as its beginning {"
+	// ERROR "ending } should have the same indentation as its beginning {"
 		}
 
 	// user defined functions
@@ -1247,7 +1247,7 @@ int underIndentedInstanceVar;
 		}
 		if (false)
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "if" above it."
+		// ERROR "This line is not controlled by the "if" above it"
 			voidFunc();
 		if (false)
 		{
@@ -1279,7 +1279,7 @@ int underIndentedInstanceVar;
 			voidFunc();
 		else
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "else" above it."
+		// ERROR "This line is not controlled by the "else" above it"
 			voidFunc();
 		if (false)
 			voidFunc();
@@ -1371,7 +1371,7 @@ int underIndentedInstanceVar;
 			}
 		while (false)
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "while" above it."
+		// ERROR "This line is not controlled by the "while" above it"
 			voidFunc();
 		do
 		// ERROR "This line should be indented more than its controlling "do""
@@ -1511,8 +1511,8 @@ int underIndentedInstanceVar;
 		void misplacedFunc()
 		// ERROR "Function definitions cannot occur inside a statement block"
 		public static void main(String[] args)
-		// ERROR "Unexpected statement"
-		import Code12.*;
+		// ERROR "Function definitions cannot occur inside a statement block"
+		public void update()
 	}
 
 	// ERROR "Variable myVar was already defined"
