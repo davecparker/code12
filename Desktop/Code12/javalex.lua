@@ -649,7 +649,7 @@ function javalex.knownName( nameStr )
 	if tt == "TYPE" then
 		usage = "type name"
 	elseif tt == "ID" or strCorrectCase == "Math" then
-		usage = "class name"
+		usage = "Java class name"
 	elseif tt == "BOOL" or tt == "NULL" then
 		usage = "constant"
 	elseif tt == false then

@@ -325,7 +325,7 @@ local function canAssign( target, vtTarget, expr, vtExpr )
 	-- Check for various type mismatch combinations to make the error message
 	local str
 	if vtExpr == 1 and vtTarget == 0 then          -- double assigned to int
-		str = "Value of type double cannot be assigned to an int, use ct.round() or ct.toInt()"
+		str = "Value of type double cannot be assigned to an int, use ct.round() or (int) type cast"
 	elseif vtExpr == 1 and vtTarget == "String" then   -- double assigned to String
 		str = "Value of type double cannot be assigned to a String, consider using ct.formatDecimal()"
 	elseif vtExpr == 0 and vtTarget == "String" then   -- int assigned to String

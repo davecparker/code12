@@ -232,9 +232,9 @@ end
 -- Return true if succesful.
 local function checkBlockBegin()
 	local tree = parseTrees[iTree]
-	local prevTree = parseTrees[iTree - 1]
 	if tree.p == "begin" then
-		if javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( prevTree.iLineStart ) then
+		local prevTree = parseTrees[iTree - 1]
+		if prevTree and javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( prevTree.iLineStart ) then
 			indentErrBlockBegin( tree, prevTree )
 		end
 		iTree = iTree + 1
@@ -774,7 +774,7 @@ local function getFunc( nodes )
 	-- Determine the return type
 	local vt
 	local retType = nodes[2]
-	if retType == "void" then
+	if retType.p == "void" then
 		vt = false
 	else
 		vt = javaTypes.vtFromType( retType.nodes[1], retType.p == "array" )

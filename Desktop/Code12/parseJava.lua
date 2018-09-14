@@ -204,11 +204,21 @@ end
 -- end
 
 -- Set the error state for an invalid type node.
-local function invalidTypeName( nameNode )
-	if nameNode.tt == "ID" then
-		javaTypes.vtFromType( nameNode )   -- sets better error
+local function invalidTypeName( node )
+	if node.tt == "ID" then
+		local strName = node.str
+		local tt, strCorrectCase, usageFound = javalex.knownName( strName )
+		if tt == "TYPE" then
+			err.setErrNode( node, 'Incorrect case for type name "%s"', strCorrectCase )
+		elseif tt ~= nil and strCorrectCase == strName then
+			err.setErrNode( node, 
+					"%s is a %s, expected a type name here", strName, usageFound )
+		else
+			err.setErrNode( node, "Unknown type name" )
+		end
+	else
+		err.setErrNode( node, "Expected a type name here" )
 	end
-	err.setErrNode( nameNode, "Invalid type name" )    -- default error
 end
 
 
@@ -877,7 +887,6 @@ function parseJava.isInvalidID( nameNode, usage, existing )
 	if tt == nil then
 		return false   -- not a variation on a known name
 	end
-	print(tt, strCorrectCase, usageFound)
 	if not existing then
 		err.setErrNode( nameNode, 
 				"Code12 does not allow names that differ only by upper/lower case from known names (\"%s\" is a %s)", 

@@ -874,9 +874,9 @@ int underIndentedInstanceVar;
 		// ERROR "Unknown method"
 		objVar.foo();
 
-		// ERROR "Names are case-sensitive"
+		// ERROR "Incorrect case for type name"
 		string ch = "A";
-		// ERROR "Names are case-sensitive"
+		// ERROR "Incorrect case for type name"
 		gameObj obj;
 		// ERROR "Names are case-sensitive"
 		ct.Circle(0,0,10);
@@ -1008,11 +1008,11 @@ int underIndentedInstanceVar;
 		else if(objVar)
 			voidFunc();
 
-		// ERROR "The Integer type is not supported by Code12. Use int instead."
+		// ERROR "Integer is a Java class name"
 		Integer n = 100;
-		// ERROR "The Double type is not supported by Code12. Use double instead."
+		// ERROR "Incorrect case for type name"
 		Double d = 100.0;
-		// ERROR "The Boolean type is not supported by Code12. Use boolean instead."
+		// ERROR "Incorrect case for type name"
 		Boolean b = false;
 
 		// ERROR "+= can only be applied to numbers"

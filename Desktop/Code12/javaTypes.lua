@@ -40,11 +40,10 @@ local mapVtToTypeName = {
 	["GameObj"]  = "GameObj",
 }
 
--- The value type (vt) of a declared type name
+-- The value type (vt) of a supported type name
 local mapTypeNameToVt = {
 	["int"]      = 0,
 	["double"]   = 1,
-	["void"]     = false,
 	["boolean"]  = true,
 	["String"]   = "String",
 	["GameObj"]  = "GameObj",
@@ -62,98 +61,35 @@ local substituteType = {
 	["Boolean"] = "boolean",
 }
 
--- Known Java types: map lowercase version to correct case string
-local knownTypes = {
-	["int"]      = "int",
-	["double"]   = "double",
-	["void"]     = "void",
-	["boolean"]  = "boolean",
-	["string"]   = "String",
-	["gameobj"]  = "GameObj",
-	["byte"]     = "byte",
-	["char"]     = "char",
-	["float"]    = "float",
-	["long"]     = "long",
-	["short"]    = "short",
-	["integer"]  = "Integer",
-}
-
--- Known Java classes: map lowercase version to correct case string
-local knownClasses = {
-	-- Standard Java classes used by Code12
-	["math"]           = "Math",           
-	["object"]         = "Object",         
-	-- Selection of other pre-defined Java classes from java.lang
-	["boolean"]        = "Boolean",        
-	["byte"]           = "Byte",           
-	["character"]      = "Character",      
-	["class"]          = "Class",          
-	["double"]         = "Double",         
-	["enum"]           = "Enum",           
-	["float"]          = "Float",          
-	["integer"]        = "Integer",        
-	["long"]           = "Long",           
-	["number"]         = "Number",         
-	["package"]        = "Package",        
-	["runtime"]        = "Runtime",        
-	["short"]          = "Short",          
-	["system"]         = "System",         
-	["throwable"]      = "Throwable",      
-	["void"]           = "Void",           
-}
-
--- Known constants: map lowercase version to correct case string
-local knownConstants = {
-	["true"]   = "true",
-	["false"]  = "false",
-	["null"]   = "null",
-}
-
 
 --- Module Functions ---------------------------------------------------------
 
 
 -- Return the value type (vt) for a typeNode token and optional isArray flag,
 -- or return nil and set the error state if the type is invalid.
--- The typeNode can also be an ID node, in which case an appropriate error is set.
 function javaTypes.vtFromType( typeNode, isArray )
+	if ( typeNode.tt ~= "TYPE" ) then
+		print(typeNode.tt, typeNode.str)
+		assert(false)
+	end
 	local typeName = typeNode.str
 	local vt = mapTypeNameToVt[typeName]
 	if vt then
-		-- known non-void type
 		if isArray then
 			return { vt = vt }
 		end
 		return vt
-	end
-
-	-- Check for void type
-	if vt == false then
-		if isArray then
-			err.setErrNode( typeNode, "Invalid type: array of void" )
-			return nil
-		end
-		return false  -- void
-	end
-
-	-- Unknown or unsupported type
-	local subType = substituteType[typeName]
-	if subType then
-		err.setErrNode( typeNode, "The %s type is not supported by Code12. Use %s instead.",
-				typeName, subType )
 	else
-		-- Unknown type. See if the case is wrong.
-		local typeNameLower = string.lower( typeName )
-		for name, _ in pairs( mapTypeNameToVt ) do
-			if string.lower( name ) == typeNameLower then
-				err.setErrNode( typeNode, 
-					"Names are case-sensitive, known name is \"%s\"", name )
-				return nil
-			end
+		-- unsupported type
+		local subType = substituteType[typeName]
+		if subType then
+			err.setErrNode( typeNode, "The %s type is not supported by Code12. Use %s instead.",
+					typeName, subType )
+		else
+			err.setErrNode( typeNode, "Unknown type name" )   -- shouldn't happen
 		end
-		err.setErrNode( typeNode, "Unknown type name \"%s\"", typeName )
+		return nil
 	end
-	return nil
 end
 
 -- Return the value type (vt) for a variable typeNode token and optional isArray flag,
@@ -217,24 +153,6 @@ function javaTypes.canCompareVts( vt1, vt2 )
 		return t1.vt == t2.vt    -- can compare arrays of same type
 	end	
 	return false
-end
-
--- If nameLower (which should be all lowercase) is a known type name ignoring case,
--- then return the correct case, else nil. 
-function javaTypes.correctTypeName( nameLower )
-	return knownTypes[nameLower]
-end
-
--- If nameLower (which should be all lowercase) is a Java class name ignoring case,
--- then return the correct case, else nil. 
-function javaTypes.correctClassName( nameLower )
-	return knownClasses[nameLower]
-end
-
--- If nameLower (which should be all lowercase) is a Java constant name ignoring case,
--- then return the correct case, else nil. 
-function javaTypes.correctConstantName( nameLower )
-	return knownConstants[nameLower]
 end
 
 

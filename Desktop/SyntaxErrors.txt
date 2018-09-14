@@ -57,3 +57,7 @@ Conflicts in this file should be resolved by preserving the union of all the lin
 		i = (integer) Math.PI * foo(1, 3.1);
 		i = (do) Math.PI * foo(1, 3.1);
 		i = (d) Math.PI * foo(1, 3.1);
+		final true X = 50;
+		final void X = 50;
+		void y;
+		void speed = 0.3;
