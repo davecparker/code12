@@ -79,8 +79,12 @@ function javaTypes.vtFromType( typeNode, isArray )
 			return { vt = vt }
 		end
 		return vt
+	end
+
+	-- Unsupported type
+	if typeName == "Object" then
+		err.setErrNode( typeNode, "The Object type is not supported by Code12. Use GameObj or String instead." )
 	else
-		-- unsupported type
 		local subType = substituteType[typeName]
 		if subType then
 			err.setErrNode( typeNode, "The %s type is not supported by Code12. Use %s instead.",
@@ -88,8 +92,8 @@ function javaTypes.vtFromType( typeNode, isArray )
 		else
 			err.setErrNode( typeNode, "Unknown type name" )   -- shouldn't happen
 		end
-		return nil
 	end
+	return nil
 end
 
 -- Return the value type (vt) for a variable typeNode token and optional isArray flag,

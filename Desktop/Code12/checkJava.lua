@@ -235,10 +235,11 @@ local function defineMethod( func )
 					"Wrong number of parameters for function %s ", fnName )
 		else
 			for i = 1, numParams do
-				if not javaTypes.vtsEqual( params[i].vt, event.params[i].vt ) then
+				local vtExpected = event.params[i].vt
+				if not javaTypes.vtsEqual( params[i].vt, vtExpected ) then
 					err.setErrNodeAndRef( paramVars[i], nameNode,
-							"Wrong type for parameter %d of function %s",
-							i, fnName )
+							"Wrong type for parameter %d of function %s (expected %s)",
+							i, fnName, javaTypes.typeNameFromVt( vtExpected ) )
 					return
 				end
 			end

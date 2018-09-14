@@ -88,6 +88,7 @@ local ttForKnownName = {
 	-- The following classes are also recognized as defined types.
 	["GameObj"] 		= "TYPE",
 	["String"] 			= "TYPE",
+	["Object"]			= "TYPE",
 
 	-- These core classes are treated as reserved words because they
 	-- can be used for static calls and/or static fields.
@@ -100,7 +101,6 @@ local ttForKnownName = {
 	["Character"]		= "ID",      
 	["Integer"]			= "ID",        
 	["Number"]			= "ID",         
-	["Object"]			= "ID",         
 	["Runtime"]			= "ID",        
 	["Throwable"]		= "ID",
 
@@ -108,12 +108,12 @@ local ttForKnownName = {
 	-- but are here for use by javalex.knownName()
 	["gameobj"] 		= "ID",
 	["string"] 			= "ID",
+	["object"]			= "ID",         
 	["system"] 			= "ID",
 	["math"] 			= "ID",
 	["character"]		= "ID",      
 	["integer"]			= "ID",        
 	["number"]			= "ID",         
-	["object"]			= "ID",         
 	["runtime"]			= "ID",        
 	["throwable"]		= "ID",
 }

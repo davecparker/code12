@@ -112,6 +112,7 @@ local function buildTables()
 			else
 				vtReturn = javaTypes.vtFromType( retType.nodes[1] )
 			end
+
 			-- Build the parameter table
 			local paramTable = {}
 			local params = nodes[5].nodes
@@ -121,10 +122,17 @@ local function buildTables()
 					local vtParam = javaTypes.vtFromVarType( param.nodes[1], true )
 					paramTable[#paramTable + 1] = { name = param.nodes[4].str, vt = vtParam }
 				else
-					local vtParam = javaTypes.vtFromVarType( param.nodes[1] )
+					local typeNode = param.nodes[1]
+					local vtParam
+					if typeNode.str == "Object" then
+						vtParam = nil
+					else
+						vtParam = javaTypes.vtFromVarType( typeNode )
+					end
 					paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
 				end
 			end
+
 			-- Add the method record
 			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable }
 		elseif p == "varDecl" then
