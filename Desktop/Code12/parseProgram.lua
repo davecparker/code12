@@ -143,7 +143,7 @@ local function parseHeader( sourceLines )
 	local lineNum = 1
 	local nameID = nil
 	local iLineImport = nil
-	while lineNum < numSourceLines do
+	while lineNum <= numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if tokens[1].tt == "import" then
@@ -170,23 +170,45 @@ local function parseHeader( sourceLines )
 
 	-- "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
 	local iLineClass = nil
-	while lineNum < numSourceLines do
+	while lineNum <= numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
+			if tokens[1].tt == "public" and tokens[2].tt == "class" then
+				table.remove( tokens, 1 )
+			end
 			if tokens[1].tt == "class" then
 				if iLineClass then
 					err.setErrLineNumAndRefLineNum( lineNum, iLineClass,
 							"There should be only one class declaration" )
 				else
 					iLineClass = lineNum
-					if #tokens == 5 and tokens[2].tt == "ID" 
+					if #tokens >= 5 and (tokens[2].tt == "ID" or tokens[2].tt == "TYPE")
 							and tokens[3].tt == "extends" 
 							and tokens[4].str == "Code12Program" then
 						-- Get the class name
 						nameID = tokens[2]
-						-- TODO: Check that nameID is valid (not a defined class)
-						-- TODO: Check for initial upper case letter in name
-						-- TODO: What about extra code after 5 tokens, e.g. {
+						-- Check that nameID is valid (not a defined class) and for initial upper case letter in name
+						local className = nameID.str
+						local chFirst = string.byte( className, 1 )
+
+						if javalex.knownName( className ) then
+							err.setErrNode( nameID,
+									"The name %s is already defined. Choose another name for your class.", className )
+						elseif chFirst < 65 or chFirst > 90 then
+							err.setErrNode( nameID, 
+									"By convention, class names should start with an upper-case letter" )
+						end
+						-- Check that the class header is not indented
+						if javalex.indentLevelForLine( iLineClass ) ~= 0 then
+							err.setErrLineNum( iLineClass, "The class header shouldn't be indented" )
+						end
+						-- Check for extra tokens after class header
+						if #tokens == 6 and tokens[5].tt == "{" then					
+							err.setErrNode( tokens[5], "In Code12, the { to start a class must be on its own line" )
+						elseif #tokens > 5 then
+							err.setErrNodeSpan( tokens[5], tokens[#tokens], 
+									'Your class header should end after\n"class %s extends Code12Program"', className )
+						end
 					else
 						err.setErrLineNum( lineNum,
 								'A Code12 class declaration should be:\n"class YourName extends Code12Program"' )
@@ -207,11 +229,15 @@ local function parseHeader( sourceLines )
 
 	-- Beginning { for the class
 	local iLineBegin = nil
-	while lineNum < numSourceLines do
+	while lineNum <= numSourceLines do
 		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if #tokens == 2 and tokens[1].tt == "{" then
 				iLineBegin = lineNum
+				-- Check that beginning { is not indented
+				if javalex.indentLevelForLine( iLineBegin ) ~= 0 then
+					err.setErrLineNum( iLineBegin, "The beginning { for the class shouldn't be indented" )
+				end
 			end
 			break
 		end
@@ -586,11 +612,9 @@ function getLineStmts( tree, stmts )
 	local stmt
 	if p == "stmt" then
 		-- stmt ;
-		checkMultiLineIndent( tree )
 		stmt = getStmt( nodes[1] )
 	elseif p == "if" then
 		-- if (expr) controlledStmts [else controlledStmts]
-		checkMultiLineIndent( tree )
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
 				stmts = getControlledStmts(), 
 				elseStmts = getElseStmts( tree ), entireLine = true }
@@ -602,7 +626,6 @@ function getLineStmts( tree, stmts )
 	elseif p == "returnVal" then
 		-- return expr ;
 		-- TODO: Check for return being only at end of a block
-		checkMultiLineIndent( tree )
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
 	elseif p == "return" then
 		-- return ;
@@ -629,8 +652,8 @@ function getLineStmts( tree, stmts )
 		if javalex.indentLevelForLine( endTree.iLineStart ) ~= javalex.indentLevelForLine( tree.iLineStart ) then
 			err.setErrNodeAndRef( endTree, tree, "This while statement should have the same indentation as its \"do\"" )
 		end
-		checkMultiLineIndent( endTree )
 		stmt.expr = makeExpr( endTree.nodes[3] )
+		checkMultiLineIndent( endTree )
 	elseif p == "while" then
 		-- while (expr) controlledStmts
 		local whileEnd = nodes[4]
@@ -638,12 +661,10 @@ function getLineStmts( tree, stmts )
 			err.setErrNode( whileEnd, "while loop header should not end with a semicolon" )
 			return nil
 		end
-		checkMultiLineIndent( tree )
 		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts(),
 				entireLine = true }
 	elseif p == "for" then
 		-- for loop variants
-		checkMultiLineIndent( tree )
 		stmt = getForStmt( nodes )
 	elseif p == "break" then
 		-- break ;
@@ -662,6 +683,7 @@ function getLineStmts( tree, stmts )
 	if stmt then
 		stmt.iLine = tree.iLine
 		stmts[#stmts + 1] = stmt
+		checkMultiLineIndent( tree )
 		return true
 	end
 	return false
@@ -719,7 +741,7 @@ function getBlockStmts()
 	end
 
 	-- Got to EOF before finding matching }
-	err.setErrLineNum( numSourceLines + 1, 
+	err.setErrLineNumAndRefLineNum( numSourceLines + 1, iLineStart,
 		"Missing } to end block starting at line %d", iLineStart )
 	return nil
 end
@@ -853,17 +875,7 @@ local function getMembers()
 	local vars = programTree.vars
 	local funcs = programTree.funcs
 	local gotFunc = false     -- set to true when the first func was seen
-
-	-- Save indentation level and line number of first member
 	local firstMemberLineNum, firstMemberIndentLevel
-	if iTree <= numParseTrees then
-		firstMemberLineNum = parseTrees[iTree].iLineStart
-		firstMemberIndentLevel = javalex.indentLevelForLine( firstMemberLineNum )
-		if firstMemberIndentLevel == 0 then
-			err.setErrLineNum( parseTrees[iTree].iLineStart,
-					"Class-level variable and function definitions should be indented" )
-		end
-	end
 
 	-- Look for instance variables and functions
 	while iTree <= numParseTrees do
@@ -883,21 +895,12 @@ local function getMembers()
 			-- because it greatly complicates keeping Java and Lua line numbers in sync.
 			if gotFunc then
 				err.setErrNode( tree, "Class-level variables must be defined at the beginning of the class" )
-			elseif javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
-				err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
-						"Class-level variable and function definitions should all have the same indentation" )
 			end
-			checkMultiLineIndent( tree )
 		elseif p == "func" then
 			if nodes[3].str == "main" then
 				skipBlock()    -- skip body of main without checking it
 			else
-				if javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
-					err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
-							"Class-level variable and function definitions should all have the same indentation" )
-				end
 				funcs[#funcs + 1] = getFunc( nodes )
-				checkMultiLineIndent( tree )
 			end
 			gotFunc = true
 		elseif p == "end" then
@@ -916,6 +919,21 @@ local function getMembers()
 			err.overrideErrLineParseTree( tree, 
 					"Statement must be inside a function body -- mismatched { } brackets?" )
 		end
+
+		-- Check indentation of members
+		if firstMemberLineNum == nil then
+			-- Save indentation level and line number of first member
+			firstMemberLineNum = tree.iLineStart
+			firstMemberIndentLevel = javalex.indentLevelForLine( firstMemberLineNum )
+			if firstMemberIndentLevel == 0 then
+				err.setErrLineNum( firstMemberLineNum,
+						"Class-level variable and function definitions should be indented" )
+			end
+		elseif javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
+			err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
+					"Class-level variable and function definitions should all have the same indentation" )
+		end
+		checkMultiLineIndent( tree )
 	end
 
 	-- Reached EOF before finding the end of the class

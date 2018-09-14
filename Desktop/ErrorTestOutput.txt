@@ -1,33 +1,15 @@
 ======= Test Started ==========================================
-4. class ErrorTest extends Code12Program
-*** Uncaught error, expected: The class header shouldn't be indented
-
-6. {
-*** Uncaught error, expected: The { beginning a block should have the same indentation as the line before it
-
-43. Code12.run(new ErrorTest());
-*** Uncaught error, expected: should be indented
-
-45. }
-*** Uncaught error, expected: ending } should have the same indentation as its beginning {
-
-1175. Code12Program.foo();
-*** Unexpected error text: Undefined variable Code12Program
-
-1177. Code12Program.foo();
-*** Unexpected error text: Undefined variable Code12Program
-
 ======= Test Complete =========================================
 
 Semantic Error Test:
 
     1598 lines processed
-    85 ms Parse time
-    7 ms Semantic check time
-    3 ms Code Generation time
-    95 ms Total time
+    170 ms Parse time
+    14 ms Semantic check time
+    5 ms Code Generation time
+    190 ms Total time
 
-2 unexpected errors
-4 uncaught errors (326 expected errors)
+0 unexpected errors
+0 uncaught errors (330 expected errors)
 
-FAILED
+SUCCESS

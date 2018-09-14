@@ -2,8 +2,8 @@ import Code12.*;
 
 // ERROR "The class header shouldn't be indented"
 	class ErrorTest extends Code12Program
-// ERROR "The { beginning a block should have the same indentation as the line before it"
-{
+// ERROR "The beginning { for the class shouldn't be indented"
+	{
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
 	GameObj button = ct.text("START", 0, 0, 10);
@@ -39,10 +39,10 @@ int underIndentedInstanceVar;
 
 	public static void main(String[] args)
 	{ 
-	// ERROR "should be indented"
-	Code12.run(new ErrorTest());
-	// ERROR "ending } should have the same indentation as its beginning {"
-		}
+		// Note: errors in main are ignored
+		// Standard code here
+		Code12.run(new ErrorTest());
+	}
 
 	// user defined functions
 	void emptyFunc()
@@ -1171,10 +1171,10 @@ int underIndentedInstanceVar;
 		GameObj.foo();
 		// ERROR "("String" is a type name)"
 		String.foo();
-		// ERROR "expected a variable name"
+		// ERROR "Undefined variable"
 		Code12Program.foo();
-		// ERROR "expected a variable name"
-		Code12Program.foo();
+		// ERROR "Undefined variable"
+		Code12.foo();
 
 		// ERROR "An index in [brackets] can only be applied to an array"
 		boolVar[0].log(objVar);

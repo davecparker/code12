@@ -2898,7 +2898,7 @@
 1175.                call foo
                         lValue: lValue { varID = Code12Program }
 1177.                call foo
-                        lValue: lValue { varID = Code12Program }
+                        lValue: lValue { varID = Code12 }
 1180.                call log { #exprs = 1 }
                         lValue: lValue { varID = boolVar, indexExpr = 0 }
                         exprs:
