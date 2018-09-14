@@ -61,12 +61,12 @@ require('Code12.api')
     
     function _fn.start()
         
-        ct.setScreen("Main")
+        ct.setScreen("Main")   --Names the main screen and stores everything after this to the Main screen
         
         --sets the height of the sceen to match the height of the background
         ct.setHeight(128)
-        this.screenHeight = 128
-        this.screenWidth = ct.getWidth()
+        this.screenHeight = 128   --sets h to 128 (the height of the screen) 
+        this.screenWidth = ct.getWidth()   --sets w to 100 (the width of the screen)  
         
         this.back1 = ct.image("background-day.png", this.screenWidth / 2, this.screenHeight / 2, this.screenWidth)
         this.back2 = ct.image("background-day.png", 1.5 * this.screenWidth, this.screenHeight / 2, this.screenWidth)
@@ -76,24 +76,24 @@ require('Code12.api')
         this.back2.xSpeed = -0.5
         
         --draws the bird ct.image("filename", x, y, h)
-        this.birdX = this.screenWidth / 2.0
-        this.birdY = this.screenHeight / 2.0
+        this.birdX = this.screenWidth / 2.0   -- sets x to 50 (the x position of the bird)
+        this.birdY = this.screenHeight / 2.0   -- sets y to 64  (the y position of the bird)
         --height of the bird (the height of the bird)
-        this.bird = ct.image("yellowbird-downflap.png", this.birdX, this.birdY, this.BIRDHIEGHT)
+        this.bird = ct.image("yellowbird-downflap.png", this.birdX, this.birdY, this.BIRDHIEGHT)   --uses x and y to stand in for 50, 64
         this.ghostBird = ct.rect(this.birdX, this.birdY, 4.5, 4.5)
         this.ghostBird.visible = false
         this.ghostBird.ySpeed = 0.5
         --draws the count
         --the value of x does not change (the x position of the bird and number are equal)
-        this.scoreX = this.birdX
+        this.scoreX = this.birdX   --sets y to 16 (the y position of the number)
         this.scoreY = this.screenHeight / 8.0
         this.scoreObj = ct.image(this.scoreImgFile, this.scoreX, this.scoreY, this.scoreHeight)
         this.scoreObj:setLayer(3)
         this.score = 0
         
         --draws the ground
-        local y = 122
-        local h = 40
+        local y = 122   --sets y to 122 (the y positoin of all the pieces of the base)
+        local h = 40   --sets h to 40 (the height of all the pieces of the base)
         --since the x position of each piece of the base is different it is not useful to use a variable
         local base1 = ct.image("base.png", 20, y, h)
         local base2 = ct.image("base.png", 60, y, h)
@@ -134,7 +134,7 @@ require('Code12.api')
         --End screen variables
         this.endY = this.scoreY + 8
         
-        ct.setScreen("Start")
+        ct.setScreen("Start")   --Names the start screen
         
         ct.image("background-day.png", this.screenWidth / 2, this.screenHeight / 2, this.screenWidth)
         ct.image("message.png", this.screenWidth / 2, 50, 50)
@@ -160,7 +160,7 @@ require('Code12.api')
             --Handles keypress input
             if ct.clicked() or ct.charTyped(" ") then
                 
-                this.ghostBird.y = this.ghostBird.y - (4.5)
+                this.ghostBird.y = this.ghostBird.y - (3.5)
                 this.ghostBird.ySpeed = -1
             end
             
@@ -198,7 +198,7 @@ require('Code12.api')
             end
             --Handles the animation of the bird
             this.updates = this.updates + 1
-            local changed = false
+            local changed = false   -- boolean to store whether the flap frame has been changed yet
             if this.updates == 10 then
                 
                 if (this.flap == "downflap") and not changed then
@@ -332,7 +332,7 @@ require('Code12.api')
         end
         if this.endPhase then
             
-            if this.restartBox:clicked() then
+            if this.restartBox:clicked() or ct.charTyped(" ") then   --Restarts the game
                 
                 --Sets Phase flags
                 this.mainPhase = true
@@ -359,7 +359,7 @@ require('Code12.api')
                 --Score
                 this.score = 0
                 this.scoreImgFile = "0.png"
-                this.scoreHeight = 5
+                this.scoreHeight = 5   --resets the score height in case the player scored over 10
                 this.scoreObj = ct.image(this.scoreImgFile, this.scoreX, this.scoreY, this.scoreHeight)
                 this.scoreObj:setLayer(3)
                 
@@ -399,3 +399,4 @@ require('Code12.api')
         end
     end
     
+
