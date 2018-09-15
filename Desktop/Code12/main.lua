@@ -252,7 +252,7 @@ local function settingsFilePath()
 end
 
 -- Save the user settings
-local function saveSettings()
+function app.saveSettings()
 	-- Update the userSettings
 	userSettings.recentPath = sourceFile.path
 	userSettings.syntaxLevel = app.syntaxLevel 
@@ -318,7 +318,7 @@ end
 local function onSystemEvent( event )
 	-- Save the user settings if the user switches out of or quits the app
 	if event.type == "applicationSuspend" or event.type == "applicationExit" then
-		saveSettings()
+		app.saveSettings()
 	end
 end
 

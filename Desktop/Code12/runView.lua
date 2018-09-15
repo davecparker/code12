@@ -163,7 +163,7 @@ function runView:create()
 end
 
 -- Prepare to show the runView scene
-function runView:show( event )
+function runView:show( event ) -- TODO: Pause/restart?
 	local phase = event.phase
 	if phase == "will" then
 		clearOutput()

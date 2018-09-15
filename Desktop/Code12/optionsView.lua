@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- optView.lua
+-- optionsView.lua
 --
 -- The view for displaying user options for the Code 12 Desktop app
 --
@@ -17,8 +17,8 @@ local app = require( "app" )
 local env = require( "env" )
 local toolbar = require( "toolbar" )
 
--- The optView module and scene
-local optView = composer.newScene()
+-- The optionsView module and scene
+local optionsView = composer.newScene()
 
 -- UI Metrics
 local margin = app.margin
@@ -34,8 +34,9 @@ local editorPicker        -- Text editor picker
 -- Data tables
 local winEditors = {
 		{ name = "Sublime Text 3", path = [[C:\Program Files\Sublime Text 3\sublime_text.exe]] },
-		{ name = "Sublime Text 3 (32-bit)", path = [[C:\Program Files (x86)\Sublime Text 3\sublime_text.exe]] },
+		{ name = "Sublime Text 3", path = [[C:\Program Files (x86)\Sublime Text 3\sublime_text.exe]] },
 		{ name = "Notepad++", path = [[C:\Program Files\Notepad++\notepad++.exe]] },
+		{ name = "Notepad++", path = [[C:\Program Files (x86)\Notepad++\notepad++.exe]] }
 }
 local macEditors = {}
 local installedEditors
@@ -50,16 +51,18 @@ local function getInstalledEditors()
 	else
 		editors = macEditors
 	end
-	local instEds = { { name = "System Default", path = nil } }
+	local installedEds = { { name = "System Default", path = nil } }
 	for i = 1, #editors do
 		local editor = editors[i]
-		local f = io.open( editor.path , "r" )
-		if f then
-			io.close( f )
-			instEds[#instEds + 1] = editor
+		if editor.name ~= installedEds[#installedEds].name then
+			local f = io.open( editor.path , "r" )
+			if f then
+				io.close( f )
+				installedEds[#installedEds + 1] = editor
+			end
 		end
 	end
-	return instEds
+	return installedEds
 end
 
 -- Set the active segment of the editorPicker to saved editor
@@ -72,22 +75,19 @@ local function setActiveEditorSegment()
 	end
 end
 
--- Save the user settings
-local function saveSettings()
-
-end
-
 -- Event handler for the Back button
 local function onBack()
-	saveSettings()
-	composer.hideOverlay( "slideRight", 500 )
+	-- app.saveSettings()
+	local prevScene = composer.getSceneName( "previous" )
+	print( prevScene )
+	composer.gotoScene( prevScene )
 end
 
 
 --- Scene Methods ------------------------------------------------
 
 -- Create the errView scene
-function optView:create()
+function optionsView:create()
 	local sceneGroup = self.view
 
 	-- Background
@@ -98,9 +98,9 @@ function optView:create()
 		parent = sceneGroup,
 		text = "Code12 Options",
 		x = app.width / 2,
-		y = topMargin,
+		y = app.margin,
 		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
+		fontSize = app.fontSizeUI * 1.5,
 	}
 	title:setFillColor( 0 )
 	title.anchorY = 0
@@ -108,19 +108,18 @@ function optView:create()
 	-- Back button
 	local btnShade = app.toolbarShade
 	backBtn = widget.newButton{
-		x = leftMargin,
-		y = title.y + title.height,
+		x = app.width - margin,
+		y = margin,
 		onRelease = onBack,
-		label = "Back",
+		label = "X",
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI,
-		fillColor = { default = { btnShade }, over = { btnShade, 0.75 } },
-		shape = "roundedRect",
-		width = 75,
-		height = 30,
+		shape = "rect",
+		width = 15,
+		height = 15,
 	}
 	sceneGroup:insert( backBtn )
-	backBtn.anchorX = 0
+	backBtn.anchorX = 1
 	backBtn.anchorY = 0
 
 	-- Level picker label
@@ -128,7 +127,7 @@ function optView:create()
 		parent = sceneGroup,
 		text = "Code12 Level:",
 		x = leftMargin,
-		y = backBtn.y + backBtn.height + margin,
+		y = title.y + title.height + margin,
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI,
 	}
@@ -220,18 +219,17 @@ function optView:create()
 end
 
 -- Prepare to show the errView scene
-function optView:show( event )
+function optionsView:show( event )
 	if event.phase == "will" then
 		setActiveEditorSegment()
+		toolbar.show( false )
 	end
 end
 
 -- Prepare to hide the errView scene
-function optView:hide( event )
-	if event.phase == "will" then
-		app.processUserFile()
-	elseif event.phase == "did" then
-		toolbar.showOptionsButton()
+function optionsView:hide( event )
+	if event.phase == "did" then
+		toolbar.show( true )
 	end
 end
 
@@ -239,9 +237,9 @@ end
 ------------------------------------------------------------------------------
 
 -- Complete and return the composer scene
-optView:addEventListener( "create", optView )
-optView:addEventListener( "show", optView )
-optView:addEventListener( "hide", optView )
-return optView
+optionsView:addEventListener( "create", optionsView )
+optionsView:addEventListener( "show", optionsView )
+optionsView:addEventListener( "hide", optionsView )
+return optionsView
 
 

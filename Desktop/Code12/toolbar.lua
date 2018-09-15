@@ -50,9 +50,7 @@ end
 
 -- Event handler for the Options button
 local function onOptions()
-	-- composer.gotoScene( "optView", { effect = "slideLeft", time = 500 } )
-	composer.showOverlay( "optView", { isModal = true, effect = "slideLeft", time = 500 } )
-	optionsBtn.isVisible = false
+	composer.gotoScene( "optionsView" )
 end
 
 --- Module Functions ------------------------------------------------
@@ -72,39 +70,38 @@ function toolbar.create()
 		y = yCenter,
 		onRelease = onChooseFile,
 		label = "Choose File",
-		labelAlign = "left",
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI,
+		textOnly = true,
 	}
 	toolbarGroup:insert( chooseFileBtn )
 	chooseFileBtn.anchorX = 0
+
+	-- Restart button
+	restartBtn = widget.newButton{
+		x = chooseFileBtn.x + chooseFileBtn.width + app.margin, 
+		y = yCenter,
+		onRelease = app.processUserFile,
+		label = "Restart",
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+		textOnly = true,
+	}
+	toolbarGroup:insert( restartBtn )
+	restartBtn.anchorX = 0
 
 	-- Options button 
 	optionsBtn = widget.newButton{
 		x = app.width - app.margin,
 		y = yCenter,
 		onRelease = onOptions,
-		label = "☰",
-		labelAlign = "right",
+		label = "Options",
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI,
-		width = 25
+		textOnly = true,
 	}
 	toolbarGroup:insert( optionsBtn )
 	optionsBtn.anchorX = 1
-
-	-- Restart button
-	restartBtn = widget.newButton{
-		x = optionsBtn.x - optionsBtn.width, 
-		y = yCenter,
-		onRelease = app.processUserFile,
-		label = "Restart",
-		labelAlign = "right",
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-	}
-	toolbarGroup:insert( restartBtn )
-	restartBtn.anchorX = 1
 end
 
 -- Resize the toolbar
@@ -113,9 +110,9 @@ function toolbar.resize()
 	optionsBtn.x = app.width - app.margin
 end
 
--- Show the options button
-function toolbar.showOptionsButton()
-	optionsBtn.isVisible = true
+-- Show/hide the toolbar
+function toolbar.show( show )
+	toolbarGroup.isVisible = show
 end
 
 
