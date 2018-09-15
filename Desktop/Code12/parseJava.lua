@@ -11,7 +11,6 @@
 local app = require( "app" )
 local err = require( "err" )
 local javalex = require( "javalex" )
-local javaTypes = require( "javaTypes" )
 
 
 -- The parseJava module

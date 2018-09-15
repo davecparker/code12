@@ -90,12 +90,14 @@ local ttForKnownName = {
 	["String"] 			= "TYPE",
 	["Object"]			= "TYPE",
 
-	-- These core classes are treated as reserved words because they
-	-- can be used for static calls and/or static fields.
-	-- TODO: Add Code12, Code12Program as reserved words
+	-- These classes are treated as reserved words so they parse distinctly.
 	["ct"] 				= "ct",
 	["System"] 			= "System",
 	["Math"] 			= "Math",
+
+	-- Pre-defined Code12 classes that we don't want redefined
+	["Code12"]          = "ID",
+	["Code12Program"]   = "ID",
 
 	-- Standard Java classes in java.lang that we don't want redefined.
 	["Character"]		= "ID",      
@@ -111,6 +113,8 @@ local ttForKnownName = {
 	["object"]			= "ID",         
 	["system"] 			= "ID",
 	["math"] 			= "ID",
+	["code12"]          = "ID",
+	["code12program"]   = "ID",
 	["character"]		= "ID",      
 	["integer"]			= "ID",        
 	["number"]			= "ID",         
@@ -125,6 +129,8 @@ local correctCaseForLowercaseName = {
 	["string"] 			= "String",
 	["system"] 			= "System",
 	["math"] 			= "Math",
+	["code12"]          = "Code12",
+	["code12program"]   = "Code12Program",
 	["character"]		= "Character",      
 	["integer"]			= "Integer",        
 	["number"]			= "Number",         
@@ -473,7 +479,7 @@ end
 
 -- Return string for token starting with .  
 -- (dot or a numeric literal token starting with a dot)
-local function  dotToken()
+local function dotToken()
 	if charTypes[chars[iChar + 1]] == false then   -- digit char after dot
 		return numericLiteralToken(true)
 	end
@@ -560,13 +566,10 @@ function javalex.getTokens( sourceStr, lineNum )
 			charType = charTypes[chars[iChar]]
 		end
 
-		-- Make a token record  TODO: get from pool
-		local token = { tt = "", str = "", iLine = lineNum, iChar = iChar }
-
 		-- Determine what token type to build next
+		local iCharStart = iChar
 		if charType == true then    -- ID start char
 			-- Identifier or reserved/known word
-			local iCharStart = iChar
 			repeat
 				iChar = iChar + 1
 				charType = charTypes[chars[iChar]]
@@ -576,7 +579,7 @@ function javalex.getTokens( sourceStr, lineNum )
 			local tt = ttForKnownName[str]
 			if tt == nil then
 				-- Not a known word, so user-defined ID
-				token.tt = "ID"
+				tt = "ID"
 				-- Code12 does not allow IDs to start with an understore
 				if chars[iCharStart] == 95 then   -- _
 					setTokenErr( iCharStart, iCharEnd, 
@@ -588,25 +591,22 @@ function javalex.getTokens( sourceStr, lineNum )
 				setTokenErr( iCharStart, iCharEnd, 
 						"Unsupported reserved word \"%s\"", str )
 				return nil
-			else
-				-- A known word (reserved word, type name, etc.)
-				token.tt = tt
 			end
-			token.str = str
-			tokens[#tokens + 1] = token
+			tokens[#tokens + 1] = { tt = tt, str = str, 
+					iLine = lineNum, iChar = iCharStart }
 		elseif charType == false then   -- numeric 0-9
 			-- Number constant
-			token.tt, token.str = numericLiteralToken()
-			if token.tt == nil then
+			local tt, str = numericLiteralToken()
+			if tt == nil then
 				return nil
 			end
-			tokens[#tokens + 1] = token
+			tokens[#tokens + 1] = { tt = tt, str = str, 
+					iLine = lineNum, iChar = iCharStart }
 		elseif charType == nil then
 			-- End of source string
 			checkIndentation( tokens )
-			token.tt = "END"
-			token.str = " "
-			tokens[#tokens + 1] = token
+			tokens[#tokens + 1] = { tt = "END", str = " ", 
+					iLine = lineNum, iChar = iCharStart }
 			return tokens 
 		elseif type(charType) == "function" then
 			-- Possible multi-char token, char or string literal, or comment
@@ -617,16 +617,14 @@ function javalex.getTokens( sourceStr, lineNum )
 				-- Remember text for end-of-line comments (discard block comments)
 				commentForLine[lineNum] = str
 			else
-				token.tt = tt
-				token.str = str or tt    -- simple tokens are their own string
-				tokens[#tokens + 1] = token
+				tokens[#tokens + 1] = { tt = tt, str = str or tt, 
+						iLine = lineNum, iChar = iCharStart }
 			end
 		else
 			-- Single char token
 			iChar = iChar + 1
-			token.tt = charType    -- single char string
-			token.str = charType   -- simple tokens are their own string
-			tokens[#tokens + 1] = token
+			tokens[#tokens + 1] = { tt = charType, str = charType, 
+					iLine = lineNum, iChar = iCharStart }
 		end 
 	until false   -- returns internally when end of string is found
 end
@@ -648,6 +646,8 @@ function javalex.knownName( nameStr )
 	local usage
 	if tt == "TYPE" then
 		usage = "type name"
+	elseif tt == "ID" and (strCorrectCase == "Code12" or strCorrectCase == "Code12Program") then
+		usage = "Code12 reserved class name"
 	elseif tt == "ID" or strCorrectCase == "Math" then
 		usage = "Java class name"
 	elseif tt == "BOOL" or tt == "NULL" then
