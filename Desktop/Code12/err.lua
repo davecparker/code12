@@ -8,7 +8,9 @@
 -----------------------------------------------------------------------------------------
 
 -- The err module
-local err = {}
+local err = {
+	bulkTestMode = false    -- set to true for bulk error test drivers
+}
 
 
 -- An error rec contains the following fields:
@@ -324,19 +326,12 @@ end
 -- Clear the error for the given line number, if any
 function err.clearErr( iLine )
 	assert( type(iLine) == "number" )
-
 	errRecForLine[iLineRankFromILine( iLine )] = nil
 end
 
--- Set the error logging mode that keeps an error for each line
-function err.logAllErrors()
-	-- TODO: remove
-end
-
 -- Return the logged error for the given line number, or nil if none.
-function err.getLoggedErrForLine( iLine )
+function err.errRecForLine( iLine )
 	assert( type(iLine) == "number" )
-
 	return errRecForLine[iLine]
 end
 
@@ -371,11 +366,6 @@ function err.hasErr()
 		return false
 	end
 	return #err.lineNumbersWithErrors() > 0
-end
-
--- Return true if there is an error that should stop further processing
-function err.shouldStop()
-	return false   -- TODO: remove
 end
 
 

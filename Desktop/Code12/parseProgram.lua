@@ -1101,9 +1101,6 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	end
 
 	-- Return result
-	if err.shouldStop() then
-		return nil
-	end
 	return programTree
 end
 

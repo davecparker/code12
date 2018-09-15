@@ -38,6 +38,10 @@ local backBtn                  -- Back button on docs toolbar
 local forwardBtn               -- Forward button on docs toolbar
 local docsWebView              -- web view for the documentation pane
 
+-- Error state
+local iLineErr                 -- line number for current error being shown
+local errRec                   -- error record for current error being shown
+
 
 --- Internal Functions ------------------------------------------------
 
@@ -129,8 +133,8 @@ local function makeErrDisplay( sceneGroup )
 
 	-- Make two code groups if there is a refLoc and it's not close enough
 	-- to the main loc to show in the same code group.
-	local loc = err.rec.loc
-	local refLoc = err.rec.refLoc
+	local loc = errRec.loc
+	local refLoc = errRec.refLoc
 	if refLoc == nil or math.abs( refLoc.iLine - loc.iLine ) <= minSourceLines then
 		-- Make just one group, but big enough to show the refLoc if any
 		local numLines = minSourceLines
@@ -254,17 +258,15 @@ end
 -- Show the error state
 local function showError()
 	-- Set the error text
-	assert( err.rec )
-	local errRecord = err.rec
-	print( "\n" .. errRecord.strErr )
-	errText.text = errRecord.strErr
+	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
+	errText.text = errRec.strErr
 
 	-- Are we using two code groups or just one?
 	if refCodeGroup then
-		loadCodeGroup( mainCodeGroup, errRecord.loc )
-		loadCodeGroup( refCodeGroup, errRecord.refLoc )
+		loadCodeGroup( mainCodeGroup, errRec.loc )
+		loadCodeGroup( refCodeGroup, errRec.refLoc )
 	else
-		loadCodeGroup( mainCodeGroup, errRecord.loc, errRecord.refLoc )
+		loadCodeGroup( mainCodeGroup, errRec.loc, errRec.refLoc )
 	end
 end
 
@@ -393,6 +395,16 @@ end
 -- Prepare to show the errView scene
 function errView:show( event )
 	if event.phase == "will" then
+		-- Get the error record (TODO: better multi-error)
+		assert( err.hasErr() )
+		local lineNumbers = err.lineNumbersWithErrors()
+		assert( #lineNumbers > 0 )
+		iLineErr = lineNumbers[1]
+		print( string.format( "\n%d errors starting at line %d", 
+					#lineNumbers, iLineErr ) )
+		errRec = err.errRecForLine( iLineErr )
+
+		-- Display the error
 		displayError( self.view )
 	end
 end
@@ -415,7 +427,7 @@ end
 -- Window resize handler
 function errView:resize()
 	-- Remake the error display, if any
-	if err.rec then
+	if err.hasErr() then
 		displayError( self.view )
 	end
 end

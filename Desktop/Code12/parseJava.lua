@@ -832,7 +832,7 @@ local function parseCurrentLine( level )
 	matchCommonErrors = false
 	iToken = 1
 	parseGrammar( line )
-	if err.getLoggedErrForLine( lineNumber ) then
+	if err.errRecForLine( lineNumber ) then
 		return nil
 	end
 
@@ -854,9 +854,8 @@ local function parseCurrentLine( level )
 		err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
 	end
 
-	-- Append the source line to our log of syntax errors if this
-	-- is an abortable error (i.e. we are not running a bulk error test)
-	if err.shouldStop() then
+	-- Append the source line to our log of syntax errors if not a bulk error test
+	if not err.bulkTestMode then
 		local logFile = io.open( "../SyntaxErrors.txt", "a" )
 		if logFile then
 			logFile:write( sourceLine )

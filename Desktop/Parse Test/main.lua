@@ -91,8 +91,9 @@ local function parseTestCode()
 		error( "Cannot open output file " .. treeFilename )
 	end
 
-	-- Tell Code12 to log all errors instead of stopping
-	err.logAllErrors()
+	-- Init error state for bulk error mode
+	err.initProgram()
+	err.bulkTestMode = true
 
 	-- Parse input and write output
 	output( "======= Test Started ==========================================" )
@@ -123,7 +124,7 @@ local function parseTestCode()
 				outFile:write( "-- Incomplete line carried forward\n" )
 			else
 				startTokens = nil
-				local errRec = err.getLoggedErrForLine( lineNum )
+				local errRec = err.errRecForLine( lineNum )
 				if errRec then
 					-- This line has an error on it, output it.
 					output( err.getErrString( errRec ) or "*** Missing error state!" )
