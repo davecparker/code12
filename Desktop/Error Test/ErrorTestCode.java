@@ -1162,9 +1162,9 @@ int underIndentedInstanceVar;
 		// ERROR "Code12 function name is"
 		setHeight(150);
 
-		// ERROR "Invalid function name"
+		// ERROR "was unexpected here"
 		intFunc[0]();
-		// ERROR "Invalid function name"
+		// ERROR "was unexpected here"
 		dblFuncIntDbl[intVar](0, 0.1);
 
 		// ERROR "("GameObj" is a type name)"

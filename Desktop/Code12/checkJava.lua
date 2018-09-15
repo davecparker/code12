@@ -1205,14 +1205,11 @@ function checkJava.checkProgram( programTree, level )
 	end
 	currentFunc = nil
 
-	-- Do some overall post-checks if there are no other errors
-	if not err.shouldStop() then
-		-- Make sure that a start function was defined
-		if not eventMethodFuncs["start"] then
-			local iLine = (programTree.nameID and programTree.nameID.iLine) or 1
-			err.setErrLineNum( iLine,
-					"A Code12 program must define a \"start\" function" )
-		end
+	-- Make sure that a start function was defined
+	if not eventMethodFuncs["start"] then
+		local iLine = (programTree.nameID and programTree.nameID.iLine) or 1
+		err.setErrLineNum( iLine,
+				"A Code12 program must define a \"start\" function" )
 	end
 end
 

@@ -402,16 +402,13 @@ local function makeCall( nodes )
 		nameID = ns[1]
 	else
 		assert( p == "method" )
-		local field2 = ns[4]
-		if field2.p == "field" then
-			lValue = makeLValueFromNodes( ns[1], ns[2], ns[3] )
-			nameID = field2.nodes[2]
-		elseif ns[3].p == "field" then
-			lValue = makeLValueFromNodes( ns[1], ns[2] )
-			nameID = ns[3].nodes[2]
+		local field = ns[5]
+		if field.p == "field" then
+			lValue = makeLValueFromNodes( ns[1], ns[2], ns[4] )
+			nameID = field.nodes[2]
 		else
-			err.setErrNode( nodes, "Invalid function name" )
-			return nil
+			lValue = makeLValueFromNodes( ns[1], ns[2] )
+			nameID = ns[4]
 		end
 	end
 
@@ -1101,9 +1098,6 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	end
 
 	-- Return result
-	if err.shouldStop() then
-		return nil
-	end
 	return programTree
 end
 
