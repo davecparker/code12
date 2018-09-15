@@ -339,9 +339,9 @@ local callHead = { t = "callHead",
 	{ 1, 12, "System",			"System", ".", "ID", ".", "ID", "("		},
 	{ 5, 12, "Math",			"Math", ".", "ID", "("					},
 	{ 9, 12, "user",			"ID", "("								},
-	{ 7, 12, "method",			"ID", index, field, field, "("			},
+	{ 7, 12, "method",			"ID", index, ".", "ID", field, "("		},
 	-- Common Errors
-	{ 7, 0, "method",			"TYPE", index, field, field, "(",		iNode = 1,
+	{ 7, 0, "method",			"TYPE", index, ".", "ID", field, "(",	iNode = 1,
 		strErr = invalidVarName },
 }
 
@@ -490,7 +490,7 @@ local line = { t = "line",
 	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",							"END" },
 	{ 8, 12, "else",			"else", 												"END" },
 	{ 9, 12, "returnVal",		"return", expr, ";",									"END" },
-	{ 9, 12, "return",			"return", ";",											"END" },
+	{ 8, 12, "return",			"return", ";",											"END" },
 	{ 11, 12, "do",				"do", 													"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,							"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",							"END" },
@@ -822,7 +822,7 @@ local function parseCurrentLine( level )
 			err.setErrNodeSpan( tokens[1], lastToken,
 					"Use of %s requires syntax level %d",
 					syntaxFeatures[tryLevel], tryLevel )
-			return nil
+			return parseTree
 		end
 	end
 
@@ -831,9 +831,9 @@ local function parseCurrentLine( level )
 	syntaxLevel = level
 	matchCommonErrors = false
 	iToken = 1
-	parseGrammar( line )
+	parseTree = parseGrammar( line )
 	if err.errRecForLine( lineNumber ) then
-		return nil
+		return parseTree
 	end
 
 	-- Try at the user's level with findError to try to find the error

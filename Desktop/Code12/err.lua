@@ -351,7 +351,7 @@ function err.lineNumbersWithErrors()
 	end
 	lineNumbers[1] = iLine
 
-	-- Add all the line numbers that have errors
+	-- Add other line numbers that have errors
 	for i = iLine + 1, iLineLastErr do
 		if errRecForLine[i] then
 			lineNumbers[#lineNumbers + 1] = i

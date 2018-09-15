@@ -33,13 +33,15 @@ local mainCodeGroup            -- display group for main/only code display
 local refCodeGroup             -- display group for ref code display if separate (TODO)
 local errText                  -- text object for error message
 local docsToolbarGroup         -- display group for the docs toolbar
+local errCountText             -- text object for error count
 local moreInfoBtn              -- More Info button on docs toolbar
 local backBtn                  -- Back button on docs toolbar
 local forwardBtn               -- Forward button on docs toolbar
 local docsWebView              -- web view for the documentation pane
 
 -- Error state
-local iLineErr                 -- line number for current error being shown
+local errLineNumbers           -- array of line numbers with errors
+local iError                   -- index of current error in errLineNumbers
 local errRec                   -- error record for current error being shown
 
 
@@ -261,6 +263,13 @@ local function showError()
 	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
 	errText.text = errRec.strErr
 
+	-- Show the error index and count if multi
+	if app.oneErrOnly or #errLineNumbers < 2 then
+		errCountText.text = ""
+	else
+		errCountText.text = iError .. " of " .. #errLineNumbers
+	end
+
 	-- Are we using two code groups or just one?
 	if refCodeGroup then
 		loadCodeGroup( mainCodeGroup, errRec.loc )
@@ -324,6 +333,11 @@ local function makeDocsToolbar( parent )
 			app.toolbarShade, app.borderShade )
 	local yCenter = dyDocsToolbar / 2
 
+	-- Error count text
+	errCountText = display.newText( docsToolbarGroup, "",
+			app.width / 2, yCenter, native.systemFont, app.fontSizeUI )
+	errCountText:setFillColor( 0 )
+
 	-- More Info button 
 	moreInfoBtn = widget.newButton{
 		x = app.width - margin, 
@@ -365,6 +379,36 @@ local function makeDocsToolbar( parent )
 	updateToolbar()
 end
 
+-- Handle key events in the view
+local function onKeyEvent( event )
+	-- Keys change the error number if multi-error
+	if app.oneErrOnly then
+		return false
+	end 
+	if event.phase == "down" then
+		local keyName = event.keyName
+		local iErrorNew
+		if keyName == "pageUp" then
+			iErrorNew = iError - 1
+		elseif keyName == "pageDown" then
+			print("pageDown")
+			iErrorNew = iError + 1
+		elseif keyName == "home" then
+			iErrorNew = 1
+		elseif keyName == "end" then
+			iErrorNew = #errLineNumbers
+		end
+
+		if iErrorNew and iErrorNew >= 1 and iErrorNew <= #errLineNumbers then
+			iError = iErrorNew
+			errRec = err.errRecForLine( errLineNumbers[iError] )
+			displayError( errView.view )
+			return true
+		end
+	end
+	return false
+end
+
 
 --- Scene Methods ------------------------------------------------
 
@@ -395,23 +439,28 @@ end
 -- Prepare to show the errView scene
 function errView:show( event )
 	if event.phase == "will" then
-		-- Get the error record (TODO: better multi-error)
+		-- Get the error record for the (first) error
 		assert( err.hasErr() )
-		local lineNumbers = err.lineNumbersWithErrors()
-		assert( #lineNumbers > 0 )
-		iLineErr = lineNumbers[1]
-		print( string.format( "\n%d errors starting at line %d", 
-					#lineNumbers, iLineErr ) )
+		errLineNumbers = err.lineNumbersWithErrors()
+		assert( #errLineNumbers > 0 )
+		local iLineErr = errLineNumbers[1]
+		print( string.format( "\n%d error(s) starting at line %d", 
+					#errLineNumbers, iLineErr ) )
+		iError = 1
 		errRec = err.errRecForLine( iLineErr )
 
 		-- Display the error
 		displayError( self.view )
+	elseif event.phase == "did" then
+		Runtime:addEventListener( "key", onKeyEvent )
 	end
 end
 
 -- Prepare to hide the errView scene
 function errView:hide( event )
 	if event.phase == "will" then
+		Runtime:removeEventListener( "key", onKeyEvent )
+	elseif event.phase == "did" then
 		showDocs( false )
 	end
 end

@@ -189,7 +189,7 @@ function app.processUserFile()
 	local startTime = system.getTimer()
 	local programTree = parseProgram.getProgramTree( 
 								sourceFile.strLines, app.syntaxLevel )
-	if err.hasErr() then
+	if programTree == nil or (err.hasErr() and app.oneErrOnly) then
 		composer.gotoScene( "errView" )
 		return true
 	end
@@ -204,12 +204,8 @@ function app.processUserFile()
 		-- Make and run the Lua code
 		local codeStr = codeGenJava.getLuaCode( programTree )
 		print( string.format( "\nFile processed in %.3f ms\n", system.getTimer() - startTime ) )
-		if err.hasErr() then
-			composer.gotoScene( "errView" )
-		else
-			writeLuaCode( codeStr )
-			runLuaCode( codeStr )
-		end
+		writeLuaCode( codeStr )
+		runLuaCode( codeStr )
 	end
 	return true
 end
