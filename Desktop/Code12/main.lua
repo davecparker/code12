@@ -81,25 +81,27 @@ end
 -- Read the sourceFile and store all of its source lines.
 -- Return true if success.
 local function readSourceFile()
+	local success = false
 	if sourceFile.path then
 		local file = io.open( sourceFile.path, "r" )
 		if file then
-			sourceFile.timeLoaded = os.time()
-			sourceFile.strLines = {}   -- delete previous contents if any
-			local lineNum = 1
-			repeat
-				local s = file:read( "*l" )  -- read a line
-				if s == nil then 
-					break  -- end of file
-				end
-				sourceFile.strLines[lineNum] = s
-				lineNum = lineNum + 1
-			until false -- breaks internally
+			-- Try to read the first line to see if it's really readable now
+			local s = file:read( "*l" )
+			if s then
+				sourceFile.timeLoaded = os.time()
+				sourceFile.strLines = {}   -- replace previous strLines if any
+				local lineNum = 1
+				repeat
+					sourceFile.strLines[lineNum] = s
+					lineNum = lineNum + 1
+					s = file:read( "*l" )  -- read next line
+				until s == nil
+				success = true
+			end
 			io.close( file )
-			return true
 		end
 	end
-	return false
+	return success
 end
 
 -- Write a Lua source code output file to save the generated code.
