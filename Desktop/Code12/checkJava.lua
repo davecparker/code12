@@ -367,28 +367,40 @@ end
 -- Store the isGlobal and vt fields in the lValue, and return the vt. 
 -- If there is an error, then set the error state and return nil.
 local function vtCheckLValue( lValue, assigned )
+	-- An lValue is just an ID node for a simple variable
+	if lValue.tt == "ID" then
+		-- Get the variable and mark it assigned as appropriate
+		local varFound = getVariable( lValue, assigned )
+		if varFound == nil then
+			return nil
+		end
+		if assigned then
+			if varFound.isConst then
+				err.setErrNode( lValue, "Cannot assign to constant (final) variable" )
+			end
+			varFound.assigned = true
+		end
+
+		-- Store the vt and isGlobal in the ID, and return the vt
+		lValue.isGlobal = varFound.isGlobal
+		local vt = varFound.vt
+		lValue.vt = vt
+		return vt
+	end
+
+	-- Full lValue structure
 	assert( lValue.s == "lValue" )
 	local varNode = lValue.varID
 	local indexExpr = lValue.indexExpr
 	local fieldID = lValue.fieldID
 
-	-- Is this a simple variable assignment?
-	local isVarAssign = assigned and (indexExpr == nil and fieldID == nil)
-
 	-- Get the variable and its type, and store isGlobal in the lValue
-	-- mark the variable assigned as appropriate.
-	local varFound = getVariable( varNode, isVarAssign )
+	local varFound = getVariable( varNode )
 	if varFound == nil then
 		return nil
 	end
 	lValue.isGlobal = varFound.isGlobal
 	local vt = varFound.vt
-	if isVarAssign then
-		if varFound.isConst then
-			err.setErrNode( varNode, "Cannot assign to constant (final) variable" )
-		end
-		varFound.assigned = true
-	end
 
 	-- Check array index if any, and get the element type
 	if indexExpr then
@@ -506,7 +518,7 @@ local function findStaticMethod( call )
 	elseif className == "System" then
 		-- System.out.print, System.out.println
 		local lValue = call.lValue
-		if lValue.varID.str == "out" then
+		if lValue.str == "out" then
 			if lValue.indexExpr == nil and lValue.fieldID == nil then
 				method = lookupID( nameID, apiTables["PrintStream"].methods )
 			end
@@ -843,7 +855,7 @@ end
 -- cast
 local function vtExprCast( node )
 	-- The only cast currently supported is (int) doubleExpr
-	assert( node.vt == 0 )  -- (int) enforced by parseProgram
+	assert( node.vtCast == 0 )  -- (int) enforced by parseProgram
 	local vtExpr = vtSetExprNode( node.expr )
 	if vtExpr == 1 then
 		return 0   -- proper cast of double to int
@@ -900,7 +912,7 @@ local function vtExprNewArray( node )
 		err.setErrNode( node.lengthExpr, "Array count must be an integer" )
 		return nil
 	end
-	return { vt = node.vt }  -- array of element type
+	return { vt = node.vtElement }  -- array of element type
 end
 
 -- new
@@ -1000,11 +1012,11 @@ local function vtExprDivide( node )
 	-- Check as numeric binOp then check for bad int divide
 	local vt = vtExprNumeric( node )
 	if vt == 0 then
-		-- int divide: allow only if dividing constants with no remainder
+		-- int divide: allow only if dividing INT constants with no remainder
 		local left = node.left
 		local right = node.right
-		if left.tt == "NUM" and right.tt == "NUM" then
-			-- Both sides are constant so we can check for a remainder
+		if left.tt == "INT" and right.tt == "INT" then
+			-- Both sides are int constant so we can check for a remainder
 			local n = tonumber( left.str )
 			local d = tonumber( right.str )
 			local r = n / d
@@ -1115,45 +1127,31 @@ local fnVtExprVariations = {
 -- Also store the vt into node.vt for future use.
 -- If an error is found, set the error state and return nil.
 function vtSetExprNode( node )
-	local vt
-	local tt = node.tt
-	if tt then
-		-- Single token node
-		if tt == "NUM" then
-			-- Imitating Java, a number is double if it has a decimal point or
-			-- is in exponential notation, regardless of its value
-			vt = ((node.str:find("[%.eE]") and 1) or 0)   -- double or int
-		elseif tt == "STR" then
-			vt = "String"
-		elseif tt == "BOOL" then
-			vt = true
-		else   -- "NULL"
-			vt = "null"
-		end
-	else
-		-- Determine the function to dispatch to from table above
-		local s = node.s
-		local fnVt
-		if s == "unaryOp" or s == "binOp" then
-			fnVt = fnVtExprVariations[node.opType]
-		else
-			fnVt = fnVtExprVariations[s]
-		end
+	-- Does this node already have the vt assigned? (e.g. literal token)
+	local vt = node.vt
+	if vt ~= nil then
+		return vt
+	end
 
-		-- Check for unsupported operator or other unexpected index
+	-- Is this an ID token (simplified lValue)?
+	if node.tt == "ID" then
+		return vtCheckLValue( node )
+	end
+
+	-- Determine the vt from functions in table above
+	local fnVt
+	local s = node.s
+	if s == "unaryOp" or s == "binOp" then
+		fnVt = fnVtExprVariations[node.opType]
 		if fnVt == nil then
-			if node.opToken then
-				err.setErrNode( node.opToken, 
-						"The %s operator is not supported by Code12 ", node.opToken.str )
-			else
-				err.setErrNode( node, "Unrecognized expression type" )  -- shouldn't happen
-			end
+			err.setErrNode( node.opToken, 
+					"The %s operator is not supported by Code12 ", node.opToken.str )
 			return nil
 		end
-
-		-- Dispatch to the function
-		vt = fnVt( node )
+	else
+		fnVt = fnVtExprVariations[s]
 	end
+	vt = fnVt( node )
 
 	-- Store the vt in the node and return it
 	node.vt = vt       
