@@ -11,6 +11,7 @@
 local app = require( "app" )
 local err = require( "err" )
 local javalex = require( "javalex" )
+local javaTypes = require( "javaTypes" )
 
 
 -- The parseJava module
@@ -136,7 +137,7 @@ local function tokenTypeDescription( tt )
 		return "a name"
 	elseif tt == "TYPE" then
 		return "a type"
-	elseif tt == "NUM" then
+	elseif tt == "INT" or tt == "NUM" then
 		return "a number"
 	elseif tt == "STR" then
 		return "a string"
@@ -231,10 +232,11 @@ end
 -- Parse the primaryExpr grammar plus single token literals (optimization)
 local function parsePrimaryExpr()
 	local token = tokens[iToken]
-	local tt = token.tt
-	if tt == "NUM" or tt == "STR" or tt == "BOOL" or tt == "NULL"  then
+	local vt = javaTypes.vtFromTokenType( token.tt )
+	if vt ~= nil then
 		iToken = iToken + 1
-		return token    -- expr nodes can also be single token nodes
+		token.vt = vt   -- assign the vt here so semantic checking doesn't have to
+		return token    -- expr node can also be a single literal token node
 	end
 	return parseGrammar( primaryExpr )
 end

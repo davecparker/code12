@@ -37,7 +37,7 @@
  79.                var n { vt = int, isGlobal = false }
                 stmts:
  81.                return
-                        expr: newArray { vt = int }
+                        expr: newArray { vtElement = 0 }
                             lengthExpr: lValue { varID = n }
  83.        func intFuncInt { #paramVars = 1, vt = int, #stmts = 1 }
                 paramVars:
@@ -221,7 +221,7 @@
 162.                assign (=) { expr = 100 }
                         lValue: lValue { varID = i }
 163.                var strArr { vt = array of String }
-                        initExpr: newArray { vt = String }
+                        initExpr: newArray { vtElement = "String" }
                             lengthExpr: lValue { varID = i }
 164.                assign (=)
                         lValue: lValue { varID = strArr }
@@ -234,9 +234,9 @@
 165.                            (3)
 166.                assign (=)
                         lValue: lValue { varID = intArr }
-                        expr: newArray { vt = int, lengthExpr = 100 }
+                        expr: newArray { vtElement = 0, lengthExpr = 100 }
 167.                var intArr2 { vt = array of int }
-                        initExpr: newArray { vt = int }
+                        initExpr: newArray { vtElement = 0 }
                             lengthExpr: call length
                                 lValue: lValue { varID = s }
 168.                assign (=)
@@ -249,12 +249,12 @@
 169.                            (2.2)
 169.                            (3.3)
 170.                var dblArr2 { vt = array of double }
-                        initExpr: newArray { vt = double, lengthExpr = 100 }
+                        initExpr: newArray { vtElement = 1, lengthExpr = 100 }
 171.                assign (=)
                         lValue: lValue { varID = dblArr }
                         expr: lValue { varID = dblArr2 }
 172.                var gObjArr { vt = array of GameObj }
-                        initExpr: newArray { vt = GameObj }
+                        initExpr: newArray { vtElement = "GameObj" }
                             lengthExpr: (*) { right = 2 }
                                 left: lValue { varID = i }
 174.                call voidFunc
@@ -885,7 +885,7 @@
                                                 left: lValue { varID = xVar }
 325.                assign (=)
                         lValue: lValue { varID = intArr }
-                        expr: newArray { vt = int, lengthExpr = 1 }
+                        expr: newArray { vtElement = 0, lengthExpr = 1 }
 326.                forArray { #stmts = 1 }
 326.                    var: var a { vt = int, isGlobal = false }
                         expr: lValue { varID = intArr }
@@ -2571,14 +2571,14 @@
 911.                            ("two")
 911.                            (3.14)
 913.                var strArr { vt = array of String }
-                        initExpr: newArray { vt = GameObj, lengthExpr = 100 }
+                        initExpr: newArray { vtElement = "GameObj", lengthExpr = 100 }
 915.                var boolArr { vt = array of boolean }
                         initExpr: call intArrFuncInt { #exprs = 1 }
                             exprs:
 915.                            (10)
 917.                assign (=)
                         lValue: lValue { varID = intArr }
-                        expr: newArray { vt = int, lengthExpr = 1.5 }
+                        expr: newArray { vtElement = 0, lengthExpr = 1.5 }
 920.                assign (++)
                         lValue: lValue { varID = boolVar }
 922.                assign (++)
@@ -2882,7 +2882,7 @@
                         expr: (/) { right = 8, left = 3 }
 1149.                var intVar { vt = int, initExpr = 13 }
 1151.                var objArr { vt = array of GameObj }
-                        initExpr: newArray { vt = GameObj, lengthExpr = 10 }
+                        initExpr: newArray { vtElement = "GameObj", lengthExpr = 10 }
 1154.                call update
 1156.                call start
 1158.                call onMousePress { #exprs = 2 }
@@ -3135,7 +3135,7 @@
 1402.                            (1)
 1404.                            (2)
 1405.                var multiLineArrDec { vt = array of int }
-                        initExpr: newArray { vt = int }
+                        initExpr: newArray { vtElement = 0 }
                             lengthExpr: call random { #exprs = 2, class = ct }
                                 exprs:
 1405.                                (1)
@@ -3217,7 +3217,7 @@
 1469.                var publicDouble { vt = double, initExpr = 0 }
 1471.                var halfIntVar { vt = double }
                         initExpr: (/) { right = 2 }
-                            left: cast { vt = int }
+                            left: cast { vtCast = 0 }
                                 expr: lValue { varID = intVar }
 1472.                if { expr = false }
 1474.                var bogusVarInit { vt = int, initExpr = 0 }
@@ -3322,7 +3322,7 @@
  20.                    (2)
  22.                    (3)
  23.        var classLevelMultilineIntArray3 { vt = array of int, isGlobal = true }
-                initExpr: newArray { vt = int }
+                initExpr: newArray { vtElement = 0 }
                     lengthExpr: call max { #exprs = 2, class = Math }
                         exprs:
  23.                        (1)
@@ -3346,7 +3346,7 @@
  34.        var bottomWall { vt = GameObj, isGlobal = true }
  35.        var enemies { vt = array of GameObj, isGlobal = true }
  36.        var friends { vt = array of GameObj, isGlobal = true }
-                initExpr: newArray { vt = GameObj }
+                initExpr: newArray { vtElement = "GameObj" }
                     lengthExpr: lValue { varID = MAX_ENEMIES }
  37.        var myPrivateVar { vt = int, isGlobal = true }
 631.        var newWidth { vt = double, isGlobal = true }

@@ -843,7 +843,7 @@ end
 -- cast
 local function vtExprCast( node )
 	-- The only cast currently supported is (int) doubleExpr
-	assert( node.vt == 0 )  -- (int) enforced by parseProgram
+	assert( node.vtCast == 0 )  -- (int) enforced by parseProgram
 	local vtExpr = vtSetExprNode( node.expr )
 	if vtExpr == 1 then
 		return 0   -- proper cast of double to int
@@ -900,7 +900,7 @@ local function vtExprNewArray( node )
 		err.setErrNode( node.lengthExpr, "Array count must be an integer" )
 		return nil
 	end
-	return { vt = node.vt }  -- array of element type
+	return { vt = node.vtElement }  -- array of element type
 end
 
 -- new
@@ -1000,11 +1000,11 @@ local function vtExprDivide( node )
 	-- Check as numeric binOp then check for bad int divide
 	local vt = vtExprNumeric( node )
 	if vt == 0 then
-		-- int divide: allow only if dividing constants with no remainder
+		-- int divide: allow only if dividing INT constants with no remainder
 		local left = node.left
 		local right = node.right
-		if left.tt == "NUM" and right.tt == "NUM" then
-			-- Both sides are constant so we can check for a remainder
+		if left.tt == "INT" and right.tt == "INT" then
+			-- Both sides are int constant so we can check for a remainder
 			local n = tonumber( left.str )
 			local d = tonumber( right.str )
 			local r = n / d
@@ -1115,45 +1115,26 @@ local fnVtExprVariations = {
 -- Also store the vt into node.vt for future use.
 -- If an error is found, set the error state and return nil.
 function vtSetExprNode( node )
-	local vt
-	local tt = node.tt
-	if tt then
-		-- Single token node
-		if tt == "NUM" then
-			-- Imitating Java, a number is double if it has a decimal point or
-			-- is in exponential notation, regardless of its value
-			vt = ((node.str:find("[%.eE]") and 1) or 0)   -- double or int
-		elseif tt == "STR" then
-			vt = "String"
-		elseif tt == "BOOL" then
-			vt = true
-		else   -- "NULL"
-			vt = "null"
-		end
-	else
-		-- Determine the function to dispatch to from table above
-		local s = node.s
-		local fnVt
-		if s == "unaryOp" or s == "binOp" then
-			fnVt = fnVtExprVariations[node.opType]
-		else
-			fnVt = fnVtExprVariations[s]
-		end
+	-- Does this node already have the vt assigned? (e.g. literal token)
+	local vt = node.vt
+	if vt ~= nil then
+		return vt
+	end
 
-		-- Check for unsupported operator or other unexpected index
+	-- Determine the vt from functions in table above
+	local fnVt
+	local s = node.s
+	if s == "unaryOp" or s == "binOp" then
+		fnVt = fnVtExprVariations[node.opType]
 		if fnVt == nil then
-			if node.opToken then
-				err.setErrNode( node.opToken, 
-						"The %s operator is not supported by Code12 ", node.opToken.str )
-			else
-				err.setErrNode( node, "Unrecognized expression type" )  -- shouldn't happen
-			end
+			err.setErrNode( node.opToken, 
+					"The %s operator is not supported by Code12 ", node.opToken.str )
 			return nil
 		end
-
-		-- Dispatch to the function
-		vt = fnVt( node )
+	else
+		fnVt = fnVtExprVariations[s]
 	end
+	vt = fnVt( node )
 
 	-- Store the vt in the node and return it
 	node.vt = vt       

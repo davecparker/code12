@@ -51,15 +51,15 @@ local parseProgram = {}
 --     { s = "lValue", varID, indexExpr, fieldID }
 -- 
 -- expr:  (Semantic analysis adds a vt field)
---     (expr nodes can be a single NUM, BOOL, NULL, or STR token node)
+--     (expr nodes can be a single INT, NUM, BOOL, NULL, or STR token node)
 --     { s = "call", class, lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "staticField", class, fieldID }
---     { s = "cast", vt, expr }
+--     { s = "cast", vtCast, expr }
 --     { s = "parens", expr }
 --     { s = "unaryOp", opToken, opType, expr }        -- opType: neg, not
 --     { s = "binOp", left, opToken, opType, right }   -- opType: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
---     { s = "newArray", vt, lengthExpr }
+--     { s = "newArray", vtElement, lengthExpr }
 --     { s = "arrayInit", exprs }
 --     { s = "new", nameID, exprs }
 --
@@ -425,7 +425,7 @@ local function makeCast( nodes )
 	if typeNode.str ~= "int" then
 		err.setErrNode( typeNode, "The only type cast supported by Code12 is (int)" )
 	end
-	return { s = "cast", vt = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
+	return { s = "cast", vtCast = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
@@ -750,7 +750,7 @@ function makeExpr( node )
 		return nil
 	end
 
-	-- Expr nodes can be a single token (NUM, BOOL, NULL, or STR)
+	-- Expr nodes can be a single token (INT, NUM, BOOL, NULL, or STR)
 	if node.tt then
 		return node
 	end
@@ -773,7 +773,7 @@ function makeExpr( node )
 	elseif p == "Math" then
 		return { s = "staticField", class = nodes[1], fieldID = nodes[3] }
 	elseif p == "newArray" then
-		return { s = "newArray", vt = javaTypes.vtFromVarType( nodes[2] ), 
+		return { s = "newArray", vtElement = javaTypes.vtFromVarType( nodes[2] ), 
 				lengthExpr = makeExpr( nodes[4] ), firstToken = nodes[1],
 				lastToken = nodes[5] }
 	elseif p == "new" then

@@ -322,7 +322,7 @@ end
 -- Return the Lua code string for a newArray expr
 local function newArrayCode( expr )
 	return "{ length = " .. exprCode( expr.lengthExpr )
-			.. ", default = " ..  defaultValueCodeForVt( expr.vt ) .. " }"
+			.. ", default = " ..  defaultValueCodeForVt( expr.vtElement ) .. " }"
 end
 
 -- Return the Lua code string for an arrayInit expr

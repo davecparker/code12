@@ -431,8 +431,10 @@ local function stringLiteralToken()
 	return "STR", str
 end
 
--- Return ("NUM", str) for a numeric literal token starting with a digit
+-- Return ("INT", str) for an integer literal token starting with a digit
+-- or ("NUM", str) if the number contains a decimal point or exponential notation.
 local function numericLiteralToken( startsWithDot )
+	local isNUM = startsWithDot
 	local iCharStart = iChar   -- the first digit char or . if startsWithDot == true
 	iChar = iChar + 1
 	local charType = charTypes[chars[iChar]]
@@ -441,6 +443,7 @@ local function numericLiteralToken( startsWithDot )
 		charType = charTypes[chars[iChar]]
 	end
 	if not startsWithDot and chars[iChar] == 46 then  -- .
+		isNUM = true
 		repeat
 			iChar = iChar + 1
 			charType = charTypes[chars[iChar]]
@@ -449,6 +452,7 @@ local function numericLiteralToken( startsWithDot )
 	-- Handle exponential notation
 	local ch = chars[iChar]
 	if ch == 69 or ch == 101 then -- E or e
+		isNUM = true
 		iChar = iChar + 1
 		ch = chars[iChar]
 		if ch == 43 or ch == 45 then -- + or -
@@ -474,14 +478,17 @@ local function numericLiteralToken( startsWithDot )
 		return nil
 	end
 	local str = string.sub(source, iCharStart, iChar - 1)
-	return "NUM", str
+	if isNUM then
+		return "NUM", str
+	end
+	return "INT", str
 end
 
 -- Return string for token starting with .  
 -- (dot or a numeric literal token starting with a dot)
 local function dotToken()
 	if charTypes[chars[iChar + 1]] == false then   -- digit char after dot
-		return numericLiteralToken(true)
+		return numericLiteralToken( true )
 	end
 	iChar = iChar + 1
 	return "."
@@ -535,7 +542,8 @@ end
 --     Keywords, operators, and seperators have tt == str (e.g. "for", "++", ";")
 --     "TYPE": a known Java primitive type or class used by Code12
 --     "ID": an identifer that is not a reserved word
---     "NUM": numeric literal (any numeric type)
+--     "INT": integer literal
+--     "NUM": non-integer numeric literal (has decimal or E notation)
 --     "STR": string literal (note that str includes the quotes)
 --     "BOOL": boolean literal (str is "false" or "true")
 --     "NULL": the null literal (str is "null")
