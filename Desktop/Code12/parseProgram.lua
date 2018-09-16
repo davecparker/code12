@@ -342,7 +342,7 @@ local function getVar( p, nodes, structs, isGlobal )
 end	
 
 -- Make and return an lValue structure from the parse node parts.
--- The indexd and field can be nil 
+-- The index and field can be nil 
 local function makeLValueFromNodes( varID, index, field )
 	local indexExpr = nil
 	local lastToken = nil
@@ -395,9 +395,9 @@ local function makeCall( nodes )
 		class = ns[1]
 		nameID = ns[3]
 	elseif p == "System" then
-		class = ns[1]
-		lValue = makeLValueFromNodes( ns[3] )
-		nameID = ns[5]
+		class = ns[1]                 -- "System"
+		lValue = makeLValue( ns[3] )  -- e.g. "out"
+		nameID = ns[5]                -- e.g. "println"
 	elseif p == "user" then
 		nameID = ns[1]
 	else
@@ -750,7 +750,7 @@ function makeExpr( node )
 		return nil
 	end
 
-	-- Expr nodes can be a single token (INT, NUM, BOOL, NULL, or STR)
+	-- Expr nodes can be a token (variable ID, or literal INT, NUM, BOOL, NULL, STR)
 	if node.tt then
 		return node
 	end

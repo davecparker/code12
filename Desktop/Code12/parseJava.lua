@@ -62,6 +62,7 @@ local findError           -- nil if not trying to find errors, or a table with:
 local parseGrammar
 local parsePattern
 local primaryExpr
+local lValueFull
 
 
 ----- Debugging help -------------------------------------------------------
@@ -115,21 +116,6 @@ local binaryOpPrecedence = {
 
 
 ----- Parsing Utilities  --------------------------------------------------
-
--- A parse tree is either:
--- 		a token node, for example:
---          { tt = "ID", str = "foo", iLine = 10, iChar = 23 }
---      or a tree node, for example:
---          { t = "line", p = "stmt", nodes = {...} }
---      where t is the grammar or function name, p is the pattern name if any,
---		and nodes is an array of children nodes.
-
--- Create and return a parse tree node with the given type (t), pattern (p), 
--- and children nodes
-local function makeParseTreeNode( t, p, nodes )
-	-- TODO: Get from pool
-	return { t = t, p = p, nodes = nodes }
-end	
 
 -- Return a description of the given token type for syntax errors
 local function tokenTypeDescription( tt )
@@ -228,12 +214,20 @@ end
 -- at iToken, considering only patterns that are defined within the syntaxLevel.
 -- They return a parse tree, or nil if failure.
 
+-- A parse tree is either:
+-- 		a token node, for example:
+--          { tt = "ID", str = "foo", iLine = 10, iChar = 23 }
+--      or a tree node, for example:
+--          { t = "line", p = "stmt", nodes = {...} }
+--      where t is the grammar or function name, p is the pattern name if any,
+--		and nodes is an array of children nodes.
+
 
 -- Parse the primaryExpr grammar plus single token literals (optimization)
 local function parsePrimaryExpr()
 	local token = tokens[iToken]
 	local vt = javaTypes.vtFromTokenType( token.tt )
-	if vt ~= nil then
+	if vt ~= nil then   -- literal token node
 		iToken = iToken + 1
 		token.vt = vt   -- assign the vt here so semantic checking doesn't have to
 		return token    -- expr node can also be a single literal token node
@@ -272,7 +266,7 @@ local function parseOpExpr( leftSide, minPrecedence )
 			prec = binaryOpPrecedence[token.tt]
 		end
 		-- Build the node for this op
-		leftSide = makeParseTreeNode( "expr", op.tt, { leftSide, op, rightSide } )
+		leftSide = { t = "expr", p = op.tt, nodes = { leftSide, op, rightSide } }
 		if rightSide.isError then
 			leftSide.isError = true   -- propagate error up to parent
 		end
@@ -303,14 +297,39 @@ local function access()
 		local token2 = tokens[iToken]
 		if token2.tt == "static" then
 			iToken = iToken + 1
-			return makeParseTreeNode( "access", "publicStatic", { token, token2 } )
+			return { t = "access", p = "publicStatic", nodes = { token, token2 } }
 		end
-		return makeParseTreeNode( "access", "public", { token } )
+		return { t = "access", p = "public", nodes = { token } }
 	elseif tt == "private" or tt == "protected" then
 		iToken = iToken + 1
-		return makeParseTreeNode( "access", "private", { token } )
+		return { t = "access", p = "private", nodes = { token } }
 	end
-	return makeParseTreeNode( "access", "empty", {} )
+	return { t = "access", p = "empty", nodes = {} }
+end
+
+-- Parse an lValue (as a function for efficiency).
+-- The result may be a single ID node for a simple variable,
+-- or an lValueFull.
+local function lValue()
+	-- Look for the required variable ID token
+	local varToken = tokens[iToken]
+	if varToken.tt ~= "ID" then
+		if findError then
+			trackUnexpectedToken( "ID" )
+		end
+		return nil
+	end
+	iToken = iToken + 1
+
+	-- Check for index and/or field and re-parse as lValueFull if needed
+	if syntaxLevel >= 6 then
+		local tt = tokens[iToken].tt
+		if tt == "." or tt == "[" then
+			iToken = iToken - 1   -- start over with the variable ID
+			return parseGrammar( lValueFull )
+		end
+	end
+	return varToken
 end
 
 
@@ -329,8 +348,8 @@ local field = { t = "field",
 }
 
 -- An lValue (var or expr that can be assigned to)
--- TODO: parse with a function?
-local lValue = { t = "lValue",
+-- An lValue can also be a single ID node, which is handled by lValue() above.
+lValueFull = { t = "lValue",
 	{ 3, 12, "lValue",			"ID", index, field		},
 }
 
@@ -613,7 +632,7 @@ function parseGrammar( grammar )
 			traceIndentLevel = traceIndentLevel - 1
 			if nodes then
 				-- This pattern matches, so make a tree node to return
-				local parseTree = makeParseTreeNode( grammar.t, p, nodes )
+				local parseTree = { t = grammar.t, p = p, nodes = nodes }
 
 				-- If we matched a common error then set the error state
 				-- and mark the parse tree with isError.
