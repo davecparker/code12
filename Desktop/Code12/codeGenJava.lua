@@ -162,6 +162,9 @@ end
 -- If assigned then the lValue is being assigned to, otherwise it is being read.  
 local function varIndexCode( lValue, assigned )
 	-- Get code for the variable
+	if lValue.tt == "ID" then   -- simple variable ID node
+		return varNameCode( lValue.str, lValue.isGlobal )
+	end
 	local varCode = varNameCode( lValue.varID.str, lValue.isGlobal )
 	local indexExpr = lValue.indexExpr
 	if indexExpr == nil then
@@ -358,9 +361,11 @@ local fnGenerateExpr = {
 -- Return the Lua code for the given expr
 function exprCode( expr )
 	local tt = expr.tt
-	if tt == "NULL" then
+	if tt == "ID" then   -- simple variable ID node
+		return varNameCode( expr.str, expr.isGlobal )
+	elseif tt == "NULL" then
 		return "nil"
-	elseif tt then
+	elseif tt then    -- INT, NUM, BOOL, STR
 		return expr.str
 	else
 		local fn = fnGenerateExpr[expr.s]

@@ -48,10 +48,11 @@ local parseProgram = {}
 --     { s = "return", iLine, expr }
 --
 -- lValue:  (Semantic analysis adds isGlobal and vt fields)
+--     (an lValue can also be a single ID node for a simple variable)
 --     { s = "lValue", varID, indexExpr, fieldID }
 -- 
 -- expr:  (Semantic analysis adds a vt field)
---     (expr nodes can be a single INT, NUM, BOOL, NULL, or STR token node)
+--     (expr nodes can also be a single ID or INT, NUM, BOOL, NULL, or STR token node)
 --     { s = "call", class, lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "staticField", class, fieldID }
@@ -346,14 +347,20 @@ end
 local function makeLValueFromNodes( varID, index, field )
 	local indexExpr = nil
 	local lastToken = nil
+	local simpleVar = true
 	if index and index.p == "index" then
+		simpleVar = false
 		indexExpr = makeExpr( index.nodes[2] )
 		lastToken = index.nodes[3]
 	end
 	local fieldID = nil
 	if field and field.p ~= "empty" then
+		simpleVar = false
 		fieldID = field.nodes[2]
 		lastToken = nil   -- don't need this anymore
+	end
+	if simpleVar then
+		return varID    -- lValue for simple variable is just the ID token
 	end
 	return { s = "lValue", varID = varID, 
 			indexExpr = indexExpr, fieldID = fieldID, lastToken = lastToken }
@@ -362,7 +369,7 @@ end
 -- Make and return an lValue structure from an ID token or lValue parse node 
 local function makeLValue( node )
 	if node.tt == "ID" then
-		return { s = "lValue", varID = node }
+		return node
 	end
 	assert( node.t == "lValue" )
 	local nodes = node.nodes
@@ -395,9 +402,9 @@ local function makeCall( nodes )
 		class = ns[1]
 		nameID = ns[3]
 	elseif p == "System" then
-		class = ns[1]                 -- "System"
-		lValue = makeLValue( ns[3] )  -- e.g. "out"
-		nameID = ns[5]                -- e.g. "println"
+		class = ns[1]     -- "System"
+		lValue = ns[3]    -- e.g. "out"
+		nameID = ns[5]    -- e.g. "println"
 	elseif p == "user" then
 		nameID = ns[1]
 	else

@@ -7,23 +7,19 @@
  55.        func intFunc { #paramVars = 0, vt = int, #stmts = 2 }
                 stmts:
  57.                var i { vt = int, initExpr = 1 }
- 58.                return
-                        expr: lValue { varID = i }
+ 58.                return { expr = i }
  60.        func dblFunc { #paramVars = 0, vt = double, #stmts = 2 }
                 stmts:
  62.                var d { vt = double, initExpr = 0.0 }
- 63.                return
-                        expr: lValue { varID = d }
+ 63.                return { expr = d }
  65.        func boolFunc { #paramVars = 0, vt = boolean, #stmts = 2 }
                 stmts:
  67.                var b { vt = boolean, initExpr = true }
- 68.                return
-                        expr: lValue { varID = b }
+ 68.                return { expr = b }
  70.        func strFunc { #paramVars = 0, vt = String, #stmts = 2 }
                 stmts:
  72.                var s { vt = String, initExpr = "" }
- 73.                return
-                        expr: lValue { varID = s }
+ 73.                return { expr = s }
  75.        func gObjFunc { #paramVars = 0, vt = GameObj, #stmts = 1 }
                 stmts:
  77.                return
@@ -37,25 +33,21 @@
  79.                var n { vt = int, isGlobal = false }
                 stmts:
  81.                return
-                        expr: newArray { vtElement = 0 }
-                            lengthExpr: lValue { varID = n }
+                        expr: newArray { vtElement = 0, lengthExpr = n }
  83.        func intFuncInt { #paramVars = 1, vt = int, #stmts = 1 }
                 paramVars:
  83.                var i { vt = int, isGlobal = false }
                 stmts:
  85.                return
                         expr: (+) { right = 1 }
-                            left: (*) { right = 2 }
-                                left: lValue { varID = i }
+                            left: (*) { right = 2, left = i }
  87.        func dblFuncIntDbl { #paramVars = 2, vt = double, #stmts = 1 }
                 paramVars:
  87.                var i { vt = int, isGlobal = false }
  87.                var d { vt = double, isGlobal = false }
                 stmts:
  89.                return
-                        expr: (+)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
+                        expr: (+) { right = d, left = i }
  91.        func boolFuncBoolStringGameObj { #paramVars = 3, vt = boolean, #stmts = 1 }
                 paramVars:
  91.                var b { vt = boolean, isGlobal = false }
@@ -65,27 +57,23 @@
  93.                return
                         expr: (&&)
                             right: lValue { varID = g, fieldID = visible }
-                            left: (&&)
-                                right: call equals { #exprs = 1 }
-                                    lValue: lValue { varID = s }
+                            left: (&&) { left = b }
+                                right: call equals { lValue = s, #exprs = 1 }
                                     exprs:
  93.                                    ("")
-                                left: lValue { varID = b }
  95.        func recursiveFunc { #paramVars = 1, vt = int, #stmts = 2 }
                 paramVars:
  95.                var i { vt = int, isGlobal = false }
                 stmts:
  97.                if { #stmts = 1 }
-                        expr: (<=) { right = 0 }
-                            left: lValue { varID = i }
+                        expr: (<=) { right = 0, left = i }
                         stmts:
  98.                        return { expr = 0 }
  99.                return
                         expr: (+) { left = 1 }
                             right: call recursiveFunc { #exprs = 1 }
                                 exprs:
-                                    (-) { right = 1 }
-                                        left: lValue { varID = i }
+                                    (-) { right = 1, left = i }
 101.        func multiLineFuncDecl { #paramVars = 3, vt = void, #stmts = 1 }
                 paramVars:
 101.                var arg1 { vt = int, isGlobal = false }
@@ -94,49 +82,34 @@
                 stmts:
 105.                call log { #exprs = 3, class = ct }
                         exprs:
-                            lValue { varID = arg1 }
-                            lValue { varID = arg2 }
-                            lValue { varID = arg3 }
+105.                        (arg1)
+105.                        (arg2)
+105.                        (arg3)
 109.        func start { #paramVars = 0, isPublic = true, vt = int, #stmts = 412 }
                 stmts:
 113.                var LIMIT { vt = int, isConst = true, initExpr = 100 }
 115.                var i { vt = int, initExpr = 3 }
-116.                assign (=)
-                        lValue: lValue { varID = i }
+116.                assign (=) { lValue = i }
                         expr: unaryOp (neg) { expr = 5 }
-117.                assign (++)
-                        lValue: lValue { varID = i }
-118.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (+) { right = 1 }
-                            left: lValue { varID = i }
-119.                assign (+=) { expr = 1 }
-                        lValue: lValue { varID = i }
-120.                assign (-=) { expr = 2 }
-                        lValue: lValue { varID = i }
-121.                assign (*=) { expr = 3 }
-                        lValue: lValue { varID = i }
-122.                assign (/=) { expr = 4 }
-                        lValue: lValue { varID = i }
-123.                assign (=)
-                        lValue: lValue { varID = i }
+117.                assign (++) { lValue = i }
+118.                assign (=) { lValue = i }
+                        expr: (+) { right = 1, left = i }
+119.                assign (+=) { lValue = i, expr = 1 }
+120.                assign (-=) { lValue = i, expr = 2 }
+121.                assign (*=) { lValue = i, expr = 3 }
+122.                assign (/=) { lValue = i, expr = 4 }
+123.                assign (=) { lValue = i }
                         expr: call intFunc
-124.                assign (=)
-                        lValue: lValue { varID = i }
+124.                assign (=) { lValue = i }
                         expr: call intFuncInt { #exprs = 1 }
                             exprs:
                                 (-)
-                                    right: (*) { left = 345 }
-                                        right: lValue { varID = i }
-                                    left: (-)
+                                    right: (*) { right = i, left = 345 }
+                                    left: (-) { left = i }
                                         right: parens
-                                            expr: (+)
-                                                right: lValue { varID = i }
-                                                left: lValue { varID = i }
-                                        left: lValue { varID = i }
+                                            expr: (+) { right = i, left = i }
 125.                var foo { vt = int }
-                        initExpr: (+) { right = 4 }
-                            left: lValue { varID = i }
+                        initExpr: (+) { right = 4, left = i }
 126.                var score { vt = int, initExpr = 500 }
 127.                var j { vt = int }
 127.                var k { vt = int }
@@ -144,72 +117,46 @@
 129.                var exponentialNumberWithDot { vt = double, initExpr = 3.42e2 }
 130.                var expontialNumberWithDecimalPlaces { vt = double, initExpr = 6.62e-34 }
 131.                var d { vt = double, initExpr = 3.14 }
-132.                assign (=) { expr = 100 }
-                        lValue: lValue { varID = d }
-133.                assign (=) { expr = .5 }
-                        lValue: lValue { varID = d }
-134.                assign (=) { expr = 1.2345e6 }
-                        lValue: lValue { varID = d }
-135.                assign (=) { expr = 1.2345e+67 }
-                        lValue: lValue { varID = d }
-136.                assign (=) { expr = .12e0 }
-                        lValue: lValue { varID = d }
-137.                assign (=)
-                        lValue: lValue { varID = d }
+132.                assign (=) { lValue = d, expr = 100 }
+133.                assign (=) { lValue = d, expr = .5 }
+134.                assign (=) { lValue = d, expr = 1.2345e6 }
+135.                assign (=) { lValue = d, expr = 1.2345e+67 }
+136.                assign (=) { lValue = d, expr = .12e0 }
+137.                assign (=) { lValue = d }
                         expr: unaryOp (neg) { expr = .123e-123 }
-138.                assign (=)
-                        lValue: lValue { varID = d }
+138.                assign (=) { lValue = d }
                         expr: unaryOp (neg) { expr = .5 }
-139.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (/) { right = 2 }
-                            left: lValue { varID = d }
-140.                assign (++)
-                        lValue: lValue { varID = d }
-141.                assign (+=) { expr = 0.5 }
-                        lValue: lValue { varID = d }
-142.                assign (-=) { expr = 7 }
-                        lValue: lValue { varID = d }
-143.                assign (*=) { expr = 8 }
-                        lValue: lValue { varID = d }
-144.                assign (/=) { expr = 8.0 }
-                        lValue: lValue { varID = d }
+139.                assign (=) { lValue = d }
+                        expr: (/) { right = 2, left = d }
+140.                assign (++) { lValue = d }
+141.                assign (+=) { lValue = d, expr = 0.5 }
+142.                assign (-=) { lValue = d, expr = 7 }
+143.                assign (*=) { lValue = d, expr = 8 }
+144.                assign (/=) { lValue = d, expr = 8.0 }
 145.                var d2 { vt = double, initExpr = 3 }
 146.                var d3 { vt = double }
-                        initExpr: (+)
+                        initExpr: (+) { left = d }
                             right: (*) { left = 2 }
                                 right: parens
-                                    expr: (+)
-                                        right: lValue { varID = d }
-                                        left: lValue { varID = d2 }
-                            left: lValue { varID = d }
+                                    expr: (+) { right = d, left = d2 }
 147.                var x1 { vt = double }
 147.                var x2 { vt = double }
 147.                var y1 { vt = double }
 147.                var y2 { vt = double }
-148.                assign (=) { expr = 1 }
-                        lValue: lValue { varID = x1 }
-149.                assign (=) { expr = 2.0 }
-                        lValue: lValue { varID = x2 }
-150.                assign (=) { expr = .5e+1 }
-                        lValue: lValue { varID = y1 }
-151.                assign (=)
-                        lValue: lValue { varID = y2 }
+148.                assign (=) { lValue = x1, expr = 1 }
+149.                assign (=) { lValue = x2, expr = 2.0 }
+150.                assign (=) { lValue = y1, expr = .5e+1 }
+151.                assign (=) { lValue = y2 }
                         expr: unaryOp (neg) { expr = .5e-1 }
 152.                var eps { vt = double, initExpr = 1e-4 }
 153.                var name { vt = String, initExpr = "Einstein" }
 154.                var b { vt = boolean, initExpr = true }
 155.                var b2 { vt = boolean, initExpr = false }
 156.                var b3 { vt = boolean }
-                        initExpr: (||)
-                            right: lValue { varID = b2 }
-                            left: lValue { varID = b }
+                        initExpr: (||) { right = b2, left = b }
 157.                var s { vt = String, initExpr = "A string variable" }
-158.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: lValue { varID = s }
-159.                assign (=) { expr = null }
-                        lValue: lValue { varID = s }
+158.                assign (=) { lValue = s, expr = s }
+159.                assign (=) { lValue = s, expr = null }
 161.                var colors { vt = array of String }
                         initExpr: arrayInit { #exprs = 5 }
                             exprs:
@@ -218,30 +165,22 @@
 161.                            ("red")
 161.                            ("green")
 161.                            ("blue")
-162.                assign (=) { expr = 100 }
-                        lValue: lValue { varID = i }
+162.                assign (=) { lValue = i, expr = 100 }
 163.                var strArr { vt = array of String }
-                        initExpr: newArray { vtElement = "String" }
-                            lengthExpr: lValue { varID = i }
-164.                assign (=)
-                        lValue: lValue { varID = strArr }
-                        expr: lValue { varID = colors }
+                        initExpr: newArray { vtElement = "String", lengthExpr = i }
+164.                assign (=) { lValue = strArr, expr = colors }
 165.                var intArr { vt = array of int }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
 165.                            (1)
 165.                            (2)
 165.                            (3)
-166.                assign (=)
-                        lValue: lValue { varID = intArr }
+166.                assign (=) { lValue = intArr }
                         expr: newArray { vtElement = 0, lengthExpr = 100 }
 167.                var intArr2 { vt = array of int }
                         initExpr: newArray { vtElement = 0 }
-                            lengthExpr: call length
-                                lValue: lValue { varID = s }
-168.                assign (=)
-                        lValue: lValue { varID = intArr }
-                        expr: lValue { varID = intArr2 }
+                            lengthExpr: call length { lValue = s }
+168.                assign (=) { lValue = intArr, expr = intArr2 }
 169.                var dblArr { vt = array of double }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
@@ -250,465 +189,220 @@
 169.                            (3.3)
 170.                var dblArr2 { vt = array of double }
                         initExpr: newArray { vtElement = 1, lengthExpr = 100 }
-171.                assign (=)
-                        lValue: lValue { varID = dblArr }
-                        expr: lValue { varID = dblArr2 }
+171.                assign (=) { lValue = dblArr, expr = dblArr2 }
 172.                var gObjArr { vt = array of GameObj }
                         initExpr: newArray { vtElement = "GameObj" }
-                            lengthExpr: (*) { right = 2 }
-                                left: lValue { varID = i }
+                            lengthExpr: (*) { right = 2, left = i }
 174.                call voidFunc
-175.                assign (=)
-                        lValue: lValue { varID = i }
+175.                assign (=) { lValue = i }
                         expr: call intFunc
-176.                assign (=)
-                        lValue: lValue { varID = d }
+176.                assign (=) { lValue = d }
                         expr: call dblFunc
-177.                assign (=)
-                        lValue: lValue { varID = b }
+177.                assign (=) { lValue = b }
                         expr: call boolFunc
-178.                assign (=)
-                        lValue: lValue { varID = s }
+178.                assign (=) { lValue = s }
                         expr: call strFunc
 179.                var gObj { vt = GameObj }
                         initExpr: call gObjFunc
-180.                assign (=)
-                        lValue: lValue { varID = intArr }
+180.                assign (=) { lValue = intArr }
                         expr: call intArrFuncInt { #exprs = 1 }
                             exprs:
-                                lValue { varID = i }
-181.                assign (=)
-                        lValue: lValue { varID = i }
+180.                            (i)
+181.                assign (=) { lValue = i }
                         expr: call intFuncInt { #exprs = 1 }
                             exprs:
-                                lValue { varID = i }
-182.                assign (=)
-                        lValue: lValue { varID = d }
+181.                            (i)
+182.                assign (=) { lValue = d }
                         expr: call dblFuncIntDbl { #exprs = 2 }
                             exprs:
-                                lValue { varID = i }
-                                lValue { varID = d }
-183.                assign (=)
-                        lValue: lValue { varID = b }
+182.                            (i)
+182.                            (d)
+183.                assign (=) { lValue = b }
                         expr: call boolFuncBoolStringGameObj { #exprs = 3 }
                             exprs:
-                                lValue { varID = b }
-                                lValue { varID = s }
-                                lValue { varID = gObj }
-184.                assign (=)
-                        lValue: lValue { varID = i }
+183.                            (b)
+183.                            (s)
+183.                            (gObj)
+184.                assign (=) { lValue = i }
                         expr: call recursiveFunc { #exprs = 1 }
                             exprs:
 184.                            (2)
-186.                assign (=)
-                        lValue: lValue { varID = i }
+186.                assign (=) { lValue = i }
                         expr: (/) { right = 1, left = 5 }
-187.                assign (=)
-                        lValue: lValue { varID = i }
+187.                assign (=) { lValue = i }
                         expr: (/) { right = 20, left = 100 }
-188.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (+)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-189.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (-)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-190.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (*)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-191.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (%)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-192.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (-)
-                            right: lValue { varID = i }
-                            left: (+)
-                                right: lValue { varID = i }
-                                left: (*)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = i }
-193.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (*)
+188.                assign (=) { lValue = i }
+                        expr: (+) { right = i, left = i }
+189.                assign (=) { lValue = i }
+                        expr: (-) { right = i, left = i }
+190.                assign (=) { lValue = i }
+                        expr: (*) { right = i, left = i }
+191.                assign (=) { lValue = i }
+                        expr: (%) { right = i, left = i }
+192.                assign (=) { lValue = i }
+                        expr: (-) { right = i }
+                            left: (+) { right = i }
+                                left: (*) { right = i, left = i }
+193.                assign (=) { lValue = i }
+                        expr: (*) { left = i }
                             right: parens
-                                expr: (-)
-                                    right: lValue { varID = i }
+                                expr: (-) { right = i }
                                     left: parens
-                                        expr: (+)
-                                            right: lValue { varID = i }
-                                            left: lValue { varID = i }
-                            left: lValue { varID = i }
-194.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: lValue { varID = i }
-195.                assign (=)
-                        lValue: lValue { varID = d }
+                                        expr: (+) { right = i, left = i }
+194.                assign (=) { lValue = d, expr = i }
+195.                assign (=) { lValue = d }
+                        expr: (+) { right = i, left = d }
+196.                assign (=) { lValue = d }
+                        expr: (-) { right = i, left = d }
+197.                assign (=) { lValue = d }
+                        expr: (*) { right = i, left = d }
+198.                assign (=) { lValue = d }
+                        expr: (/) { right = i, left = d }
+199.                assign (=) { lValue = d }
+                        expr: (%) { right = i, left = d }
+200.                assign (=) { lValue = d }
+                        expr: (+) { right = d, left = i }
+201.                assign (=) { lValue = d }
+                        expr: (-) { right = d, left = i }
+202.                assign (=) { lValue = d }
+                        expr: (*) { right = d, left = i }
+203.                assign (=) { lValue = d }
+                        expr: (/) { right = d, left = i }
+204.                assign (=) { lValue = d }
+                        expr: (%) { right = d, left = i }
+205.                assign (=) { lValue = d }
+                        expr: (+) { right = d, left = d }
+206.                assign (=) { lValue = d }
+                        expr: (-) { right = d, left = d }
+207.                assign (=) { lValue = d }
+                        expr: (*) { right = d, left = d }
+208.                assign (=) { lValue = d }
+                        expr: (/) { right = d, left = d }
+209.                assign (=) { lValue = d }
+                        expr: (%) { right = d, left = d }
+210.                assign (=) { lValue = d }
                         expr: (+)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-196.                assign (=)
-                        lValue: lValue { varID = d }
+                            right: (*) { right = i, left = i }
+                            left: (-) { right = i, left = i }
+211.                assign (=) { lValue = d }
+                        expr: (-) { right = i }
+                            left: (+) { left = d }
+                                right: (*) { right = i, left = i }
+212.                assign (=) { lValue = d }
                         expr: (-)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-197.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (*)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-198.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (/)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-199.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (%)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-200.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (+)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-201.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (-)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-202.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (*)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-203.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (/)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-204.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (%)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-205.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (+)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-206.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (-)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-207.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (*)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-208.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (/)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-209.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (%)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-210.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (+)
-                            right: (*)
-                                right: lValue { varID = i }
-                                left: lValue { varID = i }
-                            left: (-)
-                                right: lValue { varID = i }
-                                left: lValue { varID = i }
-211.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (-)
-                            right: lValue { varID = i }
-                            left: (+)
-                                right: (*)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = i }
-                                left: lValue { varID = d }
-212.                assign (=)
-                        lValue: lValue { varID = d }
-                        expr: (-)
-                            right: (*)
-                                right: lValue { varID = d }
-                                left: lValue { varID = d }
-                            left: (*)
-                                right: lValue { varID = i }
-                                left: lValue { varID = i }
-213.                assign (=)
-                        lValue: lValue { varID = d }
+                            right: (*) { right = d, left = d }
+                            left: (*) { right = i, left = i }
+213.                assign (=) { lValue = d }
                         expr: parens
                             expr: (-)
-                                right: (*)
-                                    right: lValue { varID = d }
-                                    left: lValue { varID = d }
-                                left: (*)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = i }
-214.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = s }
-                            left: lValue { varID = s }
-215.                assign (=)
-                        lValue: lValue { varID = s }
+                                right: (*) { right = d, left = d }
+                                left: (*) { right = i, left = i }
+214.                assign (=) { lValue = s }
+                        expr: (+) { right = s, left = s }
+215.                assign (=) { lValue = s }
                         expr: (+) { right = "s" }
-                            left: (+)
-                                right: lValue { varID = s }
-                                left: lValue { varID = s }
-216.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = i }
-                            left: lValue { varID = s }
-217.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = d }
-                            left: lValue { varID = s }
-218.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = b }
-                            left: lValue { varID = s }
-219.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = gObj }
-                            left: lValue { varID = s }
-220.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = s }
-                            left: lValue { varID = i }
-221.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = s }
-                            left: lValue { varID = d }
-222.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = s }
-                            left: lValue { varID = b }
-223.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: (+)
-                            right: lValue { varID = s }
-                            left: lValue { varID = gObj }
-224.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: lValue { varID = b }
-225.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: unaryOp (not)
-                            expr: lValue { varID = b }
-226.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: parens
-                            expr: lValue { varID = b }
-227.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (==)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-228.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (==)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-229.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (==)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-230.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (==)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-231.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (==)
-                            right: lValue { varID = b }
-                            left: lValue { varID = b }
-232.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (==)
-                            right: lValue { varID = gObj }
-                            left: lValue { varID = gObj }
-233.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (!=)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-234.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (!=)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-235.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (!=)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-236.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (!=)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-237.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (!=)
-                            right: lValue { varID = b }
-                            left: lValue { varID = b }
-238.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (!=)
-                            right: lValue { varID = gObj }
-                            left: lValue { varID = gObj }
-239.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (<)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-240.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (>)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-241.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (<=)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-242.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (>=)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-243.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (<)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-244.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (>)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-245.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (<=)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-246.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (>=)
-                            right: lValue { varID = d }
-                            left: lValue { varID = i }
-247.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (<)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-248.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (>)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-249.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (<=)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-250.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (>=)
-                            right: lValue { varID = i }
-                            left: lValue { varID = d }
-251.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (<)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-252.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (>)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-253.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (<=)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-254.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (>=)
-                            right: lValue { varID = d }
-                            left: lValue { varID = d }
-255.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (||)
-                            right: lValue { varID = b }
-                            left: lValue { varID = b }
-256.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (&&)
-                            right: lValue { varID = b }
-                            left: lValue { varID = b }
-257.                assign (=)
-                        lValue: lValue { varID = b }
+                            left: (+) { right = s, left = s }
+216.                assign (=) { lValue = s }
+                        expr: (+) { right = i, left = s }
+217.                assign (=) { lValue = s }
+                        expr: (+) { right = d, left = s }
+218.                assign (=) { lValue = s }
+                        expr: (+) { right = b, left = s }
+219.                assign (=) { lValue = s }
+                        expr: (+) { right = gObj, left = s }
+220.                assign (=) { lValue = s }
+                        expr: (+) { right = s, left = i }
+221.                assign (=) { lValue = s }
+                        expr: (+) { right = s, left = d }
+222.                assign (=) { lValue = s }
+                        expr: (+) { right = s, left = b }
+223.                assign (=) { lValue = s }
+                        expr: (+) { right = s, left = gObj }
+224.                assign (=) { lValue = b, expr = b }
+225.                assign (=) { lValue = b }
+                        expr: unaryOp (not) { expr = b }
+226.                assign (=) { lValue = b }
+                        expr: parens { expr = b }
+227.                assign (=) { lValue = b }
+                        expr: (==) { right = i, left = i }
+228.                assign (=) { lValue = b }
+                        expr: (==) { right = d, left = i }
+229.                assign (=) { lValue = b }
+                        expr: (==) { right = i, left = d }
+230.                assign (=) { lValue = b }
+                        expr: (==) { right = d, left = d }
+231.                assign (=) { lValue = b }
+                        expr: (==) { right = b, left = b }
+232.                assign (=) { lValue = b }
+                        expr: (==) { right = gObj, left = gObj }
+233.                assign (=) { lValue = b }
+                        expr: (!=) { right = i, left = i }
+234.                assign (=) { lValue = b }
+                        expr: (!=) { right = d, left = i }
+235.                assign (=) { lValue = b }
+                        expr: (!=) { right = i, left = d }
+236.                assign (=) { lValue = b }
+                        expr: (!=) { right = d, left = d }
+237.                assign (=) { lValue = b }
+                        expr: (!=) { right = b, left = b }
+238.                assign (=) { lValue = b }
+                        expr: (!=) { right = gObj, left = gObj }
+239.                assign (=) { lValue = b }
+                        expr: (<) { right = i, left = i }
+240.                assign (=) { lValue = b }
+                        expr: (>) { right = i, left = i }
+241.                assign (=) { lValue = b }
+                        expr: (<=) { right = i, left = i }
+242.                assign (=) { lValue = b }
+                        expr: (>=) { right = i, left = i }
+243.                assign (=) { lValue = b }
+                        expr: (<) { right = d, left = i }
+244.                assign (=) { lValue = b }
+                        expr: (>) { right = d, left = i }
+245.                assign (=) { lValue = b }
+                        expr: (<=) { right = d, left = i }
+246.                assign (=) { lValue = b }
+                        expr: (>=) { right = d, left = i }
+247.                assign (=) { lValue = b }
+                        expr: (<) { right = i, left = d }
+248.                assign (=) { lValue = b }
+                        expr: (>) { right = i, left = d }
+249.                assign (=) { lValue = b }
+                        expr: (<=) { right = i, left = d }
+250.                assign (=) { lValue = b }
+                        expr: (>=) { right = i, left = d }
+251.                assign (=) { lValue = b }
+                        expr: (<) { right = d, left = d }
+252.                assign (=) { lValue = b }
+                        expr: (>) { right = d, left = d }
+253.                assign (=) { lValue = b }
+                        expr: (<=) { right = d, left = d }
+254.                assign (=) { lValue = b }
+                        expr: (>=) { right = d, left = d }
+255.                assign (=) { lValue = b }
+                        expr: (||) { right = b, left = b }
+256.                assign (=) { lValue = b }
+                        expr: (&&) { right = b, left = b }
+257.                assign (=) { lValue = b }
                         expr: (<) { right = 2, left = 1 }
-258.                assign (=)
-                        lValue: lValue { varID = b }
+258.                assign (=) { lValue = b }
                         expr: (<=) { right = 2, left = 1.1 }
-259.                assign (=)
-                        lValue: lValue { varID = b }
+259.                assign (=) { lValue = b }
                         expr: (>) { right = 2, left = 1 }
-260.                assign (=)
-                        lValue: lValue { varID = b }
+260.                assign (=) { lValue = b }
                         expr: (>=) { right = 2.2, left = 1 }
-261.                assign (=)
-                        lValue: lValue { varID = b2 }
-                        expr: (||)
-                            right: (&&)
-                                right: (==)
-                                    right: lValue { varID = b }
-                                    left: lValue { varID = b }
-                                left: lValue { varID = b3 }
-                            left: lValue { varID = b2 }
-262.                assign (=)
-                        lValue: lValue { varID = b }
+261.                assign (=) { lValue = b2 }
+                        expr: (||) { left = b2 }
+                            right: (&&) { left = b3 }
+                                right: (==) { right = b, left = b }
+262.                assign (=) { lValue = b }
                         expr: (==) { right = 0 }
-                            left: (%) { right = 2 }
-                                left: lValue { varID = i }
-263.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: (&&)
-                            right: lValue { varID = b }
+                            left: (%) { right = 2, left = i }
+263.                assign (=) { lValue = b }
+                        expr: (&&) { right = b }
                             left: parens
-                                expr: (||)
-                                    right: lValue { varID = b }
-                                    left: lValue { varID = b }
-264.                assign (=)
-                        lValue: lValue { varID = b }
+                                expr: (||) { right = b, left = b }
+264.                assign (=) { lValue = b }
                         expr: (&&)
                             right: parens
                                 expr: (<) { right = 0.0001 }
@@ -718,68 +412,53 @@
                                 expr: (==) { right = 2 }
                                     left: (+) { right = 1, left = 1 }
 266.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: (==) { right = 0 }
-                            left: lValue { varID = i }
+                        expr: (==) { right = 0, left = i }
                         elseStmts:
                             if { #elseStmts = 1, #stmts = 1 }
-                                expr: (<=) { right = 10 }
-                                    left: lValue { varID = i }
+                                expr: (<=) { right = 10, left = i }
                                 elseStmts:
-271.                                assign (*=) { expr = 5 }
-                                        lValue: lValue { varID = i }
+271.                                assign (*=) { lValue = i, expr = 5 }
                                 stmts:
-269.                                assign (++)
-                                        lValue: lValue { varID = i }
+269.                                assign (++) { lValue = i }
                         stmts:
 267.                        call setBackColor { #exprs = 1, class = ct }
                                 exprs:
-                                    lValue { varID = colors }
-                                        indexExpr: lValue { varID = i }
+                                    lValue { varID = colors, indexExpr = i }
 273.                if { #elseStmts = 1, #stmts = 2 }
-                        expr: (>) { right = 0 }
-                            left: lValue { varID = i }
+                        expr: (>) { right = 0, left = i }
                         elseStmts:
                             if { #elseStmts = 1, #stmts = 2 }
-                                expr: (<=) { right = 10 }
-                                    left: lValue { varID = i }
+                                expr: (<=) { right = 10, left = i }
                                 elseStmts:
-                                    if { #elseStmts = 2, #stmts = 1 }
-                                        expr: lValue { varID = b }
+                                    if { expr = b, #elseStmts = 2, #stmts = 1 }
                                         elseStmts:
 287.                                        var tempStr { vt = String, initExpr = "I'll be " }
-288.                                        assign (=)
-                                                lValue: lValue { varID = tempStr }
-                                                expr: (+) { right = "out of scope soon" }
-                                                    left: lValue { varID = tempStr }
+288.                                        assign (=) { lValue = tempStr }
+                                                expr: (+) { right = "out of scope soon", left = tempStr }
                                         stmts:
-284.                                        assign (++)
-                                                lValue: lValue { varID = i }
+284.                                        assign (++) { lValue = i }
                                 stmts:
-280.                                assign (=) { expr = 7 }
-                                        lValue: lValue { varID = d }
+280.                                assign (=) { lValue = d, expr = 7 }
 281.                                call setSoundVolume { #exprs = 1, class = ct }
                                         exprs:
 281.                                        (1)
                         stmts:
-275.                        assign (=) { expr = 0 }
-                                lValue: lValue { varID = j }
-276.                        assign (=) { expr = 0 }
-                                lValue: lValue { varID = k }
+275.                        assign (=) { lValue = j, expr = 0 }
+276.                        assign (=) { lValue = k, expr = 0 }
 290.                if { #stmts = 1 }
                         expr: (&&)
-                            right: (<=)
-                                right: lValue { varID = eps }
+                            right: (<=) { right = eps }
                                 left: call distance { #exprs = 4, class = ct }
                                     exprs:
-                                        lValue { varID = x1 }
-                                        lValue { varID = y1 }
-                                        lValue { varID = x2 }
-                                        lValue { varID = y2 }
+290.                                    (x1)
+290.                                    (y1)
+290.                                    (x2)
+290.                                    (y2)
                             left: call isError { #exprs = 1, class = ct }
                                 exprs:
                                     call tan { #exprs = 1, class = Math }
                                         exprs:
-                                            lValue { varID = d }
+290.                                        (d)
                         stmts:
 291.                        call println { #exprs = 1, class = ct }
                                 exprs:
@@ -789,69 +468,51 @@
 294.                        for { #stmts = 1 }
                                 stmts:
 295.                                for { #stmts = 1 }
-295.                                    initStmt: assign (=) { expr = 0 }
-                                            lValue: lValue { varID = i }
+295.                                    initStmt: assign (=) { lValue = i, expr = 0 }
                                         stmts:
 296.                                        for { #stmts = 1 }
-                                                expr: (<) { right = 10 }
-                                                    left: lValue { varID = i }
+                                                expr: (<) { right = 10, left = i }
                                                 stmts:
 297.                                                for { #stmts = 1 }
-297.                                                    nextStmt: assign (++)
-                                                            lValue: lValue { varID = i }
+297.                                                    nextStmt: assign (++) { lValue = i }
                                                         stmts:
-298.                                                        for { #stmts = 1 }
-                                                                expr: lValue { varID = b }
+298.                                                        for { expr = b, #stmts = 1 }
                                                                 stmts:
-299.                                                                assign (=) { expr = 0 }
-                                                                        lValue: lValue { varID = d }
+299.                                                                assign (=) { lValue = d, expr = 0 }
 300.                for { #stmts = 2 }
 300.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
-                        expr: (<) { right = 10 }
-                            left: lValue { varID = ii }
-300.                    nextStmt: assign (++)
-                            lValue: lValue { varID = ii }
+                        expr: (<) { right = 10, left = ii }
+300.                    nextStmt: assign (++) { lValue = ii }
                         stmts:
 302.                        for { #stmts = 1 }
 302.                            initStmt: var jj { vt = int, isGlobal = false, initExpr = 0 }
-                                expr: (!=) { right = 10 }
-                                    left: lValue { varID = jj }
-302.                            nextStmt: assign (+=) { expr = 1 }
-                                    lValue: lValue { varID = jj }
+                                expr: (!=) { right = 10, left = jj }
+302.                            nextStmt: assign (+=) { lValue = jj, expr = 1 }
                                 stmts:
 303.                                if { #stmts = 1 }
                                         expr: (||)
-                                            right: (==) { right = 0 }
-                                                left: lValue { varID = jj }
-                                            left: (==) { right = 0 }
-                                                left: lValue { varID = ii }
+                                            right: (==) { right = 0, left = jj }
+                                            left: (==) { right = 0, left = ii }
                                         stmts:
 304.                                        break
 305.                        break
 307.                for { #stmts = 2 }
 307.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
-                        expr: (<) { right = 10 }
-                            left: lValue { varID = ii }
-307.                    nextStmt: assign (++)
-                            lValue: lValue { varID = ii }
+                        expr: (<) { right = 10, left = ii }
+307.                    nextStmt: assign (++) { lValue = ii }
                         stmts:
 309.                        for { #stmts = 2 }
 309.                            initStmt: var jj { vt = int, isGlobal = false, initExpr = 0 }
-                                expr: (!=) { right = 10 }
-                                    left: lValue { varID = jj }
-309.                            nextStmt: assign (+=) { expr = 1 }
-                                    lValue: lValue { varID = jj }
+                                expr: (!=) { right = 10, left = jj }
+309.                            nextStmt: assign (+=) { lValue = jj, expr = 1 }
                                 stmts:
 311.                                if { #stmts = 2 }
                                         expr: (&&)
-                                            right: (==) { right = 0 }
-                                                left: lValue { varID = jj }
-                                            left: (==) { right = 0 }
-                                                left: lValue { varID = ii }
+                                            right: (==) { right = 0, left = jj }
+                                            left: (==) { right = 0, left = ii }
                                         stmts:
 313.                                        assign (=) { expr = 0 }
-                                                lValue: lValue { varID = intArr }
-                                                    indexExpr: lValue { varID = ii }
+                                                lValue: lValue { varID = intArr, indexExpr = ii }
 314.                                        break
 316.                                break
 318.                        break
@@ -859,62 +520,39 @@
 321.                var yVar { vt = double, initExpr = 1 }
 322.                for { #stmts = 1 }
 322.                    initStmt: var dx { vt = double, isGlobal = false, initExpr = .1 }
-                        expr: (<) { right = 1 }
-                            left: lValue { varID = xVar }
-322.                    nextStmt: assign (+=)
-                            lValue: lValue { varID = xVar }
-                            expr: lValue { varID = dx }
+                        expr: (<) { right = 1, left = xVar }
+322.                    nextStmt: assign (+=) { lValue = xVar, expr = dx }
                         stmts:
 323.                        for { #stmts = 1 }
 323.                            initStmt: var dy { vt = double, isGlobal = false }
                                     initExpr: unaryOp (neg) { expr = .5 }
-                                expr: (>) { right = 0 }
-                                    left: lValue { varID = yVar }
-323.                            nextStmt: assign (+=)
-                                    lValue: lValue { varID = yVar }
-                                    expr: lValue { varID = dy }
+                                expr: (>) { right = 0, left = yVar }
+323.                            nextStmt: assign (+=) { lValue = yVar, expr = dy }
                                 stmts:
-324.                                assign (=)
-                                        lValue: lValue { varID = d }
+324.                                assign (=) { lValue = d }
                                         expr: (-)
-                                            right: (/)
-                                                right: lValue { varID = dy }
-                                                left: lValue { varID = yVar }
-                                            left: (+)
-                                                right: lValue { varID = dx }
-                                                left: lValue { varID = xVar }
-325.                assign (=)
-                        lValue: lValue { varID = intArr }
+                                            right: (/) { right = dy, left = yVar }
+                                            left: (+) { right = dx, left = xVar }
+325.                assign (=) { lValue = intArr }
                         expr: newArray { vtElement = 0, lengthExpr = 1 }
-326.                forArray { #stmts = 1 }
+326.                forArray { expr = intArr, #stmts = 1 }
 326.                    var: var a { vt = int, isGlobal = false }
-                        expr: lValue { varID = intArr }
                         stmts:
-327.                        assign (=) { expr = 0 }
-                                lValue: lValue { varID = a }
-329.                while { #stmts = 1 }
-                        expr: lValue { varID = b }
+327.                        assign (=) { lValue = a, expr = 0 }
+329.                while { expr = b, #stmts = 1 }
                         stmts:
-330.                        assign (=) { expr = false }
-                                lValue: lValue { varID = b }
-331.                while { #stmts = 3 }
-                        expr: lValue { varID = b }
+330.                        assign (=) { lValue = b, expr = false }
+331.                while { expr = b, #stmts = 3 }
                         stmts:
 333.                        call voidFunc
-334.                        assign (++)
-                                lValue: lValue { varID = i }
-335.                        assign (=) { expr = false }
-                                lValue: lValue { varID = b }
-337.                doWhile { #stmts = 1 }
-                        expr: lValue { varID = b }
+334.                        assign (++) { lValue = i }
+335.                        assign (=) { lValue = b, expr = false }
+337.                doWhile { expr = b, #stmts = 1 }
                         stmts:
-338.                        assign (=) { expr = false }
-                                lValue: lValue { varID = b }
-340.                doWhile { #stmts = 1 }
-                        expr: lValue { varID = b }
+338.                        assign (=) { lValue = b, expr = false }
+340.                doWhile { expr = b, #stmts = 1 }
                         stmts:
-342.                        assign (=) { expr = false }
-                                lValue: lValue { varID = b }
+342.                        assign (=) { lValue = b, expr = false }
 346.                call print { #exprs = 1, class = ct }
                         exprs:
 346.                        ("Hello world")
@@ -927,28 +565,25 @@
 348.                        ("Hello world\n")
 349.                call print { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = i }
+349.                        (i)
 350.                call print { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = d }
+350.                        (d)
 351.                call print { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = b }
+351.                        (b)
 352.                call print { #exprs = 1, class = ct }
                         exprs:
-                            (+) { left = "i = " }
-                                right: lValue { varID = i }
+                            (+) { right = i, left = "i = " }
 353.                call print { #exprs = 1, class = ct }
                         exprs:
-                            (+) { left = "d = " }
-                                right: lValue { varID = d }
+                            (+) { right = d, left = "d = " }
 354.                call print { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = name }
+354.                        (name)
 355.                call print { #exprs = 1, class = ct }
                         exprs:
-                            (+)
-                                right: lValue { varID = name }
+                            (+) { right = name }
                                 left: (+) { right = " ", left = "Hello" }
 356.                var circleObj { vt = GameObj }
                         initExpr: call circle { #exprs = 3, class = ct }
@@ -958,7 +593,7 @@
 356.                            (20)
 357.                call print { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = circleObj }
+357.                        (circleObj)
 358.                call println { #exprs = 1, class = ct }
                         exprs:
 358.                        ("Hello world")
@@ -971,56 +606,51 @@
 360.                        ("Hello world\n")
 361.                call println { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = i }
+361.                        (i)
 362.                call println { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = d }
+362.                        (d)
 363.                call println { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = b }
+363.                        (b)
 364.                call println { #exprs = 1, class = ct }
                         exprs:
-                            (+) { left = "i = " }
-                                right: lValue { varID = i }
+                            (+) { right = i, left = "i = " }
 365.                call println { #exprs = 1, class = ct }
                         exprs:
-                            (+) { left = "d = " }
-                                right: lValue { varID = d }
+                            (+) { right = d, left = "d = " }
 366.                call println { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = name }
+366.                        (name)
 367.                call println { #exprs = 1, class = ct }
                         exprs:
-                            (+)
-                                right: lValue { varID = name }
+                            (+) { right = name }
                                 left: (+) { right = " ", left = "Hello" }
 368.                call println { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = circleObj }
+368.                        (circleObj)
 369.                call log { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = i }
+369.                        (i)
 370.                call log { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = d }
+370.                        (d)
 371.                call log { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = b }
+371.                        (b)
 372.                call log { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = circleObj }
-373.                var obj2 { vt = GameObj }
-                        initExpr: lValue { varID = circleObj }
-374.                var obj3 { vt = GameObj }
-                        initExpr: lValue { varID = obj2 }
+372.                        (circleObj)
+373.                var obj2 { vt = GameObj, initExpr = circleObj }
+374.                var obj3 { vt = GameObj, initExpr = obj2 }
 375.                call log { #exprs = 9, class = ct }
                         exprs:
 375.                        ("circleObj = ")
-                            lValue { varID = circleObj }
+375.                        (circleObj)
 375.                        ("obj2 = ")
-                            lValue { varID = obj2 }
+375.                        (obj2)
 375.                        ("obj3=")
-                            lValue { varID = obj3 }
+375.                        (obj3)
 375.                        (3.14)
                             staticField { fieldID = PI, class = Math }
 375.                        (42)
@@ -1031,8 +661,8 @@
 377.                call logm { #exprs = 3, class = ct }
                         exprs:
 377.                        ("message")
-                            lValue { varID = obj2 }
-                            lValue { varID = obj3 }
+377.                        (obj2)
+377.                        (obj3)
 378.                call setOutputFile { #exprs = 1, class = ct }
                         exprs:
 378.                        ("output.txt")
@@ -1042,116 +672,100 @@
 380.                var outputFilename { vt = String, initExpr = "output.txt" }
 381.                call setOutputFile { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = outputFilename }
+381.                        (outputFilename)
 383.                call showAlert { #exprs = 1, class = ct }
                         exprs:
 383.                        ("alert meassage")
 384.                var message { vt = String, initExpr = "alert!" }
 385.                call showAlert { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = message }
+385.                        (message)
 386.                var n { vt = int }
                         initExpr: call inputInt { #exprs = 1, class = ct }
                             exprs:
 386.                            ("enter a number: ")
-387.                assign (=)
-                        lValue: lValue { varID = n }
+387.                assign (=) { lValue = n }
                         expr: call inputInt { #exprs = 1, class = ct }
                             exprs:
 387.                            ("enter a number: ")
-388.                assign (=)
-                        lValue: lValue { varID = n }
+388.                assign (=) { lValue = n }
                         expr: call inputInt { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = message }
+388.                            (message)
 389.                var x { vt = double }
                         initExpr: call inputNumber { #exprs = 1, class = ct }
                             exprs:
 389.                            ("enter a number: ")
-390.                assign (=)
-                        lValue: lValue { varID = x }
+390.                assign (=) { lValue = x }
                         expr: call inputNumber { #exprs = 1, class = ct }
                             exprs:
 390.                            ("enter a number: ")
-391.                assign (=)
-                        lValue: lValue { varID = x }
+391.                assign (=) { lValue = x }
                         expr: call inputNumber { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = message }
+391.                            (message)
 392.                var quit { vt = boolean }
                         initExpr: call inputYesNo { #exprs = 1, class = ct }
                             exprs:
 392.                            ("Quit?")
-393.                assign (=)
-                        lValue: lValue { varID = quit }
+393.                assign (=) { lValue = quit }
                         expr: call inputYesNo { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = message }
+393.                            (message)
 394.                var inputStr { vt = String }
                         initExpr: call inputString { #exprs = 1, class = ct }
                             exprs:
 394.                            ("Quit?")
-395.                assign (=)
-                        lValue: lValue { varID = inputStr }
+395.                assign (=) { lValue = inputStr }
                         expr: call inputString { #exprs = 1, class = ct }
                             exprs:
 395.                            ("Quit?")
-396.                assign (=)
-                        lValue: lValue { varID = inputStr }
+396.                assign (=) { lValue = inputStr }
                         expr: call inputString { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = message }
+396.                            (message)
 398.                call setTitle { #exprs = 1, class = ct }
                         exprs:
 398.                        ("Title")
 399.                var title { vt = String, initExpr = "Title" }
 400.                call setTitle { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = title }
+400.                        (title)
 401.                call setTitle { #exprs = 1, class = ct }
                         exprs:
-                            (+)
-                                right: lValue { varID = i }
-                                left: (+) { right = " " }
-                                    left: lValue { varID = title }
+                            (+) { right = i }
+                                left: (+) { right = " ", left = title }
 402.                call setTitle { #exprs = 1, class = ct }
                         exprs:
-                            (+)
-                                right: lValue { varID = d }
-                                left: lValue { varID = title }
+                            (+) { right = d, left = title }
 403.                call setHeight { #exprs = 1, class = ct }
                         exprs:
                             (/) { right = 16 }
                                 left: (*) { right = 9, left = 100.0 }
 404.                call setHeight { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = i }
+404.                        (i)
 405.                call setHeight { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = d }
+405.                        (d)
 406.                call setHeight { #exprs = 1, class = ct }
                         exprs:
                             (+)
                                 right: (*) { right = 4, left = 5 }
-                                left: (*)
-                                    right: lValue { varID = d }
-                                    left: lValue { varID = i }
+                                left: (*) { right = d, left = i }
 407.                var height { vt = double }
                         initExpr: call getHeight { class = ct }
-408.                assign (=)
-                        lValue: lValue { varID = height }
+408.                assign (=) { lValue = height }
                         expr: call getHeight { class = ct }
 409.                var width { vt = double }
                         initExpr: (-) { right = 10 }
                             left: (*) { right = 0.5 }
                                 left: call getWidth { class = ct }
-410.                assign (=)
-                        lValue: lValue { varID = width }
+410.                assign (=) { lValue = width }
                         expr: call getWidth { class = ct }
 411.                var pxPerUnit { vt = double }
                         initExpr: call getPixelsPerUnit { class = ct }
-412.                assign (=)
-                        lValue: lValue { varID = pxPerUnit }
+412.                assign (=) { lValue = pxPerUnit }
                         expr: call getPixelsPerUnit { class = ct }
 413.                var pixelWidth { vt = int }
                         initExpr: call round { #exprs = 1, class = ct }
@@ -1167,8 +781,7 @@
                                     left: call getHeight { class = ct }
 415.                var currentScreen { vt = String }
                         initExpr: call getScreen { class = ct }
-416.                assign (=)
-                        lValue: lValue { varID = currentScreen }
+416.                assign (=) { lValue = currentScreen }
                         expr: call getScreen { class = ct }
 417.                call clearScreen { class = ct }
 418.                call clearGroup { #exprs = 1, class = ct }
@@ -1186,7 +799,7 @@
 422.                var backColor { vt = String, initExpr = "red" }
 423.                call setBackColor { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = backColor }
+423.                        (backColor)
 424.                call setBackColorRGB { #exprs = 3, class = ct }
                         exprs:
 424.                        (255)
@@ -1194,9 +807,9 @@
 424.                        (0)
 425.                call setBackColorRGB { #exprs = 3, class = ct }
                         exprs:
-                            lValue { varID = i }
-                            lValue { varID = i }
-                            lValue { varID = i }
+425.                        (i)
+425.                        (i)
+425.                        (i)
 426.                call setBackImage { #exprs = 1, class = ct }
                         exprs:
 426.                        ("background.png")
@@ -1206,9 +819,8 @@
 428.                var filename { vt = String, initExpr = "landscape.png" }
 429.                call setBackImage { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = filename }
-431.                assign (=) { expr = 50 }
-                        lValue: lValue { varID = x }
+429.                        (filename)
+431.                assign (=) { lValue = x, expr = 50 }
 432.                var y { vt = double, initExpr = 50 }
 433.                var diameter { vt = double, initExpr = 10 }
 434.                var circle { vt = GameObj }
@@ -1217,63 +829,56 @@
 434.                            (50)
 434.                            (20)
 434.                            (10)
-435.                assign (=)
-                        lValue: lValue { varID = circle }
+435.                assign (=) { lValue = circle }
                         expr: call circle { #exprs = 3, class = ct }
                             exprs:
 435.                            (50.0)
 435.                            (20.0)
 435.                            (10.0)
-436.                assign (=)
-                        lValue: lValue { varID = circle }
+436.                assign (=) { lValue = circle }
                         expr: call circle { #exprs = 4, class = ct }
                             exprs:
 436.                            (50)
 436.                            (20)
 436.                            (10.5)
 436.                            ("blue")
-437.                assign (=)
-                        lValue: lValue { varID = circle }
+437.                assign (=) { lValue = circle }
                         expr: call circle { #exprs = 3, class = ct }
                             exprs:
-                                lValue { varID = x }
-                                lValue { varID = y }
-                                lValue { varID = diameter }
+437.                            (x)
+437.                            (y)
+437.                            (diameter)
 438.                var color { vt = String, initExpr = "green" }
-439.                assign (=)
-                        lValue: lValue { varID = circle }
+439.                assign (=) { lValue = circle }
                         expr: call circle { #exprs = 4, class = ct }
                             exprs:
-                                lValue { varID = x }
-                                lValue { varID = y }
-                                lValue { varID = diameter }
-                                lValue { varID = color }
+439.                            (x)
+439.                            (y)
+439.                            (diameter)
+439.                            (color)
 440.                var rect { vt = GameObj }
                         initExpr: call rect { #exprs = 4, class = ct }
                             exprs:
-                                lValue { varID = x }
-                                lValue { varID = y }
-                                lValue { varID = width }
-                                lValue { varID = height }
-441.                assign (=)
-                        lValue: lValue { varID = rect }
+440.                            (x)
+440.                            (y)
+440.                            (width)
+440.                            (height)
+441.                assign (=) { lValue = rect }
                         expr: call rect { #exprs = 5, class = ct }
                             exprs:
-                                lValue { varID = x }
-                                lValue { varID = y }
-                                lValue { varID = width }
-                                lValue { varID = height }
-                                lValue { varID = color }
-442.                assign (=)
-                        lValue: lValue { varID = rect }
+441.                            (x)
+441.                            (y)
+441.                            (width)
+441.                            (height)
+441.                            (color)
+442.                assign (=) { lValue = rect }
                         expr: call rect { #exprs = 4, class = ct }
                             exprs:
 442.                            (50.0)
 442.                            (33.3)
 442.                            (11.2)
 442.                            (23.890)
-443.                assign (=)
-                        lValue: lValue { varID = rect }
+443.                assign (=) { lValue = rect }
                         expr: call rect { #exprs = 5, class = ct }
                             exprs:
 443.                            (50)
@@ -1284,29 +889,26 @@
 444.                var line { vt = GameObj }
                         initExpr: call line { #exprs = 4, class = ct }
                             exprs:
-                                lValue { varID = i }
-                                lValue { varID = d }
-                                lValue { varID = width }
-                                lValue { varID = height }
-445.                assign (=)
-                        lValue: lValue { varID = line }
+444.                            (i)
+444.                            (d)
+444.                            (width)
+444.                            (height)
+445.                assign (=) { lValue = line }
                         expr: call line { #exprs = 5, class = ct }
                             exprs:
-                                lValue { varID = x1 }
-                                lValue { varID = y1 }
-                                lValue { varID = x2 }
-                                lValue { varID = y2 }
-                                lValue { varID = color }
-446.                assign (=)
-                        lValue: lValue { varID = line }
+445.                            (x1)
+445.                            (y1)
+445.                            (x2)
+445.                            (y2)
+445.                            (color)
+446.                assign (=) { lValue = line }
                         expr: call line { #exprs = 4, class = ct }
                             exprs:
 446.                            (0.0)
 446.                            (.0)
 446.                            (100.0)
 446.                            (95.0)
-447.                assign (=)
-                        lValue: lValue { varID = line }
+447.                assign (=) { lValue = line }
                         expr: call line { #exprs = 5, class = ct }
                             exprs:
 447.                            (0)
@@ -1317,34 +919,29 @@
 448.                var text { vt = GameObj }
                         initExpr: call text { #exprs = 4, class = ct }
                             exprs:
-                                lValue { varID = s }
-                                lValue { varID = x }
-                                lValue { varID = y }
-                                lValue { varID = height }
-449.                assign (=)
-                        lValue: lValue { varID = text }
+448.                            (s)
+448.                            (x)
+448.                            (y)
+448.                            (height)
+449.                assign (=) { lValue = text }
                         expr: call text { #exprs = 5, class = ct }
                             exprs:
-                                lValue { varID = s }
-                                lValue { varID = x }
-                                lValue { varID = y }
-                                lValue { varID = height }
-                                lValue { varID = color }
-450.                assign (=)
-                        lValue: lValue { varID = text }
+449.                            (s)
+449.                            (x)
+449.                            (y)
+449.                            (height)
+449.                            (color)
+450.                assign (=) { lValue = text }
                         expr: call text { #exprs = 4, class = ct }
                             exprs:
-                                (+) { left = "Score: " }
-                                    right: lValue { varID = score }
+                                (+) { right = score, left = "Score: " }
 450.                            (20.0)
 450.                            (90.0)
 450.                            (10.0)
-451.                assign (=)
-                        lValue: lValue { varID = text }
+451.                assign (=) { lValue = text }
                         expr: call text { #exprs = 5, class = ct }
                             exprs:
-                                (+) { left = "Score: " }
-                                    right: lValue { varID = score }
+                                (+) { right = score, left = "Score: " }
 451.                            (20)
 451.                            (90)
 451.                            (10)
@@ -1352,20 +949,18 @@
 452.                var img { vt = GameObj }
                         initExpr: call image { #exprs = 4, class = ct }
                             exprs:
-                                lValue { varID = filename }
-                                lValue { varID = x }
-                                lValue { varID = y }
-                                lValue { varID = width }
-453.                assign (=)
-                        lValue: lValue { varID = img }
+452.                            (filename)
+452.                            (x)
+452.                            (y)
+452.                            (width)
+453.                assign (=) { lValue = img }
                         expr: call image { #exprs = 4, class = ct }
                             exprs:
 453.                            ("car.png")
 453.                            (42)
 453.                            (25)
 453.                            (38.7)
-454.                assign (=)
-                        lValue: lValue { varID = img }
+454.                assign (=) { lValue = img }
                         expr: call image { #exprs = 4, class = ct }
                             exprs:
 454.                            ("C:\\Users\\john\\Pictures\\car.jpg")
@@ -1375,60 +970,51 @@
 455.                var objs { vt = array of GameObj }
                         initExpr: arrayInit { #exprs = 5 }
                             exprs:
-                                lValue { varID = circle }
-                                lValue { varID = rect }
-                                lValue { varID = line }
-                                lValue { varID = text }
-                                lValue { varID = img }
-456.                assign (=)
-                        lValue: lValue { varID = img }
-                        expr: lValue { varID = rect }
+455.                            (circle)
+455.                            (rect)
+455.                            (line)
+455.                            (text)
+455.                            (img)
+456.                assign (=) { lValue = img, expr = rect }
 458.                var mouseClicked { vt = boolean }
                         initExpr: call clicked { class = ct }
 459.                if { #stmts = 1 }
                         expr: call clicked { class = ct }
                         stmts:
-460.                        assign (=)
-                                lValue: lValue { varID = mouseClicked }
+460.                        assign (=) { lValue = mouseClicked }
                                 expr: call clicked { class = ct }
 461.                if { #stmts = 1 }
                         expr: (>) { right = 50 }
                             left: call clickX { class = ct }
                         stmts:
-462.                        assign (=)
-                                lValue: lValue { varID = x }
+462.                        assign (=) { lValue = x }
                                 expr: call clickX { class = ct }
-463.                assign (=)
-                        lValue: lValue { varID = x }
+463.                assign (=) { lValue = x }
                         expr: call clickX { class = ct }
 464.                if { #stmts = 1 }
-                        expr: (<=)
-                            right: lValue { varID = x }
+                        expr: (<=) { right = x }
                             left: call clickY { class = ct }
                         stmts:
-465.                        assign (=)
-                                lValue: lValue { varID = y }
+465.                        assign (=) { lValue = y }
                                 expr: call clickY { class = ct }
-466.                assign (=)
-                        lValue: lValue { varID = y }
+466.                assign (=) { lValue = y }
                         expr: call clickY { class = ct }
 467.                var keyName { vt = String, initExpr = "space" }
 468.                var keyPressed { vt = boolean }
                         initExpr: call keyPressed { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = keyName }
+468.                            (keyName)
 469.                if { #stmts = 1 }
                         expr: call keyPressed { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = keyName }
+469.                            (keyName)
                         stmts:
 470.                        if { #stmts = 1 }
                                 expr: call keyPressed { #exprs = 1, class = ct }
                                     exprs:
 470.                                    ("up")
                                 stmts:
-471.                                assign (=)
-                                        lValue: lValue { varID = keyPressed }
+471.                                assign (=) { lValue = keyPressed }
                                         expr: call keyPressed { #exprs = 1, class = ct }
                                             exprs:
 471.                                            ("up")
@@ -1437,29 +1023,25 @@
                             exprs:
 472.                            ("+")
                         stmts:
-473.                        assign (++)
-                                lValue: lValue { varID = x }
+473.                        assign (++) { lValue = x }
 474.                var ch { vt = String, initExpr = "+" }
 475.                if { #stmts = 1 }
                         expr: call charTyped { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = ch }
+475.                            (ch)
                         stmts:
-476.                        assign (=)
-                                lValue: lValue { varID = b }
+476.                        assign (=) { lValue = b }
                                 expr: call charTyped { #exprs = 1, class = ct }
                                     exprs:
 476.                                    ("+")
-477.                assign (=)
-                        lValue: lValue { varID = b }
+477.                assign (=) { lValue = b }
                         expr: call charTyped { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = ch }
-479.                assign (=)
-                        lValue: lValue { varID = b }
+477.                            (ch)
+479.                assign (=) { lValue = b }
                         expr: call loadSound { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = filename }
+479.                            (filename)
 480.                call loadSound { #exprs = 1, class = ct }
                         exprs:
 480.                        ("pow.wav")
@@ -1473,139 +1055,109 @@
 482.                                ("sounds/ding.mp3")
 483.                call sound { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = filename }
+483.                        (filename)
 484.                call setSoundVolume { #exprs = 1, class = ct }
                         exprs:
-                            lValue { varID = d }
+484.                        (d)
 485.                call setSoundVolume { #exprs = 1, class = ct }
                         exprs:
 485.                        (1)
 486.                call setSoundVolume { #exprs = 1, class = ct }
                         exprs:
 486.                        (0.5)
-488.                assign (=)
-                        lValue: lValue { varID = i }
+488.                assign (=) { lValue = i }
                         expr: call random { #exprs = 2, class = ct }
                             exprs:
-                                lValue { varID = i }
-                                lValue { varID = i }
-489.                assign (=)
-                        lValue: lValue { varID = i }
+488.                            (i)
+488.                            (i)
+489.                assign (=) { lValue = i }
                         expr: call random { #exprs = 2, class = ct }
                             exprs:
 489.                            (0)
 489.                            (100)
-490.                assign (=)
-                        lValue: lValue { varID = i }
+490.                assign (=) { lValue = i }
                         expr: call round { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = d }
-491.                assign (=)
-                        lValue: lValue { varID = i }
+490.                            (d)
+491.                assign (=) { lValue = i }
                         expr: call round { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = i }
-492.                assign (=)
-                        lValue: lValue { varID = i }
+491.                            (i)
+492.                assign (=) { lValue = i }
                         expr: call round { #exprs = 1, class = ct }
                             exprs:
 492.                            (1.62)
-493.                assign (=)
-                        lValue: lValue { varID = i }
+493.                assign (=) { lValue = i }
                         expr: call round { #exprs = 1, class = ct }
                             exprs:
-                                (*)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = d }
-494.                assign (=)
-                        lValue: lValue { varID = d }
+                                (*) { right = i, left = d }
+494.                assign (=) { lValue = d }
                         expr: call round { #exprs = 1, class = ct }
                             exprs:
                                 (+) { left = 1 }
-                                    right: (*)
-                                        right: lValue { varID = i }
-                                        left: lValue { varID = d }
-495.                assign (=)
-                        lValue: lValue { varID = d }
+                                    right: (*) { right = i, left = d }
+495.                assign (=) { lValue = d }
                         expr: call round { #exprs = 1, class = ct }
                             exprs:
                                 call distance { #exprs = 4, class = ct }
                                     exprs:
-                                        lValue { varID = x1 }
-                                        lValue { varID = y1 }
-                                        lValue { varID = x2 }
-                                        lValue { varID = y2 }
-496.                assign (=)
-                        lValue: lValue { varID = d }
+495.                                    (x1)
+495.                                    (y1)
+495.                                    (x2)
+495.                                    (y2)
+496.                assign (=) { lValue = d }
                         expr: call roundDecimal { #exprs = 2, class = ct }
                             exprs:
-                                lValue { varID = d }
-                                lValue { varID = i }
-497.                assign (=)
-                        lValue: lValue { varID = d }
+496.                            (d)
+496.                            (i)
+497.                assign (=) { lValue = d }
                         expr: call roundDecimal { #exprs = 2, class = ct }
                             exprs:
                                 (+) { right = 1 }
-                                    left: (*)
-                                        right: lValue { varID = i }
-                                        left: lValue { varID = d }
-                                (*) { right = 2 }
-                                    left: lValue { varID = i }
-498.                assign (=)
-                        lValue: lValue { varID = d }
+                                    left: (*) { right = i, left = d }
+                                (*) { right = 2, left = i }
+498.                assign (=) { lValue = d }
                         expr: call roundDecimal { #exprs = 2, class = ct }
                             exprs:
 498.                            (2.71828182846)
 498.                            (2)
-499.                assign (=)
-                        lValue: lValue { varID = d }
+499.                assign (=) { lValue = d }
                         expr: call roundDecimal { #exprs = 2, class = ct }
                             exprs:
                                 call distance { #exprs = 4, class = ct }
                                     exprs:
-                                        lValue { varID = x1 }
-                                        lValue { varID = y1 }
-                                        lValue { varID = x2 }
-                                        lValue { varID = y2 }
+499.                                    (x1)
+499.                                    (y1)
+499.                                    (x2)
+499.                                    (y2)
 499.                            (1)
-500.                assign (=)
-                        lValue: lValue { varID = i }
+500.                assign (=) { lValue = i }
                         expr: call intDiv { #exprs = 2, class = ct }
                             exprs:
-                                lValue { varID = i }
-                                lValue { varID = i }
-501.                assign (=)
-                        lValue: lValue { varID = i }
+500.                            (i)
+500.                            (i)
+501.                assign (=) { lValue = i }
                         expr: call intDiv { #exprs = 2, class = ct }
                             exprs:
 501.                            (5)
 501.                            (2)
-502.                assign (=)
-                        lValue: lValue { varID = b }
+502.                assign (=) { lValue = b }
                         expr: call isError { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = d }
-503.                assign (=)
-                        lValue: lValue { varID = b }
+502.                            (d)
+503.                assign (=) { lValue = b }
                         expr: call isError { #exprs = 1, class = ct }
                             exprs:
-                                (/)
-                                    right: lValue { varID = d }
-                                    left: lValue { varID = d }
-504.                assign (=)
-                        lValue: lValue { varID = b }
+                                (/) { right = d, left = d }
+504.                assign (=) { lValue = b }
                         expr: call isError { #exprs = 1, class = ct }
                             exprs:
-                                (/)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = d }
-505.                assign (=)
-                        lValue: lValue { varID = b }
+                                (/) { right = i, left = d }
+505.                assign (=) { lValue = b }
                         expr: call isError { #exprs = 1, class = ct }
                             exprs:
                                 (/) { right = 0, left = 0.0 }
-506.                assign (=)
-                        lValue: lValue { varID = d }
+506.                assign (=) { lValue = d }
                         expr: call distance { #exprs = 4, class = ct }
                             exprs:
                                 lValue { varID = circle, fieldID = x }
@@ -1626,135 +1178,107 @@
                                     lValue { varID = rect, fieldID = x }
                                     lValue { varID = rect, fieldID = y }
                         stmts:
-508.                        assign (=)
-                                lValue: lValue { varID = i }
+508.                        assign (=) { lValue = i }
                                 expr: call getTimer { class = ct }
-509.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (-)
-                            right: lValue { varID = i }
+509.                assign (=) { lValue = i }
+                        expr: (-) { right = i }
                             left: call getTimer { class = ct }
-510.                assign (=)
-                        lValue: lValue { varID = d }
+510.                assign (=) { lValue = d }
                         expr: call getVersion { class = ct }
 511.                call round { #exprs = 1, class = ct }
                         exprs:
                             call getVersion { class = ct }
-513.                assign (=)
-                        lValue: lValue { varID = i }
+513.                assign (=) { lValue = i }
                         expr: call toInt { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = d }
-514.                assign (=)
-                        lValue: lValue { varID = i }
+513.                            (d)
+514.                assign (=) { lValue = i }
                         expr: call toInt { #exprs = 1, class = ct }
                             exprs:
-                                (*)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = d }
-515.                assign (=)
-                        lValue: lValue { varID = i }
+                                (*) { right = i, left = d }
+515.                assign (=) { lValue = i }
                         expr: call toInt { #exprs = 1, class = ct }
                             exprs:
 515.                            (.707)
-516.                assign (=)
-                        lValue: lValue { varID = i }
+516.                assign (=) { lValue = i }
                         expr: call toInt { #exprs = 1, class = ct }
                             exprs:
                                 staticField { fieldID = PI, class = Math }
-517.                assign (=)
-                        lValue: lValue { varID = i }
+517.                assign (=) { lValue = i }
                         expr: call toInt { #exprs = 1, class = ct }
                             exprs:
 517.                            (6.0221409e+2)
-518.                assign (=)
-                        lValue: lValue { varID = i }
+518.                assign (=) { lValue = i }
                         expr: call parseInt { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = s }
-519.                assign (=)
-                        lValue: lValue { varID = i }
+518.                            (s)
+519.                assign (=) { lValue = i }
                         expr: call parseInt { #exprs = 1, class = ct }
                             exprs:
 519.                            ("345")
-520.                assign (=)
-                        lValue: lValue { varID = b }
+520.                assign (=) { lValue = b }
                         expr: call canParseInt { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = s }
-521.                assign (=)
-                        lValue: lValue { varID = b }
+520.                            (s)
+521.                assign (=) { lValue = b }
                         expr: call canParseInt { #exprs = 1, class = ct }
                             exprs:
 521.                            ("12345")
 522.                while { #stmts = 1 }
                         expr: call canParseInt { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = s }
+522.                            (s)
                         stmts:
-523.                        assign (=)
-                                lValue: lValue { varID = d }
+523.                        assign (=) { lValue = d }
                                 expr: call parseNumber { #exprs = 1, class = ct }
                                     exprs:
-                                        lValue { varID = s }
-524.                assign (=)
-                        lValue: lValue { varID = d }
+523.                                    (s)
+524.                assign (=) { lValue = d }
                         expr: (*) { right = 100 }
                             left: call parseNumber { #exprs = 1, class = ct }
                                 exprs:
 524.                                ("123.45")
-525.                assign (=)
-                        lValue: lValue { varID = b }
+525.                assign (=) { lValue = b }
                         expr: call canParseNumber { #exprs = 1, class = ct }
                             exprs:
 525.                            ("543.210")
 526.                while { #stmts = 1 }
                         expr: call canParseNumber { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = s }
+526.                            (s)
                         stmts:
-527.                        assign (=)
-                                lValue: lValue { varID = s }
+527.                        assign (=) { lValue = s }
                                 expr: call formatDecimal { #exprs = 1, class = ct }
                                     exprs:
-                                        lValue { varID = d }
-528.                assign (=)
-                        lValue: lValue { varID = s }
+527.                                    (d)
+528.                assign (=) { lValue = s }
                         expr: call formatDecimal { #exprs = 2, class = ct }
                             exprs:
-                                lValue { varID = d }
-                                lValue { varID = i }
-529.                assign (=)
-                        lValue: lValue { varID = s }
+528.                            (d)
+528.                            (i)
+529.                assign (=) { lValue = s }
                         expr: call formatDecimal { #exprs = 2, class = ct }
                             exprs:
-                                lValue { varID = d }
+529.                            (d)
                                 call intDiv { #exprs = 2, class = ct }
                                     exprs:
-                                        (*) { left = 2 }
-                                            right: lValue { varID = i }
-                                        lValue { varID = i }
-530.                assign (=)
-                        lValue: lValue { varID = s }
+                                        (*) { right = i, left = 2 }
+529.                                    (i)
+530.                assign (=) { lValue = s }
                         expr: (+) { right = ":00" }
                             left: call formatDecimal { #exprs = 2, class = ct }
                                 exprs:
 530.                                (6.0221)
 530.                                (7)
-531.                assign (=)
-                        lValue: lValue { varID = s }
+531.                assign (=) { lValue = s }
                         expr: call formatInt { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = i }
-532.                assign (=)
-                        lValue: lValue { varID = s }
+531.                            (i)
+532.                assign (=) { lValue = s }
                         expr: call formatInt { #exprs = 2, class = ct }
                             exprs:
-                                (+) { right = 1 }
-                                    left: lValue { varID = i }
-                                (+)
-                                    right: lValue { varID = k }
-                                    left: lValue { varID = j }
+                                (+) { right = 1, left = i }
+                                (+) { right = k, left = j }
 534.                assign (=)
                         lValue: lValue { varID = rect, fieldID = x }
                         expr: (-) { right = 10 }
@@ -1803,199 +1327,151 @@
 548.                        assign (=)
                                 lValue: lValue { varID = img, fieldID = autoDelete }
                                 expr: lValue { varID = img, fieldID = visible }
-549.                assign (=)
+549.                assign (=) { expr = s }
                         lValue: lValue { varID = line, fieldID = group }
-                        expr: lValue { varID = s }
 550.                assign (=)
                         lValue: lValue { varID = line, fieldID = autoDelete }
                         expr: (||)
                             right: (&&)
                                 right: (==) { right = 1 }
-                                    left: call indexOf { #exprs = 1 }
-                                        lValue: lValue { varID = s }
+                                    left: call indexOf { lValue = s, #exprs = 1 }
                                         exprs:
                                             lValue { varID = line, fieldID = group }
-                                left: call equals { #exprs = 1 }
-                                    lValue: lValue { varID = s }
+                                left: call equals { lValue = s, #exprs = 1 }
                                     exprs:
 550.                                    ("world")
-                            left: call equals { #exprs = 1 }
-                                lValue: lValue { varID = s }
+                            left: call equals { lValue = s, #exprs = 1 }
                                 exprs:
 550.                                ("hello")
-552.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: call getType
-                            lValue: lValue { varID = rect }
+552.                assign (=) { lValue = s }
+                        expr: call getType { lValue = rect }
 553.                call println { #exprs = 1, class = ct }
                         exprs:
                             (+) { right = "more text" }
-                                left: call getText
-                                    lValue: lValue { varID = text }
-554.                call setText { #exprs = 1 }
-                        lValue: lValue { varID = img }
+                                left: call getText { lValue = text }
+554.                call setText { lValue = img, #exprs = 1 }
                         exprs:
 554.                        ("racecar.png")
-555.                call setText { #exprs = 1 }
-                        lValue: lValue { varID = text }
+555.                call setText { lValue = text, #exprs = 1 }
                         exprs:
-                            (+) { left = "Score: " }
-                                right: lValue { varID = d }
-556.                call setText { #exprs = 1 }
-                        lValue: lValue { varID = text }
+                            (+) { right = d, left = "Score: " }
+556.                call setText { lValue = text, #exprs = 1 }
                         exprs:
-                            (+) { left = "Score: " }
-                                right: lValue { varID = i }
+                            (+) { right = i, left = "Score: " }
 557.                call log { #exprs = 1, class = ct }
                         exprs:
-                            call toString
-                                lValue: lValue { varID = line }
-558.                call setSize { #exprs = 2 }
-                        lValue: lValue { varID = img }
+                            call toString { lValue = line }
+558.                call setSize { lValue = img, #exprs = 2 }
                         exprs:
                             (*) { right = 1.1 }
                                 left: lValue { varID = img, fieldID = width }
                             (*) { right = 1.1 }
                                 left: lValue { varID = img, fieldID = height }
-559.                call align { #exprs = 1 }
-                        lValue: lValue { varID = text }
+559.                call align { lValue = text, #exprs = 1 }
                         exprs:
-                            lValue { varID = s }
-560.                call align { #exprs = 2 }
-                        lValue: lValue { varID = text }
+559.                        (s)
+560.                call align { lValue = text, #exprs = 2 }
                         exprs:
-                            lValue { varID = s }
+560.                        (s)
 560.                        (true)
-561.                call align { #exprs = 2 }
-                        lValue: lValue { varID = text }
+561.                call align { lValue = text, #exprs = 2 }
                         exprs:
-                            lValue { varID = s }
+561.                        (s)
 561.                        (false)
-562.                call setFillColor { #exprs = 1 }
-                        lValue: lValue { varID = circle }
+562.                call setFillColor { lValue = circle, #exprs = 1 }
                         exprs:
-                            (+) { left = "light" }
-                                right: lValue { varID = s }
-563.                call setFillColor { #exprs = 1 }
-                        lValue: lValue { varID = circle }
+                            (+) { right = s, left = "light" }
+563.                call setFillColor { lValue = circle, #exprs = 1 }
                         exprs:
-                            call getText
-                                lValue: lValue { varID = text }
-564.                call setFillColorRGB { #exprs = 3 }
-                        lValue: lValue { varID = circle }
+                            call getText { lValue = text }
+564.                call setFillColorRGB { lValue = circle, #exprs = 3 }
                         exprs:
-                            lValue { varID = i }
-                            lValue { varID = j }
-                            lValue { varID = k }
-565.                call setLineColor { #exprs = 1 }
-                        lValue: lValue { varID = rect }
+564.                        (i)
+564.                        (j)
+564.                        (k)
+565.                call setLineColor { lValue = rect, #exprs = 1 }
                         exprs:
-                            lValue { varID = colors }
-                                indexExpr: lValue { varID = i }
-566.                call setLineColorRGB { #exprs = 3 }
-                        lValue: lValue { varID = rect }
+                            lValue { varID = colors, indexExpr = i }
+566.                call setLineColorRGB { lValue = rect, #exprs = 3 }
                         exprs:
-                            lValue { varID = i }
-                            (-) { left = 255 }
-                                right: lValue { varID = i }
+566.                        (i)
+                            (-) { right = i, left = 255 }
 566.                        (0)
-567.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: call getLayer
-                            lValue: lValue { varID = rect }
+567.                assign (=) { lValue = i }
+                        expr: call getLayer { lValue = rect }
 568.                if { #stmts = 1 }
                         expr: (>=)
-                            right: call getLayer
-                                lValue: lValue { varID = circle }
-                            left: call getLayer
-                                lValue: lValue { varID = rect }
+                            right: call getLayer { lValue = circle }
+                            left: call getLayer { lValue = rect }
                         stmts:
-569.                        assign (=)
-                                lValue: lValue { varID = b }
+569.                        assign (=) { lValue = b }
                                 expr: call equals { #exprs = 1 }
                                     lValue: lValue { varID = colors }
-                                        indexExpr: call getLayer
-                                            lValue: lValue { varID = rect }
+                                        indexExpr: call getLayer { lValue = rect }
                                     exprs:
 569.                                    ("green")
-570.                call setLayer { #exprs = 1 }
-                        lValue: lValue { varID = img }
+570.                call setLayer { lValue = img, #exprs = 1 }
                         exprs:
                             unaryOp (neg) { expr = 42 }
-571.                call delete
-                        lValue: lValue { varID = img }
-572.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: call clicked
-                            lValue: lValue { varID = img }
-573.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: call containsPoint { #exprs = 2 }
-                            lValue: lValue { varID = img }
+571.                call delete { lValue = img }
+572.                assign (=) { lValue = b }
+                        expr: call clicked { lValue = img }
+573.                assign (=) { lValue = b }
+                        expr: call containsPoint { lValue = img, #exprs = 2 }
                             exprs:
                                 call clickX { class = ct }
                                 call clickY { class = ct }
 574.                if { #stmts = 1 }
-                        expr: call containsPoint { #exprs = 2 }
-                            lValue: lValue { varID = img }
+                        expr: call containsPoint { lValue = img, #exprs = 2 }
                             exprs:
                                 call clickX { class = ct }
                                 call clickY { class = ct }
                         stmts:
 575.                        while { #stmts = 1 }
-                                expr: call hit { #exprs = 1 }
-                                    lValue: lValue { varID = img }
+                                expr: call hit { lValue = img, #exprs = 1 }
                                     exprs:
-                                        lValue { varID = rect }
+575.                                    (rect)
                                 stmts:
-576.                                assign (=)
-                                        lValue: lValue { varID = b }
+576.                                assign (=) { lValue = b }
                                         expr: (==) { right = true }
-                                            left: call hit { #exprs = 1 }
-                                                lValue: lValue { varID = img }
+                                            left: call hit { lValue = img, #exprs = 1 }
                                                 exprs:
-                                                    lValue { varID = rect }
+576.                                                (rect)
 578.                var e { vt = double }
                         initExpr: staticField { fieldID = E, class = Math }
 579.                var pi { vt = double }
                         initExpr: staticField { fieldID = PI, class = Math }
 580.                if { #stmts = 1 }
-                        expr: (<)
-                            right: lValue { varID = eps }
+                        expr: (<) { right = eps }
                             left: call abs { #exprs = 1, class = Math }
                                 exprs:
                                     (-)
                                         right: lValue { varID = img, fieldID = x }
                                         left: lValue { varID = rect, fieldID = x }
                         stmts:
-581.                        assign (=)
-                                lValue: lValue { varID = i }
+581.                        assign (=) { lValue = i }
                                 expr: call abs { #exprs = 1, class = Math }
                                     exprs:
-                                        lValue { varID = i }
-582.                assign (=)
-                        lValue: lValue { varID = d }
+581.                                    (i)
+582.                assign (=) { lValue = d }
                         expr: call acos { #exprs = 1, class = Math }
                             exprs:
                                 unaryOp (neg) { expr = 0.5 }
-583.                assign (=)
-                        lValue: lValue { varID = d }
+583.                assign (=) { lValue = d }
                         expr: call asin { #exprs = 1, class = Math }
                             exprs:
                                 (/) { right = 2 }
                                     left: call sqrt { #exprs = 1, class = Math }
                                         exprs:
 583.                                        (3)
-584.                assign (=)
-                        lValue: lValue { varID = d }
+584.                assign (=) { lValue = d }
                         expr: call atan { #exprs = 1, class = Math }
                             exprs:
                                 (/) { left = 1 }
                                     right: call sqrt { #exprs = 1, class = Math }
                                         exprs:
 584.                                        (2)
-585.                assign (=)
-                        lValue: lValue { varID = d }
+585.                assign (=) { lValue = d }
                         expr: call atan2 { #exprs = 2, class = Math }
                             exprs:
                                 (-)
@@ -2004,146 +1480,111 @@
                                 (-)
                                     right: lValue { varID = img, fieldID = y }
                                     left: call clickY { class = ct }
-586.                assign (=)
-                        lValue: lValue { varID = d }
+586.                assign (=) { lValue = d }
                         expr: call ceil { #exprs = 1, class = Math }
                             exprs:
-                                lValue { varID = d }
-587.                assign (=)
-                        lValue: lValue { varID = d }
+586.                            (d)
+587.                assign (=) { lValue = d }
                         expr: call cos { #exprs = 1, class = Math }
                             exprs:
                                 (/) { right = 2 }
                                     left: staticField { fieldID = PI, class = Math }
-588.                assign (=)
-                        lValue: lValue { varID = d }
+588.                assign (=) { lValue = d }
                         expr: call cosh { #exprs = 1, class = Math }
                             exprs:
                                 (*) { right = 2 }
                                     left: staticField { fieldID = PI, class = Math }
-589.                assign (=)
-                        lValue: lValue { varID = d }
+589.                assign (=) { lValue = d }
                         expr: call exp { #exprs = 1, class = Math }
                             exprs:
                                 (+) { right = 1 }
                                     left: (*) { left = 2 }
                                         right: staticField { fieldID = PI, class = Math }
-590.                assign (=)
-                        lValue: lValue { varID = d }
+590.                assign (=) { lValue = d }
                         expr: call floor { #exprs = 1, class = Math }
                             exprs:
                                 unaryOp (neg) { expr = 1.67 }
-591.                assign (=)
-                        lValue: lValue { varID = d }
+591.                assign (=) { lValue = d }
                         expr: call log { #exprs = 1, class = Math }
                             exprs:
 591.                            (32)
-592.                assign (=)
-                        lValue: lValue { varID = d }
+592.                assign (=) { lValue = d }
                         expr: call log10 { #exprs = 1, class = Math }
                             exprs:
-                                lValue { varID = d }
-593.                assign (=)
-                        lValue: lValue { varID = d }
+592.                            (d)
+593.                assign (=) { lValue = d }
                         expr: call max { #exprs = 2, class = Math }
                             exprs:
-                                lValue { varID = d }
-                                lValue { varID = d }
-594.                assign (=)
-                        lValue: lValue { varID = i }
+593.                            (d)
+593.                            (d)
+594.                assign (=) { lValue = i }
                         expr: call max { #exprs = 2, class = Math }
                             exprs:
-                                lValue { varID = i }
-                                lValue { varID = i }
-595.                assign (=)
-                        lValue: lValue { varID = d }
+594.                            (i)
+594.                            (i)
+595.                assign (=) { lValue = d }
                         expr: call min { #exprs = 2, class = Math }
                             exprs:
-                                lValue { varID = d }
-                                lValue { varID = d }
-596.                assign (=)
-                        lValue: lValue { varID = i }
+595.                            (d)
+595.                            (d)
+596.                assign (=) { lValue = i }
                         expr: call min { #exprs = 2, class = Math }
                             exprs:
-                                lValue { varID = i }
-                                lValue { varID = i }
-597.                assign (=)
-                        lValue: lValue { varID = d }
+596.                            (i)
+596.                            (i)
+597.                assign (=) { lValue = d }
                         expr: call pow { #exprs = 2, class = Math }
                             exprs:
-                                lValue { varID = d }
-                                lValue { varID = d }
-598.                assign (=)
-                        lValue: lValue { varID = d }
+597.                            (d)
+597.                            (d)
+598.                assign (=) { lValue = d }
                         expr: call sin { #exprs = 1, class = Math }
                             exprs:
-                                lValue { varID = d }
-599.                assign (=)
-                        lValue: lValue { varID = d }
+598.                            (d)
+599.                assign (=) { lValue = d }
                         expr: call sinh { #exprs = 1, class = Math }
                             exprs:
-                                lValue { varID = d }
-600.                assign (=)
-                        lValue: lValue { varID = d }
+599.                            (d)
+600.                assign (=) { lValue = d }
                         expr: call sqrt { #exprs = 1, class = Math }
                             exprs:
-                                lValue { varID = d }
-601.                assign (=)
-                        lValue: lValue { varID = d }
+600.                            (d)
+601.                assign (=) { lValue = d }
                         expr: call tan { #exprs = 1, class = Math }
                             exprs:
-                                lValue { varID = d }
-602.                assign (=)
-                        lValue: lValue { varID = d }
+601.                            (d)
+602.                assign (=) { lValue = d }
                         expr: call tanh { #exprs = 1, class = Math }
                             exprs:
-                                lValue { varID = d }
-604.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: call compareTo { #exprs = 1 }
-                            lValue: lValue { varID = s }
+602.                            (d)
+604.                assign (=) { lValue = i }
+                        expr: call compareTo { lValue = s, #exprs = 1 }
                             exprs:
-                                lValue { varID = s }
-605.                assign (=)
-                        lValue: lValue { varID = b }
-                        expr: call equals { #exprs = 1 }
-                            lValue: lValue { varID = s }
+604.                            (s)
+605.                assign (=) { lValue = b }
+                        expr: call equals { lValue = s, #exprs = 1 }
                             exprs:
-                                lValue { varID = s }
-606.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: call indexOf { #exprs = 1 }
-                            lValue: lValue { varID = s }
+605.                            (s)
+606.                assign (=) { lValue = i }
+                        expr: call indexOf { lValue = s, #exprs = 1 }
                             exprs:
-                                lValue { varID = s }
-607.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: call length
-                            lValue: lValue { varID = s }
-608.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: call substring { #exprs = 1 }
-                            lValue: lValue { varID = s }
+606.                            (s)
+607.                assign (=) { lValue = i }
+                        expr: call length { lValue = s }
+608.                assign (=) { lValue = s }
+                        expr: call substring { lValue = s, #exprs = 1 }
                             exprs:
-                                lValue { varID = i }
-609.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: call substring { #exprs = 1 }
-                            lValue: lValue { varID = s }
+608.                            (i)
+609.                assign (=) { lValue = s }
+                        expr: call substring { lValue = s, #exprs = 1 }
                             exprs:
-                                lValue { varID = i }
-610.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: call toLowerCase
-                            lValue: lValue { varID = s }
-611.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: call toUpperCase
-                            lValue: lValue { varID = s }
-612.                assign (=)
-                        lValue: lValue { varID = s }
-                        expr: call trim
-                            lValue: lValue { varID = s }
+609.                            (i)
+610.                assign (=) { lValue = s }
+                        expr: call toLowerCase { lValue = s }
+611.                assign (=) { lValue = s }
+                        expr: call toUpperCase { lValue = s }
+612.                assign (=) { lValue = s }
+                        expr: call trim { lValue = s }
 614.                var coins { vt = array of GameObj }
 615.                var walls { vt = array of GameObj }
 616.                var multilineArrayInit { vt = array of int }
@@ -2184,15 +1625,13 @@
 652.                var s { vt = String, isGlobal = false }
 652.                var gameObj { vt = GameObj, isGlobal = false }
                 stmts:
-655.                return
-                        expr: lValue { varID = TRUE }
+655.                return { expr = TRUE }
 658.        func Double { #paramVars = 1, vt = int, #stmts = 1 }
                 paramVars:
 658.                var x { vt = int, isGlobal = false }
                 stmts:
 660.                return
-                        expr: (*) { left = 2 }
-                            right: lValue { varID = x }
+                        expr: (*) { right = x, left = 2 }
 664.        func voidFunc { #paramVars = 1, vt = void, #stmts = 0 }
                 paramVars:
 664.                var i { vt = int, isGlobal = false }
@@ -2221,94 +1660,66 @@
 691.                var objArr { vt = array of GameObj }
                         initExpr: arrayInit { #exprs = 1 }
                             exprs:
-                                lValue { varID = objVar }
-694.                assign (=)
-                        lValue: lValue { varID = intVar }
-                        expr: call setText { #exprs = 1 }
-                            lValue: lValue { varID = objVar }
+691.                            (objVar)
+694.                assign (=) { lValue = intVar }
+                        expr: call setText { lValue = objVar, #exprs = 1 }
                             exprs:
 694.                            ("circle")
 696.                var screen { vt = double }
                         initExpr: call setScreen { #exprs = 1, class = ct }
                             exprs:
 696.                            ("menu")
-698.                assign (=)
-                        lValue: lValue { varID = boolVar }
+698.                assign (=) { lValue = boolVar }
                         expr: call setHeight { #exprs = 1, class = ct }
                             exprs:
 698.                            (150)
-700.                assign (=)
-                        lValue: lValue { varID = strVar }
+700.                assign (=) { lValue = strVar }
                         expr: call voidFunc
 702.                var title { vt = GameObj }
                         initExpr: call setTitle { #exprs = 1, class = ct }
                             exprs:
 702.                            ("title")
-705.                assign (=)
-                        lValue: lValue { varID = boolVar }
-                        expr: lValue { varID = intVar }
+705.                assign (=) { lValue = boolVar, expr = intVar }
 707.                var b { vt = boolean }
                         initExpr: call intFuncInt { #exprs = 1 }
                             exprs:
 707.                            (2)
 709.                assign (=) { expr = 0 }
                         lValue: lValue { varID = objVar, fieldID = visible }
-711.                var s { vt = String }
-                        initExpr: lValue { varID = intVar }
-713.                assign (=)
-                        lValue: lValue { varID = objVar }
-                        expr: lValue { varID = intVar }
+711.                var s { vt = String, initExpr = intVar }
+713.                assign (=) { lValue = objVar, expr = intVar }
 716.                var i { vt = int, initExpr = 3.4 }
-718.                assign (=) { expr = 1.2 }
-                        lValue: lValue { varID = i }
-720.                assign (=)
-                        lValue: lValue { varID = i }
+718.                assign (=) { lValue = i, expr = 1.2 }
+720.                assign (=) { lValue = i }
                         expr: (*) { right = 3.4, left = 10 }
 722.                var j { vt = int }
                         initExpr: (+) { right = 3.14, left = 5 }
 724.                var plancksConst { vt = int, initExpr = 6.62e-34 }
 726.                var exponentialNumberNoDot { vt = int, initExpr = 12e10 }
 728.                var exponentialNumberWithDot { vt = int, initExpr = 3.42e2 }
-730.                assign (=)
+730.                assign (=) { expr = dblVar }
                         lValue: lValue { varID = objVar, fieldID = autoDelete }
-                        expr: lValue { varID = dblVar }
-732.                assign (=) { expr = 3.14 }
-                        lValue: lValue { varID = strVar }
-734.                assign (=)
-                        lValue: lValue { varID = objVar }
-                        expr: lValue { varID = dblVar }
-737.                assign (=)
-                        lValue: lValue { varID = intVar }
+732.                assign (=) { lValue = strVar, expr = 3.14 }
+734.                assign (=) { lValue = objVar, expr = dblVar }
+737.                assign (=) { lValue = intVar }
                         expr: call clicked { class = ct }
-739.                assign (=)
+739.                assign (=) { expr = boolVar }
                         lValue: lValue { varID = objVar, fieldID = x }
-                        expr: lValue { varID = boolVar }
 741.                assign (=) { expr = false }
                         lValue: lValue { varID = objVar, fieldID = xSpeed }
-743.                assign (=)
+743.                assign (=) { expr = boolVar }
                         lValue: lValue { varID = objVar, fieldID = group }
-                        expr: lValue { varID = boolVar }
-745.                assign (=)
-                        lValue: lValue { varID = objVar }
-                        expr: lValue { varID = boolVar }
-748.                assign (=)
-                        lValue: lValue { varID = intVar }
+745.                assign (=) { lValue = objVar, expr = boolVar }
+748.                assign (=) { lValue = intVar }
                         expr: lValue { varID = objVar, fieldID = group }
 750.                assign (=) { expr = "fast" }
                         lValue: lValue { varID = objVar, fieldID = ySpeed }
-752.                assign (=)
-                        lValue: lValue { varID = boolVar }
-                        expr: lValue { varID = strVar }
+752.                assign (=) { lValue = boolVar, expr = strVar }
 754.                var score { vt = GameObj, initExpr = "100 pts" }
-757.                assign (=)
-                        lValue: lValue { varID = intVar }
-                        expr: lValue { varID = objVar }
-759.                assign (=)
+757.                assign (=) { lValue = intVar, expr = objVar }
+759.                assign (=) { expr = objVar }
                         lValue: lValue { varID = objVar, fieldID = width }
-                        expr: lValue { varID = objVar }
-761.                assign (=)
-                        lValue: lValue { varID = boolVar }
-                        expr: lValue { varID = objVar }
+761.                assign (=) { lValue = boolVar, expr = objVar }
 763.                var circle { vt = String }
                         initExpr: call circle { #exprs = 3, class = ct }
                             exprs:
@@ -2319,14 +1730,12 @@
                         initExpr: call intFuncInt { #exprs = 1 }
                             exprs:
 766.                            (2.3)
-768.                assign (=)
-                        lValue: lValue { varID = intVar }
+768.                assign (=) { lValue = intVar }
                         expr: call random { #exprs = 2, class = ct }
                             exprs:
 768.                            (0.0)
 768.                            (10)
-770.                assign (=)
-                        lValue: lValue { varID = intVar }
+770.                assign (=) { lValue = intVar }
                         expr: call random { #exprs = 2, class = ct }
                             exprs:
 770.                            (0)
@@ -2336,60 +1745,54 @@
 772.                        ("red")
 772.                        (0)
 772.                        (0)
-774.                call setLayer { #exprs = 1 }
-                        lValue: lValue { varID = objVar }
+774.                call setLayer { lValue = objVar, #exprs = 1 }
                         exprs:
 774.                        ("front")
 776.                call roundDecimal { #exprs = 2, class = ct }
                         exprs:
 776.                        (3.14159)
-                            lValue { varID = objVar }
-778.                call substring { #exprs = 1 }
-                        lValue: lValue { varID = strVar }
+776.                        (objVar)
+778.                call substring { lValue = strVar, #exprs = 1 }
                         exprs:
-                            lValue { varID = objVar }
+778.                        (objVar)
 781.                call pow { #exprs = 2, class = Math }
                         exprs:
-                            lValue { varID = boolVar }
+781.                        (boolVar)
 781.                        (3)
 783.                call dblFuncIntDbl { #exprs = 2 }
                         exprs:
 783.                        (0)
 783.                        ("pi")
-785.                call containsPoint { #exprs = 2 }
-                        lValue: lValue { varID = objVar }
+785.                call containsPoint { lValue = objVar, #exprs = 2 }
                         exprs:
-                            lValue { varID = strVar }
-                            lValue { varID = dblVar }
+785.                        (strVar)
+785.                        (dblVar)
 787.                call exp { #exprs = 1, class = Math }
                         exprs:
-                            lValue { varID = objVar }
-790.                call align { #exprs = 2 }
-                        lValue: lValue { varID = objVar }
+787.                        (objVar)
+790.                call align { lValue = objVar, #exprs = 2 }
                         exprs:
 790.                        ("left")
 790.                        (0)
 792.                call boolFuncBoolStringGameObj { #exprs = 3 }
                         exprs:
-                            lValue { varID = dblVar }
-                            lValue { varID = strVar }
-                            lValue { varID = objVar }
+792.                        (dblVar)
+792.                        (strVar)
+792.                        (objVar)
 794.                call boolFuncBoolStringGameObj { #exprs = 3 }
                         exprs:
-                            lValue { varID = strVar }
-                            lValue { varID = objVar }
-                            lValue { varID = boolVar }
+794.                        (strVar)
+794.                        (objVar)
+794.                        (boolVar)
 796.                call boolFuncBoolStringGameObj { #exprs = 3 }
                         exprs:
-                            lValue { varID = objVar }
-                            lValue { varID = strVar }
-                            lValue { varID = boolVar }
-799.                call align { #exprs = 1 }
-                        lValue: lValue { varID = objVar }
+796.                        (objVar)
+796.                        (strVar)
+796.                        (boolVar)
+799.                call align { lValue = objVar, #exprs = 1 }
                         exprs:
-                            lValue { varID = intVar }
-801.                assign (=)
-                        lValue: lValue { varID = intVar }
+799.                        (intVar)
+801.                assign (=) { lValue = intVar }
                         expr: call parseInt { #exprs = 1, class = ct }
                             exprs:
 801.                            (123)
@@ -2399,43 +1802,35 @@
 803.                        (0)
 803.                        (1)
 803.                        (1)
-805.                call setText { #exprs = 1 }
-                        lValue: lValue { varID = objVar }
+805.                call setText { lValue = objVar, #exprs = 1 }
                         exprs:
 805.                        (1)
-807.                assign (=)
-                        lValue: lValue { varID = boolVar }
+807.                assign (=) { lValue = boolVar }
                         expr: call canParseInt { #exprs = 1, class = ct }
                             exprs:
 807.                            (1.0)
-809.                assign (=)
-                        lValue: lValue { varID = boolVar }
+809.                assign (=) { lValue = boolVar }
                         expr: call canParseInt { #exprs = 1, class = ct }
                             exprs:
-                                lValue { varID = boolVar }
-811.                call align { #exprs = 1 }
-                        lValue: lValue { varID = objVar }
+809.                            (boolVar)
+811.                call align { lValue = objVar, #exprs = 1 }
                         exprs:
 811.                        (true)
-813.                call equals { #exprs = 1 }
-                        lValue: lValue { varID = strVar }
+813.                call equals { lValue = strVar, #exprs = 1 }
                         exprs:
-                            lValue { varID = objVar }
+813.                        (objVar)
 816.                call boolFuncBoolStringGameObj { #exprs = 3 }
                         exprs:
-                            lValue { varID = boolVar }
-                            lValue { varID = strVar }
+816.                        (boolVar)
+816.                        (strVar)
 816.                        (42)
-818.                call hit { #exprs = 1 }
-                        lValue: lValue { varID = objVar }
+818.                call hit { lValue = objVar, #exprs = 1 }
                         exprs:
 818.                        (0.0)
-820.                call hit { #exprs = 1 }
-                        lValue: lValue { varID = objVar }
+820.                call hit { lValue = objVar, #exprs = 1 }
                         exprs:
 820.                        (false)
-822.                call hit { #exprs = 1 }
-                        lValue: lValue { varID = objVar }
+822.                call hit { lValue = objVar, #exprs = 1 }
                         exprs:
 822.                        ("the wall")
 825.                if { #stmts = 1 }
@@ -2462,12 +1857,10 @@
 838.                        (255)
 838.                        (0)
 838.                        (0)
-840.                call delete { #exprs = 1 }
-                        lValue: lValue { varID = objVar }
+840.                call delete { lValue = objVar, #exprs = 1 }
                         exprs:
 840.                        (true)
-842.                call setText { #exprs = 2 }
-                        lValue: lValue { varID = objVar }
+842.                call setText { lValue = objVar, #exprs = 2 }
                         exprs:
 842.                        ("circle")
 842.                        ("green")
@@ -2475,32 +1868,23 @@
                         initExpr: (/) { right = 2, left = 3 }
 847.                call random { #exprs = 2, class = ct }
                         exprs:
-                            (/)
-                                right: lValue { varID = intVar }
-                                left: lValue { varID = intVar }
-                            lValue { varID = intVar }
-849.                assign (=)
-                        lValue: lValue { varID = x }
-                        expr: (+) { right = 1 }
-                            left: lValue { varID = x }
+                            (/) { right = intVar, left = intVar }
+847.                        (intVar)
+849.                assign (=) { lValue = x }
+                        expr: (+) { right = 1, left = x }
 851.                for { #stmts = 1 }
-851.                    initStmt: assign (=) { expr = 0 }
-                            lValue: lValue { varID = x }
-                        expr: (<) { right = 1 }
-                            left: lValue { varID = x }
-851.                    nextStmt: assign (++)
-                            lValue: lValue { varID = x }
+851.                    initStmt: assign (=) { lValue = x, expr = 0 }
+                        expr: (<) { right = 1, left = x }
+851.                    nextStmt: assign (++) { lValue = x }
                         stmts:
 852.                        call voidFunc
 854.                call foo
 856.                var j { vt = int, initExpr = 3 }
 858.                var uninitializedVar { vt = int }
 860.                if { #stmts = 1 }
-                        expr: (<) { right = 0 }
-                            left: lValue { varID = uninitializedVar }
+                        expr: (<) { right = 0, left = uninitializedVar }
                         stmts:
-861.                        assign (=) { expr = 0 }
-                                lValue: lValue { varID = uninitializedVar }
+861.                        assign (=) { lValue = uninitializedVar, expr = 0 }
 862.                var g { vt = GameObj }
 864.                assign (=) { expr = 1 }
                         lValue: lValue { varID = g, fieldID = xSpeed }
@@ -2513,15 +1897,13 @@
 871.                            (10)
 873.                assign (=) { expr = false }
                         lValue: lValue { varID = objVar, fieldID = isVisible }
-875.                call foo
-                        lValue: lValue { varID = objVar }
+875.                call foo { lValue = objVar }
 882.                call Circle { #exprs = 3, class = ct }
                         exprs:
 882.                        (0)
 882.                        (0)
 882.                        (10)
-884.                call atan2 { #exprs = 2 }
-                        lValue: lValue { varID = math }
+884.                call atan2 { lValue = math, #exprs = 2 }
                         exprs:
                             (-)
                                 right: lValue { varID = r, fieldID = x }
@@ -2530,34 +1912,22 @@
                                 right: lValue { varID = r, fieldID = y }
                                 left: call clickY { class = ct }
 886.                call voidfunC
-888.                assign (=) { expr = 2 }
-                        lValue: lValue { varID = intvar }
-891.                assign (=)
-                        lValue: lValue { varID = strVar }
-                        expr: lValue { varID = Null }
-893.                assign (=)
-                        lValue: lValue { varID = objVar }
-                        expr: lValue { varID = NULL }
-895.                while { #stmts = 1 }
-                        expr: lValue { varID = True }
+888.                assign (=) { lValue = intvar, expr = 2 }
+891.                assign (=) { lValue = strVar, expr = Null }
+893.                assign (=) { lValue = objVar, expr = NULL }
+895.                while { expr = True, #stmts = 1 }
                         stmts:
 896.                        call voidFunc
-898.                assign (=)
-                        lValue: lValue { varID = boolVar }
-                        expr: lValue { varID = TRUE }
-900.                if { #stmts = 1 }
-                        expr: lValue { varID = False }
+898.                assign (=) { lValue = boolVar, expr = TRUE }
+900.                if { expr = False, #stmts = 1 }
                         stmts:
 901.                        call voidFunc
-903.                assign (=)
+903.                assign (=) { expr = FALSE }
                         lValue: lValue { varID = objVar, fieldID = clickable }
-                        expr: lValue { varID = FALSE }
 906.                if { #stmts = 1 }
-                        expr: (=) { right = 0 }
-                            left: lValue { varID = i }
+                        expr: (=) { right = 0, left = i }
                         stmts:
-907.                        assign (=) { expr = 0 }
-                                lValue: lValue { varID = i }
+907.                        assign (=) { lValue = i, expr = 0 }
 909.                var intArr2 { vt = array of int }
                         initExpr: arrayInit { #exprs = 3 }
                             exprs:
@@ -2576,309 +1946,196 @@
                         initExpr: call intArrFuncInt { #exprs = 1 }
                             exprs:
 915.                            (10)
-917.                assign (=)
-                        lValue: lValue { varID = intArr }
+917.                assign (=) { lValue = intArr }
                         expr: newArray { vtElement = 0, lengthExpr = 1.5 }
-920.                assign (++)
-                        lValue: lValue { varID = boolVar }
-922.                assign (++)
-                        lValue: lValue { varID = strVar }
-924.                assign (++)
-                        lValue: lValue { varID = objVar }
-926.                assign (--)
-                        lValue: lValue { varID = boolVar }
-928.                assign (--)
-                        lValue: lValue { varID = strVar }
-930.                assign (--)
-                        lValue: lValue { varID = objVar }
-933.                forArray { #stmts = 1 }
+920.                assign (++) { lValue = boolVar }
+922.                assign (++) { lValue = strVar }
+924.                assign (++) { lValue = objVar }
+926.                assign (--) { lValue = boolVar }
+928.                assign (--) { lValue = strVar }
+930.                assign (--) { lValue = objVar }
+933.                forArray { expr = intVar, #stmts = 1 }
 933.                    var: var x { vt = int, isGlobal = false }
-                        expr: lValue { varID = intVar }
                         stmts:
 934.                        call voidFunc
-936.                forArray { #stmts = 1 }
+936.                forArray { expr = dblVar, #stmts = 1 }
 936.                    var: var x { vt = double, isGlobal = false }
-                        expr: lValue { varID = dblVar }
                         stmts:
 937.                        call voidFunc
-939.                forArray { #stmts = 1 }
+939.                forArray { expr = boolVar, #stmts = 1 }
 939.                    var: var x { vt = boolean, isGlobal = false }
-                        expr: lValue { varID = boolVar }
                         stmts:
 940.                        call voidFunc
-942.                forArray { #stmts = 1 }
+942.                forArray { expr = strVar, #stmts = 1 }
 942.                    var: var x { vt = String, isGlobal = false }
-                        expr: lValue { varID = strVar }
                         stmts:
 943.                        call voidFunc
-945.                forArray { #stmts = 1 }
+945.                forArray { expr = objVar, #stmts = 1 }
 945.                    var: var x { vt = GameObj, isGlobal = false }
-                        expr: lValue { varID = objVar }
                         stmts:
 946.                        call voidFunc
-948.                forArray { #stmts = 1 }
+948.                forArray { expr = strVar, #stmts = 1 }
 948.                    var: var x { vt = GameObj, isGlobal = false }
-                        expr: lValue { varID = strVar }
                         stmts:
 949.                        call voidFunc
-952.                forArray { #stmts = 1 }
+952.                forArray { expr = intArr, #stmts = 1 }
 952.                    var: var x { vt = double, isGlobal = false }
-                        expr: lValue { varID = intArr }
                         stmts:
 953.                        call voidFunc
-955.                forArray { #stmts = 1 }
+955.                forArray { expr = objArr, #stmts = 1 }
 955.                    var: var x { vt = String, isGlobal = false }
-                        expr: lValue { varID = objArr }
                         stmts:
 956.                        call voidFunc
-959.                for { #stmts = 1 }
-                        expr: lValue { varID = intVar }
+959.                for { expr = intVar, #stmts = 1 }
                         stmts:
 960.                        call voidFunc
-962.                for { #stmts = 1 }
-                        expr: lValue { varID = dblVar }
+962.                for { expr = dblVar, #stmts = 1 }
                         stmts:
 963.                        call voidFunc
-965.                for { #stmts = 1 }
-                        expr: lValue { varID = strVar }
+965.                for { expr = strVar, #stmts = 1 }
                         stmts:
 966.                        call voidFunc
-968.                for { #stmts = 1 }
-                        expr: lValue { varID = objVar }
+968.                for { expr = objVar, #stmts = 1 }
                         stmts:
 969.                        call voidFunc
-971.                doWhile { #stmts = 1 }
-                        expr: lValue { varID = intVar }
+971.                doWhile { expr = intVar, #stmts = 1 }
                         stmts:
 972.                        call voidFunc
-977.                while { #stmts = 1 }
-                        expr: lValue { varID = dblVar }
+977.                while { expr = dblVar, #stmts = 1 }
                         stmts:
 978.                        call voidFunc
-980.                while { #stmts = 1 }
-                        expr: lValue { varID = strVar }
+980.                while { expr = strVar, #stmts = 1 }
                         stmts:
 981.                        call voidFunc
-983.                while { #stmts = 1 }
-                        expr: lValue { varID = objVar }
+983.                while { expr = objVar, #stmts = 1 }
                         stmts:
 984.                        call voidFunc
-987.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: lValue { varID = intVar }
+987.                if { expr = intVar, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #stmts = 1 }
-                                expr: lValue { varID = intVar }
+                            if { expr = intVar, #stmts = 1 }
                                 stmts:
 991.                                call voidFunc
                         stmts:
 988.                        call voidFunc
-993.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: lValue { varID = dblVar }
+993.                if { expr = dblVar, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #stmts = 1 }
-                                expr: lValue { varID = dblVar }
+                            if { expr = dblVar, #stmts = 1 }
                                 stmts:
 997.                                call voidFunc
                         stmts:
 994.                        call voidFunc
-999.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: lValue { varID = strVar }
+999.                if { expr = strVar, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #stmts = 1 }
-                                expr: lValue { varID = strVar }
+                            if { expr = strVar, #stmts = 1 }
                                 stmts:
 1003.                                call voidFunc
                         stmts:
 1000.                        call voidFunc
-1005.                if { #elseStmts = 1, #stmts = 1 }
-                        expr: lValue { varID = objVar }
+1005.                if { expr = objVar, #elseStmts = 1, #stmts = 1 }
                         elseStmts:
-                            if { #stmts = 1 }
-                                expr: lValue { varID = objVar }
+                            if { expr = objVar, #stmts = 1 }
                                 stmts:
 1009.                                call voidFunc
                         stmts:
 1006.                        call voidFunc
-1019.                assign (+=) { expr = "hello" }
-                        lValue: lValue { varID = strVar }
-1021.                assign (-=) { expr = 1 }
-                        lValue: lValue { varID = boolVar }
-1023.                assign (*=)
-                        lValue: lValue { varID = objVar }
-                        expr: lValue { varID = objVar }
-1025.                assign (/=) { expr = 3.14 }
-                        lValue: lValue { varID = objVar }
-1027.                assign (+=) { expr = "hello" }
-                        lValue: lValue { varID = intVar }
-1029.                assign (-=)
-                        lValue: lValue { varID = dblVar }
+1019.                assign (+=) { lValue = strVar, expr = "hello" }
+1021.                assign (-=) { lValue = boolVar, expr = 1 }
+1023.                assign (*=) { lValue = objVar, expr = objVar }
+1025.                assign (/=) { lValue = objVar, expr = 3.14 }
+1027.                assign (+=) { lValue = intVar, expr = "hello" }
+1029.                assign (-=) { lValue = dblVar }
                         expr: call rect { #exprs = 4, class = ct }
                             exprs:
 1029.                            (0)
 1029.                            (0)
 1029.                            (1)
 1029.                            (2)
-1031.                assign (*=) { expr = false }
-                        lValue: lValue { varID = intVar }
-1033.                assign (/=) { expr = true }
-                        lValue: lValue { varID = dblVar }
-1035.                assign (+=)
-                        lValue: lValue { varID = intVar }
-                        expr: lValue { varID = dblVar }
-1037.                assign (-=)
-                        lValue: lValue { varID = intVar }
-                        expr: lValue { varID = dblVar }
-1039.                assign (*=)
-                        lValue: lValue { varID = intVar }
-                        expr: lValue { varID = dblVar }
-1041.                assign (/=)
-                        lValue: lValue { varID = intVar }
-                        expr: lValue { varID = dblVar }
+1031.                assign (*=) { lValue = intVar, expr = false }
+1033.                assign (/=) { lValue = dblVar, expr = true }
+1035.                assign (+=) { lValue = intVar, expr = dblVar }
+1037.                assign (-=) { lValue = intVar, expr = dblVar }
+1039.                assign (*=) { lValue = intVar, expr = dblVar }
+1041.                assign (/=) { lValue = intVar, expr = dblVar }
 1043.                if { #stmts = 1 }
-                        expr: (==) { right = "s" }
-                            left: lValue { varID = strVar }
+                        expr: (==) { right = "s", left = strVar }
                         stmts:
 1044.                        call voidFunc
-1047.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (^)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-1049.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (&)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-1051.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (|)
-                            right: lValue { varID = i }
-                            left: lValue { varID = i }
-1053.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (>>) { right = 2 }
-                            left: lValue { varID = i }
-1055.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (<<) { right = 2 }
-                            left: lValue { varID = i }
-1057.                assign (=)
-                        lValue: lValue { varID = i }
-                        expr: (>>>) { right = 2 }
-                            left: lValue { varID = i }
+1047.                assign (=) { lValue = i }
+                        expr: (^) { right = i, left = i }
+1049.                assign (=) { lValue = i }
+                        expr: (&) { right = i, left = i }
+1051.                assign (=) { lValue = i }
+                        expr: (|) { right = i, left = i }
+1053.                assign (=) { lValue = i }
+                        expr: (>>) { right = 2, left = i }
+1055.                assign (=) { lValue = i }
+                        expr: (<<) { right = 2, left = i }
+1057.                assign (=) { lValue = i }
+                        expr: (>>>) { right = 2, left = i }
 1066.                var lowercasefirst { vt = int, initExpr = 1 }
 1068.                var lowerCaseFirst { vt = int, initExpr = 10 }
-1069.                var upperCaseFirst { vt = GameObj }
-                        initExpr: lValue { varID = objVar }
+1069.                var upperCaseFirst { vt = GameObj, initExpr = objVar }
 1071.                var uppercasefirst { vt = GameObj, initExpr = null }
-1073.                assign (=)
-                        lValue: lValue { varID = dblVar }
-                        expr: (+) { right = 1 }
-                            left: lValue { varID = dblvar }
+1073.                assign (=) { lValue = dblVar }
+                        expr: (+) { right = 1, left = dblvar }
 1077.                var DouBle { vt = int }
 1079.                var BooLean { vt = double }
 1081.                var string { vt = boolean }
 1084.                assign (=) { expr = 1 }
                         lValue: lValue { varID = intVar, indexExpr = 0 }
 1087.                assign (=) { expr = 1 }
-                        lValue: lValue { varID = intArr }
-                            indexExpr: lValue { varID = dblVar }
+                        lValue: lValue { varID = intArr, indexExpr = dblVar }
 1090.                var numObjs { vt = int }
                         initExpr: lValue { varID = objArr, fieldID = Length }
 1093.                var len { vt = int }
                         initExpr: lValue { varID = strVar, fieldID = length }
 1095.                var size { vt = int }
                         initExpr: lValue { varID = intVar, fieldID = size }
-1098.                assign (=)
-                        lValue: lValue { varID = objVar }
-                        expr: unaryOp (neg)
-                            expr: lValue { varID = objVar }
+1098.                assign (=) { lValue = objVar }
+                        expr: unaryOp (neg) { expr = objVar }
 1101.                assign (=)
                         lValue: lValue { varID = objVar, fieldID = visible }
-                        expr: unaryOp (not)
-                            expr: lValue { varID = intVar }
-1104.                assign (=)
-                        lValue: lValue { varID = strVar }
-                        expr: (+)
-                            right: lValue { varID = intArr }
-                            left: lValue { varID = strVar }
-1106.                assign (=)
-                        lValue: lValue { varID = strVar }
-                        expr: (+)
-                            right: lValue { varID = strVar }
-                            left: lValue { varID = intArr }
-1109.                assign (=)
-                        lValue: lValue { varID = boolVar }
-                        expr: (+)
-                            right: unaryOp (not)
-                                expr: lValue { varID = boolVar }
-                            left: lValue { varID = boolVar }
-1111.                assign (=)
-                        lValue: lValue { varID = objVar }
-                        expr: (+)
-                            right: lValue { varID = objVar }
-                            left: lValue { varID = objVar }
-1113.                assign (=)
-                        lValue: lValue { varID = intArr }
-                        expr: (+) { right = 1 }
-                            left: lValue { varID = intArr }
-1115.                assign (=)
-                        lValue: lValue { varID = objArr }
-                        expr: (+)
-                            right: lValue { varID = objVar }
-                            left: lValue { varID = objArr }
-1118.                assign (=)
-                        lValue: lValue { varID = strVar }
-                        expr: (-)
-                            right: lValue { varID = intVar }
-                            left: lValue { varID = strVar }
-1120.                assign (=)
-                        lValue: lValue { varID = boolVar }
-                        expr: (*) { right = 0 }
-                            left: lValue { varID = boolVar }
-1122.                assign (=)
-                        lValue: lValue { varID = objVar }
-                        expr: (/) { right = 2 }
-                            left: lValue { varID = objVar }
-1124.                assign (=)
-                        lValue: lValue { varID = intArr }
-                        expr: (%) { right = 2 }
-                            left: lValue { varID = intArr }
-1127.                assign (=)
-                        lValue: lValue { varID = intVar }
-                        expr: (&&) { right = 1001 }
-                            left: lValue { varID = intVar }
-1129.                assign (=)
-                        lValue: lValue { varID = boolVar }
-                        expr: (||) { right = 1010 }
-                            left: lValue { varID = boolVar }
+                        expr: unaryOp (not) { expr = intVar }
+1104.                assign (=) { lValue = strVar }
+                        expr: (+) { right = intArr, left = strVar }
+1106.                assign (=) { lValue = strVar }
+                        expr: (+) { right = strVar, left = intArr }
+1109.                assign (=) { lValue = boolVar }
+                        expr: (+) { left = boolVar }
+                            right: unaryOp (not) { expr = boolVar }
+1111.                assign (=) { lValue = objVar }
+                        expr: (+) { right = objVar, left = objVar }
+1113.                assign (=) { lValue = intArr }
+                        expr: (+) { right = 1, left = intArr }
+1115.                assign (=) { lValue = objArr }
+                        expr: (+) { right = objVar, left = objArr }
+1118.                assign (=) { lValue = strVar }
+                        expr: (-) { right = intVar, left = strVar }
+1120.                assign (=) { lValue = boolVar }
+                        expr: (*) { right = 0, left = boolVar }
+1122.                assign (=) { lValue = objVar }
+                        expr: (/) { right = 2, left = objVar }
+1124.                assign (=) { lValue = intArr }
+                        expr: (%) { right = 2, left = intArr }
+1127.                assign (=) { lValue = intVar }
+                        expr: (&&) { right = 1001, left = intVar }
+1129.                assign (=) { lValue = boolVar }
+                        expr: (||) { right = 1010, left = boolVar }
 1132.                if { #stmts = 1 }
-                        expr: (<)
-                            right: lValue { varID = boolVar }
-                            left: lValue { varID = boolVar }
+                        expr: (<) { right = boolVar, left = boolVar }
                         stmts:
 1133.                        call voidFunc
-1135.                assign (=)
-                        lValue: lValue { varID = boolVar }
-                        expr: (>)
-                            right: lValue { varID = dblVar }
-                            left: lValue { varID = objVar }
+1135.                assign (=) { lValue = boolVar }
+                        expr: (>) { right = dblVar, left = objVar }
 1137.                while { #stmts = 1 }
-                        expr: (<=)
-                            right: lValue { varID = intVar }
-                            left: lValue { varID = boolVar }
+                        expr: (<=) { right = intVar, left = boolVar }
                         stmts:
 1138.                        call voidFunc
-1141.                assign (=)
-                        lValue: lValue { varID = dblVar }
-                        expr: (>=)
-                            right: lValue { varID = intArr }
-                            left: lValue { varID = dblVar }
-1144.                assign (=)
-                        lValue: lValue { varID = intVar }
+1141.                assign (=) { lValue = dblVar }
+                        expr: (>=) { right = intArr, left = dblVar }
+1144.                assign (=) { lValue = intVar }
                         expr: (/) { right = 2, left = 1 }
-1146.                assign (=)
-                        lValue: lValue { varID = dblVar }
+1146.                assign (=) { lValue = dblVar }
                         expr: (/) { right = 8, left = 3 }
 1149.                var intVar { vt = int, initExpr = 13 }
 1151.                var objArr { vt = array of GameObj }
@@ -2895,20 +2152,16 @@
 1163.                call setHeight { #exprs = 1 }
                         exprs:
 1163.                        (150)
-1175.                call foo
-                        lValue: lValue { varID = Code12Program }
-1177.                call foo
-                        lValue: lValue { varID = Code12 }
+1175.                call foo { lValue = Code12Program }
+1177.                call foo { lValue = Code12 }
 1180.                call log { #exprs = 1 }
                         lValue: lValue { varID = boolVar, indexExpr = 0 }
                         exprs:
-                            lValue { varID = objVar }
-1185.                call voidFunc
-                        lValue: lValue { varID = intArr }
+1180.                        (objVar)
+1185.                call voidFunc { lValue = intArr }
 1188.                call voidFunc
                         lValue: lValue { varID = intArr, indexExpr = 0 }
-1190.                call foo
-                        lValue: lValue { varID = boolVar }
+1190.                call foo { lValue = boolVar }
 1193.                call prnitln { class = ct }
 1195.                call circ { #exprs = 3, class = ct }
                         exprs:
@@ -2933,32 +2186,26 @@
 1213.                        (10)
 1215.                call voidFunc { #exprs = 1 }
                         exprs:
-                            lValue { varID = intVar }
+1215.                        (intVar)
 1217.                call print { #exprs = 2, class = ct }
                         exprs:
 1217.                        ("intVar =")
-                            lValue { varID = intVar }
+1217.                        (intVar)
 1219.                call atan { #exprs = 2, class = Math }
                         exprs:
 1219.                        (4)
 1219.                        (3)
 1221.                call logm { #exprs = 2, class = ct }
                         exprs:
-                            lValue { varID = intVar }
-                            lValue { varID = objVar }
+1221.                        (intVar)
+1221.                        (objVar)
 1223.                var indent { vt = String, initExpr = "2 Tabs" }
-1225.                assign (=) { expr = "1 Space + 2 Tabs" }
-                        lValue: lValue { varID = indent }
-1227.                assign (=) { expr = "2 Tabs" }
-                        lValue: lValue { varID = indent }
-1229.                assign (=) { expr = "8 Spaces" }
-                        lValue: lValue { varID = indent }
-1231.                assign (=) { expr = "2 Tabs" }
-                        lValue: lValue { varID = indent }
-1233.                assign (=) { expr = "4 Spaces + 1 Tab" }
-                        lValue: lValue { varID = indent }
-1235.                assign (=) { expr = "2 Tabs" }
-                        lValue: lValue { varID = indent }
+1225.                assign (=) { lValue = indent, expr = "1 Space + 2 Tabs" }
+1227.                assign (=) { lValue = indent, expr = "2 Tabs" }
+1229.                assign (=) { lValue = indent, expr = "8 Spaces" }
+1231.                assign (=) { lValue = indent, expr = "2 Tabs" }
+1233.                assign (=) { lValue = indent, expr = "4 Spaces + 1 Tab" }
+1235.                assign (=) { lValue = indent, expr = "2 Tabs" }
 1237.                if { expr = false, #stmts = 1 }
                         stmts:
 1239.                        call voidFunc
@@ -3074,26 +2321,20 @@
 1349.                                call voidFunc
 1353.                for { #stmts = 1 }
 1353.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
-                        expr: (<) { right = 100 }
-                            left: lValue { varID = ii }
-1353.                    nextStmt: assign (++)
-                            lValue: lValue { varID = ii }
+                        expr: (<) { right = 100, left = ii }
+1353.                    nextStmt: assign (++) { lValue = ii }
                         stmts:
 1355.                        call voidFunc
 1356.                for { #stmts = 1 }
 1356.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
-                        expr: (<) { right = 100 }
-                            left: lValue { varID = ii }
-1356.                    nextStmt: assign (++)
-                            lValue: lValue { varID = ii }
+                        expr: (<) { right = 100, left = ii }
+1356.                    nextStmt: assign (++) { lValue = ii }
                         stmts:
 1359.                        call voidFunc
 1361.                for { #stmts = 1 }
 1361.                    initStmt: var ii { vt = int, isGlobal = false, initExpr = 0 }
-                        expr: (<) { right = 100 }
-                            left: lValue { varID = ii }
-1361.                    nextStmt: assign (++)
-                            lValue: lValue { varID = ii }
+                        expr: (<) { right = 100, left = ii }
+1361.                    nextStmt: assign (++) { lValue = ii }
                         stmts:
 1364.                        call voidFunc
 1366.                while { expr = false, #stmts = 1 }
@@ -3217,8 +2458,7 @@
 1469.                var publicDouble { vt = double, initExpr = 0 }
 1471.                var halfIntVar { vt = double }
                         initExpr: (/) { right = 2 }
-                            left: cast { vtCast = 0 }
-                                expr: lValue { varID = intVar }
+                            left: cast { expr = intVar, vtCast = 0 }
 1472.                if { expr = false }
 1474.                var bogusVarInit { vt = int, initExpr = 0 }
 1475.                if { expr = false, #elseStmts = 1, #stmts = 1 }
@@ -3333,7 +2573,7 @@
                 initExpr: call min { #exprs = 2, class = Math }
                     exprs:
  30.                    (1000)
-                        lValue { varID = MAX_ENEMIES }
+ 30.                    (MAX_ENEMIES)
  31.        var doubleArr { vt = array of double, isGlobal = true }
                 initExpr: arrayInit { #exprs = 3 }
                     exprs:
@@ -3346,8 +2586,7 @@
  34.        var bottomWall { vt = GameObj, isGlobal = true }
  35.        var enemies { vt = array of GameObj, isGlobal = true }
  36.        var friends { vt = array of GameObj, isGlobal = true }
-                initExpr: newArray { vtElement = "GameObj" }
-                    lengthExpr: lValue { varID = MAX_ENEMIES }
+                initExpr: newArray { vtElement = "GameObj", lengthExpr = MAX_ENEMIES }
  37.        var myPrivateVar { vt = int, isGlobal = true }
 631.        var newWidth { vt = double, isGlobal = true }
                 initExpr: call getWidth { class = ct }

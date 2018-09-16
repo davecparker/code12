@@ -367,28 +367,40 @@ end
 -- Store the isGlobal and vt fields in the lValue, and return the vt. 
 -- If there is an error, then set the error state and return nil.
 local function vtCheckLValue( lValue, assigned )
+	-- An lValue is just an ID node for a simple variable
+	if lValue.tt == "ID" then
+		-- Get the variable and mark it assigned as appropriate
+		local varFound = getVariable( lValue, assigned )
+		if varFound == nil then
+			return nil
+		end
+		if assigned then
+			if varFound.isConst then
+				err.setErrNode( lValue, "Cannot assign to constant (final) variable" )
+			end
+			varFound.assigned = true
+		end
+
+		-- Store the vt and isGlobal in the ID, and return the vt
+		lValue.isGlobal = varFound.isGlobal
+		local vt = varFound.vt
+		lValue.vt = vt
+		return vt
+	end
+
+	-- Full lValue structure
 	assert( lValue.s == "lValue" )
 	local varNode = lValue.varID
 	local indexExpr = lValue.indexExpr
 	local fieldID = lValue.fieldID
 
-	-- Is this a simple variable assignment?
-	local isVarAssign = assigned and (indexExpr == nil and fieldID == nil)
-
 	-- Get the variable and its type, and store isGlobal in the lValue
-	-- mark the variable assigned as appropriate.
-	local varFound = getVariable( varNode, isVarAssign )
+	local varFound = getVariable( varNode )
 	if varFound == nil then
 		return nil
 	end
 	lValue.isGlobal = varFound.isGlobal
 	local vt = varFound.vt
-	if isVarAssign then
-		if varFound.isConst then
-			err.setErrNode( varNode, "Cannot assign to constant (final) variable" )
-		end
-		varFound.assigned = true
-	end
 
 	-- Check array index if any, and get the element type
 	if indexExpr then
@@ -506,7 +518,7 @@ local function findStaticMethod( call )
 	elseif className == "System" then
 		-- System.out.print, System.out.println
 		local lValue = call.lValue
-		if lValue.varID.str == "out" then
+		if lValue.str == "out" then
 			if lValue.indexExpr == nil and lValue.fieldID == nil then
 				method = lookupID( nameID, apiTables["PrintStream"].methods )
 			end
@@ -1119,6 +1131,11 @@ function vtSetExprNode( node )
 	local vt = node.vt
 	if vt ~= nil then
 		return vt
+	end
+
+	-- Is this an ID token (simplified lValue)?
+	if node.tt == "ID" then
+		return vtCheckLValue( node )
 	end
 
 	-- Determine the vt from functions in table above
