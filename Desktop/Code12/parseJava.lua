@@ -288,7 +288,7 @@ end
 
 -- Parse an access specifier (as a function for efficiency).
 -- The resulting valid patterns are "public", "publicStatic",
--- "private", and "empty".
+-- "private", and false (empty).
 local function access()
 	local token = tokens[iToken]
 	local tt = token.tt
@@ -304,7 +304,7 @@ local function access()
 		iToken = iToken + 1
 		return { t = "access", p = "private", nodes = { token } }
 	end
-	return { t = "access", p = "empty", nodes = {} }
+	return false
 end
 
 -- Parse an lValue (as a function for efficiency).
@@ -338,13 +338,13 @@ end
 -- An array index or empty
 local index = { t = "index",
 	{ 12, 12, "index",			"[", expr, "]"			},
-	{ 1, 12, "empty",									},
+	{ 1, 12, false										},
 }
 
 -- An field reference or empty
 local field = { t = "field",
 	{ 6, 12, "field",			".", "ID"				},
-	{ 1, 12, "empty",									},
+	{ 1, 12, false										},
 }
 
 -- An lValue (var or expr that can be assigned to)
@@ -389,7 +389,7 @@ local param = { t = "param",
 -- A formal parameter list, which can be empty
 local paramList = { t = "paramList",
 	{ 10, 12, "list",			param,	list = true, 	 	},
-	{ 1, 12, "empty"										},
+	{ 1, 12, false											},
 }
 
 -- An identifier list (must have a least one)
@@ -403,7 +403,7 @@ local idList = { t = "idList",
 -- An expression list, which can be empty
 local exprList = { t = "exprList",
 	{ 1, 12, "list",			expr,	list = true,  		},
-	{ 1, 12, "empty"										},
+	{ 1, 12, false											},
 }
 
 -- An expression list, which must have at least one
@@ -465,19 +465,19 @@ local whileEnd = { t = "whileEnd",
 local forInit = { t = "forInit",
 	{ 11, 12, "var",			"TYPE", "ID", "=", expr				},
 	{ 11, 12, "stmt",			stmt								},
-	{ 11, 12, "empty",												},
+	{ 11, 12, false													},
 }
 
 -- The expr part of a for loop
 local forExpr = { t = "forExpr",
 	{ 11, 12, "expr",			expr		},
-	{ 11, 12, "empty",						},
+	{ 11, 12, false							},
 }
 
 -- The next part of a for loop
 local forNext = { t = "forNext",
 	{ 11, 12, "stmt",			stmt		},
-	{ 11, 12, "empty",						},
+	{ 11, 12, false							},
 }
 
 -- The control part of a for loop (inside the parens)
@@ -625,6 +625,9 @@ function parseGrammar( grammar )
 		local patternMaxLevel = pattern[2]
 		if syntaxLevel >= patternMinLevel 
 				and (syntaxLevel <= patternMaxLevel or matchCommonErrors) then
+			if p == false then
+				return false   -- empty pattern matches and returns tree = false
+			end
 			-- Try to match this pattern within the grammer table
 			trace("Trying " .. grammar.t .. "[" .. i .. "] (" .. p .. ")")
 			traceIndentLevel = traceIndentLevel + 1
@@ -792,9 +795,9 @@ function parsePattern( pattern )
 			return nil   -- could not parse item
 		end
 
-		-- Store the node and propagate error from if if any
+		-- Store the node and propagate error from it if any
 		nodes[#nodes + 1] = node
-		if node.isError then
+		if node and node.isError then
 			nodes.isError = true
 			return nodes
 		end
@@ -985,8 +988,6 @@ function parseJava.printParseTree( node, indentLevel, file )
 				return
 			end
 			s = s .. node.tt .. " (" .. node.str .. ")"
-		elseif node.p == "empty" then 
-			return   -- empty optional parse node
 		else
 			-- Sub-tree node
 			s = s .. node.t 

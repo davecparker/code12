@@ -43,6 +43,9 @@ local incompleteLines
 -- Expand loc as necessary to contain the location spanned by node,
 -- which can be a token, parse tree node, or strucure node.
 local function expandLocToNode( loc, node )
+	if not node then
+		return
+	end
 	assert( type(node) == "table" )
 	if node.tt then
 		-- Token: update start position if this token is before
