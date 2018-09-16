@@ -10,6 +10,7 @@
 
 -- The parsing module
 package.path = package.path .. ';../Code12/?.lua'
+local source = require( "source" )
 local javalex = require( "javalex" )
 local parseJava = require( "parseJava" )
 local err = require( "err" )
@@ -19,12 +20,6 @@ local err = require( "err" )
 local javaFilename = "TestCode.java"
 local treeFilename = "../ParseTestOutput.txt"   -- in parent so Corona won't trigger re-run
 local outFile
-
--- The user source file
-local sourceFile = {
-	path = nil,              -- full pathname to the file
-	strLines = {},           -- array of source code lines when read
-}
 
 -- Text objects in the app window
 local textObjs = {}
@@ -50,27 +45,6 @@ local function outputAndDisplay( msg )
 	end
 end
 
--- Read the sourceFile and store all of its source lines.
--- Return true if success.
-local function readSourceFile()
-	local file = io.open( sourceFile.path, "r" )
-	if file then
-		sourceFile.strLines = {}   -- delete previous contents if any
-		local lineNum = 1
-		repeat
-			local s = file:read( "*l" )  -- read a line
-			if s == nil then 
-				break  -- end of file
-			end
-			sourceFile.strLines[lineNum] = s
-			lineNum = lineNum + 1
-		until false -- breaks internally
-		io.close( file )
-		return true
-	end
-	return false
-end
-
 -- Trim whitespace from a string (http://lua-users.org/wiki/StringTrim)
 local function trim1(s)
 	return (s:gsub("^%s*(.-)%s*$", "%1"))
@@ -80,8 +54,7 @@ end
 -- Parse the test file and write the parse tree to the output
 local function parseTestCode()
 	-- Read the input file
-	sourceFile.path = javaFilename    -- name is relative to project folder
-	if not readSourceFile() then
+	if not source.readFile( javaFilename ) then
 		error( "Cannot open input file " .. javaFilename )
 	end
 
@@ -105,8 +78,8 @@ local function parseTestCode()
 	parseJava.initProgram()
 	local lineNum = 1
 	local startTokens = nil
-	while lineNum <= #sourceFile.strLines do
-		local strCode = sourceFile.strLines[lineNum]
+	while lineNum <= source.numLines do
+		local strCode = source.lines[lineNum].str
 
 		-- Output source for this line
 		outFile:write( "\n" .. lineNum .. ". " .. trim1( strCode ) .. "\n" )

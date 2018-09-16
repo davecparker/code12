@@ -11,6 +11,7 @@
 
 -- Code12 modules
 package.path = package.path .. ';../Code12/?.lua'
+local source = require( "source" )
 local javaTypes = require( "javaTypes" )
 local javalex = require( "javalex" )
 local parseJava = require( "parseJava" )
@@ -20,7 +21,6 @@ local err = require( "err" )
 -- Input and output files
 local apiSummaryFile = "../../API Summary.txt"
 local apiTablesFile = "../Code12/apiTables.lua"
-local strLines = {}     -- array of source code lines when read
 local outFile           -- output Lua file
 
 -- Data structures used
@@ -28,36 +28,15 @@ local parseTrees   -- array of parse trees
 local classes      -- api information for all classes found
 
 
--- Read the input file and store all of its source lines.
--- Return true if success.
-local function readSourceFile()
-	local file = io.open( apiSummaryFile, "r" )
-	if file then
-		strLines = {}   -- delete previous contents if any
-		local lineNum = 1
-		repeat
-			local s = file:read( "*l" )  -- read a line
-			if s == nil then 
-				break  -- end of file
-			end
-			strLines[lineNum] = s
-			lineNum = lineNum + 1
-		until false -- breaks internally
-		io.close( file )
-		return true
-	end
-	return false
-end
-
 -- Parse the input file and build the parseTrees
 local function parseFile()
 	err.initProgram()
 	parseJava.initProgram()
 	parseTrees = {}
-	for lineNum = 1, #strLines do
+	for lineNum = 1, source.numLines do
 		-- Look for the special pattern "class ID" first, and
 		-- make a "class" line pattern not found in normal grammar
-		local strCode = strLines[lineNum]
+		local strCode = source.lines[lineNum].str
 		local tokens = javalex.getTokens( strCode, lineNum )
 		if tokens and #tokens == 3 and tokens[1].tt == "class" then
 			parseTrees[lineNum] = { t == "line", p = "class", 
@@ -106,21 +85,24 @@ local function buildTables()
 
 			-- Build the parameter table
 			local paramTable = {}
-			local params = nodes[5].nodes
-			for j = 1, #params do
-				local param = params[j]
-				if param.p == "array" then
-					local vtParam = javaTypes.vtFromVarType( param.nodes[1], true )
-					paramTable[#paramTable + 1] = { name = param.nodes[4].str, vt = vtParam }
-				else
-					local typeNode = param.nodes[1]
-					local vtParam
-					if typeNode.str == "Object" then
-						vtParam = nil
+			local paramList = nodes[5]
+			if paramList then
+				local params = paramList.nodes
+				for j = 1, #params do
+					local param = params[j]
+					if param.p == "array" then
+						local vtParam = javaTypes.vtFromVarType( param.nodes[1], true )
+						paramTable[#paramTable + 1] = { name = param.nodes[4].str, vt = vtParam }
 					else
-						vtParam = javaTypes.vtFromVarType( typeNode )
+						local typeNode = param.nodes[1]
+						local vtParam
+						if typeNode.str == "Object" then
+							vtParam = nil
+						else
+							vtParam = javaTypes.vtFromVarType( typeNode )
+						end
+						paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
 					end
-					paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
 				end
 			end
 
@@ -299,7 +281,7 @@ end
 local function runApp()
 	-- Process the test file
 	print("")   -- Make console output easier to see
-	if readSourceFile() then
+	if source.readFile( apiSummaryFile ) then
 		if parseFile() then
 			buildTables()
 			fixOverloads()

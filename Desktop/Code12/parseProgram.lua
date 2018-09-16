@@ -9,6 +9,7 @@
 
 -- Code12 modules
 local app = require( "app" )
+local source = require( "source" )
 local parseJava = require( "parseJava" )
 local javaTypes = require( "javaTypes" )
 local err = require( "err" )
@@ -135,17 +136,18 @@ local function checkMultiLineIndent( tree )
 	end
 end
 
--- Parse the required program header directly from sourceLines and return
+-- Parse the required program header directly from the source and return
 -- (programTree, lineNum) where programTree is the initial programTree structure 
 -- and lineNum is the next line number after the lines processed.
 -- Return nil if there is an unrecoverable error.
-local function parseHeader( sourceLines )
+local function parseHeader()
 	-- "import", "ID", ".", "*", ";", "END"     (ID = "Code12")
+	local lines = source.lines
 	local lineNum = 1
 	local nameID = nil
 	local iLineImport = nil
 	while lineNum <= numSourceLines do
-		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+		local tokens = javalex.getTokens( lines[lineNum].str, lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if tokens[1].tt == "import" then
 				if #tokens == 6 and tokens[2].str == "Code12" 
@@ -172,7 +174,7 @@ local function parseHeader( sourceLines )
 	-- "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
 	local iLineClass = nil
 	while lineNum <= numSourceLines do
-		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+		local tokens = javalex.getTokens( lines[lineNum].str, lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if tokens[1].tt == "public" and tokens[2].tt == "class" then
 				table.remove( tokens, 1 )
@@ -231,7 +233,7 @@ local function parseHeader( sourceLines )
 	-- Beginning { for the class
 	local iLineBegin = nil
 	while lineNum <= numSourceLines do
-		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
+		local tokens = javalex.getTokens( lines[lineNum].str, lineNum )
 		if tokens and #tokens > 1 then  -- skip if blank or lexical error
 			if #tokens == 2 and tokens[1].tt == "{" then
 				iLineBegin = lineNum
@@ -1045,18 +1047,18 @@ end
 
 --- Module Functions ---------------------------------------------------------
 
--- Parse a program made of up sourceLines at the given syntaxLevel 
+-- Parse the source program at the given syntaxLevel 
 -- and return the program structure tree (see above).
 -- If there is an error then set the error state and return nil.
-function parseProgram.getProgramTree( sourceLines, syntaxLevel )
+function parseProgram.getProgramTree( syntaxLevel )
 	-- Init the parse state
 	parseJava.initProgram()
 	parseTrees = {}
-	numSourceLines = #sourceLines
+	numSourceLines = source.numLines
 
 	-- Parse the required program header
 	local lineNum
-	programTree, lineNum = parseHeader( sourceLines )
+	programTree, lineNum = parseHeader()
 	if programTree == nil then
 		return nil
 	end
@@ -1065,7 +1067,7 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	local startTokens = nil
 	local iLineStart = nil
 	while lineNum <= numSourceLines do
-		local tree, tokens = parseJava.parseLine( sourceLines[lineNum], 
+		local tree, tokens = parseJava.parseLine( source.lines[lineNum].str, 
 									lineNum, startTokens, syntaxLevel )
 		if tree == false then
 			-- Line is incomplete, carry tokens forward to next line
