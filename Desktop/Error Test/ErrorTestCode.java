@@ -2,8 +2,8 @@ import Code12.*;
 
 // ERROR "The class header shouldn't be indented"
 	class ErrorTest extends Code12Program
-// ERROR "The { beginning a block should have the same indentation as the line before it"
-{
+// ERROR "The beginning { for the class shouldn't be indented"
+	{
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
 	GameObj button = ct.text("START", 0, 0, 10);
@@ -39,10 +39,10 @@ int underIndentedInstanceVar;
 
 	public static void main(String[] args)
 	{ 
-	// ERROR "The body of a function should be indented more than its opening {"
-	Code12.run(new ErrorTest());
-	// ERROR "main functions's ending } should have the same indentation as its beginning {"
-		}
+		// Note: errors in main are ignored
+		// Standard code here
+		Code12.run(new ErrorTest());
+	}
 
 	// user defined functions
 	void emptyFunc()
@@ -630,29 +630,31 @@ int underIndentedInstanceVar;
 	// ERROR "Class-level variables must be defined at the beginning of the class"
 	double newWidth = ct.getWidth();
 
-	// ERROR "is reserved for use by the system"
-	void ct()
+	// ERROR "cannot start with an underscore"
+	void _fn()
+	// ERROR "Unexpected or extra {"  (because the function header was bad)
 	{
 		ct.println("Hello world");
 	}
 
-	// ERROR "int is a type name, expected a function name here"
-	double int()
+	// ERROR "must be declared starting with"
+	void update()
 	{
+		// ERROR "void functions cannot return a value"
 		return 0;
 	}
-	// ERROR "boolean is a type name"
+	// ERROR "("boolean" is a type name)"
 	double foo(int i, GameObj boolean)
 	{
 		return 0;
 	}
-	// ERROR "Code12 does not allow names that differ only by upper/lower case from known names ("GameObj" is a type name)"
+	// ERROR "("GameObj" is a type name)"
 	boolean bar(String s, GameObj gameObj)
 	{
-		// ERROR "Incorrect case for constant, should be "true""
+		// ERROR "Incorrect case for constant"
 		return TRUE;
 	}
-	// ERROR "Code12 does not allow names that differ only by upper/lower case from known names ("double" is a type name)"
+	// ERROR "("double" is a type name)"
 	int Double(int x)
 	{
 		return 2 * x;
@@ -872,9 +874,9 @@ int underIndentedInstanceVar;
 		// ERROR "Unknown method"
 		objVar.foo();
 
-		// ERROR "Names are case-sensitive"
+		// ERROR "Incorrect case for type name"
 		string ch = "A";
-		// ERROR "Names are case-sensitive"
+		// ERROR "Incorrect case for type name"
 		gameObj obj;
 		// ERROR "Names are case-sensitive"
 		ct.Circle(0,0,10);
@@ -1006,11 +1008,11 @@ int underIndentedInstanceVar;
 		else if(objVar)
 			voidFunc();
 
-		// ERROR "The Integer type is not supported by Code12. Use int instead."
+		// ERROR "Integer is a Java class name"
 		Integer n = 100;
-		// ERROR "The Double type is not supported by Code12. Use double instead."
+		// ERROR "Incorrect case for type name"
 		Double d = 100.0;
-		// ERROR "The Boolean type is not supported by Code12. Use boolean instead."
+		// ERROR "Incorrect case for type name"
 		Boolean b = false;
 
 		// ERROR "+= can only be applied to numbers"
@@ -1054,11 +1056,11 @@ int underIndentedInstanceVar;
 		// ERROR "operator is not supported"
 		i = i >>> 2;
 
-		// ERROR "is reserved for use by the system"
+		// ERROR "was unexpected here"
 		String ct;
-		// ERROR " is a type name, expected a variable name here"
+		// ERROR "("String" is a type name)"
 		int String;
-		// ERROR " is a type name, expected a variable name here"
+		// ERROR "("GameObj" is a type name)"
 		double GameObj;
 
 		int lowercasefirst = 1;
@@ -1160,23 +1162,23 @@ int underIndentedInstanceVar;
 		// ERROR "Code12 function name is"
 		setHeight(150);
 
-		// ERROR "Invalid function name"
+		// ERROR "was unexpected here"
 		intFunc[0]();
-		// ERROR "Invalid function name"
+		// ERROR "was unexpected here"
 		dblFuncIntDbl[intVar](0, 0.1);
 
-		// ERROR "Cannot call methods directly on class GameObj"
+		// ERROR "("GameObj" is a type name)"
 		GameObj.foo();
-		// ERROR "Cannot call methods directly on class String"
+		// ERROR "("String" is a type name)"
 		String.foo();
-		// ERROR "Cannot call methods directly on class Code12Program"
+		// ERROR "expected a variable name here"
 		Code12Program.foo();
-		// ERROR "Cannot call methods directly on class Code12Program"
-		Code12Program.foo();
+		// ERROR "expected a variable name here"
+		Code12.foo();
 
 		// ERROR "An index in [brackets] can only be applied to an array"
-		ct[0].log(objVar);
-		// ERROR "An index in [brackets] can only be applied to an array"
+		boolVar[0].log(objVar);
+		// ERROR "was unexpected here"
 		dblVar = Math[intVar].tan(0);
 		
 		// ERROR "Method call on invalid type (array of int)"
@@ -1194,7 +1196,7 @@ int underIndentedInstanceVar;
 
 		// ERROR "Unknown method"
 		objArr[0].foo();
-		// ERROR "Unknown method"
+		// ERROR "Unknown or unsupported Math method"
 		Math.foo();
 		
 		// ERROR "requires 1 parameter"
@@ -1247,7 +1249,7 @@ int underIndentedInstanceVar;
 		}
 		if (false)
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "if" above it."
+		// ERROR "This line is not controlled by the "if" above it"
 			voidFunc();
 		if (false)
 		{
@@ -1279,7 +1281,7 @@ int underIndentedInstanceVar;
 			voidFunc();
 		else
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "else" above it."
+		// ERROR "This line is not controlled by the "else" above it"
 			voidFunc();
 		if (false)
 			voidFunc();
@@ -1371,7 +1373,7 @@ int underIndentedInstanceVar;
 			}
 		while (false)
 			voidFunc();
-		// ERROR "This line is not controlled by the highlighted "while" above it."
+		// ERROR "This line is not controlled by the "while" above it"
 			voidFunc();
 		do
 		// ERROR "This line should be indented more than its controlling "do""
@@ -1511,8 +1513,8 @@ int underIndentedInstanceVar;
 		void misplacedFunc()
 		// ERROR "Function definitions cannot occur inside a statement block"
 		public static void main(String[] args)
-		// ERROR "Unexpected statement"
-		import Code12.*;
+		// ERROR "Function definitions cannot occur inside a statement block"
+		public void update()
 	}
 
 	// ERROR "Variable myVar was already defined"

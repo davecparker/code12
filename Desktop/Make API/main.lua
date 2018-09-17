@@ -12,6 +12,7 @@
 -- Code12 modules
 package.path = package.path .. ';../Code12/?.lua'
 local javaTypes = require( "javaTypes" )
+local javalex = require( "javalex" )
 local parseJava = require( "parseJava" )
 local err = require( "err" )
 
@@ -30,9 +31,6 @@ local classes      -- api information for all classes found
 -- Read the input file and store all of its source lines.
 -- Return true if success.
 local function readSourceFile()
-	--local path = system.pathForFile( "API Summary.txt", system.ResourceDirectory )
-	--print(path)
-
 	local file = io.open( apiSummaryFile, "r" )
 	if file then
 		strLines = {}   -- delete previous contents if any
@@ -51,33 +49,27 @@ local function readSourceFile()
 	return false
 end
 
--- Trim whitespace from a string (http://lua-users.org/wiki/StringTrim)
-local function trim1(s)
-	return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
 -- Parse the input file and build the parseTrees
 local function parseFile()
+	err.initProgram()
 	parseJava.initProgram()
 	parseTrees = {}
 	for lineNum = 1, #strLines do
-		-- Parse this line
+		-- Look for the special pattern "class ID" first, and
+		-- make a "class" line pattern not found in normal grammar
 		local strCode = strLines[lineNum]
-		local tree = parseJava.parseLine( strCode, lineNum )
-		if tree == false then
-			print( "*** Unexpected incomplete line at line " .. lineNum )
-			return false
-		end
-		if tree == nil then
-			print( "*** Syntax error on line " .. lineNum )
-			if err.hasErr() then
-				print( err.getErrString() )
-			else
-				print( "Unknown error (no error state)" )
+		local tokens = javalex.getTokens( strCode, lineNum )
+		if tokens and #tokens == 3 and tokens[1].tt == "class" then
+			parseTrees[lineNum] = { t == "line", p = "class", 
+				nodes = { tokens[1], tokens[2] } }
+		else
+			-- Parse the line using the normal line grammar
+			local tree = parseJava.parseLine( strCode, lineNum )
+			if not tree or tree.isError then
+				error( "*** Error error on line " .. lineNum )
 			end
-			return false
+			parseTrees[lineNum] = tree
 		end
-		parseTrees[lineNum] = tree
 	end
 	return true
 end
@@ -104,16 +96,34 @@ local function buildTables()
 				return false
 			end
 			local methodName = nodes[3].str
-			local vtReturn = javaTypes.vtFromType( nodes[2].nodes[1] )
+			local retType = nodes[2]
+			local vtReturn
+			if retType.p == "void" then
+				vtReturn = false
+			else
+				vtReturn = javaTypes.vtFromType( retType.nodes[1] )
+			end
+
 			-- Build the parameter table
 			local paramTable = {}
 			local params = nodes[5].nodes
 			for j = 1, #params do
 				local param = params[j]
-				assert( param.p == "var" )
-				local vtParam = javaTypes.vtFromType( param.nodes[1] )
-				paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
+				if param.p == "array" then
+					local vtParam = javaTypes.vtFromVarType( param.nodes[1], true )
+					paramTable[#paramTable + 1] = { name = param.nodes[4].str, vt = vtParam }
+				else
+					local typeNode = param.nodes[1]
+					local vtParam
+					if typeNode.str == "Object" then
+						vtParam = nil
+					else
+						vtParam = javaTypes.vtFromVarType( typeNode )
+					end
+					paramTable[#paramTable + 1] = { name = param.nodes[2].str, vt = vtParam }
+				end
 			end
+
 			-- Add the method record
 			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable }
 		elseif p == "varDecl" then
@@ -141,6 +151,8 @@ local function vtStr( vt )
 		return "true"
 	elseif type(vt) == "string" then
 		return "\"" .. vt .. "\""
+	elseif type(vt) == "table" then
+		return "{ vt = " .. vtStr( vt.vt ) .. " }"
 	else
 		return "nil"  -- might be "Object"
 	end

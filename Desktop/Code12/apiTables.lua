@@ -247,6 +247,7 @@ return {
         ["onchartyped"] = "onCharTyped",
         ["onResize"] = { vt = false, params = {} },
         ["onresize"] = "onResize",
+        ["main"] = { vt = false, params = {{ name = "args", vt = { vt = "String" }}} },
     }
 },
 

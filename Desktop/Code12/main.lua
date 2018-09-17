@@ -81,25 +81,27 @@ end
 -- Read the sourceFile and store all of its source lines.
 -- Return true if success.
 local function readSourceFile()
+	local success = false
 	if sourceFile.path then
 		local file = io.open( sourceFile.path, "r" )
 		if file then
-			sourceFile.timeLoaded = os.time()
-			sourceFile.strLines = {}   -- delete previous contents if any
-			local lineNum = 1
-			repeat
-				local s = file:read( "*l" )  -- read a line
-				if s == nil then 
-					break  -- end of file
-				end
-				sourceFile.strLines[lineNum] = s
-				lineNum = lineNum + 1
-			until false -- breaks internally
+			-- Try to read the first line to see if it's really readable now
+			local s = file:read( "*l" )
+			if s then
+				sourceFile.timeLoaded = os.time()
+				sourceFile.strLines = {}   -- replace previous strLines if any
+				local lineNum = 1
+				repeat
+					sourceFile.strLines[lineNum] = s
+					lineNum = lineNum + 1
+					s = file:read( "*l" )  -- read next line
+				until s == nil
+				success = true
+			end
 			io.close( file )
-			return true
 		end
 	end
-	return false
+	return success
 end
 
 -- Write a Lua source code output file to save the generated code.
@@ -189,7 +191,7 @@ function app.processUserFile()
 	local startTime = system.getTimer()
 	local programTree = parseProgram.getProgramTree( 
 								sourceFile.strLines, app.syntaxLevel )
-	if programTree == nil then
+	if programTree == nil or (err.hasErr() and app.oneErrOnly) then
 		composer.gotoScene( "errView" )
 		return true
 	end
@@ -198,18 +200,14 @@ function app.processUserFile()
 	-- parseProgram.printProgramTree( programTree )
 	checkJava.checkProgram( programTree, app.syntaxLevel )
 	-- parseProgram.printProgramTree( programTree )
-	if err.rec then
+	if err.hasErr() then
 		composer.gotoScene( "errView" )
 	else
 		-- Make and run the Lua code
 		local codeStr = codeGenJava.getLuaCode( programTree )
 		print( string.format( "\nFile processed in %.3f ms\n", system.getTimer() - startTime ) )
-		if err.rec then
-			composer.gotoScene( "errView" )
-		else
-			writeLuaCode( codeStr )
-			runLuaCode( codeStr )
-		end
+		writeLuaCode( codeStr )
+		runLuaCode( codeStr )
 	end
 	return true
 end
