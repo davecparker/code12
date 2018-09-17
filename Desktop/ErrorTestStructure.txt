@@ -1792,7 +1792,7 @@
 759.                    assign (=) { expr = objVar }
                             lValue: lValue { varID = objVar, fieldID = width }
 761.                    assign (=) { lValue = boolVar, expr = objVar }
-763.                    var circle { vt = String }
+763.                    var circleStr { vt = String }
                             initExpr: call circle { #exprs = 3, class = ct }
                                 exprs:
 763.                                (0)

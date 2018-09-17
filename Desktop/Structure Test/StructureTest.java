@@ -103,7 +103,7 @@ class StructureTest extends Code12Program
 		return;
 	}
 
-	public void onMousePress( GameObj obj, double x, double y )
+	public void onMousePress( GameObj /* target */ obj, double x, double y )
 	{
 		ct.logm("Press", obj, x, y);
 		// if (obj != null)

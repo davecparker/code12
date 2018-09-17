@@ -7,6 +7,10 @@
 -- (c)Copyright 2018 by David C. Parker 
 -----------------------------------------------------------------------------------------
 
+-- Code12 modules
+local source = require( "source" )
+
+
 -- The err module
 local err = {
 	bulkTestMode = false    -- set to true for bulk error test drivers
@@ -32,10 +36,6 @@ local errRecForLine
 -- Line numbers for the first and last error known
 local iLineFirstErr
 local iLineLastErr
-
--- A set of lines that were found to be incomplete (map lineNumber to true).
--- The err.iLineRank is determined by the first line that is not incomplete.
-local incompleteLines
 
 
 --- Utility Functions -------------------------------------------------------
@@ -114,10 +114,7 @@ end
 -- Return the line number used to rank an error on iLine 
 -- (incomplete lines are forwarded and reported on the final line).
 local function iLineRankFromILine( iLine )
-	while incompleteLines[iLine] do
-		iLine = iLine + 1
-	end
-	return iLine
+	return source.lines[iLine].iLineStart or iLine
 end
 
 -- Return a string describing the given loc
@@ -141,15 +138,8 @@ end
 -- Init the error state for a new program
 function err.initProgram()
 	errRecForLine = {}
-	incompleteLines = {}
 	iLineFirstErr = nil
 	iLineLastErr = nil
-end
-
--- Mark the given line number as incomplete (tokens were forward to the next line)
-function err.markIncompleteLine( iLine )
-	assert( type(iLine) == "number" )
-	incompleteLines[iLine] = true
 end
 
 -- Record an error with:

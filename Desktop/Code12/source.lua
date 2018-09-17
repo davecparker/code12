@@ -10,16 +10,31 @@
 
 -- The source module with public data fields
 local source =  {
-	path = nil,              -- full pathname to the source code file
-	timeLoaded = 0,          -- time this file was loaded or 0 if not loaded
-	timeModLast = 0,         -- last modification time or 0 if unknown
-	updated = false,         -- set to true when file update is detected
-	numLines = 0,            -- number of source lines
-	lines = {},              -- array of record for each source line, each with:
+	-- These are set by the main program
+	path = nil,                  -- full pathname to the source code file
+	timeModLast = 0,             -- last modification time or 0 if unknown
+	updated = false,             -- set to true when file update is detected
+
+	-- These are set by source.readFile()
+	timeLoaded = 0,              -- time this file was loaded or 0 if not loaded
+	numLines = 0,                -- number of source lines
+	lines = {},                  -- array of record for each source line, each with:
 	-- {
-	--     iLine = number,       -- index of this record in lines (line number in file)
-	--     str = string,         -- source code string for this line
-	--     comment = string,     -- comment string at end of this line if any
+	--     -- These are set by source.readFile()
+	--     iLine,                -- line number in file = index of this record in lines
+	--     str,                  -- source code string for this line
+	--
+	--     -- These are set by lexical analysis
+	--     commentStr,           -- comment string at end of the line or nil if none
+	--     iLineCommentStart,    -- start iLine of block comment involving this line, or nil
+	--     openComment,          -- true if line ends with an unclosed block comment
+	--     hasCode,              -- true if the line has code (not blank or just comment)
+	--     indentLevel,          -- indent level calculated for this line
+	--     indentStr,            -- substring of line that is indent at the beginning
+	--
+	--     -- These are set by line parsing
+	--     iLineStart,           -- starting line number if multi-line parse, else nil
+	--     parseTree,            -- parse tree for line, false if incomplete, nil if error
 	-- }
 }
 

@@ -102,11 +102,10 @@ local nameFromLuaReservedWord = {
 -- If indent then the comment needs to be indented.
 local function endLuaLine( indent )
 	if enableComments then
-		local strComment = source.lines[luaLineNum].comment
+		local strComment = source.lines[luaLineNum].commentStr
 		if strComment then
 			if indent then
 				luaCodeStrs[#luaCodeStrs + 1] = strIndents[blockLevel] or ""
-				print("indented", luaLineNum, "[" .. strIndents[blockLevel] .. "]")
 			end
 			luaCodeStrs[#luaCodeStrs + 1] = (luaLineIsBlank and "--") or "   --"
 			luaCodeStrs[#luaCodeStrs + 1] = strComment

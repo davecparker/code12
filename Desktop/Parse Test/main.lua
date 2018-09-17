@@ -75,11 +75,13 @@ local function parseTestCode()
 	local numExpectedErrors = 0
 	local numUncaughtErrors = 0
 	local startTime = system.getTimer()
-	parseJava.initProgram()
 	local lineNum = 1
 	local startTokens = nil
+	local iLineStart = nil
+	local iLineCommentStart = nil   -- set when inside a block comment
 	while lineNum <= source.numLines do
-		local strCode = source.lines[lineNum].str
+		local lineRec = source.lines[lineNum]
+		local strCode = lineRec.str
 
 		-- Output source for this line
 		outFile:write( "\n" .. lineNum .. ". " .. trim1( strCode ) .. "\n" )
@@ -89,11 +91,23 @@ local function parseTestCode()
 			errorSection = true
 			output( "************** Beginning of Expected Errors Section **************" )
 		else
-			-- Parse this line
-			local tree, tokens = parseJava.parseLine( strCode, lineNum, startTokens ) -- TODO: Set and change syntax level?
+			-- Parse this line  TODO: Use parseProgram?
+			local tree, tokens = parseJava.parseLine( lineRec, iLineCommentStart, 
+									startTokens, iLineStart ) -- TODO: Set and change syntax level?
+
+			-- Keep track of open block comments
+			if lineRec.openComment then
+				iLineCommentStart = lineRec.iLineCommentStart
+			else
+				iLineCommentStart = nil
+			end
+
 			if tree == false then
 				-- This line is unfinished, carry the tokens forward to the next line
 				startTokens = tokens
+				if iLineStart == nil then
+					iLineStart = lineNum
+				end
 				outFile:write( "-- Incomplete line carried forward\n" )
 			else
 				startTokens = nil

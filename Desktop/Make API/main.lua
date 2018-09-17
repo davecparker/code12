@@ -31,19 +31,18 @@ local classes      -- api information for all classes found
 -- Parse the input file and build the parseTrees
 local function parseFile()
 	err.initProgram()
-	parseJava.initProgram()
 	parseTrees = {}
 	for lineNum = 1, source.numLines do
 		-- Look for the special pattern "class ID" first, and
 		-- make a "class" line pattern not found in normal grammar
-		local strCode = source.lines[lineNum].str
-		local tokens = javalex.getTokens( strCode, lineNum )
+		local lineRec = source.lines[lineNum]
+		local tokens = javalex.getTokens( lineRec )
 		if tokens and #tokens == 3 and tokens[1].tt == "class" then
 			parseTrees[lineNum] = { t == "line", p = "class", 
 				nodes = { tokens[1], tokens[2] } }
 		else
 			-- Parse the line using the normal line grammar
-			local tree = parseJava.parseLine( strCode, lineNum )
+			local tree = parseJava.parseLine( lineRec )
 			if not tree or tree.isError then
 				error( "*** Error error on line " .. lineNum )
 			end

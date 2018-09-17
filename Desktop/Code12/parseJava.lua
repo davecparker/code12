@@ -9,6 +9,7 @@
 
 -- Code12 modules used
 local app = require( "app" )
+local source = require( "source" )
 local err = require( "err" )
 local javalex = require( "javalex" )
 local javaTypes = require( "javaTypes" )
@@ -38,8 +39,7 @@ local syntaxFeatures = {
 local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
-local sourceLine          -- the current source code line
-local lineNumber          -- the line number for sourceLine
+local lineNumber          -- the line number for the line being parsed
 local tokens              -- array of tokens
 local iToken              -- index of current token in tokens
 local syntaxLevel         -- the syntax level for parsing
@@ -881,7 +881,7 @@ local function parseCurrentLine( level )
 	if not err.bulkTestMode then
 		local logFile = io.open( "../SyntaxErrors.txt", "a" )
 		if logFile then
-			logFile:write( sourceLine )
+			logFile:write( source.lines[lineNumber].str )
 			logFile:write( "\n" )
 			io.close( logFile )
 		end
@@ -893,11 +893,6 @@ end
 
 
 ----- Module functions -------------------------------------------------------
-
--- Init the parsing state for a program
-function parseJava.initProgram()
-	javalex.initProgram()
-end
 
 -- If nameNode is an invalid name ID then set the error state and return true,
 -- otherwise return false. Usage should be a description of how the name is 
@@ -924,18 +919,19 @@ function parseJava.isInvalidID( nameNode, usage, existing )
 	return true
 end
 
--- Parse the given line of code at the given syntax level (default numSyntaxLevels).
+-- Parse the lineRec at the given syntax level (default numSyntaxLevels).
+-- If iLineCommentStart then the line starts inside an open comment started there.
 -- If startTokens is not nil, it is an array of tokens from a previous unfinished
--- line to prepend to the tokens found on this line.
--- Return the parse tree (a recursive array of tokens and/or nodes) if successful.
--- The given iLine will be assigned to the tokens found and the resulting tree.
+-- line to prepend to the tokens found on this line, and iLineStart is the first line
+-- of the multi-line parse.
+-- Return (parseTree, tokens) if successful, store the results in the lineRec,
+-- and set the iLine, iLineStart, and indentLevel fields in the parse tree root node.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
-function parseJava.parseLine( strLine, iLine, startTokens, level )
+function parseJava.parseLine( lineRec, iLineCommentStart, startTokens, iLineStart, level )
 	-- Run lexical analysis to get the tokens array
-	sourceLine = strLine
-	lineNumber = iLine
-	tokens = javalex.getTokens( sourceLine, iLine )
+	lineNumber = lineRec.iLine
+	tokens = javalex.getTokens( lineRec, iLineCommentStart )
 	if tokens == nil then
 		return nil
 	end
@@ -963,16 +959,24 @@ function parseJava.parseLine( strLine, iLine, startTokens, level )
 	assert( tokens[#tokens].tt == "END" )
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
 	if lastToken and lastToken.tt == "," then
-		err.markIncompleteLine( iLine )
+		lineRec.iLineStart = iLineStart
+		lineRec.parseTree = false
 		return false, tokens
 	end
 
 	-- Try to parse the line
 	local tree = parseCurrentLine( level or numSyntaxLevels )
-	if tree then
-		tree.iLine = iLine  -- store Java line number in the top tree node
+	if tree == nil then
+		return nil
 	end
-	return tree
+
+	-- Store and return results
+	tree.iLine = lineNumber
+	iLineStart = iLineStart or lineNumber
+	tree.iLineStart = iLineStart
+	tree.indentLevel = source.lines[iLineStart].indentLevel
+	lineRec.parseTree = tree
+	return tree, tokens
 end
 
 -- Print a parse tree recursively at the given indentLevel.

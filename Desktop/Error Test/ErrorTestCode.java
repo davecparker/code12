@@ -760,7 +760,7 @@ int underIndentedInstanceVar;
 		// ERROR "Value of type GameObj cannot be assigned to type boolean"
 		boolVar = objVar;
 		// ERROR "A GameObj cannot be assigned to a String"
-		String circle = ct.circle(0,0,10);
+		String circleStr = ct.circle(0,0,10);
 		
 		// ERROR "expects type int, but double was passed"
 		int y = intFuncInt(2.3);
