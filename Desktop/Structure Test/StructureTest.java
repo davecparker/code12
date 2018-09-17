@@ -14,11 +14,11 @@ class StructureTest extends Code12Program
 	double speed = 0.3;
 	int frameCount = 0;
 	int newCount = frameCount + 2 * -frameCount;
-	String str = "Testing";
+	String str = "Testing" + 3;
 
 	public static void main(String[] args)
 	{ 
-		Code12.run(new StructureTest()); 
+		Code12.run(new StructureTest());
 	}
 
 	public void start()
@@ -26,7 +26,7 @@ class StructureTest extends Code12Program
 		final int X = 50;
 		int y;
 		y = X;
-		/* comment */
+		ct.rect( X, 10, 50, 10 );
 		ball = ct.circle( X, y, 30 );
 		ball.setFillColor( "blue" );
 		frameCount = foo( LIMIT, speed * 2 );
@@ -42,6 +42,10 @@ class StructureTest extends Code12Program
 
 	int test(int i, double d)
 	{
+		int whILEe = 3;
+		double z, y, w;
+
+		i = foo( 3, 4 );
 		if (i < 0)
 			return i + 1;
 		else
@@ -93,6 +97,7 @@ class StructureTest extends Code12Program
 
 	public void onMousePress( GameObj obj, double x, double y )
 	{
+		ct.logm("Press", obj, x, y);
 		// if (obj != null)
 		// {
 		// 	obj.xSpeed = .1;
@@ -100,6 +105,11 @@ class StructureTest extends Code12Program
 		// }
 		// else
 		// 	ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
+	}
+
+	public void onMouseRelease( GameObj obj, double x, double y )
+	{
+		ct.logm("Release", obj, x, y);
 	}
 
 	// Move the ball
@@ -112,16 +122,21 @@ class StructureTest extends Code12Program
 			if (ball.x > 100)
 				ball.x = 0;
 		}
+		String in;
 		return (int) ball.x;
 	}
 
 	GameObj[] makeCircles()
 	{
 		GameObj[] circles = new GameObj[10];
+		// GameObj goo = new GameObj(10, 20, 30);
 		for (GameObj c: circles)
 			c.setFillColor( "black" );
 		int[] scores = { 10, 20, 30 };
+		double[] ratios = { 0, 1, 2 };
+		GameObj[] coins = { null, circles[1], null, circles[2] };
 		return circles;
 	}
+
 }
 

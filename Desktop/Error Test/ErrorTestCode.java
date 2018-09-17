@@ -1,7 +1,9 @@
 import Code12.*;
 
-class ErrorTest extends Code12Program
-{
+// ERROR "The class header shouldn't be indented"
+	class ErrorTest extends Code12Program
+// ERROR "The beginning { for the class shouldn't be indented"
+	{
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
 	GameObj button = ct.text("START", 0, 0, 10);
@@ -11,11 +13,35 @@ class ErrorTest extends Code12Program
 		int overIndentedInstanceVar;
 	// ERROR "Class-level variable and function definitions should all have the same indentation"
 int underIndentedInstanceVar;
+	int[] classLevelMultilineIntArray1 = { 1,
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	2 };
+	int[] classLevelMultilineIntArray2 = { 1,
+		2,
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	3 };
+	int[] classLevelMultilineIntArray3 = new int[ Math.max(1,
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	2) ];
+	// ERROR "double cannot be assigned to an int"
+	int classLevelVarTypeMismatchIntDouble = 0.1;
+	// Error-free class-level variables
+	final int MAX_ENEMIES = 100;
+	int numEnemies = Math.min(1000, MAX_ENEMIES);
+	double[] doubleArr = { 1.0,
+		2.0,
+		3.0 };
+	GameObj leftWall, rightWall, topWall, bottomWall;
+	GameObj[] enemies;
+	public GameObj[] friends = new GameObj[MAX_ENEMIES];
+	private int myPrivateVar;
 	// TODO: Need more tests involving instance (class-level) variables
 
 	public static void main(String[] args)
 	{ 
-		Code12.run(new ErrorTest()); 
+		// Note: errors in main are ignored
+		// Standard code here
+		Code12.run(new ErrorTest());
 	}
 
 	// user defined functions
@@ -604,29 +630,31 @@ int underIndentedInstanceVar;
 	// ERROR "Class-level variables must be defined at the beginning of the class"
 	double newWidth = ct.getWidth();
 
-	// ERROR "is reserved for use by the system"
-	void ct()
+	// ERROR "cannot start with an underscore"
+	void _fn()
+	// ERROR "Unexpected or extra {"  (because the function header was bad)
 	{
 		ct.println("Hello world");
 	}
 
-	// ERROR "int is a type name, expected a function name here"
-	double int()
+	// ERROR "must be declared starting with"
+	void update()
 	{
+		// ERROR "void functions cannot return a value"
 		return 0;
 	}
-	// ERROR "boolean is a type name"
+	// ERROR "("boolean" is a type name)"
 	double foo(int i, GameObj boolean)
 	{
 		return 0;
 	}
-	// ERROR "Code12 does not allow names that differ only by upper/lower case from known names ("GameObj" is a type name)"
+	// ERROR "("GameObj" is a type name)"
 	boolean bar(String s, GameObj gameObj)
 	{
-		// ERROR "Incorrect case for constant, should be "true""
+		// ERROR "Incorrect case for constant"
 		return TRUE;
 	}
-	// ERROR "Code12 does not allow names that differ only by upper/lower case from known names ("double" is a type name)"
+	// ERROR "("double" is a type name)"
 	int Double(int x)
 	{
 		return 2 * x;
@@ -639,7 +667,7 @@ int underIndentedInstanceVar;
 	void func()
 	{
 	}
-	// ERROR "Names are case-sensitive"
+	// ERROR "differs only by upper/lower case from existing function"
 	void FUNC()
 	{
 	}
@@ -647,7 +675,7 @@ int underIndentedInstanceVar;
 	void AnotherFunc()
 	{
 	}	
-	// ERROR "Names are case-sensitive"
+	// ERROR "differs only by upper/lower case from existing function"
 	void anotherfunc()
 	{
 	}
@@ -819,7 +847,7 @@ int underIndentedInstanceVar;
 		ct.random( intVar / intVar, intVar );
 		// ERROR "Undefined variable x"
 		x = x + 1;
-		// ERROR "Undefined variable x"
+		// ERROR "must be declared with a type before being assigned"
 		for (x = 0; x < 1; x++) 
 			voidFunc();
 		// ERROR "Undefined function foo"
@@ -846,9 +874,9 @@ int underIndentedInstanceVar;
 		// ERROR "Unknown method"
 		objVar.foo();
 
-		// ERROR "Names are case-sensitive"
+		// ERROR "Incorrect case for type name"
 		string ch = "A";
-		// ERROR "Names are case-sensitive"
+		// ERROR "Incorrect case for type name"
 		gameObj obj;
 		// ERROR "Names are case-sensitive"
 		ct.Circle(0,0,10);
@@ -980,11 +1008,11 @@ int underIndentedInstanceVar;
 		else if(objVar)
 			voidFunc();
 
-		// ERROR "The Integer type is not supported by Code12. Use int instead."
+		// ERROR "Integer is a Java class name"
 		Integer n = 100;
-		// ERROR "The Double type is not supported by Code12. Use double instead."
+		// ERROR "Incorrect case for type name"
 		Double d = 100.0;
-		// ERROR "The Boolean type is not supported by Code12. Use boolean instead."
+		// ERROR "Incorrect case for type name"
 		Boolean b = false;
 
 		// ERROR "+= can only be applied to numbers"
@@ -1028,18 +1056,18 @@ int underIndentedInstanceVar;
 		// ERROR "operator is not supported"
 		i = i >>> 2;
 
-		// ERROR "is reserved for use by the system"
+		// ERROR "was unexpected here"
 		String ct;
-		// ERROR " is a type name, expected a variable name here"
+		// ERROR "("String" is a type name)"
 		int String;
-		// ERROR " is a type name, expected a variable name here"
+		// ERROR "("GameObj" is a type name)"
 		double GameObj;
 
 		int lowercasefirst = 1;
-		// ERROR "Names are case-sensitive, known name is"
+		// ERROR "differs only by upper/lower case from existing variable"
 		int lowerCaseFirst = 10;
 		GameObj upperCaseFirst = objVar;
-		// ERROR "Names are case-sensitive, known name is"
+		// ERROR "differs only by upper/lower case from existing variable"
 		GameObj uppercasefirst = null;
 		// ERROR "Names are case-sensitive, known name is"
 		dblVar = dblvar + 1;
@@ -1134,23 +1162,23 @@ int underIndentedInstanceVar;
 		// ERROR "Code12 function name is"
 		setHeight(150);
 
-		// ERROR "Invalid function name"
+		// ERROR "was unexpected here"
 		intFunc[0]();
-		// ERROR "Invalid function name"
+		// ERROR "was unexpected here"
 		dblFuncIntDbl[intVar](0, 0.1);
 
-		// ERROR "Cannot call methods directly on class GameObj"
+		// ERROR "("GameObj" is a type name)"
 		GameObj.foo();
-		// ERROR "Cannot call methods directly on class String"
+		// ERROR "("String" is a type name)"
 		String.foo();
-		// ERROR "Cannot call methods directly on class Code12Program"
+		// ERROR "expected a variable name here"
 		Code12Program.foo();
-		// ERROR "Cannot call methods directly on class Code12Program"
-		Code12Program.foo();
+		// ERROR "expected a variable name here"
+		Code12.foo();
 
 		// ERROR "An index in [brackets] can only be applied to an array"
-		ct[0].log(objVar);
-		// ERROR "An index in [brackets] can only be applied to an array"
+		boolVar[0].log(objVar);
+		// ERROR "was unexpected here"
 		dblVar = Math[intVar].tan(0);
 		
 		// ERROR "Method call on invalid type (array of int)"
@@ -1168,7 +1196,7 @@ int underIndentedInstanceVar;
 
 		// ERROR "Unknown method"
 		objArr[0].foo();
-		// ERROR "Unknown method"
+		// ERROR "Unknown or unsupported Math method"
 		Math.foo();
 		
 		// ERROR "requires 1 parameter"
@@ -1221,7 +1249,7 @@ int underIndentedInstanceVar;
 		}
 		if (false)
 			voidFunc();
-		// ERROR "Unexpected change in indentation"
+		// ERROR "This line is not controlled by the "if" above it"
 			voidFunc();
 		if (false)
 		{
@@ -1253,7 +1281,7 @@ int underIndentedInstanceVar;
 			voidFunc();
 		else
 			voidFunc();
-			// ERROR "Unexpected change in indentation"
+		// ERROR "This line is not controlled by the "else" above it"
 			voidFunc();
 		if (false)
 			voidFunc();
@@ -1301,7 +1329,7 @@ int underIndentedInstanceVar;
 		if (false)
 			if (false)
 					voidFunc();
-			// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
 		else
 			voidFunc();
 		if (false)
@@ -1314,7 +1342,7 @@ int underIndentedInstanceVar;
 			{
 				voidFunc();
 			}
-			// ERROR "A block's ending } should have the same indentation as its beginning {"
+		// ERROR "A block's ending } should have the same indentation as its beginning {"
 			}
 		if (false)
 			if (false)
@@ -1345,7 +1373,7 @@ int underIndentedInstanceVar;
 			}
 		while (false)
 			voidFunc();
-		// ERROR "Unexpected change in indentation"
+		// ERROR "This line is not controlled by the "while" above it"
 			voidFunc();
 		do
 		// ERROR "This line should be indented more than its controlling "do""
@@ -1374,6 +1402,119 @@ int underIndentedInstanceVar;
 		int[] multiLineArrInit = { 1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		2 };
+		int[] multiLineArrDec = new int[ct.random(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		10)];
+		if ( ct.random(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2) > 3 )
+			voidFunc();
+		else if ( ct.random(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2) > 3 )
+			voidFunc();
+		while ( ct.random(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2) > 3 )
+			voidFunc();
+		do
+			voidFunc();
+		while( Math.max(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		0) < 0 );
+		for (;Math.max(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		0) < 0; )
+			voidFunc();
+		if (false)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "if" above it"
+			voidFunc();
+		if (false)
+			voidFunc();
+		else
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "else" above it"
+			voidFunc();
+		if (false)
+			voidFunc();
+		else if (false)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "elseif" above it"
+			voidFunc();
+		if (false)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "if" above it"
+			while (false)
+				voidFunc();
+		for (;false;)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "for" above it"
+			voidFunc();	
+		while (false)
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "while" above it"
+			voidFunc();
+		do
+			voidFunc();
+		// ERROR This line is not controlled by the highlighted "do" above it"
+			voidFunc();
+		do
+			voidFunc();
+			// ERROR This line is not controlled by the highlighted "do" above it"
+			while (false)
+		// ERROR "Access specifiers are only allowed on class-level variables"
+		private int privateInt = 0;
+		// ERROR "Access specifiers are only allowed on class-level variables"
+		public double publicDouble = 0;
+		// ERROR "The only type cast supported by Code12 is (int)"
+		double halfIntVar = (double) intVar / 2;
+		if (false)
+		// ERROR "Variable declarations are not allowed here"
+			int bogusVarInit = 0;
+		if (false)
+			voidFunc();
+		else if (false)
+		// ERROR "Variable declarations are not allowed here"
+			int bogusVarDecl;
+		if (false)
+			voidFunc();
+		else
+		// ERROR "Variable declarations are not allowed here"
+			int[] bogusArrayInit = { 0 };	
+		while (false)
+		// ERROR "Variable declarations are not allowed here"
+			int[] bogusArrayDecl;
+		// ERROR "else without matching if (misplaced { } brackets?)"
+		else
+		do
+			voidFunc();
+		// ERROR "Expected while statement to end do-while loop"
+		voidFunc();
+		do
+		{
+			voidFunc();
+		}
+		// ERROR "Expected while statement to end do-while loop"
+		voidFunc();
+		do
+			voidFunc();
+		// ERROR "while statement at end of do-while loop must end with a semicolon"
+		while (false)
+		do
+		{
+			voidFunc();
+		}
+		// ERROR "while statement at end of do-while loop must end with a semicolon"
+		while (false)
+		// ERROR "while loop header should not end with a semicolon"
+		while (false);
+		// ERROR "Function definitions cannot occur inside a statement block"
+		void misplacedFunc()
+		// ERROR "Function definitions cannot occur inside a statement block"
+		public static void main(String[] args)
+		// ERROR "Function definitions cannot occur inside a statement block"
+		public void update()
 	}
 
 	// ERROR "Variable myVar was already defined"
@@ -1442,5 +1583,16 @@ void underIndentedFunc()
 	int arg2 )
 	{
 	}
-}
-
+	int multilineReturnFunc()
+	{
+		return Math.max(1,
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		2);
+	}
+	void missingCurlyBracketFunc()
+	// ERROR "Expected {"
+	void lastFunc()
+	{
+	}
+	// ERROR "The ending } of the program class should not be indented"
+	}

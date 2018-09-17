@@ -33,9 +33,8 @@ all of the above constructs. Intentionally left out are:
 * No class definitions. All code must live inside the MainProgram class.
 * The only object types allowed are GameObj and String.
 * No use of new, except for arrays. GameObj and String objects are returned by methods.
-* No use of the Java Class Library beyond the String and Math methods indicated.
-* No use of byte, char, short, long, or float (only int, double, and bool).
-* No type casts (use the conversion functions provided).
+* No use of the Java Class Library beyond the String and Math methods indicated, and System.out.print/ln.
+* No use of byte, char, short, long, or float (only int, double, and boolean).
 
 There will be other syntax restrictions as well, and some enforcement of style,
 for example:
@@ -44,11 +43,11 @@ for example:
 * Line breaks are only allowed after complete statements/constructs, 
   with a few exceptions (such as after a comma in a parameter list).
 * if and else and the controlled statements must be all on their own lines.
-* For now, { and } must always be on their own line.
+* { and } must always be on their own line.
 * Assignment operators (=, +=, etc.) and ++ and -- make statements not expressions.
 * Object field/method access cannot be chained, so no a.b.c or a().b
 * No overloading in user-defined functions (only one parameter list signature).
-* Indentation errors will be enforced or warned. 
+* Indentation style is enforced.
 
 
 Ideas for Programming Concepts as Levels

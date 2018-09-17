@@ -162,6 +162,9 @@ end
 -- If assigned then the lValue is being assigned to, otherwise it is being read.  
 local function varIndexCode( lValue, assigned )
 	-- Get code for the variable
+	if lValue.tt == "ID" then   -- simple variable ID node
+		return varNameCode( lValue.str, lValue.isGlobal )
+	end
 	local varCode = varNameCode( lValue.varID.str, lValue.isGlobal )
 	local indexExpr = lValue.indexExpr
 	if indexExpr == nil then
@@ -183,18 +186,23 @@ end
 local function lValueCode( lValue, assigned )
 	local code = varIndexCode( lValue, assigned )
 	if lValue.fieldID then
-		local fieldName = lValue.fieldID.str
-		if lValue.varID.str == "Math" then
-			if fieldName == "PI" then
-				return "math.pi"
-			elseif fieldName == "E" then
-				return "math.exp(1)"
-			end
-		end
-		code = code .. "." .. fieldName
+		code = code .. "." .. lValue.fieldID.str
 	end
 	return code
 end
+
+-- Return Lua code for a static field
+local function staticFieldCode( expr )
+	if expr.class.str == "Math" then
+		local fieldName = expr.fieldID.str
+		if fieldName == "PI" then
+			return "math.pi"
+		elseif fieldName == "E" then
+			return "math.exp(1)"
+		end
+	end
+	return "nil"   -- shouldn't happen
+end 
 
 -- Return Lua code for a function name
 local function fnNameCode( fnName )
@@ -203,7 +211,7 @@ end
 
 -- Return Lua code for expr promoted to a string
 local function stringExprCode( expr )
-	local vt = expr.info.vt
+	local vt = expr.vt
 	if vt == "String" then
 		return exprCode( expr )
 	elseif vt == "GameObj" then
@@ -226,56 +234,48 @@ local function defaultValueCodeForVt( vt )
 	end
 end
 
--- Return the Lua code string for a literal expr
-local function literalCode( expr )
-	local token = expr.token
-	if token.tt == "NULL" then
-		return "nil"
-	else
-		return token.str
-	end
-end
-
--- Return the Lua code string for a function or method call given
--- the lValue, nameID, and exprs of the call structure.
-local function callCode( lValue, nameID, exprs )
-	local parts   -- array of strings for a table.concat
+-- Return the Lua code string for a call structure.
+local function callCode( call )
+	local class = call.class
+	local lValue = call.lValue
+	local nameID = call.nameID
+	local methodName = nameID.str
+	local exprs = call.exprs
 	local numExprs = (exprs and #exprs) or 0
-	if lValue == nil then
-		-- User-defined function call
-		parts = { fnNameCode( nameID.str ), "(" }   -- e.g. _fn.updateScore(
-	else
-		-- Method call
-		local varID = lValue.varID
-		local varName = varID.str
-		local methodName = nameID.str
-		if varName == "ct" or varName == "System" then
+	local parts   -- array of strings for a table.concat
+
+	if class then
+		local className = class.str
+		if className == "ct" or className == "System" then
 			-- Note that System.out.xxx maps to ct.xxx
 			-- Check special case: ct.println() with no params needs to generate ct.println("")
 			if methodName == "println" and numExprs == 0 then
 				return 'ct.println( "" )'
 			end
 			parts = { ctPrefix, methodName, "(" }    -- e.g. ct.circle(
-		elseif varName == "Math" then 
+		elseif className == "Math" then 
 			-- Lua math.xxx is the same as Java Math.xxx for all supported methods :)
 			parts = { "math.", methodName, "(" }
-		elseif lValue.vt == "String" then
-			-- String methods
-			if methodName == "equals" then
-				-- Lua can compare strings directly with ==
-				return "(" .. varIndexCode( lValue ) 
-						.. " == " .. exprCode( exprs[1] ) .. ")"
-			end
-			-- Map to corresponding global Lua function, passing the object.  
-			parts = { luaFnFromJavaStringMethod[methodName], "(", 
-					varIndexCode( lValue ) }
-			if numExprs > 0 then
-				parts[#parts + 1] = ", "
-			end
-		else
-			-- GameObj method, e.g. obj:delete(
-			parts = { varIndexCode( lValue ), ":", methodName, "(" }
 		end
+	elseif lValue == nil then
+		-- User-defined function call
+		parts = { fnNameCode( methodName ), "(" }   -- e.g. _fn.updateScore(
+	elseif lValue.vt == "String" then
+		-- String methods
+		if methodName == "equals" then
+			-- Lua can compare strings directly with ==
+			return "(" .. varIndexCode( lValue ) 
+					.. " == " .. exprCode( exprs[1] ) .. ")"
+		end
+		-- Map to corresponding global Lua function, passing the object.  
+		parts = { luaFnFromJavaStringMethod[methodName], "(", 
+				varIndexCode( lValue ) }
+		if numExprs > 0 then
+			parts[#parts + 1] = ", "
+		end
+	else
+		-- GameObj method, e.g. obj:delete(
+		parts = { lValueCode( lValue ), ":", methodName, "(" }
 	end
 
 	-- Add the parameter value exprs
@@ -291,7 +291,7 @@ end
 
 -- Return the Lua code string for a call expr
 local function callExprCode( expr )
-	return callCode( expr.lValue, expr.nameID, expr.exprs )
+	return callCode( expr )
 end
 
 -- Return the Lua code string for a type cast
@@ -315,7 +315,7 @@ local function binOpCode( expr )
 	local luaOp = luaOpFromOpType[expr.opType]
 	if luaOp == nil then
 		return "nil"   -- unsupported operator (may be continuing on errors)
-	elseif luaOp == "+" and expr.vt == "String" then
+	elseif expr.opType == "+" and expr.vt == "String" then
 		-- String concat, not add. Promote left and right to string as needed.
 		return stringExprCode( expr.left ) .. " .. " .. stringExprCode( expr.right )
 	end
@@ -325,42 +325,55 @@ end
 -- Return the Lua code string for a newArray expr
 local function newArrayCode( expr )
 	return "{ length = " .. exprCode( expr.lengthExpr )
-			.. ", default = " ..  defaultValueCodeForVt( expr.vt ) .. " }"
+			.. ", default = " ..  defaultValueCodeForVt( expr.vtElement ) .. " }"
 end
 
 -- Return the Lua code string for an arrayInit expr
 local function arrayInitCode( expr )
 	local codeStrs = { "{ " }
+	local length = 0
 	if expr.exprs then
 		for _, ex in ipairs( expr.exprs ) do
 			codeStrs[#codeStrs + 1] = exprCode( ex )
 			codeStrs[#codeStrs + 1] = ", "
+			length = length + 1
 		end
 	end
-	codeStrs[#codeStrs + 1] = "}"
+	codeStrs[#codeStrs + 1] = "length = " .. length
+	codeStrs[#codeStrs + 1] = " }"
 	return table.concat( codeStrs )
 end
 
 -- Functions to generate code for the various expr types
 local fnGenerateExpr = {
-	["literal"]    = literalCode,
-	["call"]       = callExprCode,
-	["lValue"]     = lValueCode,
-	["cast"]       = castCode,
-	["parens"]     = parensCode,
-	["unaryOp"]    = unaryOpCode,
-	["binOp"]      = binOpCode,
-	["newArray"]   = newArrayCode,
-	["arrayInit"]  = arrayInitCode,
+	["call"]         = callExprCode,
+	["lValue"]       = lValueCode,
+	["staticField"]  = staticFieldCode,
+	["cast"]         = castCode,
+	["parens"]       = parensCode,
+	["unaryOp"]      = unaryOpCode,
+	["binOp"]        = binOpCode,
+	["newArray"]     = newArrayCode,
+	["arrayInit"]    = arrayInitCode,
+	-- "new" is not allowed outside main, which doesn't generate code
 }
 
 -- Return the Lua code for the given expr
 function exprCode( expr )
-	local fn = fnGenerateExpr[expr.s]
-	if fn then
-		return fn( expr )
+	local tt = expr.tt
+	if tt == "ID" then   -- simple variable ID node
+		return varNameCode( expr.str, expr.isGlobal )
+	elseif tt == "NULL" then
+		return "nil"
+	elseif tt then    -- INT, NUM, BOOL, STR
+		return expr.str
+	else
+		local fn = fnGenerateExpr[expr.s]
+		if fn then
+			return fn( expr )
+		end
+		error( "Unknown expr type " .. expr.s )
 	end
-	error( "Unknown expr type %s", expr.s )
 end
 
 
@@ -405,7 +418,7 @@ end
 
 -- Generate Lua code for the given call stmt
 local function generateCall( stmt )
-	beginLuaLine( stmt.iLine, callCode( stmt.lValue, stmt.nameID, stmt.exprs ) )
+	beginLuaLine( stmt.iLine, callCode( stmt ) )
 end
 
 -- Generate Lua code for the given assign stmt
@@ -553,7 +566,7 @@ local function generateFunc( func )
 	beginLuaLine( func.iLine, "function " )
 	addLua( fnNameCode( func.nameID.str ) )
 	addLua( "(" )
-	local params = func.params
+	local params = func.paramVars
 	if params then
 		for i = 1, #params do
 			addLua( params[i].nameID.str )
@@ -589,7 +602,9 @@ function codeGenJava.getLuaCode( programTree )
 	end
 	if funcs then
 		for _, func in ipairs( funcs ) do
-			generateFunc( func )
+			if func.nameID.str ~= "main" then
+				generateFunc( func )
+			end
 		end
 	end
 

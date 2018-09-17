@@ -40,128 +40,77 @@ local mapVtToTypeName = {
 	["GameObj"]  = "GameObj",
 }
 
--- The value type (vt) of a declared type name
+-- The value type (vt) of a supported type name
 local mapTypeNameToVt = {
 	["int"]      = 0,
 	["double"]   = 1,
-	["void"]     = false,
 	["boolean"]  = true,
 	["String"]   = "String",
 	["GameObj"]  = "GameObj",
 }
 
+-- The value type (vt) of a literal token type
+local mapTokenTypeToVt = {
+	["INT"]   = 0,
+	["NUM"]   = 1,
+	["BOOL"]  = true,
+	["STR"]   = "String",
+	["NULL"]  = "null",
+}
+
 -- Map unsupported Java types to the type the user should use instead in Code12
 local substituteType = {
-	["byte"]  = "int",
-	["char"]  = "String",
-	["float"]  = "double",
-	["long"]  = "int",
-	["short"]  = "int",
-	["Integer"] = "int",
-	["Double"] = "double",
-	["Boolean"] = "boolean",
-}
-
--- Known Java types: map lowercase version to correct case string
-local knownTypes = {
-	["int"]      = "int",
-	["double"]   = "double",
-	["void"]     = "void",
-	["boolean"]  = "boolean",
-	["string"]   = "String",
-	["gameobj"]  = "GameObj",
-	["byte"]     = "byte",
-	["char"]     = "char",
-	["float"]    = "float",
-	["long"]     = "long",
-	["short"]    = "short",
-	["integer"]  = "Integer",
-}
-
--- Known class names
-local isKnownClassName = {
-	-- Code12 names
-	["Code12"]         = true,
-	["Code12Program"]  = true,
-	["ct"]             = true,
-	["GameObj"]        = true,
-	-- Standard Java classes used by Code12
-	["Math"]           = true,
-	["Object"]         = true,
-	["String"]         = true,
-	["PrintStream"]    = true,
-	-- Selection of other common Java classes in java.lang
-	["Boolean"]        = true,
-	["Byte"]           = true,
-	["Character"]      = true,
-	["Class"]          = true,
-	["Double"]         = true,
-	["Enum"]           = true,
-	["Float"]          = true,
-	["Integer"]        = true,
-	["Long"]           = true,
-	["Number"]         = true,
-	["Package"]        = true,
-	["Runtime"]        = true,
-	["Short"]          = true,
-	["System"]         = true,
-	["Throwable"]      = true,
-	["Void"]           = true,
+	["byte"]     = "int",
+	["char"]     = "String",
+	["float"]    = "double",
+	["long"]     = "int",
+	["short"]    = "int",
+	["Integer"]  = "int",
+	["Double"]   = "double",
+	["Boolean"]  = "boolean",
 }
 
 
 --- Module Functions ---------------------------------------------------------
 
 
--- Return the value type (vt) for a typeID token and optional isArray flag,
+-- Return the value type (vt) for a typeNode token and optional isArray flag,
 -- or return nil and set the error state if the type is invalid.
-function javaTypes.vtFromType( typeID, isArray )
-	assert( typeID.tt == "ID" )
-	local typeName = typeID.str
+function javaTypes.vtFromType( typeNode, isArray )
+	if ( typeNode.tt ~= "TYPE" ) then
+		print(typeNode.tt, typeNode.str)
+		assert(false)
+	end
+	local typeName = typeNode.str
 	local vt = mapTypeNameToVt[typeName]
 	if vt then
-		-- known non-void type
 		if isArray then
 			return { vt = vt }
 		end
 		return vt
 	end
 
-	-- Check for void type
-	if vt == false then
-		if isArray then
-			err.setErrNode( typeID, "Invalid type: array of void" )
-			return nil
-		end
-		return false  -- void
-	end
-
-	-- Unknown or unsupported type
-	local subType = substituteType[typeName]
-	if subType then
-		err.setErrNode( typeID, "The %s type is not supported by Code12. Use %s instead.",
-				typeName, subType )
+	-- Unsupported type
+	if typeName == "Object" then
+		err.setErrNode( typeNode, "The Object type is not supported by Code12. Use GameObj or String instead." )
 	else
-		-- Unknown type. See if the case is wrong.
-		local typeNameLower = string.lower( typeName )
-		for name, _ in pairs( mapTypeNameToVt ) do
-			if string.lower( name ) == typeNameLower then
-				err.setErrNode( typeID, 
-					"Names are case-sensitive, known name is \"%s\"", name )
-				return nil
-			end
+		local subType = substituteType[typeName]
+		if subType then
+			err.setErrNode( typeNode, "The %s type is not supported by Code12. Use %s instead.",
+					typeName, subType )
+		else
+			err.setErrNode( typeNode, "Unknown type name" )   -- shouldn't happen
 		end
-		err.setErrNode( typeID, "Unknown type name \"%s\"", typeName )
 	end
 	return nil
 end
 
--- Return the value type (vt) for a variable typeID token and optional isArray flag,
+-- Return the value type (vt) for a variable typeNode token and optional isArray flag,
 -- or return nil and set the error state if the type is invalid.
-function javaTypes.vtFromVarType( typeID, isArray )
-	local vt = javaTypes.vtFromType( typeID, isArray )
+function javaTypes.vtFromVarType( typeNode, isArray )
+	local vt = javaTypes.vtFromType( typeNode, isArray )
 	if vt == false then
-		err.setErrNode( typeID, "Variables cannot have void type" )
+		err.setErrNode( typeNode, "Variables cannot have void type" )
 		return nil
 	end
 	return vt
@@ -173,6 +122,19 @@ function javaTypes.typeNameFromVt( vt )
 		return "array of " .. javaTypes.typeNameFromVt( vt.vt )
 	end
 	return mapVtToTypeName[vt] or "(unknown)"
+end
+
+-- Return the value type (vt) for a token type if it is a literal, else nil.
+function javaTypes.vtFromTokenType( tt )
+	return mapTokenTypeToVt[tt]
+end
+
+-- Return true if vt1 and vt2 are the same type.
+function javaTypes.vtsEqual( vt1, vt2 )
+	if type(vt1) == "table" and type(vt2) == "table" then
+		return javaTypes.vtsEqual( vt1.vt, vt2.vt )
+	end
+	return vt1 == vt2
 end
 
 -- Return true if vtExpr can be passed or assigned to a variable of type vt.
@@ -209,22 +171,6 @@ function javaTypes.canCompareVts( vt1, vt2 )
 		return t1.vt == t2.vt    -- can compare arrays of same type
 	end	
 	return false
-end
-
--- Return true if name is a pre-defined class name known by Code12
-function javaTypes.isKnownClassName( name )
-	return isKnownClassName[name]
-end
-
--- Return true if name is the name of a supported class with public static members
-function javaTypes.isClassWithStaticMembers( name )
-	return name == "ct" or name == "Math"
-end
-
--- If nameLower (which should be all lowercase) is a Java type name ignoring case,
--- then return the correct case, else nil. 
-function javaTypes.correctTypeName( nameLower )
-	return knownTypes[nameLower]
 end
 
 
