@@ -70,9 +70,14 @@ local function strErrExpected( lineNum )
 			-- An error was expected, look for a snippet in quotes
 			local iCharStart = string.find( strCodePrev, "\"", 1, true)
 			if iCharStart then
-				local iCharEnd = string.find( strCodePrev, "\"", iCharStart + 1, true)
-				if iCharEnd then
+				local iCharEnd = string.len( strCodePrev )
+				while iCharEnd > iCharStart and string.byte( strCodePrev, iCharEnd ) ~= 34 do
+					iCharEnd = iCharEnd - 1
+				end
+				if iCharEnd > iCharStart then
 					return string.sub( strCodePrev, iCharStart + 1, iCharEnd - 1 )
+				else
+					return "(*** Malformed ERROR string ***)"
 				end
 			end
 			return ""  -- unspecified error

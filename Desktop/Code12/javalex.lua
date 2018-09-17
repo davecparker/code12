@@ -8,6 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
+local source = require( "source" )
 local err = require( "err" )
 
 
@@ -140,12 +141,11 @@ local correctCaseForLowercaseName = {
 } 
 
 -- State for the lexer used by token scanning functions
-local source    		   -- the source string
-local chars     		   -- array of ASCII codes for the source string
-local lineNumber           -- the line number for the source string
+local sourceStr    		   -- the source code string for the line being scanned
+local chars     		   -- array of ASCII codes for sourceStr
+local lineNumber           -- the line number for sourceStr
 local iChar     		   -- index to current char in chars
 local iLineBlockComment    -- line number for start of block comment (/* */) or nil if none
-local commentForLine       -- array of end-of-line comments indexed by line number
 local indentLevelForLine   -- array of indent levels indexed by line number
 local prevIndentStr        -- previous (non blank/comment) line of code's indent string
 local prevLineNumber       -- previous (non blank/comment) line of code's line number
@@ -359,7 +359,7 @@ local function slashToken()
 	local charNext = chars[iChar]
 	if charNext == 47 then   --  /
 		-- Comment to end of line
-		local str = string.sub( source, iChar + 1 )
+		local str = string.sub( sourceStr, iChar + 1 )
 		iChar = #chars + 1
 		return "COMMENT", str
 	elseif charNext == 42 then  -- *
@@ -426,7 +426,7 @@ local function stringLiteralToken()
 		iChar = iChar + 1
 		charNext = chars[iChar]
 	end
-	local str = string.sub(source, iCharStart, iChar)
+	local str = string.sub(sourceStr, iCharStart, iChar)
 	iChar = iChar + 1
 	return "STR", str
 end
@@ -477,7 +477,7 @@ local function numericLiteralToken( startsWithDot )
 		setTokenErr( iCharStart, iChar - 1, "This is not a valid number or name" )
 		return nil
 	end
-	local str = string.sub(source, iCharStart, iChar - 1)
+	local str = string.sub(sourceStr, iCharStart, iChar - 1)
 	if isNUM then
 		return "NUM", str
 	end
@@ -494,7 +494,7 @@ local function dotToken()
 	return "."
 end
 
--- Determine and store the indentation level of source and check for consistent use of tabs and spaces
+-- Determine and store the indentation level of sourceStr and check for consistent use of tabs and spaces
 local function checkIndentation( tokens )
 	if #tokens == 0 then
 		-- set indent for this line to 0
@@ -504,7 +504,7 @@ local function checkIndentation( tokens )
 		local indLvl = tokens[1].iChar - 1
 		-- store indent level
 		indentLevelForLine[lineNumber] = indLvl
-		local indentStr = string.sub( source, 1, indLvl )
+		local indentStr = string.sub( sourceStr, 1, indLvl )
 		-- check inconsistent indent
 		if prevIndentStr then
 			local prevIndLvl = indentLevelForLine[prevLineNumber]
@@ -527,7 +527,6 @@ end
 -- Init the state of the lexer for a program
 function javalex.initProgram()
 	iLineBlockComment = nil
-	commentForLine = {}
 	indentLevelForLine = {}
 	prevIndentStr = nil
 	prevLineNumber = nil
@@ -550,11 +549,11 @@ end
 --     "COMMENT": a comment (str is comment text if to end of line, else nil)
 --     "END": the end of the source string (str is empty string)
 -- Return nil and set the error state if a token is malformed or illegal.
-function javalex.getTokens( sourceStr, lineNum )
+function javalex.getTokens( sourceLineStr, lineNum )
 	-- Make array of ASCII codes for the source string
-	source = sourceStr
+	sourceStr = sourceLineStr
 	lineNumber = lineNum
-	chars = { string.byte(source, 1, string.len(source)) }   -- supposedly faster than a loop
+	chars = { string.byte(sourceStr, 1, string.len(sourceStr)) }   -- supposedly faster than a loop
 	iChar = 1
 
 	-- Init array of tokens to return
@@ -583,7 +582,7 @@ function javalex.getTokens( sourceStr, lineNum )
 				charType = charTypes[chars[iChar]]
 			until type(charType) ~= "boolean"    -- ID char
 			local iCharEnd = iChar - 1
-			local str = string.sub( source, iCharStart, iCharEnd )
+			local str = string.sub( sourceStr, iCharStart, iCharEnd )
 			local tt = ttForKnownName[str]
 			if tt == nil then
 				-- Not a known word, so user-defined ID
@@ -623,7 +622,7 @@ function javalex.getTokens( sourceStr, lineNum )
 				return nil   -- token error (e.g. unclosed string literal)
 			elseif tt == "COMMENT" then
 				-- Remember text for end-of-line comments (discard block comments)
-				commentForLine[lineNum] = str
+				source.lines[lineNum].comment = str
 			else
 				tokens[#tokens + 1] = { tt = tt, str = str or tt, 
 						iLine = lineNum, iChar = iCharStart }
@@ -667,11 +666,6 @@ function javalex.knownName( nameStr )
 	end
 	return tt, strCorrectCase, usage
 end 
-
--- Return the comment string at the end of the given line number or nil if none
-function javalex.commentForLine( lineNum )
-	return commentForLine[lineNum]
-end
 
 -- Return the indent level of the given line number in number of spaces,
 -- assuming a tab stop of 8 spaces

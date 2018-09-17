@@ -17,8 +17,9 @@ local source =  {
 	numLines = 0,            -- number of source lines
 	lines = {},              -- array of record for each source line, each with:
 	-- {
-	--     iLine = number,   -- index of this record in lines (line number in file)
-	--     str = string,     -- source code string for this line
+	--     iLine = number,       -- index of this record in lines (line number in file)
+	--     str = string,         -- source code string for this line
+	--     comment = string,     -- comment string at end of this line if any
 	-- }
 }
 

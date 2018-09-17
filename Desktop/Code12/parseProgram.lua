@@ -33,18 +33,21 @@ local parseProgram = {}
 -- var:  (Semantic analysis adds assigned field)
 --     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 --
+-- block:
+--     { s = "block", iLineBegin, stmts, iLineEnd }
+--
 -- func:
---     { s = "func", iLine, nameID, vt, isPublic, isStatic, paramVars, stmts }
+--     { s = "func", iLine, nameID, vt, isPublic, isStatic, paramVars, block }
 --
 -- stmt:
 --     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 --     { s = "call", iLine, class, lValue, nameID, exprs }
 --     { s = "assign", iLine, lValue, opToken, opType, expr }   -- opType: =, +=, -=, *=, /=, ++, --
---     { s = "if", iLine, expr, stmts, elseStmts }
---     { s = "while", iLine, expr, stmts }
---     { s = "doWhile", iLine, expr, stmts }
---     { s = "for", iLine, initStmt, expr, nextStmt, stmts }
---     { s = "forArray", iLine, var, expr, stmts }
+--     { s = "if", iLine, expr, block, elseBlock }
+--     { s = "while", iLine, expr, block }
+--     { s = "doWhile", iLine, expr, block, iLineWhile }
+--     { s = "for", iLine, initStmt, expr, nextStmt, block }
+--     { s = "forArray", iLine, var, expr, block }
 --     { s = "break", iLine }
 --     { s = "return", iLine, expr }
 --
@@ -94,7 +97,7 @@ local iTree             -- current tree index in parseTrees being analyzed
 
 -- Forward declarations
 local makeExpr
-local getBlockStmts
+local getBlock
 local getLineStmts
 
 -- Set an error when a block's begining { does not have the same indentation as its function header
@@ -437,17 +440,17 @@ local function makeCast( nodes )
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
--- if, else, or loop, and return an array of stmt structures. 
+-- if, else, or loop, and return a block structure. 
 -- If the next item to process is a begin block then get an entire block 
 -- of stmts until the matching block end, otherwise get a single stmt. 
 -- Return nil if there was an error.
-local function getControlledStmts()
+local function getControlledBlock()
 	local ctrlTree = parseTrees[iTree - 1] -- tree for the controlling statement
 	local ctrlIndent = javalex.indentLevelForLine( ctrlTree.iLineStart )
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "begin" then
-		return getBlockStmts()
+		return getBlock()
 	elseif p == "end" then
 		err.setErrNode( tree, "} without matching {" )
 		return nil
@@ -481,37 +484,38 @@ local function getControlledStmts()
 							ctrlTree.p )
 				end
 			end
-			return stmts
+			return { s = "block", stmts = stmts }
 		end
 	end
 	return nil
 end
 
 -- Check to see if the next stmt is an else or else if, and if so then 
--- get the controlled stmts and return an array of stmt structures. 
+-- get the controlled stmts and return a block structure. 
 -- Return nil if there is no else or an error.
-local function getElseStmts( ifTree )
+local function getElseBlock( ifTree )
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "else" then
 		if javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( ifTree.iLineStart ) then
 			err.setErrLineNumAndRefLineNum( tree.iLine, ifTree.iLineStart, 
-					"This \"else\" should have the same indentation as the highlighted \"if\" above it" )
+					'An "else" should have the same indentation as its "if"' )
 		end
 		iTree = iTree + 1
-		return getControlledStmts()
+		return getControlledBlock()
 	elseif p == "elseif" then
 		if javalex.indentLevelForLine( tree.iLineStart ) ~= javalex.indentLevelForLine( ifTree.iLineStart ) then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, ifTree.iLineStart, 
-					"This \"else if\" should have the same indentation as the highlighted \"if\" above it" )
+					'An "else if" should have the same indentation as the first "if"' )
 		end
-		checkMultiLineIndent( tree );
+		checkMultiLineIndent( tree )
 		-- Controlled stmts is a single stmt, which is the following if
 		iTree = iTree + 1
-		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
-				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts( ifTree ),
-				entireLine = true } }
+		local stmt = { s = "if", expr = makeExpr( tree.nodes[4] ), 
+						block = getControlledBlock(), 
+						elseBlock = getElseBlock( ifTree ),
+						entireLine = true }
+		return { s = "block", stmts = { stmt } }
 	end
 	return nil	
 end
@@ -557,14 +561,14 @@ local function getForStmt( nodes )
 			s = "forArray", 
 			var = makeVar( false, nil, nodes[1], nodes[2] ),
 			expr = makeExpr( nodes[4] ), 
-			stmts = getControlledStmts(),
+			block = getControlledBlock(),
 			entireLine = true, 
 		}
 	else
 		-- for (init; expr; next) controlledStmts
 		local stmt = { 
 			s = "for", 
-			stmts = getControlledStmts(), 
+			block = getControlledBlock(), 
 			entireLine = true 
 		}
 
@@ -624,8 +628,8 @@ function getLineStmts( tree, stmts )
 	elseif p == "if" then
 		-- if (expr) controlledStmts [else controlledStmts]
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
-				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts( tree ), entireLine = true }
+				block = getControlledBlock(), 
+				elseBlock = getElseBlock( tree ), entireLine = true }
 	elseif p == "elseif" or p == "else" then
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
@@ -640,8 +644,8 @@ function getLineStmts( tree, stmts )
 		stmt = { s = "return", firstToken = nodes[1] }
 	elseif p == "do" then
 		-- do controlledStmts while (expr);
-		stmt = { s = "doWhile", stmts = getControlledStmts(), entireLine = true }
-		if stmt.stmts == nil then
+		stmt = { s = "doWhile", block = getControlledBlock(), entireLine = true }
+		if stmt.block == nil then
 			return nil
 		end
 		local endTree = parseTrees[iTree]
@@ -661,6 +665,7 @@ function getLineStmts( tree, stmts )
 			err.setErrNodeAndRef( endTree, tree, "This while statement should have the same indentation as its \"do\"" )
 		end
 		stmt.expr = makeExpr( endTree.nodes[3] )
+		stmt.iLineWhile = endTree.iLine
 		checkMultiLineIndent( endTree )
 	elseif p == "while" then
 		-- while (expr) controlledStmts
@@ -669,7 +674,7 @@ function getLineStmts( tree, stmts )
 			err.setErrNode( whileEnd, "while loop header should not end with a semicolon" )
 			return nil
 		end
-		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts(),
+		stmt = { s = "while", expr = makeExpr( nodes[3] ), block = getControlledBlock(),
 				entireLine = true }
 	elseif p == "for" then
 		-- for loop variants
@@ -697,15 +702,15 @@ function getLineStmts( tree, stmts )
 	return false
 end
 
--- Process a block of statements beginning with { and ending with }
--- and return an array of stmt.
+-- Get a block of statements beginning with { and ending with }
+-- and return a block structure.
 -- If there is an error then set the error state and return nil.
-function getBlockStmts()
+function getBlock()
 	-- Block must start with a {
 	local iLineStart = parseTrees[iTree].iLine
 	local beginIndent = javalex.indentLevelForLine( iLineStart )
 	if not checkBlockBegin() then
-		return false
+		return nil
 	end
 
 	-- Check block is indented from beginning {
@@ -732,11 +737,12 @@ function getBlockStmts()
 			err.setErrLineNum( tree.iLine, "Unexpected {" )
 			return nil
 		elseif p == "end" then
+			-- This ends our block
 			if currIndent ~= beginIndent then
 				err.setErrLineNumAndRefLineNum( tree.iLineStart, iLineStart, 
 						"A block's ending } should have the same indentation as its beginning {" )
 			end
-			return stmts   -- this ends our block
+			return { s = "block", iLineBegin = iLineStart, stmts = stmts, iLineEnd = tree.iLine }
 		else
 			if currIndent ~= blockIndent then
 				err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
@@ -824,16 +830,16 @@ local function getFunc( nodes )
 		end
 	end
 
-	-- Get the stmts array
-	local stmts = getBlockStmts()
-	if stmts == nil then
+	-- Get the block
+	local block = getBlock()
+	if block == nil then
 		return nil
 	end
 
 	-- Make the func
 	local nameID = nodes[3]
 	local func = { s = "func", iLine = nameID.iLine, nameID = nameID, vt = vt,
-					paramVars = paramVars, stmts = stmts, entireLine = true }
+					paramVars = paramVars, block = block, entireLine = true }
 
 	-- Add the access flags and return it
 	local access = nodes[1]
@@ -898,9 +904,9 @@ local function getMembers()
 		iTree = iTree + 1
 
 		if tree.isError then
-			-- Skip lines with syntax errors, but process stmt blocks for bad func headers
+			-- Skip lines with syntax errors, but process blocks for bad func headers
 			if p == "func" then
-				getBlockStmts()
+				getBlock()
 			end
 		elseif getVar( p, nodes, vars, true ) then
 			-- Added instance variable(s)
@@ -926,7 +932,7 @@ local function getMembers()
 			-- Ad-hoc blocks are unexpected, but try to process the block anyway
 			err.setErrNode( tree, "Unexpected or extra {" )
 			iTree = iTree - 1   -- back to the { line
-			getBlockStmts()
+			getBlock()
 		else
 			-- Unexpected line in the class block
 			err.overrideErrLineParseTree( tree, 

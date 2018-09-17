@@ -8,7 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
-local javalex = require( "javalex" )
+local source = require( "source" )
 
 
 -- The codeGen module
@@ -98,32 +98,41 @@ local nameFromLuaReservedWord = {
 
 --- Utility Functions --------------------------------------------------------
 
--- End the previous line of Lua code and begin a new line for line number iLine
--- or the next line if iLine is nil. If strCode then start the new line with it.
-local function beginLuaLine( iLine, strCode )
-	-- Add the end-of-line comment for the previous line if any
+-- End the current Lua line, adding the comment if applicable.
+-- If indent then the comment needs to be indented.
+local function endLuaLine( indent )
 	if enableComments then
-		local strComment = javalex.commentForLine( luaLineNum )
+		local strComment = source.lines[luaLineNum].comment
 		if strComment then
+			if indent then
+				luaCodeStrs[#luaCodeStrs + 1] = strIndents[blockLevel] or ""
+				print("indented", luaLineNum, "[" .. strIndents[blockLevel] .. "]")
+			end
 			luaCodeStrs[#luaCodeStrs + 1] = (luaLineIsBlank and "--") or "   --"
 			luaCodeStrs[#luaCodeStrs + 1] = strComment
 		end
 	end
+	luaCodeStrs[#luaCodeStrs + 1] = "\n"
+	luaLineNum = luaLineNum + 1
+	luaLineIsBlank = true
+end
 
+-- End the previous line of Lua code and begin a new line for line number iLine
+-- or the next line if iLine is nil. If strCode then start the new line with it.
+local function beginLuaLine( iLine, strCode )
 	-- If the new line is on the same line number as the previous line, 
 	-- then separate them with a semicolon, else end the previous line and add
 	-- any extra blank lines to catch up to the new line number as necessary.
 	local indent = true
 	if iLine == nil then
-		luaCodeStrs[#luaCodeStrs + 1] = "\n"
-		luaLineNum = luaLineNum + 1
+		endLuaLine()
 	elseif iLine <= luaLineNum then
 		luaCodeStrs[#luaCodeStrs + 1] = "; "
 		indent = false
 	else
+		endLuaLine()
 		while luaLineNum < iLine do
-			luaCodeStrs[#luaCodeStrs + 1] = "\n"
-			luaLineNum = luaLineNum + 1
+			endLuaLine( true )
 		end
 	end
 
@@ -134,8 +143,6 @@ local function beginLuaLine( iLine, strCode )
 	if strCode then
 		luaCodeStrs[#luaCodeStrs + 1] = strCode
 		luaLineIsBlank = false
-	else
-		luaLineIsBlank = true
 	end
 end
 
@@ -143,6 +150,13 @@ end
 local function addLua( strCode )
 	luaCodeStrs[#luaCodeStrs + 1] = strCode
 	luaLineIsBlank = false
+end
+
+-- If block then end the block by generating a Lua "end"
+local function endBlock( block )
+	if block then
+		beginLuaLine( block.iLineEnd, "end" )
+	end
 end
 
 
@@ -379,19 +393,14 @@ end
 
 --- Statement Generation Functions -------------------------------------------
 
--- Generate Lua code for an array of stmts.
--- Indent the stmts one level past the current level.
--- If generateEnd then add an "end" on the next line.
-local function generateStmts( stmts, generateEnd )
-	if stmts then
+-- If block then generate Lua code for the stmts in the block
+local function generateBlockStmts( block )
+	if block and block.stmts then
 		blockLevel = blockLevel + 1
-		for _, stmt in ipairs( stmts ) do
+		for _, stmt in ipairs( block.stmts ) do
 			generateStmt( stmt )
 		end
 		blockLevel = blockLevel - 1
-	end
-	if generateEnd then
-		beginLuaLine( nil, "end" )
 	end
 end
 
@@ -449,28 +458,29 @@ local function generateIf( stmt )
 	beginLuaLine( stmt.iLine, "if ")
 	addLua( exprCode( stmt.expr ) )
 	addLua( " then")
-	generateStmts( stmt.stmts )
+	generateBlockStmts( stmt.block )
 
 	-- Generate the else block if any.
 	-- If the else block is a single stmt which is an if, 
 	-- then we can generate a Lua elseif, and keep looking
 	-- for more at the same level.
-	local elseStmts = stmt.elseStmts
-	while elseStmts do
+	local elseBlock = stmt.elseBlock
+	while elseBlock do
+		local elseStmts = elseBlock.stmts
 		if #elseStmts == 1 and elseStmts[1].s == "if" then
 			local ifStmt = elseStmts[1]
 			beginLuaLine( nil, "elseif ")
 			addLua( exprCode( ifStmt.expr ) )
 			addLua( " then")
-			generateStmts( ifStmt.stmts )
-			elseStmts = ifStmt.elseStmts
+			generateBlockStmts( ifStmt.block )
+			elseBlock = ifStmt.elseBlock
 		else
 			beginLuaLine( nil, "else" )
-			generateStmts( elseStmts )
-			elseStmts = nil
+			generateBlockStmts( elseBlock )
+			elseBlock = nil
 		end
 	end
-	beginLuaLine( nil, "end" )
+	endBlock( stmt.block )
 end
 
 -- Generate Lua code for the given while stmt
@@ -478,14 +488,15 @@ local function generateWhile( stmt )
 	beginLuaLine( stmt.iLine, "while " )
 	addLua( exprCode( stmt.expr ) )
 	addLua( " do")
-	generateStmts( stmt.stmts, true )
+	generateBlockStmts( stmt.block )
+	endBlock( stmt.block )
 end
 
 -- Generate Lua code for the given doWhile stmt
 local function generateDoWhile( stmt )
 	beginLuaLine( stmt.iLine, "repeat" )
-	generateStmts( stmt.stmts )
-	beginLuaLine( nil, "until not (")
+	generateBlockStmts( stmt.block )
+	beginLuaLine( stmt.iLineWhile, "until not (")
 	addLua( exprCode( stmt.expr ) )
 	addLua( ")" )
 end
@@ -507,11 +518,11 @@ local function generateFor( stmt )
 	addLua( " do" )
 
 	-- Generate the controlled stmts, nextStmt if any, and the end
-	generateStmts( stmt.stmts )
+	generateBlockStmts( stmt.block )
 	if stmt.nextStmt then
 		generateStmt( stmt.nextStmt )
 	end
-	beginLuaLine( nil, "end" )
+	endBlock( stmt.block )
 end
 
 -- Generate Lua code for the given forArray stmt
@@ -521,7 +532,8 @@ local function generateForArray( stmt )
 	addLua( " in ipairs(" )
 	addLua( exprCode( stmt.expr ) )
 	addLua( ") do" )
-	generateStmts( stmt.stmts, true)
+	generateBlockStmts( stmt.block )
+	endBlock( stmt.block )
 end
 
 -- Generate Lua code for the given break stmt
@@ -578,7 +590,8 @@ local function generateFunc( func )
 	addLua( ")" )
 
 	-- Generate the code block
-	generateStmts( func.stmts, true )
+	generateBlockStmts( func.block )
+	endBlock( func.block )
 end
 
 

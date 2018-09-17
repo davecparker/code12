@@ -54,6 +54,14 @@ class StructureTest extends Code12Program
 			d *= 2;
 		}
 
+		if (d < i)
+		{
+			i = 0;
+			d = 1;
+		}
+		else
+			i = 1;
+
 		if (d == i)
 			d = i;
 		else if (d < i)

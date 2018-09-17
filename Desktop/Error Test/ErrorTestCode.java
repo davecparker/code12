@@ -1274,7 +1274,7 @@ int underIndentedInstanceVar;
 		voidFunc();
 		if (false)
 			voidFunc();
-		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "This line is not controlled"
 			else
 				voidFunc();
 		if (false)
@@ -1304,7 +1304,7 @@ int underIndentedInstanceVar;
 				}
 		if (false)
 			voidFunc();
-		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it
+		// ERROR "This line is not controlled"
 			else if (false)
 				voidFunc();
 		else
@@ -1313,23 +1313,23 @@ int underIndentedInstanceVar;
 			voidFunc();
 		else if (false)
 			voidFunc();
-		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "This line is not controlled"
 			else
 				voidFunc();
 		if (false)
 			voidFunc();
 		else if (false)
 			voidFunc();
-		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it"
+		// ERROR "This line is not controlled"
 			else if (false)
 				voidFunc();
-		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "An "else" should have the same indentation as its "if""
 			else
 				voidFunc();
 		if (false)
 			if (false)
 					voidFunc();
-		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "An "else" should have the same indentation as its "if""
 		else
 			voidFunc();
 		if (false)
@@ -1347,7 +1347,7 @@ int underIndentedInstanceVar;
 		if (false)
 			if (false)
 				voidFunc();
-		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it"
+		// ERROR "An "else if" should have the same indentation as the first "if""
 		else if (false)
 			voidFunc();
 		for (int ii = 0; ii < 100; ii++)
@@ -1533,7 +1533,7 @@ int underIndentedInstanceVar;
 	void onMousePress( double x, double y )
 	{
 	}
-	// ERROR Wrong number of parameters for function"
+	// ERROR "Wrong number of parameters for function"
 	void onKeyPress( GameObj obj, double x, double y )
 	{
 	}
