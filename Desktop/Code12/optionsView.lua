@@ -223,7 +223,7 @@ function optionsView:create()
 	}
 	levelPicker = newCheckboxOption{
 		parentGroup = sceneGroup,
-		optionLabel = "Code12 Syntax Level:",
+		optionLabel = "Syntax Level:",
 		checkboxLabels = code12Levels,
 		x = leftMargin,
 		y = title.y + title.height + margin,
@@ -268,6 +268,9 @@ function optionsView:create()
 				app.useDefaultEditor = app.editorPath == nil
 			end
 	}
+
+	-- Install resize handler
+	Runtime:addEventListener( "resize", self )
 end
 
 -- Prepare to show the errView scene
@@ -283,6 +286,12 @@ function optionsView:hide( event )
 	if event.phase == "did" then
 		toolbar.show( true )
 	end
+end
+
+-- Window resize handler
+function optionsView:resize()
+	title.x = app.width / 2
+	closeBtn.x = app.width - app.margin
 end
 
 
