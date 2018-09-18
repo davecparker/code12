@@ -133,8 +133,15 @@ local function newCheckboxOption( options )
 	return checkboxOptionGroup
 end
 
--- Set the active segment of the editorPicker to saved editor
-local function setCheckedEditor()
+-- Set the checked boxes for the user's settings
+local function setSelectedOptions()
+	-- Set the checked box of the levelPicker
+	levelPicker.checkboxes[app.syntaxLevel]:setState{ isOn = true }
+
+	-- Set the checked box of the tabWidthPicker
+	tabWidthPicker.checkboxes[app.tabWidth - 1]:setState{ isOn = true }
+
+	-- Set the checked box of the editorPicker
 	if app.useDefaultEditor or #installedEditors == 1 then
 		-- Check on "System Default"
 		editorPicker.checkboxes[1]:setState{ isOn = true }
@@ -157,23 +164,6 @@ local function setCheckedEditor()
 			app.editorPath = installedEditors[2].path
 		end
 	end
-end
-
-
---- Event Handlers ------------------------------------------------
-
--- Event handler for the Close button
-local function onClose()
-	app.saveSettings()
-	local prevScene = composer.getSceneName( "previous" )
-	composer.gotoScene( prevScene )
-end
-
--- Event handler for the Editor picker checkboxes
-local function onEditorPicked( event )
-	local checkbox = event.target
-	app.editorPath = installedEditors[checkbox.number].path
-	app.useDefaultEditor = app.editorPath == nil
 end
 
 
@@ -206,73 +196,59 @@ function optionsView:create()
 		onRelease = onClose,
 		width = 15,
 		height = 15,
+		onRelease = 
+			function ()
+				app.saveSettings()
+				composer.gotoScene( composer.getSceneName( "previous" ) )
+			end
 	}
 	sceneGroup:insert( closeBtn )
 	closeBtn.anchorX = 1
 	closeBtn.anchorY = 0
 
-	-- Level picker label
-	local levelLabel = display.newText{
-		parent = sceneGroup,
-		text = "Code12 Level:",
+	-- Level picker
+	local code12Levels = {
+		"1. Procedure Calls",
+		"2. Comments",
+		"3. Variables",
+		"4. Expressions",
+		"5. Function Calls",
+		"6. Object Data Fields",
+		"7. Object Method Calls",
+		"8. If-else",
+		"9. Function Definitions",
+		"10. Parameters",
+		"11. Loops",
+		"12. Arrays"
+	}
+	levelPicker = newCheckboxOption{
+		parentGroup = sceneGroup,
+		optionLabel = "Code12 Syntax Level:",
+		checkboxLabels = code12Levels,
 		x = leftMargin,
 		y = title.y + title.height + margin,
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-	}
-	g.uiBlack( levelLabel )
-
-	-- Level picker
-	local segmentNames = {}
-	for i = 1, app.numSyntaxLevels do
-		segmentNames[i] = tostring( i )
-	end
-	local segWidth = 25
-	levelPicker = widget.newSegmentedControl{
-		x = leftMargin,
-		y = levelLabel.y + levelLabel.height,
-		segmentWidth = segWidth,
-		segments = segmentNames,
-		defaultSegment = app.syntaxLevel,
 		onPress = 
 			function ( event )
-				app.syntaxLevel = event.target.segmentNumber
+				app.syntaxLevel = event.target.number
 			end
 	}
-	sceneGroup:insert( levelPicker )
-	levelPicker.anchorX = 0
-	levelPicker.anchorY = 0
-
-	-- Tab width picker label
-	local tabWidthLabel = display.newText{
-		parent = sceneGroup,
-		text = "Tab Width:",
-		x = leftMargin,
-		y = levelPicker.y + levelPicker.height + margin,
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-	}
-	g.uiBlack( tabWidthLabel )
 
 	-- Tab width picker
-	segmentNames = {}
+	local tabWidths = {}
 	for i = 2, 8 do
-		segmentNames[i - 1] = tostring( i )
+		tabWidths[i - 1] = tostring( i )
 	end
-	tabWidthPicker = widget.newSegmentedControl{
+	tabWidthPicker = newCheckboxOption{
+		parentGroup = sceneGroup,
+		optionLabel = "Tab Width:",
+		checkboxLabels = tabWidths,
 		x = leftMargin,
-		y = tabWidthLabel.y + tabWidthLabel.height,
-		segmentWidth = segWidth,
-		segments = segmentNames,
-		defaultSegment = app.tabWidth - 1,
-		onPress =
+		y = levelPicker.y + levelPicker.height + margin,
+		onPress = 
 			function ( event )
-				app.tabWidth = event.target.segmentNumber + 1
+				app.tabWidth = event.target.number + 1
 			end
 	}
-	tabWidthPicker.anchorX = 0
-	tabWidthPicker.anchorY = 0
-	sceneGroup:insert( tabWidthPicker )
 
 	-- Editor picker
 	installedEditors = getInstalledEditors()
@@ -286,14 +262,18 @@ function optionsView:create()
 		checkboxLabels = editorNames,
 		x = leftMargin,
 		y = tabWidthPicker.y + tabWidthPicker.height + margin,
-		onPress = onEditorPicked,
+		onPress = 
+			function ( event )
+				app.editorPath = installedEditors[event.target.number].path
+				app.useDefaultEditor = app.editorPath == nil
+			end
 	}
 end
 
 -- Prepare to show the errView scene
 function optionsView:show( event )
 	if event.phase == "will" then
-		setCheckedEditor()
+		setSelectedOptions()
 		toolbar.show( false )
 	end
 end
