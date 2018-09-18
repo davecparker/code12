@@ -257,6 +257,7 @@ function app.saveSettings()
 	userSettings.tabWidth = app.tabWidth
 	userSettings.editorPath = app.editorPath
 	userSettings.useDefaultEditor = app.useDefaultEditor
+	userSettings.oneErrOnly = app.oneErrOnly
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -301,12 +302,22 @@ local function loadSettings()
 				end
 
 				-- Use the saved editorPath if valid
-				if t.editorPath then
+				if type(t.editorPath) == "string" then
 					file = io.open( t.editorPath, "r" )
 					if file then
 						io.close( file )
 						app.editorPath = t.editorPath
 					end
+				end
+
+				-- Use the saved useDefaultEditor value
+				if type(t.useDefaultEditor) == "boolean" then
+					app.useDefaultEditor = t.useDefaultEditor
+				end
+
+				-- Use the saved oneErrOnly value
+				if type(t.oneErrOnly) == "boolean" then
+					app.oneErrOnly = t.oneErrOnly
 				end
 			end
 		end

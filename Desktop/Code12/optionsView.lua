@@ -33,6 +33,7 @@ local closeBtn            -- Close view button
 local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
+local multiErrorPicker    -- Multi-error mode picker
 
 -- Data tables
 local winEditors = {
@@ -68,9 +69,9 @@ local function getInstalledEditors()
 	return foundEditors
 end
 
--- Create and return a new display group containing a label and set of option checkboxes
+-- Create and return a new display group containing a label and set of option checkboxes,
+-- which has been inserted into optionsView.view
 -- options = {
---     parentGroup = group to insert the checkboxes group in
 --     optionLabel = string for the option label text
 --     checkboxLabels = table of strings for the labeling the checkboxes (one checkbox will be )
 --     x = x-value to position the group at (with anchorX = 0)
@@ -79,7 +80,7 @@ end
 -- }
 local function newCheckboxOption( options )
 	local checkboxOptionGroup = display.newGroup() -- group to be returned
-	options.parentGroup:insert( checkboxOptionGroup )
+	optionsView.view:insert( checkboxOptionGroup )
 	checkboxOptionGroup.anchorX = 0
 	checkboxOptionGroup.anchorY = 0
 	checkboxOptionGroup.x = options.x
@@ -136,7 +137,7 @@ end
 -- Set the checked boxes for the user's settings
 local function setSelectedOptions()
 	-- Set the checked box of the levelPicker
-	levelPicker.checkboxes[app.syntaxLevel]:setState{ isOn = true }
+	levelPicker.checkboxes[app.syntaxLevel or 1]:setState{ isOn = true }
 
 	-- Set the checked box of the tabWidthPicker
 	tabWidthPicker.checkboxes[app.tabWidth - 1]:setState{ isOn = true }
@@ -163,6 +164,13 @@ local function setSelectedOptions()
 			editorPicker.checkboxes[2]:setState{ isOn = true }
 			app.editorPath = installedEditors[2].path
 		end
+	end
+
+	-- Set the checked box of the multiErrorPicker
+	if app.oneErrOnly then
+		multiErrorPicker.checkboxes[1]:setState{ isOn = true }
+	else
+		multiErrorPicker.checkboxes[2]:setState{ isOn = true }
 	end
 end
 
@@ -193,12 +201,10 @@ function optionsView:create()
 		defaultFile = "images/close.png",
 		x = app.width - margin,
 		y = margin,
-		onRelease = onClose,
 		width = 15,
 		height = 15,
 		onRelease = 
 			function ()
-				app.saveSettings()
 				composer.gotoScene( composer.getSceneName( "previous" ) )
 			end
 	}
@@ -222,7 +228,6 @@ function optionsView:create()
 		"12. Arrays"
 	}
 	levelPicker = newCheckboxOption{
-		parentGroup = sceneGroup,
 		optionLabel = "Syntax Level:",
 		checkboxLabels = code12Levels,
 		x = leftMargin,
@@ -239,7 +244,6 @@ function optionsView:create()
 		tabWidths[i - 1] = tostring( i )
 	end
 	tabWidthPicker = newCheckboxOption{
-		parentGroup = sceneGroup,
 		optionLabel = "Tab Width:",
 		checkboxLabels = tabWidths,
 		x = leftMargin,
@@ -257,7 +261,6 @@ function optionsView:create()
 		editorNames[i] = installedEditors[i].name
 	end
 	editorPicker = newCheckboxOption{
-		parentGroup = sceneGroup,
 		optionLabel = "Text Editor:",
 		checkboxLabels = editorNames,
 		x = leftMargin,
@@ -266,6 +269,22 @@ function optionsView:create()
 			function ( event )
 				app.editorPath = installedEditors[event.target.number].path
 				app.useDefaultEditor = app.editorPath == nil
+			end
+	}
+
+	-- Multi-error picker
+	local multiErrorLabels = {
+		"Show only one error at a time",
+		"Show multiple errors",
+	}
+	multiErrorPicker = newCheckboxOption{
+		optionLabel = "Multi-Error Mode:",
+		checkboxLabels = multiErrorLabels,
+		x = leftMargin,
+		y = editorPicker.y + editorPicker.height + margin,
+		onPress =
+			function ( event )
+				app.oneErrOnly = event.target.number == 1
 			end
 	}
 
@@ -283,7 +302,8 @@ end
 
 -- Prepare to hide the errView scene
 function optionsView:hide( event )
-	if event.phase == "did" then
+	if event.phase == "will" then 
+		app.saveSettings()
 		toolbar.show( true )
 	end
 end

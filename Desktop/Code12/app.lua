@@ -50,8 +50,8 @@ local app =  {
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
 	tabWidth = 4,                -- current tab width
-	oneErrOnly = false,          -- true to display only the first error
-	editorPath = nil,			 -- current text editor
+	oneErrOnly = true,           -- true to display only the first error
+	editorPath = nil,            -- current text editor
 	useDefaultEditor = false,    -- when true, use the OS default for opening user program files
 
 	-- Runtime state
