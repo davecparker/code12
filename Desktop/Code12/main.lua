@@ -256,6 +256,7 @@ function app.saveSettings()
 	userSettings.syntaxLevel = app.syntaxLevel 
 	userSettings.tabWidth = app.tabWidth
 	userSettings.editorPath = app.editorPath
+	userSettings.useDefaultEditor = app.useDefaultEditor
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )

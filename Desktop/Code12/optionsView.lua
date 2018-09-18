@@ -24,9 +24,12 @@ local optionsView = composer.newScene()
 local margin = app.margin
 local topMargin = app.dyToolbar + margin
 local leftMargin = margin
+local checkboxSize = 14
+local checkboxSheet = graphics.newImageSheet( "images/checkbox.png", { width = 256, height = 256, numFrames = 2 } )
 
 -- Display objects and groups
-local backBtn             -- Back button
+local title               -- Title text
+local closeBtn            -- Close view button
 local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
@@ -36,7 +39,7 @@ local winEditors = {
 		{ name = "Sublime Text 3", path = [[C:\Program Files\Sublime Text 3\sublime_text.exe]] },
 		{ name = "Sublime Text 3", path = [[C:\Program Files (x86)\Sublime Text 3\sublime_text.exe]] },
 		{ name = "Notepad++", path = [[C:\Program Files\Notepad++\notepad++.exe]] },
-		{ name = "Notepad++", path = [[C:\Program Files (x86)\Notepad++\notepad++.exe]] }
+		{ name = "Notepad++", path = [[C:\Program Files (x86)\Notepad++\notepad++.exe]] },
 }
 local macEditors = {}
 local installedEditors
@@ -51,36 +54,126 @@ local function getInstalledEditors()
 	else
 		editors = macEditors
 	end
-	local installedEds = { { name = "System Default", path = nil } }
+	local foundEditors = { { name = "System Default", path = nil } }
 	for i = 1, #editors do
 		local editor = editors[i]
-		if editor.name ~= installedEds[#installedEds].name then
+		if editor.name ~= foundEditors[#foundEditors].name then
 			local f = io.open( editor.path , "r" )
 			if f then
 				io.close( f )
-				installedEds[#installedEds + 1] = editor
+				foundEditors[#foundEditors + 1] = editor
 			end
 		end
 	end
-	return installedEds
+	return foundEditors
+end
+
+-- Create and return a new display group containing a label and set of option checkboxes
+-- options = {
+--     parentGroup = group to insert the checkboxes group in
+--     optionLabel = string for the option label text
+--     checkboxLabels = table of strings for the labeling the checkboxes (one checkbox will be )
+--     x = x-value to position the group at (with anchorX = 0)
+--     y = y-value to position the group at (with anchorY = 0)
+--     onPress = listener function for checkboxes
+-- }
+local function newCheckboxOption( options )
+	local checkboxOptionGroup = display.newGroup() -- group to be returned
+	options.parentGroup:insert( checkboxOptionGroup )
+	checkboxOptionGroup.anchorX = 0
+	checkboxOptionGroup.anchorY = 0
+	checkboxOptionGroup.x = options.x
+	checkboxOptionGroup.y = options.y
+	-- option main label
+	local optionLabel = display.newText{
+		parent = checkboxOptionGroup,
+		text = options.optionLabel,
+		x = 0,
+		y = 0,
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+	}
+	g.uiBlack( optionLabel )
+	-- option swiches and labels
+	local checkboxesGroup = display.newGroup()
+	checkboxOptionGroup:insert( checkboxesGroup )
+	checkboxOptionGroup.checkboxes = checkboxesGroup
+	checkboxesGroup.anchorX = 0
+	checkboxesGroup.anchorY = 0
+	checkboxesGroup.x = 0
+	checkboxesGroup.y = optionLabel.y + optionLabel.height
+	local checkboxLabels = options.checkboxLabels
+	for i = 1, #checkboxLabels do
+		local checkbox = widget.newSwitch{
+			x = 0,
+			y = checkboxSize * (i - 1),
+			style = "radio",
+			width = checkboxSize,
+			height = checkboxSize,
+			onPress = options.onPress,
+			sheet = checkboxSheet,
+			frameOn = 1,
+			frameOff = 2,
+			id = options.optionLabel .. "checkbox" .. i,
+		}
+		checkbox.number = i
+		checkbox.anchorX = 0
+		checkbox.anchorY = 0
+		checkboxesGroup:insert( checkbox )
+		local checkboxLabel = display.newText{
+			parent = checkboxOptionGroup,
+			text = checkboxLabels[i],
+			x = checkbox.x + checkboxSize + margin * 0.5,
+			y = checkboxesGroup.y + checkbox.y,
+			font = native.systemFont,
+			fontSize = app.fontSizeUI,
+		}
+		g.uiItem( checkboxLabel )
+	end
+	return checkboxOptionGroup
 end
 
 -- Set the active segment of the editorPicker to saved editor
-local function setActiveEditorSegment()
-	for i = 1, #installedEditors do
-		if installedEditors[i].path == app.editorPath then
-			editorPicker:setActiveSegment( i )
-			break
+local function setCheckedEditor()
+	if app.useDefaultEditor or #installedEditors == 1 then
+		-- Check on "System Default"
+		editorPicker.checkboxes[1]:setState{ isOn = true }
+	elseif app.editorPath == nil then
+		-- Check on first non system default editor
+		editorPicker.checkboxes[2]:setState{ isOn = true }
+		app.editorPath = installedEditors[2].path
+	else
+		-- Check on the user's preferred editor if it is installed
+		local preferredEditorInstalled
+		for i = 2, #installedEditors do
+			if installedEditors[i].path == app.editorPath then
+				editorPicker.checkboxes[i]:setState{ isOn = true }
+				preferredEditorInstalled = true
+				break
+			end
+		end
+		if not preferredEditorInstalled then
+			editorPicker.checkboxes[2]:setState{ isOn = true }
+			app.editorPath = installedEditors[2].path
 		end
 	end
 end
 
--- Event handler for the Back button
-local function onBack()
-	-- app.saveSettings()
+
+--- Event Handlers ------------------------------------------------
+
+-- Event handler for the Close button
+local function onClose()
+	app.saveSettings()
 	local prevScene = composer.getSceneName( "previous" )
-	print( prevScene )
 	composer.gotoScene( prevScene )
+end
+
+-- Event handler for the Editor picker checkboxes
+local function onEditorPicked( event )
+	local checkbox = event.target
+	app.editorPath = installedEditors[checkbox.number].path
+	app.useDefaultEditor = app.editorPath == nil
 end
 
 
@@ -94,7 +187,7 @@ function optionsView:create()
 	 g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
 	
 	-- Title
-	local title = display.newText{
+	title = display.newText{
 		parent = sceneGroup,
 		text = "Code12 Options",
 		x = app.width / 2,
@@ -105,22 +198,18 @@ function optionsView:create()
 	title:setFillColor( 0 )
 	title.anchorY = 0
 
-	-- Back button
-	local btnShade = app.toolbarShade
-	backBtn = widget.newButton{
+	-- Close button
+	closeBtn = widget.newButton{
+		defaultFile = "images/close.png",
 		x = app.width - margin,
 		y = margin,
-		onRelease = onBack,
-		label = "X",
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-		shape = "rect",
+		onRelease = onClose,
 		width = 15,
 		height = 15,
 	}
-	sceneGroup:insert( backBtn )
-	backBtn.anchorX = 1
-	backBtn.anchorY = 0
+	sceneGroup:insert( closeBtn )
+	closeBtn.anchorX = 1
+	closeBtn.anchorY = 0
 
 	-- Level picker label
 	local levelLabel = display.newText{
@@ -184,44 +273,27 @@ function optionsView:create()
 	tabWidthPicker.anchorX = 0
 	tabWidthPicker.anchorY = 0
 	sceneGroup:insert( tabWidthPicker )
-	
-	-- Editor picker label
-	local editorLabel = display.newText{
-		parent = sceneGroup,
-		text = "Text Editor:",
-		x = leftMargin,
-		y = tabWidthPicker.y + tabWidthPicker.height + margin,
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-	}
-	g.uiBlack( editorLabel )
 
 	-- Editor picker
 	installedEditors = getInstalledEditors()
-	segmentNames = {}
+	local editorNames = {}
 	for i = 1, #installedEditors do
-		segmentNames[i] = installedEditors[i].name
+		editorNames[i] = installedEditors[i].name
 	end
-	editorPicker = widget.newSegmentedControl{
-	x = leftMargin,
-	y = editorLabel.y + editorLabel.height,
-	segmentWidth = 120,
-	segments = segmentNames,
-	onPress = 
-		function ( event )
-			app.editorPath = installedEditors[event.target.segmentNumber].path
-		end
+	editorPicker = newCheckboxOption{
+		parentGroup = sceneGroup,
+		optionLabel = "Text Editor:",
+		checkboxLabels = editorNames,
+		x = leftMargin,
+		y = tabWidthPicker.y + tabWidthPicker.height + margin,
+		onPress = onEditorPicked,
 	}
-	editorPicker.anchorX = 0
-	editorPicker.anchorY = 0
-	sceneGroup:insert( editorPicker )
-	setActiveEditorSegment()
 end
 
 -- Prepare to show the errView scene
 function optionsView:show( event )
 	if event.phase == "will" then
-		setActiveEditorSegment()
+		setCheckedEditor()
 		toolbar.show( false )
 	end
 end
