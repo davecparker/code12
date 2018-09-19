@@ -1,4 +1,9 @@
-import Code12.*;
+/* 
+	This is my class project
+	This is my name
+*/ 
+
+// import Code12.*;
 
 class StructureTest extends Code12Program
 {

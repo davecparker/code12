@@ -36,18 +36,11 @@ local function parseFile()
 		-- Look for the special pattern "class ID" first, and
 		-- make a "class" line pattern not found in normal grammar
 		local lineRec = source.lines[lineNum]
-		local tokens = javalex.getTokens( lineRec )
-		if tokens and #tokens == 3 and tokens[1].tt == "class" then
-			parseTrees[lineNum] = { t == "line", p = "class", 
-				nodes = { tokens[1], tokens[2] } }
-		else
-			-- Parse the line using the normal line grammar
-			local tree = parseJava.parseLine( lineRec )
-			if not tree or tree.isError then
-				error( "*** Error error on line " .. lineNum )
-			end
-			parseTrees[lineNum] = tree
+		local tree = parseJava.parseLine( lineRec )
+		if tree == nil then
+			error( "*** Error error on line " .. lineNum )
 		end
+		parseTrees[lineNum] = tree
 	end
 	return true
 end
@@ -65,7 +58,13 @@ local function buildTables()
 		local nodes = tree.nodes
 		if p == "class" then
 			-- Begin a new class table
-			classes[#classes + 1] = { name = nodes[2].str, fields = {}, methods = {} }
+			local name = nodes[3].str
+			if name == "CT" then
+				name = "ct"
+			elseif name == "MATH" then
+				name = "Math"
+			end
+			classes[#classes + 1] = { name = name, fields = {}, methods = {} }
 			class = classes[#classes]
 		elseif p == "func" then
 			-- Get the method name and return type

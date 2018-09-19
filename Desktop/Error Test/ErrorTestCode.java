@@ -1,9 +1,9 @@
+// ERROR "Code12 does not support importing"
 import Code12.*;
-
 // ERROR "The class header shouldn't be indented"
 	class ErrorTest extends Code12Program
-// ERROR "The beginning { for the class shouldn't be indented"
-	{
+// ERROR "should not be indented"
+		{
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
 	GameObj button = ct.text("START", 0, 0, 10);
@@ -1258,14 +1258,14 @@ int underIndentedInstanceVar;
 		voidFunc();
 		}
 		if (false)
-		// ERROR "The { after an if statement should have the same indentation as the "if""
+		// ERROR "should have the same indentation"
 			{
 				voidFunc();
 			}
 		if (false)
 		{
 			voidFunc();
-			// ERROR "A block's ending } should have the same indentation as its beginning {"
+			// ERROR "should have the same indentation"
 			}
 		if (false)
 			voidFunc();
@@ -1286,7 +1286,7 @@ int underIndentedInstanceVar;
 		if (false)
 			voidFunc();
 		else
-			// ERROR "The { after an "else" should have the same indentation as the "else""
+			// ERROR "should have the same indentation"
 				{
 					voidFunc();
 				}
@@ -1298,7 +1298,7 @@ int underIndentedInstanceVar;
 		if (false)
 			voidFunc();
 		else if (false)
-		// ERROR "The { after an else if statement should have the same indentation as the "else if""
+		// ERROR "should have the same indentation"
 				{
 					voidFunc();
 				}
@@ -1359,7 +1359,7 @@ int underIndentedInstanceVar;
 		voidFunc();
 		}
 		for (int ii = 0; ii < 100; ii++)
-		// ERROR "The { after a for loop header should have the same indentation as the "for""
+		// ERROR "should have the same indentation"
 			{
 				voidFunc();
 			}
@@ -1367,7 +1367,7 @@ int underIndentedInstanceVar;
 		// ERROR "This line should be indented more than its controlling "while""
 		voidFunc();
 		while (false)
-		// ERROR "The { after a while loop header should have the same indentation as the "while""
+		// ERROR "should have the same indentation"
 			{
 				voidFunc();
 			}
@@ -1380,7 +1380,7 @@ int underIndentedInstanceVar;
 		voidFunc();
 		while (false);
 		do
-		// ERROR "The { after a "do" should have the same indentation as the "do""		
+		// ERROR "should have the same indentation"		
 			{
 				voidFunc();
 			}

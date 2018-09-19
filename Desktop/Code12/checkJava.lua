@@ -9,6 +9,7 @@
 
 -- Code12 modules
 local app = require( "app" )
+local source = require( "source" )
 local err = require( "err" )
 local javaTypes = require( "javaTypes" )
 local parseJava = require( "parseJava" )
@@ -20,7 +21,7 @@ local checkJava = {}
 
 
 -- File local state
-local syntaxLevel          -- the langauge (syntax) level
+local syntaxLevel          -- the language (syntax) level
 
 -- Table of variables that are currently defined. 
 -- These map a name to a var structure. There are also entries of type string 
@@ -1203,11 +1204,10 @@ function checkJava.checkProgram( programTree, level )
 	end
 	currentFunc = nil
 
-	-- Make sure that a start function was defined
+	-- Make sure that a start function was defined.
 	if not eventMethodFuncs["start"] then
-		local iLine = (programTree.nameID and programTree.nameID.iLine) or 1
-		err.setErrLineNum( iLine,
-				"A Code12 program must define a \"start\" function" )
+		err.setErrLineNum( source.numLines,
+				'A Code12 program must define a "start" function' )
 	end
 end
 

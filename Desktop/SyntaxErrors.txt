@@ -61,3 +61,7 @@ Conflicts in this file should be resolved by preserving the union of all the lin
 		final void X = 50;
 		void y;
 		void speed = 0.3;
+		x ct.rect( X, 10, 50, 10 );
+		if ct.rect( X, 10, 50, 10 );
+
+clas StructureTest extends Code12Program

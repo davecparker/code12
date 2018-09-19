@@ -153,22 +153,27 @@ local function checkTestCode()
 	local startTime = system.getTimer()
 	local programTree = parseProgram.getProgramTree( syntaxLevel )
 	local parseTime = system.getTimer() - startTime
-
-	-- Output the structure tree
-	local structureFile = io.open( structureFilename, "w" )
-	if structureFile then
-		parseProgram.printProgramTree( programTree, structureFile )
-		io.close( structureFile )
+	if programTree then
+		-- Output the structure tree
+		local structureFile = io.open( structureFilename, "w" )
+		if structureFile then
+			parseProgram.printProgramTree( programTree, structureFile )
+			io.close( structureFile )
+		end
 	end
 
 	-- Do Semantic Analysis
 	startTime = system.getTimer()
-	checkJava.checkProgram( programTree, syntaxLevel )
+	if programTree then
+		checkJava.checkProgram( programTree, syntaxLevel )
+	end
 	local semCheckTime = system.getTimer() - startTime
 
 	-- Do Code Generation
 	startTime = system.getTimer()
-	codeGenJava.getLuaCode( programTree )
+	if programTree then
+		codeGenJava.getLuaCode( programTree )
+	end
 	local codeGenTime = system.getTimer() - startTime
 
 	-- Check the results

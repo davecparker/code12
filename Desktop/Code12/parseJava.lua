@@ -496,6 +496,12 @@ local arrayInit = { t = "arrayInit",
 	{ 12, 12, "expr", 			expr										},
 }
 
+-- An extends superclass or empty
+local extends = { t = "extends",
+	{ 1, 12, "extends",			"extends", "ID"				},
+	{ 1, 12, false											},
+}
+
 -- A line of code
 local line = { t = "line",
 	{ 1, 12, "blank",																	"END" },
@@ -517,6 +523,7 @@ local line = { t = "line",
 	{ 11, 12, "break",			"break", ";",											"END" },
 	{ 12, 12, "arrayInit",		access, "TYPE", "[", "]", "ID", "=", arrayInit, ";",	"END" },
 	{ 12, 12, "arrayDecl",		access, "TYPE", "[", "]", idList, ";",					"END" },
+	{ 1, 12, "class",			access, "class", "ID", extends,							"END" },
 
 	-- Common errors: unknown type
 	{ 3, 0, "varInit",			access, "ID", "ID", "=", expr, ";", "END",					iNode = 2 },
@@ -526,11 +533,14 @@ local line = { t = "line",
 	{ 12, 0, "arrayDecl",		access, "ID", "[", "]", idList, ";", "END",					iNode = 2,
 			strErr = invalidTypeName },
 
-	-- Common errors: type instead of variable name
+	-- Common errors: type instead of ID
 	{ 3, 0, "varInit",			access, "TYPE", "TYPE", "=", expr, ";", "END",					iNode = 3 },
 	{ 3, 0, "constInit", 		access, "final", "TYPE", "TYPE", "=", expr, ";", "END", 		iNode = 4 },
 	{ 12, 0, "arrayInit",		access, "TYPE", "[", "]", "TYPE", "=", arrayInit, ";", "END",	iNode = 5,
 			strErr = invalidVarName },
+
+	{ 1, 0, "class",			access, "class", "TYPE", 0,										iNode = 3,
+			strErr = "This name is already defined. Choose another name for your class." },
 
 	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
@@ -561,6 +571,9 @@ local line = { t = "line",
 	{ 11, 0, "for",			"for", "(", forControl, ")", ";", 0,	 				iNode = 5,
 			strErr = "for loop header should not end with a semicolon" },
 
+	{ 1, 0, "class",		access, "class", "ID", extends, ";",					iNode = 5,
+			strErr = "class header should not end with a semicolon" },
+
 	-- Common errors: unsupported bracket style
 	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	"{", 0,		iNode = 7 },
 	{ 8, 0, "if",			"if", "(", expr, ")", "{", 0,							iNode = 5 },
@@ -568,11 +581,12 @@ local line = { t = "line",
 	{ 8, 0, "else",			"else", "{", 0,											iNode = 2 },
 	{ 11, 0, "do",			"do", "{", 0,											iNode = 2 },
 	{ 11, 0, "while",		"while", "(", expr, whileEnd, "{", 0,					iNode = 5 },
-	{ 11, 0, "for",			"for", "(", forControl, ")", "{", 0,					iNode = 5,
-			strErr = "In Code12, each { to start a new block must be on its own line" },
+	{ 11, 0, "for",			"for", "(", forControl, ")", "{", 0,					iNode = 5 },
+	{ 1, 0, "class",		access, "class", "ID", extends, "{", 0,					iNode = 5,
+			strErr = "In Code12, each {  to start a new block must be on its own line" },
 
 	{ 1, 0, "end",			"}", 1,
-			strErr = "In Code12, each } to end a block must be on its own line" },
+			strErr = "In Code12, each }  to end a block must be on its own line" },
 
 	-- Common errors: multiple statements per line
 	{ 1, 0, "stmt", 		stmt, ";", 2,
@@ -595,6 +609,10 @@ local line = { t = "line",
 	{ 11, 0, "while",		"while", "(", expr, whileEnd, 2,						iNode = 5, toEnd = true },
 	{ 11, 0, "for",			"for", "(", forControl, ")", 2,							iNode = 5, toEnd = true,
 			strErr = "Code12 requires the contents of a loop to start on its own line" },
+
+	-- Common errors: unsupported statements
+	{ 1, 0, "import",		"import", "ID", 0,
+			strErr = "Code12 does not support importing other classes" },
 }
 
 
