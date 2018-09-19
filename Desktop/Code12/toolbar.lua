@@ -58,28 +58,15 @@ end
 -- Make the toolbar UI
 function toolbar.create()
 	toolbarGroup = g.makeGroup()
+	local yCenter = app.dyToolbar / 2
 
 	-- Background
 	bgRect = g.uiItem( display.newRect( toolbarGroup, 0, 0, app.width, app.dyToolbar ),
 							app.toolbarShade, app.borderShade )
 
-	-- Choose File Button
-	local yCenter = app.dyToolbar / 2
-	chooseFileBtn = widget.newButton{
-		x = app.margin, 
-		y = yCenter,
-		onRelease = onChooseFile,
-		label = "Choose File",
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-		textOnly = true,
-	}
-	toolbarGroup:insert( chooseFileBtn )
-	chooseFileBtn.anchorX = 0
-
 	-- Restart button
 	restartBtn = widget.newButton{
-		x = chooseFileBtn.x + chooseFileBtn.width + app.margin, 
+		x = app.margin, 
 		y = yCenter,
 		onRelease = app.processUserFile,
 		label = "Restart",
@@ -89,6 +76,23 @@ function toolbar.create()
 	}
 	toolbarGroup:insert( restartBtn )
 	restartBtn.anchorX = 0
+	
+	-- Get File button
+	local getFileButton = widget.newButton{
+		x = restartBtn.x + restartBtn.width + app.margin, 
+		y = yCenter,
+		label = "Get File",
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+		textOnly = true,
+		onRelease = 
+			function ()
+				composer.gotoScene( "getFile" )
+			end
+	}
+	toolbarGroup:insert( getFileButton )
+	getFileButton.anchorX = 0
+
 
 	-- Options button 
 	optionsBtn = widget.newButton{
@@ -102,12 +106,26 @@ function toolbar.create()
 	}
 	toolbarGroup:insert( optionsBtn )
 	optionsBtn.anchorX = 1
+
+	-- Choose File Button
+	chooseFileBtn = widget.newButton{
+		x = optionsBtn.x - optionsBtn.width - app.margin,
+		y = yCenter,
+		onRelease = onChooseFile,
+		label = "Choose File",
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+		textOnly = true,
+	}
+	toolbarGroup:insert( chooseFileBtn )
+	chooseFileBtn.anchorX = 1
 end
 
 -- Resize the toolbar
 function toolbar.resize()
 	bgRect.width = app.width
 	optionsBtn.x = app.width - app.margin
+	chooseFileBtn.x = optionsBtn.x - optionsBtn.width - app.margin
 end
 
 -- Show/hide the toolbar

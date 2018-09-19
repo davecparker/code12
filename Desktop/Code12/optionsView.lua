@@ -22,10 +22,9 @@ local optionsView = composer.newScene()
 
 -- UI Metrics
 local margin = app.margin
-local topMargin = app.dyToolbar + margin
+local topMargin = margin
 local leftMargin = margin
 local checkboxSize = 14
-local checkboxSheet = graphics.newImageSheet( "images/checkbox.png", { width = 256, height = 256, numFrames = 2 } )
 
 -- Display objects and groups
 local title               -- Title text
@@ -112,7 +111,7 @@ local function newCheckboxOption( options )
 			width = checkboxSize,
 			height = checkboxSize,
 			onPress = options.onPress,
-			sheet = checkboxSheet,
+			sheet = app.checkboxSheet,
 			frameOn = 1,
 			frameOff = 2,
 			id = options.optionLabel .. "checkbox" .. i,
@@ -177,19 +176,19 @@ end
 
 --- Scene Methods ------------------------------------------------
 
--- Create the errView scene
+-- Create the optionsView scene
 function optionsView:create()
 	local sceneGroup = self.view
 
 	-- Background
-	 g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
+	g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
 	
 	-- Title
 	title = display.newText{
 		parent = sceneGroup,
 		text = "Code12 Options",
 		x = app.width / 2,
-		y = app.margin,
+		y = topMargin,
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI * 1.5,
 	}
@@ -292,7 +291,7 @@ function optionsView:create()
 	Runtime:addEventListener( "resize", self )
 end
 
--- Prepare to show the errView scene
+-- Prepare to show the optionsView scene
 function optionsView:show( event )
 	if event.phase == "will" then
 		setSelectedOptions()
@@ -300,7 +299,7 @@ function optionsView:show( event )
 	end
 end
 
--- Prepare to hide the errView scene
+-- Prepare to hide the optionsView scene
 function optionsView:hide( event )
 	if event.phase == "will" then 
 		app.saveSettings()
