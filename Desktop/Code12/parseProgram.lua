@@ -1019,6 +1019,161 @@ local function printStructureTree( node, indentLevel, file, label )
 	end
 end
 
+-- Make and return a copy of the given parse tree (copying leaf tokens as well),
+-- assigning the given line number to the tree and tokens.
+local function copyParseTree( node, lineNum )
+	if not node then
+		return node   -- nil or false
+	elseif node.tt then  
+		-- Copy token node
+		local token = {}
+		for i, v in pairs( node ) do
+			token[i] = v
+		end
+		token.iLine = lineNum 
+		return token
+	else  
+		-- A parse tree node: make a copy recursively
+		assert( node.t )
+		local tree = {}
+		for i, v in pairs( node ) do
+			tree[i] = v
+		end
+		local nodes = node.nodes
+		local nodesCopy = {}
+		for i = 1, #nodes do
+			nodesCopy[i] = copyParseTree( nodes[i], lineNum )
+		end
+		tree.nodes = nodesCopy
+		if tree.iLine then
+			tree.iLine = lineNum
+			tree.iLineStart = node.iLineStart + lineNum - node.iLine
+		end
+		return tree
+	end
+end
+
+-- Parse source.strLines at the given syntaxLevel and store the results
+-- in source.lines and source.numLines
+local function parseLines( syntaxLevel )
+	local iLineCommentStart = nil   -- set when inside a block comment
+	local iLineStart = nil          -- starting iLine for multi-line parse
+	local startTokens = nil         -- tokens from unfinished multi-line parse
+	local lineRecCodePrev = nil     -- the last line so far with code on it
+	local strLines = source.strLines
+	local lines = source.lines
+	local numUnchangedLines = 0
+	local numCachedLines = 0
+
+	for lineNum = 1, #strLines do
+		local strLine = strLines[lineNum]
+		local lineRec = lines[lineNum]
+
+		-- if we've seen this line before, we may be able to reuse its
+		-- cached parse results, but only if we are not in the middle of a 
+		-- block comment or incomplete line.
+		local lineRecCached = (iLineCommentStart == nil and startTokens == nil) 
+								and source.lineCacheForStrLine[strLine]
+		if lineRecCached then  -- found in cache so we know its reusable
+			if lineRec and lineRec.str == strLine then
+				-- Same line at same line number as before, we can just reuse it as is
+				numUnchangedLines = numUnchangedLines + 1
+			else
+				-- Make a copy of the cached results found for this line number
+				lineRec = {
+					iLine = lineNum,
+					str = strLine,
+					commentStr = lineRecCached.commentStr,
+					hasCode = lineRecCached.hasCode,
+					indentLevel = lineRecCached.indentLevel,
+					indentStr = lineRecCached.indentStr,
+					parseTree = copyParseTree( lineRecCached.parseTree, lineNum )
+				}
+				lines[lineNum] = lineRec
+				source.lineCacheForStrLine[strLine] = lineRec  -- update cache to newer one
+				numCachedLines = numCachedLines + 1
+			end
+		else
+			-- We need to parse this line
+			lineRec = { iLine= lineNum, str = strLine }  
+			lines[lineNum] = lineRec
+			local tree, tokens = parseJava.parseLine( lineRec, iLineCommentStart,
+									startTokens, iLineStart, syntaxLevel )
+			if tree == false then
+				-- Line is incomplete, carry tokens forward to next line
+				startTokens = tokens
+				if iLineStart == nil then
+					iLineStart = lineNum  -- remember where this multi-line parse started
+				end
+			else
+				-- Completed parse
+				startTokens = nil
+				iLineStart = nil
+
+				-- We can cache this parse for possible reuse if it was successful
+				-- and not involved in a multi-line parse or block comment
+				if tree and lineRec.iLineStart == nil and iLineCommentStart == nil
+						and not lineRec.openComment then
+					source.lineCacheForStrLine[strLine] = lineRec  -- cache it
+				end
+
+				-- Keep track of open block comments
+				if lineRec.openComment then
+					iLineCommentStart = lineRec.iLineCommentStart
+				else
+					iLineCommentStart = nil
+				end
+			end
+		end
+
+		-- Check for inconsistent tab/space indent on all non-blank lines
+		if lineRec.hasCode then
+			if lineRecCodePrev then
+				checkIndentTabsAndSpaces( lineRec, lineRecCodePrev )
+			end
+			lineRecCodePrev = lineRec
+		end
+	end -- end of loop
+	source.numLines = #strLines
+
+	-- Add sentinel line at end of source.lines
+	local lineNum = #strLines + 1
+	lines[lineNum] = { iLine = lineNum, str = "" }
+
+	-- Check for unclosed block comment
+	if iLineCommentStart then
+		err.setErrLineNum( iLineCommentStart, "Comment started with /* was not closed with */" )
+	end
+
+	-- Print cache stats
+	print( string.format( "\n%d unchanged lines (%d%%)", 
+				numUnchangedLines, numUnchangedLines * 100 / source.numLines ) )
+	print( string.format( "%d lines copied from cache (%d%%)", 
+				numCachedLines, numCachedLines * 100 / source.numLines ) )
+	local numParsed = source.numLines - numUnchangedLines - numCachedLines
+	print( string.format( "%d lines parsed (%d%%)", 
+				numParsed, numParsed * 100 / source.numLines ) )
+end
+
+-- Make the parseTrees array from the parsed source.lines and set numParseTrees
+local function getParseTrees()
+	-- Get all non-blank parse trees from source.lines
+	parseTrees = {}
+	for i = 1, source.numLines do
+		local tree = source.lines[i].parseTree
+		if tree and tree.p ~= "blank" then
+			parseTrees[#parseTrees + 1] = tree
+		end
+	end
+	numParseTrees = #parseTrees
+
+	-- Add sentinel parse tree at the end of parseTrees
+	local lineNum = source.numLines + 1   -- will report at source line sentinel
+	parseTrees[numParseTrees + 1] = 
+			{ t = "line", p = "EOF", nodes = {}, 
+				iLine = lineNum, iLineStart = lineNum, indentLevel = 0 }
+end
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -1026,65 +1181,10 @@ end
 -- If there is an error then set the error state, and return nil if the error 
 -- is unrecoverable.
 function parseProgram.getProgramTree( syntaxLevel )
-	-- Init the parse state
-	parseTrees = {}
-	numParseTrees = 0
+	-- Get the parse trees and init the strucure parse state
+	parseLines( syntaxLevel )
+	getParseTrees()
 	iTree = 1
-
-	-- Parse the source lines and build the parseTrees array
-	local iLineCommentStart = nil   -- set when inside a block comment
-	local iLineStart = nil          -- starting iLine for multi-line parse
-	local startTokens = nil         -- tokens from unfinished multi-line parse
-	local lineRecCodePrev = nil     -- the last line so far with code on it
-	for lineNum = 1, source.numLines do
-		-- Get parse tree for this line
-		local lineRec = source.lines[lineNum]
-		local tree, tokens = parseJava.parseLine( lineRec, iLineCommentStart,
-								startTokens, iLineStart, syntaxLevel )
-
-		-- Keep track of open block comments
-		if lineRec.openComment then
-			iLineCommentStart = lineRec.iLineCommentStart
-		else
-			iLineCommentStart = nil
-		end
-
-		-- Check for inconsistent tabs and spaces
-		if lineRec.hasCode then
-			if lineRecCodePrev then
-				checkIndentTabsAndSpaces( lineRec, lineRecCodePrev )
-			end
-			lineRecCodePrev = lineRec
-		end
-
-		if tree == false then
-			-- Line is incomplete, carry tokens forward to next line
-			assert( type(tokens) == "table" )
-			startTokens = tokens
-			if iLineStart == nil then
-				iLineStart = lineNum  -- remember what line this multi-line parse stated on
-			end
-		else
-			-- Store the parse tree if we got one and it's not blank
-			startTokens = nil
-			if tree and tree.p ~= "blank" then
-				parseTrees[#parseTrees + 1] = tree
-			end
-			iLineStart = nil
-		end
-	end
-
-	-- Check for unclosed block comment
-	if iLineCommentStart then
-		err.setErrLineNum( iLineCommentStart, "Comment started with /* was not closed with */" )
-	end
-
-	-- Add sentinel parse tree at the end
-	numParseTrees = #parseTrees    -- this count doesn't include the sentinel
-	local lineNum = source.numLines + 1
-	parseTrees[#parseTrees + 1] = 
-			{ t = "line", p = "EOF", nodes = {}, 
-				iLine = lineNum, iLineStart = lineNum, indentLevel = 0 }
 
 	-- Make the root of the program tree and check the program header
 	local programTree = getProgramHeader()

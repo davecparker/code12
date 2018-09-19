@@ -32,10 +32,9 @@ local classes      -- api information for all classes found
 local function parseFile()
 	err.initProgram()
 	parseTrees = {}
-	for lineNum = 1, source.numLines do
-		-- Look for the special pattern "class ID" first, and
-		-- make a "class" line pattern not found in normal grammar
-		local lineRec = source.lines[lineNum]
+	for lineNum = 1, #source.strLines do
+		local lineRec = { iLine = lineNum, str = source.strLines[lineNum] }
+		source.lines[lineNum] = lineRec
 		local tree = parseJava.parseLine( lineRec )
 		if tree == nil then
 			error( "*** Error error on line " .. lineNum )

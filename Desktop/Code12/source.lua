@@ -17,10 +17,16 @@ local source =  {
 
 	-- These are set by source.readFile()
 	timeLoaded = 0,              -- time this file was loaded or 0 if not loaded
-	numLines = 0,                -- number of source lines
-	lines = {},                  -- array of record for each source line, each with:
+	strLines = nil,              -- array of source lines from last read of file
+
+	-- Array of line records built by the last parse, indexed by line number.
+	-- Note that immediately after a call to source.readFile(), source.strLines 
+	-- contains the new lines, and source.lines contains the data built by the 
+	-- last parse, which will be reused when possible.
+	numLines = 0,  -- number of lines relevant to this parse (lines may have more)
+	lines = {},    -- each record contains:
 	-- {
-	--     -- These are set by source.readFile()
+	--     -- These are set by program parsing
 	--     iLine,                -- line number in file = index of this record in lines
 	--     str,                  -- source code string for this line
 	--
@@ -36,13 +42,16 @@ local source =  {
 	--     iLineStart,           -- starting line number if multi-line parse, else nil
 	--     parseTree,            -- parse tree for line, false if incomplete, nil if error
 	-- }
+
+	-- Cache of source lines mapped to line records for lines that can be reused
+	lineCacheForStrLine = {}
 }
 
 
 --- Utility Functions ----------------------------------------------------------------
 
 -- If path then set source.path to it, otherwise use the existing source.path.
--- Read the source and store all of its source lines.
+-- Read the source and store all of its source lines in source.strLines.
 -- Return true if success.
 function source.readFile( path )
 	if path then
@@ -56,15 +65,14 @@ function source.readFile( path )
 			local s = file:read( "*l" )
 			if s then
 				source.timeLoaded = os.time()
-				source.lines = {}   -- replace previous lines if any
+				source.strLines = {}   -- replace previous lines if any
+				local strs = source.strLines
 				local lineNum = 1
 				repeat
-					source.lines[lineNum] = { iLine = lineNum, str = s }
+					strs[lineNum] = s
 					lineNum = lineNum + 1
 					s = file:read( "*l" )  -- read next line
 				until s == nil
-				source.numLines = lineNum - 1
-				source.lines[lineNum] = { iLine = lineNum, str = "" }  -- sentinel
 				success = true
 			end
 			io.close( file )

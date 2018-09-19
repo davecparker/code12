@@ -79,9 +79,10 @@ local function parseTestCode()
 	local startTokens = nil
 	local iLineStart = nil
 	local iLineCommentStart = nil   -- set when inside a block comment
-	while lineNum <= source.numLines do
-		local lineRec = source.lines[lineNum]
-		local strCode = lineRec.str
+	while lineNum <= #source.strLines do
+		local strCode = source.strLines[lineNum]
+		local lineRec = { iLine = lineNum, str = strCode }
+		source.lines[lineNum] = lineRec
 
 		-- Output source for this line
 		outFile:write( "\n" .. lineNum .. ". " .. trim1( strCode ) .. "\n" )
