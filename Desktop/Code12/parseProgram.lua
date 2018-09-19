@@ -1054,8 +1054,15 @@ local function copyParseTree( node, lineNum )
 end
 
 -- Parse source.strLines at the given syntaxLevel and store the results
--- in source.lines and source.numLines
+-- in source.lines, source.numLines, and source.syntaxLevel.
 local function parseLines( syntaxLevel )
+	-- Set the syntax level and purge the parse cache if it changed
+	if syntaxLevel ~= source.syntaxLevel then
+		source.purgeParseCache()
+	end
+	source.syntaxLevel = syntaxLevel
+
+	-- Process source.strLines
 	local iLineCommentStart = nil   -- set when inside a block comment
 	local iLineStart = nil          -- starting iLine for multi-line parse
 	local startTokens = nil         -- tokens from unfinished multi-line parse
@@ -1064,7 +1071,6 @@ local function parseLines( syntaxLevel )
 	local lines = source.lines
 	local numUnchangedLines = 0
 	local numCachedLines = 0
-
 	for lineNum = 1, #strLines do
 		local strLine = strLines[lineNum]
 		local lineRec = lines[lineNum]
@@ -1112,7 +1118,8 @@ local function parseLines( syntaxLevel )
 
 				-- We can cache this parse for possible reuse if it was successful
 				-- and not involved in a multi-line parse or block comment
-				if tree and lineRec.iLineStart == nil and iLineCommentStart == nil
+				if tree and not tree.isError and not lineRec.hasErr
+						and lineRec.iLineStart == nil and iLineCommentStart == nil
 						and not lineRec.openComment then
 					source.lineCacheForStrLine[strLine] = lineRec  -- cache it
 				end

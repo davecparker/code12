@@ -23,12 +23,16 @@ local source =  {
 	-- Note that immediately after a call to source.readFile(), source.strLines 
 	-- contains the new lines, and source.lines contains the data built by the 
 	-- last parse, which will be reused when possible.
-	numLines = 0,  -- number of lines relevant to this parse (lines may have more)
+	numLines = 0,       -- # of lines relevant to this parse (lines may have more)
+	syntaxLevel = nil,  -- syntax level for this parse
 	lines = {},    -- each record contains:
 	-- {
 	--     -- These are set by program parsing
 	--     iLine,                -- line number in file = index of this record in lines
 	--     str,                  -- source code string for this line
+	--
+	--     -- This can be set any time an error is detected on this line
+	--     hasErr,               -- true if an error was recorded on this line 
 	--
 	--     -- These are set by lexical analysis
 	--     commentStr,           -- comment string at end of the line or nil if none
@@ -50,6 +54,14 @@ local source =  {
 
 --- Utility Functions ----------------------------------------------------------------
 
+-- Purge the parse cache
+function source.purgeParseCache()
+	source.lineCacheForStrLine = {}
+	source.lines = {}
+	source.numLines = 0
+	source.syntaxLevel = nil
+end
+
 -- If path then set source.path to it, otherwise use the existing source.path.
 -- Read the source and store all of its source lines in source.strLines.
 -- Return true if success.
@@ -59,6 +71,10 @@ function source.readFile( path )
 	end
 	local success = false
 	if source.path then
+		-- If this is a new file then purge the parse cache
+		if source.timeLoaded == 0 then
+			source.purgeParseCache()
+		end
 		local file = io.open( source.path, "r" )
 		if file then
 			-- Try to read the first line to see if it's really readable now

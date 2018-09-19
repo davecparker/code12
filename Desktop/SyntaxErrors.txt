@@ -65,3 +65,4 @@ Conflicts in this file should be resolved by preserving the union of all the lin
 		if ct.rect( X, 10, 50, 10 );
 
 clas StructureTest extends Code12Program
+         double x = ct.random(0, 100)

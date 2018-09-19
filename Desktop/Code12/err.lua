@@ -158,6 +158,8 @@ function err.setErr( loc, refLoc, strErr, ... )
 	-- Keep only the first error on each line
 	if errRecForLine[iLineRank] == nil then
 		errRecForLine[iLineRank] = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+		source.lines[iLineRank].hasErr = true
+		source.lines[loc.iLine].hasErr = true
 
 		-- Keep track of the first and last line numbers with errors
 		if iLineFirstErr == nil or iLineRank < iLineFirstErr then
