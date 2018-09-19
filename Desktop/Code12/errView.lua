@@ -391,7 +391,6 @@ local function onKeyEvent( event )
 		if keyName == "pageUp" then
 			iErrorNew = iError - 1
 		elseif keyName == "pageDown" then
-			print("pageDown")
 			iErrorNew = iError + 1
 		elseif keyName == "home" then
 			iErrorNew = 1

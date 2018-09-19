@@ -32,7 +32,7 @@ local source =  {
 	--     str,                  -- source code string for this line
 	--
 	--     -- This can be set any time an error is detected on this line
-	--     hasErr,               -- true if an error was recorded on this line 
+	--     errRec,               -- error record for this line or nil if none 
 	--
 	--     -- These are set by lexical analysis
 	--     commentStr,           -- comment string at end of the line or nil if none

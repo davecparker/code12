@@ -1118,7 +1118,7 @@ local function parseLines( syntaxLevel )
 
 				-- We can cache this parse for possible reuse if it was successful
 				-- and not involved in a multi-line parse or block comment
-				if tree and not tree.isError and not lineRec.hasErr
+				if tree and not tree.isError and lineRec.errRec == nil
 						and lineRec.iLineStart == nil and iLineCommentStart == nil
 						and not lineRec.openComment then
 					source.lineCacheForStrLine[strLine] = lineRec  -- cache it

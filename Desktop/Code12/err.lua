@@ -30,9 +30,6 @@ local err = {
 --     refLoc,           -- reference location if any (same fields as loc above)
 -- }
 
--- Array mapping iLine to err record, to store the first error on each line
-local errRecForLine
-
 -- Line numbers for the first and last error known
 local iLineFirstErr
 local iLineLastErr
@@ -137,7 +134,6 @@ end
 
 -- Init the error state for a new program
 function err.initProgram()
-	errRecForLine = {}
 	iLineFirstErr = nil
 	iLineLastErr = nil
 end
@@ -156,10 +152,8 @@ function err.setErr( loc, refLoc, strErr, ... )
 	local iLineRank = iLineRankFromILine( loc.iLine )
 
 	-- Keep only the first error on each line
-	if errRecForLine[iLineRank] == nil then
-		errRecForLine[iLineRank] = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
-		source.lines[iLineRank].hasErr = true
-		source.lines[loc.iLine].hasErr = true
+	if source.lines[iLineRank].errRec == nil then
+		source.lines[iLineRank].errRec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
 
 		-- Keep track of the first and last line numbers with errors
 		if iLineFirstErr == nil or iLineRank < iLineFirstErr then
@@ -321,13 +315,14 @@ end
 -- Clear the error for the given line number, if any
 function err.clearErr( iLine )
 	assert( type(iLine) == "number" )
-	errRecForLine[iLineRankFromILine( iLine )] = nil
+	source.lines[iLineRankFromILine( iLine )].errRec = nil
 end
 
 -- Return the logged error for the given line number, or nil if none.
 function err.errRecForLine( iLine )
 	assert( type(iLine) == "number" )
-	return errRecForLine[iLine]
+	local lineRec = source.lines[iLine]
+	return (lineRec and lineRec.errRec) or nil
 end
 
 -- Return an array of line numbers that have errors
@@ -338,7 +333,7 @@ function err.lineNumbersWithErrors()
 		return lineNumbers
 	end
 	local iLine = iLineFirstErr   -- might have gotten cleared so loop below
-	while errRecForLine[iLine] == nil do
+	while source.lines[iLine].errRec == nil do
 		iLine = iLine + 1
 		if iLine > iLineLastErr then
 			return lineNumbers
@@ -348,7 +343,7 @@ function err.lineNumbersWithErrors()
 
 	-- Add other line numbers that have errors
 	for i = iLine + 1, iLineLastErr do
-		if errRecForLine[i] then
+		if source.lines[i].errRec then
 			lineNumbers[#lineNumbers + 1] = i
 		end
 	end
