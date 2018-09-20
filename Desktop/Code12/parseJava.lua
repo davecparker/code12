@@ -909,8 +909,40 @@ local function parseCurrentLine( level )
 	return nil
 end
 
+-- Make and return a recursive copy of the given parse tree node 
+-- (including leaf tokens), assigning the given line number to the tokens.
+local function copyParseTreeNode( node, lineNum )
+	if not node then
+		return node   -- nil or false
+	elseif node.tt then  
+		-- Copy token node
+		return { tt = node.tt, str = node.str, iLine = lineNum, 
+				iChar = node.iChar, vt = node.vt }
+	else  
+		-- A parse tree node: make a copy recursively
+		assert( node.t )
+		local nodes = node.nodes
+		local nodesCopy = {}
+		for i = 1, #nodes do
+			nodesCopy[i] = copyParseTreeNode( nodes[i], lineNum )
+		end
+		return { t = node.t, p = node.p, nodes = nodesCopy }
+	end
+end
+
 
 ----- Module functions -------------------------------------------------------
+
+-- Make and return a full (deep) copy of the given line parse tree, assigning
+-- the given line number to the tokens and the top (line) tree node.
+function parseJava.copyLineParseTree( tree, lineNum )
+	assert( tree.t == "line")
+	local treeCopy = copyParseTreeNode( tree, lineNum )
+	treeCopy.iLine = lineNum
+	treeCopy.iLineStart = lineNum + tree.iLineStart - tree.iLine
+	treeCopy.indentLevel = tree.indentLevel
+	return treeCopy
+end
 
 -- If nameNode is an invalid name ID then set the error state and return true,
 -- otherwise return false. Usage should be a description of how the name is 

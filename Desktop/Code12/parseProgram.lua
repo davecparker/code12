@@ -1019,40 +1019,6 @@ local function printStructureTree( node, indentLevel, file, label )
 	end
 end
 
--- Make and return a copy of the given parse tree (copying leaf tokens as well),
--- assigning the given line number to the tree and tokens.
-local function copyParseTree( node, lineNum )
-	if not node then
-		return node   -- nil or false
-	elseif node.tt then  
-		-- Copy token node
-		local token = {}
-		for i, v in pairs( node ) do
-			token[i] = v
-		end
-		token.iLine = lineNum 
-		return token
-	else  
-		-- A parse tree node: make a copy recursively
-		assert( node.t )
-		local tree = {}
-		for i, v in pairs( node ) do
-			tree[i] = v
-		end
-		local nodes = node.nodes
-		local nodesCopy = {}
-		for i = 1, #nodes do
-			nodesCopy[i] = copyParseTree( nodes[i], lineNum )
-		end
-		tree.nodes = nodesCopy
-		if tree.iLine then
-			tree.iLine = lineNum
-			tree.iLineStart = node.iLineStart + lineNum - node.iLine
-		end
-		return tree
-	end
-end
-
 -- Parse source.strLines at the given syntaxLevel and store the results
 -- in source.lines, source.numLines, and source.syntaxLevel.
 local function parseLines( syntaxLevel )
@@ -1093,7 +1059,7 @@ local function parseLines( syntaxLevel )
 					hasCode = lineRecCached.hasCode,
 					indentLevel = lineRecCached.indentLevel,
 					indentStr = lineRecCached.indentStr,
-					parseTree = copyParseTree( lineRecCached.parseTree, lineNum )
+					parseTree = parseJava.copyLineParseTree( lineRecCached.parseTree, lineNum )
 				}
 				lines[lineNum] = lineRec
 				source.lineCacheForStrLine[strLine] = lineRec  -- update cache to newer one
