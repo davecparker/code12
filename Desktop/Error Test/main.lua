@@ -109,7 +109,7 @@ end
 local function checkErrorResults()
 	for lineNum = 1, #sourceFile.strLines do
 		local strCode = sourceFile.strLines[lineNum]
-		local errRec = err.getLoggedErrForLine( lineNum )
+		local errRec = err.errRecForLine( lineNum )
 		local strExpected = strErrExpected( lineNum )
 
 		-- Did we get an error on this line?
@@ -165,8 +165,9 @@ local function checkTestCode()
 	numUncaughtErrors = 0
 	local startTime = system.getTimer()
 
-	-- Tell Code12 to log all errors instead of stopping
-	err.logAllErrors()
+	-- Init error state for bulk error mode
+	err.initProgram()
+	err.bulkTestMode = true
 
 	-- Get the program structure tree and parse tree array
 	local startTime = system.getTimer()

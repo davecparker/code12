@@ -192,4 +192,8 @@ class Code12Program
 	void onKeyRelease( String key )      // key code name e.g. "a", "up"
 	void onCharTyped( String ch )        // "a", "A", "$", etc.
 	void onResize( ) 
+
+	// The main function
+	//------------------
+	void main( String[] args )
 }

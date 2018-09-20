@@ -9,9 +9,9 @@
 
 -- The err module
 local err = {
-	-- Public error record for the earliest error, or nil if none.
-	rec = nil,
+	bulkTestMode = false    -- set to true for bulk error test drivers
 }
+
 
 -- An error rec contains the following fields:
 -- {
@@ -26,12 +26,16 @@ local err = {
 --     refLoc,           -- reference location if any (same fields as loc above)
 -- }
 
--- In diagnostic error logging mode, we keep an error for each source line
-local errRecForLine = nil    -- array mapping iLine to err record if logging
+-- Array mapping iLine to err record, to store the first error on each line
+local errRecForLine
+
+-- Line numbers for the first and last error known
+local iLineFirstErr
+local iLineLastErr
 
 -- A set of lines that were found to be incomplete (map lineNumber to true).
 -- The err.iLineRank is determined by the first line that is not incomplete.
-local incompleteLines = {}
+local incompleteLines
 
 
 --- Utility Functions -------------------------------------------------------
@@ -39,6 +43,9 @@ local incompleteLines = {}
 -- Expand loc as necessary to contain the location spanned by node,
 -- which can be a token, parse tree node, or strucure node.
 local function expandLocToNode( loc, node )
+	if not node then
+		return
+	end
 	assert( type(node) == "table" )
 	if node.tt then
 		-- Token: update start position if this token is before
@@ -133,9 +140,10 @@ end
 
 -- Init the error state for a new program
 function err.initProgram()
-	err.rec = nil
-	errRecForLine = nil
+	errRecForLine = {}
 	incompleteLines = {}
+	iLineFirstErr = nil
+	iLineLastErr = nil
 end
 
 -- Mark the given line number as incomplete (tokens were forward to the next line)
@@ -157,17 +165,17 @@ function err.setErr( loc, refLoc, strErr, ... )
 	-- Determine the line number that we are ranking this error with 
 	local iLineRank = iLineRankFromILine( loc.iLine )
 
-	-- Are we keeping an error for each line?
-	if errRecForLine then
-		-- Keep only the first error on each line
-		if errRecForLine[iLineRank] == nil then
-			errRecForLine[iLineRank] = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
-		end
-	end
+	-- Keep only the first error on each line
+	if errRecForLine[iLineRank] == nil then
+		errRecForLine[iLineRank] = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
 
-	-- Make err.rec keep the first error for the lowest ranked line number
-	if err.rec == nil or iLineRank < err.rec.iLineRank then
-		err.rec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+		-- Keep track of the first and last line numbers with errors
+		if iLineFirstErr == nil or iLineRank < iLineFirstErr then
+			iLineFirstErr = iLineRank
+		end
+		if iLineLastErr == nil or iLineRank > iLineLastErr then
+			iLineLastErr = iLineRank
+		end
 	end
 end
 
@@ -321,36 +329,46 @@ end
 -- Clear the error for the given line number, if any
 function err.clearErr( iLine )
 	assert( type(iLine) == "number" )
-
-	if errRecForLine then
-		errRecForLine[iLineRankFromILine( iLine )] = nil
-	end
-	if err.rec and err.rec.iLineRank == iLineRankFromILine( iLine ) then  
-		err.rec = nil
-	end
-end
-
--- Set the error logging mode that keeps an error for each line
-function err.logAllErrors()
-	errRecForLine = {}
+	errRecForLine[iLineRankFromILine( iLine )] = nil
 end
 
 -- Return the logged error for the given line number, or nil if none.
-function err.getLoggedErrForLine( iLine )
+function err.errRecForLine( iLine )
 	assert( type(iLine) == "number" )
-
-	if errRecForLine then
-		return errRecForLine[iLine]
-	elseif err.rec and err.rec.iLineRank == iLineRankFromILine( iLine ) then
-		return err.rec
-	end
-	return nil
+	return errRecForLine[iLine]
 end
 
--- Return true if there is an error that should stop further processing
-function err.shouldStop()
-	-- Only stop if there is an error and we are not logging all errors
-	return err.rec and errRecForLine == nil
+-- Return an array of line numbers that have errors
+function err.lineNumbersWithErrors()
+	-- Find the first line if any
+	local lineNumbers = {}
+	if iLineFirstErr == nil then
+		return lineNumbers
+	end
+	local iLine = iLineFirstErr   -- might have gotten cleared so loop below
+	while errRecForLine[iLine] == nil do
+		iLine = iLine + 1
+		if iLine > iLineLastErr then
+			return lineNumbers
+		end
+	end
+	lineNumbers[1] = iLine
+
+	-- Add other line numbers that have errors
+	for i = iLine + 1, iLineLastErr do
+		if errRecForLine[i] then
+			lineNumbers[#lineNumbers + 1] = i
+		end
+	end
+	return lineNumbers
+end
+
+-- Return true if the program has an error in it
+function err.hasErr()
+	if iLineFirstErr == nil then
+		return false
+	end
+	return #err.lineNumbersWithErrors() > 0
 end
 
 
