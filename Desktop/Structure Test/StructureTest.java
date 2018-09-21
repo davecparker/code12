@@ -5,7 +5,7 @@
 
 // import Code12.*;
 
-class StructureTest extends Code12Program
+class StructureTest // extends Code12Program
 {
 	// instance variables
 	private GameObj fish, ball, bigBall;

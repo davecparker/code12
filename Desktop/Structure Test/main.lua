@@ -5,7 +5,7 @@ require('Code12.api')
 
 -- import Code12.*;
 
-
+-- extends Code12Program
 
 -- instance variables
 this.fish = nil; this.ball = nil; this.bigBall = nil

@@ -183,7 +183,14 @@ local function getProgramHeader()
 	-- Find the first line of code, skipping blanks/comments and imports
 	while iLine <= source.numLines do
 		tree = source.lines[iLine].parseTree
-		if tree == nil or (tree.p ~= "blank" and tree.p ~= "import") then
+		if tree == nil then
+			break  -- a line with a syntax error
+		elseif tree.p == "import" then
+			-- Silently allow import of Code12 package
+			if tree.nodes[2].str == "Code12" then
+				err.clearErr( iLine )   -- was reported as common parse error
+			end
+		elseif tree.p ~= "blank" then
 			break
 		end
 		iLine = iLine + 1

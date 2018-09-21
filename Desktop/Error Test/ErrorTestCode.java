@@ -1,5 +1,5 @@
 // ERROR "Code12 does not support importing"
-import Code12.*;
+import java.util.Scanner;
 // ERROR "The class header shouldn't be indented"
 	class ErrorTest extends Code12Program
 // ERROR "should not be indented"

@@ -1,6 +1,10 @@
 This file is a log of generic syntax errors detected by the Code12 parser.
 It is appended to each time a generic syntax error is found. 
 Conflicts in this file should be resolved by preserving the union of all the lines.
+------------------------------------------------------------------------------------
+
+clas StructureTest extends Code12Program
+imort Code12.*;
  
 		ct.circle;
 		ct.circle X, y, 20
@@ -63,6 +67,4 @@ Conflicts in this file should be resolved by preserving the union of all the lin
 		void speed = 0.3;
 		x ct.rect( X, 10, 50, 10 );
 		if ct.rect( X, 10, 50, 10 );
-
-clas StructureTest extends Code12Program
-         double x = ct.random(0, 100)
+        double x = ct.random(0, 100)
