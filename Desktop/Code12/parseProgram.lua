@@ -1056,7 +1056,10 @@ local function parseLines( syntaxLevel )
 		if lineRecCached then  -- found in cache so we know its reusable
 			if lineRec and lineRec.str == strLine then
 				-- Same line at same line number as before, we can just reuse it as is
+				-- except that we need to clear the errRec that might have been set
+				-- after parsing
 				numUnchangedLines = numUnchangedLines + 1
+				lineRec.errRec = nil
 			else
 				-- Make a copy of the cached results found for this line number
 				lineRec = {
