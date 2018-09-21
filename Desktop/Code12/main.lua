@@ -258,6 +258,7 @@ function app.saveSettings()
 	userSettings.editorPath = app.editorPath
 	userSettings.useDefaultEditor = app.useDefaultEditor
 	userSettings.oneErrOnly = app.oneErrOnly
+	userSettings.recentSourceFilePaths = app.recentSourceFilePaths
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -318,6 +319,11 @@ local function loadSettings()
 				-- Use the saved oneErrOnly value
 				if type(t.oneErrOnly) == "boolean" then
 					app.oneErrOnly = t.oneErrOnly
+				end
+
+				-- Use the saved recentSourceFilePaths
+				if type(t.recentSourceFilePaths) == "table" then
+					app.recentSourceFilePaths = t.recentSourceFilePaths
 				end
 			end
 		end

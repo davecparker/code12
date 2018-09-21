@@ -25,30 +25,56 @@ local extraMargin = margin * 4
 local topMargin = app.dyToolbar
 local iconSize = 30
 local btnLabelOffset = 40
-local fontSize = app.fontSizeUI * 2
+local fontSize = 24
 
 -- Display objects and groups
 local newProgramBtn
 local openProgramBtn
 local recentProgramsTxt
+local recentProgramsGroup
 
 
 --- Internal Functions ------------------------------------------------
 
+-- Return the file name from the given file path
+local function getNameFromPath( path )
+	return string.match( path, '[^\\/]+%.java' )
+end
+
+-- Update app.sourseFile and add path to app.recentSourceFilePaths
+local function updateSourceFile( path )
+	if path then
+		app.sourceFile.path = path
+		app.sourceFile.timeLoaded = 0
+		app.sourceFile.timeModLast = 0
+		app.addRecentSourceFilePath( path )
+	end
+end
+
+-- Show dialog to choose the user source code file
+local function chooseFile()
+	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
+	updateSourceFile( path )
+	native.setActivityIndicator( false )
+end
+
+-- Event handler for the New Program button
 local function onNewProgram()
-	print("new program")
+	-- TODO
 end
 
+-- Event handler for the Open Program button
 local function onOpenProgram()
-	print("open program")
+	native.setActivityIndicator( true )
+	timer.performWithDelay( 50, chooseFile )
 end
 
-local function updateRecentPrograms()
-
+local function updateRecentProgramsGroup()
+	-- TODO
 end
 
 local function setOpenInEditorCheckbox()
-
+	-- TODO
 end
 
 
@@ -61,13 +87,6 @@ function getFile:create()
 	-- Background
 	g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
 	
-	-- New Program Group
-	-- newProgramGroup = display.newGroup( )
-	-- sceneGroup:insert( newProgramGroup )
-	-- newProgramGroup.x = app.width / 2
-	-- newProgramGroup.y = topMargin
-	-- newProgramGroup.anchorY = 0
-
 	-- New Program Button
 	newProgramBtn = widget.newButton{
 		x = app.width / 2,
@@ -84,10 +103,11 @@ function getFile:create()
 	}
 	sceneGroup:insert( newProgramBtn )
 	newProgramBtn.anchorY = 0
+	local xBtns = newProgramBtn.x - newProgramBtn.width / 2
 
 	-- Open Program Button
 	openProgramBtn = widget.newButton{
-		x = newProgramBtn.x - newProgramBtn.width / 2,
+		x = xBtns,
 		y = newProgramBtn.y + newProgramBtn.height + margin,
 		onRelease = onOpenProgram,
 		label = "Open Program",
@@ -107,18 +127,70 @@ function getFile:create()
 	recentProgramsTxt = display.newText{
 		parent = sceneGroup,
 		text = "Recent Programs",
-		x = openProgramBtn.x,
+		x = xBtns,
 		y = openProgramBtn.y + openProgramBtn.height + extraMargin,
 		font = native.systemFontBold,
 		fontSize = fontSize,
 	}
 	g.uiItem( recentProgramsTxt )
+
+	-- Recent Programs list
+	recentProgramsGroup = display.newGroup()
+	recentProgramsGroup.x = xBtns
+	recentProgramsGroup.y = recentProgramsTxt.y + recentProgramsTxt.height + margin
+	recentProgramsGroup.anchorX = 0
+	recentProgramsGroup.anchorY = 0
+	updateRecentProgramsGroup()
+	sceneGroup:insert( recentProgramsGroup )
+	local yBtn = 0
+	for i = 1, #app.recentSourceFilePaths do
+		local path = app.recentSourceFilePaths[i]
+		-- Make icon and filename text
+		local recentProgramBtn = widget.newButton{
+			x = 0,
+			y = yBtn,
+			label = getNameFromPath( path ),
+			labelAlign = "left",
+			labelXOffset = btnLabelOffset,
+			font = native.systemFontBold,
+			fontSize = fontSize,
+			width = iconSize,
+			height = iconSize,
+			defaultFile = "images/recentProgram.png",
+			onRelease =
+				function ()
+					if app.openFilesInEditor then
+						env.openFileInEditor( path )
+					end
+					updateSourceFile( path )
+					app.saveSettings()
+					app.processUserFile()
+				end
+
+		}
+		recentProgramBtn.anchorX = 0
+		recentProgramBtn.anchorY = 0
+		recentProgramBtn.path = 
+		recentProgramsGroup:insert( recentProgramBtn )
+		-- Make file path text
+		local pathTxt = display.newText{
+			parent = recentProgramsGroup,
+			text = path,
+			x = iconSize + btnLabelOffset,
+			y = recentProgramBtn.y + recentProgramBtn.height,
+			width = app.width - margin - xBtns - iconSize - btnLabelOffset,
+			font = native.systemFont,
+			fontSize = fontSize * 0.5,
+		}
+		g.uiItem( pathTxt )
+		yBtn = yBtn + recentProgramBtn.height + pathTxt.height + margin
+	end
 end
 
 -- Prepare to show the getFile scene
 function getFile:show( event )
 	if event.phase == "will" then
-		updateRecentPrograms()
+		updateRecentProgramsGroup()
 		setOpenInEditorCheckbox()
 	end
 end

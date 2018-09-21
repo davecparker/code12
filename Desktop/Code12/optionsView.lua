@@ -23,7 +23,6 @@ local optionsView = composer.newScene()
 -- UI Metrics
 local margin = app.margin
 local topMargin = margin
-local leftMargin = margin
 local xSwitches = 200
 local switchSize = 20        -- size of radio buttons, checkboxes, etc
 local fontSize = 20
@@ -196,10 +195,6 @@ local function setSelectedOptions()
 	fillBoxes( levelPicker.switches, app.syntaxLevel )
 
 	-- Set the checked box of the tabWidthPicker
-	print("app.tabWidth", app.tabWidth)
-	for i = 1, tabWidthPicker.switches.numChildren do
-		print(tabWidthPicker.switches[i].val)
-	end
 	tabWidthPicker.switches[app.tabWidth - 1]:setState{ isOn = true }
 
 	-- Set the checked box of the editorPicker
@@ -278,7 +273,8 @@ function optionsView:create()
 		height = 15,
 		onRelease = 
 			function ()
-				composer.gotoScene( composer.getSceneName( "previous" ) )
+				app.saveSettings()
+				app.processUserFile()
 			end
 	}
 	sceneGroup:insert( closeBtn )
@@ -286,29 +282,23 @@ function optionsView:create()
 	closeBtn.anchorY = 0
 
 	-- Syntax level picker
-	local levelNums = {}
 	local syntaxLevels = {
-		"12. Arrays",
-		"11. Loops",
-		"10. Parameters",
-		"9. Function Definitions",
-		"8. If-else",
-		"7. Object Method Calls",
-		"6. Object Data Fields",
-		"5. Function Calls",
-		"4. Expressions",
-		"3. Variables",
+		"1. Procedure Calls",
 		"2. Comments",
-		"1. Procedure Calls"
+		"3. Variables",
+		"4. Expressions",
+		"5. Function Calls",
+		"6. Object Data Fields",
+		"7. Object Method Calls",
+		"8. If-else",
+		"9. Function Definitions",
+		"10. Parameters",
+		"11. Loops",
+		"12. Arrays",
 	}
-	local numSyntaxLevels = #syntaxLevels
-	for i = 1, numSyntaxLevels do
-		levelNums[i] = numSyntaxLevels + 1 - i
-	end
 	levelPicker = newSettingPicker{
 		header = "Syntax Level:",
 		labels = syntaxLevels,
-		values = levelNums,
 		style = "fillbox",
 		orientation = "vertical",
 		y = title.y + title.height + margin,

@@ -42,6 +42,10 @@ local app =  {
 
 	-- Misc constants
 	numSyntaxLevels = 12,        -- number of different parsing levels
+	maxNumRecentPaths = 5,       -- maximum number of recent source file paths to keep
+
+	-- List of most recent source file paths opened, with duplicates removed
+	recentSourceFilePaths = {},
 
 	-- The user source file
 	sourceFile = {
@@ -187,6 +191,20 @@ function app.partialMatchString( str1, str2 )
 	return (front + back) / (2 * longerLen)
 end
 
+
+-- Add given path to the end of app.recentSourceFilePaths and remove any other
+-- occurance of it in the list.
+-- Then trim app.recentSourceFilePaths so its size doen't exceed app.maxNumRecentPaths
+function app.addRecentSourceFilePath( path )
+	local recentPaths = app.recentSourceFilePaths
+	table.insert(recentPaths, 1, path)
+	for i = #recentPaths, 2, -1 do
+		if recentPaths[i] == path then
+			table.remove(recentPaths, i)
+			break
+		end
+	end
+end
 
 ------------------------------------------------------------------------------
 return app
