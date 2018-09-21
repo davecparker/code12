@@ -7,6 +7,10 @@
 -- (c)Copyright 2018 by David C. Parker 
 -----------------------------------------------------------------------------------------
 
+-- Code12 modules
+local source = require( "source" )
+
+
 -- The err module
 local err = {
 	bulkTestMode = false    -- set to true for bulk error test drivers
@@ -26,16 +30,9 @@ local err = {
 --     refLoc,           -- reference location if any (same fields as loc above)
 -- }
 
--- Array mapping iLine to err record, to store the first error on each line
-local errRecForLine
-
 -- Line numbers for the first and last error known
 local iLineFirstErr
 local iLineLastErr
-
--- A set of lines that were found to be incomplete (map lineNumber to true).
--- The err.iLineRank is determined by the first line that is not incomplete.
-local incompleteLines
 
 
 --- Utility Functions -------------------------------------------------------
@@ -114,10 +111,7 @@ end
 -- Return the line number used to rank an error on iLine 
 -- (incomplete lines are forwarded and reported on the final line).
 local function iLineRankFromILine( iLine )
-	while incompleteLines[iLine] do
-		iLine = iLine + 1
-	end
-	return iLine
+	return source.lines[iLine].iLineStart or iLine
 end
 
 -- Return a string describing the given loc
@@ -140,16 +134,8 @@ end
 
 -- Init the error state for a new program
 function err.initProgram()
-	errRecForLine = {}
-	incompleteLines = {}
 	iLineFirstErr = nil
 	iLineLastErr = nil
-end
-
--- Mark the given line number as incomplete (tokens were forward to the next line)
-function err.markIncompleteLine( iLine )
-	assert( type(iLine) == "number" )
-	incompleteLines[iLine] = true
 end
 
 -- Record an error with:
@@ -166,8 +152,8 @@ function err.setErr( loc, refLoc, strErr, ... )
 	local iLineRank = iLineRankFromILine( loc.iLine )
 
 	-- Keep only the first error on each line
-	if errRecForLine[iLineRank] == nil then
-		errRecForLine[iLineRank] = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+	if source.lines[iLineRank].errRec == nil then
+		source.lines[iLineRank].errRec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
 
 		-- Keep track of the first and last line numbers with errors
 		if iLineFirstErr == nil or iLineRank < iLineFirstErr then
@@ -329,13 +315,14 @@ end
 -- Clear the error for the given line number, if any
 function err.clearErr( iLine )
 	assert( type(iLine) == "number" )
-	errRecForLine[iLineRankFromILine( iLine )] = nil
+	source.lines[iLineRankFromILine( iLine )].errRec = nil
 end
 
 -- Return the logged error for the given line number, or nil if none.
 function err.errRecForLine( iLine )
 	assert( type(iLine) == "number" )
-	return errRecForLine[iLine]
+	local lineRec = source.lines[iLine]
+	return (lineRec and lineRec.errRec) or nil
 end
 
 -- Return an array of line numbers that have errors
@@ -346,7 +333,7 @@ function err.lineNumbersWithErrors()
 		return lineNumbers
 	end
 	local iLine = iLineFirstErr   -- might have gotten cleared so loop below
-	while errRecForLine[iLine] == nil do
+	while source.lines[iLine].errRec == nil do
 		iLine = iLine + 1
 		if iLine > iLineLastErr then
 			return lineNumbers
@@ -356,7 +343,7 @@ function err.lineNumbersWithErrors()
 
 	-- Add other line numbers that have errors
 	for i = iLine + 1, iLineLastErr do
-		if errRecForLine[i] then
+		if source.lines[i].errRec then
 			lineNumbers[#lineNumbers + 1] = i
 		end
 	end

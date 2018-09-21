@@ -1,7 +1,6 @@
-import Code12.*;
-
-class BubblePop extends Code12Program
+class BubblePop
 {
+   // Variables to keep track of hits and misses
    int hits = 0;
    int misses = 0;
 
@@ -40,9 +39,4 @@ class BubblePop extends Code12Program
       }
       ct.println(hits + " hits, " + misses + " misses");
    }
-
-   // public static void main(String[] args)
-   // { 
-   //    Code12.run(new BubblePop()); 
-   // }
 }
