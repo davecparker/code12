@@ -24,7 +24,9 @@ local optionsView = composer.newScene()
 local margin = app.margin
 local topMargin = margin
 local leftMargin = margin
-local checkboxSize = 14
+local xSwitches = 200
+local switchSize = 20        -- size of radio buttons, checkboxes, etc
+local fontSize = 20
 
 -- Display objects and groups
 local title               -- Title text
@@ -68,109 +70,181 @@ local function getInstalledEditors()
 	return foundEditors
 end
 
--- Create and return a new display group containing a label and set of option checkboxes,
+-- Create and return a new display group containing a header and set of setting switches,
 -- which has been inserted into optionsView.view
 -- options = {
---     optionLabel = string for the option label text
---     checkboxLabels = table of strings for the labeling the checkboxes (one checkbox will be )
---     x = x-value to position the group at (with anchorX = 0)
+--     header = string for the setting header text
+--     labels = table of strings for the labeling the switches
+--     values = optional table of values to associate with each switch, in field switch.val
+--              if values is not provided switch.val will be a number equal to its order displayed,
+--              from top to bottom/left to right
+--     style = "radio", "checkbox", "fillbox"
+--     orientation = "vertical", "horizontal"
 --     y = y-value to position the group at (with anchorY = 0)
---     onPress = listener function for checkboxes
+--     onPress = listener function for switches
 -- }
-local function newCheckboxOption( options )
-	local checkboxOptionGroup = display.newGroup() -- group to be returned
-	optionsView.view:insert( checkboxOptionGroup )
-	checkboxOptionGroup.anchorX = 0
-	checkboxOptionGroup.anchorY = 0
-	checkboxOptionGroup.x = options.x
-	checkboxOptionGroup.y = options.y
-	-- option main label
-	local optionLabel = display.newText{
-		parent = checkboxOptionGroup,
-		text = options.optionLabel,
-		x = 0,
+-- Fields in return value:
+-- switches = display group of switches for the setting
+-- each switch also has a "number" field equal to it's order displayed from bottom to top
+local function newSettingPicker( options )
+	local newSettingPickerGroup = display.newGroup() -- group to be returned
+	optionsView.view:insert( newSettingPickerGroup )
+	newSettingPickerGroup.anchorY = 0
+	newSettingPickerGroup.y = options.y
+	local switchStyle, switchSheet
+	if options.style == "radio" then
+		switchStyle = "radio"
+		switchSheet = app.radioBtnSheet
+	elseif options.style == "checkbox" then
+		switchStyle = "checkbox"
+		switchSheet = app.checkboxSheet
+	else
+		switchStyle = "checkbox"
+		switchSheet = app.fillboxSheet
+	end
+	-- Make header
+	local header = display.newText{
+		parent = newSettingPickerGroup,
+		text = options.header,
+		x = xSwitches - margin,
 		y = 0,
 		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
+		fontSize = fontSize,
+		align = "right",
 	}
-	g.uiBlack( optionLabel )
-	-- option swiches and labels
-	local checkboxesGroup = display.newGroup()
-	checkboxOptionGroup:insert( checkboxesGroup )
-	checkboxOptionGroup.checkboxes = checkboxesGroup
-	checkboxesGroup.anchorX = 0
-	checkboxesGroup.anchorY = 0
-	checkboxesGroup.x = 0
-	checkboxesGroup.y = optionLabel.y + optionLabel.height
-	local checkboxLabels = options.checkboxLabels
-	for i = 1, #checkboxLabels do
-		local checkbox = widget.newSwitch{
-			x = 0,
-			y = checkboxSize * (i - 1),
-			style = "radio",
-			width = checkboxSize,
-			height = checkboxSize,
+	header.anchorX = 1
+	header.anchorY = 0
+	header:setFillColor( 0 )
+	-- Make swiches and labels
+	local switchesGroup = display.newGroup()
+	newSettingPickerGroup:insert( switchesGroup )
+	newSettingPickerGroup.switches = switchesGroup
+	switchesGroup.anchorX = 0
+	switchesGroup.anchorY = 0
+	local labels = options.labels
+	local offset = 0
+	for i = 1, #labels do
+		-- Make a switch
+		local switch = widget.newSwitch{
+			style = switchStyle,
+			width = switchSize,
+			height = switchSize,
 			onPress = options.onPress,
-			sheet = app.checkboxSheet,
+			sheet = switchSheet,
 			frameOn = 1,
 			frameOff = 2,
-			id = options.optionLabel .. "checkbox" .. i,
 		}
-		checkbox.number = i
-		checkbox.anchorX = 0
-		checkbox.anchorY = 0
-		checkboxesGroup:insert( checkbox )
-		local checkboxLabel = display.newText{
-			parent = checkboxOptionGroup,
-			text = checkboxLabels[i],
-			x = checkbox.x + checkboxSize + margin * 0.5,
-			y = checkboxesGroup.y + checkbox.y,
+		switch.anchorX = 0
+		switch.anchorY = 0
+		switchesGroup:insert( switch )
+		-- Make the switch's label
+		local switchLabel = display.newText{
+			parent = newSettingPickerGroup,
+			text = labels[i],
 			font = native.systemFont,
-			fontSize = app.fontSizeUI,
+			fontSize = fontSize,
 		}
-		g.uiItem( checkboxLabel )
+		g.uiItem( switchLabel )
+		-- Set x, y values according to orientation
+		if options.orientation == "vertical" then
+			switch.x = xSwitches
+			switch.y = switchSize * (i - 1)
+			switchLabel.x = switch.x + switchSize + margin * 0.5
+			switchLabel.y = switchesGroup.y + switch.y
+		else
+			switch.x = xSwitches + offset
+			switch.y = 0
+			switchLabel.x = switch.x + switchSize + margin * 0.5
+			switchLabel.y = switchesGroup.y
+			offset = offset + switch.width + switchLabel.width + margin * 1.5
+		end
 	end
-	return checkboxOptionGroup
+	-- Attach values to switches
+	local numSwitches = switchesGroup.numChildren
+	if options.values then
+		local values = options.values
+		local numValues = #values
+		assert( numSwitches == numValues )
+		for i = 1, numSwitches do
+			switchesGroup[i].val = values[i]
+		end
+	else
+		for i = 1, numSwitches do
+			switchesGroup[i].val = i
+		end
+	end
+	return newSettingPickerGroup
+end
+
+-- Turn on all the checkboxes in given display group boxesGroup whose value is less than or
+-- equal to given maxVal, and turn off all the other boxes
+local function fillBoxes( boxesGroup, maxVal )
+	for i = 1, boxesGroup.numChildren do
+		local box = boxesGroup[i]
+		if box.val <= maxVal then
+			box:setState{ isOn = true }
+		else
+			box:setState{ isOn = false }
+		end
+	end
 end
 
 -- Set the checked boxes for the user's settings
 local function setSelectedOptions()
-	-- Set the checked box of the levelPicker
-	levelPicker.checkboxes[app.syntaxLevel or 1]:setState{ isOn = true }
+	-- Set the filled boxes of the levelPicker
+	app.syntaxLevel = app.syntaxLevel or 1
+	fillBoxes( levelPicker.switches, app.syntaxLevel )
 
 	-- Set the checked box of the tabWidthPicker
-	tabWidthPicker.checkboxes[app.tabWidth - 1]:setState{ isOn = true }
+	print("app.tabWidth", app.tabWidth)
+	for i = 1, tabWidthPicker.switches.numChildren do
+		print(tabWidthPicker.switches[i].val)
+	end
+	tabWidthPicker.switches[app.tabWidth - 1]:setState{ isOn = true }
 
 	-- Set the checked box of the editorPicker
 	if app.useDefaultEditor or #installedEditors == 1 then
 		-- Check on "System Default"
-		editorPicker.checkboxes[1]:setState{ isOn = true }
+		editorPicker.switches[1]:setState{ isOn = true }
 	elseif app.editorPath == nil then
 		-- Check on first non system default editor
-		editorPicker.checkboxes[2]:setState{ isOn = true }
+		editorPicker.switches[2]:setState{ isOn = true }
 		app.editorPath = installedEditors[2].path
 	else
 		-- Check on the user's preferred editor if it is installed
 		local preferredEditorInstalled
 		for i = 2, #installedEditors do
 			if installedEditors[i].path == app.editorPath then
-				editorPicker.checkboxes[i]:setState{ isOn = true }
+				editorPicker.switches[i]:setState{ isOn = true }
 				preferredEditorInstalled = true
 				break
 			end
 		end
 		if not preferredEditorInstalled then
-			editorPicker.checkboxes[2]:setState{ isOn = true }
+			editorPicker.switches[2]:setState{ isOn = true }
 			app.editorPath = installedEditors[2].path
 		end
 	end
 
 	-- Set the checked box of the multiErrorPicker
 	if app.oneErrOnly then
-		multiErrorPicker.checkboxes[1]:setState{ isOn = true }
+		multiErrorPicker.switches[1]:setState{ isOn = true }
 	else
-		multiErrorPicker.checkboxes[2]:setState{ isOn = true }
+		multiErrorPicker.switches[1]:setState{ isOn = false }
 	end
+end
+
+
+
+--- Event Handlers ------------------------------------------------
+
+-- Set app.syntax level to selected level.
+-- Fill all syntax level boxes for levels up to and including the 
+-- selected level and clear the remaining boxes.
+local function onSyntaxLevelPress( event )
+	local syntaxLevel = event.target.val
+	app.syntaxLevel = syntaxLevel
+	fillBoxes( levelPicker.switches, syntaxLevel )
 end
 
 
@@ -181,7 +255,7 @@ function optionsView:create()
 	local sceneGroup = self.view
 
 	-- Background
-	g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
+	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 0.9 ) 
 	
 	-- Title
 	title = display.newText{
@@ -190,7 +264,7 @@ function optionsView:create()
 		x = app.width / 2,
 		y = topMargin,
 		font = native.systemFontBold,
-		fontSize = app.fontSizeUI * 1.5,
+		fontSize = fontSize * 2,
 	}
 	title:setFillColor( 0 )
 	title.anchorY = 0
@@ -211,45 +285,53 @@ function optionsView:create()
 	closeBtn.anchorX = 1
 	closeBtn.anchorY = 0
 
-	-- Level picker
-	local code12Levels = {
-		"1. Procedure Calls",
-		"2. Comments",
-		"3. Variables",
-		"4. Expressions",
-		"5. Function Calls",
-		"6. Object Data Fields",
-		"7. Object Method Calls",
-		"8. If-else",
-		"9. Function Definitions",
-		"10. Parameters",
+	-- Syntax level picker
+	local levelNums = {}
+	local syntaxLevels = {
+		"12. Arrays",
 		"11. Loops",
-		"12. Arrays"
+		"10. Parameters",
+		"9. Function Definitions",
+		"8. If-else",
+		"7. Object Method Calls",
+		"6. Object Data Fields",
+		"5. Function Calls",
+		"4. Expressions",
+		"3. Variables",
+		"2. Comments",
+		"1. Procedure Calls"
 	}
-	levelPicker = newCheckboxOption{
-		optionLabel = "Syntax Level:",
-		checkboxLabels = code12Levels,
-		x = leftMargin,
+	local numSyntaxLevels = #syntaxLevels
+	for i = 1, numSyntaxLevels do
+		levelNums[i] = numSyntaxLevels + 1 - i
+	end
+	levelPicker = newSettingPicker{
+		header = "Syntax Level:",
+		labels = syntaxLevels,
+		values = levelNums,
+		style = "fillbox",
+		orientation = "vertical",
 		y = title.y + title.height + margin,
-		onPress = 
-			function ( event )
-				app.syntaxLevel = event.target.number
-			end
+		onPress = onSyntaxLevelPress,
 	}
 
 	-- Tab width picker
-	local tabWidths = {}
+	local tabLabels = {}
+	local tabValues = {}
 	for i = 2, 8 do
-		tabWidths[i - 1] = tostring( i )
+		tabLabels[i - 1] = tostring( i )
+		tabValues[i - 1] = i
 	end
-	tabWidthPicker = newCheckboxOption{
-		optionLabel = "Tab Width:",
-		checkboxLabels = tabWidths,
-		x = leftMargin,
+	tabWidthPicker = newSettingPicker{
+		header = "Tab Width:",
+		labels = tabLabels,
+		values = tabValues,
+		style = "radio",
+		orientation = "horizontal",
 		y = levelPicker.y + levelPicker.height + margin,
 		onPress = 
 			function ( event )
-				app.tabWidth = event.target.number + 1
+				app.tabWidth = event.target.val
 			end
 	}
 
@@ -259,31 +341,30 @@ function optionsView:create()
 	for i = 1, #installedEditors do
 		editorNames[i] = installedEditors[i].name
 	end
-	editorPicker = newCheckboxOption{
-		optionLabel = "Text Editor:",
-		checkboxLabels = editorNames,
-		x = leftMargin,
+	editorPicker = newSettingPicker{
+		header = "Text Editor:",
+		labels = editorNames,
+		style = "radio",
+		orientation = "vertical",
 		y = tabWidthPicker.y + tabWidthPicker.height + margin,
 		onPress = 
 			function ( event )
-				app.editorPath = installedEditors[event.target.number].path
+				app.editorPath = installedEditors[event.target.val].path
 				app.useDefaultEditor = app.editorPath == nil
 			end
 	}
 
 	-- Multi-error picker
-	local multiErrorLabels = {
-		"Show only one error at a time",
-		"Show multiple errors",
-	}
-	multiErrorPicker = newCheckboxOption{
-		optionLabel = "Multi-Error Mode:",
-		checkboxLabels = multiErrorLabels,
-		x = leftMargin,
+	local multiErrorLabels = { "Show only one error at a time" }
+	multiErrorPicker = newSettingPicker{
+		header = "Multi-Error Mode:",
+		labels = multiErrorLabels,
+		style = "checkbox",
+		orientation = "vertical",
 		y = editorPicker.y + editorPicker.height + margin,
 		onPress =
 			function ( event )
-				app.oneErrOnly = event.target.number == 1
+				app.oneErrOnly = event.target.isOn
 			end
 	}
 

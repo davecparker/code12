@@ -23,7 +23,9 @@ local app =  {
 	fontSizeUI = 12,
 
 	-- Image sheets
+	radioBtnSheet = graphics.newImageSheet( "images/radiobutton.png", { width = 1024, height = 1024, numFrames = 2 } ),
 	checkboxSheet = graphics.newImageSheet( "images/checkbox.png", { width = 256, height = 256, numFrames = 2 } ),
+	fillboxSheet = graphics.newImageSheet( "images/fillbox.png", { width = 256, height = 256, numFrames = 2 } ),
 
 	-- UI metrics
 	margin = 10,                 -- generic margin to leave between many UI items
