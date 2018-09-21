@@ -33,10 +33,16 @@ local mainCodeGroup            -- display group for main/only code display
 local refCodeGroup             -- display group for ref code display if separate (TODO)
 local errText                  -- text object for error message
 local docsToolbarGroup         -- display group for the docs toolbar
+local errCountText             -- text object for error count
 local moreInfoBtn              -- More Info button on docs toolbar
 local backBtn                  -- Back button on docs toolbar
 local forwardBtn               -- Forward button on docs toolbar
 local docsWebView              -- web view for the documentation pane
+
+-- Error state
+local errLineNumbers           -- array of line numbers with errors
+local iError                   -- index of current error in errLineNumbers
+local errRec                   -- error record for current error being shown
 
 
 --- Internal Functions ------------------------------------------------
@@ -129,8 +135,8 @@ local function makeErrDisplay( sceneGroup )
 
 	-- Make two code groups if there is a refLoc and it's not close enough
 	-- to the main loc to show in the same code group.
-	local loc = err.rec.loc
-	local refLoc = err.rec.refLoc
+	local loc = errRec.loc
+	local refLoc = errRec.refLoc
 	if refLoc == nil or math.abs( refLoc.iLine - loc.iLine ) <= minSourceLines then
 		-- Make just one group, but big enough to show the refLoc if any
 		local numLines = minSourceLines
@@ -254,17 +260,22 @@ end
 -- Show the error state
 local function showError()
 	-- Set the error text
-	assert( err.rec )
-	local errRecord = err.rec
-	print( "\n" .. errRecord.strErr )
-	errText.text = errRecord.strErr
+	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
+	errText.text = errRec.strErr
+
+	-- Show the error index and count if multi
+	if app.oneErrOnly or #errLineNumbers < 2 then
+		errCountText.text = ""
+	else
+		errCountText.text = iError .. " of " .. #errLineNumbers
+	end
 
 	-- Are we using two code groups or just one?
 	if refCodeGroup then
-		loadCodeGroup( mainCodeGroup, errRecord.loc )
-		loadCodeGroup( refCodeGroup, errRecord.refLoc )
+		loadCodeGroup( mainCodeGroup, errRec.loc )
+		loadCodeGroup( refCodeGroup, errRec.refLoc )
 	else
-		loadCodeGroup( mainCodeGroup, errRecord.loc, errRecord.refLoc )
+		loadCodeGroup( mainCodeGroup, errRec.loc, errRec.refLoc )
 	end
 end
 
@@ -322,6 +333,11 @@ local function makeDocsToolbar( parent )
 			app.toolbarShade, app.borderShade )
 	local yCenter = dyDocsToolbar / 2
 
+	-- Error count text
+	errCountText = display.newText( docsToolbarGroup, "",
+			app.width / 2, yCenter, native.systemFont, app.fontSizeUI )
+	errCountText:setFillColor( 0 )
+
 	-- More Info button 
 	moreInfoBtn = widget.newButton{
 		x = app.width - margin, 
@@ -363,6 +379,36 @@ local function makeDocsToolbar( parent )
 	updateToolbar()
 end
 
+-- Handle key events in the view
+local function onKeyEvent( event )
+	-- Keys change the error number if multi-error
+	if app.oneErrOnly then
+		return false
+	end 
+	if event.phase == "down" then
+		local keyName = event.keyName
+		local iErrorNew
+		if keyName == "pageUp" then
+			iErrorNew = iError - 1
+		elseif keyName == "pageDown" then
+			print("pageDown")
+			iErrorNew = iError + 1
+		elseif keyName == "home" then
+			iErrorNew = 1
+		elseif keyName == "end" then
+			iErrorNew = #errLineNumbers
+		end
+
+		if iErrorNew and iErrorNew >= 1 and iErrorNew <= #errLineNumbers then
+			iError = iErrorNew
+			errRec = err.errRecForLine( errLineNumbers[iError] )
+			displayError( errView.view )
+			return true
+		end
+	end
+	return false
+end
+
 
 --- Scene Methods ------------------------------------------------
 
@@ -393,13 +439,28 @@ end
 -- Prepare to show the errView scene
 function errView:show( event )
 	if event.phase == "will" then
+		-- Get the error record for the (first) error
+		assert( err.hasErr() )
+		errLineNumbers = err.lineNumbersWithErrors()
+		assert( #errLineNumbers > 0 )
+		local iLineErr = errLineNumbers[1]
+		print( string.format( "\n%d error(s) starting at line %d", 
+					#errLineNumbers, iLineErr ) )
+		iError = 1
+		errRec = err.errRecForLine( iLineErr )
+
+		-- Display the error
 		displayError( self.view )
+	elseif event.phase == "did" then
+		Runtime:addEventListener( "key", onKeyEvent )
 	end
 end
 
 -- Prepare to hide the errView scene
 function errView:hide( event )
 	if event.phase == "will" then
+		Runtime:removeEventListener( "key", onKeyEvent )
+	elseif event.phase == "did" then
 		showDocs( false )
 	end
 end
@@ -415,7 +476,7 @@ end
 -- Window resize handler
 function errView:resize()
 	-- Remake the error display, if any
-	if err.rec then
+	if err.hasErr() then
 		displayError( self.view )
 	end
 end

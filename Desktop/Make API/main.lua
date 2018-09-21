@@ -51,6 +51,7 @@ end
 
 -- Parse the input file and build the parseTrees
 local function parseFile()
+	err.initProgram()
 	parseJava.initProgram()
 	parseTrees = {}
 	for lineNum = 1, #strLines do
@@ -64,18 +65,8 @@ local function parseFile()
 		else
 			-- Parse the line using the normal line grammar
 			local tree = parseJava.parseLine( strCode, lineNum )
-			if tree == false then
-				print( "*** Unexpected incomplete line at line " .. lineNum )
-				return false
-			end
-			if tree == nil or tree.isError then
-				print( "*** Syntax error on line " .. lineNum )
-				if err.shouldStop() then
-					print( err.getErrString() )
-				else
-					print( "Unknown error (no error state)" )
-				end
-				return false
+			if not tree or tree.isError then
+				error( "*** Error error on line " .. lineNum )
 			end
 			parseTrees[lineNum] = tree
 		end

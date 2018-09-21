@@ -1162,18 +1162,18 @@ int underIndentedInstanceVar;
 		// ERROR "Code12 function name is"
 		setHeight(150);
 
-		// ERROR "Invalid function name"
+		// ERROR "was unexpected here"
 		intFunc[0]();
-		// ERROR "Invalid function name"
+		// ERROR "was unexpected here"
 		dblFuncIntDbl[intVar](0, 0.1);
 
 		// ERROR "("GameObj" is a type name)"
 		GameObj.foo();
 		// ERROR "("String" is a type name)"
 		String.foo();
-		// ERROR "Undefined variable"
+		// ERROR "expected a variable name here"
 		Code12Program.foo();
-		// ERROR "Undefined variable"
+		// ERROR "expected a variable name here"
 		Code12.foo();
 
 		// ERROR "An index in [brackets] can only be applied to an array"

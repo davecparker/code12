@@ -18,7 +18,7 @@ class StructureTest extends Code12Program
 
 	public static void main(String[] args)
 	{ 
-		Code12.run(new StructureTest()); 
+		Code12.run(new StructureTest());
 	}
 
 	public void start()

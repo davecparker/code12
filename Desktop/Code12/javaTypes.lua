@@ -49,16 +49,25 @@ local mapTypeNameToVt = {
 	["GameObj"]  = "GameObj",
 }
 
+-- The value type (vt) of a literal token type
+local mapTokenTypeToVt = {
+	["INT"]   = 0,
+	["NUM"]   = 1,
+	["BOOL"]  = true,
+	["STR"]   = "String",
+	["NULL"]  = "null",
+}
+
 -- Map unsupported Java types to the type the user should use instead in Code12
 local substituteType = {
-	["byte"]  = "int",
-	["char"]  = "String",
-	["float"]  = "double",
-	["long"]  = "int",
-	["short"]  = "int",
-	["Integer"] = "int",
-	["Double"] = "double",
-	["Boolean"] = "boolean",
+	["byte"]     = "int",
+	["char"]     = "String",
+	["float"]    = "double",
+	["long"]     = "int",
+	["short"]    = "int",
+	["Integer"]  = "int",
+	["Double"]   = "double",
+	["Boolean"]  = "boolean",
 }
 
 
@@ -113,6 +122,11 @@ function javaTypes.typeNameFromVt( vt )
 		return "array of " .. javaTypes.typeNameFromVt( vt.vt )
 	end
 	return mapVtToTypeName[vt] or "(unknown)"
+end
+
+-- Return the value type (vt) for a token type if it is a literal, else nil.
+function javaTypes.vtFromTokenType( tt )
+	return mapTokenTypeToVt[tt]
 end
 
 -- Return true if vt1 and vt2 are the same type.

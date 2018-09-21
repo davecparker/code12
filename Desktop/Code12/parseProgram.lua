@@ -48,18 +48,19 @@ local parseProgram = {}
 --     { s = "return", iLine, expr }
 --
 -- lValue:  (Semantic analysis adds isGlobal and vt fields)
+--     (an lValue can also be a single ID node for a simple variable)
 --     { s = "lValue", varID, indexExpr, fieldID }
 -- 
 -- expr:  (Semantic analysis adds a vt field)
---     (expr nodes can be a single NUM, BOOL, NULL, or STR token node)
+--     (expr nodes can also be a single ID or INT, NUM, BOOL, NULL, or STR token node)
 --     { s = "call", class, lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "staticField", class, fieldID }
---     { s = "cast", vt, expr }
+--     { s = "cast", vtCast, expr }
 --     { s = "parens", expr }
 --     { s = "unaryOp", opToken, opType, expr }        -- opType: neg, not
 --     { s = "binOp", left, opToken, opType, right }   -- opType: *, /, %, +, -, <, <=, >, >=, ==, !=, &&, ||
---     { s = "newArray", vt, lengthExpr }
+--     { s = "newArray", vtElement, lengthExpr }
 --     { s = "arrayInit", exprs }
 --     { s = "new", nameID, exprs }
 --
@@ -270,21 +271,11 @@ local function checkBlockBegin()
 	return false
 end
 
--- Make an arrayInit structure from the nodes of an exprList list pattern
-local function makeArrayInit( nodes )
-	local exprs = {}
-	for _, exprNode in ipairs( nodes[2].nodes ) do
-		exprs[#exprs + 1] = makeExpr( exprNode )
-	end	
-	return { s = "arrayInit", exprs = exprs, 
-			firstToken = nodes[1], lastToken = nodes[3] }
-end 
-
 -- Make and return a var given the parsed fields and optional initExpr structure.
 -- If there is an error then set the error state.
 local function makeVar( isGlobal, access, typeNode, nameID, initExpr, isArray, isConst )
 	-- Access is optional and ignored for instance variables, not allowed otherwise
-	if not isGlobal and access and access.p ~= "empty" then
+	if not isGlobal and access then
 		err.setErrNode( access, "Access specifiers are only allowed on class-level variables" )
 	end
 
@@ -299,6 +290,29 @@ local function makeVar( isGlobal, access, typeNode, nameID, initExpr, isArray, i
 		initExpr = initExpr,
 	}
 end
+
+-- Make and return an exprs array from an exprList parse tree
+local function makeExprs( exprList )
+	if not exprList then
+		return nil
+	end 
+	assert( exprList.t == "exprList" )
+	local exprNodes = exprList.nodes
+	if #exprNodes == 0 then
+		return nil
+	end
+	local exprs = {}
+	for i = 1, #exprNodes do
+		exprs[i] = makeExpr( exprNodes[i] )
+	end
+	return exprs
+end
+
+-- Make an arrayInit structure from the nodes of an arrayInit list pattern
+local function makeArrayInit( nodes )
+	return { s = "arrayInit", exprs = makeExprs( nodes[2] ), 
+			firstToken = nodes[1], lastToken = nodes[3] }
+end 
 
 -- Check for a variable declaration or initialization for line pattern p and 
 -- the parse nodes, and add variable(s) to the structure array structs.
@@ -342,18 +356,24 @@ local function getVar( p, nodes, structs, isGlobal )
 end	
 
 -- Make and return an lValue structure from the parse node parts.
--- The indexd and field can be nil 
+-- The index and field can be nil 
 local function makeLValueFromNodes( varID, index, field )
 	local indexExpr = nil
 	local lastToken = nil
-	if index and index.p == "index" then
+	local simpleVar = true
+	if index then
+		simpleVar = false
 		indexExpr = makeExpr( index.nodes[2] )
 		lastToken = index.nodes[3]
 	end
 	local fieldID = nil
-	if field and field.p ~= "empty" then
+	if field then
+		simpleVar = false
 		fieldID = field.nodes[2]
 		lastToken = nil   -- don't need this anymore
+	end
+	if simpleVar then
+		return varID    -- lValue for simple variable is just the ID token
 	end
 	return { s = "lValue", varID = varID, 
 			indexExpr = indexExpr, fieldID = fieldID, lastToken = lastToken }
@@ -362,25 +382,11 @@ end
 -- Make and return an lValue structure from an ID token or lValue parse node 
 local function makeLValue( node )
 	if node.tt == "ID" then
-		return { s = "lValue", varID = node }
+		return node
 	end
 	assert( node.t == "lValue" )
 	local nodes = node.nodes
 	return makeLValueFromNodes( nodes[1], nodes[2], nodes[3] )
-end
-
--- Make and return an exprs array from an exprList parse tree
-local function makeExprs( exprList )
-	assert( exprList.t == "exprList" )
-	local exprNodes = exprList.nodes
-	if #exprNodes == 0 then
-		return nil
-	end
-	local exprs = {}
-	for i = 1, #exprNodes do
-		exprs[i] = makeExpr( exprNodes[i] )
-	end
-	return exprs
 end
 
 -- Make and return a call structure from a call parse tree's nodes array.
@@ -395,23 +401,20 @@ local function makeCall( nodes )
 		class = ns[1]
 		nameID = ns[3]
 	elseif p == "System" then
-		class = ns[1]
-		lValue = makeLValueFromNodes( ns[3] )
-		nameID = ns[5]
+		class = ns[1]     -- "System"
+		lValue = ns[3]    -- e.g. "out"
+		nameID = ns[5]    -- e.g. "println"
 	elseif p == "user" then
 		nameID = ns[1]
 	else
 		assert( p == "method" )
-		local field2 = ns[4]
-		if field2.p == "field" then
-			lValue = makeLValueFromNodes( ns[1], ns[2], ns[3] )
-			nameID = field2.nodes[2]
-		elseif ns[3].p == "field" then
-			lValue = makeLValueFromNodes( ns[1], ns[2] )
-			nameID = ns[3].nodes[2]
+		local field = ns[5]
+		if field then
+			lValue = makeLValueFromNodes( ns[1], ns[2], ns[4] )
+			nameID = field.nodes[2]
 		else
-			err.setErrNode( nodes, "Invalid function name" )
-			return nil
+			lValue = makeLValueFromNodes( ns[1], ns[2] )
+			nameID = ns[4]
 		end
 	end
 
@@ -428,7 +431,7 @@ local function makeCast( nodes )
 	if typeNode.str ~= "int" then
 		err.setErrNode( typeNode, "The only type cast supported by Code12 is (int)" )
 	end
-	return { s = "cast", vt = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
+	return { s = "cast", vtCast = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
@@ -565,23 +568,26 @@ local function getForStmt( nodes )
 
 		-- Add the initStmt if any
 		local forInit = nodes[1]
-		if forInit.p == "var" then
-			local ns = forInit.nodes
-			stmt.initStmt = makeVar( false, nil, ns[1], ns[2], makeExpr( ns[4] ) )
-		elseif forInit.p == "stmt" then
-			stmt.initStmt = getStmt( forInit.nodes[1] )
-			stmt.initStmt.iLine = iLine
+		if forInit then
+			if forInit.p == "var" then
+				local ns = forInit.nodes
+				stmt.initStmt = makeVar( false, nil, ns[1], ns[2], makeExpr( ns[4] ) )
+			else
+				assert( forInit.p == "stmt" )
+				stmt.initStmt = getStmt( forInit.nodes[1] )
+				stmt.initStmt.iLine = iLine
+			end
 		end
 
 		-- Add the expr if any
 		local forExpr = nodes[3]
-		if forExpr.p == "expr" then
+		if forExpr then
 			stmt.expr = makeExpr( forExpr.nodes[1] )
 		end
 
 		-- Add the nextStmt if any
 		local forNext = nodes[5]
-		if forNext.p == "stmt" then
+		if forNext then
 			stmt.nextStmt = getStmt( forNext.nodes[1] )
 			stmt.nextStmt.iLine = iLine
 		end
@@ -746,14 +752,14 @@ function getBlockStmts()
 	return nil
 end
 
--- Make and return an expr structure from an expr or arrayInit parse node
+-- Make and return an expr structure from an expr parse node
 function makeExpr( node )
 	-- No expr or parse error makes nil (e.g. an optional expr field)
 	if node == nil or node.isError then
 		return nil
 	end
 
-	-- Expr nodes can be a single token (NUM, BOOL, NULL, or STR)
+	-- Expr nodes can be a token (variable ID, or literal INT, NUM, BOOL, NULL, STR)
 	if node.tt then
 		return node
 	end
@@ -776,7 +782,7 @@ function makeExpr( node )
 	elseif p == "Math" then
 		return { s = "staticField", class = nodes[1], fieldID = nodes[3] }
 	elseif p == "newArray" then
-		return { s = "newArray", vt = javaTypes.vtFromVarType( nodes[2] ), 
+		return { s = "newArray", vtElement = javaTypes.vtFromVarType( nodes[2] ), 
 				lengthExpr = makeExpr( nodes[4] ), firstToken = nodes[1],
 				lastToken = nodes[5] }
 	elseif p == "new" then
@@ -803,14 +809,16 @@ local function getFunc( nodes )
 	end
 
 	-- Build the paramVars array
-	local paramList = nodes[5]
 	local paramVars = {}
-	for _, node in ipairs( paramList.nodes ) do
-		local ns = node.nodes
-		if node.p == "array" then
-			paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[4], nil, true )
-		else
-			paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[2] )
+	local paramList = nodes[5]
+	if paramList then
+		for _, node in ipairs( paramList.nodes ) do
+			local ns = node.nodes
+			if node.p == "array" then
+				paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[4], nil, true )
+			else
+				paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[2] )
+			end
 		end
 	end
 
@@ -826,12 +834,15 @@ local function getFunc( nodes )
 					paramVars = paramVars, stmts = stmts, entireLine = true }
 
 	-- Add the access flags and return it
-	local accessP = nodes[1].p
-	if accessP == "publicStatic" then
-		func.isPublic = true
-		func.isStatic = true
-	elseif accessP == "public" then
-		func.isPublic = true
+	local access = nodes[1]
+	if access then
+		local p = access.p
+		if p == "publicStatic" then
+			func.isPublic = true
+			func.isStatic = true
+		elseif p == "public" then
+			func.isPublic = true
+		end
 	end
 	return func
 end
@@ -1101,9 +1112,6 @@ function parseProgram.getProgramTree( sourceLines, syntaxLevel )
 	end
 
 	-- Return result
-	if err.shouldStop() then
-		return nil
-	end
 	return programTree
 end
 
