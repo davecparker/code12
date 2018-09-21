@@ -1,6 +1,11 @@
-import Code12.*;
+/* 
+	This is my class project
+	This is my name
+*/ 
 
-class StructureTest extends Code12Program
+// import Code12.*;
+
+class StructureTest // extends Code12Program
 {
 	// instance variables
 	private GameObj fish, ball, bigBall;
@@ -54,6 +59,14 @@ class StructureTest extends Code12Program
 			d *= 2;
 		}
 
+		if (d < i)
+		{
+			i = 0;
+			d = 1;
+		}
+		else
+			i = 1;
+
 		if (d == i)
 			d = i;
 		else if (d < i)
@@ -95,7 +108,7 @@ class StructureTest extends Code12Program
 		return;
 	}
 
-	public void onMousePress( GameObj obj, double x, double y )
+	public void onMousePress( GameObj /* target */ obj, double x, double y )
 	{
 		ct.logm("Press", obj, x, y);
 		// if (obj != null)

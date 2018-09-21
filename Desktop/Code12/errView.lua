@@ -14,6 +14,7 @@ local composer = require( "composer" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
+local source = require( "source" )
 local err = require( "err" )
 
 -- The runView module and scene
@@ -88,7 +89,7 @@ local function makeCodeGroup( numSourceLines )
 							dxChar * 6, dyLine, true )
 	cg.sourceRect = makeHilightRect( cg.highlightGroup, 0, y, dxChar * 4, dyLine )
 
-	-- Make the lines numbers
+	-- Make the line numbers
 	cg.lineNumGroup = g.makeGroup( cg, 0, margin )
 	for i = 1, numSourceLines do
 		local t = display.newText{
@@ -191,25 +192,24 @@ local function setHighlightRectFromLoc( r, loc )
 	r.x = -dxExtra   -- default for whole and multi-line cases
 	r.height = app.consoleFontHeight  -- default for single line cases
 	local iLine = loc.iLine
-	local sourceLines = app.sourceFile.strLines
 	local numCols = 0
 	if loc.iLineEnd and loc.iLineEnd > iLine then
 		-- Multi-line. Make a rectangle bounding all the lines.
 		r.height = 0
 		for i = iLine, loc.iLineEnd do
-			local _, cols = app.iCharToICol( sourceLines[i] or "", 1 )
+			local _, cols = app.iCharToICol( source.lines[i].str, 1 )
 			numCols = math.max( numCols, cols )
 			r.height = r.height + app.consoleFontHeight
 		end
 	elseif loc.iCharStart then
 		-- Partial line
 		local iColStart, iColEnd = app.iCharToICol(
-				sourceLines[iLine] or "", loc.iCharStart, loc.iCharEnd )
+				source.lines[iLine].str, loc.iCharStart, loc.iCharEnd )
 		r.x = (iColStart - 1) * dxChar - dxExtra
 		numCols = iColEnd - iColStart + 1
 	else
 		-- Whole line
-		local _, cols = app.iCharToICol( sourceLines[iLine] or "", 1 )
+		local _, cols = app.iCharToICol( source.lines[iLine].str, 1 )
 		numCols = cols
 	end
 	r.width = math.max( numCols, 1 ) * dxChar + dxExtra * 2
@@ -226,14 +226,14 @@ local function loadCodeGroup( cg, loc, refLoc )
 	local lineNumFirst = iLine - before
 	local lineNumLast = lineNumFirst + numLines
 	local lineNum = lineNumFirst
-	local sourceLines = app.sourceFile.strLines
 	for i = 1, numLines do 
-		if lineNum < 1 or lineNum > #sourceLines + 1 then
+		if lineNum < 1 or lineNum > source.numLines + 1 then
 			cg.lineNumGroup[i].text = ""
+			cg.sourceGroup[i].text = ""
 		else
 			cg.lineNumGroup[i].text = tostring( lineNum )
+			cg.sourceGroup[i].text = app.detabLine( source.lines[lineNum].str )
 		end
-		cg.sourceGroup[i].text = app.detabLine( sourceLines[lineNum] or "" )
 		lineNum = lineNum + 1
 	end
 
@@ -391,7 +391,6 @@ local function onKeyEvent( event )
 		if keyName == "pageUp" then
 			iErrorNew = iError - 1
 		elseif keyName == "pageDown" then
-			print("pageDown")
 			iErrorNew = iError + 1
 		elseif keyName == "home" then
 			iErrorNew = 1

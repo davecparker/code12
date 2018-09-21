@@ -13,6 +13,7 @@ local widget = require( "widget" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
+local source = require( "source" )
 local env = require( "env" )
 
 -- The statusBar module
@@ -30,7 +31,7 @@ local openFileBtn          -- Open in Editor button
 
 -- Open the source file in the system default text editor for its file type
 local function openFileInEditor()
-	local path = app.sourceFile.path
+	local path = source.path
 	if path then
 		env.openFileInEditor( path )
 	end
@@ -39,22 +40,21 @@ end
 
 --- Module Functions ------------------------------------------------
 
--- Update the status bar based on data in app.sourceFile
+-- Update the status bar based on data in source
 function statusBar.update()
-	local sourceFile = app.sourceFile
-	if sourceFile.path == nil then
+	if source.path == nil then
 		openFileBtn.isVisible = false
 		return
 	end
 
 	-- Set the fileText with update status
-	local _, filename = env.dirAndFilenameOfPath( sourceFile.path )
-	if sourceFile.timeLoaded == 0 or sourceFile.timeModLast == 0 
-			or sourceFile.timeModLast < app.startTime then
+	local _, filename = env.dirAndFilenameOfPath( source.path )
+	if source.timeLoaded == 0 or source.timeModLast == 0 
+			or source.timeModLast < app.startTime then
 		fileText.text = filename    -- not updated after this app run
 	else
 		local updateStr
-		local secs = os.time() - sourceFile.timeModLast
+		local secs = os.time() - source.timeModLast
 		if secs < 10 then
 			updateStr = "just now"
 		elseif secs < 60 then
