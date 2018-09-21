@@ -9,6 +9,7 @@
 
 -- Code12 modules
 local app = require( "app" )
+local source = require( "source" )
 local err = require( "err" )
 local javaTypes = require( "javaTypes" )
 local parseJava = require( "parseJava" )
@@ -20,7 +21,7 @@ local checkJava = {}
 
 
 -- File local state
-local syntaxLevel          -- the langauge (syntax) level
+local syntaxLevel          -- the language (syntax) level
 
 -- Table of variables that are currently defined. 
 -- These map a name to a var structure. There are also entries of type string 
@@ -690,12 +691,12 @@ local function endLocalBlock()
 	end
 end
 
--- If stmts then check the block of stmts. If paramVars is included then define 
+-- If block then check the block of stmts. If paramVars is included then define 
 -- these formal parameters at the beginning of the block.
-local function checkBlock( stmts, paramVars )
-	if stmts then
+local function checkBlock( block, paramVars )
+	if block and block.stmts then
 		beginLocalBlock( paramVars )
-		for _, stmt in ipairs( stmts ) do
+		for _, stmt in ipairs( block.stmts ) do
 			checkStmt( stmt )
 		end
 		endLocalBlock()
@@ -737,11 +738,11 @@ local function canOpAssign( lValue, opNode, expr )
 	return true
 end
 
--- Check the stmt block for the given loop stmt
+-- Check the block for the given loop stmt
 local function checkLoopBlock( stmt )
 	local currentLoopSav = currentLoop
 	currentLoop = stmt
-	checkBlock( stmt.stmts )
+	checkBlock( stmt.block )
 	currentLoop = currentLoopSav
 end
 
@@ -772,8 +773,8 @@ function checkStmt( stmt )
 		if vtSetExprNode( stmt.expr ) ~= true then
 			err.setErrNode( stmt.expr, "Conditional test must be boolean (true or false)" )
 		end
-		checkBlock( stmt.stmts )
-		checkBlock( stmt.elseStmts )
+		checkBlock( stmt.block )
+		checkBlock( stmt.elseBlock )
 	elseif s == "while" then
 		-- { s = "while", iLine, expr, stmts }
 		checkLoopExpr( stmt.expr )
@@ -1197,17 +1198,16 @@ function checkJava.checkProgram( programTree, level )
 		for _, func in ipairs( funcs ) do
 			if func.nameID.str ~= "main" then
 				currentFunc = func
-				checkBlock( func.stmts, func.paramVars )
+				checkBlock( func.block, func.paramVars )
 			end
 		end
 	end
 	currentFunc = nil
 
-	-- Make sure that a start function was defined
+	-- Make sure that a start function was defined.
 	if not eventMethodFuncs["start"] then
-		local iLine = (programTree.nameID and programTree.nameID.iLine) or 1
-		err.setErrLineNum( iLine,
-				"A Code12 program must define a \"start\" function" )
+		err.setErrLineNum( source.numLines,
+				'A Code12 program must define a "start" function' )
 	end
 end
 

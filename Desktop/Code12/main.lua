@@ -14,6 +14,7 @@ local json = require( "json" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
+local source = require( "source" )
 local env = require( "env" )
 local parseProgram = require( "parseProgram" )
 local checkJava = require( "checkJava" )
@@ -41,7 +42,6 @@ local userSettings = {
 }
 
 -- Cached state
-local sourceFile = app.sourceFile     -- info about the user's source code file
 local appContext = ct._appContext
 
 
@@ -78,37 +78,11 @@ local function runLuaCode( luaCode )
 	end
 end
 
--- Read the sourceFile and store all of its source lines.
--- Return true if success.
-local function readSourceFile()
-	local success = false
-	if sourceFile.path then
-		local file = io.open( sourceFile.path, "r" )
-		if file then
-			-- Try to read the first line to see if it's really readable now
-			local s = file:read( "*l" )
-			if s then
-				sourceFile.timeLoaded = os.time()
-				sourceFile.strLines = {}   -- replace previous strLines if any
-				local lineNum = 1
-				repeat
-					sourceFile.strLines[lineNum] = s
-					lineNum = lineNum + 1
-					s = file:read( "*l" )  -- read next line
-				until s == nil
-				success = true
-			end
-			io.close( file )
-		end
-	end
-	return success
-end
-
 -- Write a Lua source code output file to save the generated code.
 -- Put it next to the Java source file.
 local function writeLuaCode( codeStr )
 	-- Put the output file in the same location as the source but named "main.lua"
-	local dir, filename = env.dirAndFilenameOfPath( sourceFile.path )
+	local dir, filename = env.dirAndFilenameOfPath( source.path )
 	local outPath = dir .. "main.lua"
 
 	-- If the file already exists, then only overwrite it if we created it
@@ -162,7 +136,7 @@ local function initNewProgram()
 
 	-- Set the source dir and filename
 	appContext.sourceDir, appContext.sourceFilename = 
-			env.dirAndFilenameOfPath( sourceFile.path )
+			env.dirAndFilenameOfPath( source.path )
 
 	-- Set the mediaBaseDir and the mediaDir.
 	-- Good grief, Corona requires the path to images and sounds to be
@@ -172,7 +146,7 @@ local function initNewProgram()
 	appContext.mediaDir = env.relativePath( env.docsDir, appContext.sourceDir )
 
 	print( "\n--- New Run ----------------------" )
-	print( "sourceFile.path: " .. sourceFile.path )
+	print( "source.path: " .. source.path )
 
 	-- Clear class variables and user functions
 	_G.this = {}
@@ -182,15 +156,14 @@ local function initNewProgram()
 	err.initProgram()
 end
 
--- Process the sourceFile (parse then run or show error), which has already been read. 
+-- Process the source (parse then run or show error), which has already been read. 
 function app.processUserFile()
 	-- Get ready to run a new program
 	initNewProgram()
 
 	-- Create parse tree array
 	local startTime = system.getTimer()
-	local programTree = parseProgram.getProgramTree( 
-								sourceFile.strLines, app.syntaxLevel )
+	local programTree = parseProgram.getProgramTree( app.syntaxLevel )
 	if programTree == nil or (err.hasErr() and app.oneErrOnly) then
 		composer.gotoScene( "errView" )
 		return true
@@ -214,23 +187,23 @@ end
 
 -- Check user file for changes and (re)run it if modified or never loaded
 local function checkUserFile()
-	if sourceFile.path then
+	if source.path then
 		-- Check the file modification time
-		local timeMod = env.fileModTimeFromPath( sourceFile.path )
-		if sourceFile.timeModLast == 0 then
-			sourceFile.timeModLast = timeMod or os.time()
+		local timeMod = env.fileModTimeFromPath( source.path )
+		if source.timeModLast == 0 then
+			source.timeModLast = timeMod or os.time()
 		end
 
 		-- Consider the file updated if timeMod changed or if never loaded
-		if sourceFile.timeLoaded == 0 
-				or (timeMod and timeMod > sourceFile.timeModLast) then
-			sourceFile.timeModLast = timeMod
-			sourceFile.updated = true
+		if source.timeLoaded == 0 
+				or (timeMod and timeMod > source.timeModLast) then
+			source.timeModLast = timeMod
+			source.updated = true
 		end
 
 		-- (Re)Load and process the file if updated 
-		if sourceFile.updated and readSourceFile() then
-			sourceFile.updated = false    -- until next time the file updates
+		if source.updated and source.readFile() then
+			source.updated = false    -- until next time the file updates
 			app.processUserFile()
 			statusBar.update()
 		end
@@ -252,7 +225,7 @@ end
 -- Save the user settings
 function app.saveSettings()
 	-- Update the userSettings
-	userSettings.recentPath = sourceFile.path
+	userSettings.recentPath = source.path
 	userSettings.syntaxLevel = app.syntaxLevel 
 	userSettings.tabWidth = app.tabWidth
 	userSettings.editorPath = app.editorPath
@@ -285,7 +258,7 @@ local function loadSettings()
 					if file then
 						io.close( file )
 						userSettings.recentPath = t.recentPath
-						sourceFile.path = userSettings.recentPath
+						source.path = userSettings.recentPath
 					end
 				end
 

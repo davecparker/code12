@@ -5545,7 +5545,7 @@ Comma not supported
 *** Line 666 chars 1-79: Code12 requires each variable initialization to be on its own line
 
 667. import java.io.PrintWriter;   // import other than Code12.*
-*** Line 667 chars 1-6: Syntax Error: "import" was unexpected here
+*** Line 667 chars 1-60: Code12 does not support importing other classes
 
 668. protected int secretVar;        // protected access
 *** Line 668 chars 1-9: Unsupported reserved word "protected"
@@ -5560,7 +5560,7 @@ Comma not supported
 *** Line 671 char 11: char type not supported, use double quotes
 
 672. while(foo) { 	// opening { in control structure not on it's own line
-*** Line 672 char 12: In Code12, each { to start a new block must be on its own line
+*** Line 672 char 12: In Code12, each {  to start a new block must be on its own line
 
 673. i++; } 			// closing } not on it's own line
 *** Line 673 char 6: Syntax Error: expected end of line
@@ -5579,7 +5579,7 @@ Comma not supported
 *** Line 677 chars 13-36: Code12 requires code after an if statement to be on its own line
 
 678. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Line 678 char 22: In Code12, each { to start a new block must be on its own line
+*** Line 678 char 22: In Code12, each {  to start a new block must be on its own line
 
 679. switch (choice)
 *** Line 679 chars 1-6: Unsupported reserved word "switch"
@@ -5706,7 +5706,7 @@ Comma not supported
 *** Line 719 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-719 lines processed in 95 ms
+719 lines processed in 94 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)

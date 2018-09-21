@@ -47,15 +47,6 @@ local app =  {
 	-- List of most recent source file paths opened, with duplicates removed
 	recentSourceFilePaths = {},
 
-	-- The user source file
-	sourceFile = {
-		path = nil,              -- full pathname to the file
-		timeLoaded = 0,          -- time this file was loaded or 0 if not loaded
-		timeModLast = 0,         -- last modification time or 0 if unknown
-		updated = false,         -- set to true when file update is detected
-		strLines = {},           -- array of source code lines when read
-	},
-
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
 	tabWidth = 4,                -- current tab width

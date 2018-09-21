@@ -14,6 +14,7 @@ local composer = require( "composer" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
+local source = require( "source" )
 local env = require( "env" )
 
 
@@ -35,9 +36,11 @@ local restartBtn          -- Restart button
 local function chooseFile()
 	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
 	if path then
-		app.sourceFile.path = path
-		app.sourceFile.timeLoaded = 0
-		app.sourceFile.timeModLast = 0
+		source.path = path
+		source.timeLoaded = 0
+		source.timeModLast = 0
+		source.updated = false
+		source.numLines = 0
 	end
 	native.setActivityIndicator( false )
 end

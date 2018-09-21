@@ -9,6 +9,7 @@
 
 -- Code12 modules used
 local app = require( "app" )
+local source = require( "source" )
 local err = require( "err" )
 local javalex = require( "javalex" )
 local javaTypes = require( "javaTypes" )
@@ -38,8 +39,7 @@ local syntaxFeatures = {
 local numSyntaxLevels = #syntaxFeatures
 
 -- The parsing state
-local sourceLine          -- the current source code line
-local lineNumber          -- the line number for sourceLine
+local lineNumber          -- the line number for the line being parsed
 local tokens              -- array of tokens
 local iToken              -- index of current token in tokens
 local syntaxLevel         -- the syntax level for parsing
@@ -496,6 +496,12 @@ local arrayInit = { t = "arrayInit",
 	{ 12, 12, "expr", 			expr										},
 }
 
+-- An extends superclass or empty
+local extends = { t = "extends",
+	{ 1, 12, "extends",			"extends", "ID"				},
+	{ 1, 12, false											},
+}
+
 -- A line of code
 local line = { t = "line",
 	{ 1, 12, "blank",																	"END" },
@@ -517,6 +523,7 @@ local line = { t = "line",
 	{ 11, 12, "break",			"break", ";",											"END" },
 	{ 12, 12, "arrayInit",		access, "TYPE", "[", "]", "ID", "=", arrayInit, ";",	"END" },
 	{ 12, 12, "arrayDecl",		access, "TYPE", "[", "]", idList, ";",					"END" },
+	{ 1, 12, "class",			access, "class", "ID", extends,							"END" },
 
 	-- Common errors: unknown type
 	{ 3, 0, "varInit",			access, "ID", "ID", "=", expr, ";", "END",					iNode = 2 },
@@ -526,11 +533,14 @@ local line = { t = "line",
 	{ 12, 0, "arrayDecl",		access, "ID", "[", "]", idList, ";", "END",					iNode = 2,
 			strErr = invalidTypeName },
 
-	-- Common errors: type instead of variable name
+	-- Common errors: type instead of ID
 	{ 3, 0, "varInit",			access, "TYPE", "TYPE", "=", expr, ";", "END",					iNode = 3 },
 	{ 3, 0, "constInit", 		access, "final", "TYPE", "TYPE", "=", expr, ";", "END", 		iNode = 4 },
 	{ 12, 0, "arrayInit",		access, "TYPE", "[", "]", "TYPE", "=", arrayInit, ";", "END",	iNode = 5,
 			strErr = invalidVarName },
+
+	{ 1, 0, "class",			access, "class", "TYPE", 0,										iNode = 3,
+			strErr = "This name is already defined. Choose another name for your class." },
 
 	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
@@ -561,6 +571,9 @@ local line = { t = "line",
 	{ 11, 0, "for",			"for", "(", forControl, ")", ";", 0,	 				iNode = 5,
 			strErr = "for loop header should not end with a semicolon" },
 
+	{ 1, 0, "class",		access, "class", "ID", extends, ";",					iNode = 5,
+			strErr = "class header should not end with a semicolon" },
+
 	-- Common errors: unsupported bracket style
 	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	"{", 0,		iNode = 7 },
 	{ 8, 0, "if",			"if", "(", expr, ")", "{", 0,							iNode = 5 },
@@ -568,11 +581,12 @@ local line = { t = "line",
 	{ 8, 0, "else",			"else", "{", 0,											iNode = 2 },
 	{ 11, 0, "do",			"do", "{", 0,											iNode = 2 },
 	{ 11, 0, "while",		"while", "(", expr, whileEnd, "{", 0,					iNode = 5 },
-	{ 11, 0, "for",			"for", "(", forControl, ")", "{", 0,					iNode = 5,
-			strErr = "In Code12, each { to start a new block must be on its own line" },
+	{ 11, 0, "for",			"for", "(", forControl, ")", "{", 0,					iNode = 5 },
+	{ 1, 0, "class",		access, "class", "ID", extends, "{", 0,					iNode = 5,
+			strErr = "In Code12, each {  to start a new block must be on its own line" },
 
 	{ 1, 0, "end",			"}", 1,
-			strErr = "In Code12, each } to end a block must be on its own line" },
+			strErr = "In Code12, each }  to end a block must be on its own line" },
 
 	-- Common errors: multiple statements per line
 	{ 1, 0, "stmt", 		stmt, ";", 2,
@@ -595,6 +609,10 @@ local line = { t = "line",
 	{ 11, 0, "while",		"while", "(", expr, whileEnd, 2,						iNode = 5, toEnd = true },
 	{ 11, 0, "for",			"for", "(", forControl, ")", 2,							iNode = 5, toEnd = true,
 			strErr = "Code12 requires the contents of a loop to start on its own line" },
+
+	-- Common errors: unsupported statements
+	{ 1, 0, "import",		"import", "ID", 0,
+			strErr = "Code12 does not support importing other classes" },
 }
 
 
@@ -881,7 +899,7 @@ local function parseCurrentLine( level )
 	if not err.bulkTestMode then
 		local logFile = io.open( "../SyntaxErrors.txt", "a" )
 		if logFile then
-			logFile:write( sourceLine )
+			logFile:write( source.lines[lineNumber].str )
 			logFile:write( "\n" )
 			io.close( logFile )
 		end
@@ -891,12 +909,39 @@ local function parseCurrentLine( level )
 	return nil
 end
 
+-- Make and return a recursive copy of the given parse tree node 
+-- (including leaf tokens), assigning the given line number to the tokens.
+local function copyParseTreeNode( node, lineNum )
+	if not node then
+		return node   -- nil or false
+	elseif node.tt then  
+		-- Copy token node
+		return { tt = node.tt, str = node.str, iLine = lineNum, 
+				iChar = node.iChar, vt = node.vt }
+	else  
+		-- A parse tree node: make a copy recursively
+		assert( node.t )
+		local nodes = node.nodes
+		local nodesCopy = {}
+		for i = 1, #nodes do
+			nodesCopy[i] = copyParseTreeNode( nodes[i], lineNum )
+		end
+		return { t = node.t, p = node.p, nodes = nodesCopy }
+	end
+end
+
 
 ----- Module functions -------------------------------------------------------
 
--- Init the parsing state for a program
-function parseJava.initProgram()
-	javalex.initProgram()
+-- Make and return a full (deep) copy of the given line parse tree, assigning
+-- the given line number to the tokens and the top (line) tree node.
+function parseJava.copyLineParseTree( tree, lineNum )
+	assert( tree.t == "line")
+	local treeCopy = copyParseTreeNode( tree, lineNum )
+	treeCopy.iLine = lineNum
+	treeCopy.iLineStart = lineNum + tree.iLineStart - tree.iLine
+	treeCopy.indentLevel = tree.indentLevel
+	return treeCopy
 end
 
 -- If nameNode is an invalid name ID then set the error state and return true,
@@ -924,18 +969,19 @@ function parseJava.isInvalidID( nameNode, usage, existing )
 	return true
 end
 
--- Parse the given line of code at the given syntax level (default numSyntaxLevels).
+-- Parse the lineRec at the given syntax level (default numSyntaxLevels).
+-- If iLineCommentStart then the line starts inside an open comment started there.
 -- If startTokens is not nil, it is an array of tokens from a previous unfinished
--- line to prepend to the tokens found on this line.
--- Return the parse tree (a recursive array of tokens and/or nodes) if successful.
--- The given iLine will be assigned to the tokens found and the resulting tree.
+-- line to prepend to the tokens found on this line, and iLineStart is the first line
+-- of the multi-line parse.
+-- Return (parseTree, tokens) if successful, store the results in the lineRec,
+-- and set the iLine, iLineStart, and indentLevel fields in the parse tree root node.
 -- If the line is unfinished (ends with a comma token) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
-function parseJava.parseLine( strLine, iLine, startTokens, level )
+function parseJava.parseLine( lineRec, iLineCommentStart, startTokens, iLineStart, level )
 	-- Run lexical analysis to get the tokens array
-	sourceLine = strLine
-	lineNumber = iLine
-	tokens = javalex.getTokens( sourceLine, iLine )
+	lineNumber = lineRec.iLine
+	tokens = javalex.getTokens( lineRec, iLineCommentStart )
 	if tokens == nil then
 		return nil
 	end
@@ -963,16 +1009,24 @@ function parseJava.parseLine( strLine, iLine, startTokens, level )
 	assert( tokens[#tokens].tt == "END" )
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
 	if lastToken and lastToken.tt == "," then
-		err.markIncompleteLine( iLine )
+		lineRec.iLineStart = iLineStart
+		lineRec.parseTree = false
 		return false, tokens
 	end
 
 	-- Try to parse the line
 	local tree = parseCurrentLine( level or numSyntaxLevels )
-	if tree then
-		tree.iLine = iLine  -- store Java line number in the top tree node
+	if tree == nil then
+		return nil
 	end
-	return tree
+
+	-- Store and return results
+	tree.iLine = lineNumber
+	iLineStart = iLineStart or lineNumber
+	tree.iLineStart = iLineStart
+	tree.indentLevel = source.lines[iLineStart].indentLevel
+	lineRec.parseTree = tree
+	return tree, tokens
 end
 
 -- Print a parse tree recursively at the given indentLevel.

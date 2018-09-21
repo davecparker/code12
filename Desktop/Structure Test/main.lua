@@ -3,12 +3,17 @@ package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Cod
 require('Code12.api')
 
 
-this.fish = nil; this.ball = nil; this.bigBall = nil
+-- import Code12.*;
 
+-- extends Code12Program
+
+-- instance variables
+this.fish = nil; this.ball = nil; this.bigBall = nil
+-- GameObj[] moreBalls = new GameObj[10];
 this.count = 0; this.total = 0
 this.gameOver = false
 
-
+-- More instance variables
 
 this.LIMIT = 120 + 4
 this.speed = 0.3
@@ -35,7 +40,7 @@ end
 
 function _fn.foo(i, d)
 
-
+	-- Scanner scanner = new Scanner(System.in);
 	i = 8
 	return 0
 end
@@ -53,6 +58,14 @@ function _fn.test(i, d)
 		i = i + (3)
 		d = d * (2)
 	end
+
+	if d < i then
+
+		i = 0
+		d = 1
+	else
+
+		i = 1; end
 
 	if d == i then
 		d = i
@@ -98,21 +111,21 @@ end
 function _fn.onMousePress(obj, x, y)
 
 	ct.logm("Press", obj, x, y)
-end   -- if (obj != null)
-
-
-
-
-
-
-
+-- if (obj != null)
+-- {
+-- 	obj.xSpeed = .1;
+-- 	ct.println( obj.toString() + " was clicked" );
+-- }
+-- else
+-- 	ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
+end
 
 function _fn.onMouseRelease(obj, x, y)
 
 	ct.logm("Release", obj, x, y)
 end
 
-
+-- Move the ball
 function _fn.moveBall(wrap)
 
 	this.ball.x = this.ball.x + 1
@@ -121,15 +134,15 @@ function _fn.moveBall(wrap)
 		local checked = true
 		if this.ball.x > 100 then
 			this.ball.x = 0
-		end
-	end; local _in = nil
+		end; end
+	local _in = nil
 	return ct.toInt(this.ball.x)
 end
 
 function _fn.makeCircles()
 
 	local circles = { length = 10, default = nil }
-
+	-- GameObj goo = new GameObj(10, 20, 30);
 	for _, c in ipairs(circles) do
 		c:setFillColor("black")
 	end; local scores = { 10, 20, 30, length = 3 }
