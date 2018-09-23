@@ -5319,22 +5319,22 @@ line (end)
 *** Line 592 char 37: Statement should end with a semicolon (;)
 
 593. int x = 10		// missing ; in varInit
-*** Line 593 char 36: Syntax Error: expected ";"
+*** Line 593 char 36: Syntax Error: expected a semicolon
 
 594. int x 			// missing ; in varDecl
 *** Line 594 char 33: Syntax Error: end of line was unexpected here
 
 595. final int x = 10 // missing ; in constInit
-*** Line 595 char 43: Syntax Error: expected ";"
+*** Line 595 char 43: Syntax Error: expected a semicolon
 
 596. foo(x, );       // missing expr in exprList
-*** Line 596 char 6: Missing list item or extra comma
+*** Line 596 char 8: Syntax Error: ")" was unexpected here
 
 597. f00()++;		// ++ applied to non-lvalue
-*** Line 597 chars 6-7: Syntax Error: expected ";"
+*** Line 597 chars 6-7: Syntax Error: expected a semicolon
 
 598. --x.foo();		// -- applied to non-lvalue
-*** Line 598 char 8: Syntax Error: expected ";"
+*** Line 598 char 8: Syntax Error: expected a semicolon
 
 599. x = / b;		// missing expr before binary op
 *** Line 599 char 5: Syntax Error: "/" was unexpected here
@@ -5384,13 +5384,13 @@ line (end)
 *** Line 612 char 3: Syntax Error: "+" was unexpected here
 
 613. x = 1,000;      // commas in numbers
-*** Line 613 char 6: Syntax Error: expected ";"
+*** Line 613 char 6: Syntax Error: expected a semicolon
 
 614. x = 1.23.45;    // too many decimal points
-*** Line 614 chars 9-11: Syntax Error: expected ";"
+*** Line 614 chars 9-11: Syntax Error: expected a semicolon
 
 615. x = 3.14e1.0;   // exponential notation with decimal point in exponent
-*** Line 615 chars 11-12: Syntax Error: expected ";"
+*** Line 615 chars 11-12: Syntax Error: expected a semicolon
 
 616. x = 3.14e;      // Invalid exponential notation
 *** Line 616 chars 5-10: Invalid exponential notation
@@ -5426,7 +5426,7 @@ line (end)
 *** Line 626 char 19: Syntax Error: expected ")"
 
 627. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
-*** Line 627 char 21: Syntax Error: ";" was unexpected here
+*** Line 627 char 21: Syntax Error: a semicolon was unexpected here
 
 628. x = a + b + c ) / 3; 	// missing openning parenthesis
 *** Line 628 char 15: Syntax Error: ")" was unexpected here
@@ -5464,7 +5464,7 @@ Comma not supported
 Comma not supported
 
 639. for(int i=0: i<n: i++) 	// colons in place of semicolons
-*** Line 639 char 12: Syntax Error: expected ";"
+*** Line 639 char 12: Syntax Error: expected a semicolon
 
 640. for{int i=0; i<n; i++} 	// {} in place of ()
 *** Line 640 char 4: Syntax Error: expected "("
@@ -5476,7 +5476,7 @@ Comma not supported
 *** Line 642 char 8: Syntax Error: ":" was unexpected here
 
 643. for( int x; arr ) 		// using ; instead of :
-*** Line 643 char 11: Syntax Error: ";" was unexpected here
+*** Line 643 char 11: Syntax Error: a semicolon was unexpected here
 
 644. for( int[] x : arr )
 *** Line 644 char 9: Syntax Error: "[" was unexpected here
@@ -5515,10 +5515,10 @@ Comma not supported
 *** Line 655 chars 34-35: Unclosed string literal
 
 656. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Line 656 char 26: Function parameter values must be separated by commas
+*** Line 656 char 21: Function parameter values must be separated by commas
 
 657. newObj() = oldObj; 				// assigning to a function value
-*** Line 657 char 10: Syntax Error: expected ";"
+*** Line 657 char 10: Syntax Error: expected a semicolon
 
 658. f = void foo()					// mixing assignment and function declaration
 *** Line 658 chars 5-8: Syntax Error: "void" was unexpected here
@@ -5594,10 +5594,10 @@ Comma not supported
 *** Line 682 char 14: Syntax Error: expected "("
 
 683. input.toLowerCase().equals("quit"); // indexing after function call
-*** Line 683 char 20: Syntax Error: expected ";"
+*** Line 683 char 20: Syntax Error: expected a semicolon
 
 684. newBullet().ySpeed = 0;
-*** Line 684 char 12: Syntax Error: expected ";"
+*** Line 684 char 12: Syntax Error: expected a semicolon
 
 685. final int N; 	// constant declaration without initialization
 *** Line 685 char 12: Syntax Error: expected "="
@@ -5706,7 +5706,7 @@ Comma not supported
 *** Line 719 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-719 lines processed in 94 ms
+719 lines processed in 100 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)
