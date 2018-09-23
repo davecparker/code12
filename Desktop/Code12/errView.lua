@@ -261,7 +261,11 @@ end
 local function showError()
 	-- Set the error text
 	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
-	errText.text = errRec.strErr
+	local text = errRec.strErr
+	if errRec.strNote then
+		text = text .. "\n" .. errRec.strNote
+	end
+	errText.text = text
 
 	-- Show the error index and count if multi
 	if app.oneErrOnly or #errLineNumbers < 2 then

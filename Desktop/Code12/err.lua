@@ -28,6 +28,7 @@ local err = {
 --	       iCharEnd,     -- last char index for the error, or nil for end of line
 --     },
 --     refLoc,           -- reference location if any (same fields as loc above)
+--     strNote,          -- second line to add to error message or nil for none
 -- }
 
 -- Line numbers for the first and last error known
@@ -300,6 +301,18 @@ function err.overrideErrLineParseTree( tree, strErr, ... )
 	err.setErrLineNum( iLine, strErr, ... )
 end
 
+-- If strNote then add it as a second line for the error message at iLine
+function err.addNoteToErrAtLineNum( iLine, strNote )
+	assert( type(iLine) == "number" )
+	if strNote then
+		assert( type(strNote) == "string" )
+		local errRec = err.errRecForLine( iLine )
+		if errRec then
+			errRec.strNote = strNote
+		end
+	end
+end
+
 -- Return a string describing the given error rec, or return nil if no error
 function err.getErrString( rec )
 	if rec == nil then
@@ -308,6 +321,9 @@ function err.getErrString( rec )
 	local str = "*** " .. err.getLocString( rec.loc ) .. ": " .. rec.strErr
 	if rec.refLoc then
 		str = str .. "\n*** Reference " .. err.getLocString( rec.refLoc )
+	end
+	if rec.strNote then
+		str = str .. "\n*** Note: " .. rec.strNote
 	end
 	return str
 end
