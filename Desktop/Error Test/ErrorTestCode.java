@@ -606,7 +606,6 @@ int underIndentedInstanceVar;
 		i = s.indexOf(s);
 		i = s.length();
 		s = s.substring(i);
-		s = s.substring(i);
 		s = s.toLowerCase();
 		s = s.toUpperCase();
 		s = s.trim();
@@ -625,6 +624,7 @@ int underIndentedInstanceVar;
 		ct.log( 1, ct.random( 1,
 							  100 ),
 				3, 4 );
+		return 0;
 	}
 
 	// ERROR "Class-level variables must be defined at the beginning of the class"
@@ -1521,13 +1521,14 @@ int underIndentedInstanceVar;
 	void myFunc(int myVar)
 	{
 	}
-	// ERROR "Return type of update function should be void"
-	GameObj update()
+	GameObj makeCoin()
 	{
+	// ERROR "missing a return"
 	}
 	// ERROR "Return type of onMousePress function should be void"
-	String onMousePress( GameObj obj, double x, double y )
+	int onMousePress( GameObj obj, double x, double y )
 	{
+		return 0;
 	}
 	// ERROR "Wrong number of parameters for function"
 	void onMousePress( double x, double y )

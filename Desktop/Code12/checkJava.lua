@@ -851,6 +851,78 @@ function checkStmt( stmt )
 	end
 end
 
+-- Check for unreachable stmts in the block
+local function checkUnreachableStmts( block )
+	assert( block )
+	local stmts = block.stmts
+	if stmts then
+		local numStmts = #stmts
+		for i = 1, numStmts do
+			local stmt = stmts[i]
+
+			-- Check sub-blocks recursively
+			if stmt.block then
+				checkUnreachableStmts( stmt.block )
+				if stmt.elseBlock then
+					checkUnreachableStmts( stmt.elseBlock )
+				end
+			end
+
+			-- Check for return blocking stmts after
+			if i < numStmts and stmt.s == "return" then
+				err.setErrNodeAndRef( stmts[i + 1], stmt, 
+						"This statement is unreachable because there is a return before it.")
+				return
+			end
+		end
+	end
+end
+
+-- If the block is missing a return statement on one of its code paths
+-- then return the line number for the missing return. Return nil if OK.
+-- TODO: Doesn't check for infinite loops and flow within loops.
+local function iLineMissingReturn( block )
+	if block then
+		-- Look at the last stmt
+		local stmts = block.stmts
+		assert( stmts )
+		local stmt = stmts[#stmts]
+		if stmt == nil then
+			return block.iLineEnd   -- empty block
+		end
+		local s = stmt.s
+		if s == "return" then
+			return nil   -- found required return
+		elseif s == "if" and stmt.elseBlock then
+			-- Both sub-blocks must return a value if one does
+			local iLine = iLineMissingReturn( stmt.block )
+			local iLineElse = iLineMissingReturn( stmt.elseBlock )
+			if not (iLine and iLineElse) then
+				return iLine or iLineElse
+			end
+		end
+		-- This block is missing a return. Report at the } or last/only stmt
+		return block.iLineEnd or stmt.iLine
+	end
+end
+				
+-- Check the placement of returns in the (non-void) func.
+-- Existing return statements have already been type checked.
+-- Here we are checking that each code path ends in a return.
+local function checkFuncReturns( func )
+	local iLine = iLineMissingReturn( func.block )
+	if iLine then
+		local strErr
+		if iLine == func.block.iLineEnd then
+			strErr = "Function is missing a return statement (must return a value of type %s)"
+		else
+			strErr = "This code path is missing a return statement (function must return a value of type %s)"
+		end
+		err.setErrLineNumAndRefLineNum( iLine, func.iLine, 
+				strErr, javaTypes.typeNameFromVt( func.vt ) )
+	end
+end
+
 
 --- Type Analysis of expressions  --------------------------------------------
 
@@ -1215,6 +1287,10 @@ function checkJava.checkProgram( programTree, level )
 			if func.nameID.str ~= "main" then
 				currentFunc = func
 				checkBlock( func.block, func.paramVars )
+				checkUnreachableStmts( func.block )
+				if func.vt then
+					checkFuncReturns( func )
+				end
 			end
 		end
 	end
