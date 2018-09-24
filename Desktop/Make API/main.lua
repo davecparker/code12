@@ -187,6 +187,25 @@ local function fixOverloads()
 	end
 end
 
+-- Return a string hash tag link to the Code12 documentation for the
+-- given method name of the given class name, or nil if none.
+local function docLinkForMethod( className, methodName )
+	if className == "ct" then   
+		-- e.g. "#ct-circle-" for ct.circle
+		return "#ct-" .. string.lower( methodName ) .. "-"
+	elseif className == "GameObj" then   
+		-- e.g. "#obj-gettext-" for GameObj.getText
+		return "#obj-" .. string.lower( methodName ) .. "-"
+	elseif className == "Math" then
+		return "#java-math-class-methods-and-fields-supported"
+	elseif className == "String" then
+		return "#java-string-class-methods-supported"
+	elseif className == "Code12Program" then
+		return "#" .. string.lower( methodName )
+	end
+	return nil
+end
+
 -- Make the Lua output file from the parseTrees. Return true if successful.
 local function makeLuaFile()
 	-- Open the output file
@@ -256,7 +275,16 @@ local function makeLuaFile()
 					outFile:write( "," )
 				end
 			end
-			outFile:write( "} },\n" )  -- end of params and the method
+			outFile:write( "}" )
+
+			-- Write the documentation link if any
+			local link = docLinkForMethod( class.name, method.name )
+			if link then
+				outFile:write( ', docLink = "' .. link .. '"' )
+			end
+
+			-- End the method
+			outFile:write( " },\n" )
 
 			-- Lowercase mapping if needed
 			local nameLower = string.lower( method.name )

@@ -33,42 +33,42 @@ Text Output
 
 ### ct.print()
 ```
-ct.print( Object obj )
+ct.print( Object value )
 ```
 Print the text representation of a value to the console.
-The `obj` can be a value of any type.
+The `value` can be a variable or expression of any type.
 No newline or extra characters are added.
 
 > This is equivalent to Java's `System.out.print`.
 
 ### ct.println()
 ```
-ct.println( Object obj )
+ct.println( Object value )
 ct.println( )
 ```
 Print the text representation of a value to the console,
 and add a newline afterwards.
-The `obj` can be a value of any type.
-If `obj` is not included, just a newline is printed.
+The `value` can be a variable or expression of any type.
+If `value` is not included, just a newline is printed.
 
 > This is equivalent to Java's `System.out.println`.
 
 ### ct.log()
 ```
-ct.log( Object... objs )
+ct.log( Object... values )
 ```
 Print any number of values to the console.
-There can be any number of values passed, of any types.
+There can be any number of variables or expressions passed, of any types.
 If multiple values are given, they are printed on one line separated by commas.
 Strings are enclosed in ``"double quotes"``,
 and `GameObj` objects are described in `[square brackets]`.
 
 ### ct.logm()
 ```
-ct.logm( String message, Object... objs )
+ct.logm( String message, Object... values )
 ```
-Print the `message` followed by a space,
-then print any number of values to the console.
+Print the `message` followed by a space, then print the values
+(any number of variables or expressions) to the console.
 The values are output in the same way as `ct.logm()` (see above).
 
 ### ct.setOutputFile()
@@ -315,10 +315,10 @@ pre-defined color named `color`. See [Color Names](#color-names).
 
 ### ct.setBackColorRGB()
 ```
-ct.setBackColorRGB( int r, int g, int b )
+ct.setBackColorRGB( int red, int green, int blue )
 ```
 Set the background color of the current screen to the
-custom RGB color with components `r`, `g`, and `b`
+custom RGB color with components `red`, `green`, and `blue`
 in the range 0-255.
 
 ### ct.setBackImage()
@@ -472,15 +472,15 @@ Note that multiple keys can be down at the same time.
 
 ### ct.charTyped()
 ```
-boolean ct.charTyped( String ch )
+boolean ct.charTyped( String charString )
 ```
-Return `true` if the printable character `ch` was typed
+Return `true` if the printable character `charString` was typed
 during the last update cycle.
 
 Calling this function every time in your `update` function
 will detect any time that the given character is typed.
 
-> Unlike the key names used by `ct.keyPressed()`, the `ch` here
+> Unlike the key names used by `ct.keyPressed()`, the `charString` here
 > is a printable character including the appropriate shift status
 > (e.g. "A" if a shifted "a" is typed, "$" or "4", "+" vs. "=", etc.).
 > Only printable characters are detected, so key sequences such as Ctrl+C
@@ -545,30 +545,33 @@ Return a random integer from `min` to `max` (inclusive).
 
 ### ct.round()
 ```
-int ct.round( double d )
+int ct.round( double number )
 ```
-Return the number `d` rounded to the nearest integer.
+Return the `number` rounded to the nearest integer.
 
 ### ct.roundDecimal()
 ```
-double ct.roundDecimal( double d, int numPlaces )
+double ct.roundDecimal( double number, int numPlaces )
 ```
-Return the number `d` rounded to `numPlaces` decimal places.
+Return the `number` rounded to `numPlaces` decimal places.
 
 ### ct.intDiv()
 ```
-int ct.intDiv( int n, int d )
+int ct.intDiv( int numerator, int denominator )
 ```
-Return the result of an integer divide of n / d. If n / d is not an
-integer, the result is rounded down to the next smaller integer.
-If d is 0 then the result is a large positive integer if n > 0,
-a large negative integer if n < 0, and 0 if n is 0. 
+Return the result of an integer divide of `numerator / denominator`. 
+If `numerator / denominator` is not an integer, the result is rounded 
+down to the next smaller integer.
+If `denominator` is 0 then the result is a large positive integer 
+if `numerator` > 0, a large negative integer if `numerator` < 0, 
+and 0 if `numerator` is 0. 
 
 ### ct.isError()
 ```
-boolean ct.isError( double d )
+boolean ct.isError( double number )
 ```
-Return `true` if the value of `d` is an error value (NaN = "Not a Number").
+Return `true` if the value of `number` is an error value 
+(NaN = "Not a Number").
 
 ### ct.distance()
 ```
@@ -594,9 +597,9 @@ Type Conversion
 ---------------
 ### ct.toInt()
 ```
-int ct.toInt( double d )
+int ct.toInt( double number )
 ```
-Return the value `d` truncated to an integer.
+Return the `number` truncated to an integer.
 
 > All decimal places are lost.
 > This is equivalent to a type cast from double to int.
@@ -604,9 +607,9 @@ Return the value `d` truncated to an integer.
 
 ### ct.parseInt()
 ```
-int ct.parseInt( String s )
+int ct.parseInt( String str )
 ```
-If `s` can be converted to (parsed as) an integer,
+If `str` can be converted to (parsed as) an integer,
 then return the integer value, otherwise return 0.
 
 > Since 0 is a valid integer, it is a good idea to
@@ -614,16 +617,16 @@ then return the integer value, otherwise return 0.
 
 ### ct.canParseInt()
 ```
-boolean ct.canParseInt( String s )
+boolean ct.canParseInt( String str )
 ```
-If `s` can be converted to (parsed as) an integer,
+If `str` can be converted to (parsed as) an integer,
 then return `true`, otherwise return `false`.
 
 ### ct.parseNumber()
 ```
-double ct.parseNumber( String s )
+double ct.parseNumber( String str )
 ```
-If `s` can be converted to (parsed as) a number,
+If `str` can be converted to (parsed as) a number,
 then return the value as a `double`,
 otherwise return the NaN (Not a Number) error value.
 
@@ -631,27 +634,27 @@ otherwise return the NaN (Not a Number) error value.
 
 ### ct.canParseNumber()
 ```
-boolean ct.canParseNumber( String s )
+boolean ct.canParseNumber( String str )
 ```
-If `s` can be converted to (parsed as) a number,
+If `str` can be converted to (parsed as) a number,
 then return `true`, otherwise return `false`.
 
 ### ct.formatDecimal()
 ```
-String ct.formatDecimal( double d )
-String ct.formatDecimal( double d, int numPlaces )
+String ct.formatDecimal( double number )
+String ct.formatDecimal( double number, int numPlaces )
 ```
-Return the value of `d` converted to a string.
+Return the value of `number` converted to a string.
 If `numPlaces` is included, then format the output
 to exactly this many places past the decimal point,
 rounding or adding extra zeros as necessary.
 
 ### ct.formatInt()
 ```
-String ct.formatInt( int i )
-String ct.formatInt( int i, int numDigits )
+String ct.formatInt( int number )
+String ct.formatInt( int number, int numDigits )
 ```
-Return the value of `i` converted to a string.
+Return the value of `number` converted to a string.
 If numDigits is included, then format to this many digits,
 adding leading zeros as necessary.
 
@@ -840,9 +843,9 @@ but you can change it to something else (see `obj.setText` below).
 
 ### obj.setText()
 ```
-obj.setText( String s )
+obj.setText( String text )
 ```
-Set the text of an object. If the object is a text object,
+Set the text of an object to `text`. If the object is a text object,
 setting the text will cause the visible text to change.
 For other object types, the text is simply stored in the object
 (See `obj.getText( )` above).
@@ -879,10 +882,11 @@ in width or height. (see [width, height](#width-height) above).
 
 ### obj.align()
 ```
-obj.align( String a )
-obj.align( String a, boolean adjustY )
+obj.align( String alignment )
+obj.align( String alignment, boolean adjustY )
 ```
-Set the alignment of the object, which is where the object is
+Set the alignment of the object to `alignment`.
+The alignment is a description of where where the object is
 positioned on screen relative to its `x` and `y` coordinates.
 By default, objects are positioned by their center point,
 so that (`x`, `y`) is at the horizontal and vertical center
@@ -926,10 +930,11 @@ If `color` is `null` then the fill is removed from the object.
 
 ### obj.setFillColorRGB()
 ```
-obj.setFillColorRGB( int r, int g, int b )
+obj.setFillColorRGB( int red, int green, int blue )
 ```
-Set the fill color of the object (text color for text objects) to the
-custom RGB color with components `r`, `g`, and `b` in the range 0-255.
+Set the fill color of the object (text color for text objects) to 
+the custom RGB color with components `red`, `green`, and `blue` 
+in the range 0-255.
 
 ### obj.setLineColor()
 ```
@@ -942,11 +947,11 @@ If `color` is `null` then the stroke is removed from the object.
 
 ### obj.setLineColorRGB()
 ```
-obj.setLineColorRGB( int r, int g, int b )
+obj.setLineColorRGB( int red, int green, int blue )
 ```
 Set the line color of the object (the outline stroke color for objects
 other than line objects) to the custom RGB color with components
-`r`, `g`, and `b` in the range 0-255.
+`red`, `green`, and `blue` in the range 0-255.
 
 ### obj.getLayer()
 ```
@@ -1006,11 +1011,11 @@ of the object, or on the border.
 
 ### obj.hit()
 ```
-boolean obj.hit( GameObj obj2 )
+boolean obj.hit( GameObj objTest )
 ```
-Return `true` if the object currently intersects with another object `obj2`.
-If you call this method every time in your `update` function, it can
-be used to test if/when two objects "hit" each other.
+Return `true` if the object currently intersects with another 
+object `objTest`. If you call this method every time in your `update` 
+function, it can be used to test if/when two objects "hit" each other.
 
 ### obj.objectHitInGroup( String group )
 ```
@@ -1029,33 +1034,33 @@ will be considered.
 _____________________________________________________________________
 Java Math Class Methods and Fields Supported
 --------------------------------------------
-The following fields and methods from the Java `Math` class are supported.
+The following fields and functions from the Java `Math` class are supported.
 ```
 double  Math.E
 double  Math.PI
-double  Math.abs( double a )
-int     Math.abs( int a )
-double  Math.acos( double a )
-double  Math.asin( double a )
-double  Math.atan( double a )
+double  Math.abs( double number )
+int     Math.abs( int number )
+double  Math.acos( double number )
+double  Math.asin( double number )
+double  Math.atan( double number )
 double  Math.atan2( double y, double x)
-double  Math.ceil( double a )
-double  Math.cos( double a )
-double  Math.cosh( double a )
-double  Math.exp( double a )
-double  Math.floor( double a )
-double  Math.log( double a )
-double  Math.log10( double a )
-double  Math.max( double a, double b )
-int     Math.max( int a, int b )
-double  Math.min( double a, double b )
-int     Math.min( int a, int b )
-double  Math.pow( double a, double b )
-double  Math.sin( double a )
-double  Math.sinh( double a )
-double  Math.sqrt( double a )
-double  Math.tan( double a )
-double  Math.tanh( double a )
+double  Math.ceil( double number )
+double  Math.cos( double angle )
+double  Math.cosh( double angle )
+double  Math.exp( double number )
+double  Math.floor( double number )
+double  Math.log( double number )
+double  Math.log10( double number )
+double  Math.max( double number1, double number2 )
+int     Math.max( int number1, int number2 )
+double  Math.min( double number1, double number2 )
+int     Math.min( int number1, int number2 )
+double  Math.pow( double number, double exponent )
+double  Math.sin( double angle )
+double  Math.sinh( double angle )
+double  Math.sqrt( double number )
+double  Math.tan( double angle )
+double  Math.tanh( double angle )
 ```
 _____________________________________________________________________
 Java String Class Methods Supported
@@ -1199,13 +1204,13 @@ has been released (after being pressed). See [Key Names](#key-names).
 
 ### onCharTyped()
 ```
-void onCharTyped( String ch )     // "a", "A", "$", etc.
+void onCharTyped( String charString )     // "a", "A", "$", etc.
 ```
 This event is called when keyboard action results in a printable
 character being generated.
 
-> Unlike the key names used by `onkeyPressed` above, the `ch` here
-> is a printable character including the appropriate shift status
+> Unlike the key names used by `onkeyPressed` above, the `charString`
+> here is a printable character including the appropriate shift status
 > (e.g. "A" if a shifted "a" is typed, "$" or "4", "+" vs. "=", etc.).
 > Only printable characters are detected, so key sequences such as Ctrl+C
 > do not result in characters.

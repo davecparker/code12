@@ -690,15 +690,15 @@ int underIndentedInstanceVar;
 		int[] intArr = {1, 2, 3};
 		GameObj[] objArr = { objVar };
 
-		// ERROR "Value of type void cannot be assigned to type int"
+		// ERROR "does not return a value"
 		intVar = objVar.setText("circle");
-		// ERROR "Value of type void cannot be assigned to type double"
+		// ERROR "does not return a value"
 		double screen = ct.setScreen("menu");
-		// ERROR "Value of type void cannot be assigned to type boolean"
+		// ERROR "does not return a value"
 		boolVar = ct.setHeight(150);
-		// ERROR "Value of type void cannot be assigned to type String"
+		// ERROR "does not return a value"
 		strVar = voidFunc();
-		// ERROR "Value of type void cannot be assigned to type GameObj"
+		// ERROR "does not return a value"
 		GameObj title = ct.setTitle("title");
 
 		// ERROR "Value of type int cannot be assigned to type boolean"
@@ -828,9 +828,9 @@ int underIndentedInstanceVar;
 		dblFuncIntDbl();
 		// ERROR "requires 3 parameters"
 		ct.circle();
-		// ERROR "Not enough parameters"
+		// ERROR "requires 4 parameters"
 		ct.rect(0, 0, 10);
-		// ERROR "Not enough parameters"
+		// ERROR "requires 3 parameters"
 		ct.circle(0, 0);
 		// ERROR "Too many parameters passed"
 		voidFunc(1);
@@ -1207,9 +1207,9 @@ int underIndentedInstanceVar;
 		ct.log();
 		// ERROR "requires 2 parameters"
 		Math.atan2();
-		// ERROR "Not enough parameters passed"
+		// ERROR "requires 3 parameters"
 		boolFuncBoolStringGameObj(false, "");
-		// ERROR "Not enough parameters passed"
+		// ERROR "requires 4 parameters"
 		ct.rect(0,0,10);
 		// ERROR "Too many parameters passed"
 		voidFunc(intVar);

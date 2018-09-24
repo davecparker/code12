@@ -3,7 +3,11 @@ class MainProgram
    public void start()
    {
       ct.println("Hey");
-      // int x = 4;
-      ct.circle(50, 30, 10);
+      ct.setTitle("My Program");
+      //GameObj x = ct.setTitle("My Program");
+      GameObj c = ct.circle(50, 30, 10);
+      if (ct.clicked()) 
+         c.setFillColor("blue");
+      Math.sin(50);
    }
 }
