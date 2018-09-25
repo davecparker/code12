@@ -3,6 +3,10 @@ package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Cod
 require('Code12.api')
 
 	ct.println("Hey")
-	-- int x = 4;
-	ct.circle(50, 30, 10)
+	ct.setTitle("My Program")
+	--GameObj x = ct.setTitle("My Program");
+	local c = ct.circle(50, 30, 10)
+	if ct.clicked() then
+		c:setFillColor("blue")
+	end; math.sin(50)
 end

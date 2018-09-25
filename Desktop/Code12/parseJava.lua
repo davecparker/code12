@@ -885,7 +885,7 @@ local function parseCurrentLine( level )
 	err.addNoteToErrAtLineNum( lineNumber, strNote )
 
 	-- Append the source line to our log of syntax errors if not a bulk error test
-	if not err.bulkTestMode then
+	if not err.bulkTestMode and not strNote then
 		local logFile = io.open( "../SyntaxErrors.txt", "a" )
 		if logFile then
 			logFile:write( source.lines[lineNumber].str )

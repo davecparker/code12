@@ -3,7 +3,7 @@
 	This is my name
 */ 
 
-// import Code12.*;
+import Code12.*;
 
 class StructureTest // extends Code12Program
 {
@@ -21,10 +21,10 @@ class StructureTest // extends Code12Program
 	int newCount = frameCount + 2 * -frameCount;
 	String str = "Testing" + 3;
 
-	public static void main(String[] args)
-	{ 
-		Code12.run(new StructureTest());
-	}
+	// public static void main(String[] args)
+	// { 
+	// 	Code12.run(new StructureTest());
+	// }
 
 	public void start()
 	{
@@ -78,6 +78,8 @@ class StructureTest // extends Code12Program
 			i++;
 		while (i < 0);
 
+		// return 0;
+
 		d = 13;
 
 		while (i > 10)
@@ -99,7 +101,15 @@ class StructureTest // extends Code12Program
 
 		i = (int) Math.PI * foo(1, 3.1);
 
-		return 0;
+		if (d == 1)
+		{
+			if (i < 0)
+				return 0;
+			else
+				return 1;
+		}
+		else
+			return 9;
 	}
  
 	public void update()
@@ -123,6 +133,8 @@ class StructureTest // extends Code12Program
 	public void onMouseRelease( GameObj obj, double x, double y )
 	{
 		ct.logm("Release", obj, x, y);
+		if (x == 0)
+			return;
 	}
 
 	// Move the ball

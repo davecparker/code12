@@ -1638,48 +1638,45 @@
                                 exprs:
 608.                                (i)
 609.                    assign (=) { lValue = s }
-                            expr: call substring { lValue = s, #exprs = 1 }
-                                exprs:
-609.                                (i)
-610.                    assign (=) { lValue = s }
                             expr: call toLowerCase { lValue = s }
-611.                    assign (=) { lValue = s }
+610.                    assign (=) { lValue = s }
                             expr: call toUpperCase { lValue = s }
-612.                    assign (=) { lValue = s }
+611.                    assign (=) { lValue = s }
                             expr: call trim { lValue = s }
-614.                    var coins { vt = array of GameObj }
-615.                    var walls { vt = array of GameObj }
-616.                    var multilineArrayInit { vt = array of int }
+613.                    var coins { vt = array of GameObj }
+614.                    var walls { vt = array of GameObj }
+615.                    var multilineArrayInit { vt = array of int }
                             initExpr: arrayInit { #exprs = 3 }
                                 exprs:
-616.                                (1)
-617.                                (2)
-618.                                (3)
-621.                    call log { #exprs = 3, class = ct }
+615.                                (1)
+616.                                (2)
+617.                                (3)
+620.                    call log { #exprs = 3, class = ct }
                             exprs:
-619.                            (1)
-620.                            (2)
-621.                            (3)
-623.                    if
+618.                            (1)
+619.                            (2)
+620.                            (3)
+622.                    if
                             expr: (==) { right = 1 }
                                 left: call random { #exprs = 2, class = ct }
                                     exprs:
-622.                                    (1)
-623.                                    (2)
+621.                                    (1)
+622.                                    (2)
                             block: block { #stmts = 1 }
                                 stmts:
-624.                                call println { #exprs = 1, class = ct }
+623.                                call println { #exprs = 1, class = ct }
                                         exprs:
-624.                                        ("heads")
-627.                    call log { #exprs = 4, class = ct }
+623.                                        ("heads")
+626.                    call log { #exprs = 4, class = ct }
                             exprs:
-625.                            (1)
+624.                            (1)
                                 call random { #exprs = 2, class = ct }
                                     exprs:
-625.                                    (1)
-626.                                    (100)
-627.                            (3)
-627.                            (4)
+624.                                    (1)
+625.                                    (100)
+626.                            (3)
+626.                            (4)
+627.                    return { expr = 0 }
 641.        func update { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 645, #stmts = 1, iLineBegin = 642 }
                     stmts:
@@ -2662,80 +2659,82 @@
                 paramVars:
 1521.                var myVar { vt = int, isGlobal = false }
                 block: block { iLineEnd = 1523, #stmts = 0, iLineBegin = 1522 }
-1525.        func update { #paramVars = 0, vt = GameObj }
-                block: block { iLineEnd = 1527, #stmts = 0, iLineBegin = 1526 }
-1529.        func onMousePress { #paramVars = 3, vt = String }
+1524.        func makeCoin { #paramVars = 0, vt = GameObj }
+                block: block { iLineEnd = 1527, #stmts = 0, iLineBegin = 1525 }
+1529.        func onMousePress { #paramVars = 3, vt = int }
                 paramVars:
 1529.                var obj { vt = GameObj, isGlobal = false }
 1529.                var x { vt = double, isGlobal = false }
 1529.                var y { vt = double, isGlobal = false }
-                block: block { iLineEnd = 1531, #stmts = 0, iLineBegin = 1530 }
-1533.        func onMousePress { #paramVars = 2, vt = void }
-                paramVars:
-1533.                var x { vt = double, isGlobal = false }
-1533.                var y { vt = double, isGlobal = false }
-                block: block { iLineEnd = 1535, #stmts = 0, iLineBegin = 1534 }
-1537.        func onKeyPress { #paramVars = 3, vt = void }
-                paramVars:
-1537.                var obj { vt = GameObj, isGlobal = false }
-1537.                var x { vt = double, isGlobal = false }
-1537.                var y { vt = double, isGlobal = false }
-                block: block { iLineEnd = 1539, #stmts = 0, iLineBegin = 1538 }
-1541.        func onKeyRelease { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 1543, #stmts = 0, iLineBegin = 1542 }
-1545.        func onMousePress { #paramVars = 3, vt = void }
-                paramVars:
-1545.                var obj { vt = boolean, isGlobal = false }
-1545.                var x { vt = double, isGlobal = false }
-1545.                var y { vt = double, isGlobal = false }
-                block: block { iLineEnd = 1547, #stmts = 0, iLineBegin = 1546 }
-1549.        func onMouseDrag { #paramVars = 3, vt = void }
-                paramVars:
-1549.                var obj { vt = GameObj, isGlobal = false }
-1549.                var x { vt = int, isGlobal = false }
-1549.                var y { vt = double, isGlobal = false }
-                block: block { iLineEnd = 1551, #stmts = 0, iLineBegin = 1550 }
-1553.        func onMouseRelease { #paramVars = 3, vt = void }
-                paramVars:
-1553.                var obj { vt = GameObj, isGlobal = false }
-1553.                var x { vt = double, isGlobal = false }
-1553.                var y { vt = String, isGlobal = false }
-                block: block { iLineEnd = 1555, #stmts = 0, iLineBegin = 1554 }
-1557.        func onKeyPress { #paramVars = 1, vt = void }
-                paramVars:
-1557.                var keyName { vt = double, isGlobal = false }
-                block: block { iLineEnd = 1559, #stmts = 0, iLineBegin = 1558 }
-1561.        func onKeyRelease { #paramVars = 1, vt = void }
-                paramVars:
-1561.                var keyName { vt = int, isGlobal = false }
-                block: block { iLineEnd = 1563, #stmts = 0, iLineBegin = 1562 }
-1565.        func onCharTyped { #paramVars = 1, vt = void }
-                paramVars:
-1565.                var keyName { vt = GameObj, isGlobal = false }
-                block: block { iLineEnd = 1567, #stmts = 0, iLineBegin = 1566 }
-1569.        func overIndentedFunc { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 1571, #stmts = 0, iLineBegin = 1570 }
-1573.        func underIndentedFunc { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 1575, #stmts = 0, iLineBegin = 1574 }
-1576.        func funcWithUnindentedBody { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 1580, #stmts = 1, iLineBegin = 1577 }
+                block: block { iLineEnd = 1532, #stmts = 1, iLineBegin = 1530 }
                     stmts:
-1579.                    return { expr = 0 }
-1581.        func multiLineFuncDef { #paramVars = 2, vt = void }
+1531.                    return { expr = 0 }
+1534.        func onMousePress { #paramVars = 2, vt = void }
                 paramVars:
-1581.                var arg1 { vt = int, isGlobal = false }
-1583.                var arg2 { vt = int, isGlobal = false }
-                block: block { iLineEnd = 1585, #stmts = 0, iLineBegin = 1584 }
-1586.        func multilineReturnFunc { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 1591, #stmts = 1, iLineBegin = 1587 }
+1534.                var x { vt = double, isGlobal = false }
+1534.                var y { vt = double, isGlobal = false }
+                block: block { iLineEnd = 1536, #stmts = 0, iLineBegin = 1535 }
+1538.        func onKeyPress { #paramVars = 3, vt = void }
+                paramVars:
+1538.                var obj { vt = GameObj, isGlobal = false }
+1538.                var x { vt = double, isGlobal = false }
+1538.                var y { vt = double, isGlobal = false }
+                block: block { iLineEnd = 1540, #stmts = 0, iLineBegin = 1539 }
+1542.        func onKeyRelease { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 1544, #stmts = 0, iLineBegin = 1543 }
+1546.        func onMousePress { #paramVars = 3, vt = void }
+                paramVars:
+1546.                var obj { vt = boolean, isGlobal = false }
+1546.                var x { vt = double, isGlobal = false }
+1546.                var y { vt = double, isGlobal = false }
+                block: block { iLineEnd = 1548, #stmts = 0, iLineBegin = 1547 }
+1550.        func onMouseDrag { #paramVars = 3, vt = void }
+                paramVars:
+1550.                var obj { vt = GameObj, isGlobal = false }
+1550.                var x { vt = int, isGlobal = false }
+1550.                var y { vt = double, isGlobal = false }
+                block: block { iLineEnd = 1552, #stmts = 0, iLineBegin = 1551 }
+1554.        func onMouseRelease { #paramVars = 3, vt = void }
+                paramVars:
+1554.                var obj { vt = GameObj, isGlobal = false }
+1554.                var x { vt = double, isGlobal = false }
+1554.                var y { vt = String, isGlobal = false }
+                block: block { iLineEnd = 1556, #stmts = 0, iLineBegin = 1555 }
+1558.        func onKeyPress { #paramVars = 1, vt = void }
+                paramVars:
+1558.                var keyName { vt = double, isGlobal = false }
+                block: block { iLineEnd = 1560, #stmts = 0, iLineBegin = 1559 }
+1562.        func onKeyRelease { #paramVars = 1, vt = void }
+                paramVars:
+1562.                var keyName { vt = int, isGlobal = false }
+                block: block { iLineEnd = 1564, #stmts = 0, iLineBegin = 1563 }
+1566.        func onCharTyped { #paramVars = 1, vt = void }
+                paramVars:
+1566.                var keyName { vt = GameObj, isGlobal = false }
+                block: block { iLineEnd = 1568, #stmts = 0, iLineBegin = 1567 }
+1570.        func overIndentedFunc { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 1572, #stmts = 0, iLineBegin = 1571 }
+1574.        func underIndentedFunc { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 1576, #stmts = 0, iLineBegin = 1575 }
+1577.        func funcWithUnindentedBody { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 1581, #stmts = 1, iLineBegin = 1578 }
                     stmts:
-1590.                    return
+1580.                    return { expr = 0 }
+1582.        func multiLineFuncDef { #paramVars = 2, vt = void }
+                paramVars:
+1582.                var arg1 { vt = int, isGlobal = false }
+1584.                var arg2 { vt = int, isGlobal = false }
+                block: block { iLineEnd = 1586, #stmts = 0, iLineBegin = 1585 }
+1587.        func multilineReturnFunc { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 1592, #stmts = 1, iLineBegin = 1588 }
+                    stmts:
+1591.                    return
                             expr: call max { #exprs = 2, class = Math }
                                 exprs:
-1588.                                (1)
-1590.                                (2)
-1594.        func lastFunc { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 1596, #stmts = 0, iLineBegin = 1595 }
+1589.                                (1)
+1591.                                (2)
+1595.        func lastFunc { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 1597, #stmts = 0, iLineBegin = 1596 }
         vars:
   7.        var myVar { vt = int, isGlobal = true, initExpr = 1 }
   9.        var button { vt = GameObj, isGlobal = true }

@@ -29,6 +29,7 @@ local err = {
 --     },
 --     refLoc,           -- reference location if any (same fields as loc above)
 --     strNote,          -- second line to add to error message or nil for none
+--     docLink,          -- string hashtag link to article in docs or nil if none
 -- }
 
 -- Line numbers for the first and last error known
@@ -154,7 +155,8 @@ function err.setErr( loc, refLoc, strErr, ... )
 
 	-- Keep only the first error on each line
 	if source.lines[iLineRank].errRec == nil then
-		source.lines[iLineRank].errRec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+		local errRec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+		source.lines[iLineRank].errRec = errRec
 
 		-- Keep track of the first and last line numbers with errors
 		if iLineFirstErr == nil or iLineRank < iLineFirstErr then
@@ -162,6 +164,19 @@ function err.setErr( loc, refLoc, strErr, ... )
 		end
 		if iLineLastErr == nil or iLineRank > iLineLastErr then
 			iLineLastErr = iLineRank
+		end
+
+		-- If last ... arg is table then use it as options
+		if ... then
+			local args = { ... }
+			local lastArg = args[#args]
+			if type(lastArg) == "table" then
+				for i, v in pairs(lastArg) do
+					if i == "docLink" then
+						errRec.docLink = v
+					end
+				end
+			end
 		end
 	end
 end

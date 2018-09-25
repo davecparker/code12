@@ -515,7 +515,7 @@ local function findStaticMethod( call )
 		elseif beforeStart then
 			err.setErrNode( call, "Code12 API functions cannot be called before start()" )
 		end
-		return method, "ct." .. nameStr
+		return method, "function ct." .. nameStr
 	elseif className == "System" then
 		-- System.out.print, System.out.println
 		local lValue = call.lValue
@@ -529,7 +529,7 @@ local function findStaticMethod( call )
 					"The only supported System functions are System.out.print() and System.out.println()" )
 			return nil
 		end
-		return method, "System.out." .. nameStr
+		return method, "function System.out." .. nameStr
 	elseif className == "Math" then
 		-- e.g. Math.sin
 		method = lookupID( nameID, apiTables["Math"].methods )
@@ -538,7 +538,7 @@ local function findStaticMethod( call )
 					"Unknown or unsupported Math method" )
 			return nil
 		end
-		return method, "Math." .. nameStr
+		return method, "function Math." .. nameStr
 	end
 	error( "Unexpected static class name " .. className )
 	return nil
@@ -572,7 +572,7 @@ local function findObjectMethod( call )
 			end
 			return nil
 		end
-		return method, className .. "." .. nameStr
+		return method, className .. " method " .. nameStr
 	end
 
 	-- Error: e.g. intVar.delete()
@@ -581,12 +581,8 @@ local function findObjectMethod( call )
 	return nil
 end
 
--- Check a call stmt or expr structure.
--- If there is an error then set the error state and return nil, 
--- otherwise return the vt for the return type vt if successful.
-local function vtCheckCall( call )
-	-- { s = "call", class, lValue, nameID, exprs }
-	-- Find the method
+-- Return (method table entry, display name) for a call structure
+local function methodAndDisplayNameFromCall( call )
 	local method, fnName
 	if call.class then     -- e.g. ct.circle, System.out.println, Math.sin
 		method, fnName = findStaticMethod( call )
@@ -596,6 +592,16 @@ local function vtCheckCall( call )
 		method = findUserMethod( call.nameID )
 		fnName = call.nameID.str
 	end
+	return method, fnName
+end
+
+-- Check a call stmt or expr structure.
+-- If there is an error then set the error state and return nil, 
+-- otherwise return the vt for the return type vt if successful.
+local function vtCheckCall( call )
+	-- { s = "call", class, lValue, nameID, exprs }
+	-- Find the method
+	local method, fnName = methodAndDisplayNameFromCall( call )
 	if method == nil then
 		return nil
 	end
@@ -607,18 +613,14 @@ local function vtCheckCall( call )
 	local numParams = #method.params
 	local min = method.min or numParams
 	if numExprs < min then
-		if numExprs == 0 then
-			err.setErrNodeAndRef( call, refFunc, "%s requires %d parameter%s", 
-					fnName, min, (min ~= 1 and "s") or "" )
-		else
-			err.setErrNodeAndRef( call, refFunc, 
-					"Not enough parameters passed to %s (requires %d)", 
-					fnName, min )
-		end
+		err.setErrNodeAndRef( call, refFunc, "%s requires %d parameter%s", 
+				app.startWithCapital( fnName ), min, (min ~= 1 and "s") or "",
+				{ docLink = method.docLink } )
 		return nil
 	elseif not method.variadic and numExprs > numParams then
 		err.setErrNodeAndRef( call, refFunc, 
-				"Too many parameters passed to %s", fnName )
+				"Too many parameters passed to %s", fnName, 
+				{ docLink = method.docLink }  )
 		return nil
 	end
 
@@ -647,10 +649,13 @@ local function vtCheckCall( call )
 		local vtPassed = expr.vt
 		local vtNeeded = method.params[i].vt
 		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
+			print(call.class, method.name)
 			err.setErrNodeAndRef( expr, refFunc, 
-					"Parameter %d (%s) of %s expects type %s, but %s was passed",
-					i, method.params[i].name, fnName, javaTypes.typeNameFromVt( vtNeeded ), 
-					javaTypes.typeNameFromVt( vtPassed ) )
+					"Parameter #%d of %s (%s) expects type %s, but %s was passed",
+					i, fnName, method.params[i].name, 
+					javaTypes.typeNameFromVt( vtNeeded ), 
+					javaTypes.typeNameFromVt( vtPassed ),
+					{ docLink = method.docLink } )
 			return nil
 		end
 	end
@@ -843,6 +848,78 @@ function checkStmt( stmt )
 		end
 	else
 		error( "Unknown stmt structure " .. s )
+	end
+end
+
+-- Check for unreachable stmts in the block
+local function checkUnreachableStmts( block )
+	assert( block )
+	local stmts = block.stmts
+	if stmts then
+		local numStmts = #stmts
+		for i = 1, numStmts do
+			local stmt = stmts[i]
+
+			-- Check sub-blocks recursively
+			if stmt.block then
+				checkUnreachableStmts( stmt.block )
+				if stmt.elseBlock then
+					checkUnreachableStmts( stmt.elseBlock )
+				end
+			end
+
+			-- Check for return blocking stmts after
+			if i < numStmts and stmt.s == "return" then
+				err.setErrNodeAndRef( stmts[i + 1], stmt, 
+						"This statement is unreachable because there is a return before it.")
+				return
+			end
+		end
+	end
+end
+
+-- If the block is missing a return statement on one of its code paths
+-- then return the line number for the missing return. Return nil if OK.
+-- TODO: Doesn't check for infinite loops and flow within loops.
+local function iLineMissingReturn( block )
+	if block then
+		-- Look at the last stmt
+		local stmts = block.stmts
+		assert( stmts )
+		local stmt = stmts[#stmts]
+		if stmt == nil then
+			return block.iLineEnd   -- empty block
+		end
+		local s = stmt.s
+		if s == "return" then
+			return nil   -- found required return
+		elseif s == "if" and stmt.elseBlock then
+			-- Both sub-blocks must return a value if one does
+			local iLine = iLineMissingReturn( stmt.block )
+			local iLineElse = iLineMissingReturn( stmt.elseBlock )
+			if not (iLine and iLineElse) then
+				return iLine or iLineElse
+			end
+		end
+		-- This block is missing a return. Report at the } or last/only stmt
+		return block.iLineEnd or stmt.iLine
+	end
+end
+				
+-- Check the placement of returns in the (non-void) func.
+-- Existing return statements have already been type checked.
+-- Here we are checking that each code path ends in a return.
+local function checkFuncReturns( func )
+	local iLine = iLineMissingReturn( func.block )
+	if iLine then
+		local strErr
+		if iLine == func.block.iLineEnd then
+			strErr = "Function is missing a return statement (must return a value of type %s)"
+		else
+			strErr = "This code path is missing a return statement (function must return a value of type %s)"
+		end
+		err.setErrLineNumAndRefLineNum( iLine, func.iLine, 
+				strErr, javaTypes.typeNameFromVt( func.vt ) )
 	end
 end
 
@@ -1091,6 +1168,17 @@ local function vtExprBadEquality( node )
 	return nil
 end
 
+-- call used as an expression
+local function vtExprCall( node )
+	local vt = vtCheckCall( node ) 
+	if vt == false then
+		local method, fnName = methodAndDisplayNameFromCall( node )
+		err.setErrNode( node, 
+				"%s does not return a value", app.startWithCapital( fnName ), 
+				{ docLink = method.docLink } )
+	end
+	return vt
+end
 
 -- Since there are so many expr variations, we hash them to functions by their
 -- structure name (s), or opType string.
@@ -1114,7 +1202,7 @@ local fnVtExprVariations = {
 	["!="]          = vtExprEquality,
 	["="]           = vtExprBadEquality,
 	-- other expr patterns
-	["call"]        = vtCheckCall,
+	["call"]        = vtExprCall,
 	["lValue"]      = vtCheckLValue,
 	["staticField"] = vtExprStaticField,
 	["cast"]        = vtExprCast,
@@ -1199,6 +1287,10 @@ function checkJava.checkProgram( programTree, level )
 			if func.nameID.str ~= "main" then
 				currentFunc = func
 				checkBlock( func.block, func.paramVars )
+				checkUnreachableStmts( func.block )
+				if func.vt then
+					checkFuncReturns( func )
+				end
 			end
 		end
 	end
