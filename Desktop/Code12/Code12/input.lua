@@ -22,13 +22,13 @@ local function clickEvent(event, gameObj)
 	-- No matter what the program or input state is, if the click is ending here 
 	-- then make sure the touch focus is released.
 	local phase = event.phase
-	local focusObj = g.getFocusObj()
+	local focusObj = g.focusObj
 	if phase == "ended" or phase == "cancelled" then
 		g.setFocusObj(nil)
 	end
 
 	-- Ignore events if the game is not supposed to be getting them now
-	if g.modalDialog or g.blocked or g.stopped then
+	if g.runState ~= "running" then
 		return false
 	end
 
@@ -183,10 +183,9 @@ end
 -- Handle a Corona key event.
 -- Track which keys are down and typed, and call client event handler(s).
 function g.onKey(event)
-	if g.modalDialog or g.blocked or g.stopped then
+	if g.runState ~= "running" then
 		return false
 	end
-	local returnValue = false
 
 	-- Get the key name and change it as necessary to match the Code12 spec
 	local keyName = event.keyName
@@ -199,7 +198,6 @@ function g.onKey(event)
 		-- keyPress
 		keysDown[keyName] = true
 		runtime.eventFunctionYielded(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
-		returnValue = true    -- Always? Means client has to handle all keys
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)
@@ -207,12 +205,13 @@ function g.onKey(event)
 			g.charTyped = ch    -- remember for ct.charTyped()
 			runtime.eventFunctionYielded(ct.userFns.onCharTyped, ch)
 		end
+		return true    -- Always? Means client has to handle all keys
 	elseif event.phase == "up" then
 		-- keyRelease
 		keysDown[keyName] = nil
 		runtime.eventFunctionYielded(ct.userFns.onKeyRelease, keyName)
 	end
-	return returnValue
+	return false
 end
 
 

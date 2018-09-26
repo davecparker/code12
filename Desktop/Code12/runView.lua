@@ -93,7 +93,7 @@ local function onTouchPaneSplit( event )
 	if phase == "began" then
 		g.setFocusObj( paneSplit )
 		paneDragOffset = event.y - lowerGroup.y
-	elseif g.getFocusObj() == paneSplit and phase ~= "cancelled" then
+	elseif g.focusObj == paneSplit and phase ~= "cancelled" then
 		-- Compute and set new console size below pane split
 		local y = event.y - paneDragOffset
 		minConsoleHeight = g.pinValue( app.height - y - app.dyStatusBar,

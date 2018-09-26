@@ -230,8 +230,8 @@ function GameObj:sync()
 	end
 end
 
--- Update the GameObj for a new frame interval
-function GameObj:update()
+-- Move/update the GameObj as necessary for a new frame interval
+function GameObj:updateForNextFrame()
 	-- Move object by its velocity
 	self.x = self.x + self.xSpeed
 	self.y = self.y + self.ySpeed

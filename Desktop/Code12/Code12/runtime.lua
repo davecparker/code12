@@ -42,9 +42,6 @@ local coRoutineUser = nil    -- coroutine running an event or nil if none
 local function onNewFrame()
 	-- Call or resume the client's update function if any
 	local yielded = runtime.eventFunctionYielded(ct.userFns.update)
-	if g.stopped then
-		return
-	end
 
 	-- Clear the polled input state for this frame
 	g.clicked = false
@@ -66,8 +63,8 @@ local function onNewFrame()
 		if gameObj:shouldAutoDelete() then
 			gameObj:removeAndDelete()
 		else
-			if not yielded then
-				gameObj:update()
+			if g.gameState == "running" and not yielded then
+				gameObj:updateForNextFrame()
 			end
 			gameObj:sync()
 			i = i + 1
@@ -82,9 +79,6 @@ end
 local function onFirstFrame()
 	-- Call or resume the client's start method if any
 	local yielded = runtime.eventFunctionYielded(ct.userFns.start)
-	if g.stopped then
-		return
-	end
 
 	-- Flush the output file if any, to make sure at least 
 	-- output done in start() gets written, in case we abort later.
@@ -99,10 +93,14 @@ local function onFirstFrame()
 	end
 
 	-- If start() finished then switch to the normal frame update 
-	-- handler for subsequent frames
+	-- handler for subsequent frames, if any
 	if not yielded then
 		Runtime:removeEventListener("enterFrame", onFirstFrame)
-		Runtime:addEventListener("enterFrame", onNewFrame)
+		if ct.userFns.update then
+			Runtime:addEventListener("enterFrame", onNewFrame)
+		else
+			runtime.stopRun()   -- no update, so done after start
+		end
 	end
 end
 
@@ -127,11 +125,9 @@ local function coroutineYielded(success, strErr)
 		if coroutine.status(coRoutineUser) == "dead" then
 			-- The user code finished
 			coRoutineUser = nil
-			g.blocked = false
 			return false
 		end
 		-- The user code blocked and yielded
-		g.blocked = true
 		return true
 	else
 		-- Runtime error
@@ -232,14 +228,6 @@ function runtime.stopRun()
 	Runtime:removeEventListener("key", g.onKey)
 	Runtime:removeEventListener("resize", runtime.onResize)
 
-	-- Destroy the main display group, screens, and display objects
-	if g.mainGroup then
-		g.mainGroup:removeSelf()  -- deletes contained screen and object groups
-		g.mainGroup = nil
-	end
-	g.screens = {}
-	g.screen = nil
-
 	-- Close output file if any
 	if g.outputFile then
 		g.outputFile:close()
@@ -254,10 +242,10 @@ function runtime.stopRun()
 	g.charTyped = nil
 
 	-- Set game state for a stopped run
+	if g.runState then
+		g.runState = "stopped"
+	end
 	g.startTime = nil
-	g.modalDialog = false
-	g.stopped = true
-	g.blocked = false
 end	
 
 -- Start a new run of the user program after the user's code has been loaded
@@ -268,8 +256,14 @@ function runtime.run()
 	-- Create a main outer display group so that we can rotate and place it 
 	-- to change orientation (portrait to landscape). Also, the origin of this group
 	-- corrects for Corona's origin possibly not being at the device upper left.
+	if g.mainGroup then
+		g.mainGroup:removeSelf()  -- delete old contained screen and object groups
+	end
 	g.mainGroup = display.newGroup()
-	g.mainGroup.finalize = function () g.mainGroup = nil end   -- in case parent kills it
+	g.mainGroup.finalize =        -- in case parent group kills it
+			function () 
+				g.mainGroup = nil 
+			end
 
 	-- If in an app context then put the main display group inside the app's output group,
 	-- otherwise prepare to use the entire device screen.
@@ -278,6 +272,10 @@ function runtime.run()
 	else
 		display.setStatusBar(display.HiddenStatusBar)   -- hide device status bar
 	end
+
+	-- Create empty screens array (destroy any existing ones)
+	g.screens = {}
+	g.screen = nil
 
 	-- Get the device metrics and set the default height
 	getDeviceMetrics()
@@ -294,7 +292,7 @@ function runtime.run()
 	end
 
 	-- Start the game and the game timer
-	g.stopped = false
+	g.runState = "running"
 	g.startTime = system.getTimer()
 	-- Now onFirstFrame called by enterFrame listener will start the action
 end

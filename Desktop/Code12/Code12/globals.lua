@@ -43,8 +43,11 @@ local g = {
 
 	-- Display data structures 
 	mainGroup = nil,    -- main outer Corona display group
-	screens = {},       -- Table of screens indexed by: name = { name = n, group = g }
+	screens = nil,      -- Table of screens indexed by: name = { name = n, group = g }
 	screen = nil,       -- current screen in screens table
+
+	-- UI state shared by the app and the user program
+	focusObj = nil,        -- object with the touch focus or nil if none
 
 	-- Text output state
 	outputFile = nil,      -- file handle for text output or nil for none
@@ -57,11 +60,8 @@ local g = {
 	charTyped = nil,       -- char typed during this update frame (string), nil if none
 
 	-- Run state
+	runState = nil,        -- "running", "blocked", "stopped", or nil if no program
 	startTime = nil,       -- System time in ms when start function began, or nil before
-	focusObj = nil,        -- object with the touch focus or nil if none
-	modalDialog = false,   -- true if a modal dialog is showing
-	blocked = false,       -- true if user code is blocked on user input
-	stopped = false,       -- true if run was stopped or failed
 }
 
 
@@ -114,18 +114,10 @@ function g.uiBlack(obj)
 	return g.uiItem(obj, 0)
 end
 
-
----------------- Runtime State Functions--------------------------------------
-
 -- Set the touch focus to the given object or nil to release
 function g.setFocusObj(obj)
 	display.getCurrentStage():setFocus(obj)
 	g.focusObj = obj
-end
-
--- Return the object with the touch focus or nil if none
-function g.getFocusObj()
-	return g.focusObj
 end
 
 
