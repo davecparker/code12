@@ -40,8 +40,11 @@ local coRoutineUser = nil    -- coroutine running an event or nil if none
 
 -- The enterFrame listener for each frame update after the first
 local function onNewFrame()
-	-- Call or resume the client's update function if any
-	local yielded = runtime.eventFunctionYielded(ct.userFns.update)
+	-- Call or resume the client's update function if not paused
+	local yielded = false
+	if g.runState ~= "paused" then
+		yielded = runtime.eventFunctionYielded(ct.userFns.update)
+	end
 
 	-- Clear the polled input state for this frame
 	g.clicked = false
@@ -99,7 +102,7 @@ local function onFirstFrame()
 		if ct.userFns.update then
 			Runtime:addEventListener("enterFrame", onNewFrame)
 		else
-			runtime.stopRun( "ended" )   -- no update, so done after start
+			runtime.stop( "ended" )   -- no update, so done after start
 		end
 	end
 end
@@ -131,7 +134,7 @@ local function coroutineYielded(success, strErr)
 		return true
 	else
 		-- Runtime error
-		runtime.stopRun()
+		runtime.stop()
 		print("\n*** Runtime Error: " .. strErr)
 		-- Did the error occur in user code or Code12?
 		local strLineNum, strMessage = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
@@ -212,8 +215,15 @@ function runtime.onResize()
 	runtime.eventFunctionYielded(ct.userFns.onResize)
 end
 
+-- Pause a run
+function runtime.pause()
+	if g.runState == "running" then
+		g.runState = "paused"
+	end
+end
+
 -- Stop a run, and set the runState to endState (default "stopped")
-function runtime.stopRun( endState )
+function runtime.stop( endState )
 	-- Abort the user coRoutine if necessary
 	if coRoutineUser then
 		if coroutine.status(coRoutineUser) ~= "dead" then
@@ -249,7 +259,7 @@ end
 -- Start a new run of the user program after the user's code has been loaded
 function runtime.run()
 	-- Stop any existing run in case it wasn't ended explicitly
-	runtime.stopRun()
+	runtime.stop()
 
 	-- Create a main outer display group so that we can rotate and place it 
 	-- to change orientation (portrait to landscape). Also, the origin of this group

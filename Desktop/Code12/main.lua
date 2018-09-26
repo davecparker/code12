@@ -135,7 +135,7 @@ function app.processUserFile()
 	print( "source.path: " .. source.path )
 
 	-- Stop existing run if any
-	runtime.stopRun()
+	runtime.stop()
 
 	-- Set the source dir and filename
 	local appContext = runtime.appContext
@@ -172,7 +172,7 @@ function app.processUserFile()
 	end
 
 	-- Error in processing
-	runtime.stopRun( "error" )
+	runtime.stop( "error" )
 	composer.gotoScene( "errView" )
 end
 
