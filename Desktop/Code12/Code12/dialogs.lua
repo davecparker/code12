@@ -245,7 +245,7 @@ local function inputValue(message, valueType)
 	-- Init the input state, then block and yield until the dialog finishes
 	inputType = valueType
 	g.setFocusObj(nil)   -- a GameObj may have focus if it was just clicked on
-	g.runState = "blocked"
+	g.runState = "waiting"
 	while dialogGroup do
 		if runtime.blockAndYield() == "abort" then
 			endDialog()
@@ -253,7 +253,7 @@ local function inputValue(message, valueType)
 			error("aborted");   -- caught by the runtime
 		end
 	end
-	if g.runState == "blocked" then
+	if g.runState == "waiting" then
 		g.runState = "running"
 	end
 

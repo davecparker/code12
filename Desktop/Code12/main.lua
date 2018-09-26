@@ -13,6 +13,7 @@ local json = require( "json" )
 
 -- Code12 Runtime modules
 local ct = require("Code12.ct")
+local g = require( "Code12.globals" )
 local runtime = require("Code12.runtime")
 require( "Code12.api" )
 
@@ -28,6 +29,8 @@ local statusBar = require( "statusBar" )
 local toolbar = require( "toolbar" )
 local console = require( "console" )
 
+-- File local state
+local runStateLast     -- last known runState (for status bar)
 
 -- User settings to load/save
 local userSettings = {
@@ -169,6 +172,7 @@ function app.processUserFile()
 	end
 
 	-- Error in processing
+	runtime.stopRun( "error" )
 	composer.gotoScene( "errView" )
 end
 
@@ -191,9 +195,16 @@ local function checkUserFile()
 		-- (Re)Load and process the file if updated 
 		if source.updated and source.readFile() then
 			source.updated = false    -- until next time the file updates
+			statusBar.update()
 			app.processUserFile()
 			statusBar.update()
 		end
+	end
+
+	-- Update status bar if the run state changed
+	if g.runState ~= runStateLast then
+		runStateLast = g.runState
+		statusBar.update()
 	end
 end
 

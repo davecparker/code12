@@ -63,7 +63,7 @@ local function onNewFrame()
 		if gameObj:shouldAutoDelete() then
 			gameObj:removeAndDelete()
 		else
-			if g.gameState == "running" and not yielded then
+			if g.runState == "running" and not yielded then
 				gameObj:updateForNextFrame()
 			end
 			gameObj:sync()
@@ -99,7 +99,7 @@ local function onFirstFrame()
 		if ct.userFns.update then
 			Runtime:addEventListener("enterFrame", onNewFrame)
 		else
-			runtime.stopRun()   -- no update, so done after start
+			runtime.stopRun( "ended" )   -- no update, so done after start
 		end
 	end
 end
@@ -212,8 +212,8 @@ function runtime.onResize()
 	runtime.eventFunctionYielded(ct.userFns.onResize)
 end
 
--- Stop a run
-function runtime.stopRun()
+-- Stop a run, and set the runState to endState (default "stopped")
+function runtime.stopRun( endState )
 	-- Abort the user coRoutine if necessary
 	if coRoutineUser then
 		if coroutine.status(coRoutineUser) ~= "dead" then
@@ -241,10 +241,8 @@ function runtime.stopRun()
 	g.clickY = 0
 	g.charTyped = nil
 
-	-- Set game state for a stopped run
-	if g.runState then
-		g.runState = "stopped"
-	end
+	-- Set the game state
+	g.runState = endState or "stopped"
 	g.startTime = nil
 end	
 
