@@ -14,10 +14,10 @@ class UserCode extends Code12Program
 	int frameCount = 0;
 	String function = "Testing";
 
-   public static void main(String[] args)
-   { 
-      Code12.run(new UserCode()); 
-   }
+	public static void main(String[] args)
+	{ 
+		Code12.run(new UserCode()); 
+	}
    
 	public void start()
 	{

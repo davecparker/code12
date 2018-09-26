@@ -21,11 +21,7 @@ read_globals = {
 	-- Corona SDK globals
 	'audio', 'display', 'easing', 'graphics', 'lfs', 'media', 'native',
 	'network', 'Runtime', 'system', 'timer', 'transition',	
-
-	-- Code12 globals
-	"_fn", "this",   -- these should be written only once/rarely
 }
-globals = { "ct" }      -- the runtime defines many functions in here
 
 -- File-specific overrides
 files["config.lua"].globals = { "application" }

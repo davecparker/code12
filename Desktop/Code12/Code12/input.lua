@@ -7,8 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 ----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 
 
 ---------------- Touch Tracking ----------------------------------------------
@@ -73,7 +74,7 @@ local function clickEvent(event, gameObj)
 		g.setFocusObj(focusObj)
 
 		-- Call client event
-		g.eventFunctionYielded(_fn.onMousePress, gameObj, x, y)
+		runtime.eventFunctionYielded(ct.userFns.onMousePress, gameObj, x, y)
 	elseif event.target ~= focusObj then
 		return false    -- click did not begin on this object
 	elseif phase == "moved" then
@@ -87,12 +88,12 @@ local function clickEvent(event, gameObj)
 		g.clickY = y
 
 		-- Call client event
-		g.eventFunctionYielded(_fn.onMouseDrag, gameObj, x, y)
+		runtime.eventFunctionYielded(ct.userFns.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
 		-- Call client event, forcing the final point inside the game area
 		x = g.pinValue(x, 0, g.WIDTH)
 		y = g.pinValue(y, 0, g.height)
-		g.eventFunctionYielded(_fn.onMouseRelease, gameObj, x, y)
+		runtime.eventFunctionYielded(ct.userFns.onMouseRelease, gameObj, x, y)
 	end
 	return true
 end
@@ -197,19 +198,19 @@ function g.onKey(event)
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
-		g.eventFunctionYielded(_fn.onKeyPress, keyName)  -- TODO: if yielded
+		runtime.eventFunctionYielded(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
 		returnValue = true    -- Always? Means client has to handle all keys
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)
 		if ch then
 			g.charTyped = ch    -- remember for ct.charTyped()
-			g.eventFunctionYielded(_fn.onCharTyped, ch)
+			runtime.eventFunctionYielded(ct.userFns.onCharTyped, ch)
 		end
 	elseif event.phase == "up" then
 		-- keyRelease
 		keysDown[keyName] = nil
-		g.eventFunctionYielded(_fn.onKeyRelease, keyName)
+		runtime.eventFunctionYielded(ct.userFns.onKeyRelease, keyName)
 	end
 	return returnValue
 end

@@ -10,14 +10,19 @@
 -- Corona modules
 local composer = require( "composer" )
 
--- Code12 app modules
+-- Code12 runtime modules
 local g = require( "Code12.globals" )
+local runtime = require("Code12.runtime")
+
+-- Code12 app modules
 local app = require( "app" )
 local err = require( "err" )
 local console = require( "console" )
 
+
 -- The runView module and scene
 local runView = composer.newScene()
+
 
 -- UI metrics
 local dyPaneSplit = 10
@@ -33,7 +38,6 @@ local gameGroup                -- display group for game output
 -- Program state
 local minConsoleHeight         -- min height of the console window (from pane split)
 local paneDragOffset           -- when dragging the pane split
-local appContext               -- app context for the running program
 
 
 --- Internal Functions ------------------------------------------------
@@ -75,10 +79,10 @@ local function onResize()
 	-- This will result in a call to ct.setHeight() internally, 
 	-- which will then call us back at setClipSize().
 	app.getWindowSize()
-	appContext.widthP = math.max( app.width, 1 )
-	appContext.heightP = math.max( outputAreaHeight(), 1 )
-	if g.onResize then
-		g.onResize()
+	runtime.appContext.widthP = math.max( app.width, 1 )
+	runtime.appContext.heightP = math.max( outputAreaHeight(), 1 )
+	if runtime.onResize then
+		runtime.onResize()
 	end
 end
 
@@ -146,8 +150,8 @@ function runView:create()
 	-- Install resize handler
 	Runtime:addEventListener( "resize", onResize )
 
-	-- Fill in the appContext for the runtime
-	appContext = ct._appContext
+	-- Set appContext data related to the view
+	local appContext = runtime.appContext
 	appContext.outputGroup = outputGroup
 	appContext.widthP = app.outputWidth
 	appContext.heightP = app.outputHeight
@@ -155,11 +159,6 @@ function runView:create()
 	appContext.print = console.print
 	appContext.println = console.println
 	appContext.runtimeErr = showRuntimeError
-
-	-- Load the Code12 API and runtime.
-	-- This defines the Code12 APIs in the global ct table
-	-- and sets the runtime's fields in ct._appContext.
-	require( "Code12.api" )
 end
 
 -- Prepare to show the runView scene
@@ -168,7 +167,7 @@ function runView:show( event )
 	if phase == "will" then
 		clearOutput()
 	elseif phase == "did" then
-		g.initRun()   -- Tell the runtime to init and start a new run
+		runtime.run()   -- run the user program
 	end
 end
 

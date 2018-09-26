@@ -8,16 +8,20 @@
 -----------------------------------------------------------------------------------------
 
 
+-- Ask Corona what platform we are running on
+local platform = system.getInfo("platform")
+
+
 -- The global state table
 local g = {
 	-- The runtime version number
 	version = 0.5,
 
 	-- Platform info
-	platform = nil,        -- e.g. "android", "macos"
-	isMac = false,         -- true if MacOS
-	isMobile = false,      -- true if iOS or Android
-	isSimulator = false,   -- true if running on Corona Simulator
+	platform = platform,
+	isMac = (platform == "macos"),
+	isMobile = (platform == "android" or platform == "ios"),
+	isSimulator = (system.getInfo("environment") == "simulator"),	
 
 	-- Device pixel metrics, set at init time and when the window resizes
 	device = {

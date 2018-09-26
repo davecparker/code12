@@ -7,8 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 
 local widget = require("widget")
 
@@ -246,7 +247,7 @@ local function inputValue(message, valueType)
 	g.setFocusObj(nil)   -- a GameObj may have focus if it was just clicked on
 	g.modalDialog = true
 	while dialogGroup do
-		if g.blockAndYield() == "abort" then
+		if runtime.blockAndYield() == "abort" then
 			endDialog()
 			g.modalDialog = false
 			error("aborted");

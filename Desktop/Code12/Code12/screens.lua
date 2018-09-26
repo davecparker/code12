@@ -7,8 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
 
 
@@ -35,7 +36,7 @@ function ct.setHeight(height, ...)
 	height = g.pinValue(height, 1, 10000)
 
 	-- Are we embedded in an external app window?
-	local appContext = ct._appContext
+	local appContext = runtime.appContext
 	if appContext then
 		-- (Embedded) Make sure we show the whole output, scaling as necessary
 		local windowAspect = appContext.widthP / appContext.heightP
