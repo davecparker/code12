@@ -14,8 +14,6 @@ local composer = require( "composer" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
-local source = require( "source" )
-local env = require( "env" )
 
 
 -- The toolbar module
@@ -25,30 +23,17 @@ local toolbar = {}
 -- File local state
 local toolbarGroup        -- display group for toolbar
 local bgRect              -- background rect
-local chooseFileBtn       -- Choose File button
+local chooseProgramBtn    -- Choose Program button
 local optionsBtn          -- Options button
 local restartBtn          -- Restart button
 
 
 --- Internal Functions ------------------------------------------------
 
--- Show dialog to choose the user source code file
-local function chooseFile()
-	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
-	if path then
-		source.path = path
-		source.timeLoaded = 0
-		source.timeModLast = 0
-		source.updated = false
-		source.numLines = 0
-	end
-	native.setActivityIndicator( false )
-end
 
--- Event handler for the Choose File button
-local function onChooseFile()
-	native.setActivityIndicator( true )
-	timer.performWithDelay( 50, chooseFile )
+-- Event handler for the Choose Program button
+local function onChooseProgram()
+	composer.gotoScene( "getFile" )
 end
 
 -- Event handler for the Options button
@@ -79,23 +64,6 @@ function toolbar.create()
 	}
 	toolbarGroup:insert( restartBtn )
 	restartBtn.anchorX = 0
-	
-	-- Get File button
-	local getFileButton = widget.newButton{
-		x = restartBtn.x + restartBtn.width + app.margin, 
-		y = yCenter,
-		label = "Get File",
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-		textOnly = true,
-		onRelease = 
-			function ()
-				composer.gotoScene( "getFile" )
-			end
-	}
-	toolbarGroup:insert( getFileButton )
-	getFileButton.anchorX = 0
-
 
 	-- Options button 
 	optionsBtn = widget.newButton{
@@ -110,25 +78,25 @@ function toolbar.create()
 	toolbarGroup:insert( optionsBtn )
 	optionsBtn.anchorX = 1
 
-	-- Choose File Button
-	chooseFileBtn = widget.newButton{
+	-- Choose Program Button
+	chooseProgramBtn = widget.newButton{
 		x = optionsBtn.x - optionsBtn.width - app.margin,
 		y = yCenter,
-		onRelease = onChooseFile,
-		label = "Choose File",
+		onRelease = onChooseProgram,
+		label = "Choose Program",
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI,
 		textOnly = true,
 	}
-	toolbarGroup:insert( chooseFileBtn )
-	chooseFileBtn.anchorX = 1
+	toolbarGroup:insert( chooseProgramBtn )
+	chooseProgramBtn.anchorX = 1
 end
 
 -- Resize the toolbar
 function toolbar.resize()
 	bgRect.width = app.width
 	optionsBtn.x = app.width - app.margin
-	chooseFileBtn.x = optionsBtn.x - optionsBtn.width - app.margin
+	chooseProgramBtn.x = optionsBtn.x - optionsBtn.width - app.margin
 end
 
 -- Show/hide the toolbar
