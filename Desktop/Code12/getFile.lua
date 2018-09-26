@@ -15,6 +15,7 @@ local composer = require( "composer" )
 local g = require( "Code12.globals" )
 local app = require( "app" )
 local env = require( "env" )
+local source = require( "source" )
 
 -- The getFile module and scene
 local getFile = composer.newScene()
@@ -22,16 +23,12 @@ local getFile = composer.newScene()
 -- UI Metrics
 local margin = app.margin
 local extraMargin = margin * 4
-local topMargin = app.dyToolbar
-local iconSize = 30
-local btnLabelOffset = 40
-local fontSize = 24
+local largeFontSize = 24
+local medFontSize = 14
+local smallFontSize = 12
 
 -- Display objects and groups
-local newProgramBtn
-local openProgramBtn
-local recentProgramsTxt
-local recentProgramsGroup
+local UIGroup
 
 
 --- Internal Functions ------------------------------------------------
@@ -44,9 +41,11 @@ end
 -- Update app.sourseFile and add path to app.recentSourceFilePaths
 local function updateSourceFile( path )
 	if path then
-		app.sourceFile.path = path
-		app.sourceFile.timeLoaded = 0
-		app.sourceFile.timeModLast = 0
+		source.path = path
+		source.timeLoaded = 0
+		source.timeModLast = 0
+		source.updated = false
+		source.numLines = 0
 		app.addRecentSourceFilePath( path )
 	end
 end
@@ -55,6 +54,10 @@ end
 local function chooseFile()
 	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
 	updateSourceFile( path )
+	app.saveSettings()
+	if app.openFilesInEditor then
+		env.openFileInEditor( path )
+	end
 	native.setActivityIndicator( false )
 end
 
@@ -69,14 +72,181 @@ local function onOpenProgram()
 	timer.performWithDelay( 50, chooseFile )
 end
 
-local function updateRecentProgramsGroup()
-	-- TODO
+-- Event handler for the list of recent programs
+local function onRecentProgram( event )
+	local path = event.target.path
+	updateSourceFile( path )
+	app.saveSettings()
+	if app.openFilesInEditor then
+		env.openFileInEditor( path )
+	end
 end
 
-local function setOpenInEditorCheckbox()
-	-- TODO
+-- Event handler for the Also Open in Text Editor checkbox
+local function onAlsoOpenInEditor( event )
+	app.openFilesInEditor = event.target.isOn
 end
 
+local function makeUIGroup()
+	if UIGroup then
+		UIGroup:removeSelf()
+		UIGroup = nil
+	end
+	UIGroup = display.newGroup()
+
+	-- New Program Text Button
+	local newProgramTxtBtn = widget.newButton{
+		x = app.width / 2,
+		y = app.dyToolbar + extraMargin,
+		onRelease = onNewProgram,
+		textOnly = true,
+		label = "New Program",
+		font = native.systemFontBold,
+		fontSize = largeFontSize,
+	}
+	UIGroup:insert( newProgramTxtBtn )
+	newProgramTxtBtn.anchorY = 0
+	local iconSize = newProgramTxtBtn.height
+	
+	-- New Program Icon Button
+	local newProgramIcnBtn = widget.newButton{
+		x = newProgramTxtBtn.x - newProgramTxtBtn.width / 2 - margin,
+		y = newProgramTxtBtn.y,
+		onRelease = onNewProgram,
+		width = iconSize,
+		height = iconSize,
+		defaultFile = "images/newProgram.png",
+	}
+	UIGroup:insert( newProgramIcnBtn )
+	newProgramIcnBtn.anchorX = 1
+	newProgramIcnBtn.anchorY = 0
+	local leftMargin = newProgramIcnBtn.x - iconSize
+
+	-- New Program Icon Button
+	local openProgramIcnBtn = widget.newButton{
+		x = leftMargin,
+		y = newProgramTxtBtn.y + newProgramTxtBtn.height + margin,
+		onRelease = onOpenProgram,
+		width = iconSize,
+		height = iconSize,
+		defaultFile = "images/openProgram.png",
+	}
+	UIGroup:insert( openProgramIcnBtn )
+	openProgramIcnBtn.anchorX = 0
+	openProgramIcnBtn.anchorY = 0
+
+	-- Open Program Text Button
+	local openProgramTxtBtn = widget.newButton{
+		x = openProgramIcnBtn.x + openProgramIcnBtn.width + margin,
+		y = openProgramIcnBtn.y,
+		onRelease = onOpenProgram,
+		textOnly = true,
+		label = "Open Program",
+		font = native.systemFontBold,
+		fontSize = largeFontSize,
+	}
+	openProgramTxtBtn.anchorY = 0
+	openProgramTxtBtn.anchorX = 0
+	UIGroup:insert( openProgramTxtBtn )
+
+	-- Recent Programs Text
+	local recentProgramsTxt = display.newText{
+		parent = UIGroup,
+		text = "Recent Programs",
+		x = leftMargin,
+		y = openProgramTxtBtn.y + openProgramTxtBtn.height + extraMargin,
+		font = native.systemFontBold,
+		fontSize = largeFontSize,
+	}
+	recentProgramsTxt.anchorX = 0
+	recentProgramsTxt.anchorY = 0
+	recentProgramsTxt:setFillColor( 0 )
+
+	-- Recent Programs Group
+	local recentProgramsGroup = display.newGroup()
+	recentProgramsGroup.x = leftMargin
+	recentProgramsGroup.y = recentProgramsTxt.y + recentProgramsTxt.height + margin
+	recentProgramsGroup.anchorX = 0
+	recentProgramsGroup.anchorY = 0
+	UIGroup:insert( recentProgramsGroup )
+	local yBtn = 0
+	for i = 1, #app.recentSourceFilePaths do
+		local path = app.recentSourceFilePaths[i]
+		-- Make icon button
+		local icnBtn = widget.newButton{
+			x = 0,
+			y = yBtn,
+			width = iconSize,
+			height = iconSize,
+			defaultFile = "images/recentProgram.png",
+			onRelease = onRecentProgram,
+		}
+		icnBtn.anchorX = 0
+		icnBtn.anchorY = 0
+		icnBtn.path = path
+		recentProgramsGroup:insert( icnBtn )
+		-- Make file title text button
+		local fileNameBtn = widget.newButton{
+			x = iconSize + margin,
+			y = icnBtn.y,
+			label = getNameFromPath( path ),
+			labelAlign = "left",
+			font = native.systemFontBold,
+			fontSize = medFontSize,
+			textOnly = true,
+			onRelease = onRecentProgram,
+		}
+		fileNameBtn.anchorX = 0
+		fileNameBtn.anchorY = 0
+		fileNameBtn.path = path
+		recentProgramsGroup:insert( fileNameBtn )
+		-- Make file path text
+		local filePathTxt = display.newText{
+			parent = recentProgramsGroup,
+			text = path,
+			x = fileNameBtn.x,
+			y = fileNameBtn.y + fileNameBtn.height,
+			width = app.width - leftMargin - iconSize - margin * 2,
+			font = native.systemFont,
+			fontSize = smallFontSize,
+		}
+		g.uiItem( filePathTxt )
+		filePathTxt.path = path
+		local yOffset = math.max( fileNameBtn.height + filePathTxt.height, iconSize )
+		yBtn = yBtn + yOffset + margin
+	end
+
+	-- Also Open in Text Editor text
+	local openInEditorTxt = display.newText{
+		parent = UIGroup,
+		text = "Also Open in Text Editor",
+		x = leftMargin,
+		y = recentProgramsGroup.y + recentProgramsGroup.height + extraMargin,
+		width = app.width - leftMargin - margin,
+		font = native.systemFontBold,
+		fontSize = largeFontSize,
+	}
+	openInEditorTxt.anchorX = 0
+	openInEditorTxt.anchorY = 0
+	openInEditorTxt:setFillColor( 0 )
+
+	-- Also Open in Text Editor checkbox
+	local openInEditorCheckbox = widget.newSwitch{
+		style = "checkbox",
+		x = openInEditorTxt. x - margin,
+		y = openInEditorTxt.y,
+		width = iconSize,
+		height = iconSize,
+		onPress = onAlsoOpenInEditor,
+		sheet = app.checkboxSheet,
+		frameOn = 1,
+		frameOff = 2,
+	}
+	openInEditorCheckbox.anchorX = 1
+	openInEditorCheckbox.anchorY = 0
+	openInEditorCheckbox:setState{ isOn = app.openFilesInEditor }
+	UIGroup:insert( openInEditorCheckbox )
+end
 
 --- Scene Methods ------------------------------------------------
 
@@ -87,118 +257,29 @@ function getFile:create()
 	-- Background
 	g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
 	
-	-- New Program Button
-	newProgramBtn = widget.newButton{
-		x = app.width / 2,
-		y = topMargin + extraMargin,
-		onRelease = onNewProgram,
-		label = "New Program",
-		labelAlign = "left",
-		labelXOffset = btnLabelOffset,
-		font = native.systemFontBold,
-		fontSize = fontSize,
-		width = iconSize,
-		height = iconSize,
-		defaultFile = "images/newProgram.png",
-	}
-	sceneGroup:insert( newProgramBtn )
-	newProgramBtn.anchorY = 0
-	local xBtns = newProgramBtn.x - newProgramBtn.width / 2
+	-- UI Elements
+	makeUIGroup()
+	sceneGroup:insert( UIGroup )
 
-	-- Open Program Button
-	openProgramBtn = widget.newButton{
-		x = xBtns,
-		y = newProgramBtn.y + newProgramBtn.height + margin,
-		onRelease = onOpenProgram,
-		label = "Open Program",
-		labelAlign = "left",
-		labelXOffset = btnLabelOffset,
-		font = native.systemFontBold,
-		fontSize = fontSize,
-		width = iconSize,
-		height = iconSize,
-		defaultFile = "images/openProgram.png",
-	}
-	sceneGroup:insert( openProgramBtn )
-	openProgramBtn.anchorX = 0
-	openProgramBtn.anchorY = 0
+	-- Install resize handler
+	Runtime:addEventListener( "resize", self )
+end
 
-	-- Recent Programs label
-	recentProgramsTxt = display.newText{
-		parent = sceneGroup,
-		text = "Recent Programs",
-		x = xBtns,
-		y = openProgramBtn.y + openProgramBtn.height + extraMargin,
-		font = native.systemFontBold,
-		fontSize = fontSize,
-	}
-	g.uiItem( recentProgramsTxt )
-
-	-- Recent Programs list
-	recentProgramsGroup = display.newGroup()
-	recentProgramsGroup.x = xBtns
-	recentProgramsGroup.y = recentProgramsTxt.y + recentProgramsTxt.height + margin
-	recentProgramsGroup.anchorX = 0
-	recentProgramsGroup.anchorY = 0
-	updateRecentProgramsGroup()
-	sceneGroup:insert( recentProgramsGroup )
-	local yBtn = 0
-	for i = 1, #app.recentSourceFilePaths do
-		local path = app.recentSourceFilePaths[i]
-		-- Make icon and filename text
-		local recentProgramBtn = widget.newButton{
-			x = 0,
-			y = yBtn,
-			label = getNameFromPath( path ),
-			labelAlign = "left",
-			labelXOffset = btnLabelOffset,
-			font = native.systemFontBold,
-			fontSize = fontSize,
-			width = iconSize,
-			height = iconSize,
-			defaultFile = "images/recentProgram.png",
-			onRelease =
-				function ()
-					if app.openFilesInEditor then
-						env.openFileInEditor( path )
-					end
-					updateSourceFile( path )
-					app.saveSettings()
-					app.processUserFile()
-				end
-
-		}
-		recentProgramBtn.anchorX = 0
-		recentProgramBtn.anchorY = 0
-		recentProgramBtn.path = 
-		recentProgramsGroup:insert( recentProgramBtn )
-		-- Make file path text
-		local pathTxt = display.newText{
-			parent = recentProgramsGroup,
-			text = path,
-			x = iconSize + btnLabelOffset,
-			y = recentProgramBtn.y + recentProgramBtn.height,
-			width = app.width - margin - xBtns - iconSize - btnLabelOffset,
-			font = native.systemFont,
-			fontSize = fontSize * 0.5,
-		}
-		g.uiItem( pathTxt )
-		yBtn = yBtn + recentProgramBtn.height + pathTxt.height + margin
+-- Prepare to hide the getFile scene
+function getFile:hide( event )
+	if event.phase == "did" then
+		composer.removeScene( "getFile" )
 	end
 end
 
--- Prepare to show the getFile scene
-function getFile:show( event )
-	if event.phase == "will" then
-		updateRecentProgramsGroup()
-		setOpenInEditorCheckbox()
-	end
+-- Window resize handler
+function getFile:resize()
+	makeUIGroup()
 end
-
 
 ------------------------------------------------------------------------------
 
 -- Complete and return the composer scene
 getFile:addEventListener( "create", getFile )
-getFile:addEventListener( "show", getFile )
+getFile:addEventListener( "hide", getFile )
 return getFile

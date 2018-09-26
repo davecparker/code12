@@ -132,8 +132,10 @@ end
 -- Prepare for a new run of the user program
 local function initNewProgram()
 	-- Stop existing run if any
-	g.stopRun()
-
+	if g.startTime then
+		g.stopRun()
+	end
+	
 	-- Set the source dir and filename
 	appContext.sourceDir, appContext.sourceFilename = 
 			env.dirAndFilenameOfPath( source.path )
@@ -232,6 +234,7 @@ function app.saveSettings()
 	userSettings.useDefaultEditor = app.useDefaultEditor
 	userSettings.oneErrOnly = app.oneErrOnly
 	userSettings.recentSourceFilePaths = app.recentSourceFilePaths
+	userSettings.openFilesInEditor = app.openFilesInEditor
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -251,17 +254,6 @@ local function loadSettings()
 		if str then
 			local t = json.decode( str )
 			if t then
-				-- Restore last used source file by default
-				if t.recentPath then
-					-- Use the recentPath only if the file still exists
-					file = io.open( t.recentPath, "r" )
-					if file then
-						io.close( file )
-						userSettings.recentPath = t.recentPath
-						source.path = userSettings.recentPath
-					end
-				end
-
 				-- Use the saved syntaxLevel if valid
 				local level = t.syntaxLevel
 				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
@@ -297,6 +289,11 @@ local function loadSettings()
 				-- Use the saved recentSourceFilePaths
 				if type(t.recentSourceFilePaths) == "table" then
 					app.recentSourceFilePaths = t.recentSourceFilePaths
+				end
+
+				-- Used the saved openFilesInEditor value
+				if type(t.openFilesInEditor) == "boolean" then
+					app.openFilesInEditor = t.openFilesInEditor
 				end
 			end
 		end
@@ -335,9 +332,9 @@ local function initApp()
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
 
-	-- Start in the runView, which inits the runtime
+	-- -- Start in the runView, which inits the runtime
 	timer.performWithDelay( 10, checkUserFile, 0 )       -- first check soon
-	composer.gotoScene( "runView" )
+	composer.gotoScene( "getFile" )
 end
 
 

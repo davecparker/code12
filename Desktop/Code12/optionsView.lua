@@ -233,6 +233,17 @@ end
 
 --- Event Handlers ------------------------------------------------
 
+-- Save settings and process user file or go back to getFile view
+local function onClose()
+	app.saveSettings()
+	local prevScene = composer.getSceneName( "previous" )
+	if prevScene == "getFile" then
+		composer.gotoScene( prevScene )
+	else
+		app.processUserFile()
+	end
+end
+
 -- Set app.syntax level to selected level.
 -- Fill all syntax level boxes for levels up to and including the 
 -- selected level and clear the remaining boxes.
@@ -271,11 +282,7 @@ function optionsView:create()
 		y = margin,
 		width = 15,
 		height = 15,
-		onRelease = 
-			function ()
-				app.saveSettings()
-				app.processUserFile()
-			end
+		onRelease = onClose,
 	}
 	sceneGroup:insert( closeBtn )
 	closeBtn.anchorX = 1
