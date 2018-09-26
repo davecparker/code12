@@ -189,7 +189,9 @@ function g.onKey(event)
 
 	-- Get the key name and change it as necessary to match the Code12 spec
 	local keyName = event.keyName
-	if keyName == "deleteBack" then
+	if keyName == "back"  then
+		return false    -- let Android handle this (will back out of the app)
+	elseif keyName == "deleteBack" then
 		keyName = "backspace"
 	end
 
