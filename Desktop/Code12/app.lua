@@ -145,6 +145,11 @@ local function lowerASCII( code )
 	return code
 end
 
+-- Return the string with the first letter changed to uppercase if lowercase.
+function app.startWithCapital( str )
+	return string.upper( string.sub( str, 1, 1 ) ) .. (string.sub( str, 2 ) or "")
+end
+
 -- Return a number from 0 to 1 representing a partial match of 
 -- str1 to str2 (1.0 if they match exactly).
 function app.partialMatchString( str1, str2 )

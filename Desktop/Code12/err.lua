@@ -28,6 +28,8 @@ local err = {
 --	       iCharEnd,     -- last char index for the error, or nil for end of line
 --     },
 --     refLoc,           -- reference location if any (same fields as loc above)
+--     strNote,          -- second line to add to error message or nil for none
+--     docLink,          -- string hashtag link to article in docs or nil if none
 -- }
 
 -- Line numbers for the first and last error known
@@ -153,7 +155,8 @@ function err.setErr( loc, refLoc, strErr, ... )
 
 	-- Keep only the first error on each line
 	if source.lines[iLineRank].errRec == nil then
-		source.lines[iLineRank].errRec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+		local errRec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+		source.lines[iLineRank].errRec = errRec
 
 		-- Keep track of the first and last line numbers with errors
 		if iLineFirstErr == nil or iLineRank < iLineFirstErr then
@@ -161,6 +164,19 @@ function err.setErr( loc, refLoc, strErr, ... )
 		end
 		if iLineLastErr == nil or iLineRank > iLineLastErr then
 			iLineLastErr = iLineRank
+		end
+
+		-- If last ... arg is table then use it as options
+		if ... then
+			local args = { ... }
+			local lastArg = args[#args]
+			if type(lastArg) == "table" then
+				for i, v in pairs(lastArg) do
+					if i == "docLink" then
+						errRec.docLink = v
+					end
+				end
+			end
 		end
 	end
 end
@@ -300,6 +316,18 @@ function err.overrideErrLineParseTree( tree, strErr, ... )
 	err.setErrLineNum( iLine, strErr, ... )
 end
 
+-- If strNote then add it as a second line for the error message at iLine
+function err.addNoteToErrAtLineNum( iLine, strNote )
+	assert( type(iLine) == "number" )
+	if strNote then
+		assert( type(strNote) == "string" )
+		local errRec = err.errRecForLine( iLine )
+		if errRec then
+			errRec.strNote = strNote
+		end
+	end
+end
+
 -- Return a string describing the given error rec, or return nil if no error
 function err.getErrString( rec )
 	if rec == nil then
@@ -308,6 +336,9 @@ function err.getErrString( rec )
 	local str = "*** " .. err.getLocString( rec.loc ) .. ": " .. rec.strErr
 	if rec.refLoc then
 		str = str .. "\n*** Reference " .. err.getLocString( rec.refLoc )
+	end
+	if rec.strNote then
+		str = str .. "\n*** Note: " .. rec.strNote
 	end
 	return str
 end

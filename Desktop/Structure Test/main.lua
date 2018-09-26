@@ -3,7 +3,7 @@ package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Cod
 require('Code12.api')
 
 
--- import Code12.*;
+
 
 -- extends Code12Program
 
@@ -21,10 +21,10 @@ this.frameCount = 0
 this.newCount = this.frameCount + 2 *  -this.frameCount
 this.str = "Testing" .. tostring(3)
 
-
-
-
-
+-- public static void main(String[] args)
+-- { 
+-- 	Code12.run(new StructureTest());
+-- }
 
 function _fn.start()
 
@@ -78,6 +78,8 @@ function _fn.test(i, d)
 		i = i + 1
 	until not (i < 0)
 
+	-- return 0;
+
 	d = 13
 
 	while i > 10 do
@@ -99,7 +101,15 @@ function _fn.test(i, d)
 
 	i = ct.toInt(math.pi) * _fn.foo(1, 3.1)
 
-	return 0
+	if d == 1 then
+
+		if i < 0 then
+			return 0
+		else
+			return 1
+		end
+	else
+		return 9; end
 end
 
 function _fn.update()
@@ -123,7 +133,9 @@ end
 function _fn.onMouseRelease(obj, x, y)
 
 	ct.logm("Release", obj, x, y)
-end
+	if x == 0 then
+		return 
+	end; end
 
 -- Move the ball
 function _fn.moveBall(wrap)

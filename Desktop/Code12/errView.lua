@@ -163,7 +163,7 @@ local function makeErrDisplay( sceneGroup )
 	end
 
 	-- Make the error text
-	errText = g.uiBlack( display.newText{
+	errText = g.uiItem( display.newText{
 		parent = errGroup,
 		text = "", 
 		x = margin * 2, 
@@ -174,6 +174,7 @@ local function makeErrDisplay( sceneGroup )
 		fontSize = app.consoleFontSize + 2,
 		align = "left",
 	} )
+	errText:setFillColor( 0.9, 0, 0.1 )   -- slightly darkened red
 
 	-- Position the docs toolbar
 	-- Can't use errText.height: doesn't work when it wraps :(
@@ -257,34 +258,6 @@ local function loadCodeGroup( cg, loc, refLoc )
 	end
 end
 
--- Show the error state
-local function showError()
-	-- Set the error text
-	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
-	errText.text = errRec.strErr
-
-	-- Show the error index and count if multi
-	if app.oneErrOnly or #errLineNumbers < 2 then
-		errCountText.text = ""
-	else
-		errCountText.text = iError .. " of " .. #errLineNumbers
-	end
-
-	-- Are we using two code groups or just one?
-	if refCodeGroup then
-		loadCodeGroup( mainCodeGroup, errRec.loc )
-		loadCodeGroup( refCodeGroup, errRec.refLoc )
-	else
-		loadCodeGroup( mainCodeGroup, errRec.loc, errRec.refLoc )
-	end
-end
-
--- Display or re-display the current error
-local function displayError( sceneGroup )
-	makeErrDisplay( sceneGroup )
-	showError()
-end
-
 -- Enable or disable the given toolbar button
 local function enableBtn( btn, enable )
 	if enable then
@@ -309,18 +282,55 @@ local function updateToolbar()
 	end
 end
 
--- Show the docs if show else hide them, and update the toolbar
+-- Show the docs if show else hide them, and update the toolbar.
 local function showDocs( show )
 	if show then
 		docsWebView.isVisible = true
-
-		-- TODO: Link to specific section if possible
-		docsWebView:request( "API.html", system.ResourceDirectory )
+		local url = "API.html"
+		if errRec.docLink then
+			url = url .. errRec.docLink
+		end
+		docsWebView:request( url, system.ResourceDirectory )
 	else
 		docsWebView:stop()
 		docsWebView.isVisible = false
 	end
 	updateToolbar()
+end
+
+-- Show the error state
+local function showError()
+	-- Set the error text
+	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
+	local text = errRec.strErr
+	if errRec.strNote then
+		text = text .. "\n" .. errRec.strNote
+	end
+	errText.text = text
+
+	-- Show the error index and count if multi
+	if app.oneErrOnly or #errLineNumbers < 2 then
+		errCountText.text = ""
+	else
+		errCountText.text = iError .. " of " .. #errLineNumbers
+	end
+
+	-- Are we using two code groups or just one?
+	if refCodeGroup then
+		loadCodeGroup( mainCodeGroup, errRec.loc )
+		loadCodeGroup( refCodeGroup, errRec.refLoc )
+	else
+		loadCodeGroup( mainCodeGroup, errRec.loc, errRec.refLoc )
+	end
+
+	-- Show documentation link if any
+	showDocs( errRec.docLink ~= nil )
+end
+
+-- Display or re-display the current error
+local function displayError( sceneGroup )
+	makeErrDisplay( sceneGroup )
+	showError()
 end
 
 -- Make the toolbar for the docs view
