@@ -35,39 +35,8 @@ local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
 local multiErrorPicker    -- Multi-error mode picker
 
--- Data tables
-local winEditors = {
-		{ name = "Sublime Text 3", path = [[C:\Program Files\Sublime Text 3\sublime_text.exe]] },
-		{ name = "Sublime Text 3", path = [[C:\Program Files (x86)\Sublime Text 3\sublime_text.exe]] },
-		{ name = "Notepad++", path = [[C:\Program Files\Notepad++\notepad++.exe]] },
-		{ name = "Notepad++", path = [[C:\Program Files (x86)\Notepad++\notepad++.exe]] },
-}
-local macEditors = {}
-local installedEditors
 
 --- Internal Functions ------------------------------------------------
-
--- return a table of names of installed text editors found from the editors data table
-local function getInstalledEditors()
-	local editors
-	if env.isWindows then
-		editors = winEditors
-	else
-		editors = macEditors
-	end
-	local foundEditors = { { name = "System Default", path = nil } }
-	for i = 1, #editors do
-		local editor = editors[i]
-		if editor.name ~= foundEditors[#foundEditors].name then
-			local f = io.open( editor.path , "r" )
-			if f then
-				io.close( f )
-				foundEditors[#foundEditors + 1] = editor
-			end
-		end
-	end
-	return foundEditors
-end
 
 -- Create and return a new display group containing a header and set of setting switches,
 -- which has been inserted into optionsView.view
@@ -198,18 +167,18 @@ local function setSelectedOptions()
 	tabWidthPicker.switches[app.tabWidth - 1]:setState{ isOn = true }
 
 	-- Set the checked box of the editorPicker
-	if app.useDefaultEditor or #installedEditors == 1 then
+	if app.useDefaultEditor or #env.installedEditors == 1 then
 		-- Check on "System Default"
 		editorPicker.switches[1]:setState{ isOn = true }
 	elseif app.editorPath == nil then
 		-- Check on first non system default editor
 		editorPicker.switches[2]:setState{ isOn = true }
-		app.editorPath = installedEditors[2].path
+		app.editorPath = env.installedEditors[2].path
 	else
 		-- Check on the user's preferred editor if it is installed
 		local preferredEditorInstalled
-		for i = 2, #installedEditors do
-			if installedEditors[i].path == app.editorPath then
+		for i = 2, #env.installedEditors do
+			if env.installedEditors[i].path == app.editorPath then
 				editorPicker.switches[i]:setState{ isOn = true }
 				preferredEditorInstalled = true
 				break
@@ -217,7 +186,7 @@ local function setSelectedOptions()
 		end
 		if not preferredEditorInstalled then
 			editorPicker.switches[2]:setState{ isOn = true }
-			app.editorPath = installedEditors[2].path
+			app.editorPath = env.installedEditors[2].path
 		end
 	end
 
@@ -333,10 +302,9 @@ function optionsView:create()
 	}
 
 	-- Editor picker
-	installedEditors = getInstalledEditors()
 	local editorNames = {}
-	for i = 1, #installedEditors do
-		editorNames[i] = installedEditors[i].name
+	for i = 1, #env.installedEditors do
+		editorNames[i] = env.installedEditors[i].name
 	end
 	editorPicker = newSettingPicker{
 		header = "Text Editor:",
@@ -346,7 +314,7 @@ function optionsView:create()
 		y = tabWidthPicker.y + tabWidthPicker.height + margin,
 		onPress = 
 			function ( event )
-				app.editorPath = installedEditors[event.target.val].path
+				app.editorPath = env.installedEditors[event.target.val].path
 				app.useDefaultEditor = app.editorPath == nil
 			end
 	}

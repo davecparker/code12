@@ -38,7 +38,14 @@ local function getNameFromPath( path )
 	return string.match( path, '[^\\/]+%.java' )
 end
 
+-- Ruturn true if given path is to a valid new java program,
+-- false otherwise
+local function isValidNewProgramPath( path )
+	return true -- TODO
+end
+
 -- Update app.sourseFile and add path to app.recentSourceFilePaths
+-- and save user settings
 local function updateSourceFile( path )
 	if path then
 		source.path = path
@@ -47,29 +54,97 @@ local function updateSourceFile( path )
 		source.updated = false
 		source.numLines = 0
 		app.addRecentSourceFilePath( path )
+		app.saveSettings()
 	end
 end
 
 -- Show dialog to choose the user source code file
-local function chooseFile()
+local function openProgram()
 	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
-	updateSourceFile( path )
-	app.saveSettings()
-	if app.openFilesInEditor then
-		env.openFileInEditor( path )
+	if not path then
+		native.setActivityIndicator( false )
+	elseif string.sub( path, -5, -1 ) ~= ".java" then
+		env.showErrAlert( "Wrong File Extension", "Please choose a .java file" )
+		openProgram()
+	else
+		updateSourceFile( path )
+		if app.openFilesInEditor then
+			env.openFileInEditor( path )
+		end
+		native.setActivityIndicator( false )
 	end
-	native.setActivityIndicator( false )
-end
-
--- Event handler for the New Program button
-local function onNewProgram()
-	-- TODO
 end
 
 -- Event handler for the Open Program button
 local function onOpenProgram()
 	native.setActivityIndicator( true )
-	timer.performWithDelay( 50, chooseFile )
+	timer.performWithDelay( 50, openProgram )
+end
+
+-- Write a new program skeleton to the given path
+local function writeNewProgramSkeleton( path )
+	if path then
+		local _, filename = env.dirAndFilenameOfPath( path )
+		local classname = string.gsub( filename, ".java", "" )
+		local skeleton = "class " .. classname .. "\n"
+		if app.syntaxLevel <= 4 then
+			skeleton = skeleton ..
+[[
+{
+	public void start()
+	{
+		// Start your code here
+	}
+}
+]]
+		else
+			skeleton = skeleton ..
+[[
+{
+	// Declare your class-level variables here
+
+	public void start()
+	{
+		// Your code here runs once at the start of running the program
+	}
+
+	public void update()
+	{
+		// Your code here runs once per new frame after start()
+	}
+}
+]]
+		end
+		local file = io.open( path, "w" )
+		file:write( skeleton )
+		file:close()
+	end
+end
+
+-- Show dialog to create a new user source code file
+local function newProgram()
+	local path = env.pathFromSaveFileDialog( "Save New Program As" )
+	if not path then
+		native.setActivityIndicator( false )
+	elseif isValidNewProgramPath( path ) then
+		writeNewProgramSkeleton( path )
+		updateSourceFile( path )
+		if app.openFilesInEditor then
+			env.openFileInEditor( path )
+		end
+		native.setActivityIndicator( false )
+	else
+		os.remove( path )
+		local errMessage = "Invalid filename" -- TODO: different messages depending on why the filename is invalid
+		env.showErrAlert( "Error", errMessage )
+		newProgram()
+	end
+end
+
+-- Event handler for the New Program button
+local function onNewProgram()
+	native.setActivityIndicator( true )
+	timer.performWithDelay( 50, newProgram )
 end
 
 -- Event handler for the list of recent programs

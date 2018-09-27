@@ -19,6 +19,7 @@ local env = {
 	isSimulator = false,     -- true if running under the Corona simulator
 	docsDir = "",            -- path to the app's documents directory
 	baseDirDocs = nil,       -- Corona's baseDir constant to use for docsDir
+	installedEditors,        -- Table of editor data { name, path } for intalled editors
 }
 
 -- File local data
@@ -86,11 +87,29 @@ end
 function env.pathFromOpenFileDialog( title )
 	local result = fileDialogs.openFileDialog{
 		title = title,
+		filter_patterns = "*.java",
+		filter_description = "Java Files (*.java)",
 		allow_multiple_selects = false,
 	}
 	if type(result) == "string" then
 		return result
 	end
+	return nil
+end
+
+-- Run the Save File dialog with the given title.
+-- Return the string pathname chosen or nil if cancelled.
+function env.pathFromSaveFileDialog( title )
+	local result = fileDialogs.saveFileDialog{
+		title = title,
+		default_path_and_file = [[%userprofile\documents\Code12\NewPgram.java]],
+		filter_patterns = "*.java",
+		filter_description = "Java Files (*.java)",
+	}
+	if type(result) == "string" then
+		return result
+	end
+	print(system.pathForFile("My Documents"))
 	return nil
 end
 
@@ -117,6 +136,46 @@ function env.openFileInEditor( path )
 			end
 		else
 			os.execute( "open \"" .. path .. "\"" )
+		end
+	end
+end
+
+-- Show an error alert message dialog with an OK button and the given
+-- title and message
+function env.showErrAlert( title, message )
+	fileDialogs.messageBox{
+		title = title,
+		message = message,
+		icon_type = "error",
+	}
+end
+
+-- Populate the env.installedEditors table with editors found installed
+-- in the current environment
+function env.findInstalledEditors()
+	local winEditors = {
+			{ name = "Sublime Text 3", path = [[C:\Program Files\Sublime Text 3\sublime_text.exe]] },
+			{ name = "Sublime Text 3", path = [[C:\Program Files (x86)\Sublime Text 3\sublime_text.exe]] },
+			{ name = "Notepad++", path = [[C:\Program Files\Notepad++\notepad++.exe]] },
+			{ name = "Notepad++", path = [[C:\Program Files (x86)\Notepad++\notepad++.exe]] },
+	}
+	local macEditors = {}
+	local editors
+	if env.isWindows then
+		editors = winEditors
+	else
+		editors = macEditors
+	end
+	
+	env.installedEditors = { { name = "System Default", path = nil } }
+	for i = 1, #editors do
+		local editor = editors[i]
+		if editor.name ~= env.installedEditors[#env.installedEditors].name then
+			local f = io.open( editor.path , "r" )
+			if f then
+				io.close( f )
+				env.installedEditors[#env.installedEditors + 1] = editor
+			end
 		end
 	end
 end

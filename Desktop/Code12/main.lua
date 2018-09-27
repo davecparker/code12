@@ -300,6 +300,28 @@ local function loadSettings()
 	end
 end
 
+-- If app.editorPath is nil and app.useDefaultEditor is false, set app.editorPath
+-- to the path of the first non-system default editor in env.installedEditors
+function app.setEditorPath()
+	if #env.installedEditors == 1 then
+		app.editorPath = nil
+	elseif app.editorPath ~= nil then
+		-- Make sure prefered editor is installed
+		local preferredEditorInstalled
+		for i = 2, #env.installedEditors do
+			if env.installedEditors[i].path == app.editorPath then
+				preferredEditorInstalled = true
+				break
+			end
+		end
+		if not preferredEditorInstalled then
+			app.editorPath = env.installedEditors[2].path
+		end
+	elseif not app.useDefaultEditor then
+		app.editorPath = env.installedEditors[2].path
+	end
+end
+
 -- Handle system events for the app
 local function onSystemEvent( event )
 	-- Save the user settings if the user switches out of or quits the app
@@ -317,6 +339,10 @@ local function initApp()
 	-- Load saved user settings if any
 	app.startTime = os.time()
 	loadSettings()
+
+	-- Set the text editor 
+	env.findInstalledEditors()
+	app.setEditorPath()
 
 	-- Get initial window size and metrics
 	app.getWindowSize()
