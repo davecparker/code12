@@ -168,6 +168,7 @@ local function makeUIGroup()
 		UIGroup = nil
 	end
 	UIGroup = display.newGroup()
+		getFile.view:insert( UIGroup )
 
 	-- New Program Text Button
 	local newProgramTxtBtn = widget.newButton{
@@ -334,7 +335,6 @@ function getFile:create()
 	
 	-- UI Elements
 	makeUIGroup()
-	sceneGroup:insert( UIGroup )
 
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
@@ -349,7 +349,10 @@ end
 
 -- Window resize handler
 function getFile:resize()
-	makeUIGroup()
+	if composer.getSceneName( "current" ) == "getFile" then
+		makeUIGroup()
+	end
+
 end
 
 ------------------------------------------------------------------------------

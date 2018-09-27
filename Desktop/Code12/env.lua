@@ -109,7 +109,6 @@ function env.pathFromSaveFileDialog( title )
 	if type(result) == "string" then
 		return result
 	end
-	print(system.pathForFile("My Documents"))
 	return nil
 end
 
