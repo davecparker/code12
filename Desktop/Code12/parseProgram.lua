@@ -609,7 +609,6 @@ function getLineStmts( tree, stmts )
 		return false
 	elseif p == "returnVal" then
 		-- return expr ;
-		-- TODO: Check for return being only at end of a block
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
 	elseif p == "return" then
 		-- return ;

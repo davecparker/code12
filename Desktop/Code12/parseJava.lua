@@ -114,27 +114,26 @@ local binaryOpPrecedence = {
 	["?"]	= 2,
 }
 
+-- Description strings for various token types (map tt to string)
+local strDescriptionForTokenType = {
+	["ID"]    = "a name",
+	["TYPE"]  = "a type",
+	["INT"]   = "a number",
+	["NUM"]   = "a number",
+	["STR"]   = "a string",
+	["BOOL"]  = "a boolean constant",
+	["NULL"]  = "null",
+	["END"]   = "end of line",
+	[","]     = "a comma",
+	["."]     = "a dot",
+	[";"]     = "a semicolon",
+}
 
 ----- Parsing Utilities  --------------------------------------------------
 
 -- Return a description of the given token type for syntax errors
 local function tokenTypeDescription( tt )
-	if tt == "ID" then
-		return "a name"
-	elseif tt == "TYPE" then
-		return "a type"
-	elseif tt == "INT" or tt == "NUM" then
-		return "a number"
-	elseif tt == "STR" then
-		return "a string"
-	elseif tt == "BOOL" then
-		return "a boolean constant"
-	elseif tt == "NULL" then
-		return "null"
-	elseif tt == "END" then
-		return "end of line"
-	end
-	return "\"" .. tt .. "\""   -- "if", "(", "<=", etc.
+	return strDescriptionForTokenType[tt] or ("\"" .. tt .. "\"")
 end	
 
 -- Return a description of the given token for syntax errors
@@ -148,28 +147,30 @@ end
 
 -- Update the findError tracking state for an unexpected token at the current
 -- parse location when type ttExpected was expected.
-local function trackUnexpectedToken( ttExpected )
-	local iTokenMax = findError.iTokenMax or 0
-	if iToken >= iTokenMax then
-		local token = tokens[iToken] or tokens[#tokens]   -- use END if past end
-		err.clearErr( lineNumber )   -- replace previous error on this line if any
-		if iToken > iTokenMax then
-			-- This partial parse made it the farthest so far
-			findError.iTokenMax = iToken
-			findError.parses = { {    -- first parses entry out this far
-				stmtPattern = findError.lineOrStmtPattern,
-				ttExpected = ttExpected 
-			} }
-			err.setErrNode( token, "Syntax Error: expected %s",
-					tokenTypeDescription( ttExpected ) )
-		else
-			-- This partial parse went to the same token we stopped at before
-			findError.parses[#findError.parses + 1] = { 
-				stmtPattern = findError.lineOrStmtPattern, 
-				ttExpected = ttExpected 
-			}
-			err.setErrNode( token, "Syntax Error: %s was unexpected here",
-					tokenDescription( token ) )
+local function possibleExpectedToken( ttExpected )
+	if findError then
+		local iTokenMax = findError.iTokenMax or 0
+		if iToken >= iTokenMax then
+			local token = tokens[iToken] or tokens[#tokens]   -- use END if past end
+			err.clearErr( lineNumber )   -- replace previous error on this line if any
+			if iToken > iTokenMax then
+				-- This partial parse made it the farthest so far
+				findError.iTokenMax = iToken
+				findError.parses = { {    -- first parses entry out this far
+					stmtPattern = findError.lineOrStmtPattern,
+					ttExpected = ttExpected 
+				} }
+				err.setErrNode( token, "Syntax Error: expected %s",
+						tokenTypeDescription( ttExpected ) )
+			else
+				-- This partial parse went to the same token we stopped at before
+				findError.parses[#findError.parses + 1] = { 
+					stmtPattern = findError.lineOrStmtPattern, 
+					ttExpected = ttExpected 
+				}
+				err.setErrNode( token, "Syntax Error: %s was unexpected here",
+						tokenDescription( token ) )
+			end
 		end
 	end
 end
@@ -231,6 +232,13 @@ local function parsePrimaryExpr()
 		iToken = iToken + 1
 		token.vt = vt   -- assign the vt here so semantic checking doesn't have to
 		return token    -- expr node can also be a single literal token node
+	end
+	if findError then
+		possibleExpectedToken( "INT" )
+		possibleExpectedToken( "NUM" )
+		possibleExpectedToken( "BOOL" )
+		possibleExpectedToken( "STR" )
+		possibleExpectedToken( "NULL" )
 	end
 	return parseGrammar( primaryExpr )
 end
@@ -314,9 +322,7 @@ local function lValue()
 	-- Look for the required variable ID token
 	local varToken = tokens[iToken]
 	if varToken.tt ~= "ID" then
-		if findError then
-			trackUnexpectedToken( "ID" )
-		end
+		possibleExpectedToken( "ID" )
 		return nil
 	end
 	iToken = iToken + 1
@@ -415,7 +421,7 @@ local exprList1 = { t = "exprList1",
 primaryExpr = { t = "expr",
 	{ 5, 12, "call",			callHead, exprList, ")" 			},
 	-- Common Error for call (must preceed lValue)
-	{ 5, 0, "call",				callHead, exprList1, expr, 0,	iNode = 4, missing = true,
+	{ 5, 0, "call",				callHead, exprList1, expr, 0,	iNode = 3, missing = true,
 			strErr = "Function parameter values must be separated by commas" },
 	-- More valid patterns
 	{ 3, 12, "lValue",			lValue								},
@@ -451,7 +457,7 @@ local stmt = { t = "stmt",
 	{ 4, 12, "postInc",			lValue, "++" 						},
 	{ 4, 12, "postDec",			lValue, "--"						},
 	-- Common Errors
-	{ 1, 0, "call",				callHead, exprList1, expr, 0,	iNode = 4, missing = true,
+	{ 1, 0, "call",				callHead, exprList1, expr, 0,	iNode = 3, missing = true,
 			strErr = "Function parameter values must be separated by commas" },
 }
 
@@ -707,22 +713,14 @@ local function parseListPattern( pattern )
 
 	-- Match as many list items as possible
 	repeat
-		-- A list item cannot start with a comma
-		local token = tokens[iToken]
-		if token.tt == "," then
-			err.setErrNode( token, "Missing list item or extra comma" )
-			return nil
-		end
-
 		-- Try to parse the item
+		local token = tokens[iToken]
 		local node = nil
 		if t == "string" then
 			-- Token: compare to next token
 			if token == nil or token.tt ~= item then
 				-- Required next token type doesn't match
-				if findError then
-					trackUnexpectedToken( item )
-				end
+				possibleExpectedToken( item )
 				return nil    -- required next token type doesn't match
 			end
 			node = token
@@ -747,16 +745,8 @@ local function parseListPattern( pattern )
 		-- Look for a comma to continue the list
 		if tokens[iToken].tt == "," then
 			iToken = iToken + 1   -- pass comma and prepare to parse item again
-			local tt = tokens[iToken].tt   -- peek at token after the comma
-			if tt == ")" or tt == "}" or tt == ";" then   -- always list terminators
-				err.setErrNode( tokens[iToken - 1],
-					"Missing list item or extra comma" )
-				return nil
-			end
 		else
-			if findError then
-				trackUnexpectedToken( "," )   -- could have expected a comma here
-			end
+			possibleExpectedToken( "," )   -- could have expected a comma here
 			return nodes  -- can't parse any more list items
 		end
 	until false  -- returns internally
@@ -786,9 +776,7 @@ function parsePattern( pattern )
 			local token = tokens[iToken]
 			if token == nil or token.tt ~= item then
 				-- Required next token type doesn't match
-				if findError then
-					trackUnexpectedToken( item )
-				end
+				possibleExpectedToken( item )
 				return nil
 			end
 			node = token
@@ -823,6 +811,17 @@ function parsePattern( pattern )
 	return nodes  -- successful pattern match
 end
 
+-- Try to parse the current line at the given level.
+-- Return the parse tree if successful or nil if failure.
+-- If includeCommonErrors then include common error patterns
+-- (will return a parse tree with tree.isError = true).
+local function tryLineParseAtLevel( level, includeCommonErrors )
+	syntaxLevel = level
+	matchCommonErrors = includeCommonErrors
+	iToken = 1
+	return parseGrammar( line )
+end
+
 -- Try to parse the current token stream as a line of code at the given
 -- syntax level. If a match is found then return the parseTree, otherwise
 -- return nil and set the error state. If the match was for a known 
@@ -831,56 +830,45 @@ end
 -- then set the error state to indicate this.
 local function parseCurrentLine( level )
 	-- Try normal parse at the requested syntax level first
-	syntaxLevel = level
-	matchCommonErrors = false
-	findError = nil    -- don't try to find errors (optimize for success)
-	iToken = 1
-	local parseTree = parseGrammar( line )
+	findError = nil    -- don't track error tokens (optimize for success)
+	local parseTree = tryLineParseAtLevel( level )
 	if parseTree then
 		return parseTree  -- success
 	end
 
-	-- Try common errors at the given syntax level
-	err.clearErr( lineNumber )
-	matchCommonErrors = true
-	iToken = 1
-	parseTree = parseGrammar( line )
-	if parseTree then
-		assert( parseTree.isError )  -- matched a common error
-		return parseTree    -- TODO: Is this too risky?
-	end	
-
-	-- Try parsing at higher levels, including common errors
+	-- Try parsing at higher levels
+	local strNote = nil
 	for tryLevel = level + 1, numSyntaxLevels do
 		err.clearErr( lineNumber )
-		syntaxLevel = tryLevel
-		iToken = 1
-		parseTree = parseGrammar( line )
+		parseTree = tryLineParseAtLevel( tryLevel )
 		if parseTree then
-			err.clearErr( lineNumber )   -- in case we matched a common error
-			-- Report level error with minimum level required
-			local lastToken = tokens[#tokens - 1]  -- not counting the END
-			err.setErrNodeSpan( tokens[1], lastToken,
-					"Use of %s requires syntax level %d",
-					syntaxFeatures[tryLevel], tryLevel )
-			return parseTree
+			-- Make note to add to syntax error
+			strNote = string.format( "(Use of %s requires syntax level %d)",
+							syntaxFeatures[tryLevel], tryLevel)
+			break
 		end
 	end
 
-	-- Parse again at the user's level to look for basic parse errors.
+	-- Try common errors at the given syntax level
 	err.clearErr( lineNumber )
-	syntaxLevel = level
-	matchCommonErrors = false
-	iToken = 1
-	parseTree = parseGrammar( line )
+	parseTree = tryLineParseAtLevel( level, true )
+	if parseTree then
+		assert( parseTree.isError )  -- matched a common error
+		err.addNoteToErrAtLineNum( lineNumber, strNote )
+		return parseTree    -- TODO: Is this too risky?
+	end
+
+	-- Normal parse again at the user's level to look for basic parse errors.
+	err.clearErr( lineNumber )
+	parseTree = tryLineParseAtLevel( level )
 	if err.errRecForLine( lineNumber ) then
+		err.addNoteToErrAtLineNum( lineNumber, strNote )
 		return parseTree
 	end
 
-	-- Try at the user's level with findError to try to find the error
+	-- Try at the user's level with findError to try to find the error token
 	findError = {}
-	iToken = 1
-	parseGrammar( line )
+	tryLineParseAtLevel( level )
 	if findError.iTokenMax then
 		-- Tracking found and reported an error
 		print( string.format( '\nSyntax error at token %d "%s"', 
@@ -890,13 +878,14 @@ local function parseCurrentLine( level )
 					parse.stmtPattern, parse.ttExpected ) )
 		end
 
-		-- Make a generic syntax error to use since a more specific error was not found
+		-- Make a generic syntax error to use if a more specific error was not already set
 		local lastToken = tokens[#tokens - 1]  -- not counting the END
 		err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
 	end
+	err.addNoteToErrAtLineNum( lineNumber, strNote )
 
 	-- Append the source line to our log of syntax errors if not a bulk error test
-	if not err.bulkTestMode then
+	if not err.bulkTestMode and not strNote then
 		local logFile = io.open( "../SyntaxErrors.txt", "a" )
 		if logFile then
 			logFile:write( source.lines[lineNumber].str )
