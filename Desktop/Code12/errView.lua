@@ -18,7 +18,7 @@ local source = require( "source" )
 local err = require( "err" )
 
 
--- The runView module and scene
+-- The errView module and scene
 local errView = composer.newScene()
 
 

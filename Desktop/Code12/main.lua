@@ -211,10 +211,16 @@ local function settingsFilePath()
 end
 
 -- Save the user settings
-local function saveSettings()
+function app.saveSettings()
 	-- Update the userSettings
 	userSettings.recentPath = source.path
 	userSettings.syntaxLevel = app.syntaxLevel 
+	userSettings.tabWidth = app.tabWidth
+	userSettings.editorPath = app.editorPath
+	userSettings.useDefaultEditor = app.useDefaultEditor
+	userSettings.oneErrOnly = app.oneErrOnly
+	userSettings.recentSourceFilePaths = app.recentSourceFilePaths
+	userSettings.openFilesInEditor = app.openFilesInEditor
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -234,25 +240,71 @@ local function loadSettings()
 		if str then
 			local t = json.decode( str )
 			if t then
-				-- Restore last used source file by default
-				if t.recentPath then
-					-- Use the recentPath only if the file still exists
-					file = io.open( t.recentPath, "r" )
-					if file then
-						io.close( file )
-						userSettings.recentPath = t.recentPath
-						source.path = userSettings.recentPath
-					end
-				end
-
 				-- Use the saved syntaxLevel if valid
 				local level = t.syntaxLevel
 				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
 					userSettings.syntaxLevel = level
 					app.syntaxLevel = userSettings.syntaxLevel
 				end
+
+				-- Use the saved tabWidth if valid
+				local tabWidth = t.tabWidth
+				if type(tabWidth) == "number" and tabWidth >=2 and tabWidth <= 8 then
+					app.tabWidth = tabWidth
+				end
+
+				-- Use the saved editorPath if valid
+				if type(t.editorPath) == "string" then
+					file = io.open( t.editorPath, "r" )
+					if file then
+						io.close( file )
+						app.editorPath = t.editorPath
+					end
+				end
+
+				-- Use the saved useDefaultEditor value
+				if type(t.useDefaultEditor) == "boolean" then
+					app.useDefaultEditor = t.useDefaultEditor
+				end
+
+				-- Use the saved oneErrOnly value
+				if type(t.oneErrOnly) == "boolean" then
+					app.oneErrOnly = t.oneErrOnly
+				end
+
+				-- Use the saved recentSourceFilePaths
+				if type(t.recentSourceFilePaths) == "table" then
+					app.recentSourceFilePaths = t.recentSourceFilePaths
+				end
+
+				-- Used the saved openFilesInEditor value
+				if type(t.openFilesInEditor) == "boolean" then
+					app.openFilesInEditor = t.openFilesInEditor
+				end
 			end
 		end
+	end
+end
+
+-- If app.editorPath is nil and app.useDefaultEditor is false, set app.editorPath
+-- to the path of the first non-system default editor in env.installedEditors
+function app.setEditorPath()
+	if #env.installedEditors == 1 then
+		app.editorPath = nil
+	elseif app.editorPath ~= nil then
+		-- Make sure prefered editor is installed
+		local preferredEditorInstalled
+		for i = 2, #env.installedEditors do
+			if env.installedEditors[i].path == app.editorPath then
+				preferredEditorInstalled = true
+				break
+			end
+		end
+		if not preferredEditorInstalled then
+			app.editorPath = env.installedEditors[2].path
+		end
+	elseif not app.useDefaultEditor then
+		app.editorPath = env.installedEditors[2].path
 	end
 end
 
@@ -260,7 +312,7 @@ end
 local function onSystemEvent( event )
 	-- Save the user settings if the user switches out of or quits the app
 	if event.type == "applicationSuspend" or event.type == "applicationExit" then
-		saveSettings()
+		app.saveSettings()
 	end
 end
 
@@ -277,6 +329,10 @@ local function initApp()
 	app.startTime = os.time()
 	loadSettings()
 
+	-- Set the text editor 
+	env.findInstalledEditors()
+	app.setEditorPath()
+
 	-- Get initial window size and metrics
 	app.getWindowSize()
 	console.init()      -- gets and stores console font metrics
@@ -291,6 +347,7 @@ local function initApp()
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10, checkUserFile, 0 )        -- first check soon
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
+	composer.gotoScene( "getFile" )
 end
 
 

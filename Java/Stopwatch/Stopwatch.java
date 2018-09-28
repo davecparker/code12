@@ -30,10 +30,10 @@ import Code12.*;
 
 class Stopwatch extends Code12Program
 {
-   public static void main(String[] args)
-   { 
-      Code12.run(new Stopwatch()); 
-   }
+   // public static void main(String[] args)
+   // { 
+   //    Code12.run(new Stopwatch()); 
+   // }
    
    GameObj timeDisplay; // Display for time elapsed
    GameObj startButton; // Button for starting the stopwatch

@@ -22,6 +22,11 @@ local app =  {
 	consoleFontSize = 14,
 	fontSizeUI = 12,
 
+	-- Image sheets
+	radioBtnSheet = graphics.newImageSheet( "images/radiobutton.png", { width = 1024, height = 1024, numFrames = 2 } ),
+	checkboxSheet = graphics.newImageSheet( "images/checkbox.png", { width = 256, height = 256, numFrames = 2 } ),
+	fillboxSheet = graphics.newImageSheet( "images/fillbox.png", { width = 256, height = 256, numFrames = 2 } ),
+
 	-- UI metrics
 	margin = 10,                 -- generic margin to leave between many UI items
 	dyToolbar = 40,              -- toolbar height
@@ -37,11 +42,18 @@ local app =  {
 
 	-- Misc constants
 	numSyntaxLevels = 12,        -- number of different parsing levels
+	maxNumRecentPaths = 5,       -- maximum number of recent source file paths to keep
+
+	-- List of most recent source file paths opened, with duplicates removed
+	recentSourceFilePaths = {},
 
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
 	tabWidth = 4,                -- current tab width
-	oneErrOnly = false,          -- true to display only the first error
+	oneErrOnly = true,           -- true to display only the first error
+	editorPath = nil,            -- current text editor
+	useDefaultEditor = false,    -- when true, use the OS default for opening user program files
+	openFilesInEditor = true,    -- when true, opened programs will also open in text editor
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
@@ -176,6 +188,22 @@ function app.partialMatchString( str1, str2 )
 	return (front + back) / (2 * longerLen)
 end
 
+-- Add given path to the end of app.recentSourceFilePaths and remove any other
+-- occurance of it in the list.
+-- Then trim app.recentSourceFilePaths so its size doen't exceed app.maxNumRecentPaths
+function app.addRecentSourceFilePath( path )
+	local recentPaths = app.recentSourceFilePaths
+	table.insert( recentPaths, 1, path )
+	for i = #recentPaths, 2, -1 do
+		if recentPaths[i] == path then
+			table.remove( recentPaths, i )
+			break
+		end
+	end
+	if #recentPaths > app.maxNumRecentPaths then
+		table.remove( recentPaths )
+	end
+end
 
 ------------------------------------------------------------------------------
 return app
