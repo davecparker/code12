@@ -146,7 +146,6 @@ local function newProgram()
 			end
 			native.setActivityIndicator( false )
 		else
-			os.remove( path )
 			env.showErrAlert( "Invalid File Name", errMessage )
 			newProgram()
 		end
@@ -174,13 +173,14 @@ local function onAlsoOpenInEditor( event )
 	app.openFilesInEditor = event.target.isOn
 end
 
-local function makeUIGroup()
+-- Make the UI elements
+local function makeUIGroup( sceneGroup )
 	if UIGroup then
 		UIGroup:removeSelf()
 		UIGroup = nil
 	end
 	UIGroup = display.newGroup()
-		getFile.view:insert( UIGroup )
+	sceneGroup:insert( UIGroup )
 
 	-- New Program Text Button
 	local newProgramTxtBtn = widget.newButton{
@@ -355,30 +355,27 @@ function getFile:create()
 	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 0.9 ) 
 	
 	-- UI Elements
-	makeUIGroup()
+	makeUIGroup( sceneGroup )
 
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
 end
 
--- Prepare to hide the getFile scene
-function getFile:hide( event )
-	if event.phase == "did" then
-		composer.removeScene( "getFile" )
+-- Prepare to show the getFile scene
+function getFile:show( event )
+	if event.phase == "will" then
+		makeUIGroup( self.view )
 	end
 end
 
 -- Window resize handler
 function getFile:resize()
-	if composer.getSceneName( "current" ) == "getFile" then
-		makeUIGroup()
-	end
-
+	makeUIGroup( self.view )
 end
 
 ------------------------------------------------------------------------------
 
 -- Complete and return the composer scene
 getFile:addEventListener( "create", getFile )
-getFile:addEventListener( "hide", getFile )
+getFile:addEventListener( "show", getFile )
 return getFile

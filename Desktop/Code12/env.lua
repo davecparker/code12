@@ -85,10 +85,15 @@ end
 -- Run the Open File dialog with the given title.
 -- Return the string pathname chosen or nil if cancelled.
 function env.pathFromOpenFileDialog( title )
+	local filterPatterns, filterDescription
+	if env.isWindows then
+		filterPatterns = "*.java"
+		filterDescription = "Java Files (*.java)"
+	end
 	local result = fileDialogs.openFileDialog{
 		title = title,
-		filter_patterns = "*.java",
-		filter_description = "Java Files (*.java)",
+		filter_patterns = filterPatterns,
+		filter_description = filterDescription,
 		allow_multiple_selects = false,
 	}
 	if type(result) == "string" then
@@ -105,11 +110,7 @@ function env.pathFromSaveFileDialog( title )
 		local homeDrive = os.getenv( "HOMEDRIVE" )
 		local homePath = os.getenv( "HOMEPATH" )
 		local path = homeDrive .. homePath .. [[\Documents\Code12 Programs\]]
-		-- check if path exists and create it if not
-		local pathAttributes = lfs.attributes( path )
-		if not pathAttributes then
-			os.execute([[mkdir "]] .. path .. [["]] )
-		end
+		lfs.mkdir( path )
 		defaultPathAndFile = path .. [[MyProgram.java]]
 	end
 	local result = fileDialogs.saveFileDialog{
