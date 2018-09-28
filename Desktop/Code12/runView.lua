@@ -10,14 +10,19 @@
 -- Corona modules
 local composer = require( "composer" )
 
--- Code12 app modules
+-- Code12 runtime modules
 local g = require( "Code12.globals" )
+local runtime = require("Code12.runtime")
+
+-- Code12 app modules
 local app = require( "app" )
 local err = require( "err" )
 local console = require( "console" )
 
+
 -- The runView module and scene
 local runView = composer.newScene()
+
 
 -- UI metrics
 local dyPaneSplit = 10
@@ -28,12 +33,10 @@ local outputGroup              -- display group for program output area
 local rightBar                 -- clipping bar to the right of the output area
 local paneSplit                -- pane split area
 local lowerGroup               -- display area below the pane split
-local gameGroup                -- display group for game output
 
 -- Program state
 local minConsoleHeight         -- min height of the console window (from pane split)
 local paneDragOffset           -- when dragging the pane split
-local appContext               -- app context for the running program
 
 
 --- Internal Functions ------------------------------------------------
@@ -75,10 +78,10 @@ local function onResize()
 	-- This will result in a call to ct.setHeight() internally, 
 	-- which will then call us back at setClipSize().
 	app.getWindowSize()
-	appContext.widthP = math.max( app.width, 1 )
-	appContext.heightP = math.max( outputAreaHeight(), 1 )
-	if g.onResize then
-		g.onResize()
+	runtime.appContext.widthP = math.max( app.width, 1 )
+	runtime.appContext.heightP = math.max( outputAreaHeight(), 1 )
+	if runtime.onResize then
+		runtime.onResize()
 	end
 end
 
@@ -89,7 +92,7 @@ local function onTouchPaneSplit( event )
 	if phase == "began" then
 		g.setFocusObj( paneSplit )
 		paneDragOffset = event.y - lowerGroup.y
-	elseif g.getFocusObj() == paneSplit and phase ~= "cancelled" then
+	elseif g.focusObj == paneSplit and phase ~= "cancelled" then
 		-- Compute and set new console size below pane split
 		local y = event.y - paneDragOffset
 		minConsoleHeight = g.pinValue( app.height - y - app.dyStatusBar,
@@ -100,15 +103,6 @@ local function onTouchPaneSplit( event )
 		g.setFocusObj(nil)
 	end
 	return true
-end
-
--- Clear any existing program output
-local function clearOutput()
-	console.clear()
-	if gameGroup then
-		gameGroup:removeSelf()
-	end
-	gameGroup = g.makeGroup( outputGroup )
 end
 
 -- Show a runtime error with the given line number and message
@@ -146,29 +140,25 @@ function runView:create()
 	-- Install resize handler
 	Runtime:addEventListener( "resize", onResize )
 
-	-- Fill in the appContext for the runtime
-	appContext = ct._appContext
+	-- Set appContext data related to the view
+	local appContext = runtime.appContext
 	appContext.outputGroup = outputGroup
 	appContext.widthP = app.outputWidth
 	appContext.heightP = app.outputHeight
 	appContext.setClipSize = setClipSize
+	appContext.clearConsole = console.clear
 	appContext.print = console.print
 	appContext.println = console.println
 	appContext.runtimeErr = showRuntimeError
-
-	-- Load the Code12 API and runtime.
-	-- This defines the Code12 APIs in the global ct table
-	-- and sets the runtime's fields in ct._appContext.
-	require( "Code12.api" )
 end
 
 -- Prepare to show the runView scene
-function runView:show( event ) -- TODO: Pause/restart?
-	local phase = event.phase
-	if phase == "will" then
-		clearOutput()
-	elseif phase == "did" then
-		g.initRun()   -- Tell the runtime to init and start a new run
+function runView:show( event )
+	if event.phase == "did" then
+		-- Automatically run a new program
+		if g.runState == nil then
+			runtime.run()
+		end
 	end
 end
 

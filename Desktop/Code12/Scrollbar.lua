@@ -67,7 +67,7 @@ function Scrollbar:touchShuttle( phase, y )
 	if phase == "began" then
 		self.yDragOffset = y - self.shuttleTop.y
 		g.setFocusObj( self.shuttleTop )
-	elseif g.getFocusObj() == self.shuttleTop and phase ~= "cancelled" then
+	elseif g.focusObj == self.shuttleTop and phase ~= "cancelled" then
 		-- Compute new shuttle top
 		local yTop = y - self.yDragOffset
 		yTop = g.pinValue( yTop, self.yMinShuttle , self.yMaxShuttle )
@@ -113,7 +113,7 @@ function Scrollbar:touch( event )
 	-- Which part got touched?
 	local _, y = self.group:contentToLocal( event.x, event.y )
 	local yTop = self.shuttleTop.y
-	if g.getFocusObj() == self.shuttleTop 
+	if g.focusObj == self.shuttleTop 
 			or (y >= yTop and y <= self.shuttleBottom.y + diameter) then
 		return self:touchShuttle( event.phase, y )
 	end

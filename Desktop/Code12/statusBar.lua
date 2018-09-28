@@ -42,17 +42,18 @@ end
 
 -- Update the status bar based on data in source
 function statusBar.update()
+	-- Set blank status bar if no file
 	if source.path == nil then
+		fileText.text = ""
 		openFileBtn.isVisible = false
 		return
 	end
 
-	-- Set the fileText with update status
-	local _, filename = env.dirAndFilenameOfPath( source.path )
-	if source.timeLoaded == 0 or source.timeModLast == 0 
-			or source.timeModLast < app.startTime then
-		fileText.text = filename    -- not updated after this app run
-	else
+	-- Set the fileText with runState and update status
+	local _, text = env.dirAndFilenameOfPath( source.path )
+	if source.timeLoaded ~= 0 and source.timeModLast ~= 0 
+			and source.timeModLast >= app.startTime then
+		-- File has been updated since first loaded
 		local updateStr
 		local secs = os.time() - source.timeModLast
 		if secs < 10 then
@@ -69,8 +70,12 @@ function statusBar.update()
 				updateStr = min .. " minutes ago"
 			end
 		end
-		fileText.text = filename .. " - Updated " .. updateStr
+		text = text .. " - Updated " .. updateStr
 	end
+	if g.runState then
+		text = text .. " (" .. g.runState .. ")"
+	end 
+	fileText.text = text
 
 	-- Hide the Open button if there isn't enough room
 	local dxNeeded = fileText.contentWidth + openFileBtn.contentWidth + app.margin * 3

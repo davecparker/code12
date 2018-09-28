@@ -8,7 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 
 
 -- Constants
@@ -172,7 +172,7 @@ function GameObj:newImage(group, filename, x, y, width)
 	if filename ~= nil then
 		-- If an app context tells us the media directory then use it, else current dir.
 		local baseDir, path
-		local appContext = ct._appContext
+		local appContext = runtime.appContext
 		if appContext and appContext.mediaDir then
 			path = appContext.mediaDir .. filename
 			baseDir = appContext.mediaBaseDir
@@ -230,8 +230,8 @@ function GameObj:sync()
 	end
 end
 
--- Update the GameObj for a new frame interval
-function GameObj:update()
+-- Move/update the GameObj as necessary for a new frame interval
+function GameObj:updateForNextFrame()
 	-- Move object by its velocity
 	self.x = self.x + self.xSpeed
 	self.y = self.y + self.ySpeed

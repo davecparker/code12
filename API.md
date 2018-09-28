@@ -592,6 +592,45 @@ double getVersion( )
 ```
 Return the version number of the Code12 runtime system.
 
+### ct.pause()
+```
+ct.pause( )
+```
+Execution of the program is paused at this statement.
+You can then resume or stop execution using the toolbar buttons
+in the Code12 application. 
+
+> You can use `ct.pause` to help you examine or debug your program
+> while running your program in the Code12 application.
+> The `ct.pause` function is not supported (ignored) when programs 
+> are running standalone outside of the Code12 application.
+
+### ct.stop()
+```
+ct.stop( )
+```
+Execution of the program is immediately stopped and ended at this statement.
+You can restart execution over from the beginning of the program using 
+the **Restart** toolbar button in the Code12 application. 
+
+> You can use `ct.stop` to help you examine or debug your program
+> while running your program in the Code12 application.
+> The `ct.stop` function is not supported (ignored) when programs 
+> are running standalone outside of the Code12 application.
+
+### ct.restart()
+```
+ct.restart( )
+```
+Execution of the program is immediately stopped and restarted from 
+the beginning of the program. Variables are re-initialized with their
+default/starting values, and execution starts over with your `start`
+function.
+
+> The `ct.restart` function is not supported (ignored) when programs 
+> are running standalone under the Java runtime outside of the 
+> Code12 environment.
+
 _____________________________________________________________________
 Type Conversion
 ---------------

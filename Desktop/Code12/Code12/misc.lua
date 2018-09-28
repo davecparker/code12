@@ -7,8 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 
 
 ---------------- Math API ---------------------------------------------
@@ -107,6 +108,61 @@ function ct.getVersion(...)
 
 	-- Return the Code 12 runtime version
 	return g.version 
+end
+
+-- API
+function ct.pause(...)
+	-- Check parameters
+	if g.checkAPIParams("ct.pause") then
+		g.checkNoParams(...)
+	end
+
+	-- This API is ignored if not running in the Code12 app
+	if runtime.appContext then 
+		-- Change run state to paused then block and yield
+		g.runState = "paused"
+		repeat
+			if runtime.blockAndYield() == "abort" then
+				g.runState = "stopped"
+				error("aborted")   -- caught by the runtime
+			end
+		until g.runState ~= "paused"
+	end
+end
+
+-- API
+function ct.stop(...)
+	-- Check parameters
+	if g.checkAPIParams("ct.stop") then
+		g.checkNoParams(...)
+	end
+
+	-- This API is ignored if not running in the Code12 app
+	if runtime.appContext then 
+		-- Block, signal the main thread to stop, and wait for the
+		-- main thread to kill the user coroutine.
+		repeat
+			if runtime.blockAndYield("stop") == "abort" then
+				error("stopped")   -- caught by the runtime
+			end
+		until false
+	end
+end
+
+-- API
+function ct.restart(...)
+	-- Check parameters
+	if g.checkAPIParams("ct.restart") then
+		g.checkNoParams(...)
+	end
+
+	-- Block, signal the main thread to restart, and wait for the
+	-- main thread to kill the user coroutine.
+	repeat
+		if runtime.blockAndYield("restart") == "abort" then
+			error("restarted")   -- caught by the runtime
+		end
+	until false
 end
 
 

@@ -7,8 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 
 
 -- Data for this module
@@ -28,7 +29,7 @@ local function getSound(filename)
 
 	-- If an app context tells us the media directory then use it, else current dir.
 	local baseDir, path
-	local appContext = ct._appContext
+	local appContext = runtime.appContext
 	if appContext and appContext.mediaDir then
 		path = appContext.mediaDir .. filename
 		baseDir = appContext.mediaBaseDir

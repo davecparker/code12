@@ -14,10 +14,10 @@ class UserCode extends Code12Program
 	int frameCount = 0;
 	String function = "Testing";
 
-   public static void main(String[] args)
-   { 
-      Code12.run(new UserCode()); 
-   }
+	public static void main(String[] args)
+	{ 
+		Code12.run(new UserCode()); 
+	}
    
 	public void start()
 	{
@@ -150,7 +150,10 @@ class UserCode extends Code12Program
 
 		// Check for fish click
 		if (fish.clicked())
-			ct.inputYesNo("Continue?");
+		{
+			if (!ct.inputYesNo("Continue?"))
+				ct.restart();
+		}
 	}
 
 	// Move the ball
