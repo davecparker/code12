@@ -19,7 +19,7 @@ local env = {
 	isSimulator = false,     -- true if running under the Corona simulator
 	docsDir = "",            -- path to the app's documents directory
 	baseDirDocs = nil,       -- Corona's baseDir constant to use for docsDir
-	installedEditors,        -- Table of editor data { name, path } for intalled editors
+	installedEditors = {},   -- Table of editor data { name, path } for intalled editors
 }
 
 -- File local data
@@ -100,9 +100,21 @@ end
 -- Run the Save File dialog with the given title.
 -- Return the string pathname chosen or nil if cancelled.
 function env.pathFromSaveFileDialog( title )
+	local defaultPathAndFile
+	if env.isWindows then
+		local homeDrive = os.getenv( "HOMEDRIVE" )
+		local homePath = os.getenv( "HOMEPATH" )
+		local path = homeDrive .. homePath .. [[\Documents\Code12 Programs\]]
+		-- check if path exists and create it if not
+		local pathAttributes = lfs.attributes( path )
+		if not pathAttributes then
+			os.execute([[mkdir "]] .. path .. [["]] )
+		end
+		defaultPathAndFile = path .. [[MyProgram.java]]
+	end
 	local result = fileDialogs.saveFileDialog{
 		title = title,
-		default_path_and_file = [[%userprofile\documents\Code12\NewPgram.java]],
+		default_path_and_file = defaultPathAndFile,
 		filter_patterns = "*.java",
 		filter_description = "Java Files (*.java)",
 	}

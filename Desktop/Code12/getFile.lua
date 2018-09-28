@@ -34,14 +34,26 @@ local UIGroup
 --- Internal Functions ------------------------------------------------
 
 -- Return the file name from the given file path
-local function getNameFromPath( path )
-	return string.match( path, '[^\\/]+%.java' )
+-- Assumes the path ends in ".java"
+local function classNameOfPath( path )
+	local _, filename = env.dirAndFilenameOfPath( path )
+	return string.gsub( filename, ".java$", "" )
 end
 
--- Ruturn true if given path is to a valid new java program,
--- false otherwise
-local function isValidNewProgramPath( path )
-	return true -- TODO
+-- Return true if given path is to a valid new java program.java
+-- Return false and an error message string otherwise
+local function isValidNewProgramAndErrMessage( path )
+	if string.sub( path, -5, -1 ) ~= ".java" then
+		return false, "Your program filename should have a .java extension."
+	end
+	local className = classNameOfPath( path )
+	local chFirst = string.byte( className, 1 )
+	if not chFirst then
+		return false, ".java is not a valid filename."
+	elseif chFirst < 65 or chFirst > 90 then
+		return false, "By convention, your program filename should start with an upper-case letter."
+	end
+	return true
 end
 
 -- Update app.sourseFile and add path to app.recentSourceFilePaths
@@ -84,9 +96,7 @@ end
 -- Write a new program skeleton to the given path
 local function writeNewProgramSkeleton( path )
 	if path then
-		local _, filename = env.dirAndFilenameOfPath( path )
-		local classname = string.gsub( filename, ".java", "" )
-		local skeleton = "class " .. classname .. "\n"
+		local skeleton = "class " .. classNameOfPath( path ) .. "\n"
 		if app.syntaxLevel <= 4 then
 			skeleton = skeleton ..
 [[
@@ -126,18 +136,20 @@ local function newProgram()
 	local path = env.pathFromSaveFileDialog( "Save New Program As" )
 	if not path then
 		native.setActivityIndicator( false )
-	elseif isValidNewProgramPath( path ) then
-		writeNewProgramSkeleton( path )
-		updateSourceFile( path )
-		if app.openFilesInEditor then
-			env.openFileInEditor( path )
-		end
-		native.setActivityIndicator( false )
 	else
-		os.remove( path )
-		local errMessage = "Invalid filename" -- TODO: different messages depending on why the filename is invalid
-		env.showErrAlert( "Error", errMessage )
-		newProgram()
+		local isValidNewProgram, errMessage = isValidNewProgramAndErrMessage( path )
+		if isValidNewProgram then
+			writeNewProgramSkeleton( path )
+			updateSourceFile( path )
+			if app.openFilesInEditor then
+				env.openFileInEditor( path )
+			end
+			native.setActivityIndicator( false )
+		else
+			os.remove( path )
+			env.showErrAlert( "Invalid File Name", errMessage )
+			newProgram()
+		end
 	end
 end
 
@@ -265,7 +277,7 @@ local function makeUIGroup()
 		local fileNameBtn = widget.newButton{
 			x = iconSize + margin,
 			y = icnBtn.y,
-			label = getNameFromPath( path ),
+			label = classNameOfPath( path ),
 			labelAlign = "left",
 			font = native.systemFontBold,
 			fontSize = medFontSize,
@@ -293,10 +305,8 @@ local function makeUIGroup()
 	end
 	if #app.recentSourceFilePaths == 0 then
 		local noRecentProgramsTxt = display.newText{
-			parent = UIGroup,
+			parent = recentProgramsGroup,
 			text = "No recent programs\n",
-			x = recentProgramsGroup.x,
-			y = recentProgramsGroup.y,
 			font = native.systemFont,
 			fontSize = medFontSize,
 		}
