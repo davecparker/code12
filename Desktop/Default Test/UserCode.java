@@ -150,7 +150,10 @@ class UserCode extends Code12Program
 
 		// Check for fish click
 		if (fish.clicked())
-			ct.inputYesNo("Continue?");
+		{
+			if (!ct.inputYesNo("Continue?"))
+				ct.restart();
+		}
 	}
 
 	// Move the ball

@@ -150,8 +150,11 @@ function _fn.update()
 	end
 	-- Check for fish click
 	if this.fish:clicked() then
-		ct.inputYesNo("Continue?")
-	end; end
+
+		if  not ct.inputYesNo("Continue?") then
+			ct.restart()
+		end; end
+end
 
 -- Move the ball
 function _fn.moveBall(wrap)

@@ -12,7 +12,6 @@ local composer = require( "composer" )
 local json = require( "json" )
 
 -- Code12 Runtime modules
-local ct = require("Code12.ct")
 local g = require( "Code12.globals" )
 local runtime = require("Code12.runtime")
 require( "Code12.api" )
@@ -44,16 +43,9 @@ local userSettings = {
 -- Run the given lua code string dynamically, showing the runView if 
 -- successful or the errView if there is an error.
 local function runLuaCode( luaCode )
-	-- Clear user variable and functions tables from last run if any
-	ct.userVars = {}
-	ct.userFns = {}
-
-	-- Load the Lua code dynamically and execute it
-	local codeFunction, strErr = loadstring( luaCode )
-	if type(codeFunction) == "function" then
-		-- Run user code main chunk, which defines the functions
-		codeFunction()
-
+	-- Try to load the code
+	local strErr = runtime.strErrLoadLuaCode( luaCode )
+	if strErr == nil then
 		-- Run and show the program output
 		composer.gotoScene( "runView" )
 	else
@@ -134,8 +126,8 @@ function app.processUserFile()
 	print( "\n--- New Run ----------------------" )
 	print( "source.path: " .. source.path )
 
-	-- Stop existing run if any
-	runtime.stop()
+	-- Stop and clear existing program if any
+	runtime.clearProgram()
 
 	-- Set the source dir and filename
 	local appContext = runtime.appContext
@@ -149,10 +141,8 @@ function app.processUserFile()
 	appContext.mediaBaseDir = env.baseDirDocs
 	appContext.mediaDir = env.relativePath( env.docsDir, appContext.sourceDir )
 
-	-- Clear the error state
-	err.initProgram()
-
 	-- Parse the user code then do further processing
+	err.initProgram()
 	local startTime = system.getTimer()
 	local programTree = parseProgram.getProgramTree( app.syntaxLevel )
 	if programTree and not (err.hasErr() and app.oneErrOnly) then
@@ -299,11 +289,8 @@ local function initApp()
 	Runtime:addEventListener( "system", onSystemEvent )
 	Runtime:addEventListener( "resize", onResizeWindow )
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
+	timer.performWithDelay( 10, checkUserFile, 0 )        -- first check soon
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
-
-	-- Start in the runView, which inits the runtime
-	timer.performWithDelay( 10, checkUserFile, 0 )       -- first check soon
-	composer.gotoScene( "runView" )
 end
 
 

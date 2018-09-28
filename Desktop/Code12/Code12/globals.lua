@@ -59,8 +59,8 @@ local g = {
 	clickY = 0,            -- Last click x location 
 	charTyped = nil,       -- char typed during this update frame (string), nil if none
 
-	-- Run state
-	runState = nil,    -- "running", "waiting", "stopped", "paused", "ended", "error", or nil
+	-- The run state
+	runState = nil,    -- "running", "waiting", "paused", "stopped", "ended", "error", or nil
 	startTime = nil,   -- System time in ms when start function began, or nil before
 }
 

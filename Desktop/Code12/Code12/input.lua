@@ -74,7 +74,7 @@ local function clickEvent(event, gameObj)
 		g.setFocusObj(focusObj)
 
 		-- Call client event
-		runtime.eventFunctionYielded(ct.userFns.onMousePress, gameObj, x, y)
+		runtime.runEventFunction(ct.userFns.onMousePress, gameObj, x, y)
 	elseif event.target ~= focusObj then
 		return false    -- click did not begin on this object
 	elseif phase == "moved" then
@@ -88,12 +88,12 @@ local function clickEvent(event, gameObj)
 		g.clickY = y
 
 		-- Call client event
-		runtime.eventFunctionYielded(ct.userFns.onMouseDrag, gameObj, x, y)
+		runtime.runEventFunction(ct.userFns.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
 		-- Call client event, forcing the final point inside the game area
 		x = g.pinValue(x, 0, g.WIDTH)
 		y = g.pinValue(y, 0, g.height)
-		runtime.eventFunctionYielded(ct.userFns.onMouseRelease, gameObj, x, y)
+		runtime.runEventFunction(ct.userFns.onMouseRelease, gameObj, x, y)
 	end
 	return true
 end
@@ -199,19 +199,19 @@ function g.onKey(event)
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
-		runtime.eventFunctionYielded(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
+		runtime.runEventFunction(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)
 		if ch then
 			g.charTyped = ch    -- remember for ct.charTyped()
-			runtime.eventFunctionYielded(ct.userFns.onCharTyped, ch)
+			runtime.runEventFunction(ct.userFns.onCharTyped, ch)
 		end
 		return true    -- Always? Means client has to handle all keys
 	elseif event.phase == "up" then
 		-- keyRelease
 		keysDown[keyName] = nil
-		runtime.eventFunctionYielded(ct.userFns.onKeyRelease, keyName)
+		runtime.runEventFunction(ct.userFns.onKeyRelease, keyName)
 	end
 	return false
 end

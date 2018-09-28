@@ -33,7 +33,6 @@ local outputGroup              -- display group for program output area
 local rightBar                 -- clipping bar to the right of the output area
 local paneSplit                -- pane split area
 local lowerGroup               -- display area below the pane split
-local gameGroup                -- display group for game output
 
 -- Program state
 local minConsoleHeight         -- min height of the console window (from pane split)
@@ -106,15 +105,6 @@ local function onTouchPaneSplit( event )
 	return true
 end
 
--- Clear any existing program output
-local function clearOutput()
-	console.clear()
-	if gameGroup then
-		gameGroup:removeSelf()
-	end
-	gameGroup = g.makeGroup( outputGroup )
-end
-
 -- Show a runtime error with the given line number and message
 local function showRuntimeError( lineNum, message )
 	err.setErrLineNum( lineNum, "Runtime error: " .. message )
@@ -156,6 +146,7 @@ function runView:create()
 	appContext.widthP = app.outputWidth
 	appContext.heightP = app.outputHeight
 	appContext.setClipSize = setClipSize
+	appContext.clearConsole = console.clear
 	appContext.print = console.print
 	appContext.println = console.println
 	appContext.runtimeErr = showRuntimeError
@@ -163,11 +154,11 @@ end
 
 -- Prepare to show the runView scene
 function runView:show( event )
-	local phase = event.phase
-	if phase == "will" then
-		clearOutput()
-	elseif phase == "did" then
-		runtime.run()   -- run the user program
+	if event.phase == "did" then
+		-- Automatically run a new program
+		if g.runState == nil then
+			runtime.run()
+		end
 	end
 end
 

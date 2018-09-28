@@ -11,8 +11,8 @@
 -- The ct table
 local ct = {
 	-- User program data
-	userVars = {},         -- table for user code class-level variables
-	userFns = {},          -- table for user code functions (including event functions)
+	userVars = nil,        -- table for user code class-level variables
+	userFns = nil,         -- table for user code functions (including event functions)
 
 	-- Options
 	checkParams = true,    -- set to false to disable runtime API parameter checks

@@ -250,7 +250,7 @@ local function inputValue(message, valueType)
 		if runtime.blockAndYield() == "abort" then
 			endDialog()
 			g.runState = "stopped"
-			error("aborted");   -- caught by the runtime
+			error("aborted")   -- caught by the runtime
 		end
 	end
 	if g.runState == "waiting" then
