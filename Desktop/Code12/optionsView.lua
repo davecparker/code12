@@ -21,11 +21,11 @@ local toolbar = require( "toolbar" )
 local optionsView = composer.newScene()
 
 -- UI Metrics
-local margin = app.margin
-local topMargin = margin
-local xSwitches = 200
-local switchSize = 20        -- size of radio buttons, checkboxes, etc
-local fontSize = 20
+local margin = app.margin -- Space between most UI elements
+local topMargin = margin  -- Top margin of the scene
+local xSwitches = 200     -- x-Value to align left side of switches
+local switchSize = 20     -- Size of radio buttons, checkboxes, and fillboxes
+local fontSize = 20       -- Font size of switch headers and labels
 
 -- Display objects and groups
 local title               -- Title text
@@ -34,9 +34,41 @@ local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
 local multiErrorPicker    -- Multi-error mode picker
+local openInEditorBtn     -- Open current source file in editor
 
 
 --- Internal Functions ------------------------------------------------
+
+-- Create and return a new button widget with standard color and font
+-- and which has been inserted into optionsView.view
+-- options = {
+--     x = x-value to position the button at (with anchorX = 0),
+--     y = y-value to position the button at (with anchorY = 0),
+--     onRelease = listener function for the button,
+--     label = string for the button's label,
+--     width = width for the button,
+-- }
+local function newOptionButton( options )
+	local button = widget.newButton{
+		x = options.x,
+		y = options.y,
+		onRelease = options.onRelease,
+		label = options.label,
+		labelColor = { default = { 0 }, over = { 0 } },
+		fillColor = { default = { 1 }, over = { 0.8 } },
+		strokeColor = { default = { 0.1 }, over = { 0.1 } },
+		strokeWidth = 1,
+		font = native.systemFont,
+		fontSize = fontSize,
+		shape = "roundedRect",
+		width = options.width,
+		height = 30,
+	}
+	button.anchorX = 0
+	button.anchorY = 0
+	optionsView.view:insert( button )
+	return button
+end
 
 -- Create and return a new display group containing a header and set of setting switches,
 -- which has been inserted into optionsView.view
@@ -116,9 +148,10 @@ local function newSettingPicker( options )
 		-- Set x, y values according to orientation
 		if options.orientation == "vertical" then
 			switch.x = xSwitches
-			switch.y = switchSize * (i - 1)
+			switch.y = offset
 			switchLabel.x = switch.x + switchSize + margin * 0.5
 			switchLabel.y = switchesGroup.y + switch.y
+			offset = offset + math.max( switch.height, switchLabel.height )
 		else
 			switch.x = xSwitches + offset
 			switch.y = 0
@@ -199,9 +232,9 @@ local function setSelectedOptions()
 end
 
 
-
 --- Event Handlers ------------------------------------------------
 
+-- Close Button handler
 -- Save settings and process user file or go back to getFile view
 local function onClose()
 	app.saveSettings()
@@ -213,6 +246,7 @@ local function onClose()
 	end
 end
 
+-- Syntax Level Switch handler
 -- Set app.syntax level to selected level.
 -- Fill all syntax level boxes for levels up to and including the 
 -- selected level and clear the remaining boxes.
@@ -222,6 +256,11 @@ local function onSyntaxLevelPress( event )
 	fillBoxes( levelPicker.switches, syntaxLevel )
 end
 
+-- Open In Editor Button handler
+-- Open most recent program file in text editor
+local function onOpenInEditor()
+	env.openFileInEditor( app.recentSourceFilePaths[1] )
+end
 
 --- Scene Methods ------------------------------------------------
 
@@ -319,6 +358,15 @@ function optionsView:create()
 			end
 	}
 
+	-- Open In Editor button
+	openInEditorBtn = newOptionButton{
+		x = xSwitches,
+		y = editorPicker.y + editorPicker.height + margin * 0.5,
+		onRelease = onOpenInEditor,
+		label = "Open MyProgram.java in Editor",
+		width = 350,
+	}
+
 	-- Multi-error picker
 	local multiErrorLabels = { "Show only one error at a time" }
 	multiErrorPicker = newSettingPicker{
@@ -326,7 +374,7 @@ function optionsView:create()
 		labels = multiErrorLabels,
 		style = "checkbox",
 		orientation = "vertical",
-		y = editorPicker.y + editorPicker.height + margin,
+		y = openInEditorBtn.y + openInEditorBtn.height + margin,
 		onPress =
 			function ( event )
 				app.oneErrOnly = event.target.isOn
@@ -342,6 +390,13 @@ function optionsView:show( event )
 	if event.phase == "will" then
 		setSelectedOptions()
 		toolbar.show( false )
+		if #app.recentSourceFilePaths > 0 then
+			local _, filename = env.dirAndFilenameOfPath( app.recentSourceFilePaths[1] )
+			openInEditorBtn:setLabel( "Open " .. filename .. " in Editor" )
+			openInEditorBtn.isVisible = true
+		else
+			openInEditorBtn.isVisible = false
+		end
 	end
 end
 

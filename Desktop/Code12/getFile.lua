@@ -291,6 +291,17 @@ local function makeUIGroup()
 		local yOffset = math.max( fileNameBtn.height + filePathTxt.height, iconSize )
 		yBtn = yBtn + yOffset + margin
 	end
+	if #app.recentSourceFilePaths == 0 then
+		local noRecentProgramsTxt = display.newText{
+			parent = UIGroup,
+			text = "No recent programs\n",
+			x = recentProgramsGroup.x,
+			y = recentProgramsGroup.y,
+			font = native.systemFont,
+			fontSize = medFontSize,
+		}
+		g.uiItem( noRecentProgramsTxt )
+	end
 
 	-- Also Open in Text Editor text
 	local openInEditorTxt = display.newText{
@@ -331,7 +342,7 @@ function getFile:create()
 	local sceneGroup = self.view
 
 	-- Background
-	g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
+	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 0.9 ) 
 	
 	-- UI Elements
 	makeUIGroup()
