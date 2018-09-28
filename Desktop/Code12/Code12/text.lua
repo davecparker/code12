@@ -7,10 +7,10 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
-local appContext = ct._appContext
 
 
 ---------------- Internal Functions ------------------------------------------
@@ -51,8 +51,8 @@ function ct.print(value, ...)
 
 	-- Print/output the value
 	local text = textForValue(value)
-	if appContext then
-		appContext.print(text)     -- Code12 app console
+	if runtime.appContext then
+		runtime.appContext.print(text)     -- Code12 app console
 	elseif g.isSimulator then
 		io.write(text)             -- Corona simulator console
 		io.flush()
@@ -73,8 +73,8 @@ function ct.println(value, ...)
 
 	-- Print/output the value
 	local text = textForValue(value)
-	if appContext then
-		appContext.println(text)   -- Code12 app console
+	if runtime.appContext then
+		runtime.appContext.println(text)   -- Code12 app console
 	elseif g.isSimulator then
 		io.write(text)             -- Corona simulator console
 		io.write("\n")
@@ -143,8 +143,8 @@ function ct.setOutputFile(filename, ...)
 	-- Open the new output file, if any
 	if filename then
 		local path = filename
-		if appContext and appContext.sourceDir then
-			path = appContext.sourceDir .. filename
+		if runtime.appContext and runtime.appContext.sourceDir then
+			path = runtime.appContext.sourceDir .. filename
 		end
 		g.outputFile = io.open(path, "w")
 		if g.outputFile == nil then

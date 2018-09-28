@@ -7,8 +7,8 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
 
 

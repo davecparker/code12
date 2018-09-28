@@ -73,6 +73,9 @@ class CT
 	double distance( double x1, double y1, double x2, double y2 )
 	int getTimer( )
 	double getVersion( )
+	void pause( )
+	void stop( )
+	void restart( )
 
 	// Type Conversion
 	//----------------

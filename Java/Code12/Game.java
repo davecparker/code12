@@ -416,7 +416,22 @@ public class Game implements GameInterface
       return VERSION;
    }
       
+   public void pause()
+   {
+      logError("ct.pause() is not supported by the standalone Java runtime");
+   }
    
+   public void stop()
+   {
+      logError("ct.stop() is not supported by the standalone Java runtime");
+   }
+   
+   public void restart()
+   {
+      logError("ct.restart() is not supported by the standalone Java runtime");
+   }
+   
+
    //===================== Type Conversion API ========================
    
    public int toInt(double d)         { return (int) d; }

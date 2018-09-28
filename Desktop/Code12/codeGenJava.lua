@@ -598,10 +598,12 @@ end
 
 -- Generate and return the Lua code string corresponding to the programTree,
 function codeGenJava.getLuaCode( programTree )
-	-- Init the Lua code state
-	luaCodeStrs = {}
-	luaLineNum = 1
-	luaLineIsBlank = true
+	-- Init the Lua code state.
+	-- Start the Lua program with a blank line to make a cleaner insertion of the
+	-- package.path for generated standalone main.lua, then the table initialization
+	luaCodeStrs = { "\nlocal ct, this, _fn = require('Code12.ct').getTables()" }
+	luaLineNum = 2
+	luaLineIsBlank = false
 	blockLevel = 0
 
 	-- Generate the instance variables then the member functions
