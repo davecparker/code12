@@ -7,10 +7,10 @@ import Code12.*;
 
 public class DuckHunt extends Code12Program
 {
-	public static void main( String[] args )
-	{
-		Code12.run( new DuckHunt() ); 
-	}
+	// public static void main( String[] args )
+	// {
+	// 	Code12.run( new DuckHunt() ); 
+	// }
 
 	GameObj gun; // Gun at bottom of window that fires bullets
 	GameObj ducksHitDisplay; // Text display for percent of ducks hit

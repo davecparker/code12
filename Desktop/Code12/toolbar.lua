@@ -9,12 +9,11 @@
 
 -- Corona modules
 local widget = require( "widget" )
+local composer = require( "composer" )
 
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
-local source = require( "source" )
-local env = require( "env" )
 
 
 -- The toolbar module
@@ -24,81 +23,85 @@ local toolbar = {}
 -- File local state
 local toolbarGroup        -- display group for toolbar
 local bgRect              -- background rect
-local chooseFileBtn       -- Choose File button
-local levelPicker         -- Syntax level picker
+local chooseProgramBtn    -- Choose Program button
+local optionsBtn          -- Options button
+local restartBtn          -- Restart button
 
 
 --- Internal Functions ------------------------------------------------
 
--- Show dialog to choose the user source code file
-local function chooseFile()
-	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
-	if path then
-		source.path = path
-		source.timeLoaded = 0
-		source.timeModLast = 0
-		source.updated = false
-		source.numLines = 0
-	end
-	native.setActivityIndicator( false )
+
+-- Event handler for the Choose Program button
+local function onChooseProgram()
+	composer.gotoScene( "getFile" )
 end
 
--- Event handler for the Choose File button
-local function onChooseFile()
-	native.setActivityIndicator( true )
-	timer.performWithDelay( 50, chooseFile )
+-- Event handler for the Options button
+local function onOptions()
+	composer.gotoScene( "optionsView" )
 end
-
 
 --- Module Functions ------------------------------------------------
 
 -- Make the toolbar UI
 function toolbar.create()
 	toolbarGroup = g.makeGroup()
+	local yCenter = app.dyToolbar / 2
 
 	-- Background
 	bgRect = g.uiItem( display.newRect( toolbarGroup, 0, 0, app.width, app.dyToolbar ),
 							app.toolbarShade, app.borderShade )
 
-	-- Choose File Button
-	local yCenter = app.dyToolbar / 2
-	chooseFileBtn = widget.newButton{
+	-- Restart button
+	restartBtn = widget.newButton{
 		x = app.margin, 
 		y = yCenter,
-		onRelease = onChooseFile,
-		label = "Choose File",
-		labelAlign = "left",
+		onRelease = app.processUserFile,
+		label = "Restart",
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI,
+		textOnly = true,
 	}
-	toolbarGroup:insert( chooseFileBtn )
-	chooseFileBtn.anchorX = 0
+	toolbarGroup:insert( restartBtn )
+	restartBtn.anchorX = 0
 
-	-- Level picker
-	local segmentNames = {}
-	for i = 1, app.numSyntaxLevels do
-		segmentNames[i] = tostring( i )
-	end
-	local segWidth = 25
-	levelPicker = widget.newSegmentedControl{
+	-- Options button 
+	optionsBtn = widget.newButton{
 		x = app.width - app.margin,
 		y = yCenter,
-		segmentWidth = segWidth,
-		segments = segmentNames,
-		defaultSegment = app.syntaxLevel,
-		onPress = 
-			function (event )
-				app.syntaxLevel = event.target.segmentNumber
-				app.processUserFile()
-			end
+		onRelease = onOptions,
+		label = "Options",
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+		textOnly = true,
 	}
-	levelPicker.anchorX = 1
+	toolbarGroup:insert( optionsBtn )
+	optionsBtn.anchorX = 1
+
+	-- Choose Program Button
+	chooseProgramBtn = widget.newButton{
+		x = optionsBtn.x - optionsBtn.width - app.margin,
+		y = yCenter,
+		onRelease = onChooseProgram,
+		label = "Choose Program",
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+		textOnly = true,
+	}
+	toolbarGroup:insert( chooseProgramBtn )
+	chooseProgramBtn.anchorX = 1
 end
 
 -- Resize the toolbar
 function toolbar.resize()
 	bgRect.width = app.width
-	levelPicker.x = app.width - app.margin
+	optionsBtn.x = app.width - app.margin
+	chooseProgramBtn.x = optionsBtn.x - optionsBtn.width - app.margin
+end
+
+-- Show/hide the toolbar
+function toolbar.show( show )
+	toolbarGroup.isVisible = show
 end
 
 
