@@ -164,4 +164,4 @@ function _fn.makeCircles()
 end
 
 require('Code12.api')
-ct.initRuntime()
+require('Code12.runtime').run()

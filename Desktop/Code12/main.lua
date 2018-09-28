@@ -190,12 +190,6 @@ local function checkUserFile()
 			statusBar.update()
 		end
 	end
-
-	-- Update status bar if the run state changed
-	if g.runState ~= runStateLast then
-		runStateLast = g.runState
-		statusBar.update()
-	end
 end
 
 -- Handle resize event for the window
@@ -316,6 +310,15 @@ local function onSystemEvent( event )
 	end
 end
 
+-- Handle enterFrame events
+local function onEnterFrame()
+	-- Update UI if the run state changed
+	if g.runState ~= runStateLast then
+		runStateLast = g.runState
+		statusBar.update()
+	end
+end
+
 -- Init the app
 local function initApp()
 	-- Make the app context for the Code12 runtime to use
@@ -344,6 +347,7 @@ local function initApp()
 	-- Install listeners and update timers
 	Runtime:addEventListener( "system", onSystemEvent )
 	Runtime:addEventListener( "resize", onResizeWindow )
+	Runtime:addEventListener( "enterFrame", onEnterFrame )
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10, checkUserFile, 0 )        -- first check soon
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
