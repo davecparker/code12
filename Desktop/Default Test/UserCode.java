@@ -72,6 +72,7 @@ class UserCode extends Code12Program
 
 		// Draw some circles
 		ball = ct.circle(x + 6, 15, 5);
+		ball.setFillColor("blue");
 		ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5);
 		bigBall = ct.circle(x, 80, 40);
 		// bigBall.setFillColorRGB(400, 127, -50);

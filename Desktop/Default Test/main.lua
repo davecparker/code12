@@ -72,6 +72,7 @@ function _fn.start()
 
 	-- Draw some circles
 	this.ball = ct.circle(x + 6, 15, 5)
+	this.ball:setFillColor("blue")
 	ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5)
 	this.bigBall = ct.circle(x, 80, 40)
 	-- bigBall.setFillColorRGB(400, 127, -50);

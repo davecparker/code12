@@ -659,55 +659,7 @@ end
 
 ---------------- Colors ------------------------------------------------------
 
--- A color for a GameObj is a 3 element array with 255-based r, g, b values.
--- Map color names to colors.
-local colors = {
-    ["black"] =          { 0, 0, 0 },
-    ["white"] =          {255, 255, 255},
-    ["red"] =            {255, 0, 0},
-    ["green"] =          {0, 255, 0},
-    ["blue"] =           {0, 0, 255},
-    ["cyan"] =           {0, 255, 255},
-    ["magenta"] =        {255, 0, 255},
-    ["yellow"] =         {255, 255, 0},
-         
-    ["gray"] =           {127, 127, 127},
-    ["orange"] =         {255, 127, 0},
-    ["pink"] =           {255, 192, 203},
-    ["purple"] =         {64, 0, 127},
-         
-    ["light gray"] =     {191, 191, 191},
-    ["light red"] =      {255, 127, 127},
-    ["light green"] =    {127, 255, 127},
-    ["light blue"] =     {127, 127, 255},
-    ["light cyan"] =     {127, 255, 255},
-    ["light magenta"] =  {255, 127, 255},
-    ["light yellow"] =   {255, 255, 127},
-
-    ["dark gray"] =      {64, 64, 64},
-    ["dark red"] =       {127, 0, 0},
-    ["dark green"] =     {0, 127, 0},
-    ["dark blue"] =      {0, 0, 127},
-    ["dark cyan"] =      {0, 127, 127},
-    ["dark magenta"] =   {127, 0, 127},
-    ["dark yellow"] =    {127, 127, 0},
-}
-
--- Return the color for the given color name, or gray if name not known.
--- Return nil if colorName is nil.
-local function colorFromName(colorName)
-	if colorName == nil then
-		return nil
-	end
-	local color = colors[string.lower(colorName)]
-	if color then
-		return color
-	end
-	g.warning("Unknown color name", colorName)
-	return colors["gray"]
-end
-
--- Set a GameObj's fill color from a color (nil for none)
+-- Set a GameObj's fill color from a color 3-array (nil for none)
 function GameObj:setFillColorFromColor(color)
 	self._code12.fillColor = color
 	local obj = self._code12.obj
@@ -723,7 +675,7 @@ function GameObj:setFillColorFromColor(color)
 	end
 end
 
--- Set a GameObj's line color from a color (nil for none)
+-- Set a GameObj's line color from a color 3-array (nil for none)
 function GameObj:setLineColorFromColor(color)
 	self._code12.lineColor = color  -- nil will set 0 strokeWidth at update
 	local obj = self._code12.obj
@@ -737,12 +689,12 @@ end
 
 -- Set a GameObj's fill color from a color name
 function GameObj:setFillColorFromName(colorName)
-	self:setFillColorFromColor(colorFromName(colorName))
+	self:setFillColorFromColor(g.colorFromName(colorName))
 end
 
 -- Set a GameObj's line color from a color name
 function GameObj:setLineColorFromName(colorName)
-	self:setLineColorFromColor(colorFromName(colorName))
+	self:setLineColorFromColor(g.colorFromName(colorName))
 end
 
 
