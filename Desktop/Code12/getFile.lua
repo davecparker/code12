@@ -16,6 +16,8 @@ local g = require( "Code12.globals" )
 local app = require( "app" )
 local env = require( "env" )
 local source = require( "source" )
+local buttons = require( "buttons" )
+
 
 -- The getFile module and scene
 local getFile = composer.newScene()
@@ -171,6 +173,7 @@ end
 -- Event handler for the Also Open in Text Editor checkbox
 local function onAlsoOpenInEditor( event )
 	app.openFilesInEditor = event.target.isOn
+	app.saveSettings()
 end
 
 -- Make the UI elements
@@ -313,36 +316,19 @@ local function makeUIGroup( sceneGroup )
 		g.uiItem( noRecentProgramsTxt )
 	end
 
-	-- Also Open in Text Editor text
-	local openInEditorTxt = display.newText{
+	-- Also Open in Text Editor Checkbox and Label
+	local openInEditorPicker = buttons.newSettingPicker{
 		parent = UIGroup,
-		text = "Also Open in Text Editor",
-		x = leftMargin,
-		y = recentProgramsGroup.y + recentProgramsGroup.height + extraMargin,
-		width = app.width - leftMargin - margin,
-		font = native.systemFontBold,
-		fontSize = largeFontSize,
-	}
-	openInEditorTxt.anchorX = 0
-	openInEditorTxt.anchorY = 0
-	openInEditorTxt:setFillColor( 0 )
-
-	-- Also Open in Text Editor checkbox
-	local openInEditorCheckbox = widget.newSwitch{
+		labels = { "Also Open In Text Editor" },
+		labelsFont = native.systemFontBold,
+		labelsFontSize = largeFontSize,
 		style = "checkbox",
-		x = openInEditorTxt. x - margin,
-		y = openInEditorTxt.y,
-		width = iconSize,
-		height = iconSize,
+		switchSize = iconSize,
+		x = leftMargin - iconSize - margin ,
+		y = recentProgramsGroup.y + recentProgramsGroup.height + extraMargin,
 		onPress = onAlsoOpenInEditor,
-		sheet = app.checkboxSheet,
-		frameOn = 1,
-		frameOff = 2,
 	}
-	openInEditorCheckbox.anchorX = 1
-	openInEditorCheckbox.anchorY = 0
-	openInEditorCheckbox:setState{ isOn = app.openFilesInEditor }
-	UIGroup:insert( openInEditorCheckbox )
+	openInEditorPicker.switches[1]:setState{ isOn = app.openFilesInEditor }
 end
 
 --- Scene Methods ------------------------------------------------
@@ -372,6 +358,7 @@ end
 function getFile:resize()
 	makeUIGroup( self.view )
 end
+
 
 ------------------------------------------------------------------------------
 
