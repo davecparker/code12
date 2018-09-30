@@ -385,6 +385,36 @@ function runtime:clearProgram()
 	g.runState = nil
 end
 
+-- Output the given text to where console output should go
+function runtime.printText(text)
+	if runtime.appContext then
+		runtime.appContext.print(text)     -- Code12 app console
+	elseif g.isSimulator then
+		io.write(text)             -- Corona simulator console
+		io.flush()
+	end
+	if g.outputFile then
+		g.outputFile:write(text)   -- echo to text file
+	end
+end
+
+-- Output the given text plus a newline to where console output should go.
+-- if rgb is included then it is an array {r, g, b} (each 0-1) for the 
+-- color to assign to the line if possible.
+function runtime.printTextLine(text, rgb)
+	if runtime.appContext then
+		runtime.appContext.println(text, rgb)   -- Code12 app console
+	elseif g.isSimulator then
+		io.write(text)             -- Corona simulator console
+		io.write("\n")
+		io.flush()
+	end
+	if g.outputFile then
+		g.outputFile:write(text)   -- echo to text file
+		g.outputFile:write("\n")
+	end
+end
+
 
 ----------------------------------------------------------------------------
 

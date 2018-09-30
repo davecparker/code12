@@ -184,7 +184,7 @@ function _fn.onMousePress(obj, x, y)
 		ct.println(obj:toString() .. " was clicked")
 	else
 
-		ct.println("Mouse was pressed at (" .. tostring(x) .. ", " .. tostring(y) .. ")"); end
+		ct.logm("onMousePress", x, y); end
 end
 
 function _fn.loopAndArrayTest()

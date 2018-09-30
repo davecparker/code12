@@ -147,7 +147,7 @@ function env.openFileInEditor( path )
 				os.execute( 'start "" "' .. path .. '"' )
 			end
 		else
-			os.execute( "open \"" .. path .. "\"" )
+			os.execute( 'open -a "Sublime Text.app" "' .. path .. '"' )
 		end
 	end
 end

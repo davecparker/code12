@@ -184,7 +184,7 @@ class UserCode extends Code12Program
 			ct.println( obj.toString() + " was clicked" );
 		}
 		else
-			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
+			ct.logm( "onMousePress", x, y );
 	}
 
 	void loopAndArrayTest()
