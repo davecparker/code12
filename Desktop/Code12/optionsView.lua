@@ -16,14 +16,17 @@ local g = require( "Code12.globals" )
 local app = require( "app" )
 local env = require( "env" )
 local toolbar = require( "toolbar" )
+local buttons = require( "buttons" )
+
 
 -- The optionsView module and scene
 local optionsView = composer.newScene()
 
+
 -- UI Metrics
 local margin = app.margin -- Space between most UI elements
 local topMargin = margin  -- Top margin of the scene
-local xSwitches = 200     -- x-Value to align left side of switches
+local leftMargin = 125    -- Left margin of the options
 local switchSize = 20     -- Size of radio buttons, checkboxes, and fillboxes
 local fontSize = 20       -- Font size of switch headers and labels
 
@@ -39,150 +42,12 @@ local openInEditorBtn     -- Open current source file in editor
 
 --- Internal Functions ------------------------------------------------
 
--- Create and return a new button widget with standard color and font
--- and which has been inserted into optionsView.view
--- options = {
---     x = x-value to position the button at (with anchorX = 0),
---     y = y-value to position the button at (with anchorY = 0),
---     onRelease = listener function for the button,
---     label = string for the button's label,
---     width = width for the button,
--- }
-local function newOptionButton( options )
-	local button = widget.newButton{
-		x = options.x,
-		y = options.y,
-		onRelease = options.onRelease,
-		label = options.label,
-		labelColor = { default = { 0 }, over = { 0 } },
-		fillColor = { default = { 1 }, over = { 0.8 } },
-		strokeColor = { default = { 0.1 }, over = { 0.1 } },
-		strokeWidth = 1,
-		font = native.systemFont,
-		fontSize = fontSize,
-		shape = "roundedRect",
-		width = options.width,
-		height = 30,
-	}
-	button.anchorX = 0
-	button.anchorY = 0
-	optionsView.view:insert( button )
-	return button
-end
-
--- Create and return a new display group containing a header and set of setting switches,
--- which has been inserted into optionsView.view
--- options = {
---     header = string for the setting header text
---     labels = table of strings for the labeling the switches
---     values = optional table of values to associate with each switch, in field switch.val
---              if values is not provided switch.val will be a number equal to its order displayed,
---              from top to bottom/left to right
---     style = "radio", "checkbox", "fillbox"
---     orientation = "vertical", "horizontal"
---     y = y-value to position the group at (with anchorY = 0)
---     onPress = listener function for switches
--- }
--- Fields in return value:
--- switches = display group of switches for the setting
--- each switch also has a "number" field equal to it's order displayed from bottom to top
-local function newSettingPicker( options )
-	local newSettingPickerGroup = display.newGroup() -- group to be returned
-	optionsView.view:insert( newSettingPickerGroup )
-	newSettingPickerGroup.anchorY = 0
-	newSettingPickerGroup.y = options.y
-	local switchStyle, switchSheet
-	if options.style == "radio" then
-		switchStyle = "radio"
-		switchSheet = app.radioBtnSheet
-	elseif options.style == "checkbox" then
-		switchStyle = "checkbox"
-		switchSheet = app.checkboxSheet
-	else
-		switchStyle = "checkbox"
-		switchSheet = app.fillboxSheet
-	end
-	-- Make header
-	local header = display.newText{
-		parent = newSettingPickerGroup,
-		text = options.header,
-		x = xSwitches - margin,
-		y = 0,
-		font = native.systemFontBold,
-		fontSize = fontSize,
-		align = "right",
-	}
-	header.anchorX = 1
-	header.anchorY = 0
-	header:setFillColor( 0 )
-	-- Make swiches and labels
-	local switchesGroup = display.newGroup()
-	newSettingPickerGroup:insert( switchesGroup )
-	newSettingPickerGroup.switches = switchesGroup
-	switchesGroup.anchorX = 0
-	switchesGroup.anchorY = 0
-	local labels = options.labels
-	local offset = 0
-	for i = 1, #labels do
-		-- Make a switch
-		local switch = widget.newSwitch{
-			style = switchStyle,
-			width = switchSize,
-			height = switchSize,
-			onPress = options.onPress,
-			sheet = switchSheet,
-			frameOn = 1,
-			frameOff = 2,
-		}
-		switch.anchorX = 0
-		switch.anchorY = 0
-		switchesGroup:insert( switch )
-		-- Make the switch's label
-		local switchLabel = display.newText{
-			parent = newSettingPickerGroup,
-			text = labels[i],
-			font = native.systemFont,
-			fontSize = fontSize,
-		}
-		g.uiItem( switchLabel )
-		-- Set x, y values according to orientation
-		if options.orientation == "vertical" then
-			switch.x = xSwitches
-			switch.y = offset
-			switchLabel.x = switch.x + switchSize + margin * 0.5
-			switchLabel.y = switchesGroup.y + switch.y
-			offset = offset + math.max( switch.height, switchLabel.height )
-		else
-			switch.x = xSwitches + offset
-			switch.y = 0
-			switchLabel.x = switch.x + switchSize + margin * 0.5
-			switchLabel.y = switchesGroup.y
-			offset = offset + switch.width + switchLabel.width + margin * 1.5
-		end
-	end
-	-- Attach values to switches
-	local numSwitches = switchesGroup.numChildren
-	if options.values then
-		local values = options.values
-		local numValues = #values
-		assert( numSwitches == numValues )
-		for i = 1, numSwitches do
-			switchesGroup[i].val = values[i]
-		end
-	else
-		for i = 1, numSwitches do
-			switchesGroup[i].val = i
-		end
-	end
-	return newSettingPickerGroup
-end
-
 -- Turn on all the checkboxes in given display group boxesGroup whose value is less than or
--- equal to given maxVal, and turn off all the other boxes
-local function fillBoxes( boxesGroup, maxVal )
+-- equal to given maxValue, and turn off all the other boxes
+local function fillBoxes( boxesGroup, maxValue )
 	for i = 1, boxesGroup.numChildren do
 		local box = boxesGroup[i]
-		if box.val <= maxVal then
+		if box.value <= maxValue then
 			box:setState{ isOn = true }
 		else
 			box:setState{ isOn = false }
@@ -196,8 +61,8 @@ local function setSelectedOptions()
 	app.syntaxLevel = app.syntaxLevel or 1
 	fillBoxes( levelPicker.switches, app.syntaxLevel )
 
-	-- Set the checked box of the tabWidthPicker
-	tabWidthPicker.switches[app.tabWidth - 1]:setState{ isOn = true }
+	-- Set the active segment of the tabWidthPicker
+	tabWidthPicker:setActiveSegment( app.tabWidth - 1 )
 
 	-- Set the checked box of the editorPicker
 	if app.useDefaultEditor or #env.installedEditors == 1 then
@@ -251,7 +116,7 @@ end
 -- Fill all syntax level boxes for levels up to and including the 
 -- selected level and clear the remaining boxes.
 local function onSyntaxLevelPress( event )
-	local syntaxLevel = event.target.val
+	local syntaxLevel = event.target.value
 	app.syntaxLevel = syntaxLevel
 	fillBoxes( levelPicker.switches, syntaxLevel )
 end
@@ -311,69 +176,102 @@ function optionsView:create()
 		"11. Loops",
 		"12. Arrays",
 	}
-	levelPicker = newSettingPicker{
+	levelPicker = buttons.newSettingPicker{
+		parent = sceneGroup,
 		header = "Syntax Level:",
+		headerFont = native.systemFontBold,
+		headerFontSize = fontSize,	
 		labels = syntaxLevels,
+		labelsFont = native.systemFont,
+		labelsFontSize = fontSize,
 		style = "fillbox",
-		orientation = "vertical",
+		switchSize = switchSize,
+		x = leftMargin,
 		y = title.y + title.height + margin,
 		onPress = onSyntaxLevelPress,
 	}
 
-	-- Tab width picker
-	local tabLabels = {}
-	local tabValues = {}
-	for i = 2, 8 do
-		tabLabels[i - 1] = tostring( i )
-		tabValues[i - 1] = i
-	end
-	tabWidthPicker = newSettingPicker{
-		header = "Tab Width:",
-		labels = tabLabels,
-		values = tabValues,
-		style = "radio",
-		orientation = "horizontal",
+	-- Tab width header
+	local tabWidthHeader  = display.newText{
+		parent = sceneGroup,
+		text = "Tab Width:",
+		x = leftMargin,
 		y = levelPicker.y + levelPicker.height + margin,
-		onPress = 
+		font = native.systemFontBold,
+		fontSize = fontSize,
+	}
+	g.uiItem( tabWidthHeader )
+	local tabWidths = {}
+	for i = 2, 8 do
+		tabWidths[i - 1] = tostring( i )
+	end
+
+	-- Tab width picker
+	tabWidthPicker = widget.newSegmentedControl{
+		x = leftMargin,
+		y = tabWidthHeader.y + tabWidthHeader.height + margin * 0.5,
+		segments = tabWidths,
+		defaultSegment = app.tabWidth - 1,
+		labelSize = fontSize,
+		labelColor = { default = { 0 }, over = { 0 } },
+		onPress =
 			function ( event )
-				app.tabWidth = event.target.val
+				app.tabWidth = event.target.segmentNumber + 1
 			end
 	}
+	tabWidthPicker.anchorX = 0
+	tabWidthPicker.anchorY = 0
+	sceneGroup:insert( tabWidthPicker )
 
 	-- Editor picker
 	local editorNames = {}
 	for i = 1, #env.installedEditors do
 		editorNames[i] = env.installedEditors[i].name
 	end
-	editorPicker = newSettingPicker{
+	editorPicker = buttons.newSettingPicker{
+		parent = sceneGroup,
 		header = "Text Editor:",
+		headerFont = native.systemFontBold,
+		headerFontSize = fontSize,
 		labels = editorNames,
+		labelsFont = native.systemFont,
+		labelsFontSize = fontSize,
 		style = "radio",
-		orientation = "vertical",
+		switchSize = switchSize,
+		x = leftMargin,
 		y = tabWidthPicker.y + tabWidthPicker.height + margin,
 		onPress = 
 			function ( event )
-				app.editorPath = env.installedEditors[event.target.val].path
+				app.editorPath = env.installedEditors[event.target.value].path
 				app.useDefaultEditor = app.editorPath == nil
 			end
 	}
 
 	-- Open In Editor button
-	openInEditorBtn = newOptionButton{
-		x = xSwitches,
+	openInEditorBtn = buttons.newOptionButton{
+		parent = sceneGroup,
+		x = leftMargin,
 		y = editorPicker.y + editorPicker.height + margin * 0.5,
 		onRelease = onOpenInEditor,
 		label = "Open MyProgram.java in Editor",
+		font = native.systemFont,
+		fontSize = fontSize,
 		width = 350,
+		height = 35,
 	}
 
 	-- Multi-error picker
-	local multiErrorLabels = { "Show only one error at a time" }
-	multiErrorPicker = newSettingPicker{
+	multiErrorPicker = buttons.newSettingPicker{
+		parent = sceneGroup,
 		header = "Multi-Error Mode:",
-		labels = multiErrorLabels,
+		headerFont = native.systemFontBold,
+		headerFontSize = fontSize,
+		labels = { "Show only one error at a time" },
+		labelsFont = native.systemFont,
+		labelsFontSize = fontSize,
 		style = "checkbox",
-		orientation = "vertical",
+		switchSize = switchSize,
+		x = leftMargin,
 		y = openInEditorBtn.y + openInEditorBtn.height + margin,
 		onPress =
 			function ( event )

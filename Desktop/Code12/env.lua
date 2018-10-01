@@ -104,15 +104,7 @@ end
 
 -- Run the Save File dialog with the given title.
 -- Return the string pathname chosen or nil if cancelled.
-function env.pathFromSaveFileDialog( title )
-	local defaultPathAndFile
-	if env.isWindows then
-		local homeDrive = os.getenv( "HOMEDRIVE" )
-		local homePath = os.getenv( "HOMEPATH" )
-		local path = homeDrive .. homePath .. [[\Documents\Code12 Programs\]]
-		lfs.mkdir( path )
-		defaultPathAndFile = path .. [[MyProgram.java]]
-	end
+function env.pathFromSaveFileDialog( title, defaultPathAndFile )
 	local result = fileDialogs.saveFileDialog{
 		title = title,
 		default_path_and_file = defaultPathAndFile,
@@ -162,6 +154,18 @@ function env.showErrAlert( title, message )
 	}
 end
 
+-- Show an error alert message dialog with Yes and No buttons and the given
+-- title and message
+-- Return wether the Yes button was clicked, or nil if closed
+function env.showWarningAlert( title, message )
+	return fileDialogs.messageBox{
+		title = title,
+		message = message,
+		icon_type = "warning",
+		dialog_type = "yesno",
+	}
+end
+
 -- Populate the env.installedEditors table with editors found installed
 -- in the current environment
 function env.findInstalledEditors()
@@ -190,6 +194,19 @@ function env.findInstalledEditors()
 			end
 		end
 	end
+end
+
+-- Run the Input Box dialog with the given title and message.
+-- Return the string inputed or nil if cancelled.
+function env.strFromInputBoxDialog( title, message )
+	local result = fileDialogs.inputBox{
+		title = title,
+		message = message,
+	}
+	if type(result) == "string" then
+		return result
+	end
+	return nil
 end
 
 
