@@ -23,11 +23,14 @@ local buttons = require( "buttons" )
 local getFile = composer.newScene()
 
 -- UI Metrics
-local margin = app.margin
-local extraMargin = margin * 4
-local largeFontSize = 24
-local medFontSize = 14
-local smallFontSize = 12
+local margin = app.margin       -- Distance between most UI elements
+local extraMargin = margin * 4  -- Extra distance between UI sections
+local largeFontSize = 24        -- Font size for main labels (New Program, Open Program, etc.)
+local medFontSize = 14          -- Font size for recent program names
+local smallFontSize = 12        -- Font size for recent program paths
+
+-- File local state variables
+local firstSave = true        -- Set to false after the first time a user successfully uses the new program button
 
 -- Display objects and groups
 local UIGroup
@@ -42,18 +45,18 @@ local function classNameOfPath( path )
 	return string.gsub( filename, ".java$", "" )
 end
 
--- Return true if given path is to a valid new java program.java
+-- Return true if given className is a valid java class name
 -- Return false and an error message string otherwise
-local function isValidNewProgramAndErrMessage( path )
-	if string.sub( path, -5, -1 ) ~= ".java" then
-		return false, "Your program filename should have a .java extension."
-	end
-	local className = classNameOfPath( path )
+local function isValidClassNameAndErrMessage( className )
 	local chFirst = string.byte( className, 1 )
 	if not chFirst then
-		return false, ".java is not a valid filename."
+		return false, "No class name was entered."
 	elseif chFirst < 65 or chFirst > 90 then
-		return false, "By convention, your program filename should start with an upper-case letter."
+		return false, "By convention, your program class name should start with an upper-case letter."
+	end
+	local i, j = string.find( className, "[%a%d_]+" )
+	if i ~= 1 or j ~= string.len( className ) then
+		return false, "Java class names can only contain letters, digits, and underscores."
 	end
 	return true
 end
@@ -135,23 +138,53 @@ end
 
 -- Show dialog to create a new user source code file
 local function newProgram()
-	local path = env.pathFromSaveFileDialog( "Save New Program As" )
-	if not path then
-		native.setActivityIndicator( false )
-	else
-		local isValidNewProgram, errMessage = isValidNewProgramAndErrMessage( path )
-		if isValidNewProgram then
-			writeNewProgramSkeleton( path )
-			updateSourceFile( path )
-			if app.openFilesInEditor then
-				env.openFileInEditor( path )
+	-- Get className
+	local className = env.strFromInputBoxDialog( "New Program", "Enter a class name for your new program." )
+	if className then
+		-- Check for valid Java class name
+		local isValidClassName, errMessage = isValidClassNameAndErrMessage( className )
+		if isValidClassName then
+			-- Open Save As dialog for user to save file
+			local defaultPathAndFile
+			if env.isWindows then
+				local defaultPath = ""
+				if firstSave then
+					local userProfile = os.getenv( "USERPROFILE" )
+					defaultPath = userProfile .. [[\Documents\Code12 Programs\]]
+					lfs.mkdir( defaultPath )
+				end
+				defaultPathAndFile = defaultPath .. className .. [[.java]]
 			end
-			native.setActivityIndicator( false )
+			local path = env.pathFromSaveFileDialog( "Save New Program As", defaultPathAndFile )
+			if path then
+				local _, fileName = env.dirAndFilenameOfPath( path )
+				-- Append ".java" to file name if missing
+				if string.sub( fileName, -5, -1 ) ~= ".java" then
+					fileName = fileName .. ".java"
+				end
+				-- Check that fileName matches className.java
+				local saveFile = true
+				if fileName ~= className .. [[.java]] then
+					local message = "Java program file names should match the class name.\nDo you wish the save your as ".. fileName .." instead of " .. className .. ".java?"
+					saveFile = env.showWarningAlert( "Unexpected File Name", message, "yesno" )
+				end
+				print( "saveFile", saveFile )
+				if saveFile then
+					-- Save the new program
+					writeNewProgramSkeleton( path )
+					updateSourceFile( path )
+					if app.openFilesInEditor then
+						env.openFileInEditor( path )
+					end
+					firstSave = false
+				end
+			end
 		else
 			env.showErrAlert( "Invalid File Name", errMessage )
 			newProgram()
 		end
 	end
+	native.setActivityIndicator( false )
 end
 
 -- Event handler for the New Program button
