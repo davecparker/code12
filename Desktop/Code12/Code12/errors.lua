@@ -21,9 +21,24 @@ local rgbWarningText = { 0.9, 0, 0.1 }   -- warnings in red
 
 ---------------- Error Reporting  --------------------------------------------
 
--- Print a warning message, with optional quoted name
+-- Print a warning message with optional quoted name
 function g.warning(message, name)
-	local s = "WARNING: " .. message
+	-- Look back on the stack trace to find the user's code (string)
+	-- so we can get the line number.
+	local info = nil
+	local level = 1
+	repeat
+		info = debug.getinfo(level, "Sl")
+		level = level + 1
+	until info == nil or info.short_src == '[string "..."]'
+	
+	-- Build and print the error	
+	local s
+	if info and info.currentline then
+		s = "WARNING (line " .. info.currentline .. "): " .. message
+	else
+		s = "WARNING: " .. message
+	end
 	if name then
 		s = s .. " \"" .. name .. "\""
 	end
