@@ -165,7 +165,8 @@ local function newProgram()
 				-- Check that fileName matches className.java
 				local saveFile = true
 				if fileName ~= className .. [[.java]] then
-					local message = "Java program file names should match the class name.\nDo you wish the save your as ".. fileName .." instead of " .. className .. ".java?"
+					local message = "Java program file names should match the class name.\n" ..
+							"Do you wish the save your as ".. fileName .." instead of " .. className .. ".java?"
 					saveFile = env.showWarningAlert( "Unexpected File Name", message, "yesno" )
 				end
 				print( "saveFile", saveFile )
