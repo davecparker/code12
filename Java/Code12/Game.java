@@ -322,7 +322,12 @@ public class Game implements GameInterface
 
    public GameObj image(String filename, double x, double y, double width)
    {
-      GameObj obj = new GameImage(this, filename, x, y);
+      GameImage obj = new GameImage(this, filename, x, y);
+      if (!obj.imageFound())
+      {
+         // Substitute text with red "X" for images that aren't found
+         return text("[x]", x, y, width, "red");
+      } 
       obj.setSize(width, width * obj.height / obj.width);
       screen.addObj(obj);
       return obj;
