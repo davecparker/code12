@@ -498,7 +498,7 @@ public class Game implements GameInterface
    public String formatDecimal(double d, int numPlaces)
    {
       if (numPlaces <= 0)
-         return String.valueOf(Math.rint(d));
+         return String.valueOf((int) Math.rint(d));
       
       String fmt = "%." + numPlaces + "f";
       return String.format(fmt, d);
