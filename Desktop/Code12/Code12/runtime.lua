@@ -270,6 +270,15 @@ function runtime.resume()
 	end
 end
 
+-- When the run state is paused, advance one frame then pause again.
+function runtime.stepOneFrame()
+	if g.runState == "paused" then
+		g.runState = "running"
+		onNewFrame()
+		g.runState = "paused"
+	end
+end
+
 -- Stop a run and set the runState to endState (default "stopped")
 function runtime.stop( endState )
 	-- Abort the user coRoutine if necessary
