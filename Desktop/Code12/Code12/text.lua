@@ -13,6 +13,10 @@ local runtime = require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
 
 
+-- File local data
+local rgbLogText = { 0, 0, 1 }    -- ct.log console output is blue
+
+
 ---------------- Internal Functions ------------------------------------------
 
 -- Return the text to print for the given value
@@ -31,11 +35,11 @@ end
 -- Print a value as it should appear in ct.log output
 local function logValue(value)
 	if type(value) == "string" then
-		ct.print("\"")
-		ct.print(value)
-		ct.print("\"")
+		runtime.printText("\"")
+		runtime.printText(value)
+		runtime.printText("\"")
 	else
-		ct.print(textForValue(value))
+		runtime.printText(textForValue(value))
 	end
 end
 
@@ -49,17 +53,8 @@ function ct.print(value, ...)
 		g.checkOnly1Param(...)
 	end
 
-	-- Print/output the value
-	local text = textForValue(value)
-	if runtime.appContext then
-		runtime.appContext.print(text)     -- Code12 app console
-	elseif g.isSimulator then
-		io.write(text)             -- Corona simulator console
-		io.flush()
-	end
-	if g.outputFile then
-		g.outputFile:write(text)   -- echo to text file
-	end
+	-- Convert value to text and print it
+	runtime.printText(textForValue(value))
 end
 
 -- API
@@ -71,19 +66,8 @@ function ct.println(value, ...)
 		g.checkOnly1Param(...)
 	end
 
-	-- Print/output the value
-	local text = textForValue(value)
-	if runtime.appContext then
-		runtime.appContext.println(text)   -- Code12 app console
-	elseif g.isSimulator then
-		io.write(text)             -- Corona simulator console
-		io.write("\n")
-		io.flush()
-	end
-	if g.outputFile then
-		g.outputFile:write(text)   -- echo to text file
-		g.outputFile:write("\n")
-	end
+	-- Convert value to text and print it
+	runtime.printTextLine(textForValue(value))
 end
 
 -- API
@@ -100,16 +84,16 @@ function ct.log(value, ...)
 	local args = {...}
 	local n = #args
 	if n > 0 then
-		ct.print(", ")   -- comma after first value
+		runtime.printText(", ")   -- comma after first value
 		for i = 1, n - 1 do
 			logValue(args[i])
-			ct.print(", ")
+			runtime.printText(", ")
 		end
 		logValue(args[n])  -- last arg without comma
 	end
 
 	-- End with a newline no matter what
-	ct.print("\n")  
+	runtime.printTextLine("", rgbLogText )  
 end
 
 -- API

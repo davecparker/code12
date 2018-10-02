@@ -39,13 +39,25 @@ local coRoutineUser      -- coroutine running an event or nil if none
 
 ---------------- Internal Runtime Functions ------------------------------------------
 
--- The enterFrame listener for each frame update after the first
+-- The enterFrame listener for each frame update
 local function onNewFrame()
-	-- Call or resume the client's update function if not paused
+	-- Call or resume the current user function if not paused (start or update)
 	local status = false
-	if g.runState ~= "paused" then
-		status = runtime.runEventFunction(ct.userFns.update)
-		if status == "aborted" then
+	if g.userFn and g.runState ~= "paused" then
+		status = runtime.runEventFunction(g.userFn)
+		if status == nil then   -- userFn finished
+			if g.userFn == ct.userFns.start then
+				-- User's start function finished
+				if g.outputFile then
+					g.outputFile:flush()   -- flush any print output
+				end
+				if ct.userFns.update then
+					g.userFn = ct.userFns.update  -- now call update
+				else   -- no update function, so done after start
+					runtime.stop( "ended" )
+				end
+			end
+		elseif status == "aborted" then
 			return
 		end
 	end
@@ -55,28 +67,29 @@ local function onNewFrame()
 	g.gameObjClicked = nil
 	g.charTyped = nil
 
-	-- Update the background object if the screen resized since last time
-	if g.window.resized then
-		g.screen.backObj:updateBackObj()
-	end
-
-	-- Update and sync the drawing objects as necessary.
-    -- Note that objects may be deleted during the loop. 
-	local objs = g.screen.objs
-	local i = 1
-	while i <= objs.numChildren do
-		-- Check for autoDelete first
-		local gameObj = objs[i].code12GameObj
-		if gameObj:shouldAutoDelete() then
-			gameObj:removeAndDelete()
-		else
-			-- Update objects if running and update completed
-			if g.runState == "running" and status == nil then
-				gameObj:updateForNextFrame()
+	-- Update drawing objects as necessary
+    if g.screen then
+		-- Update the background object if the screen resized since last time
+		if g.window.resized then
+			g.screen.backObj:updateBackObj()
+		end
+		-- Update and/or sync the user drawing objects
+		local objs = g.screen.objs
+		local i = 1
+		while i <= objs.numChildren do
+			-- Check for autoDelete first
+			local gameObj = objs[i].code12GameObj
+			if gameObj:shouldAutoDelete() then
+				gameObj:removeAndDelete()
+			else
+				-- Update objects if running and userFn completed
+				if g.runState == "running" and status == nil then
+					gameObj:updateForNextFrame()
+				end
+				-- Always sync the objects so the display is correct
+				gameObj:sync()
+				i = i + 1
 			end
-			-- Always sync the objects so the display is correct
-			gameObj:sync()
-			i = i + 1
 		end
 	end
 
@@ -84,48 +97,12 @@ local function onNewFrame()
 	g.window.resized = false
 end
 
--- The enterFrame listener for the first update only
-local function onFirstFrame()
-	-- Call or resume the client's start function if not paused
-	local status = false
-	if g.runState ~= "paused" then
-		status = runtime.runEventFunction(ct.userFns.start)
-		if status == "aborted" then
-			return
-		end
+-- Global key event handler for the runtime
+local function onKey(event)
+	if g.runState == "running" then
+		return g.onKey(event)
 	end
-
-	-- Flush the output file if any, to make sure at least 
-	-- output done in start() gets written, in case we abort later.
-	if g.outputFile then
-		g.outputFile:flush()
-	end
-
-	-- Update the background object if the screen resized since last time
-	if g.window.resized then
-		g.screen.backObj:updateBackObj()
-	end
-
-	-- Sync the drawing objects for the draw
-	local objs = g.screen.objs
-	for i = 1, objs.numChildren do
-		objs[i].code12GameObj:sync()
-	end
-
-	-- If start() finished then switch to the normal frame update 
-	-- handler for subsequent frames, if any
-	if g.runState == "running" and status == nil then
-		Runtime:removeEventListener("enterFrame", onFirstFrame)
-		if ct.userFns.update then
-			Runtime:addEventListener("enterFrame", onNewFrame)
-		else
-			-- There is no update function, so done after start
-			runtime.stop( "ended" )
-		end
-	end
-
-	-- We have now adapted to any window resize
-	g.window.resized = false
+	return false
 end
 
 -- Get the device/output metrics in native units
@@ -200,6 +177,13 @@ local function initUserProgram()
 	end
 end
 
+-- Init the runtime
+local function initRuntime()
+	-- Install the global event listeners
+	Runtime:addEventListener("enterFrame", onNewFrame)
+	Runtime:addEventListener("key", onKey)
+end
+
 
 ---------------- Module Functions ------------------------------------------
 
@@ -247,10 +231,11 @@ function runtime.blockAndYield(...)
 	end
 end
 
--- Handle a window resize for a standalone resizeable app
+-- Handle a window resize (relevant for a standalone resizeable app)
 function runtime.onResize()
-	local oldHeight = g.height    -- remember old height if any
-	getDeviceMetrics()            -- get new device metrics
+	-- Remember old height and get new metrics
+	local oldHeight = g.height
+	getDeviceMetrics()
 
 	-- Set new logical height (sets g.height and g.scale)
 	ct.setHeight(g.WIDTH * g.window.height / g.window.width)
@@ -265,7 +250,9 @@ function runtime.onResize()
 	g.window.resized = true
 
 	-- Send user event if necessary
-	runtime.runEventFunction(ct.userFns.onResize)
+	if g.runState == "running" then
+		runtime.runEventFunction(ct.userFns.onResize)
+	end
 end
 
 -- Pause a run
@@ -282,6 +269,15 @@ function runtime.resume()
 	end
 end
 
+-- When the run state is paused, advance one frame then pause again.
+function runtime.stepOneFrame()
+	if g.runState == "paused" then
+		g.runState = "running"
+		onNewFrame()
+		g.runState = "paused"
+	end
+end
+
 -- Stop a run and set the runState to endState (default "stopped")
 function runtime.stop( endState )
 	-- Abort the user coRoutine if necessary
@@ -291,12 +287,6 @@ function runtime.stop( endState )
 		end
 		coRoutineUser = nil
 	end
-
-	-- Remove the event listeners (only some may be installed)
-	Runtime:removeEventListener("enterFrame", onFirstFrame)
-	Runtime:removeEventListener("enterFrame", onNewFrame)
-	Runtime:removeEventListener("key", g.onKey)
-	Runtime:removeEventListener("resize", runtime.onResize)
 
 	-- Close output file if any
 	if g.outputFile then
@@ -313,6 +303,7 @@ function runtime.stop( endState )
 
 	-- Set the run state and restart if requested
 	g.runState = endState or "stopped"
+	g.userFn = nil
 	g.startTime = nil
 end	
 
@@ -353,17 +344,11 @@ function runtime.run()
 	-- Make the first screen with default empty name
 	ct.setScreen("")
 
-	-- Install the event listeners
-	Runtime:addEventListener("enterFrame", onFirstFrame)  -- will call user's start()
-	Runtime:addEventListener("key", g.onKey)
-	if runtime.appContext == nil and not g.isMobile then
-		Runtime:addEventListener("resize", runtime.onResize)  -- for standalone window resize
-	end
-
 	-- Start the game and the game timer
 	g.runState = "running"
+	g.userFn = ct.userFns.start
 	g.startTime = system.getTimer()
-	-- Now onFirstFrame called by enterFrame listener will start the action
+	-- Now onNewFrame called by enterFrame listener will start the action
 end
 
 -- Restart the current user program if any
@@ -385,8 +370,40 @@ function runtime:clearProgram()
 	g.runState = nil
 end
 
+-- Output the given text to where console output should go
+function runtime.printText(text)
+	if runtime.appContext then
+		runtime.appContext.print(text)     -- Code12 app console
+	elseif g.isSimulator then
+		io.write(text)             -- Corona simulator console
+		io.flush()
+	end
+	if g.outputFile then
+		g.outputFile:write(text)   -- echo to text file
+	end
+end
+
+-- Output the given text plus a newline to where console output should go.
+-- if rgb is included then it is an array {r, g, b} (each 0-1) for the 
+-- color to assign to the line if possible.
+function runtime.printTextLine(text, rgb)
+	if runtime.appContext then
+		runtime.appContext.println(text, rgb)   -- Code12 app console
+	elseif g.isSimulator then
+		io.write(text)             -- Corona simulator console
+		io.write("\n")
+		io.flush()
+	end
+	if g.outputFile then
+		g.outputFile:write(text)   -- echo to text file
+		g.outputFile:write("\n")
+	end
+end
+
 
 ----------------------------------------------------------------------------
 
+-- Init and return the runtime module
+initRuntime()
 return runtime
 

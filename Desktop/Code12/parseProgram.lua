@@ -52,11 +52,10 @@ local parseProgram = {}
 --     { s = "return", iLine, expr }
 --
 -- lValue:  (Semantic analysis adds isGlobal and vt fields)
---     (an lValue can also be a single ID node for a simple variable)
 --     { s = "lValue", varID, indexExpr, fieldID }
 -- 
 -- expr:  (Semantic analysis adds a vt field)
---     (expr nodes can also be a single ID or INT, NUM, BOOL, NULL, or STR token node)
+--     (expr nodes can also be a single literal token (INT, NUM, BOOL, NULL, or STR) node)
 --     { s = "call", class, lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "staticField", class, fieldID }
@@ -337,20 +336,14 @@ end
 local function makeLValueFromNodes( varID, index, field )
 	local indexExpr = nil
 	local lastToken = nil
-	local simpleVar = true
 	if index then
-		simpleVar = false
 		indexExpr = makeExpr( index.nodes[2] )
 		lastToken = index.nodes[3]
 	end
 	local fieldID = nil
 	if field then
-		simpleVar = false
 		fieldID = field.nodes[2]
 		lastToken = nil   -- don't need this anymore
-	end
-	if simpleVar then
-		return varID    -- lValue for simple variable is just the ID token
 	end
 	return { s = "lValue", varID = varID, 
 			indexExpr = indexExpr, fieldID = fieldID, lastToken = lastToken }
@@ -359,7 +352,7 @@ end
 -- Make and return an lValue structure from an ID token or lValue parse node 
 local function makeLValue( node )
 	if node.tt == "ID" then
-		return node
+		return { s = "lValue", varID = node }   -- a simple variable
 	end
 	assert( node.t == "lValue" )
 	local nodes = node.nodes
@@ -739,9 +732,11 @@ function makeExpr( node )
 		return nil
 	end
 
-	-- Expr nodes can be a token (variable ID, or literal INT, NUM, BOOL, NULL, STR)
-	if node.tt then
-		return node
+	-- Is node a token? (variable ID, or literal INT, NUM, BOOL, STR, or NULL)
+	if node.tt == "ID" then
+		return makeLValue( node )   -- a simple variable
+	elseif node.tt then
+		return node     -- expr node can be a literal token node directly
 	end
 
 	-- Handle the different primaryExpr types plus binary operators

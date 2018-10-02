@@ -322,7 +322,12 @@ public class Game implements GameInterface
 
    public GameObj image(String filename, double x, double y, double width)
    {
-      GameObj obj = new GameImage(this, filename, x, y);
+      GameImage obj = new GameImage(this, filename, x, y);
+      if (!obj.imageFound())
+      {
+         // Substitute text with red "X" for images that aren't found
+         return text("[x]", x, y, width, "red");
+      } 
       obj.setSize(width, width * obj.height / obj.width);
       screen.addObj(obj);
       return obj;
@@ -498,7 +503,7 @@ public class Game implements GameInterface
    public String formatDecimal(double d, int numPlaces)
    {
       if (numPlaces <= 0)
-         return String.valueOf(Math.rint(d));
+         return String.valueOf((int) Math.rint(d));
       
       String fmt = "%." + numPlaces + "f";
       return String.format(fmt, d);

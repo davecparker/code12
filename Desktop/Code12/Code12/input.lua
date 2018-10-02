@@ -183,10 +183,6 @@ end
 -- Handle a Corona key event.
 -- Track which keys are down and typed, and call client event handler(s).
 function g.onKey(event)
-	if g.runState ~= "running" then
-		return false
-	end
-
 	-- Get the key name and change it as necessary to match the Code12 spec
 	local keyName = event.keyName
 	if keyName == "back"  then

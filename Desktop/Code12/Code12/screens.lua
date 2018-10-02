@@ -164,6 +164,11 @@ function ct.setScreen(name, ...)
 
 	-- Show new screen
 	screen.group.isVisible = true;
+
+	-- Update the screen's background object if any
+	if screen.backObj then
+		screen.backObj:updateBackObj()
+	end
 end
 
 -- API

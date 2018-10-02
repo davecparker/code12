@@ -68,3 +68,5 @@ imort Code12.*;
 		x ct.rect( X, 10, 50, 10 );
 		if ct.rect( X, 10, 50, 10 );
         double x = ct.random(0, 100)
+      c;setFillColor("blue");
+      c:setFillColor("blue");
