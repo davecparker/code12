@@ -58,7 +58,6 @@ end
 -- Set the checked boxes for the user's settings
 local function setSelectedOptions()
 	-- Set the filled boxes of the levelPicker
-	app.syntaxLevel = app.syntaxLevel or 1
 	fillBoxes( levelPicker.switches, app.syntaxLevel )
 
 	-- Set the active segment of the tabWidthPicker
