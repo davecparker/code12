@@ -9,23 +9,40 @@
 
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
+local runtime = require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
 
 
 -- File local state for error reporting
 local currentFunctionName = ""     -- string name of current API or method being executed
 local errorStackLevel = 0          -- error reporting stack level relative to 0 for normal
+local rgbWarningText = { 0.9, 0, 0.1 }   -- warnings in red
 
 
 ---------------- Error Reporting  --------------------------------------------
 
--- Print a warning message, with optional quoted name
+-- Print a warning message with optional quoted name
 function g.warning(message, name)
-	local s = "WARNING: " .. message
+	-- Look back on the stack trace to find the user's code (string)
+	-- so we can get the line number.
+	local info = nil
+	local level = 1
+	repeat
+		info = debug.getinfo(level, "Sl")
+		level = level + 1
+	until info == nil or info.short_src == '[string "..."]'
+	
+	-- Build and print the error	
+	local s
+	if info and info.currentline then
+		s = "WARNING (line " .. info.currentline .. "): " .. message
+	else
+		s = "WARNING: " .. message
+	end
 	if name then
 		s = s .. " \"" .. name .. "\""
 	end
-	ct.println(s)
+	runtime.printTextLine(s, rgbWarningText)
 end
 
 -- Generate a runtime error for the current function and stack level, with the given message.
@@ -151,4 +168,31 @@ function g.checkTypes(types, ...)
 		end
 	end
 end 
+
+-- Check the value of a numeric parameter for the current API name (as set by
+-- g.checkAPIParams) to make sure it's not negative, and print a warning 
+-- if it is. Return 0 if negative otherwise the original value.
+function g.checkParamNotNegative(paramName, num)
+	if num < 0 then
+		g.warning(string.format("%s parameter to %s is negative (%d)",
+						paramName, currentFunctionName, num))
+		return 0
+	end
+	return num
+end
+
+-- Check the value of a string parameter for the current API name (as set by
+-- g.checkAPIParams) to make sure it's not nil or empty, and print a warning 
+-- if it is. Return nil if empty otherwise the original value.
+function g.checkParamNotEmpty(paramName, str)
+	if str == nil then
+		g.warning(string.format("%s parameter to %s is null",
+						paramName, currentFunctionName))
+	elseif str == "" then
+		g.warning(string.format("%s parameter to %s is empty string",
+						paramName, currentFunctionName))
+		return nil
+	end
+	return str
+end
 

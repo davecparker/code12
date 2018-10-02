@@ -4,11 +4,12 @@ function _fn.start()
 
 	ct.println("Hey")
 	ct.setTitle("My Program")
-	--GameObj x = ct.setTitle("My Program");
 	local c = ct.circle(50, 30, 10)
-	if ct.clicked() then
-		c:setFillColor("blue")
-	end; math.sin(50)
+	-- c.align("back");
+	-- ct.image("foo", 50, 70, 20);
+	c:setFillColor("blue")
+	-- ct.sound("hoy");
+	ct.log(c)
 end
 
 require('Code12.api')

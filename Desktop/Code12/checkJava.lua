@@ -191,7 +191,9 @@ local function getVariable( varNode, isVarAssign )
 		end
 		return nil
 	end
-	if not isVarAssign and not varFound.assigned then
+	if isVarAssign then
+		varFound.assigned = true
+	elseif not varFound.assigned then
 		err.setErrNode( varNode,  
 			"Variable %s must be assigned before it is used", varNode.str )
 	end
@@ -368,32 +370,22 @@ end
 -- Store the isGlobal and vt fields in the lValue, and return the vt. 
 -- If there is an error, then set the error state and return nil.
 local function vtCheckLValue( lValue, assigned )
-	-- An lValue is just an ID node for a simple variable
-	if lValue.tt == "ID" then
-		-- Get the variable and mark it assigned as appropriate
-		local varFound = getVariable( lValue, assigned )
-		if varFound == nil then
-			return nil
-		end
-		if assigned then
-			if varFound.isConst then
-				err.setErrNode( lValue, "Cannot assign to constant (final) variable" )
-			end
-			varFound.assigned = true
-		end
-
-		-- Store the vt and isGlobal in the ID, and return the vt
-		lValue.isGlobal = varFound.isGlobal
-		local vt = varFound.vt
-		lValue.vt = vt
-		return vt
-	end
-
-	-- Full lValue structure
 	assert( lValue.s == "lValue" )
 	local varNode = lValue.varID
 	local indexExpr = lValue.indexExpr
 	local fieldID = lValue.fieldID
+
+	-- Handle case of a simple variable (tracks if assigned)
+	if not (indexExpr or fieldID) then
+		local varFound = getVariable( varNode, assigned )
+		if varFound == nil then
+			return nil
+		end
+		local vt = varFound.vt
+		lValue.vt = vt
+		lValue.isGlobal = varFound.isGlobal
+		return vt
+	end
 
 	-- Get the variable and its type, and store isGlobal in the lValue
 	local varFound = getVariable( varNode )
@@ -401,7 +393,7 @@ local function vtCheckLValue( lValue, assigned )
 		return nil
 	end
 	lValue.isGlobal = varFound.isGlobal
-	local vt = varFound.vt
+	local vt = varFound.vt    -- start with the type of just the varNode part
 
 	-- Check array index if any, and get the element type
 	if indexExpr then
@@ -426,7 +418,8 @@ local function vtCheckLValue( lValue, assigned )
 		elseif type(vt) == "table" then
 			-- Support array.length
 			if fieldID.str == "length" then
-				return 0  -- int
+				lValue.vt = 0  -- int
+				return 0       -- int
 			else
 				err.setErrNodeAndRef( fieldID, lValue,
 					"Arrays can only access their \".length\" field" )
@@ -1216,20 +1209,16 @@ local fnVtExprVariations = {
 -- Also store the vt into node.vt for future use.
 -- If an error is found, set the error state and return nil.
 function vtSetExprNode( node )
-	-- Does this node already have the vt assigned? (e.g. literal token)
-	local vt = node.vt
-	if vt ~= nil then
-		return vt
+	-- An expr node can be a literal token, which has its vt set by parseJava
+	if node.tt then
+		assert( node.vt )
+		return node.vt
 	end
 
-	-- Is this an ID token (simplified lValue)?
-	if node.tt == "ID" then
-		return vtCheckLValue( node )
-	end
-
-	-- Determine the vt from functions in table above
+	-- Determine the type checking function to call from the table above
 	local fnVt
 	local s = node.s
+	assert( s )
 	if s == "unaryOp" or s == "binOp" then
 		fnVt = fnVtExprVariations[node.opType]
 		if fnVt == nil then
@@ -1240,9 +1229,9 @@ function vtSetExprNode( node )
 	else
 		fnVt = fnVtExprVariations[s]
 	end
-	vt = fnVt( node )
 
-	-- Store the vt in the node and return it
+	-- Get the vt, store it in the node, and return it
+	local vt = fnVt( node )
 	node.vt = vt       
 	return vt
 end
