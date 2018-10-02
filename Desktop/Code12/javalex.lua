@@ -655,7 +655,7 @@ end
 -- Init the charTypes array
 local function initCharTypes()
 	-- Init array to all invalid chars to start with (and ensure contiguous array)
-	for ch = 0, 127 do
+	for ch = 0, 255 do
 		charTypes[ch] = invalidCharToken
 	end
 

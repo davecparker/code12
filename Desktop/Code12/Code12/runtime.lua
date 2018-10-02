@@ -182,7 +182,6 @@ local function initRuntime()
 	-- Install the global event listeners
 	Runtime:addEventListener("enterFrame", onNewFrame)
 	Runtime:addEventListener("key", onKey)
-	Runtime:addEventListener("resize", runtime.onResize)
 end
 
 

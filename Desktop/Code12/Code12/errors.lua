@@ -25,7 +25,7 @@ local rgbWarningText = { 0.9, 0, 0.1 }   -- warnings in red
 function g.warning(message, name)
 	-- Look back on the stack trace to find the user's code (string)
 	-- so we can get the line number.
-	local info = nil
+	local info
 	local level = 1
 	repeat
 		info = debug.getinfo(level, "Sl")
