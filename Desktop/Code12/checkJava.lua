@@ -23,10 +23,11 @@ local checkJava = {}
 -- File local state
 local syntaxLevel          -- the language (syntax) level
 
--- Table of variables that are currently defined. 
+-- Tables for variables that are currently defined, and those out of scope. 
 -- These map a name to a var structure. There are also entries of type string 
 -- that map a lowercase version of the name to the name with the correct case.
-local variables = {}
+local variables
+local variablesOutOfScope
 
 -- Table of user-defined methods that are currently defined. 
 -- These map a name to a table in the same format as the apiTables 
@@ -35,13 +36,13 @@ local variables = {}
 --            params = array of { name = str, vt = vtParam, var = var } }
 -- There are also entries of type string 
 -- that map a lowercase version of the name to the name with the correct case.
-local userMethods = {}
+local userMethods
 
 -- Set of funcs for names of event methods that the user has defined (overridden)
-local eventMethodFuncs = {}
+local eventMethodFuncs
 
 -- Stack of local variable names, with an empty name "" marking the beginning of each block
-local localNameStack = {}
+local localNameStack
 
 -- Program processing state
 local beforeStart       -- true when checking code that will run before start()
@@ -69,9 +70,10 @@ end
 -- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
 -- If the name is found and the entry is a record (table) then return the record.
 -- If an entry has an index (name) differing only in case, then set the error state 
--- to a description of the error and return (nil, entryCorrectCase, strCorrectCase). 
+-- to a description of the error unless noError is true, and return 
+-- (nil, entryCorrectCase, strCorrectCase). 
 -- If the name is not found at all then return nil.
-local function lookupID( nameToken, nameTable )
+local function lookupID( nameToken, nameTable, noError )
 	assert( nameToken.tt == "ID" )
 	local name = nameToken.str
 
@@ -95,8 +97,10 @@ local function lookupID( nameToken, nameTable )
 
 	-- Found but wrong case?
 	if strCorrectCase then
-		err.setErrNode( nameToken, 
-				"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
+		if not noError then
+			err.setErrNodeAndRef( nameToken, result,
+					"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
+		end
 		return nil, result, strCorrectCase
 	end
 	return nil
@@ -138,13 +142,12 @@ local function defineVar( var )
 
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
+	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables, true )
 	if varFound then
 		err.setErrNodeAndRef( var, varFound, 
 				"Variable %s was already defined", varName )
 		return false
 	elseif varCorrectCase then
-		err.clearErr( nameNode.iLine )
 		err.setErrNodeAndRef( var, varCorrectCase, 
 				"Variable %s differs only by upper/lower case from existing variable %s", 
 				varName, nameCorrectCase )
@@ -182,7 +185,18 @@ local function getVariable( varNode, isVarAssign )
 	end
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
-		if isVarAssign then
+		-- Variable is undefined. Check old (out of scope) variables and choose an error.
+		local oldVar, oldVarCorrect, oldStrCorrect = 
+				lookupID( varNode, variablesOutOfScope, true )
+		if oldVar then
+			err.setErrNodeAndRef( varNode, oldVar, 
+					"Undefined variable (previous variable %s was defined in a different block)",
+					oldVar.nameID.str )
+		elseif oldStrCorrect then
+			err.setErrNodeAndRef( varNode, oldVarCorrect, 
+					"Undefined variable (previous similar variable %s was defined in a different block)",
+					oldStrCorrect )
+		elseif isVarAssign then
 			err.setErrNode( varNode, 
 					"Variable %s must be declared with a type before being assigned",
 					varNode.str )
@@ -274,13 +288,12 @@ local function defineMethod( func )
 
 	-- User-defined function: Check if already defined
 	local methodFound, methodCorrectCase, nameCorrectCase 
-			= lookupID( nameNode, userMethods )
+			= lookupID( nameNode, userMethods, true )
 	if methodFound then
 		err.setErrNodeAndRef( func, methodFound.func, 
 				"Function %s was already defined", fnName )
 		return
 	elseif methodCorrectCase then
-		err.clearErr( nameNode.iLine )
 		err.setErrNodeAndRef( func, methodCorrectCase.func, 
 				"Function %s differs only by upper/lower case from existing function %s", 
 				fnName, nameCorrectCase )
@@ -669,7 +682,7 @@ local function beginLocalBlock( paramVars )
 	end
 end
 
--- End a local variable block, discarding any definitions in the top block
+-- End a local variable block, moving any definitions in the top block out of scope
 local function endLocalBlock()
 	local iTop = #localNameStack
 	while iTop > 0 do
@@ -683,9 +696,14 @@ local function endLocalBlock()
 			break
 		end
 
-		-- Remove the definition of this variable and lowercase version too
+		-- Move the definition of this variable to variablesOutOfScope
+		-- and the lowercase version too
+		variablesOutOfScope[varName] = variables[varName]
+		local nameLower = string.lower( varName )
+		variablesOutOfScope[nameLower] = variables[nameLower]
+		print(nameLower, variables[nameLower])
 		variables[varName] = nil
-		variables[string.lower( varName )] = nil
+		variables[nameLower] = nil
 	end
 end
 
@@ -1245,6 +1263,7 @@ function checkJava.checkProgram( programTree, level )
 	-- Init program state
 	syntaxLevel = level
 	variables = {}
+	variablesOutOfScope = {}
 	userMethods = {}
 	eventMethodFuncs = {}
 	localNameStack = {}

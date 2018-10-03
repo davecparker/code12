@@ -70,3 +70,4 @@ imort Code12.*;
         double x = ct.random(0, 100)
       c;setFillColor("blue");
       c:setFillColor("blue");
+      int tot 0;

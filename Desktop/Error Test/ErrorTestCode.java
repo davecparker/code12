@@ -845,9 +845,9 @@ int underIndentedInstanceVar;
 		int k = 3 / 2;
 		// ERROR "Integer divide"
 		ct.random( intVar / intVar, intVar );
-		// ERROR "Undefined variable x"
+		// ERROR "Undefined variable"
 		x = x + 1;
-		// ERROR "must be declared with a type before being assigned"
+		// ERROR "Undefined variable"
 		for (x = 0; x < 1; x++) 
 			voidFunc();
 		// ERROR "Undefined function foo"
