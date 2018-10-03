@@ -21,6 +21,7 @@ local buttons = {}
 
 -- UI Metrics
 local margin = app.margin -- Space between most UI elements
+local yCenterToolbar = app.dyToolbar / 2
 
 -- Image sheets
 local radioBtnSheet = graphics.newImageSheet( "images/radiobutton.png", { width = 1024, height = 1024, numFrames = 2 } )
@@ -173,6 +174,37 @@ function buttons.newSettingPicker( options )
 		options.parent:insert( newSettingPickerGroup )
 	end
 	return newSettingPickerGroup
+end
+
+-- Return a new button for the toolbar
+function buttons.newToolbarButton( parent, label, onRelease, placement, adjacentBtn )
+	local btn = widget.newButton{
+		x = 0,
+		y = yCenterToolbar,
+		onRelease = onRelease,
+		label = label,
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+		textOnly = true,
+	}
+	if placement == "left" then
+		btn.anchorX = 0
+		if adjacentBtn then
+			btn.x = adjacentBtn.x + adjacentBtn.width + app.margin
+		else
+			btn.x = app.margin
+		end
+	else
+		btn.anchorX = 1
+		if adjacentBtn then
+			btn.x = adjacentBtn.x - adjacentBtn.width - app.margin
+		else
+			btn.x = app.width - margin
+		end
+	end
+
+	parent:insert( btn )
+	return btn
 end
 
 

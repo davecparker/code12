@@ -318,6 +318,7 @@ local function onEnterFrame()
 	if g.runState ~= runStateLast then
 		runStateLast = g.runState
 		statusBar.update()
+		toolbar.update()
 	end
 end
 
