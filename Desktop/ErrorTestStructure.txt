@@ -1,4 +1,4 @@
-    program ErrorTest { #funcs = 41, #vars = 20 }
+    program ErrorTest { #funcs = 42, #vars = 20 }
         funcs:
  48.        func emptyFunc { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 50, #stmts = 0, iLineBegin = 49 }
@@ -2238,6 +2238,12 @@
                 block: block { iLineEnd = 645, #stmts = 1, iLineBegin = 642 }
                     stmts:
 644.                    return { expr = 0 }
+647.        func fooBad { #paramVars = 1, isError = true, vt = double }
+                paramVars:
+647.                var i { vt = int, isGlobal = false }
+                block: block { iLineEnd = 650, #stmts = 1, iLineBegin = 648 }
+                    stmts:
+649.                    return { expr = 0 }
 652.        func bar { #paramVars = 2, vt = boolean }
                 paramVars:
 652.                var s { vt = String, isGlobal = false }

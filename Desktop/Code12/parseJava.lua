@@ -380,21 +380,25 @@ local retType = { t = "retType",
 
 -- A formal parameter (in a function definition)
 local param = { t = "param",
-	{ 12, 12, "array",			"TYPE", "[", "]", "ID"		},
 	{ 10, 12, "var",			"TYPE", "ID"				},
+	{ 12, 12, "array",			"TYPE", "[", "]", "ID"		},
 	-- Common Errors
+	{ 9, 0, "var",				"TYPE", "ID",
+			strErr = "" },   -- needs level 10
 	{ 12, 0, "array",			"ID", "[", "]", "ID",		iNode = 1 },
 	{ 10, 0, "var",				"ID", "ID",					iNode = 1,
 			strErr = invalidTypeName },
 	{ 10, 0, "var",				"TYPE", "TYPE",				iNode = 2,
 			strErr = invalidParamName },
-	{ 10, 0, "var",				"ID", "TYPE",
-			strErr = "Function parameters should be a type followed by a name" },
+	{ 10, 0, "backwards",		"ID", "TYPE" },
+	{ 10, 0, "type",			"TYPE" },
+	{ 10, 0, "expr",			expr,
+			strErr = "Parameters in a function definition should be a type followed by a name" },
 }
 
 -- A formal parameter list, which can be empty
 local paramList = { t = "paramList",
-	{ 10, 12, "list",			param,	list = true, 	 	},
+	{ 9, 12, "list",			param,	list = true, 	 	},
 	{ 1, 12, false											},
 }
 
@@ -843,7 +847,7 @@ local function parseCurrentLine( level )
 		parseTree = tryLineParseAtLevel( tryLevel )
 		if parseTree then
 			-- Make note to add to syntax error
-			strNote = string.format( "(Use of %s requires syntax level %d)",
+			strNote = string.format( "Use of %s requires syntax level %d",
 							syntaxFeatures[tryLevel], tryLevel)
 			break
 		end

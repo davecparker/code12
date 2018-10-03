@@ -5221,7 +5221,7 @@ line (end)
 *** Line 559 chars 8-14: Unsupported reserved word "finally"
 
 560. boolean foo(int for);
-*** Line 560 chars 17-19: Syntax Error: "for" was unexpected here
+*** Line 560 chars 13-15: Parameters in a function definition should be a type followed by a name
 
 561. for(int do = 0; do < 10; do++)
 *** Line 561 chars 9-10: Syntax Error: "do" was unexpected here
@@ -5488,7 +5488,7 @@ Comma not supported
 *** Line 646 char 10: Syntax Error: ":" was unexpected here
 
 647. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Line 647 char 12: Syntax Error: a name was unexpected here
+*** Line 647 char 12: Parameters in a function definition should be a type followed by a name
 
 648. double foo[i]()			// index on function identifier
 *** Line 648 char 11: Syntax Error: "[" was unexpected here
@@ -5706,7 +5706,7 @@ Comma not supported
 *** Line 719 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-719 lines processed in 100 ms
+719 lines processed in 104 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)

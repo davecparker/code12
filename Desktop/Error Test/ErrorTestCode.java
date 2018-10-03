@@ -644,7 +644,7 @@ int underIndentedInstanceVar;
 		return 0;
 	}
 	// ERROR "("boolean" is a type name)"
-	double foo(int i, GameObj boolean)
+	double fooBad(int i, GameObj boolean)
 	{
 		return 0;
 	}

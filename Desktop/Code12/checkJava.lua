@@ -612,6 +612,9 @@ local function vtCheckCall( call )
 		return nil
 	end
 	local refFunc = method.func   -- for user-defined methods, nil for API
+	if refFunc and refFunc.isError then
+		return nil     -- don't check calls to funcs with isError
+	end
 
 	-- Check parameter count
 	local exprs = call.exprs
@@ -655,10 +658,9 @@ local function vtCheckCall( call )
 		local vtPassed = expr.vt
 		local vtNeeded = method.params[i].vt
 		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
-			print(call.class, method.name)
 			err.setErrNodeAndRef( expr, refFunc, 
-					"Parameter #%d of %s (%s) expects type %s, but %s was passed",
-					i, fnName, method.params[i].name, 
+					"Parameter #%d (%s) of %s expects type %s, but %s was passed",
+					i, method.params[i].name, fnName,
 					javaTypes.typeNameFromVt( vtNeeded ), 
 					javaTypes.typeNameFromVt( vtPassed ),
 					{ docLink = method.docLink } )
@@ -701,7 +703,6 @@ local function endLocalBlock()
 		variablesOutOfScope[varName] = variables[varName]
 		local nameLower = string.lower( varName )
 		variablesOutOfScope[nameLower] = variables[nameLower]
-		print(nameLower, variables[nameLower])
 		variables[varName] = nil
 		variables[nameLower] = nil
 	end
