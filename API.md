@@ -634,16 +634,6 @@ function.
 _____________________________________________________________________
 Type Conversion
 ---------------
-### ct.toInt()
-```
-int ct.toInt( double number )
-```
-Return the `number` truncated to an integer.
-
-> All decimal places are lost.
-> This is equivalent to a type cast from double to int.
-> If you wish to round, use `ct.round()` instead.
-
 ### ct.parseInt()
 ```
 int ct.parseInt( String str )
