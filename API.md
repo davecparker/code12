@@ -9,7 +9,7 @@ The design of the Code 12 API is (c)Copyright 2018 by David C. Parker.
 * [GameObj Creation](#gameobj-creation)
 * [Mouse and Keyboard Input](#mouse-and-keyboard-input)
 * [Audio](#audio)
-* [Math and Misc.](#math-and-misc)
+* [Math and Misc.](#math-and-misc-)
 * [Type Conversion](#type-conversion)
 
 ##### GameObj Fields and Methods
