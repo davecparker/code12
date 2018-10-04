@@ -658,7 +658,7 @@ function getLineStmts( tree, stmts )
 
 	-- Add the stmt if successful
 	if stmt then
-		stmt.iLine = tree.iLine
+		stmt.iLine = tree.iLineStart or tree.iLine
 		stmts[#stmts + 1] = stmt
 		checkMultiLineIndent( tree )
 		return true
@@ -898,7 +898,6 @@ local function getMembers( programTree )
 				skipBlock()    -- skip body of main without checking it
 			else
 				funcs[#funcs + 1] = getFunc( nodes )
-				print(funcs[#funcs].nameID.str, funcs[#funcs].isError)
 			end
 			gotFunc = true
 		elseif tree.isError then
@@ -1041,9 +1040,12 @@ local function printStructureTree( node, indentLevel, file, label )
 	end
 end
 
+
+--- Module Functions ---------------------------------------------------------
+
 -- Parse source.strLines at the given syntaxLevel and store the results
 -- in source.lines, source.numLines, and source.syntaxLevel.
-local function parseLines( syntaxLevel )
+function parseProgram.parseLines( syntaxLevel )
 	-- Set the syntax level and purge the parse cache if it changed
 	if syntaxLevel ~= source.syntaxLevel then
 		source.purgeParseCache()
@@ -1160,15 +1162,12 @@ local function getParseTrees()
 				iLine = lineNum, iLineStart = lineNum, indentLevel = 0 }
 end
 
-
---- Module Functions ---------------------------------------------------------
-
 -- Parse the source at the given syntaxLevel and return the program structure.
 -- If there is an error then set the error state, and return nil if the error 
 -- is unrecoverable.
 function parseProgram.getProgramTree( syntaxLevel )
 	-- Get the parse trees and init the strucure parse state
-	parseLines( syntaxLevel )
+	parseProgram.parseLines( syntaxLevel )
 	getParseTrees()
 	iTree = 1
 

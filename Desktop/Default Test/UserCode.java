@@ -24,7 +24,9 @@ class UserCode extends Code12Program
 		// int oops = count;
 		// double nope = ball.x;
 		// ct.circle(50, 50, LIMIT);
-		double x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0;
+		double x = (10 + 50 * 5    ///
+			+ (45 / 3 * 2))        ///  
+			/ 5.0;
 		int xInt = ct.toInt( x );
 		String name = "Dave" + " " + "Parker";
 		boolean done, end;

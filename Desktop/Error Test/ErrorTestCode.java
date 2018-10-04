@@ -13,15 +13,15 @@ import java.util.Scanner;
 		int overIndentedInstanceVar;
 	// ERROR "Class-level variable and function definitions should all have the same indentation"
 int underIndentedInstanceVar;
-	int[] classLevelMultilineIntArray1 = { 1,
 	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	int[] classLevelMultilineIntArray1 = { 1,
 	2 };
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 	int[] classLevelMultilineIntArray2 = { 1,
 		2,
-	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 	3 };
-	int[] classLevelMultilineIntArray3 = new int[ Math.max(1,
 	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	int[] classLevelMultilineIntArray3 = new int[ Math.max(1,
 	2) ];
 	// ERROR "double cannot be assigned to an int"
 	int classLevelVarTypeMismatchIntDouble = 0.1;
@@ -618,11 +618,11 @@ int underIndentedInstanceVar;
 		ct.log( 1,
 				2,
 				3 );
-		if ( ct.random( 1,
-						2 ) == 1 )
+		if ( ct.random( 1, 2 ) ///
+				== 1 )
 			ct.println("heads");
 		ct.log( 1, ct.random( 1,
-							  100 ),
+							  100 ), ///
 				3, 4 );
 		return 0;
 	}
@@ -1389,41 +1389,41 @@ int underIndentedInstanceVar;
 			voidFunc();
 		// ERROR "This while statement should have the same indentation as its "do""
 			while (false);
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		int x1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		x2,	x3;
-		GameObj circle = ct.circle( 0, 0,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		GameObj circle = ct.circle( 0, 0,
 		10);
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		ct.log( 1,
 			2,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		3);
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		int[] multiLineArrInit = { 1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		2 };
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		int[] multiLineArrDec = new int[ct.random(1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		10)];
-		if ( ct.random(1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
-		2) > 3 )
+		if ( ct.random(1, 2)  ///
+		> 3 )
 			voidFunc();
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		else if ( ct.random(1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		2) > 3 )
 			voidFunc();
-		while ( ct.random(1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		while ( ct.random(1,
 		2) > 3 )
 			voidFunc();
 		do
 			voidFunc();
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		while( Math.max(1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		0) < 0 );
-		for (;Math.max(1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		for (;Math.max(1,
 		0) < 0; )
 			voidFunc();
 		if (false)
@@ -1579,15 +1579,15 @@ void underIndentedFunc()
 	// ERROR "Lines within { } brackets should be indented"
 	return 0;
 	}
-	void multiLineFuncDef( int arg1,
 	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	void multiLineFuncDef( int arg1,
 	int arg2 )
 	{
 	}
 	int multilineReturnFunc()
 	{
-		return Math.max(1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		return Math.max(1,
 		2);
 	}
 	void missingCurlyBracketFunc()

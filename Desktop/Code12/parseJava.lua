@@ -974,11 +974,13 @@ end
 -- of the multi-line parse.
 -- Return (parseTree, tokens) if successful, store the results in the lineRec,
 -- and set the iLine, iLineStart, and indentLevel fields in the parse tree root node.
--- If the line is unfinished (ends with a comma token) then return (false, tokens).
+-- If the line is unfinished (ends with a comma or ///) then return (false, tokens).
 -- If the line cannot be parsed then return nil and set the error state.
 function parseJava.parseLine( lineRec, iLineCommentStart, startTokens, iLineStart, level )
 	-- Run lexical analysis to get the tokens array
 	lineNumber = lineRec.iLine
+	iLineStart = iLineStart or lineNumber
+	lineRec.iLineStart = iLineStart
 	tokens = javalex.getTokens( lineRec, iLineCommentStart )
 	if tokens == nil then
 		return nil
@@ -1002,14 +1004,23 @@ function parseJava.parseLine( lineRec, iLineCommentStart, startTokens, iLineStar
 		-- startTokens = nil
 	end
 
-	-- If this line ends in a comma token, then it is unfinished
+	-- If this line has code and ends in a comma token or the /// continuation 
+	-- comment, then it is unfinished.
 	assert( #tokens > 0 )
 	assert( tokens[#tokens].tt == "END" )
 	local lastToken = tokens[#tokens - 1]  -- not counting the END
-	if lastToken and lastToken.tt == "," then
-		lineRec.iLineStart = iLineStart
-		lineRec.parseTree = false
-		return false, tokens
+	if lastToken then
+		if lastToken.tt == "," then
+			lineRec.parseTree = false
+			return false, tokens
+		end
+		-- Check for /// allowing trailing whitespace (only)
+		local comment = lineRec.commentStr 
+		if comment and string.match( comment, "/[ \t]*") == comment then
+			lineRec.commentStr = nil
+			lineRec.parseTree = false
+			return false, tokens
+		end			
 	end
 
 	-- Try to parse the line
@@ -1020,7 +1031,6 @@ function parseJava.parseLine( lineRec, iLineCommentStart, startTokens, iLineStar
 
 	-- Store and return results
 	tree.iLine = lineNumber
-	iLineStart = iLineStart or lineNumber
 	tree.iLineStart = iLineStart
 	tree.indentLevel = source.lines[iLineStart].indentLevel
 	lineRec.parseTree = tree

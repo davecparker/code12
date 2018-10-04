@@ -5128,9 +5128,9 @@ line (end)
 527. 
 
 528. ////////////////////////////////////////////////////////////////////
+*** Beginning of Expected Errors Section ***
 
-529. ERRORS
-************** Beginning of Expected Errors Section **************
+529. // ERRORS
 
 530. 
 
@@ -5140,6 +5140,10 @@ line (end)
 *** Line 532 chars 1-2: Close of comment without matching opening /*
 
 533. int i; /* /* */ // nested block comments
+line (varDecl)
+    TYPE (int)
+    idList (list)
+        ID (i)
 *** Line 533: Java does not allow nesting comments within comments using /* */
 *** Reference Line 533
 
@@ -5221,6 +5225,13 @@ line (end)
 *** Line 559 chars 8-14: Unsupported reserved word "finally"
 
 560. boolean foo(int for);
+line (func)
+    retType (type)
+        TYPE (boolean)
+    ID (foo)
+    paramList (list)
+        param (type)
+            TYPE (int)
 *** Line 560 chars 13-15: Parameters in a function definition should be a type followed by a name
 
 561. for(int do = 0; do < 10; do++)
@@ -5316,6 +5327,10 @@ line (end)
 *** Line 591 char 9: Syntax Error: expected "("
 
 592. x = 10          // missing ; in stmt
+line (stmt)
+    stmt (assign)
+        ID (x)
+        INT (10)
 *** Line 592 char 37: Statement should end with a semicolon (;)
 
 593. int x = 10		// missing ; in varInit
@@ -5418,9 +5433,18 @@ line (end)
 
 624. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
+*** Line 625 char 29: Statement should end with a semicolon (;)
 
 625. y)              // missing ;
-*** Line 625 char 29: Statement should end with a semicolon (;)
+line (stmt)
+    stmt (call)
+        callHead (user)
+            ID (foo)
+        exprList (list)
+            expr (lValue)
+                ID (x)
+            expr (lValue)
+                ID (y)
 
 626. x = (a + b + c / 3; 	// missing closing parenthesis
 *** Line 626 char 19: Syntax Error: expected ")"
@@ -5435,9 +5459,29 @@ line (end)
 *** Line 629 char 52: Syntax Error: expected ")"
 
 630. if ( i == 1 ); 	// if statment ended by ;
+line (if)
+    expr (==)
+        expr (lValue)
+            ID (i)
+        INT (1)
 *** Line 630 char 14: if statement should not end with a semicolon
 
 631. for ( i=0; i<n; i++); 	// for() followed directly by ;
+line (for)
+    forControl (three)
+        forInit (stmt)
+            stmt (assign)
+                ID (i)
+                INT (0)
+        forExpr (expr)
+            expr (<)
+                expr (lValue)
+                    ID (i)
+                expr (lValue)
+                    ID (n)
+        forNext (stmt)
+            stmt (postInc)
+                ID (i)
 *** Line 631 char 21: for loop header should not end with a semicolon
 
 632. x + 1 = x; 		// confusing left hand side an right hand side of assignment
@@ -5453,13 +5497,44 @@ line (end)
 *** Line 635 chars 8-9: Invalid operator. Did you mean <= ?
 
 636. elseif( x > 2 ) // elseif instead of else if
+line (stmt)
+    stmt (call)
+        callHead (user)
+            ID (elseif)
+        exprList (list)
+            expr (>)
+                expr (lValue)
+                    ID (x)
+                INT (2)
 *** Line 636 char 45: Statement should end with a semicolon (;)
 
 637. for(int i=0, i<n, i++) 	// commas in place of semicolons
+line (for)
+    forControl (three)
+        forInit (var)
+            TYPE (int)
+            ID (i)
+            INT (0)
+        ID (i)
+        ID (n)
+        ID (i)
 *** Line 637 char 12: for loop parts should be separated by semicolons (;)
 Comma not supported
 
 638. for(int i=0; i<n, i++) 	// comma in place of semicolon
+line (for)
+    forControl (three)
+        forInit (var)
+            TYPE (int)
+            ID (i)
+            INT (0)
+        forExpr (expr)
+            expr (<)
+                expr (lValue)
+                    ID (i)
+                expr (lValue)
+                    ID (n)
+        ID (i)
 *** Line 638 char 17: for loop parts should be separated by semicolons (;)
 Comma not supported
 
@@ -5488,6 +5563,14 @@ Comma not supported
 *** Line 646 char 10: Syntax Error: ":" was unexpected here
 
 647. double foo(x, y, z) 	// missing variable types for arguments in function definition
+line (func)
+    retType (type)
+        TYPE (double)
+    ID (foo)
+    paramList (list)
+        param (expr)
+            expr (lValue)
+                ID (x)
 *** Line 647 char 12: Parameters in a function definition should be a type followed by a name
 
 648. double foo[i]()			// index on function identifier
@@ -5503,6 +5586,20 @@ Comma not supported
 *** Line 651 chars 5-7: Syntax Error: a type was unexpected here
 
 652. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
+line (func)
+    retType (type)
+        TYPE (boolean)
+    ID (foo)
+    paramList (list)
+        param (var)
+            TYPE (int)
+            ID (x)
+        param (var)
+            TYPE (double)
+            ID (y)
+        param (var)
+            TYPE (GameObj)
+            ID (z)
 *** Line 652 char 40: function header should not end with a semicolon
 
 653. String s = 'Hello'; 	// '' in place of "" for strings
@@ -5515,6 +5612,15 @@ Comma not supported
 *** Line 655 chars 34-35: Unclosed string literal
 
 656. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
+line (stmt)
+    stmt (call)
+        callHead (ct)
+            ID (println)
+        exprList1 (list)
+            STR ("He said ")
+        expr (lValue)
+            ID (Hello)
+        STR ("")
 *** Line 656 char 21: Function parameter values must be separated by commas
 
 657. newObj() = oldObj; 				// assigning to a function value
@@ -5542,9 +5648,21 @@ Comma not supported
 665. // --------------------------------------------------------------------------------
 
 666. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+line (varInit)
+    TYPE (int)
+    ID (x)
+    INT (1)
+    ID (y)
+    INT (2)
+    ID (z)
+    INT (3)
 *** Line 666 chars 1-79: Code12 requires each variable initialization to be on its own line
 
 667. import java.io.PrintWriter;   // import other than Code12.*
+line (import)
+    ID (java)
+    ID (io)
+    ID (PrintWriter)
 *** Line 667 chars 1-60: Code12 does not support importing other classes
 
 668. protected int secretVar;        // protected access
@@ -5560,6 +5678,10 @@ Comma not supported
 *** Line 671 char 11: char type not supported, use double quotes
 
 672. while(foo) { 	// opening { in control structure not on it's own line
+line (while)
+    expr (lValue)
+        ID (foo)
+    whileEnd (while)
 *** Line 672 char 12: In Code12, each {  to start a new block must be on its own line
 
 673. i++; } 			// closing } not on it's own line
@@ -5573,12 +5695,31 @@ Comma not supported
 *** Line 675 chars 12-54: Syntax Error: a string was unexpected here
 
 676. x = a; y = b; 	// more than one statement on a single line
+line (stmt)
+    stmt (assign)
+        ID (x)
+        expr (lValue)
+            ID (a)
+    ID (y)
+    ID (b)
 *** Line 676 chars 1-59: Code12 requires each statement to be on its own line
 
 677. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
+line (if)
+    expr (==)
+        expr (lValue)
+            ID (x)
+        INT (0)
+    ID (println)
+    STR ("x is zero")
 *** Line 677 chars 13-36: Code12 requires code after an if statement to be on its own line
 
 678. double getVariable() { return variable; } // {} must start and end on their own lines
+line (func)
+    retType (type)
+        TYPE (double)
+    ID (getVariable)
+    ID (variable)
 *** Line 678 char 22: In Code12, each {  to start a new block must be on its own line
 
 679. switch (choice)
@@ -5603,6 +5744,15 @@ Comma not supported
 *** Line 685 char 12: Syntax Error: expected "="
 
 686. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
+line (for)
+    forControl (three)
+        forInit (var)
+            TYPE (int)
+            ID (i)
+            INT (0)
+        TYPE (int)
+        ID (j)
+        INT (0)
 *** Line 686 char 15: for loop parts should be separated by semicolons (;)
 Comma not supported
 

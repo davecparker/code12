@@ -89,8 +89,9 @@ end
 -- Check the error results for correctness
 local function checkErrorResults()
 	for lineNum = 1, source.numLines do
-		local strCode = source.lines[lineNum].str
-		local errRec = err.errRecForLine( lineNum )
+		local lineRec = source.lines[lineNum]
+		local strCode = lineRec.str
+		local errRec = lineRec.errRec
 		local strExpected = strErrExpected( lineNum )
 
 		-- Did we get an error on this line?
