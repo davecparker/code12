@@ -111,8 +111,8 @@ end
 -- Resize the toolbar
 function toolbar.resize()
 	bgRect.width = app.width
-	optionsBtn.x = app.width - app.margin
-	chooseProgramBtn.x = optionsBtn.x - optionsBtn.width - app.margin
+	optionsBtn.x = app.width - app.margin - optionsBtn.width
+	chooseProgramBtn.x = optionsBtn.x - chooseProgramBtn.width - app.margin
 end
 
 -- Show/hide the toolbar

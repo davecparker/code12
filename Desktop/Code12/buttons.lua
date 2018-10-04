@@ -21,7 +21,6 @@ local buttons = {}
 
 -- UI Metrics
 local margin = app.margin -- Space between most UI elements
-local yCenterToolbar = app.dyToolbar / 2
 
 -- Image sheets
 local radioBtnSheet = graphics.newImageSheet( "images/radiobutton.png", { width = 1024, height = 1024, numFrames = 2 } )
@@ -176,35 +175,63 @@ function buttons.newSettingPicker( options )
 	return newSettingPickerGroup
 end
 
--- Return a new button for the toolbar
+-- Return a display group containing a new button and its icon for the toolbar.
+-- Placement can be "left" or "right" to place the button on that side of the toolbar.
 function buttons.newToolbarButton( parent, label, onRelease, placement, adjacentBtn )
+	-- Make button display group
+	local btnGroup = display.newGroup()
+	parent:insert( btnGroup )
+	btnGroup.anchorX = 0
+	btnGroup.y = app.dyToolbar / 2
+	-- Get size of button icon and label for setting button width
+	local iconSize = 20
+	local padding = 15
+	local labelFont = native.systemFontBold
+	local labelFontSize = app.fontSizeUI
+	local labelText = display.newText( label, 0, 0, labelFont, labelFontSize )
+	local labelWidth = labelText.width
+	labelText:removeSelf()
+	-- Make button
 	local btn = widget.newButton{
 		x = 0,
-		y = yCenterToolbar,
+		y = 0,
 		onRelease = onRelease,
 		label = label,
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-		textOnly = true,
+		labelAlign = "left",
+		labelColor = { default = { 0 }, over = { 0 } },
+		labelXOffset = iconSize,
+		font = labelFont,
+		fontSize = labelFontSize,
+		shape = "roundedRect",
+		fillColor = { default = { app.toolbarShade }, over = { app.toolbarShade * 1.1 } },
+		strokeColor = { default = { 0 }, over = { 0 } },
+		strokeWidth = 1,
+		width = iconSize + labelWidth + padding,
+		height = app.dyToolbar * 0.8,
 	}
+	btn.anchorX = 0
+	btnGroup:insert( btn )
+	-- Make button icon
+	local icon = display.newImageRect( parent, "images/" .. label .. ".png", iconSize, iconSize )
+	icon.anchorX = 0
+	icon.x = 5
+	btnGroup:insert( icon )
+	-- Set horizontal position of button group
 	if placement == "left" then
-		btn.anchorX = 0
 		if adjacentBtn then
-			btn.x = adjacentBtn.x + adjacentBtn.width + app.margin
+			btnGroup.x = adjacentBtn.x + adjacentBtn.width + app.margin
 		else
-			btn.x = app.margin
+			btnGroup.x = app.margin
 		end
 	else
-		btn.anchorX = 1
 		if adjacentBtn then
-			btn.x = adjacentBtn.x - adjacentBtn.width - app.margin
+			btnGroup.x = adjacentBtn.x - btnGroup.width - app.margin
 		else
-			btn.x = app.width - margin
+			btnGroup.x = app.width - margin - btnGroup.width
 		end
 	end
 
-	parent:insert( btn )
-	return btn
+	return btnGroup
 end
 
 
