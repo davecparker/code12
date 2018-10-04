@@ -24,12 +24,12 @@
 <h5 id="global-ct-apis">Global (ct) APIs</h5>
 <ul>
 <li><a href="#text-output">Text Output</a></li>
-<li><a href="#text-input">Text Input</a></li>
+<li><a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a></li>
 <li><a href="#screen-management">Screen Management</a></li>
 <li><a href="#gameobj-creation">GameObj Creation</a></li>
 <li><a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a></li>
 <li><a href="#audio">Audio</a></li>
-<li><a href="#math-and-misc">Math and Misc.</a></li>
+<li><a href="#math-and-misc-">Math and Misc.</a></li>
 <li><a href="#type-conversion">Type Conversion</a></li>
 </ul>
 <h5 id="gameobj-fields-and-methods">GameObj Fields and Methods</h5>
@@ -54,38 +54,54 @@
 <hr>
 <h2 id="text-output">Text Output</h2>
 <h3 id="ct-print-">ct.print()</h3>
-<pre><code>ct.print( Object obj )
-</code></pre><p>Print the text representation of a value to the console. The <code>obj</code> can be a value of any type. No newline or extra characters are added.</p>
+<pre><code>ct.print( Object value )
+</code></pre><p>Print the text representation of a value to the console. The <code>value</code> can be a variable or expression of any type. No newline or extra characters are added.</p>
 <blockquote>
 <p>This is equivalent to Java&#39;s <code>System.out.print</code>.</p>
 </blockquote>
 <h3 id="ct-println-">ct.println()</h3>
-<pre><code>ct.println( Object obj )
+<pre><code>ct.println( Object value )
 ct.println( )
-</code></pre><p>Print the text representation of a value to the console, and add a newline afterwards. The <code>obj</code> can be a value of any type. If <code>obj</code> is not included, just a newline is printed.</p>
+</code></pre><p>Print the text representation of a value to the console, and add a newline afterwards. The <code>value</code> can be a variable or expression of any type. If <code>value</code> is not included, just a newline is printed.</p>
 <blockquote>
 <p>This is equivalent to Java&#39;s <code>System.out.println</code>.</p>
 </blockquote>
 <h3 id="ct-log-">ct.log()</h3>
-<pre><code>ct.log( Object… objs )
-</code></pre><p>Print any number of values to the console. There can be any number of values passed, of any types. If multiple values are given, they are printed on one line separated by commas. Strings are enclosed in <code>&quot;double quotes&quot;</code>, and <code>GameObj</code> objects are described in <code>[square brackets]</code>.</p>
+<pre><code>ct.log( Object... values )
+</code></pre><p>Print any number of values to the console. There can be any number of variables or expressions passed, of any types. If multiple values are given, they are printed on one line separated by commas. Strings are enclosed in <code>&quot;double quotes&quot;</code>, and <code>GameObj</code> objects are described in <code>[square brackets]</code>.</p>
 <h3 id="ct-logm-">ct.logm()</h3>
-<pre><code>ct.logm( String message, Object… objs )
-</code></pre><p>Print the <code>message</code> followed by a space, then print any number of values to the console. The values are output in the same way as <code>ct.logm()</code> (see above).</p>
+<pre><code>ct.logm( String message, Object... values )
+</code></pre><p>Print the <code>message</code> followed by a space, then print the values (any number of variables or expressions) to the console. The values are output in the same way as <code>ct.logm()</code> (see above).</p>
+<h3 id="ct-setoutputfile-">ct.setOutputFile()</h3>
+<pre><code>ct.setOutputFile( String filename )
+</code></pre><p>If you call <code>ct.setOutputFile()</code>, then any subsequent text output from <code>ct.print()</code>, <code>ct.println()</code>, <code>ct.log()</code>, and <code>ct.logm()</code> will be written to a text file named <code>filename</code> in addition to being displayed in the console window. Call <code>ct.setOutputFile( null )</code> to restore output to appearing in the console only.</p>
+<p>The <code>filename</code> should be a simple filename such as <code>&quot;output.txt&quot;</code>, which will be written to the same folder as the source code file, or a relative path starting from the source code folder, such as <code>&quot;output/nameList.txt&quot;</code>.</p>
+<blockquote>
+<p>If there is an existing file named <code>filename</code> then it will be deleted and written over. Note that each time you run your program and call <code>ct.setOutputFile()</code> to a certain filename, it will overwrite the previous file. </p>
+</blockquote>
 <hr>
-<h2 id="text-input">Text Input</h2>
+<h2 id="alerts-and-input-dialogs">Alerts and Input Dialogs</h2>
+<h3 id="ct-showalert-">ct.showAlert()</h3>
+<pre><code>ct.showAlert( String message )
+</code></pre><p>Display <code>message</code> in a popup alert dialog. Execution of the program will pause and wait for the user to press the OK button on the dialog or press the Enter key on the keyboard.</p>
+<blockquote>
+<p>The <code>message</code> can contain line breaks by embedding newline (<code>\n</code>) characters in the string.</p>
+</blockquote>
 <h3 id="ct-inputint-">ct.inputInt()</h3>
 <pre><code>int ct.inputInt( String message )
-</code></pre><p>If <code>message</code> is not null then print it to the console followed by a space. Then, accept input from the console until a newline is entered. Attempt to parse the input as an integer. If a valid integer is input then return the integer, otherwise return 0.</p>
+</code></pre><p>Display <code>message</code> in a popup dialog box that allows the user to enter a number. Execution of the program will pause and wait until the user enters a valid integer. The resulting integer value is returned.</p>
 <h3 id="ct-inputnumber-">ct.inputNumber()</h3>
 <pre><code>double ct.inputNumber( String message )
-</code></pre><p>If <code>message</code> is not null then print it to the console followed by a space. Then, accept input from the console until a newline is entered. Attempt to parse the input as a number. If a valid number is input then return the number, otherwise return an error value (NaN). You can test for an error value using <code>ct.isError()</code>.</p>
-<h3 id="ct-inputboolean-">ct.inputBoolean()</h3>
-<pre><code>boolean ct.inputBoolean( String message )
-</code></pre><p>If <code>message</code> is not null then print it to the console followed by a space. Then, accept input from the console until a newline is entered. If the first non-blank character of the input is &#39;y&#39;, &#39;Y&#39;, &#39;t&#39;, &#39;T&#39;, or 1 (yes, true, or 1), then return true, otherwise return false.</p>
+</code></pre><p>Display <code>message</code> in a popup dialog box that allows the user to enter a number. Execution of the program will pause and wait until the user enters a valid number. The resulting numeric value is returned.</p>
+<h3 id="ct-inputyesno-">ct.inputYesNo()</h3>
+<pre><code>boolean ct.inputYesNo( String message )
+</code></pre><p>Display <code>message</code> in a popup dialog box that has two buttons labelled Yes and No. Execution of the program will pause and wait until the user presses one of the buttons. The function returns <code>true</code> if the user presses Yes and <code>false</code> if they press No.</p>
 <h3 id="ct-inputstring-">ct.inputString()</h3>
 <pre><code>String ct.inputString( String message )
-</code></pre><p>If <code>message</code> is not null then print it to the console followed by a space. Then, accept input from the console until a newline is entered. Return the entire input as a String.</p>
+</code></pre><p>Display <code>message</code> in a popup dialog box that allows the user to enter a text string. Execution of the program will pause and wait until the user presses the Enter key to end the text input. The resulting String value is returned.</p>
+<blockquote>
+<p>If the user presses the Enter key without entering any other characters, then an empty string (<code>&quot;&quot;</code>) will be returned.</p>
+</blockquote>
 <hr>
 <h2 id="screen-management">Screen Management</h2>
 <h3 id="ct-settitle-">ct.setTitle()</h3>
@@ -93,12 +109,15 @@ ct.println( )
 </code></pre><p>Set the title of the application window to <code>title</code>. If and where the title displays depends on the platform that the application is running on. The title will not display on mobile devices.</p>
 <h3 id="ct-setheight-">ct.setHeight()</h3>
 <pre><code>ct.setHeight( double height )
-</code></pre><p>Set the height of the application window, relative to its width, to <code>height</code>, as a percent. The width of the application window in display units is always 100, so this function determines the maximum y-coordinate value inside the window. The default height is 100 if not set (resulting in a square window).</p>
+</code></pre><p>Set the height of the application window in coordinate units. The width of the application window in display units is always 100.0 by definition, so this function sets the height relative to its width as a percent. The default height is 100.0, resulting in a square window.</p>
 <blockquote>
-<p><strong>Note</strong>: On some platforms, you may have limited or no control over the window size. On mobile devices, the application will always fill the entire device screen. In this case, this function will determine whether the application runs in portrait or landscape orientation. If <code>height</code> is less than 100 then the application will run in landscape mode, otherwise portrait mode.</p>
+<p>Coordinate units are not pixels, because the Code12 graphics window scales your game up and down automatically when the window size changes. You can think of coordinate units as a percent of the window width, so an x-coordiante of 50 is always horizontally centered in the window.</p>
 </blockquote>
 <blockquote>
-<p>After calling <code>ct.setHeight()</code>, you can call <code>ct.getHeight()</code> to determine the actual height of the window (and thus the maximum y-coordinate).</p>
+<p><strong>Note</strong>: On some platforms, you may have limited or no control over the window size or aspect ratio. On mobile devices, the application will always fill the entire device screen. In this case, <code>ct.setHeight()</code> will determine whether the application runs in portrait or landscape orientation. If <code>height</code> is less than 100 then the application will run in landscape mode, otherwise portrait mode.</p>
+</blockquote>
+<blockquote>
+<p>After calling <code>ct.setHeight()</code>, you can call <code>ct.getHeight()</code> to determine the actual height of the window.</p>
 </blockquote>
 <h5 id="examples">Examples</h5>
 <pre><code>ct.setHeight( 100 );               // default square window
@@ -107,10 +126,10 @@ ct.setHeight( 100.0 * 9 / 16 );    // 16:9 aspect landscape
 double height = ct.getHeight();    // get actual height used
 </code></pre><h3 id="ct-getwidth-">ct.getWidth()</h3>
 <pre><code>double ct.getWidth( )
-</code></pre><p>This function always returns 100.0, which is the width of the application window in coordinate units by definition. This is the maximum x-coordinate that is inside the window (the right edge).</p>
+</code></pre><p>This function always returns 100.0, which is the width of the application window in coordinate units by definition.</p>
 <h3 id="ct-getheight-">ct.getHeight()</h3>
 <pre><code>double ct.getHeight( )
-</code></pre><p>Return the maximum y-coordinate value that is inside the application window (the bottom edge).</p>
+</code></pre><p>Return the height of the the application window in coordinate units. This is 100.0 by default, unless it is changed by <code>ct.setHeight()</code>.</p>
 <h3 id="ct-getpixelsperunit-">ct.getPixelsPerUnit()</h3>
 <pre><code>double ct.getPixelsPerUnit( )
 </code></pre><p>Return the current scale factor from display coordinate units to device pixels. The contents of your application scale automatically relative to the window size, and the width of the window is always defined as 100 in coordinate units. If you want to determine the physical size of the application window in pixels, you can calculate this as:</p>
@@ -134,6 +153,18 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 <li>Create <code>GameObj</code> objects for the second screen</li>
 <li>At the end of <code>start</code>, call <code>ct.setScreen()</code> to set the desired starting screen for your application.</li>
 </ol>
+<h3 id="ct-setscreenorigin-">ct.setScreenOrigin()</h3>
+<pre><code>ct.setScreenOrigin( double x, double y )
+</code></pre><p>Offset the entire screen horizontally and/or vertically so that the coordinate at the upper-left of the screen is (<code>x</code>, <code>y</code>). Normally the coordinate of the upper-left corner of the screen is (0, 0). Using <code>ct.setScreenOrigin()</code> allows you to think of the screen as a window viewing part of a larger world, and you can pan (&quot;scroll&quot;) the window where you want, in order to bring objects that would normally be outside the window into view.</p>
+<blockquote>
+<p>Using <code>ct.setScreenOrigin()</code> does not modify the (x, y) position of any objects. Rather it determines which objects are visible within the game window.</p>
+</blockquote>
+<blockquote>
+<p>Note that it is always OK to create or position objects outside of the normal screen bounds. The x-coordinate of the right edge of the screen is normally 100. If you draw a small object at say (150, 50), it will normally not be visible. If you then call <code>ct.setScreenOrigin( 150, 0 )</code>, the game will &quot;scroll&quot; horizontally and the object will become visible in the center of the game window. Conversely, another object at (50, 0) will scroll off the screen to the left and no longer be visible.</p>
+</blockquote>
+<blockquote>
+<p>The screen&#39;s background image (see <a href="#ctsetbackimage">ct.setBackImage</a>), if any, is not affected by the screen origin. If you want a background image that scrolls, you can use <a href="#ctimage">ct.image</a> to create and display one that is larger than the normal screen window.</p>
+</blockquote>
 <h3 id="ct-clearscreen-">ct.clearScreen()</h3>
 <pre><code>ct.clearScreen( )
 </code></pre><p>Remove and delete all <code>GameObj</code> objects on the current screen. The background color or image is kept.</p>
@@ -145,8 +176,8 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 <pre><code>ct.setBackColor( String color )
 </code></pre><p>Set the background color of the current screen to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>.</p>
 <h3 id="ct-setbackcolorrgb-">ct.setBackColorRGB()</h3>
-<pre><code>ct.setBackColorRGB( int r, int g, int b )
-</code></pre><p>Set the background color of the current screen to the custom RGB color with components <code>r</code>, <code>g</code>, and <code>b</code> in the range 0-255.</p>
+<pre><code>ct.setBackColorRGB( int red, int green, int blue )
+</code></pre><p>Set the background color of the current screen to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
 <h3 id="ct-setbackimage-">ct.setBackImage()</h3>
 <pre><code>ct.setBackImage( String filename )
 </code></pre><p>Set the background image of the current screen to the image <code>filename</code>. The image file must be in PNG or JPG format. The background image is centered and cropped automatically to show as much of the image as possible given the aspect ratio of the window, while preserving the aspect ratio of the image.</p>
@@ -189,15 +220,24 @@ GameObj ct.text( String s, double x, double y, double height, String color )
 <h3 id="ct-clicky-">ct.clickY()</h3>
 <pre><code>double ct.clickY( )
 </code></pre><p>Return the y-coordinate of the last known click, touch, or drag location in the application.</p>
+<h3 id="ct-objectclicked-">ct.objectClicked()</h3>
+<pre><code>GameObj ct.objectClicked( )
+</code></pre><p>If a clickable <code>GameObj</code> object was clicked during the last update cycle, then <code>ct.objectClicked()</code> returns a reference to that object, otherwise it returns <code>null</code> . Calling this function every time in your <code>update</code> function will find the topmost clickable object that was clicked, whenever the user clicks on one.</p>
+<blockquote>
+<p>Any objects with the <code>clickable</code> field set to <code>false</code> will not be considered when determining which object was clicked. See <a href="#clickable">clickable</a>. </p>
+</blockquote>
+<blockquote>
+<p>Note that <code>ct.objectClicked()</code> will return <code>null</code> if no object was clicked, which is the case for most update cycles in a game (they occur 60 times per second). So you must check the return value for <code>null</code> before using the <code>GameObj</code> returned. Attempting to access a field of a <code>GameObj</code> (such as <code>obj.x</code>) or call a method (such as <code>obj.delete()</code>) will generate a runtime error (a &quot;crash&quot;) if the <code>GameObj</code> is <code>null</code>.</p>
+</blockquote>
 <h3 id="ct-keypressed-">ct.keyPressed()</h3>
 <pre><code>boolean ct.keyPressed( String keyName )
 </code></pre><p>Return <code>true</code> if the key named <code>keyName</code> is currently pressed (the key is down). See <a href="#key-names">Key Names</a>. Note that multiple keys can be down at the same time.</p>
 <h3 id="ct-chartyped-">ct.charTyped()</h3>
-<pre><code>boolean ct.charTyped( String ch )
-</code></pre><p>Return <code>true</code> if the printable character <code>ch</code> was typed during the last update cycle.</p>
+<pre><code>boolean ct.charTyped( String charString )
+</code></pre><p>Return <code>true</code> if the printable character <code>charString</code> was typed during the last update cycle.</p>
 <p>Calling this function every time in your <code>update</code> function will detect any time that the given character is typed.</p>
 <blockquote>
-<p>Unlike the key names used by <code>ct.keyPressed()</code>, the <code>ch</code> here is a printable character including the appropriate shift status (e.g. &quot;A&quot; if a shifted &quot;a&quot; is typed, &quot;$&quot; or &quot;4&quot;, &quot;+&quot; vs. &quot;=&quot;, etc.). Only printable characters are detected, so key sequences such as Ctrl+C do not result in characters.</p>
+<p>Unlike the key names used by <code>ct.keyPressed()</code>, the <code>charString</code> here is a printable character including the appropriate shift status (e.g. &quot;A&quot; if a shifted &quot;a&quot; is typed, &quot;$&quot; or &quot;4&quot;, &quot;+&quot; vs. &quot;=&quot;, etc.). Only printable characters are detected, so key sequences such as Ctrl+C do not result in characters.</p>
 </blockquote>
 <blockquote>
 <p>Note that some platforms may have keys that auto-repeat when held down, so if you check <code>ct.charTyped()</code> every time in your <code>update</code> function, and the user holds down a key, you may get the first character, then perhaps a 1 second delay, then repeats at around 8 characters per second. Contrast this with using <code>ct.keyPressed()</code> instead, where you will get a <code>true</code> result continuously (60 times per second), and no delay after the first one.</p>
@@ -205,13 +245,9 @@ GameObj ct.text( String s, double x, double y, double height, String color )
 <hr>
 <h2 id="audio">Audio</h2>
 <h3 id="ct-loadsound-">ct.loadSound()</h3>
-<pre><code>boolean ct.loadSound( String filename )</code></pre>
-<p>You can call <code>ct.loadSound</code> to pre-load the sound effect in the sound file 
-<code>filename</code>, so that it will play quickly when <code>ct.sound( filename )</code> is 
-called. Loading sounds before playing them is optional, but it reduces the
-slight delay that occurs the first time a certain sound is played.</p> 
-<p>This function returns <code>true</code> if the sound was successfully loaded,
-or <code>false</code> if the filename could not be found or is not a supported sound format.</p>
+<pre><code>boolean ct.loadSound( String filename )
+</code></pre><p>You can call <code>ct.loadSound</code> to pre-load the sound effect in the sound file <code>filename</code>, so that it will play quickly when <code>ct.sound( filename )</code> is called. Loading sounds before playing them is optional, but it reduces the slight delay that occurs the first time a certain sound is played. </p>
+<p>This function returns <code>true</code> if the sound was successfully loaded, or <code>false</code> if the filename could not be found or is not a supported sound format.</p>
 <blockquote>
 <p>You will typically want to call <code>ct.loadSound</code> in your <code>start</code> function once for each sound that you want pre-loaded.</p>
 </blockquote>
@@ -222,31 +258,28 @@ or <code>false</code> if the filename could not be found or is not a supported s
 <p>Only standard formats of WAV sounds are reliable on all platforms, although most platforms will support MP3 also.</p>
 </blockquote>
 <blockquote>
-<p>You can use <code>ct.loadSound()</code> to reduce the short delay that might occur the first time a certain sound is played.</p>
+<p>You can use <code>ct.loadSound</code> to reduce the short delay that might occur the first time a certain sound is played.</p>
 </blockquote>
 <h3 id="ct-setsoundvolume-">ct.setSoundVolume()</h3>
 <pre><code>ct.setSoundVolume( double volume )
 </code></pre><p>Set the relative volume to use for sounds played by <code>ct.sound()</code> to <code>volume</code>, which should be between 0.0 and 1.0. The default sound volume is 1.0. If the volume is decreased then sounds are attenuated relative to the volume they were recorded at.</p>
 <hr>
-<h2 id="math-and-misc">Math and Misc.</h2>
+<h2 id="math-and-misc-">Math and Misc.</h2>
 <h3 id="ct-random-">ct.random()</h3>
 <pre><code>int ct.random( int min, int max )
 </code></pre><p>Return a random integer from <code>min</code> to <code>max</code> (inclusive).</p>
-
 <h3 id="ct-round-">ct.round()</h3>
-<pre><code>int ct.round( double d )
-</code></pre><p>Return the number <code>d</code> rounded to the nearest integer.</p>
-
+<pre><code>int ct.round( double number )
+</code></pre><p>Return the <code>number</code> rounded to the nearest integer.</p>
 <h3 id="ct-rounddecimal-">ct.roundDecimal()</h3>
-<pre><code>double ct.roundDecimal( double d, int numPlaces )
-</code></pre><p>Return the number <code>d</code> rounded to <code>numPlaces</code> decimal places.</p>
-
+<pre><code>double ct.roundDecimal( double number, int numPlaces )
+</code></pre><p>Return the <code>number</code> rounded to <code>numPlaces</code> decimal places.</p>
 <h3 id="ct-intdiv-">ct.intDiv()</h3>
-<pre><code>int ct.intDiv( int n, int d )
-</code></pre><p>Return the result of an integer divide of n / d. If n / d is not an integer, the result is rounded down to the next smaller integer. If d is 0 then the result is a large positive integer if n &gt; 0, a large negative integer if n &lt; 0, and 0 if n is 0. </p>
+<pre><code>int ct.intDiv( int numerator, int denominator )
+</code></pre><p>Return the result of an integer divide of <code>numerator / denominator</code>. If <code>numerator / denominator</code> is not an integer, the result is rounded down to the next smaller integer. If <code>denominator</code> is 0 then the result is a large positive integer if <code>numerator</code> &gt; 0, a large negative integer if <code>numerator</code> &lt; 0, and 0 if <code>numerator</code> is 0. </p>
 <h3 id="ct-iserror-">ct.isError()</h3>
-<pre><code>boolean ct.isError( double d )
-</code></pre><p>Return <code>true</code> if the value of <code>d</code> is an error value (NaN = &quot;Not a Number&quot;).</p>
+<pre><code>boolean ct.isError( double number )
+</code></pre><p>Return <code>true</code> if the value of <code>number</code> is an error value (NaN = &quot;Not a Number&quot;).</p>
 <h3 id="ct-distance-">ct.distance()</h3>
 <pre><code>double ct.distance( double x1, double y1, double x2, double y2 )
 </code></pre><p>Return the distance between the points (<code>x1</code>, <code>y1</code>) and (<code>x2</code>, <code>y2</code>).</p>
@@ -256,40 +289,52 @@ or <code>false</code> if the filename could not be found or is not a supported s
 <h3 id="ct-getversion-">ct.getVersion()</h3>
 <pre><code>double getVersion( )
 </code></pre><p>Return the version number of the Code12 runtime system.</p>
+<h3 id="ct-pause-">ct.pause()</h3>
+<pre><code>ct.pause( )
+</code></pre><p>Execution of the program is paused at this statement. You can then resume or stop execution using the toolbar buttons in the Code12 application. </p>
+<blockquote>
+<p>You can use <code>ct.pause</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.pause</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
+</blockquote>
+<h3 id="ct-stop-">ct.stop()</h3>
+<pre><code>ct.stop( )
+</code></pre><p>Execution of the program is immediately stopped and ended at this statement. You can restart execution over from the beginning of the program using the <strong>Restart</strong> toolbar button in the Code12 application. </p>
+<blockquote>
+<p>You can use <code>ct.stop</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.stop</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
+</blockquote>
+<h3 id="ct-restart-">ct.restart()</h3>
+<pre><code>ct.restart( )
+</code></pre><p>Execution of the program is immediately stopped and restarted from the beginning of the program. Variables are re-initialized with their default/starting values, and execution starts over with your <code>start</code> function.</p>
+<blockquote>
+<p>The <code>ct.restart</code> function is not supported (ignored) when programs are running standalone under the Java runtime outside of the Code12 environment.</p>
+</blockquote>
 <hr>
 <h2 id="type-conversion">Type Conversion</h2>
-<h3 id="ct-toint-">ct.toInt()</h3>
-<pre><code>int ct.toInt( double d )
-</code></pre><p>Return the value <code>d</code> truncated to an integer.</p>
-<blockquote>
-<p>All decimal places are lost. This is equivalent to a type cast from double to int. If you wish to round, use <code>ct.round()</code> instead.</p>
-</blockquote>
 <h3 id="ct-parseint-">ct.parseInt()</h3>
-<pre><code>int ct.parseInt( String s )
-</code></pre><p>If <code>s</code> can be converted to (parsed as) an integer, then return the integer value, otherwise return 0.</p>
+<pre><code>int ct.parseInt( String str )
+</code></pre><p>If <code>str</code> can be converted to (parsed as) an integer, then return the integer value, otherwise return 0.</p>
 <blockquote>
 <p>Since 0 is a valid integer, it is a good idea to test the string with <code>ct.canParseInt()</code> first.</p>
 </blockquote>
 <h3 id="ct-canparseint-">ct.canParseInt()</h3>
-<pre><code>boolean ct.canParseInt( String s )
-</code></pre><p>If <code>s</code> can be converted to (parsed as) an integer, then return <code>true</code>, otherwise return <code>false</code>.</p>
+<pre><code>boolean ct.canParseInt( String str )
+</code></pre><p>If <code>str</code> can be converted to (parsed as) an integer, then return <code>true</code>, otherwise return <code>false</code>.</p>
 <h3 id="ct-parsenumber-">ct.parseNumber()</h3>
-<pre><code>double ct.parseNumber( String s )
-</code></pre><p>If <code>s</code> can be converted to (parsed as) a number, then return the value as a <code>double</code>, otherwise return the NaN (Not a Number) error value.</p>
+<pre><code>double ct.parseNumber( String str )
+</code></pre><p>If <code>str</code> can be converted to (parsed as) a number, then return the value as a <code>double</code>, otherwise return the NaN (Not a Number) error value.</p>
 <blockquote>
 <p>To test for NaN, use <code>ct.isError()</code></p>
 </blockquote>
 <h3 id="ct-canparsenumber-">ct.canParseNumber()</h3>
-<pre><code>boolean ct.canParseNumber( String s )
-</code></pre><p>If <code>s</code> can be converted to (parsed as) a number, then return <code>true</code>, otherwise return <code>false</code>.</p>
+<pre><code>boolean ct.canParseNumber( String str )
+</code></pre><p>If <code>str</code> can be converted to (parsed as) a number, then return <code>true</code>, otherwise return <code>false</code>.</p>
 <h3 id="ct-formatdecimal-">ct.formatDecimal()</h3>
-<pre><code>String ct.formatDecimal( double d )
-String ct.formatDecimal( double d, int numPlaces )
-</code></pre><p>Return the value of <code>d</code> converted to a string. If <code>numPlaces</code> is included, then format the output to exactly this many places past the decimal point, rounding or adding extra zeros as necessary.</p>
+<pre><code>String ct.formatDecimal( double number )
+String ct.formatDecimal( double number, int numPlaces )
+</code></pre><p>Return the value of <code>number</code> converted to a string. If <code>numPlaces</code> is included, then format the output to exactly this many places past the decimal point, rounding or adding extra zeros as necessary.</p>
 <h3 id="ct-formatint-">ct.formatInt()</h3>
-<pre><code>String ct.formatInt( int i )
-String ct.formatInt( int i, int numDigits )
-</code></pre><p>Return the value of <code>i</code> converted to a string. If numDigits is included, then format to this many digits, adding leading zeros as necessary.</p>
+<pre><code>String ct.formatInt( int number )
+String ct.formatInt( int number, int numDigits )
+</code></pre><p>Return the value of <code>number</code> converted to a string. If numDigits is included, then format to this many digits, adding leading zeros as necessary.</p>
 <hr>
 <h2 id="gameobj-public-data-fields">GameObj Public Data Fields</h2>
 <p><code>GameObj</code> objects are graphics objects visible on the screen. See <a href="#gameobj-creation">GameObj Creation</a> to create a <code>GameObj</code>. All <code>GameObj</code> objects have the following public data fields, which can be accessed or assigned to at any time. If assigned to, the new value takes effect at the next update cycle.</p>
@@ -338,9 +383,9 @@ String ct.formatInt( int i, int numDigits )
 </code></pre><p>The <code>visible</code> field defaults to <code>true</code>, but you can set it to <code>false</code> to hide the object. Hidden objects are effectively disabled, and will not draw or respond to mouse/touch input.</p>
 <h3 id="clickable">clickable</h3>
 <pre><code>boolean clickable
-</code></pre><p>Set the <code>clickable</code> field of an object to <code>true</code> (default <code>false</code>) to make it respond to mouse/touch input. If an object with both both <code>visible</code> and <code>clickable</code> is clicked, then mouse events will be sent for it (see <a href="#events">Events</a>), and the <code>GameObj</code> method &#39;obj.clicked()&#39; can also be used to detect click on the object.</p>
+</code></pre><p>The <code>clickable</code> field defaults to <code>true</code>, so by default all <code>GameObj</code> objects can be used to respond to click/touch input (see <a href="#ctobjectclicked">ct.objectClicked</a>, <a href="#objclicked">obj.clicked</a>, and <a href="#onmousepress">onMousePress</a>). However, if you set an object&#39;s <code>clickable</code> field to false, then it will ignore clicks and pass them through to the object below, if any. </p>
 <blockquote>
-<p>When a click occurs in the application window, the topmost object <code>visible</code> and <code>clickable</code> object that intersects the click location is considered to be the target of the click for mouse events. However, the functions <code>ct.clicked()</code>, <code>ct.clickX()</code>, and <code>ct.clickY()</code> can still be used to check for the click as well.</p>
+<p>If you stack two objects and want to use the bottom object to test for hits (for example a rectangle with a text label on top of it), then you can set the <code>clickable</code> field of the top object to <code>false</code>, which will cause the click to &quot;pass through&quot; to the object below it.</p>
 </blockquote>
 <h3 id="autodelete">autoDelete</h3>
 <pre><code>boolean autoDelete     // auto delete if it goes from on to off-screen
@@ -364,8 +409,8 @@ String ct.formatInt( int i, int numDigits )
 <p>The <code>obj.toString()</code> method (see below) includes the object text in the description of an object.</p>
 </blockquote>
 <h3 id="obj-settext-">obj.setText()</h3>
-<pre><code>obj.setText( String s )
-</code></pre><p>Set the text of an object. If the object is a text object, setting the text will cause the visible text to change. For other object types, the text is simply stored in the object (See <code>obj.getText( )</code> above).</p>
+<pre><code>obj.setText( String text )
+</code></pre><p>Set the text of an object to <code>text</code>. If the object is a text object, setting the text will cause the visible text to change. For other object types, the text is simply stored in the object (See <code>obj.getText( )</code> above).</p>
 <h3 id="obj-tostring-">obj.toString()</h3>
 <pre><code>String obj.toString( )
 </code></pre><p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
@@ -379,9 +424,9 @@ String ct.formatInt( int i, int numDigits )
 <pre><code>obj.setSize( double width, double height )
 </code></pre><p>Set the size of the object using <code>width</code> and <code>height</code>. This is just a convenience method that is equivalent to setting both the <code>width</code> and <code>height</code> fields. Note that different types of objects react differently to changes in width or height. (see <a href="#width-height">width, height</a> above).</p>
 <h3 id="obj-align-">obj.align()</h3>
-<pre><code>obj.align( String a )
-obj.align( String a, boolean adjustY )
-</code></pre><p>Set the alignment of the object, which is where the object is positioned on screen relative to its <code>x</code> and <code>y</code> coordinates. By default, objects are positioned by their center point, so that (<code>x</code>, <code>y</code>) is at the horizontal and vertical center of the object.</p>
+<pre><code>obj.align( String alignment )
+obj.align( String alignment, boolean adjustY )
+</code></pre><p>Set the alignment of the object to <code>alignment</code>. The alignment is a description of where where the object is positioned on screen relative to its <code>x</code> and <code>y</code> coordinates. By default, objects are positioned by their center point, so that (<code>x</code>, <code>y</code>) is at the horizontal and vertical center of the object.</p>
 <p>The following alignments are supported, which describe the location of (<code>x</code>, <code>y</code>) on the object:</p>
 <pre><code>&quot;top left&quot;
 &quot;top&quot;             or &quot;top center&quot;
@@ -398,14 +443,14 @@ obj.align( String a, boolean adjustY )
 <pre><code>obj.setFillColor( String color )
 </code></pre><p>Set the fill color of the object (text color for text objects) to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>. If <code>color</code> is <code>null</code> then the fill is removed from the object.</p>
 <h3 id="obj-setfillcolorrgb-">obj.setFillColorRGB()</h3>
-<pre><code>obj.setFillColorRGB( int r, int g, int b )
-</code></pre><p>Set the fill color of the object (text color for text objects) to the custom RGB color with components <code>r</code>, <code>g</code>, and <code>b</code> in the range 0-255.</p>
+<pre><code>obj.setFillColorRGB( int red, int green, int blue )
+</code></pre><p>Set the fill color of the object (text color for text objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
 <h3 id="obj-setlinecolor-">obj.setLineColor()</h3>
 <pre><code>obj.setLineColor( String color )
 </code></pre><p>Set the line color of the object (the outline stroke color for objects other than line objects) to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>. If <code>color</code> is <code>null</code> then the stroke is removed from the object.</p>
 <h3 id="obj-setlinecolorrgb-">obj.setLineColorRGB()</h3>
-<pre><code>obj.setLineColorRGB( int r, int g, int b )
-</code></pre><p>Set the line color of the object (the outline stroke color for objects other than line objects) to the custom RGB color with components <code>r</code>, <code>g</code>, and <code>b</code> in the range 0-255.</p>
+<pre><code>obj.setLineColorRGB( int red, int green, int blue )
+</code></pre><p>Set the line color of the object (the outline stroke color for objects other than line objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
 <h3 id="obj-getlayer-">obj.getLayer()</h3>
 <pre><code>int obj.getLayer( )
 </code></pre><p>Return the layer number for the object. See <code>obj.setLayer()</code> below.</p>
@@ -433,36 +478,42 @@ obj.align( String a, boolean adjustY )
 <p>Text and image objects use the rectangular bounds of the object for the test. Circles (or ellipses) use the curved shape. Lines have no interior and always return <code>false</code>.</p>
 </blockquote>
 <h3 id="obj-hit-">obj.hit()</h3>
-<pre><code>boolean obj.hit( GameObj obj2 )
-</code></pre><p>Return <code>true</code> if the object currently intersects with another object <code>obj2</code>. If you call this method every time in your <code>update</code> function, it can be used to test if/when two objects &quot;hit&quot; each other.</p>
+<pre><code>boolean obj.hit( GameObj objTest )
+</code></pre><p>Return <code>true</code> if the object currently intersects with another object <code>objTest</code>. If you call this method every time in your <code>update</code> function, it can be used to test if/when two objects &quot;hit&quot; each other.</p>
+<h3 id="obj-objecthitingroup-string-group-">obj.objectHitInGroup( String group )</h3>
+<pre><code>GameObj obj.objectHitInGroup( String group )
+</code></pre><p>If the object currently intersects with another <code>GameObj</code> object on the current screen that has its <a href="#group">group</a> field equal to <code>group</code>, then return a reference to the other object, otherwise return <code>null</code>. If the specified <code>group</code> is <code>null</code> then all objects on the current screen will be considered.</p>
+<blockquote>
+<p>Note that <code>obj.objectHitInGroup()</code> will return <code>null</code> if no matching object intersects <code>obj</code>, so you must check the return value for <code>null</code> before using the <code>GameObj</code> returned.</p>
+</blockquote>
 <hr>
 <h2 id="java-math-class-methods-and-fields-supported">Java Math Class Methods and Fields Supported</h2>
-<p>The following fields and methods from the Java <code>Math</code> class are supported.</p>
+<p>The following fields and functions from the Java <code>Math</code> class are supported.</p>
 <pre><code>double  Math.E
 double  Math.PI
-double  Math.abs( double a )
-int     Math.abs( int a )
-double  Math.acos( double a )
-double  Math.asin( double a )
-double  Math.atan( double a )
+double  Math.abs( double number )
+int     Math.abs( int number )
+double  Math.acos( double number )
+double  Math.asin( double number )
+double  Math.atan( double number )
 double  Math.atan2( double y, double x)
-double  Math.ceil( double a )
-double  Math.cos( double a )
-double  Math.cosh( double a )
-double  Math.exp( double a )
-double  Math.floor( double a )
-double  Math.log( double a )
-double  Math.log10( double a )
-double  Math.max( double a, double b )
-int     Math.max( int a, int b )
-double  Math.min( double a, double b )
-int     Math.min( int a, int b )
-double  Math.pow( double a, double b )
-double  Math.sin( double a )
-double  Math.sinh( double a )
-double  Math.sqrt( double a )
-double  Math.tan( double a )
-double  Math.tanh( double a )
+double  Math.ceil( double number )
+double  Math.cos( double angle )
+double  Math.cosh( double angle )
+double  Math.exp( double number )
+double  Math.floor( double number )
+double  Math.log( double number )
+double  Math.log10( double number )
+double  Math.max( double number1, double number2 )
+int     Math.max( int number1, int number2 )
+double  Math.min( double number1, double number2 )
+int     Math.min( int number1, int number2 )
+double  Math.pow( double number, double exponent )
+double  Math.sin( double angle )
+double  Math.sinh( double angle )
+double  Math.sqrt( double number )
+double  Math.tan( double angle )
+double  Math.tanh( double angle )
 </code></pre><hr>
 <h2 id="java-string-class-methods-supported">Java String Class Methods Supported</h2>
 <p>The following methods from the Java <code>String</code> class are supported.</p>
@@ -498,7 +549,7 @@ String   str.trim()
 <h3 id="onmousepress-">onMousePress()</h3>
 <pre><code>void onMousePress( GameObj obj, double x, double y )
 </code></pre><p>This event is called each time a mouse click or touch is detected. The point (<code>x</code>, <code>y</code>) is the location of the click in display coordinates (relative to the top-left of the application window).</p>
-<p>If <code>obj</code> is not <code>null</code>, then it indicates that the click occured on that object. Note that <code>GameObj</code> objects must have both their <code>visible</code> and <code>clickable</code> fields set to <code>true</code> to receive clicks. If <code>obj</code> is null, then the click occured outside of any clickable object.</p>
+<p>If <code>obj</code> is not <code>null</code>, then it indicates that the click occured on that object. Note that <code>GameObj</code> objects must have both their <code>visible</code> and <code>clickable</code> fields <code>true</code> to receive clicks. If <code>obj</code> is null, then the click occured outside of any clickable object.</p>
 <h3 id="onmousedrag-">onMouseDrag()</h3>
 <pre><code>void onMouseDrag( GameObj obj, double x, double y )
 </code></pre><p>After a click or touch has happened, if the user&#39;s mouse or finger is still &quot;down&quot; and drags across the screen, then <code>onMouseDrag</code> will be called each time the position changes (you may get many calls in succession). The point (<code>x</code>, <code>y</code>) is the new location of the mouse/finger.</p>
@@ -521,10 +572,10 @@ String   str.trim()
 <pre><code>void onKeyRelease( String keyName )   // key code name e.g. &quot;a&quot;, &quot;up&quot;
 </code></pre><p>This event is called when the keyboard key named <code>keyName</code> has been released (after being pressed). See <a href="#key-names">Key Names</a>.</p>
 <h3 id="onchartyped-">onCharTyped()</h3>
-<pre><code>void onCharTyped( String ch )     // &quot;a&quot;, &quot;A&quot;, &quot;$&quot;, etc.
+<pre><code>void onCharTyped( String charString )     // &quot;a&quot;, &quot;A&quot;, &quot;$&quot;, etc.
 </code></pre><p>This event is called when keyboard action results in a printable character being generated.</p>
 <blockquote>
-<p>Unlike the key names used by <code>onkeyPressed</code> above, the <code>ch</code> here is a printable character including the appropriate shift status (e.g. &quot;A&quot; if a shifted &quot;a&quot; is typed, &quot;$&quot; or &quot;4&quot;, &quot;+&quot; vs. &quot;=&quot;, etc.). Only printable characters are detected, so key sequences such as Ctrl+C do not result in characters.</p>
+<p>Unlike the key names used by <code>onkeyPressed</code> above, the <code>charString</code> here is a printable character including the appropriate shift status (e.g. &quot;A&quot; if a shifted &quot;a&quot; is typed, &quot;$&quot; or &quot;4&quot;, &quot;+&quot; vs. &quot;=&quot;, etc.). Only printable characters are detected, so key sequences such as Ctrl+C do not result in characters.</p>
 </blockquote>
 <blockquote>
 <p>Note that some platforms may have keys that auto-repeat, so you may get multiple <code>onCharTyped</code> events if a key is held down.</p>

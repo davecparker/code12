@@ -306,7 +306,11 @@ local function showError()
 	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
 	local text = errRec.strErr
 	if errRec.strNote then
-		text = text .. "\n" .. errRec.strNote
+		if text == "" then
+			text = errRec.strNote
+		else
+			text = text .. "\n(" .. errRec.strNote .. ")"
+		end
 	end
 	errText.text = text
 
