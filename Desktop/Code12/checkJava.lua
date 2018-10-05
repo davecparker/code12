@@ -41,6 +41,9 @@ local userMethods
 -- Set of funcs for names of event methods that the user has defined (overridden)
 local eventMethodFuncs
 
+-- Array of global var structures in the order they were defined
+local globalVars
+
 -- Stack of local variable names, with an empty name "" marking the beginning of each block
 local localNameStack
 
@@ -166,8 +169,10 @@ local function defineVar( var )
 		variables[varNameLower] = varName
 	end
 
-	-- Push local variables on the locals stack
-	if not var.isGlobal then
+	-- Add global vars to globalVars and push locals on the locals stack
+	if var.isGlobal then
+		globalVars[#globalVars + 1] = var
+	else
 		localNameStack[#localNameStack + 1] = nameNode.str
 	end
 	return true
@@ -1267,6 +1272,7 @@ function checkJava.checkProgram( programTree, level )
 	variablesOutOfScope = {}
 	userMethods = {}
 	eventMethodFuncs = {}
+	globalVars = {}
 	localNameStack = {}
 	beforeStart = true
 	currentFunc = nil
@@ -1312,6 +1318,11 @@ function checkJava.checkProgram( programTree, level )
 	end
 end
 
+-- Return an array of var structures for the user global variables
+-- in the order they were defined in the program.
+function checkJava.globalVars()
+	return globalVars
+end
 
 ------------------------------------------------------------------------------
 
