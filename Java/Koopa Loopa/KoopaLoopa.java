@@ -10,10 +10,10 @@ import Code12.*;
 
 public class KoopaLoopa extends Code12Program
 {
-   public static void main(String[] args)
-   { 
-      Code12.run(new KoopaLoopa()); 
-   }
+   // public static void main(String[] args)
+   // { 
+   //    Code12.run(new KoopaLoopa()); 
+   // }
    
    GameObj koopa; // koopa-troopa image
    int numberOfLevels = 8; // how many blocks high the staircase is

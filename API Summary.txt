@@ -1,7 +1,7 @@
 // Code 12 API Summary
 //====================
 
-class ct
+class CT
 {
 	// Text Output
 	//------------
@@ -55,7 +55,7 @@ class ct
 	double clickY( )
 	GameObj objectClicked( )
 	boolean keyPressed( String keyName )
-	boolean charTyped( String ch )
+	boolean charTyped( String charString )
 
 	// Audio
 	//------
@@ -66,25 +66,28 @@ class ct
 	// Math and Misc.
 	//---------------
 	int random( int min, int max )
-	int round( double d )
-	double roundDecimal( double d, int numPlaces )
-	int intDiv( int n, int d )
-	boolean isError( double d )
+	int round( double number )
+	double roundDecimal( double number, int numPlaces )
+	int intDiv( int numerator, int denominator )
+	boolean isError( double number )
 	double distance( double x1, double y1, double x2, double y2 )
 	int getTimer( )
 	double getVersion( )
+	void pause( )
+	void stop( )
+	void restart( )
 
 	// Type Conversion
 	//----------------
-	int toInt( double d )                // truncates
-	int parseInt( String s )             // 0 if failure
-	boolean canParseInt( String s )
-	double parseNumber( String s )       // NaN if failure
-	boolean canParseNumber( String s )
-	String formatDecimal( double d )
-	String formatDecimal( double d, int numPlaces )
-	String formatInt( int i )
-	String formatInt( int i, int numDigits )    // uses leading 0's
+	int toInt( double number )           // truncates
+	int parseInt( String str )             // 0 if failure
+	boolean canParseInt( String str )
+	double parseNumber( String str )       // NaN if failure
+	boolean canParseNumber( String str )
+	String formatDecimal( double number )
+	String formatDecimal( double number, int numPlaces )
+	String formatInt( int number )
+	String formatInt( int number, int numDigits )    // uses leading 0's
 }
 
 class GameObj
@@ -118,11 +121,11 @@ class GameObj
 	void delete( )
 	boolean clicked( )
 	boolean containsPoint( double x, double y )
-	boolean hit( GameObj obj )
+	boolean hit( GameObj objTest )
 	GameObj objectHitInGroup( String group )
 }
 
-class Math
+class MATH
 {
 	// Java Math Class Fields Supported
 	//----------------------------------
@@ -131,29 +134,29 @@ class Math
 
 	// Java Math Class Methods Supported
 	//----------------------------------
-	double  abs( double a )
-	int     abs( int a )
-	double  acos( double a )
-	double  asin( double a )
-	double  atan( double a )
+	double  abs( double number )
+	int     abs( int number )
+	double  acos( double number )
+	double  asin( double number )
+	double  atan( double number )
 	double  atan2( double y, double x)
-	double  ceil( double a )
-	double  cos( double a )
-	double  cosh( double a )
-	double  exp( double a )
-	double  floor( double a )
-	double  log( double a )
-	double  log10( double a )
-	double  max( double a, double b )
-	int     max( int a, int b )
-	double  min( double a, double b )
-	int     min( int a, int b )
-	double  pow( double a, double b )
-	double  sin( double a )
-	double  sinh( double a )
-	double  sqrt( double a )
-	double  tan( double a )
-	double  tanh( double a )
+	double  ceil( double number )
+	double  cos( double angle )
+	double  cosh( double angle )
+	double  exp( double number )
+	double  floor( double number )
+	double  log( double number )
+	double  log10( double number )
+	double  max( double number1, double number2 )
+	int     max( int number1, int number2 )
+	double  min( double number1, double number2 )
+	int     min( int number1, int number2 )
+	double  pow( double number, double exponent )
+	double  sin( double angle )
+	double  sinh( double angle )
+	double  sqrt( double number )
+	double  tan( double angle )
+	double  tanh( double angle )
 }
 
 class String
@@ -188,9 +191,9 @@ class Code12Program
 	void onMousePress( GameObj obj, double x, double y ) 
 	void onMouseDrag( GameObj obj, double x, double y ) 
 	void onMouseRelease( GameObj obj, double x, double y )
-	void onKeyPress( String key )        // key code name e.g. "a", "up"
-	void onKeyRelease( String key )      // key code name e.g. "a", "up"
-	void onCharTyped( String ch )        // "a", "A", "$", etc.
+	void onKeyPress( String keyName )        // key code name e.g. "a", "up"
+	void onKeyRelease( String keyName )      // key code name e.g. "a", "up"
+	void onCharTyped( String charString )        // "a", "A", "$", etc.
 	void onResize( ) 
 
 	// The main function

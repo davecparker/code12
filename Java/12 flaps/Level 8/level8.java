@@ -1,6 +1,6 @@
 import Code12.*;
 
-class level10 extends Code12Program
+class level8 extends Code12Program
 {
    //Global variables
       boolean startPhase = true;
@@ -26,7 +26,7 @@ class level10 extends Code12Program
       int scoreHeight = 5;
       int highScore = 0;
       String scoreImgFile = "0.png";
-      //Background
+      //Backgroundcv  ;
       GameObj back1;
       GameObj back2;
       //Ground
@@ -56,7 +56,7 @@ class level10 extends Code12Program
 
    public static void main(String[] args)
    { 
-      Code12.run( new level10() ); 
+      Code12.run( new level8() ); 
    }
    
    public void start()
@@ -160,7 +160,7 @@ class level10 extends Code12Program
          //Handles keypress input
          if( ct.clicked() || ct.charTyped(" ") )
          {
-            ghostBird.y -= 4.5;
+            ghostBird.y -= 3.5;
             ghostBird.ySpeed = -1;
          } 
 
@@ -332,7 +332,7 @@ class level10 extends Code12Program
       }  
       if( endPhase )
       {
-         if( restartBox.clicked() ) //Restarts the game
+         if( restartBox.clicked() || ct.charTyped(" ") ) //Restarts the game
          {            
             //Sets Phase flags
             mainPhase = true;

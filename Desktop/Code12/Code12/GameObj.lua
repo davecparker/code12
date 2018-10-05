@@ -8,7 +8,7 @@
 -----------------------------------------------------------------------------------------
 
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 
 
 -- Constants
@@ -172,7 +172,7 @@ function GameObj:newImage(group, filename, x, y, width)
 	if filename ~= nil then
 		-- If an app context tells us the media directory then use it, else current dir.
 		local baseDir, path
-		local appContext = ct._appContext
+		local appContext = runtime.appContext
 		if appContext and appContext.mediaDir then
 			path = appContext.mediaDir .. filename
 			baseDir = appContext.mediaBaseDir
@@ -230,8 +230,8 @@ function GameObj:sync()
 	end
 end
 
--- Update the GameObj for a new frame interval
-function GameObj:update()
+-- Move/update the GameObj as necessary for a new frame interval
+function GameObj:updateForNextFrame()
 	-- Move object by its velocity
 	self.x = self.x + self.xSpeed
 	self.y = self.y + self.ySpeed
@@ -659,8 +659,7 @@ end
 
 ---------------- Colors ------------------------------------------------------
 
--- A color for a GameObj is a 3 element array with 255-based r, g, b values.
--- Map color names to colors.
+-- Map color names to a 3 element array with 255-based r, g, b values.
 local colors = {
     ["black"] =          { 0, 0, 0 },
     ["white"] =          {255, 255, 255},
@@ -693,7 +692,7 @@ local colors = {
     ["dark yellow"] =    {127, 127, 0},
 }
 
--- Return the color for the given color name, or gray if name not known.
+-- Return the color (3-array) for the given color name, or gray if name not known.
 -- Return nil if colorName is nil.
 local function colorFromName(colorName)
 	if colorName == nil then
@@ -707,7 +706,7 @@ local function colorFromName(colorName)
 	return colors["gray"]
 end
 
--- Set a GameObj's fill color from a color (nil for none)
+-- Set a GameObj's fill color from a color 3-array (nil for none)
 function GameObj:setFillColorFromColor(color)
 	self._code12.fillColor = color
 	local obj = self._code12.obj
@@ -723,7 +722,7 @@ function GameObj:setFillColorFromColor(color)
 	end
 end
 
--- Set a GameObj's line color from a color (nil for none)
+-- Set a GameObj's line color from a color 3-array (nil for none)
 function GameObj:setLineColorFromColor(color)
 	self._code12.lineColor = color  -- nil will set 0 strokeWidth at update
 	local obj = self._code12.obj

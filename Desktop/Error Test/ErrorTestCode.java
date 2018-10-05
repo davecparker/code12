@@ -1,9 +1,9 @@
-import Code12.*;
-
+// ERROR "Code12 does not support importing"
+import java.util.Scanner;
 // ERROR "The class header shouldn't be indented"
 	class ErrorTest extends Code12Program
-// ERROR "The beginning { for the class shouldn't be indented"
-	{
+// ERROR "should not be indented"
+		{
 	int myVar = 1;
 	// ERROR "Code12 API functions cannot be called before start()"
 	GameObj button = ct.text("START", 0, 0, 10);
@@ -13,15 +13,15 @@ import Code12.*;
 		int overIndentedInstanceVar;
 	// ERROR "Class-level variable and function definitions should all have the same indentation"
 int underIndentedInstanceVar;
-	int[] classLevelMultilineIntArray1 = { 1,
 	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	int[] classLevelMultilineIntArray1 = { 1,
 	2 };
+	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 	int[] classLevelMultilineIntArray2 = { 1,
 		2,
-	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 	3 };
-	int[] classLevelMultilineIntArray3 = new int[ Math.max(1,
 	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	int[] classLevelMultilineIntArray3 = new int[ Math.max(1,
 	2) ];
 	// ERROR "double cannot be assigned to an int"
 	int classLevelVarTypeMismatchIntDouble = 0.1;
@@ -606,7 +606,6 @@ int underIndentedInstanceVar;
 		i = s.indexOf(s);
 		i = s.length();
 		s = s.substring(i);
-		s = s.substring(i);
 		s = s.toLowerCase();
 		s = s.toUpperCase();
 		s = s.trim();
@@ -619,12 +618,13 @@ int underIndentedInstanceVar;
 		ct.log( 1,
 				2,
 				3 );
-		if ( ct.random( 1,
-						2 ) == 1 )
+		if ( ct.random( 1, 2 ) ///
+				== 1 )
 			ct.println("heads");
 		ct.log( 1, ct.random( 1,
-							  100 ),
+							  100 ), ///
 				3, 4 );
+		return 0;
 	}
 
 	// ERROR "Class-level variables must be defined at the beginning of the class"
@@ -644,7 +644,7 @@ int underIndentedInstanceVar;
 		return 0;
 	}
 	// ERROR "("boolean" is a type name)"
-	double foo(int i, GameObj boolean)
+	double fooBad(int i, GameObj boolean)
 	{
 		return 0;
 	}
@@ -690,15 +690,15 @@ int underIndentedInstanceVar;
 		int[] intArr = {1, 2, 3};
 		GameObj[] objArr = { objVar };
 
-		// ERROR "Value of type void cannot be assigned to type int"
+		// ERROR "does not return a value"
 		intVar = objVar.setText("circle");
-		// ERROR "Value of type void cannot be assigned to type double"
+		// ERROR "does not return a value"
 		double screen = ct.setScreen("menu");
-		// ERROR "Value of type void cannot be assigned to type boolean"
+		// ERROR "does not return a value"
 		boolVar = ct.setHeight(150);
-		// ERROR "Value of type void cannot be assigned to type String"
+		// ERROR "does not return a value"
 		strVar = voidFunc();
-		// ERROR "Value of type void cannot be assigned to type GameObj"
+		// ERROR "does not return a value"
 		GameObj title = ct.setTitle("title");
 
 		// ERROR "Value of type int cannot be assigned to type boolean"
@@ -760,7 +760,7 @@ int underIndentedInstanceVar;
 		// ERROR "Value of type GameObj cannot be assigned to type boolean"
 		boolVar = objVar;
 		// ERROR "A GameObj cannot be assigned to a String"
-		String circle = ct.circle(0,0,10);
+		String circleStr = ct.circle(0,0,10);
 		
 		// ERROR "expects type int, but double was passed"
 		int y = intFuncInt(2.3);
@@ -828,9 +828,9 @@ int underIndentedInstanceVar;
 		dblFuncIntDbl();
 		// ERROR "requires 3 parameters"
 		ct.circle();
-		// ERROR "Not enough parameters"
+		// ERROR "requires 4 parameters"
 		ct.rect(0, 0, 10);
-		// ERROR "Not enough parameters"
+		// ERROR "requires 3 parameters"
 		ct.circle(0, 0);
 		// ERROR "Too many parameters passed"
 		voidFunc(1);
@@ -845,9 +845,9 @@ int underIndentedInstanceVar;
 		int k = 3 / 2;
 		// ERROR "Integer divide"
 		ct.random( intVar / intVar, intVar );
-		// ERROR "Undefined variable x"
+		// ERROR "Undefined variable"
 		x = x + 1;
-		// ERROR "must be declared with a type before being assigned"
+		// ERROR "Undefined variable"
 		for (x = 0; x < 1; x++) 
 			voidFunc();
 		// ERROR "Undefined function foo"
@@ -1207,9 +1207,9 @@ int underIndentedInstanceVar;
 		ct.log();
 		// ERROR "requires 2 parameters"
 		Math.atan2();
-		// ERROR "Not enough parameters passed"
+		// ERROR "requires 3 parameters"
 		boolFuncBoolStringGameObj(false, "");
-		// ERROR "Not enough parameters passed"
+		// ERROR "requires 4 parameters"
 		ct.rect(0,0,10);
 		// ERROR "Too many parameters passed"
 		voidFunc(intVar);
@@ -1258,14 +1258,14 @@ int underIndentedInstanceVar;
 		voidFunc();
 		}
 		if (false)
-		// ERROR "The { after an if statement should have the same indentation as the "if""
+		// ERROR "should have the same indentation"
 			{
 				voidFunc();
 			}
 		if (false)
 		{
 			voidFunc();
-			// ERROR "A block's ending } should have the same indentation as its beginning {"
+			// ERROR "should have the same indentation"
 			}
 		if (false)
 			voidFunc();
@@ -1274,7 +1274,7 @@ int underIndentedInstanceVar;
 		voidFunc();
 		if (false)
 			voidFunc();
-		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "This line is not controlled"
 			else
 				voidFunc();
 		if (false)
@@ -1286,7 +1286,7 @@ int underIndentedInstanceVar;
 		if (false)
 			voidFunc();
 		else
-			// ERROR "The { after an "else" should have the same indentation as the "else""
+			// ERROR "should have the same indentation"
 				{
 					voidFunc();
 				}
@@ -1298,13 +1298,13 @@ int underIndentedInstanceVar;
 		if (false)
 			voidFunc();
 		else if (false)
-		// ERROR "The { after an else if statement should have the same indentation as the "else if""
+		// ERROR "should have the same indentation"
 				{
 					voidFunc();
 				}
 		if (false)
 			voidFunc();
-		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it
+		// ERROR "This line is not controlled"
 			else if (false)
 				voidFunc();
 		else
@@ -1313,23 +1313,23 @@ int underIndentedInstanceVar;
 			voidFunc();
 		else if (false)
 			voidFunc();
-		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "This line is not controlled"
 			else
 				voidFunc();
 		if (false)
 			voidFunc();
 		else if (false)
 			voidFunc();
-		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it"
+		// ERROR "This line is not controlled"
 			else if (false)
 				voidFunc();
-		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "An "else" should have the same indentation as its "if""
 			else
 				voidFunc();
 		if (false)
 			if (false)
 					voidFunc();
-		// ERROR "This "else" should have the same indentation as the highlighted "if" above it"
+		// ERROR "An "else" should have the same indentation as its "if""
 		else
 			voidFunc();
 		if (false)
@@ -1347,7 +1347,7 @@ int underIndentedInstanceVar;
 		if (false)
 			if (false)
 				voidFunc();
-		// ERROR "This "else if" should have the same indentation as the highlighted "if" above it"
+		// ERROR "An "else if" should have the same indentation as the first "if""
 		else if (false)
 			voidFunc();
 		for (int ii = 0; ii < 100; ii++)
@@ -1359,7 +1359,7 @@ int underIndentedInstanceVar;
 		voidFunc();
 		}
 		for (int ii = 0; ii < 100; ii++)
-		// ERROR "The { after a for loop header should have the same indentation as the "for""
+		// ERROR "should have the same indentation"
 			{
 				voidFunc();
 			}
@@ -1367,7 +1367,7 @@ int underIndentedInstanceVar;
 		// ERROR "This line should be indented more than its controlling "while""
 		voidFunc();
 		while (false)
-		// ERROR "The { after a while loop header should have the same indentation as the "while""
+		// ERROR "should have the same indentation"
 			{
 				voidFunc();
 			}
@@ -1380,7 +1380,7 @@ int underIndentedInstanceVar;
 		voidFunc();
 		while (false);
 		do
-		// ERROR "The { after a "do" should have the same indentation as the "do""		
+		// ERROR "should have the same indentation"		
 			{
 				voidFunc();
 			}
@@ -1389,41 +1389,41 @@ int underIndentedInstanceVar;
 			voidFunc();
 		// ERROR "This while statement should have the same indentation as its "do""
 			while (false);
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		int x1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		x2,	x3;
-		GameObj circle = ct.circle( 0, 0,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		GameObj circle = ct.circle( 0, 0,
 		10);
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		ct.log( 1,
 			2,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		3);
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		int[] multiLineArrInit = { 1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		2 };
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		int[] multiLineArrDec = new int[ct.random(1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		10)];
-		if ( ct.random(1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
-		2) > 3 )
+		if ( ct.random(1, 2)  ///
+		> 3 )
 			voidFunc();
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		else if ( ct.random(1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		2) > 3 )
 			voidFunc();
-		while ( ct.random(1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		while ( ct.random(1,
 		2) > 3 )
 			voidFunc();
 		do
 			voidFunc();
+		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		while( Math.max(1,
-		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 		0) < 0 );
-		for (;Math.max(1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		for (;Math.max(1,
 		0) < 0; )
 			voidFunc();
 		if (false)
@@ -1521,19 +1521,20 @@ int underIndentedInstanceVar;
 	void myFunc(int myVar)
 	{
 	}
-	// ERROR "Return type of update function should be void"
-	GameObj update()
+	GameObj makeCoin()
 	{
+	// ERROR "missing a return"
 	}
 	// ERROR "Return type of onMousePress function should be void"
-	String onMousePress( GameObj obj, double x, double y )
+	int onMousePress( GameObj obj, double x, double y )
 	{
+		return 0;
 	}
 	// ERROR "Wrong number of parameters for function"
 	void onMousePress( double x, double y )
 	{
 	}
-	// ERROR Wrong number of parameters for function"
+	// ERROR "Wrong number of parameters for function"
 	void onKeyPress( GameObj obj, double x, double y )
 	{
 	}
@@ -1578,15 +1579,15 @@ void underIndentedFunc()
 	// ERROR "Lines within { } brackets should be indented"
 	return 0;
 	}
-	void multiLineFuncDef( int arg1,
 	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+	void multiLineFuncDef( int arg1,
 	int arg2 )
 	{
 	}
 	int multilineReturnFunc()
 	{
-		return Math.max(1,
 		// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
+		return Math.max(1,
 		2);
 	}
 	void missingCurlyBracketFunc()

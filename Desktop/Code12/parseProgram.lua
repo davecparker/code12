@@ -9,6 +9,7 @@
 
 -- Code12 modules
 local app = require( "app" )
+local source = require( "source" )
 local parseJava = require( "parseJava" )
 local javaTypes = require( "javaTypes" )
 local err = require( "err" )
@@ -32,27 +33,29 @@ local parseProgram = {}
 -- var:  (Semantic analysis adds assigned field)
 --     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 --
+-- block:
+--     { s = "block", iLineBegin, stmts, iLineEnd }
+--
 -- func:
---     { s = "func", iLine, nameID, vt, isPublic, isStatic, paramVars, stmts }
+--     { s = "func", iLine, nameID, vt, isPublic, isStatic, isError, paramVars, block }
 --
 -- stmt:
 --     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
 --     { s = "call", iLine, class, lValue, nameID, exprs }
 --     { s = "assign", iLine, lValue, opToken, opType, expr }   -- opType: =, +=, -=, *=, /=, ++, --
---     { s = "if", iLine, expr, stmts, elseStmts }
---     { s = "while", iLine, expr, stmts }
---     { s = "doWhile", iLine, expr, stmts }
---     { s = "for", iLine, initStmt, expr, nextStmt, stmts }
---     { s = "forArray", iLine, var, expr, stmts }
+--     { s = "if", iLine, expr, block, elseBlock }
+--     { s = "while", iLine, expr, block }
+--     { s = "doWhile", iLine, expr, block, iLineWhile }
+--     { s = "for", iLine, initStmt, expr, nextStmt, block }
+--     { s = "forArray", iLine, var, expr, block }
 --     { s = "break", iLine }
 --     { s = "return", iLine, expr }
 --
 -- lValue:  (Semantic analysis adds isGlobal and vt fields)
---     (an lValue can also be a single ID node for a simple variable)
 --     { s = "lValue", varID, indexExpr, fieldID }
 -- 
 -- expr:  (Semantic analysis adds a vt field)
---     (expr nodes can also be a single ID or INT, NUM, BOOL, NULL, or STR token node)
+--     (expr nodes can also be a single literal token (INT, NUM, BOOL, NULL, or STR) node)
 --     { s = "call", class, lValue, nameID, exprs }
 --     { s = "lValue", varID, indexExpr, fieldID }
 --     { s = "staticField", class, fieldID }
@@ -79,22 +82,35 @@ local parseProgram = {}
 --    (12)   a[3].group.equals()                a[3].group      equals
 
 
--- Parsing structures
-local parseTrees        -- array of parse trees for each source line
-local programTree       -- structure tree for the program (see above)
-
 -- Parsing state
-local numSourceLines    -- number of source code lines
-local numParseTrees     -- number of trees in parseTrees
+local parseTrees        -- array of parse trees for each source line
+local numParseTrees     -- number of trees in parseTrees not counting the sentinel
 local iTree             -- current tree index in parseTrees being analyzed
+
+-- Forward declarations
+local makeExpr
+local getBlock
+local getLineStmts
 
 
 --- Internal Functions -------------------------------------------------------
 
--- Forward declarations
-local makeExpr
-local getBlockStmts
-local getLineStmts
+-- Check for inconsistent tabs/spaces between the given line and previous line
+local function checkIndentTabsAndSpaces( lineRec, lineRecPrev )
+	local indLvl = lineRec.indentLevel
+	local prevIndLvl = lineRecPrev.indentLevel
+	if indLvl > 0 and prevIndLvl > 0 then
+		-- Both lines have indent: Check for inconsistent tabs
+		local indentStr = lineRec.indentStr
+		local prevIndentStr = lineRecPrev.indentStr
+		if indLvl == prevIndLvl and indentStr ~= prevIndentStr
+				or indLvl > prevIndLvl and string.sub( indentStr, 1, prevIndLvl ) ~= prevIndentStr
+				or indLvl < prevIndLvl and string.sub( prevIndentStr, 1, indLvl ) ~= indentStr then
+			err.setErrLineNumAndRefLineNum( lineRec.iLine, lineRecPrev.iLine,
+					"Mix of tabs and spaces used for indentation is not consistent with the previous line of code" )
+		end
+	end
+end
 
 -- Set an error when a block's begining { does not have the same indentation as its function header
 -- or control statement
@@ -102,21 +118,23 @@ local function indentErrBlockBegin( tree, prevTree )
 	local p = prevTree.p
 	local strErr
 	if p == "func" then
-		strErr = "The { after a function header should have the same indentation as the function header"
+		strErr = "The {  after a function header should have the same indentation as the function header"
 	elseif p == "if" then
-		strErr = "The { after an if statement should have the same indentation as the \"if\""
+		strErr = "The {  after an if statement should have the same indentation as the \"if\""
 	elseif p == "elseif" then
-		strErr = "The { after an else if statement should have the same indentation as the \"else if\""
+		strErr = "The {  after an else if statement should have the same indentation as the \"else if\""
 	elseif p == "else" then
-		strErr = "The { after an \"else\" should have the same indentation as the \"else\""
+		strErr = "The {  after an \"else\" should have the same indentation as the \"else\""
 	elseif p == "do" then
-		strErr = "The { after a \"do\" should have the same indentation as the \"do\""
+		strErr = "The {  after a \"do\" should have the same indentation as the \"do\""
 	elseif p == "while" then
-		strErr = "The { after a while loop header should have the same indentation as the \"while\""
+		strErr = "The {  after a while loop header should have the same indentation as the \"while\""
 	elseif p == "for" then
-		strErr = "The { after a for loop header should have the same indentation as the \"for\""
+		strErr = "The {  after a for loop header should have the same indentation as the \"for\""
+	elseif p == "class" then
+		strErr = "The {  that begins a class should not be indented"
 	else
-		strErr = "The { beginning a block should have the same indentation as the line before it"
+		strErr = "The {  beginning a block should have the same indentation as the line before it"
 	end
 	err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLineStart, strErr )
 end
@@ -124,134 +142,16 @@ end
 -- Check indentation for multi-line var decls, function defs, and calls
 local function checkMultiLineIndent( tree )
 	if tree.iLineStart ~= tree.iLine then
-		local startIndent = javalex.indentLevelForLine( tree.iLineStart )
-		for lineNum = tree.iLineStart + 1, tree.iLine do 
-			if javalex.indentLevelForLine( lineNum ) <= startIndent then
+		local startIndent = tree.indentLevel
+		for lineNum = tree.iLineStart + 1, tree.iLine do
+			local lineRec = source.lines[lineNum]
+			if lineRec.hasCode and lineRec.indentLevel <= startIndent then
 				err.setErrLineNumAndRefLineNum( lineNum, tree.iLineStart, 
 						"The lines after the first line of a multi-line statement should be indented further than the first line" )
 				break
 			end
 		end
 	end
-end
-
--- Parse the required program header directly from sourceLines and return
--- (programTree, lineNum) where programTree is the initial programTree structure 
--- and lineNum is the next line number after the lines processed.
--- Return nil if there is an unrecoverable error.
-local function parseHeader( sourceLines )
-	-- "import", "ID", ".", "*", ";", "END"     (ID = "Code12")
-	local lineNum = 1
-	local nameID = nil
-	local iLineImport = nil
-	while lineNum <= numSourceLines do
-		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
-		if tokens and #tokens > 1 then  -- skip if blank or lexical error
-			if tokens[1].tt == "import" then
-				if #tokens == 6 and tokens[2].str == "Code12" 
-						and tokens[3].tt == "." and tokens[4].tt == "*" 
-						and tokens[5].tt == ";" then
-					iLineImport = lineNum
-				else
-					err.setErrLineNum( lineNum, 
-							"Code12 programs should import only Code12.*" )
-				end
-			else
-				break
-			end
-		end
-		lineNum = lineNum + 1
-	end
-	if iLineImport then
-		-- print( "Got import" )
-	else
-		err.setErrLineNum( lineNum, 
-			'Code12 programs must start with:\n"import Code12.*;"' )
-	end
-
-	-- "class", "ID", "extends", "ID",	"END"    (2nd ID = "Code12Program")
-	local iLineClass = nil
-	while lineNum <= numSourceLines do
-		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
-		if tokens and #tokens > 1 then  -- skip if blank or lexical error
-			if tokens[1].tt == "public" and tokens[2].tt == "class" then
-				table.remove( tokens, 1 )
-			end
-			if tokens[1].tt == "class" then
-				if iLineClass then
-					err.setErrLineNumAndRefLineNum( lineNum, iLineClass,
-							"There should be only one class declaration" )
-				else
-					iLineClass = lineNum
-					if #tokens >= 5 and (tokens[2].tt == "ID" or tokens[2].tt == "TYPE")
-							and tokens[3].tt == "extends" 
-							and tokens[4].str == "Code12Program" then
-						-- Get the class name
-						nameID = tokens[2]
-						-- Check that nameID is valid (not a defined class) and for initial upper case letter in name
-						local className = nameID.str
-						local chFirst = string.byte( className, 1 )
-
-						if javalex.knownName( className ) then
-							err.setErrNode( nameID,
-									"The name %s is already defined. Choose another name for your class.", className )
-						elseif chFirst < 65 or chFirst > 90 then
-							err.setErrNode( nameID, 
-									"By convention, class names should start with an upper-case letter" )
-						end
-						-- Check that the class header is not indented
-						if javalex.indentLevelForLine( iLineClass ) ~= 0 then
-							err.setErrLineNum( iLineClass, "The class header shouldn't be indented" )
-						end
-						-- Check for extra tokens after class header
-						if #tokens == 6 and tokens[5].tt == "{" then					
-							err.setErrNode( tokens[5], "In Code12, the { to start a class must be on its own line" )
-						elseif #tokens > 5 then
-							err.setErrNodeSpan( tokens[5], tokens[#tokens], 
-									'Your class header should end after\n"class %s extends Code12Program"', className )
-						end
-					else
-						err.setErrLineNum( lineNum,
-								'A Code12 class declaration should be:\n"class YourName extends Code12Program"' )
-					end
-				end
-			else
-				break
-			end
-		end
-		lineNum = lineNum + 1
-	end
-	if iLineClass then
-		-- print( "Got class" )
-	else
-		err.setErrLineNum( lineNum,
-				'Code12 programs must start with:\n"class YourName extends Code12Program"' )
-	end
-
-	-- Beginning { for the class
-	local iLineBegin = nil
-	while lineNum <= numSourceLines do
-		local tokens = javalex.getTokens( sourceLines[lineNum], lineNum )
-		if tokens and #tokens > 1 then  -- skip if blank or lexical error
-			if #tokens == 2 and tokens[1].tt == "{" then
-				iLineBegin = lineNum
-				-- Check that beginning { is not indented
-				if javalex.indentLevelForLine( iLineBegin ) ~= 0 then
-					err.setErrLineNum( iLineBegin, "The beginning { for the class shouldn't be indented" )
-				end
-			end
-			break
-		end
-		lineNum = lineNum + 1
-	end
-	if iLineBegin then
-		-- Success or good enough to continue
-		-- print( "Got begin" )
-		local program = { s = "program", nameID = nameID, vars = {}, funcs = {} }
-		return program, lineNum + 1
-	end
-	err.setErrLineNum( lineNum, "Your class should start with a { on its own line" )
-	return nil   -- probably not good to keep parsing after this
 end
 
 -- Check for a block begin and move iTree past it.
@@ -261,7 +161,7 @@ local function checkBlockBegin()
 	local tree = parseTrees[iTree]
 	if tree.p == "begin" then
 		local prevTree = parseTrees[iTree - 1]
-		if prevTree and javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( prevTree.iLineStart ) then
+		if prevTree and tree.indentLevel ~= prevTree.indentLevel then
 			indentErrBlockBegin( tree, prevTree )
 		end
 		iTree = iTree + 1
@@ -269,6 +169,82 @@ local function checkBlockBegin()
 	end
 	err.overrideErrLineParseTree( tree, "Expected {" )	
 	return false
+end
+
+-- Parse the required program header and return the root program structure.
+-- Return nil if the there is an unrecoverable error.
+local function getProgramHeader()
+	-- Since we're at the very beginning of the program and there may be
+	-- who knows what syntax errors and whatnot, try to find the class header 
+	-- parse tree in the source lines directly.
+	local iLine = 1
+	local tree = nil
+	-- Find the first line of code, skipping blanks/comments and imports
+	while iLine <= source.numLines do
+		tree = source.lines[iLine].parseTree
+		if tree == nil then
+			break  -- a line with a syntax error
+		elseif tree.p == "import" then
+			-- Silently allow import of Code12 package
+			if tree.nodes[2].str == "Code12" then
+				err.clearErr( iLine )   -- was reported as common parse error
+			end
+		elseif tree.p ~= "blank" then
+			break
+		end
+		iLine = iLine + 1
+	end
+
+	-- Check for the class header
+	if tree == nil or tree.p ~= "class" then
+		err.clearErr( iLine )
+		err.setErrLineNum( iLine, 
+				"Code12 programs must start with:\nclass YourProgramName" )
+		return nil
+	end
+
+	-- Move iTree past the class header we found
+	iTree = 1
+	while parseTrees[iTree] ~= tree do
+		iTree = iTree + 1   -- skipping items before it
+	end
+	iTree = iTree + 1  -- pass the class header
+
+	-- Check for valid class access specifier
+	local nodes = tree.nodes
+	local access = nodes[1]
+	if access and access.p ~= "public" then
+		err.setErrNode( access, 
+				'A Code12 class should be declared "public" or nothing/default' )
+	end
+
+	-- Check that class name is valid (not a defined class) and starts with upper case letter
+	local nameID = nodes[3]
+	local className = nameID.str
+	local chFirst = string.byte( className, 1 )
+	local tt, strCorrectCase, _ = javalex.knownName( className ) 
+	if tt and strCorrectCase == className then
+		err.setErrNode( nameID,
+				"The name %s is already defined. Choose another name for your class.", className )
+	elseif chFirst < 65 or chFirst > 90 then
+		err.setErrNode( nameID, 
+				"By convention, class names should start with an upper-case letter" )
+	end
+
+	-- Check that the class header is not indented
+	if tree.indentLevel ~= 0 then
+		err.setErrLineNum( tree.iLineStart, "The class header shouldn't be indented" )
+	end
+
+	-- Check for the { to start the class block
+	if not checkBlockBegin() then
+		-- Report this error on the line right after the class even if blank or comment
+		err.clearErr( tree.iLine + 1 )
+		err.setErrLineNum( tree.iLine + 1, "Expected {  to start the class body" )
+	end
+
+	-- Return the root program structure node
+	return { s = "program", nameID = nameID, vars = {}, funcs = {} }
 end
 
 -- Make and return a var given the parsed fields and optional initExpr structure.
@@ -360,20 +336,14 @@ end
 local function makeLValueFromNodes( varID, index, field )
 	local indexExpr = nil
 	local lastToken = nil
-	local simpleVar = true
 	if index then
-		simpleVar = false
 		indexExpr = makeExpr( index.nodes[2] )
 		lastToken = index.nodes[3]
 	end
 	local fieldID = nil
 	if field then
-		simpleVar = false
 		fieldID = field.nodes[2]
 		lastToken = nil   -- don't need this anymore
-	end
-	if simpleVar then
-		return varID    -- lValue for simple variable is just the ID token
 	end
 	return { s = "lValue", varID = varID, 
 			indexExpr = indexExpr, fieldID = fieldID, lastToken = lastToken }
@@ -382,7 +352,7 @@ end
 -- Make and return an lValue structure from an ID token or lValue parse node 
 local function makeLValue( node )
 	if node.tt == "ID" then
-		return node
+		return { s = "lValue", varID = node }   -- a simple variable
 	end
 	assert( node.t == "lValue" )
 	local nodes = node.nodes
@@ -435,17 +405,17 @@ local function makeCast( nodes )
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
--- if, else, or loop, and return an array of stmt structures. 
+-- if, else, or loop, and return a block structure. 
 -- If the next item to process is a begin block then get an entire block 
 -- of stmts until the matching block end, otherwise get a single stmt. 
 -- Return nil if there was an error.
-local function getControlledStmts()
+local function getControlledBlock()
 	local ctrlTree = parseTrees[iTree - 1] -- tree for the controlling statement
-	local ctrlIndent = javalex.indentLevelForLine( ctrlTree.iLineStart )
+	local ctrlIndent = ctrlTree.indentLevel
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "begin" then
-		return getBlockStmts()
+		return getBlock()
 	elseif p == "end" then
 		err.setErrNode( tree, "} without matching {" )
 		return nil
@@ -455,7 +425,7 @@ local function getControlledStmts()
 		return nil
 	else
 		-- Single controlled stmt
-		local stmtIndent = javalex.indentLevelForLine( tree.iLineStart )
+		local stmtIndent = tree.indentLevel
 		if stmtIndent <= ctrlIndent then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, ctrlTree.iLineStart, 
 					"This line should be indented more than its controlling \"%s\"", ctrlTree.p )
@@ -467,7 +437,7 @@ local function getControlledStmts()
 			if iTree <= numParseTrees then
 				local nextTree = parseTrees[iTree]
 				local nextP = nextTree.p
-				local nextIndent = javalex.indentLevelForLine( nextTree.iLineStart )
+				local nextIndent = nextTree.indentLevel
 				if nextP == "end" then
 					if nextIndent >= ctrlIndent then
 						err.setErrLineNum( nextTree.iLineStart, "Unexpected indentation. Stray closing } bracket?" )
@@ -479,37 +449,38 @@ local function getControlledStmts()
 							ctrlTree.p )
 				end
 			end
-			return stmts
+			return { s = "block", stmts = stmts }
 		end
 	end
 	return nil
 end
 
 -- Check to see if the next stmt is an else or else if, and if so then 
--- get the controlled stmts and return an array of stmt structures. 
+-- get the controlled stmts and return a block structure. 
 -- Return nil if there is no else or an error.
-local function getElseStmts( ifTree )
+local function getElseBlock( ifTree )
 	local tree = parseTrees[iTree]
 	local p = tree.p
 	if p == "else" then
-		if javalex.indentLevelForLine( tree.iLine ) ~= javalex.indentLevelForLine( ifTree.iLineStart ) then
+		if tree.indentLevel ~= ifTree.indentLevel then
 			err.setErrLineNumAndRefLineNum( tree.iLine, ifTree.iLineStart, 
-					"This \"else\" should have the same indentation as the highlighted \"if\" above it" )
+					'An "else" should have the same indentation as its "if"' )
 		end
 		iTree = iTree + 1
-		return getControlledStmts()
+		return getControlledBlock()
 	elseif p == "elseif" then
-		if javalex.indentLevelForLine( tree.iLineStart ) ~= javalex.indentLevelForLine( ifTree.iLineStart ) then
+		if tree.indentLevel ~= ifTree.indentLevel then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, ifTree.iLineStart, 
-					"This \"else if\" should have the same indentation as the highlighted \"if\" above it" )
+					'An "else if" should have the same indentation as the first "if"' )
 		end
-		checkMultiLineIndent( tree );
+		checkMultiLineIndent( tree )
 		-- Controlled stmts is a single stmt, which is the following if
 		iTree = iTree + 1
-		return { { s = "if", expr = makeExpr( tree.nodes[4] ), 
-				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts( ifTree ),
-				entireLine = true } }
+		local stmt = { s = "if", expr = makeExpr( tree.nodes[4] ), 
+						block = getControlledBlock(), 
+						elseBlock = getElseBlock( ifTree ),
+						entireLine = true }
+		return { s = "block", stmts = { stmt } }
 	end
 	return nil	
 end
@@ -555,14 +526,14 @@ local function getForStmt( nodes )
 			s = "forArray", 
 			var = makeVar( false, nil, nodes[1], nodes[2] ),
 			expr = makeExpr( nodes[4] ), 
-			stmts = getControlledStmts(),
+			block = getControlledBlock(),
 			entireLine = true, 
 		}
 	else
 		-- for (init; expr; next) controlledStmts
 		local stmt = { 
 			s = "for", 
-			stmts = getControlledStmts(), 
+			block = getControlledBlock(), 
 			entireLine = true 
 		}
 
@@ -622,8 +593,8 @@ function getLineStmts( tree, stmts )
 	elseif p == "if" then
 		-- if (expr) controlledStmts [else controlledStmts]
 		stmt = { s = "if", expr = makeExpr( nodes[3] ), 
-				stmts = getControlledStmts(), 
-				elseStmts = getElseStmts( tree ), entireLine = true }
+				block = getControlledBlock(), 
+				elseBlock = getElseBlock( tree ), entireLine = true }
 	elseif p == "elseif" or p == "else" then
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
@@ -631,15 +602,14 @@ function getLineStmts( tree, stmts )
 		return false
 	elseif p == "returnVal" then
 		-- return expr ;
-		-- TODO: Check for return being only at end of a block
 		stmt = { s = "return", expr = makeExpr( nodes[2] ), firstToken = nodes[1] }
 	elseif p == "return" then
 		-- return ;
 		stmt = { s = "return", firstToken = nodes[1] }
 	elseif p == "do" then
 		-- do controlledStmts while (expr);
-		stmt = { s = "doWhile", stmts = getControlledStmts(), entireLine = true }
-		if stmt.stmts == nil then
+		stmt = { s = "doWhile", block = getControlledBlock(), entireLine = true }
+		if stmt.block == nil then
 			return nil
 		end
 		local endTree = parseTrees[iTree]
@@ -655,10 +625,11 @@ function getLineStmts( tree, stmts )
 					"while statement at end of do-while loop must end with a semicolon" )
 			return nil
 		end
-		if javalex.indentLevelForLine( endTree.iLineStart ) ~= javalex.indentLevelForLine( tree.iLineStart ) then
+		if endTree.indentLevel ~= tree.indentLevel then
 			err.setErrNodeAndRef( endTree, tree, "This while statement should have the same indentation as its \"do\"" )
 		end
 		stmt.expr = makeExpr( endTree.nodes[3] )
+		stmt.iLineWhile = endTree.iLine
 		checkMultiLineIndent( endTree )
 	elseif p == "while" then
 		-- while (expr) controlledStmts
@@ -667,7 +638,7 @@ function getLineStmts( tree, stmts )
 			err.setErrNode( whileEnd, "while loop header should not end with a semicolon" )
 			return nil
 		end
-		stmt = { s = "while", expr = makeExpr( nodes[3] ), stmts = getControlledStmts(),
+		stmt = { s = "while", expr = makeExpr( nodes[3] ), block = getControlledBlock(),
 				entireLine = true }
 	elseif p == "for" then
 		-- for loop variants
@@ -687,7 +658,7 @@ function getLineStmts( tree, stmts )
 
 	-- Add the stmt if successful
 	if stmt then
-		stmt.iLine = tree.iLine
+		stmt.iLine = tree.iLineStart or tree.iLine
 		stmts[#stmts + 1] = stmt
 		checkMultiLineIndent( tree )
 		return true
@@ -695,23 +666,24 @@ function getLineStmts( tree, stmts )
 	return false
 end
 
--- Process a block of statements beginning with { and ending with }
--- and return an array of stmt.
+-- Get a block of statements beginning with { and ending with }
+-- and return a block structure.
 -- If there is an error then set the error state and return nil.
-function getBlockStmts()
+function getBlock()
 	-- Block must start with a {
-	local iLineStart = parseTrees[iTree].iLine
-	local beginIndent = javalex.indentLevelForLine( iLineStart )
+	local treeStart = parseTrees[iTree]
+	local iLineStart = treeStart.iLine
+	local beginIndent = treeStart.indentLevel
 	if not checkBlockBegin() then
-		return false
+		return nil
 	end
 
 	-- Check block is indented from beginning {
 	local prevTree, blockIndent
 	if iTree <= numParseTrees then
 		prevTree = parseTrees[iTree]
-		blockIndent = javalex.indentLevelForLine( prevTree.iLineStart )
-		if prevTree.p ~= "end" and blockIndent <= javalex.indentLevelForLine( iLineStart ) then
+		blockIndent = prevTree.indentLevel
+		if prevTree.p ~= "end" and blockIndent <= beginIndent then
 			err.setErrLineNumAndRefLineNum( prevTree.iLineStart, iLineStart,
 					"Lines within { } brackets should be indented" )
 		end
@@ -722,19 +694,19 @@ function getBlockStmts()
 	while iTree <= numParseTrees do
 		local tree = parseTrees[iTree]
 		local p = tree.p
-		local currIndent = javalex.indentLevelForLine( tree.iLineStart )
+		local currIndent = tree.indentLevel
 		iTree = iTree + 1    -- pass this line
 
 		if p == "begin" then
 			-- Ad-hoc blocks are not supported
 			err.setErrLineNum( tree.iLine, "Unexpected {" )
-			return nil
 		elseif p == "end" then
+			-- This ends our block
 			if currIndent ~= beginIndent then
 				err.setErrLineNumAndRefLineNum( tree.iLineStart, iLineStart, 
 						"A block's ending } should have the same indentation as its beginning {" )
 			end
-			return stmts   -- this ends our block
+			return { s = "block", iLineBegin = iLineStart, stmts = stmts, iLineEnd = tree.iLine }
 		else
 			if currIndent ~= blockIndent then
 				err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
@@ -747,7 +719,7 @@ function getBlockStmts()
 	end
 
 	-- Got to EOF before finding matching }
-	err.setErrLineNumAndRefLineNum( numSourceLines + 1, iLineStart,
+	err.setErrLineNumAndRefLineNum( source.numLines + 1, iLineStart,
 		"Missing } to end block starting at line %d", iLineStart )
 	return nil
 end
@@ -759,9 +731,11 @@ function makeExpr( node )
 		return nil
 	end
 
-	-- Expr nodes can be a token (variable ID, or literal INT, NUM, BOOL, NULL, STR)
-	if node.tt then
-		return node
+	-- Is node a token? (variable ID, or literal INT, NUM, BOOL, STR, or NULL)
+	if node.tt == "ID" then
+		return makeLValue( node )   -- a simple variable
+	elseif node.tt then
+		return node     -- expr node can be a literal token node directly
 	end
 
 	-- Handle the different primaryExpr types plus binary operators
@@ -795,14 +769,24 @@ function makeExpr( node )
 	end
 end
 
--- Make and return a function member given the parsed fields,
+-- Make and return a function member given the parsed nodes,
 -- including the contained statements, and move iTree past it.
+-- This function will get called even if the func has isError true
+-- and will try to process the func as much as possible but
+-- will set isError in the func if there is an error.
 -- If there is an error then set the error state and return nil.
 local function getFunc( nodes )
+	-- Any part of the nodes may have errors, so be careful and check
+	-- everything before using it, and set isError if an error is found.
+	local isError = nil
+
 	-- Determine the return type
 	local vt
 	local retType = nodes[2]
-	if retType.p == "void" then
+	if retType.t ~= "retType" or retType.isError then
+		vt = nil 
+		isError = true
+	elseif retType.p == "void" then
 		vt = false
 	else
 		vt = javaTypes.vtFromType( retType.nodes[1], retType.p == "array" )
@@ -811,27 +795,39 @@ local function getFunc( nodes )
 	-- Build the paramVars array
 	local paramVars = {}
 	local paramList = nodes[5]
-	if paramList then
+	if paramList and paramList.nodes then
 		for _, node in ipairs( paramList.nodes ) do
-			local ns = node.nodes
-			if node.p == "array" then
-				paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[4], nil, true )
+			if node.isError then
+				isError = true
 			else
-				paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[2] )
+				local ns = node.nodes
+				if not ns or ns.isError then
+					isError = true
+				else
+					if node.p == "array" then
+						paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[4], nil, true )
+					else
+						paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[2] )
+					end
+				end
 			end
 		end
 	end
 
-	-- Get the stmts array
-	local stmts = getBlockStmts()
-	if stmts == nil then
-		return nil
+	-- Get the block
+	local block = getBlock()
+	if block == nil then
+		return nil   -- probably too malformed to even define it with isError
 	end
 
 	-- Make the func
 	local nameID = nodes[3]
-	local func = { s = "func", iLine = nameID.iLine, nameID = nameID, vt = vt,
-					paramVars = paramVars, stmts = stmts, entireLine = true }
+	if not nameID or nameID.tt ~= "ID" then
+		return nil   -- can't define it without a name
+	end
+	local func = { s = "func", iLine = nameID.iLine, nameID = nameID,
+					vt = vt, paramVars = paramVars, block = block, 
+					isError = isError, entireLine = true }
 
 	-- Add the access flags and return it
 	local access = nodes[1]
@@ -873,16 +869,16 @@ local function skipBlock()
 	end
 
 	-- Got to EOF before finding matching }
-	err.setErrLineNum( numSourceLines + 1, 
+	err.setErrLineNum( source.numLines + 1, 
 		"Missing } to end block starting at line %d", iLineStart )
 	return nil
 end
 
--- Check and build the members, ending with and including the } at 
--- the end of the program class.
+-- Check and build the members for the programTree, ending with and including 
+-- the } at the end of the program class.
 -- If there is an error then set the error state and return false.
 -- Return true if succesful.
-local function getMembers()
+local function getMembers( programTree )
 	local vars = programTree.vars
 	local funcs = programTree.funcs
 	local gotFunc = false     -- set to true when the first func was seen
@@ -895,11 +891,17 @@ local function getMembers()
 		local nodes = tree.nodes
 		iTree = iTree + 1
 
-		if tree.isError then
-			-- Skip lines with syntax errors, but process stmt blocks for bad func headers
-			if p == "func" then
-				getBlockStmts()
+		if p == "func" then
+			-- Handle a func definition as best as possible even if tree.isError,
+			-- to try to maintain the structure and define known functions. 
+			if nodes[3] and nodes[3].str == "main" then
+				skipBlock()    -- skip body of main without checking it
+			else
+				funcs[#funcs + 1] = getFunc( nodes )
 			end
+			gotFunc = true
+		elseif tree.isError then
+			-- Skip misc. lines with syntax errors
 		elseif getVar( p, nodes, vars, true ) then
 			-- Added instance variable(s)
 			-- Code12 does not allow instance variables to follow member functions,
@@ -907,16 +909,9 @@ local function getMembers()
 			if gotFunc then
 				err.setErrNode( tree, "Class-level variables must be defined at the beginning of the class" )
 			end
-		elseif p == "func" then
-			if nodes[3].str == "main" then
-				skipBlock()    -- skip body of main without checking it
-			else
-				funcs[#funcs + 1] = getFunc( nodes )
-			end
-			gotFunc = true
 		elseif p == "end" then
 			-- The end of the class
-			if javalex.indentLevelForLine( tree.iLine ) ~= 0 then
+			if tree.indentLevel ~= 0 then
 				err.setErrLineNum( tree.iLine, "The ending } of the program class should not be indented" )
 			end
 			return true
@@ -924,7 +919,10 @@ local function getMembers()
 			-- Ad-hoc blocks are unexpected, but try to process the block anyway
 			err.setErrNode( tree, "Unexpected or extra {" )
 			iTree = iTree - 1   -- back to the { line
-			getBlockStmts()
+			getBlock()
+		elseif p == "class" then
+			err.setErrNode( tree, "Code12 does not support additional class definitions" )
+			getBlock()
 		else
 			-- Unexpected line in the class block
 			err.overrideErrLineParseTree( tree, 
@@ -935,12 +933,12 @@ local function getMembers()
 		if firstMemberLineNum == nil then
 			-- Save indentation level and line number of first member
 			firstMemberLineNum = tree.iLineStart
-			firstMemberIndentLevel = javalex.indentLevelForLine( firstMemberLineNum )
+			firstMemberIndentLevel = tree.indentLevel
 			if firstMemberIndentLevel == 0 then
 				err.setErrLineNum( firstMemberLineNum,
 						"Class-level variable and function definitions should be indented" )
 			end
-		elseif javalex.indentLevelForLine( tree.iLineStart ) ~= firstMemberIndentLevel then
+		elseif tree.indentLevel ~= firstMemberIndentLevel then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
 					"Class-level variable and function definitions should all have the same indentation" )
 		end
@@ -948,7 +946,7 @@ local function getMembers()
 	end
 
 	-- Reached EOF before finding the end of the class
-	err.setErrLineNum( numSourceLines + 1, "Missing } to end the program class" )
+	err.setErrLineNum( source.numLines + 1, "Missing } to end the program class" )
 	return false
 end
 
@@ -1045,73 +1043,154 @@ end
 
 --- Module Functions ---------------------------------------------------------
 
--- Parse a program made of up sourceLines at the given syntaxLevel 
--- and return the program structure tree (see above).
--- If there is an error then set the error state and return nil.
-function parseProgram.getProgramTree( sourceLines, syntaxLevel )
-	-- Init the parse state
-	parseJava.initProgram()
-	parseTrees = {}
-	numSourceLines = #sourceLines
-
-	-- Parse the required program header
-	local lineNum
-	programTree, lineNum = parseHeader( sourceLines )
-	if programTree == nil then
-		return nil
+-- Parse source.strLines at the given syntaxLevel and store the results
+-- in source.lines, source.numLines, and source.syntaxLevel.
+function parseProgram.parseLines( syntaxLevel )
+	-- Set the syntax level and purge the parse cache if it changed
+	if syntaxLevel ~= source.syntaxLevel then
+		source.purgeParseCache()
 	end
+	source.syntaxLevel = syntaxLevel
 
-	-- Parse the remaining lines and build the parseTrees array
-	local startTokens = nil
-	local iLineStart = nil
-	while lineNum <= numSourceLines do
-		local tree, tokens = parseJava.parseLine( sourceLines[lineNum], 
-									lineNum, startTokens, syntaxLevel )
-		if tree == false then
-			-- Line is incomplete, carry tokens forward to next line
-			assert( type(tokens) == "table" )
-			startTokens = tokens
-			if iLineStart == nil then
-				iLineStart = lineNum  -- remember what line this multi-line parse stated on
-			end
+	-- Process source.strLines
+	local iLineCommentStart = nil   -- set when inside a block comment
+	local iLineStart = nil          -- starting iLine for multi-line parse
+	local startTokens = nil         -- tokens from unfinished multi-line parse
+	local lineRecCodePrev = nil     -- the last line so far with code on it
+	local strLines = source.strLines
+	local lines = source.lines
+	local numCachedLines = 0
+	for lineNum = 1, #strLines do
+		-- If we've seen this line before, we may be able to reuse its
+		-- cached parse results, but only if we are not in the middle of a 
+		-- block comment or incomplete line.
+		local strLine = strLines[lineNum]
+		local lineRecCached = (iLineCommentStart == nil and startTokens == nil) 
+								and source.lineCacheForStrLine[strLine]
+		local lineRec
+		if lineRecCached then
+			-- Make a copy of the cached results found for this line
+			lineRec = {
+				iLine = lineNum,
+				str = strLine,
+				commentStr = lineRecCached.commentStr,
+				hasCode = lineRecCached.hasCode,
+				indentLevel = lineRecCached.indentLevel,
+				indentStr = lineRecCached.indentStr,
+				parseTree = parseJava.copyLineParseTree( lineRecCached.parseTree, lineNum )
+			}
+			lines[lineNum] = lineRec
+			source.lineCacheForStrLine[strLine] = lineRec  -- update cache to newer one
+			numCachedLines = numCachedLines + 1
 		else
-			startTokens = nil
-			if tree then
-				tree.iLineStart = iLineStart or lineNum
-				if tree.p ~= "blank" then
-					parseTrees[#parseTrees + 1] = tree
+			-- We need to parse this line
+			lineRec = { iLine= lineNum, str = strLine }  
+			lines[lineNum] = lineRec
+			local tree, tokens = parseJava.parseLine( lineRec, iLineCommentStart,
+									startTokens, iLineStart, syntaxLevel )
+			if tree == false then
+				-- Line is incomplete, carry tokens forward to next line
+				startTokens = tokens
+				if iLineStart == nil then
+					iLineStart = lineNum  -- remember where this multi-line parse started
+				end
+			else
+				-- Completed parse
+				startTokens = nil
+				iLineStart = nil
+
+				-- We can cache this parse for possible reuse if it was successful
+				-- and not involved in a multi-line parse or block comment
+				if tree and not tree.isError and lineRec.errRec == nil
+						and lineRec.iLineStart == nil and iLineCommentStart == nil
+						and not lineRec.openComment then
+					source.lineCacheForStrLine[strLine] = lineRec  -- cache it
+				end
+
+				-- Keep track of open block comments
+				if lineRec.openComment then
+					iLineCommentStart = lineRec.iLineCommentStart
+				else
+					iLineCommentStart = nil
 				end
 			end
-			iLineStart = nil
 		end
-		lineNum = lineNum + 1
-	end
+
+		-- Check for inconsistent tab/space indent on all non-blank lines
+		if lineRec.hasCode then
+			if lineRecCodePrev then
+				checkIndentTabsAndSpaces( lineRec, lineRecCodePrev )
+			end
+			lineRecCodePrev = lineRec
+		end
+	end -- end of loop
+	source.numLines = #strLines
+
+	-- Add sentinel line at end of source.lines
+	local lineNum = #strLines + 1
+	lines[lineNum] = { iLine = lineNum, str = "" }
 
 	-- Check for unclosed block comment
-	local iLineComment = javalex.iLineStartOfUnclosedBlockComment()
-	if iLineComment then
-		err.setErrLineNum( iLineComment, "Comment started with /* was not closed with */" )
-		return nil
+	if iLineCommentStart then
+		err.setErrLineNum( iLineCommentStart, "Comment started with /* was not closed with */" )
 	end
 
-	-- Add sentinel parse tree at the end
-	numParseTrees = #parseTrees
-	parseTrees[#parseTrees + 1] = 
-			{ t = "line", p = "EOF", nodes = {}, 
-				iLine = numSourceLines + 1, iLineStart = numSourceLines + 1 }
+	-- Print cache stats
+	print( string.format( "%d lines copied from cache (%d%%)", 
+				numCachedLines, numCachedLines * 100 / source.numLines ) )
+	local numParsed = source.numLines - numCachedLines
+	print( string.format( "%d lines parsed (%d%%)", 
+				numParsed, numParsed * 100 / source.numLines ) )
+end
 
-	-- Get the member vars and funcs
-	iTree = 1
-	if getMembers() then
-		-- We should be at the EOF now
-		if parseTrees[iTree].p ~= "EOF" then
-			err.overrideErrLineParseTree( parseTrees[iTree],
-					"Unexpected line after end of class -- mismatched { } brackets?" )
-			return nil
+-- Make the parseTrees array from the parsed source.lines and set numParseTrees
+local function getParseTrees()
+	-- Get all non-blank parse trees from source.lines
+	parseTrees = {}
+	for i = 1, source.numLines do
+		local tree = source.lines[i].parseTree
+		if tree and tree.p ~= "blank" then
+			parseTrees[#parseTrees + 1] = tree
 		end
 	end
+	numParseTrees = #parseTrees
 
-	-- Return result
+	-- Add sentinel parse tree at the end of parseTrees
+	local lineNum = source.numLines + 1   -- will report at source line sentinel
+	parseTrees[numParseTrees + 1] = 
+			{ t = "line", p = "EOF", nodes = {}, 
+				iLine = lineNum, iLineStart = lineNum, indentLevel = 0 }
+end
+
+-- Parse the source at the given syntaxLevel and return the program structure.
+-- If there is an error then set the error state, and return nil if the error 
+-- is unrecoverable.
+function parseProgram.getProgramTree( syntaxLevel )
+	-- Get the parse trees and init the strucure parse state
+	parseProgram.parseLines( syntaxLevel )
+	getParseTrees()
+	iTree = 1
+
+	-- Make the root of the program tree and check the program header
+	local programTree = getProgramHeader()
+	if programTree == nil then
+		return nil    -- probably not useful to keep parsing
+	end
+
+	-- Get the member vars and funcs and return the completed program structure
+	if getMembers( programTree ) then
+		-- We should be at the EOF now
+		local tree = parseTrees[iTree]
+		if tree and tree.p ~= "EOF" then
+			if tree.p == "class" then
+				err.overrideErrLineParseTree( tree,
+						"Code12 does not allow defining additional classes" )
+			else
+				err.overrideErrLineParseTree( tree,
+						"Unexpected line after end of class -- mismatched { } brackets?" )
+			end
+		end
+	end
 	return programTree
 end
 

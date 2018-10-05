@@ -13,6 +13,7 @@ local widget = require( "widget" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
+local source = require( "source" )
 local env = require( "env" )
 
 -- The statusBar module
@@ -30,7 +31,7 @@ local openFileBtn          -- Open in Editor button
 
 -- Open the source file in the system default text editor for its file type
 local function openFileInEditor()
-	local path = app.sourceFile.path
+	local path = source.path
 	if path then
 		env.openFileInEditor( path )
 	end
@@ -39,22 +40,22 @@ end
 
 --- Module Functions ------------------------------------------------
 
--- Update the status bar based on data in app.sourceFile
+-- Update the status bar based on data in source
 function statusBar.update()
-	local sourceFile = app.sourceFile
-	if sourceFile.path == nil then
+	-- Set blank status bar if no file
+	if source.path == nil then
+		fileText.text = ""
 		openFileBtn.isVisible = false
 		return
 	end
 
-	-- Set the fileText with update status
-	local _, filename = env.dirAndFilenameOfPath( sourceFile.path )
-	if sourceFile.timeLoaded == 0 or sourceFile.timeModLast == 0 
-			or sourceFile.timeModLast < app.startTime then
-		fileText.text = filename    -- not updated after this app run
-	else
+	-- Set the fileText with runState and update status
+	local _, text = env.dirAndFilenameOfPath( source.path )
+	if source.timeLoaded ~= 0 and source.timeModLast ~= 0 
+			and source.timeModLast >= app.startTime then
+		-- File has been updated since first loaded
 		local updateStr
-		local secs = os.time() - sourceFile.timeModLast
+		local secs = os.time() - source.timeModLast
 		if secs < 10 then
 			updateStr = "just now"
 		elseif secs < 60 then
@@ -69,8 +70,12 @@ function statusBar.update()
 				updateStr = min .. " minutes ago"
 			end
 		end
-		fileText.text = filename .. " - Updated " .. updateStr
+		text = text .. " - Updated " .. updateStr
 	end
+	if g.runState then
+		text = text .. " (" .. g.runState .. ")"
+	end 
+	fileText.text = text
 
 	-- Hide the Open button if there isn't enough room
 	local dxNeeded = fileText.contentWidth + openFileBtn.contentWidth + app.margin * 3

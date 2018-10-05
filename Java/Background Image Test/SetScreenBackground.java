@@ -14,6 +14,10 @@ public class SetScreenBackground extends Code12Program
 		ct.setBackImage("background1.jpg");		
 	}
 
+	public void update()
+	{
+	}
+
 	public void onKeyPress( String keyName )
 	{
 		if ( keyName.equals("1") )

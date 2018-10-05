@@ -7,8 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
+local runtime = require("Code12.runtime")
 
 local widget = require("widget")
 
@@ -140,7 +141,7 @@ local function onTouchDragBar(event)
 		g.setFocusObj(dragBar)
 		dragOffsetX = event.x - dialogGroup.x
 		dragOffsetY = event.y - dialogGroup.y
-	elseif g.getFocusObj() == dragBar and phase ~= "cancelled" then
+	elseif g.focusObj == dragBar and phase ~= "cancelled" then
 		-- Move dialog then make sure it's fully visible in the app window
 		local xMax = display.actualContentWidth - dialogFrame.width
 		local yMax = display.actualContentHeight - dialogFrame.height
@@ -244,15 +245,17 @@ local function inputValue(message, valueType)
 	-- Init the input state, then block and yield until the dialog finishes
 	inputType = valueType
 	g.setFocusObj(nil)   -- a GameObj may have focus if it was just clicked on
-	g.modalDialog = true
+	g.runState = "waiting"
 	while dialogGroup do
-		if g.blockAndYield() == "abort" then
+		if runtime.blockAndYield() == "abort" then
 			endDialog()
-			g.modalDialog = false
-			error("aborted");
+			g.runState = "stopped"
+			error("aborted")   -- caught by the runtime
 		end
 	end
-	g.modalDialog = false
+	if g.runState == "waiting" then
+		g.runState = "running"
+	end
 
 	-- Return the result
 	return inputResult

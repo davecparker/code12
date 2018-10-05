@@ -19,9 +19,10 @@ local console = {
 	scrollbar = nil,         -- the console scrollbar (a Scrollbar)
 }
 
--- Layout metrics
-local textMargin = 5         -- margin for text items
-local maxLineLength = 500    -- max line length (since we clip and don't wrap)
+-- UI constants
+local textMargin = 5                 -- margin for text items
+local maxLineLength = 500            -- max line length (since we clip and don't wrap)
+local rgbTextDefault = { 0, 0, 0 }   -- default text color is black
 
 -- Display state
 local bg                     -- background rect
@@ -32,6 +33,7 @@ local fontCharWidth          -- measured font char width
 
 -- Console data
 local completedLines         -- array of strings for completed text lines
+local rgbForLine             -- map line number to color to use (rgb 3-array) if any
 local currentLineStrings     -- array of strings making up the current line
 local currentLineLength      -- number of chars in current line
 local scrollStartLine        -- starting line if scrolled back or nil if at end
@@ -65,7 +67,10 @@ local function updateConsole()
 		-- Load the completed lines
 		local iLine = startLine
 		while iText <= numDisplayLines and iLine <= numCompletedLines do
-			textObjs[iText].text = completedLines[iLine]
+			local textObj = textObjs[iText]
+			textObj.text = completedLines[iLine]
+			local rgb = rgbForLine[iLine] or rgbTextDefault
+			textObj:setFillColor( rgb[1], rgb[2], rgb[3] )
 			iText = iText + 1
 			iLine = iLine + 1
 		end
@@ -116,18 +121,20 @@ local function addText( text )
 	end
 end
 
--- End the current line in the console
-local function endLine()
+-- End the current line in the console, assigning the color rgb if given.
+local function endLine( rgb )
 	local n = #currentLineStrings
+	local iLine = #completedLines + 1
 	if n == 1 then
-		completedLines[#completedLines + 1] = currentLineStrings[1]
+		completedLines[iLine] = currentLineStrings[1]
 		currentLineStrings[1] = nil
 	elseif n == 0 then	
-		completedLines[#completedLines + 1] = ""
+		completedLines[iLine] = ""
 	else
-		completedLines[#completedLines + 1] = table.concat( currentLineStrings )
+		completedLines[iLine] = table.concat( currentLineStrings )
 		currentLineStrings = {}
 	end
+	rgbForLine[iLine] = rgb
 	currentLineLength = 0
 	changed = true
 end
@@ -166,15 +173,18 @@ function console.print( text )
 	end
 end
 
--- Print text plus a newline to the console
-function console.println( text )		
+-- Print text plus a newline to the console.
+-- if rgb is included then it is an array {r, g, b} (each 0-1) for the 
+-- color to assign to the line.
+function console.println( text, rgb )		
 	console.print( text )
-	endLine()
+	endLine( rgb )
 end
 
 -- Clear the console data and view
 function console.clear()
 	completedLines = {}
+	rgbForLine = {}
 	currentLineStrings = {}
 	currentLineLength = 0
 	scrollStartLine = nil

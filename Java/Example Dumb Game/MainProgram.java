@@ -1,19 +1,14 @@
-import Code12.*;
-
-public class MainProgram extends Code12Program
-{
-   // public static void main(String[] args)
-   // { 
-   //    Code12.run(new MainProgram()); 
-   // }
-   
+class MainProgram
+{   
    public void start()
    {
-      foo("Hey");
-   }
-
-   void foo(String s)
-   {
-      ct.println(s);
+      ct.println("Hey");
+      ct.setTitle("My Program");
+      GameObj c = ct.circle(50, 30, 10);
+      // c.align("back");
+      // ct.image("foo", 50, 70, 20);
+      c.setFillColor("blue");
+      // ct.sound("hoy");
+      ct.log(c);
    }
 }

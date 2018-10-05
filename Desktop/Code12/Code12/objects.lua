@@ -7,8 +7,8 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
-require("Code12.runtime")
 local GameObj = require("Code12.GameObjAPI")
 
 
@@ -23,6 +23,7 @@ function ct.circle(x, y, diameter, color, ...)
 			g.checkType(4, "string", color)
 		end
 		g.checkNoMoreParams(...)
+		diameter = g.checkParamNotNegative("diameter", diameter)
 	end 
 
 	-- Make the circle
@@ -38,6 +39,8 @@ function ct.rect(x, y, width, height, color, ...)
 			g.checkType(5, "string", color)
 		end
 		g.checkNoMoreParams(...)
+		width = g.checkParamNotNegative("width", width)
+		height = g.checkParamNotNegative("height", height)
 	end 
 
 	-- Make the rect
@@ -69,6 +72,7 @@ function ct.text(text, x, y, height, color, ...)
 			g.checkType(5, "string", color)
 		end
 		g.checkNoMoreParams(...)
+		height = g.checkParamNotNegative("height", height)
 	end 
 
 	-- Make the text
@@ -80,6 +84,8 @@ function ct.image(filename, x, y, width, ...)
 	-- Check parameters
 	if g.checkAPIParams("ct.image") then
 		g.checkTypes({"string", "number", "number", "number"}, filename or "", x, y, width, ...)
+		filename = g.checkParamNotEmpty("filename", filename)
+		width = g.checkParamNotNegative("width", width)
 	end
 	
 	-- Make the text

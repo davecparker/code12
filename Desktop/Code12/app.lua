@@ -37,20 +37,18 @@ local app =  {
 
 	-- Misc constants
 	numSyntaxLevels = 12,        -- number of different parsing levels
+	maxNumRecentPaths = 5,       -- maximum number of recent source file paths to keep
 
-	-- The user source file
-	sourceFile = {
-		path = nil,              -- full pathname to the file
-		timeLoaded = 0,          -- time this file was loaded or 0 if not loaded
-		timeModLast = 0,         -- last modification time or 0 if unknown
-		updated = false,         -- set to true when file update is detected
-		strLines = {},           -- array of source code lines when read
-	},
+	-- List of most recent source file paths opened, with duplicates removed
+	recentSourceFilePaths = {},
 
 	-- User settings
 	syntaxLevel = nil,           -- current syntax level
 	tabWidth = 4,                -- current tab width
-	oneErrOnly = false,          -- true to display only the first error
+	oneErrOnly = true,           -- true to display only the first error
+	editorPath = nil,            -- current text editor
+	useDefaultEditor = false,    -- when true, use the OS default for opening user program files
+	openFilesInEditor = true,    -- when true, opened programs will also open in text editor
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
@@ -142,6 +140,11 @@ local function lowerASCII( code )
 	return code
 end
 
+-- Return the string with the first letter changed to uppercase if lowercase.
+function app.startWithCapital( str )
+	return string.upper( string.sub( str, 1, 1 ) ) .. (string.sub( str, 2 ) or "")
+end
+
 -- Return a number from 0 to 1 representing a partial match of 
 -- str1 to str2 (1.0 if they match exactly).
 function app.partialMatchString( str1, str2 )
@@ -180,6 +183,22 @@ function app.partialMatchString( str1, str2 )
 	return (front + back) / (2 * longerLen)
 end
 
+-- Add given path to the end of app.recentSourceFilePaths and remove any other
+-- occurance of it in the list.
+-- Then trim app.recentSourceFilePaths so its size doen't exceed app.maxNumRecentPaths
+function app.addRecentSourceFilePath( path )
+	local recentPaths = app.recentSourceFilePaths
+	table.insert( recentPaths, 1, path )
+	for i = #recentPaths, 2, -1 do
+		if recentPaths[i] == path then
+			table.remove( recentPaths, i )
+			break
+		end
+	end
+	if #recentPaths > app.maxNumRecentPaths then
+		table.remove( recentPaths )
+	end
+end
 
 ------------------------------------------------------------------------------
 return app

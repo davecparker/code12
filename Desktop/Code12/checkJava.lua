@@ -9,6 +9,7 @@
 
 -- Code12 modules
 local app = require( "app" )
+local source = require( "source" )
 local err = require( "err" )
 local javaTypes = require( "javaTypes" )
 local parseJava = require( "parseJava" )
@@ -20,12 +21,13 @@ local checkJava = {}
 
 
 -- File local state
-local syntaxLevel          -- the langauge (syntax) level
+local syntaxLevel          -- the language (syntax) level
 
--- Table of variables that are currently defined. 
+-- Tables for variables that are currently defined, and those out of scope. 
 -- These map a name to a var structure. There are also entries of type string 
 -- that map a lowercase version of the name to the name with the correct case.
-local variables = {}
+local variables
+local variablesOutOfScope
 
 -- Table of user-defined methods that are currently defined. 
 -- These map a name to a table in the same format as the apiTables 
@@ -34,13 +36,13 @@ local variables = {}
 --            params = array of { name = str, vt = vtParam, var = var } }
 -- There are also entries of type string 
 -- that map a lowercase version of the name to the name with the correct case.
-local userMethods = {}
+local userMethods
 
 -- Set of funcs for names of event methods that the user has defined (overridden)
-local eventMethodFuncs = {}
+local eventMethodFuncs
 
 -- Stack of local variable names, with an empty name "" marking the beginning of each block
-local localNameStack = {}
+local localNameStack
 
 -- Program processing state
 local beforeStart       -- true when checking code that will run before start()
@@ -68,9 +70,10 @@ end
 -- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
 -- If the name is found and the entry is a record (table) then return the record.
 -- If an entry has an index (name) differing only in case, then set the error state 
--- to a description of the error and return (nil, entryCorrectCase, strCorrectCase). 
+-- to a description of the error unless noError is true, and return 
+-- (nil, entryCorrectCase, strCorrectCase). 
 -- If the name is not found at all then return nil.
-local function lookupID( nameToken, nameTable )
+local function lookupID( nameToken, nameTable, noError )
 	assert( nameToken.tt == "ID" )
 	local name = nameToken.str
 
@@ -94,8 +97,10 @@ local function lookupID( nameToken, nameTable )
 
 	-- Found but wrong case?
 	if strCorrectCase then
-		err.setErrNode( nameToken, 
-				"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
+		if not noError then
+			err.setErrNodeAndRef( nameToken, result,
+					"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
+		end
 		return nil, result, strCorrectCase
 	end
 	return nil
@@ -137,13 +142,12 @@ local function defineVar( var )
 
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
+	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables, true )
 	if varFound then
 		err.setErrNodeAndRef( var, varFound, 
 				"Variable %s was already defined", varName )
 		return false
 	elseif varCorrectCase then
-		err.clearErr( nameNode.iLine )
 		err.setErrNodeAndRef( var, varCorrectCase, 
 				"Variable %s differs only by upper/lower case from existing variable %s", 
 				varName, nameCorrectCase )
@@ -181,7 +185,18 @@ local function getVariable( varNode, isVarAssign )
 	end
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
-		if isVarAssign then
+		-- Variable is undefined. Check old (out of scope) variables and choose an error.
+		local oldVar, oldVarCorrect, oldStrCorrect = 
+				lookupID( varNode, variablesOutOfScope, true )
+		if oldVar then
+			err.setErrNodeAndRef( varNode, oldVar, 
+					"Undefined variable (previous variable %s was defined in a different block)",
+					oldVar.nameID.str )
+		elseif oldStrCorrect then
+			err.setErrNodeAndRef( varNode, oldVarCorrect, 
+					"Undefined variable (previous similar variable %s was defined in a different block)",
+					oldStrCorrect )
+		elseif isVarAssign then
 			err.setErrNode( varNode, 
 					"Variable %s must be declared with a type before being assigned",
 					varNode.str )
@@ -190,7 +205,9 @@ local function getVariable( varNode, isVarAssign )
 		end
 		return nil
 	end
-	if not isVarAssign and not varFound.assigned then
+	if isVarAssign then
+		varFound.assigned = true
+	elseif not varFound.assigned then
 		err.setErrNode( varNode,  
 			"Variable %s must be assigned before it is used", varNode.str )
 	end
@@ -271,13 +288,12 @@ local function defineMethod( func )
 
 	-- User-defined function: Check if already defined
 	local methodFound, methodCorrectCase, nameCorrectCase 
-			= lookupID( nameNode, userMethods )
+			= lookupID( nameNode, userMethods, true )
 	if methodFound then
 		err.setErrNodeAndRef( func, methodFound.func, 
 				"Function %s was already defined", fnName )
 		return
 	elseif methodCorrectCase then
-		err.clearErr( nameNode.iLine )
 		err.setErrNodeAndRef( func, methodCorrectCase.func, 
 				"Function %s differs only by upper/lower case from existing function %s", 
 				fnName, nameCorrectCase )
@@ -367,32 +383,22 @@ end
 -- Store the isGlobal and vt fields in the lValue, and return the vt. 
 -- If there is an error, then set the error state and return nil.
 local function vtCheckLValue( lValue, assigned )
-	-- An lValue is just an ID node for a simple variable
-	if lValue.tt == "ID" then
-		-- Get the variable and mark it assigned as appropriate
-		local varFound = getVariable( lValue, assigned )
-		if varFound == nil then
-			return nil
-		end
-		if assigned then
-			if varFound.isConst then
-				err.setErrNode( lValue, "Cannot assign to constant (final) variable" )
-			end
-			varFound.assigned = true
-		end
-
-		-- Store the vt and isGlobal in the ID, and return the vt
-		lValue.isGlobal = varFound.isGlobal
-		local vt = varFound.vt
-		lValue.vt = vt
-		return vt
-	end
-
-	-- Full lValue structure
 	assert( lValue.s == "lValue" )
 	local varNode = lValue.varID
 	local indexExpr = lValue.indexExpr
 	local fieldID = lValue.fieldID
+
+	-- Handle case of a simple variable (tracks if assigned)
+	if not (indexExpr or fieldID) then
+		local varFound = getVariable( varNode, assigned )
+		if varFound == nil then
+			return nil
+		end
+		local vt = varFound.vt
+		lValue.vt = vt
+		lValue.isGlobal = varFound.isGlobal
+		return vt
+	end
 
 	-- Get the variable and its type, and store isGlobal in the lValue
 	local varFound = getVariable( varNode )
@@ -400,7 +406,7 @@ local function vtCheckLValue( lValue, assigned )
 		return nil
 	end
 	lValue.isGlobal = varFound.isGlobal
-	local vt = varFound.vt
+	local vt = varFound.vt    -- start with the type of just the varNode part
 
 	-- Check array index if any, and get the element type
 	if indexExpr then
@@ -425,7 +431,8 @@ local function vtCheckLValue( lValue, assigned )
 		elseif type(vt) == "table" then
 			-- Support array.length
 			if fieldID.str == "length" then
-				return 0  -- int
+				lValue.vt = 0  -- int
+				return 0       -- int
 			else
 				err.setErrNodeAndRef( fieldID, lValue,
 					"Arrays can only access their \".length\" field" )
@@ -514,7 +521,7 @@ local function findStaticMethod( call )
 		elseif beforeStart then
 			err.setErrNode( call, "Code12 API functions cannot be called before start()" )
 		end
-		return method, "ct." .. nameStr
+		return method, "function ct." .. nameStr
 	elseif className == "System" then
 		-- System.out.print, System.out.println
 		local lValue = call.lValue
@@ -528,7 +535,7 @@ local function findStaticMethod( call )
 					"The only supported System functions are System.out.print() and System.out.println()" )
 			return nil
 		end
-		return method, "System.out." .. nameStr
+		return method, "function System.out." .. nameStr
 	elseif className == "Math" then
 		-- e.g. Math.sin
 		method = lookupID( nameID, apiTables["Math"].methods )
@@ -537,7 +544,7 @@ local function findStaticMethod( call )
 					"Unknown or unsupported Math method" )
 			return nil
 		end
-		return method, "Math." .. nameStr
+		return method, "function Math." .. nameStr
 	end
 	error( "Unexpected static class name " .. className )
 	return nil
@@ -571,7 +578,7 @@ local function findObjectMethod( call )
 			end
 			return nil
 		end
-		return method, className .. "." .. nameStr
+		return method, className .. " method " .. nameStr
 	end
 
 	-- Error: e.g. intVar.delete()
@@ -580,12 +587,8 @@ local function findObjectMethod( call )
 	return nil
 end
 
--- Check a call stmt or expr structure.
--- If there is an error then set the error state and return nil, 
--- otherwise return the vt for the return type vt if successful.
-local function vtCheckCall( call )
-	-- { s = "call", class, lValue, nameID, exprs }
-	-- Find the method
+-- Return (method table entry, display name) for a call structure
+local function methodAndDisplayNameFromCall( call )
 	local method, fnName
 	if call.class then     -- e.g. ct.circle, System.out.println, Math.sin
 		method, fnName = findStaticMethod( call )
@@ -595,10 +598,23 @@ local function vtCheckCall( call )
 		method = findUserMethod( call.nameID )
 		fnName = call.nameID.str
 	end
+	return method, fnName
+end
+
+-- Check a call stmt or expr structure.
+-- If there is an error then set the error state and return nil, 
+-- otherwise return the vt for the return type vt if successful.
+local function vtCheckCall( call )
+	-- { s = "call", class, lValue, nameID, exprs }
+	-- Find the method
+	local method, fnName = methodAndDisplayNameFromCall( call )
 	if method == nil then
 		return nil
 	end
 	local refFunc = method.func   -- for user-defined methods, nil for API
+	if refFunc and refFunc.isError then
+		return nil     -- don't check calls to funcs with isError
+	end
 
 	-- Check parameter count
 	local exprs = call.exprs
@@ -606,18 +622,14 @@ local function vtCheckCall( call )
 	local numParams = #method.params
 	local min = method.min or numParams
 	if numExprs < min then
-		if numExprs == 0 then
-			err.setErrNodeAndRef( call, refFunc, "%s requires %d parameter%s", 
-					fnName, min, (min ~= 1 and "s") or "" )
-		else
-			err.setErrNodeAndRef( call, refFunc, 
-					"Not enough parameters passed to %s (requires %d)", 
-					fnName, min )
-		end
+		err.setErrNodeAndRef( call, refFunc, "%s requires %d parameter%s", 
+				app.startWithCapital( fnName ), min, (min ~= 1 and "s") or "",
+				{ docLink = method.docLink } )
 		return nil
 	elseif not method.variadic and numExprs > numParams then
 		err.setErrNodeAndRef( call, refFunc, 
-				"Too many parameters passed to %s", fnName )
+				"Too many parameters passed to %s", fnName, 
+				{ docLink = method.docLink }  )
 		return nil
 	end
 
@@ -647,9 +659,11 @@ local function vtCheckCall( call )
 		local vtNeeded = method.params[i].vt
 		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
 			err.setErrNodeAndRef( expr, refFunc, 
-					"Parameter %d (%s) of %s expects type %s, but %s was passed",
-					i, method.params[i].name, fnName, javaTypes.typeNameFromVt( vtNeeded ), 
-					javaTypes.typeNameFromVt( vtPassed ) )
+					"Parameter #%d (%s) of %s expects type %s, but %s was passed",
+					i, method.params[i].name, fnName,
+					javaTypes.typeNameFromVt( vtNeeded ), 
+					javaTypes.typeNameFromVt( vtPassed ),
+					{ docLink = method.docLink } )
 			return nil
 		end
 	end
@@ -670,7 +684,7 @@ local function beginLocalBlock( paramVars )
 	end
 end
 
--- End a local variable block, discarding any definitions in the top block
+-- End a local variable block, moving any definitions in the top block out of scope
 local function endLocalBlock()
 	local iTop = #localNameStack
 	while iTop > 0 do
@@ -684,18 +698,22 @@ local function endLocalBlock()
 			break
 		end
 
-		-- Remove the definition of this variable and lowercase version too
+		-- Move the definition of this variable to variablesOutOfScope
+		-- and the lowercase version too
+		variablesOutOfScope[varName] = variables[varName]
+		local nameLower = string.lower( varName )
+		variablesOutOfScope[nameLower] = variables[nameLower]
 		variables[varName] = nil
-		variables[string.lower( varName )] = nil
+		variables[nameLower] = nil
 	end
 end
 
--- If stmts then check the block of stmts. If paramVars is included then define 
+-- If block then check the block of stmts. If paramVars is included then define 
 -- these formal parameters at the beginning of the block.
-local function checkBlock( stmts, paramVars )
-	if stmts then
+local function checkBlock( block, paramVars )
+	if block and block.stmts then
 		beginLocalBlock( paramVars )
-		for _, stmt in ipairs( stmts ) do
+		for _, stmt in ipairs( block.stmts ) do
 			checkStmt( stmt )
 		end
 		endLocalBlock()
@@ -737,11 +755,11 @@ local function canOpAssign( lValue, opNode, expr )
 	return true
 end
 
--- Check the stmt block for the given loop stmt
+-- Check the block for the given loop stmt
 local function checkLoopBlock( stmt )
 	local currentLoopSav = currentLoop
 	currentLoop = stmt
-	checkBlock( stmt.stmts )
+	checkBlock( stmt.block )
 	currentLoop = currentLoopSav
 end
 
@@ -772,8 +790,8 @@ function checkStmt( stmt )
 		if vtSetExprNode( stmt.expr ) ~= true then
 			err.setErrNode( stmt.expr, "Conditional test must be boolean (true or false)" )
 		end
-		checkBlock( stmt.stmts )
-		checkBlock( stmt.elseStmts )
+		checkBlock( stmt.block )
+		checkBlock( stmt.elseBlock )
 	elseif s == "while" then
 		-- { s = "while", iLine, expr, stmts }
 		checkLoopExpr( stmt.expr )
@@ -842,6 +860,78 @@ function checkStmt( stmt )
 		end
 	else
 		error( "Unknown stmt structure " .. s )
+	end
+end
+
+-- Check for unreachable stmts in the block
+local function checkUnreachableStmts( block )
+	assert( block )
+	local stmts = block.stmts
+	if stmts then
+		local numStmts = #stmts
+		for i = 1, numStmts do
+			local stmt = stmts[i]
+
+			-- Check sub-blocks recursively
+			if stmt.block then
+				checkUnreachableStmts( stmt.block )
+				if stmt.elseBlock then
+					checkUnreachableStmts( stmt.elseBlock )
+				end
+			end
+
+			-- Check for return blocking stmts after
+			if i < numStmts and stmt.s == "return" then
+				err.setErrNodeAndRef( stmts[i + 1], stmt, 
+						"This statement is unreachable because there is a return before it.")
+				return
+			end
+		end
+	end
+end
+
+-- If the block is missing a return statement on one of its code paths
+-- then return the line number for the missing return. Return nil if OK.
+-- TODO: Doesn't check for infinite loops and flow within loops.
+local function iLineMissingReturn( block )
+	if block then
+		-- Look at the last stmt
+		local stmts = block.stmts
+		assert( stmts )
+		local stmt = stmts[#stmts]
+		if stmt == nil then
+			return block.iLineEnd   -- empty block
+		end
+		local s = stmt.s
+		if s == "return" then
+			return nil   -- found required return
+		elseif s == "if" and stmt.elseBlock then
+			-- Both sub-blocks must return a value if one does
+			local iLine = iLineMissingReturn( stmt.block )
+			local iLineElse = iLineMissingReturn( stmt.elseBlock )
+			if not (iLine and iLineElse) then
+				return iLine or iLineElse
+			end
+		end
+		-- This block is missing a return. Report at the } or last/only stmt
+		return block.iLineEnd or stmt.iLine
+	end
+end
+				
+-- Check the placement of returns in the (non-void) func.
+-- Existing return statements have already been type checked.
+-- Here we are checking that each code path ends in a return.
+local function checkFuncReturns( func )
+	local iLine = iLineMissingReturn( func.block )
+	if iLine then
+		local strErr
+		if iLine == func.block.iLineEnd then
+			strErr = "Function is missing a return statement (must return a value of type %s)"
+		else
+			strErr = "This code path is missing a return statement (function must return a value of type %s)"
+		end
+		err.setErrLineNumAndRefLineNum( iLine, func.iLine, 
+				strErr, javaTypes.typeNameFromVt( func.vt ) )
 	end
 end
 
@@ -1090,6 +1180,17 @@ local function vtExprBadEquality( node )
 	return nil
 end
 
+-- call used as an expression
+local function vtExprCall( node )
+	local vt = vtCheckCall( node ) 
+	if vt == false then
+		local method, fnName = methodAndDisplayNameFromCall( node )
+		err.setErrNode( node, 
+				"%s does not return a value", app.startWithCapital( fnName ), 
+				{ docLink = method.docLink } )
+	end
+	return vt
+end
 
 -- Since there are so many expr variations, we hash them to functions by their
 -- structure name (s), or opType string.
@@ -1113,7 +1214,7 @@ local fnVtExprVariations = {
 	["!="]          = vtExprEquality,
 	["="]           = vtExprBadEquality,
 	-- other expr patterns
-	["call"]        = vtCheckCall,
+	["call"]        = vtExprCall,
 	["lValue"]      = vtCheckLValue,
 	["staticField"] = vtExprStaticField,
 	["cast"]        = vtExprCast,
@@ -1127,20 +1228,16 @@ local fnVtExprVariations = {
 -- Also store the vt into node.vt for future use.
 -- If an error is found, set the error state and return nil.
 function vtSetExprNode( node )
-	-- Does this node already have the vt assigned? (e.g. literal token)
-	local vt = node.vt
-	if vt ~= nil then
-		return vt
+	-- An expr node can be a literal token, which has its vt set by parseJava
+	if node.tt then
+		assert( node.vt )
+		return node.vt
 	end
 
-	-- Is this an ID token (simplified lValue)?
-	if node.tt == "ID" then
-		return vtCheckLValue( node )
-	end
-
-	-- Determine the vt from functions in table above
+	-- Determine the type checking function to call from the table above
 	local fnVt
 	local s = node.s
+	assert( s )
 	if s == "unaryOp" or s == "binOp" then
 		fnVt = fnVtExprVariations[node.opType]
 		if fnVt == nil then
@@ -1151,9 +1248,9 @@ function vtSetExprNode( node )
 	else
 		fnVt = fnVtExprVariations[s]
 	end
-	vt = fnVt( node )
 
-	-- Store the vt in the node and return it
+	-- Get the vt, store it in the node, and return it
+	local vt = fnVt( node )
 	node.vt = vt       
 	return vt
 end
@@ -1167,6 +1264,7 @@ function checkJava.checkProgram( programTree, level )
 	-- Init program state
 	syntaxLevel = level
 	variables = {}
+	variablesOutOfScope = {}
 	userMethods = {}
 	eventMethodFuncs = {}
 	localNameStack = {}
@@ -1197,17 +1295,20 @@ function checkJava.checkProgram( programTree, level )
 		for _, func in ipairs( funcs ) do
 			if func.nameID.str ~= "main" then
 				currentFunc = func
-				checkBlock( func.stmts, func.paramVars )
+				checkBlock( func.block, func.paramVars )
+				checkUnreachableStmts( func.block )
+				if func.vt then
+					checkFuncReturns( func )
+				end
 			end
 		end
 	end
 	currentFunc = nil
 
-	-- Make sure that a start function was defined
+	-- Make sure that a start function was defined.
 	if not eventMethodFuncs["start"] then
-		local iLine = (programTree.nameID and programTree.nameID.iLine) or 1
-		err.setErrLineNum( iLine,
-				"A Code12 program must define a \"start\" function" )
+		err.setErrLineNum( source.numLines,
+				'A Code12 program must define a "start" function' )
 	end
 end
 

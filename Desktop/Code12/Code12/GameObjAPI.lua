@@ -8,7 +8,6 @@
 -----------------------------------------------------------------------------------------
 
 local g = require("Code12.globals")
-require("Code12.runtime")
 local GameObj = require("Code12.GameObj")
 
 
@@ -72,6 +71,8 @@ function GameObj:setSize(width, height, ...)
 	-- Check parameters
 	if g.checkGameObjMethodParams(self, "setSize") then
 		g.checkTypes({"number", "number"}, width, height, ...)
+		width = g.checkParamNotNegative("width", width)
+		height = g.checkParamNotNegative("height", height)
 	end
 
 	-- This is just a convenience method to set the public fields
