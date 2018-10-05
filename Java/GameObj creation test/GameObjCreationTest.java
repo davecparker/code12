@@ -86,11 +86,10 @@ public class GameObjCreationTest extends Code12Program
     public void enableScreen(String[] labels)
     {
         for (int i = 0; i < labels.length; i++)
-            screenButtons[i].visible = true;
-        for (int i = 0; i < labels.length; i++)
         {
-            screenLabels[i].setText(labels[i]);
+            screenButtons[i].visible = true;
             screenLabels[i].visible = true;
+            screenLabels[i].setText(labels[i]);
         }
     }
 
@@ -309,8 +308,8 @@ public class GameObjCreationTest extends Code12Program
     public void textStringTest()
     {
         title.setText("Text String Test");
-        String[] stringArray = {null, "(1)\t(2)\t(3)", "(1)\n(2)\n(3)"};
-        String[] labels = {"null", "tabs", "new lines"};
+        String[] stringArray = {"(1)\t(2)\t(3)", "(1)\n(2)\n(3)", null};
+        String[] labels = {"tabs", "new lines", "null"};
         for (int i = 0; i < stringArray.length; i++)
         {
             GameObj text = ct.text(stringArray[i], 55, 20 * i + 20, 5);
@@ -328,7 +327,7 @@ public class GameObjCreationTest extends Code12Program
         for (double i = 0; i < 10.1; i++)
         {
             GameObj text = ct.text(textString, x, 8 * i + 20, 4);
-            GameObj length = ct.text(ct.formatDecimal(text.width, 4), x - text.width / 2 - 8, text.y, 3);
+            GameObj length = ct.text(ct.formatDecimal(text.width, 2), x - text.width / 2 - 8, text.y, 3);
             textString = textString + ct.formatDecimal(i, 0);
             text.group = "testObjs";
             length.group = "testObjs";
@@ -343,12 +342,12 @@ public class GameObjCreationTest extends Code12Program
     public void textHeightTest()
     {
         title.setText("Text Height Test");
-        for (double i = -8; i <= 8; i += 2)
+        for (int i = -8; i <= 8; i += 2)
         {
             double x = 3.5 * i + 50;
             double y = -4 * i + 55;
             GameObj text = ct.text("code12", x, y, i);
-            GameObj height = ct.text(ct.formatDecimal(i), x - 15, y, 3);
+            GameObj height = ct.text(ct.formatInt(i), x - 15, y, 3);
             text.group = "testObjs";
             height.group = "testObjs";
         }
@@ -494,7 +493,7 @@ public class GameObjCreationTest extends Code12Program
             ct.clearGroup("performanceObjs");
     }
 
-    public void onMouseRelease(GameObj obj, double x, double y)
+    public void onMousePress(GameObj obj, double x, double y)
     {
         boolean objClicked = objClicked(obj);
         String titleName = title.getText();
@@ -516,13 +515,12 @@ public class GameObjCreationTest extends Code12Program
 
     public boolean objClicked(GameObj obj)
     {
-        boolean objClicked = false;
         for (int i = 0; i < screenButtons.length; i++)
         {
             if (obj == screenButtons[i] || obj == screenLabels[i])
-                objClicked = true;
+                return true;
         }
-        return objClicked;
+        return false;
     }
 
     public void backButtonAction()

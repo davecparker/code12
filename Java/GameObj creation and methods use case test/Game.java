@@ -22,7 +22,7 @@ public class Game extends Code12Program
         goal = ct.circle(ct.random(0, 100), ct.random(33, 100), 3, "light green");
         goal.setLineColor("light green");
 
-        score = ct.text("Score: 0    Goal: 10", 50, 4, 5, "dark gray");
+        score = ct.text("Score: 0", 50, 4, 5, "dark gray");
     }
 
     public void update()
@@ -98,7 +98,7 @@ public class Game extends Code12Program
             scoreCount++;
         else
             scoreCount--;
-        score.setText("Score: " + scoreCount + "    Goal: 10");
+        score.setText("Score: " + scoreCount);
     }
 
     public void losingAction()
