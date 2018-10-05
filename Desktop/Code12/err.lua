@@ -352,7 +352,7 @@ end
 -- Return the logged error for the given line number, or nil if none.
 function err.errRecForLine( iLine )
 	assert( type(iLine) == "number" )
-	local lineRec = source.lines[iLine]
+	local lineRec = source.lines[iLineRankFromILine( iLine )]
 	return (lineRec and lineRec.errRec) or nil
 end
 

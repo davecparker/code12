@@ -9,7 +9,7 @@ The design of the Code 12 API is (c)Copyright 2018 by David C. Parker.
 * [GameObj Creation](#gameobj-creation)
 * [Mouse and Keyboard Input](#mouse-and-keyboard-input)
 * [Audio](#audio)
-* [Math and Misc.](#math-and-misc)
+* [Math and Misc.](#math-and-misc-)
 * [Type Conversion](#type-conversion)
 
 ##### GameObj Fields and Methods
@@ -634,16 +634,6 @@ function.
 _____________________________________________________________________
 Type Conversion
 ---------------
-### ct.toInt()
-```
-int ct.toInt( double number )
-```
-Return the `number` truncated to an integer.
-
-> All decimal places are lost.
-> This is equivalent to a type cast from double to int.
-> If you wish to round, use `ct.round()` instead.
-
 ### ct.parseInt()
 ```
 int ct.parseInt( String str )

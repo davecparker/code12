@@ -1,4 +1,4 @@
-    program ErrorTest { #funcs = 41, #vars = 20 }
+    program ErrorTest { #funcs = 42, #vars = 20 }
         funcs:
  48.        func emptyFunc { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 50, #stmts = 0, iLineBegin = 49 }
@@ -2208,23 +2208,23 @@
 615.                                (1)
 616.                                (2)
 617.                                (3)
-620.                    call log { #exprs = 3, class = ct }
+618.                    call log { #exprs = 3, class = ct }
                             exprs:
 618.                            (1)
 619.                            (2)
 620.                            (3)
-622.                    if
+621.                    if
                             expr: (==) { right = 1 }
                                 left: call random { #exprs = 2, class = ct }
                                     exprs:
 621.                                    (1)
-622.                                    (2)
+621.                                    (2)
                             block: block { #stmts = 1 }
                                 stmts:
 623.                                call println { #exprs = 1, class = ct }
                                         exprs:
 623.                                        ("heads")
-626.                    call log { #exprs = 4, class = ct }
+624.                    call log { #exprs = 4, class = ct }
                             exprs:
 624.                            (1)
                                 call random { #exprs = 2, class = ct }
@@ -2238,6 +2238,12 @@
                 block: block { iLineEnd = 645, #stmts = 1, iLineBegin = 642 }
                     stmts:
 644.                    return { expr = 0 }
+647.        func fooBad { #paramVars = 1, isError = true, vt = double }
+                paramVars:
+647.                var i { vt = int, isGlobal = false }
+                block: block { iLineEnd = 650, #stmts = 1, iLineBegin = 648 }
+                    stmts:
+649.                    return { expr = 0 }
 652.        func bar { #paramVars = 2, vt = boolean }
                 paramVars:
 652.                var s { vt = String, isGlobal = false }
@@ -3273,39 +3279,39 @@
                             block: block { #stmts = 1 }
                                 stmts:
 1389.                                call voidFunc
-1392.                    var x1 { vt = int }
+1393.                    var x1 { vt = int }
 1394.                    var x2 { vt = int }
 1394.                    var x3 { vt = int }
-1395.                    var circle { vt = GameObj }
+1396.                    var circle { vt = GameObj }
                             initExpr: call circle { #exprs = 3, class = ct }
                                 exprs:
-1395.                                (0)
-1395.                                (0)
+1396.                                (0)
+1396.                                (0)
 1397.                                (10)
-1401.                    call log { #exprs = 3, class = ct }
+1399.                    call log { #exprs = 3, class = ct }
                             exprs:
-1398.                            (1)
-1399.                            (2)
+1399.                            (1)
+1400.                            (2)
 1401.                            (3)
-1402.                    var multiLineArrInit { vt = array of int }
+1403.                    var multiLineArrInit { vt = array of int }
                             initExpr: arrayInit { #exprs = 2 }
                                 exprs:
-1402.                                (1)
+1403.                                (1)
 1404.                                (2)
-1405.                    var multiLineArrDec { vt = array of int }
+1406.                    var multiLineArrDec { vt = array of int }
                             initExpr: newArray { vtElement = 0 }
                                 lengthExpr: call random { #exprs = 2, class = ct }
                                     exprs:
-1405.                                    (1)
+1406.                                    (1)
 1407.                                    (10)
-1410.                    if
+1409.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         expr: (>) { right = 3 }
                                             left: call random { #exprs = 2, class = ct }
                                                 exprs:
-1412.                                                (1)
+1413.                                                (1)
 1414.                                                (2)
                                         block: block { #stmts = 1 }
                                             stmts:
@@ -3313,16 +3319,16 @@
                             expr: (>) { right = 3 }
                                 left: call random { #exprs = 2, class = ct }
                                     exprs:
-1408.                                    (1)
-1410.                                    (2)
+1409.                                    (1)
+1409.                                    (2)
                             block: block { #stmts = 1 }
                                 stmts:
 1411.                                call voidFunc
-1418.                    while
+1417.                    while
                             expr: (>) { right = 3 }
                                 left: call random { #exprs = 2, class = ct }
                                     exprs:
-1416.                                    (1)
+1417.                                    (1)
 1418.                                    (2)
                             block: block { #stmts = 1 }
                                 stmts:
@@ -3331,16 +3337,16 @@
                             expr: (<) { right = 0 }
                                 left: call max { #exprs = 2, class = Math }
                                     exprs:
-1422.                                    (1)
+1423.                                    (1)
 1424.                                    (0)
                             block: block { #stmts = 1 }
                                 stmts:
 1421.                                call voidFunc
-1427.                    for
+1426.                    for
                             expr: (<) { right = 0 }
                                 left: call max { #exprs = 2, class = Math }
                                     exprs:
-1425.                                    (1)
+1426.                                    (1)
 1427.                                    (0)
                             block: block { #stmts = 1 }
                                 stmts:
@@ -3478,18 +3484,18 @@
                 block: block { iLineEnd = 1581, #stmts = 1, iLineBegin = 1578 }
                     stmts:
 1580.                    return { expr = 0 }
-1582.        func multiLineFuncDef { #paramVars = 2, vt = void }
+1583.        func multiLineFuncDef { #paramVars = 2, vt = void }
                 paramVars:
-1582.                var arg1 { vt = int, isGlobal = false }
+1583.                var arg1 { vt = int, isGlobal = false }
 1584.                var arg2 { vt = int, isGlobal = false }
                 block: block { iLineEnd = 1586, #stmts = 0, iLineBegin = 1585 }
 1587.        func multilineReturnFunc { #paramVars = 0, vt = int }
                 block: block { iLineEnd = 1592, #stmts = 1, iLineBegin = 1588 }
                     stmts:
-1591.                    return
+1590.                    return
                             expr: call max { #exprs = 2, class = Math }
                                 exprs:
-1589.                                (1)
+1590.                                (1)
 1591.                                (2)
 1595.        func lastFunc { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 1597, #stmts = 0, iLineBegin = 1596 }
@@ -3506,22 +3512,22 @@
                 initExpr: call intFunc
  13.        var overIndentedInstanceVar { vt = int, isGlobal = true }
  15.        var underIndentedInstanceVar { vt = int, isGlobal = true }
- 16.        var classLevelMultilineIntArray1 { vt = array of int, isGlobal = true }
+ 17.        var classLevelMultilineIntArray1 { vt = array of int, isGlobal = true }
                 initExpr: arrayInit { #exprs = 2 }
                     exprs:
- 16.                    (1)
+ 17.                    (1)
  18.                    (2)
- 19.        var classLevelMultilineIntArray2 { vt = array of int, isGlobal = true }
+ 20.        var classLevelMultilineIntArray2 { vt = array of int, isGlobal = true }
                 initExpr: arrayInit { #exprs = 3 }
                     exprs:
- 19.                    (1)
- 20.                    (2)
+ 20.                    (1)
+ 21.                    (2)
  22.                    (3)
- 23.        var classLevelMultilineIntArray3 { vt = array of int, isGlobal = true }
+ 24.        var classLevelMultilineIntArray3 { vt = array of int, isGlobal = true }
                 initExpr: newArray { vtElement = 0 }
                     lengthExpr: call max { #exprs = 2, class = Math }
                         exprs:
- 23.                        (1)
+ 24.                        (1)
  25.                        (2)
  27.        var classLevelVarTypeMismatchIntDouble { vt = int, isGlobal = true, initExpr = 0.1 }
  29.        var MAX_ENEMIES { vt = int, isConst = true, isGlobal = true, initExpr = 100 }
