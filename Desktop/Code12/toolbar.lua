@@ -31,7 +31,7 @@ local stopBtn             -- Stop button
 local pauseBtn            -- Pause button
 local resumeBtn           -- Resume button
 local nextFrameBtn        -- Next Frame button
-local toolbarButtons      -- Array of buttons on the toolbar
+local toolbarBtns         -- Array of buttons on the toolbar
 
 
 --- Internal Functions ------------------------------------------------
@@ -53,11 +53,11 @@ end
 
 -- Show the toolbar buttons in given array btns and hide any other buttons
 local function showButtons( btns )
-	for i = 1, #toolbarButtons do
-		toolbarButtons[i].isVisible = false
+	for i = 1, #toolbarBtns do
+		toolbarBtns[i].isVisible = false
 		for j = 1, #btns do
-			if toolbarButtons[i] == btns[j] then
-				toolbarButtons[i].isVisible = true
+			if toolbarBtns[i] == btns[j] then
+				toolbarBtns[i].isVisible = true
 				break
 			end
 		end
@@ -70,7 +70,7 @@ end
 -- Make the toolbar UI
 function toolbar.create()
 	toolbarGroup = g.makeGroup()
-	toolbarButtons = {}
+	toolbarBtns = {}
 
 	-- Background
 	bgRect = g.uiItem( display.newRect( toolbarGroup, 0, 0, app.width, app.dyToolbar ),
@@ -78,31 +78,31 @@ function toolbar.create()
 
 	-- Options button
 	optionsBtn = buttons.newToolbarButton( toolbarGroup, "Options", onOptions, "right" )
-	toolbarButtons[#toolbarButtons + 1] = optionsBtn
+	toolbarBtns[#toolbarBtns + 1] = optionsBtn
 
 	-- Choose Program Button
 	chooseProgramBtn = buttons.newToolbarButton( toolbarGroup, "Choose Program", onChooseProgram, "right", optionsBtn )
-	toolbarButtons[#toolbarButtons + 1] = chooseProgramBtn
+	toolbarBtns[#toolbarBtns + 1] = chooseProgramBtn
 
 	-- Pause button
 	pauseBtn = buttons.newToolbarButton( toolbarGroup, "Pause", runtime.pause, "left" )
-	toolbarButtons[#toolbarButtons + 1] = pauseBtn
+	toolbarBtns[#toolbarBtns + 1] = pauseBtn
 
 	-- Resume button
 	resumeBtn = buttons.newToolbarButton( toolbarGroup, "Resume", runtime.resume, "left" )
-	toolbarButtons[#toolbarButtons + 1] = resumeBtn
+	toolbarBtns[#toolbarBtns + 1] = resumeBtn
 	
 	-- Stop button
 	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", onStop, "left", resumeBtn )
-	toolbarButtons[#toolbarButtons + 1] = stopBtn
+	toolbarBtns[#toolbarBtns + 1] = stopBtn
 
 	-- Next Frame button
 	nextFrameBtn = buttons.newToolbarButton( toolbarGroup, "Next Frame", runtime.stepOneFrame, "left", stopBtn )
-	toolbarButtons[#toolbarButtons + 1] = nextFrameBtn
+	toolbarBtns[#toolbarBtns + 1] = nextFrameBtn
 
 	-- Restart button
 	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", app.processUserFile, "left" )
-	toolbarButtons[#toolbarButtons + 1] = restartBtn
+	toolbarBtns[#toolbarBtns + 1] = restartBtn
 
 	-- Set the initial visibility of the toolbar buttons
 	toolbar.update()

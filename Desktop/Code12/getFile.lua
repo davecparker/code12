@@ -390,7 +390,9 @@ end
 
 -- Window resize handler
 function getFile:resize()
-	makeUIGroup( self.view )
+	if composer.getSceneName( "current" ) == "getFile" then
+		makeUIGroup( self.view )
+	end
 end
 
 

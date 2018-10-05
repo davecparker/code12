@@ -26,7 +26,6 @@ local optionsView = composer.newScene()
 -- UI Metrics
 local margin = app.margin -- Space between most UI elements
 local topMargin = margin  -- Top margin of the scene
-local leftMargin = 125    -- Left margin of the options
 local switchSize = 20     -- Size of radio buttons, checkboxes, and fillboxes
 local fontSize = 20       -- Font size of switch headers and labels
 
@@ -37,7 +36,13 @@ local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
 local multiErrorPicker    -- Multi-error mode picker
-local openInEditorBtn     -- Open current source file in editor
+local openInEditorBtn     -- Open current source file in editor button
+local optionsGroup        -- Display group containing the options objects
+local scrollView          -- Scroll view widget containing optionsGroup
+
+-- State variables
+local lastAppWidth        -- Value of app.width the last time optionsView was shown/resized
+local lastAppHeight       -- Value of app.height the last time optionsView was shown/resized
 
 
 --- Internal Functions ------------------------------------------------
@@ -126,6 +131,34 @@ local function onOpenInEditor()
 	env.openFileInEditor( app.recentSourceFilePaths[1] )
 end
 
+-- Make the scroll view, insert it into the scene, and insert optionsGroup into it
+local function makeScrollView( parent )
+	parent:insert( optionsGroup )
+	if scrollView then
+		scrollView:removeSelf()
+		scrollView = nil
+	end
+	scrollView = widget.newScrollView{
+		top = title.y + title.height + margin,
+		left = 0,
+		width = app.width,
+		height = app.height - title.height - app.dyStatusBar,
+		isBounceEnabled = false,
+		backgroundColor = { 0.9 },
+	}
+	parent:insert( scrollView )
+	scrollView:insert( optionsGroup )
+	scrollView:setScrollWidth( optionsGroup.width )
+	scrollView:setScrollHeight( optionsGroup.height + app.dyStatusBar )
+	if optionsGroup.width <= app.width then
+		scrollView:setIsLocked( true, "horizontal" )
+	end
+	if optionsGroup.height <= app.height then
+		scrollView:setIsLocked( true, "vertical" )
+	end
+end
+
+
 --- Scene Methods ------------------------------------------------
 
 -- Create the optionsView scene
@@ -142,7 +175,7 @@ function optionsView:create()
 		x = app.width / 2,
 		y = topMargin,
 		font = native.systemFontBold,
-		fontSize = fontSize * 2,
+		fontSize = fontSize * 1.5,
 	}
 	title:setFillColor( 0 )
 	title.anchorY = 0
@@ -160,6 +193,9 @@ function optionsView:create()
 	closeBtn.anchorX = 1
 	closeBtn.anchorY = 0
 
+	-- Options display group
+	optionsGroup = display.newGroup()
+
 	-- Syntax level picker
 	local syntaxLevels = {
 		"1. Procedure Calls",
@@ -176,7 +212,7 @@ function optionsView:create()
 		"12. Arrays",
 	}
 	levelPicker = buttons.newSettingPicker{
-		parent = sceneGroup,
+		parent = optionsGroup,
 		header = "Syntax Level:",
 		headerFont = native.systemFontBold,
 		headerFontSize = fontSize,	
@@ -185,16 +221,16 @@ function optionsView:create()
 		labelsFontSize = fontSize,
 		style = "fillbox",
 		switchSize = switchSize,
-		x = leftMargin,
-		y = title.y + title.height + margin,
+		x = 0,
+		y = 0,
 		onPress = onSyntaxLevelPress,
 	}
 
 	-- Tab width header
 	local tabWidthHeader  = display.newText{
-		parent = sceneGroup,
+		parent = optionsGroup,
 		text = "Tab Width:",
-		x = leftMargin,
+		x = 0,
 		y = levelPicker.y + levelPicker.height + margin,
 		font = native.systemFontBold,
 		fontSize = fontSize,
@@ -207,7 +243,7 @@ function optionsView:create()
 
 	-- Tab width picker
 	tabWidthPicker = widget.newSegmentedControl{
-		x = leftMargin,
+		x = 0,
 		y = tabWidthHeader.y + tabWidthHeader.height + margin * 0.5,
 		segments = tabWidths,
 		defaultSegment = app.tabWidth - 1,
@@ -220,7 +256,7 @@ function optionsView:create()
 	}
 	tabWidthPicker.anchorX = 0
 	tabWidthPicker.anchorY = 0
-	sceneGroup:insert( tabWidthPicker )
+	optionsGroup:insert( tabWidthPicker )
 
 	-- Editor picker
 	local editorNames = {}
@@ -228,7 +264,7 @@ function optionsView:create()
 		editorNames[i] = env.installedEditors[i].name
 	end
 	editorPicker = buttons.newSettingPicker{
-		parent = sceneGroup,
+		parent = optionsGroup,
 		header = "Text Editor:",
 		headerFont = native.systemFontBold,
 		headerFontSize = fontSize,
@@ -237,7 +273,7 @@ function optionsView:create()
 		labelsFontSize = fontSize,
 		style = "radio",
 		switchSize = switchSize,
-		x = leftMargin,
+		x = 0,
 		y = tabWidthPicker.y + tabWidthPicker.height + margin,
 		onPress = 
 			function ( event )
@@ -248,8 +284,8 @@ function optionsView:create()
 
 	-- Open In Editor button
 	openInEditorBtn = buttons.newOptionButton{
-		parent = sceneGroup,
-		x = leftMargin,
+		parent = optionsGroup,
+		x = 0,
 		y = editorPicker.y + editorPicker.height + margin * 0.5,
 		onRelease = onOpenInEditor,
 		label = "Open MyProgram.java in Editor",
@@ -261,7 +297,7 @@ function optionsView:create()
 
 	-- Multi-error picker
 	multiErrorPicker = buttons.newSettingPicker{
-		parent = sceneGroup,
+		parent = optionsGroup,
 		header = "Multi-Error Mode:",
 		headerFont = native.systemFontBold,
 		headerFontSize = fontSize,
@@ -270,16 +306,26 @@ function optionsView:create()
 		labelsFontSize = fontSize,
 		style = "checkbox",
 		switchSize = switchSize,
-		x = leftMargin,
+		x = 0,
 		y = openInEditorBtn.y + openInEditorBtn.height + margin,
 		onPress =
 			function ( event )
 				app.oneErrOnly = event.target.isOn
 			end
 	}
+	-- Center options group
+	if app.width > optionsGroup.width then
+		optionsGroup.x = app.width / 2 - optionsGroup.width / 2
+	end
+
+	-- Set up scroll view
+	makeScrollView( sceneGroup )
 
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
+	
+	-- Save app window size
+	lastAppWidth, lastAppHeight = app.width, app.height
 end
 
 -- Prepare to show the optionsView scene
@@ -294,6 +340,9 @@ function optionsView:show( event )
 		else
 			openInEditorBtn.isVisible = false
 		end
+		if lastAppWidth ~= app.width or lastAppHeight ~= app.height then
+			self:resize()
+		end
 	end
 end
 
@@ -306,9 +355,23 @@ function optionsView:hide( event )
 end
 
 -- Window resize handler
+-- TODO: Fix Corona runtime error or replace scrollView with scrollbar.lua
 function optionsView:resize()
-	title.x = app.width / 2
-	closeBtn.x = app.width - app.margin
+	if composer.getSceneName( "current" ) == "optionsView" then
+		local sceneGroup = self.view
+		-- remake scroll view
+		makeScrollView( sceneGroup )
+		-- reposition objects
+		closeBtn.x = app.width - app.margin
+		title.x = app.width / 2
+		if app.width > optionsGroup.width then
+			optionsGroup.x = app.width / 2 - optionsGroup.width / 2
+		else
+			optionsGroup.x = 0
+		end
+		lastAppWidth = app.width
+		lastAppHeight = app.height
+	end
 end
 
 
