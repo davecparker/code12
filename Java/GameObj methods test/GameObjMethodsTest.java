@@ -23,6 +23,10 @@ public class GameObjMethodsTest extends Code12Program
         enableMainScreen();
     }
 
+    public void update()
+    {
+    }
+
     public void defineScreens()
     {
         title = ct.text("", 50, 8, 8);
@@ -38,7 +42,6 @@ public class GameObjMethodsTest extends Code12Program
         disableScreens();
     }
 
-    // TODO: do we need screens?
     public void enableMainScreen()
     {
         title.setText("GameObj Method Testing");
@@ -69,11 +72,14 @@ public class GameObjMethodsTest extends Code12Program
         for (int i = 0; i < testObjs.length; i++)
         {
             if (testObjs[i] != null)
+            {
                 testObjs[i].delete();
+                testObjs[i] = null;
+            }
         }
     }
 
-    public void onMousePress(GameObj obj, double x, double y)
+    public void onMouseRelease(GameObj obj, double x, double y)
     {
         if (obj == backButton || obj == backText)
             backButtonAction();
@@ -120,10 +126,53 @@ public class GameObjMethodsTest extends Code12Program
             objectHitInGroupDragAction();
     }
 
-    // TODO: print instructions
+    public void backButtonAction()
+    {
+        disableScreens();
+        enableMainScreen();
+    }
+
+    public void mainScreenAction(GameObj obj)
+    {
+        disableScreens();
+        backButton.visible = true;
+        backText.visible = true;
+        if (obj == screenButtons[0] || obj == screenLabels[0])
+            getTypeTest();
+        else if (obj == screenButtons[1] || obj == screenLabels[1])
+            getsetTextTest();
+        else if (obj == screenButtons[2] || obj == screenLabels[2])
+            toStringTest();
+        else if (obj == screenButtons[3] || obj == screenLabels[3])
+            setSizeTest();
+        else if (obj == screenButtons[4] || obj == screenLabels[4])
+            alignTest();
+        else if (obj == screenButtons[5] || obj == screenLabels[5])
+            setFillColorTest();
+        else if (obj == screenButtons[6] || obj == screenLabels[6])
+            setFillColorRGBTest();
+        else if (obj == screenButtons[7] || obj == screenLabels[7])
+            setLineColor();
+        else if (obj == screenButtons[8] || obj == screenLabels[8])
+            setLineColorRGBTest();
+        else if (obj == screenButtons[9] || obj == screenLabels[9])
+            getsetLayerTest();
+        else if (obj == screenButtons[10] || obj == screenLabels[10])
+            deleteTest();
+        else if (obj == screenButtons[11] || obj == screenLabels[11])
+            clickedTest();
+        else if (obj == screenButtons[12] || obj == screenLabels[12])
+            containsPointTest();
+        else if (obj == screenButtons[13] || obj == screenLabels[13])
+            hitTest();
+        else if (obj == screenButtons[14] || obj == screenLabels[14])
+            objectHitInGroupTest();
+    }
+
     public void getTypeTest()
     {
         title.setText("getType Test");
+        ct.println("**getType Test**");
         testObjs = getBasicTestObjs(10, 15);
         testObjs[5] = ct.text(testObjs[0].getType(), 50, 30, 6);
         testObjs[6] = ct.text(testObjs[1].getType(), 50, 45, 6);
@@ -135,7 +184,8 @@ public class GameObjMethodsTest extends Code12Program
     public void getsetTextTest()
     {
         title.setText("get/setText Test");
-        ct.println("Click an object to change its text");
+        ct.println("**get/setText Test**");
+        ct.println("\tClick an object to change its text");
         testObjs = getBasicTestObjs(10, 15);
         testObjs[5] = ct.text(testObjs[0].getText(), 50, 30, 6);
         testObjs[6] = ct.text(testObjs[1].getText(), 50, 45, 6);
@@ -147,31 +197,34 @@ public class GameObjMethodsTest extends Code12Program
     public void toStringTest()
     {
         title.setText("toString Test");
-        testObjs = getBasicTestObjs(11, 50);
-        testObjs[5] = ct.text("toString()", 50, 23, 4);
-        testObjs[6] = ct.text(testObjs[0].toString(), 50, 30, 3);
-        testObjs[7] = ct.text(testObjs[1].toString(), 50, 45, 3);
-        testObjs[8] = ct.text(testObjs[2].toString(), 50, 60, 3);
-        testObjs[9] = ct.text(testObjs[3].toString(), 50, 75, 3);
-        testObjs[10] = ct.text(testObjs[4].toString(), 50, 90, 3);
+        ct.println("**toString Test**");
+        testObjs = getBasicTestObjs(11, 15);
+        testObjs[5] = ct.text("toString()", 70, 23, 4);
+        testObjs[6] = ct.text(testObjs[0].toString(), 70, 30, 3);
+        testObjs[7] = ct.text(testObjs[1].toString(), 70, 45, 3);
+        testObjs[8] = ct.text(testObjs[2].toString(), 70, 60, 3);
+        testObjs[9] = ct.text(testObjs[3].toString(), 70, 75, 3);
+        testObjs[10] = ct.text(testObjs[4].toString(), 70, 90, 3);
         for (int i = 0; i < testObjs.length; i++)
-            ct.println(testObjs);
+            ct.println(testObjs[i]);
     }
 
     public void setSizeTest()
     {
         title.setText("setSize Test");
-        ct.println("Click an object to set its size");
-        ct.println("Verify that reference points are placed on the bisection\nof each edge of the object once you enter width and height");
+        ct.println("**setSize Test**");
+        ct.println("\tClick an object to set its size");
+        ct.println("\tVerify that reference points are placed on the bisection\n\tof each edge of the object once you enter width and height");
         testObjs = getBasicTestObjs(9, 50);
     }
 
     public void alignTest()
     {
-        //TODO: null parameter does not make fill color null
+        // TODO: null parameter does not make fill color null
         title.setText("align Test");
-        ct.println("Click an object to set its alignment");
-        ct.println("Alignments: 'top left', 'top', 'top right', 'left', 'center', 'right', 'bottom left', 'bottom right'");
+        ct.println("**align Test**");
+        ct.println("\tClick an object to set its alignment");
+        ct.println("\tAlignments: 'top left', 'top', 'top right', 'left', 'center', 'right', 'bottom left', 'bottom right'");
         testObjs = getBasicTestObjs(15, 50);
         testObjs[5] = ct.rect(50, 30, 10, 10, null);
         testObjs[6] = ct.rect(50, 45, 10, 10, null);
@@ -193,7 +246,8 @@ public class GameObjMethodsTest extends Code12Program
     public void setFillColorTest()
     {
         title.setText("setFillColor Test");
-        ct.println("Click an object to change its fill color");
+        ct.println("**setFillColor Test**");
+        ct.println("\tClick an object to change its fill color");
         GameObj[] testObjsCopy = new GameObj[54];
         for (int i = 0; i < 27; i++)
         {
@@ -212,7 +266,8 @@ public class GameObjMethodsTest extends Code12Program
     public void setFillColorRGBTest()
     {
         title.setText("setFillColorRGB Test");
-        ct.println("Click an object to set its RGB fill color");
+        ct.println("**setFillColorRGB Test**");
+        ct.println("\tClick an object to set its RGB fill color");
         GameObj[] testObjsCopy = new GameObj[80];
         for (int i = 0; i < 40; i++)
         {
@@ -230,7 +285,8 @@ public class GameObjMethodsTest extends Code12Program
     public void setLineColor()
     {
         title.setText("setLineColor Test");
-        ct.println("Click an object to set its line color");
+        ct.println("**setLineColor Test**");
+        ct.println("\tClick an object to set its line color");
         GameObj[] testObjsCopy = new GameObj[54];
         for (int i = 0; i < 27; i++)
         {
@@ -250,7 +306,8 @@ public class GameObjMethodsTest extends Code12Program
     public void setLineColorRGBTest()
     {
         title.setText("setLineColorRGB Test");
-        ct.println("Click an object to set its RGB line color");
+        ct.println("**setLineColorRGB Test**");
+        ct.println("\tClick an object to set its RGB line color");
         GameObj[] testObjsCopy = new GameObj[80];
         for (int i = 0; i < 40; i++)
         {
@@ -266,10 +323,12 @@ public class GameObjMethodsTest extends Code12Program
         testObjs = testObjsCopy;
     }
 
+    // TODO: add \t to directions && change getsetLayerTest to use onMouseRelease and get rid of reseting test
     public void getsetLayerTest()
     {
         title.setText("get/setLayer Test");
-        ct.println("Drag an object to compare layers, click 'Reset test' to reset layers");
+        ct.println("**get/setLayer Test**");
+        ct.println("\tDrag an object to compare layers, click 'Reset test' to reset layers");
         testObjs = getBasicTestObjs(11, 15);
         for (int i = 0; i < 5; i++)
             testObjs[i].setLayer(ct.inputInt("Enter a layer number for " + testObjs[i].getType() + " object"));
@@ -284,6 +343,7 @@ public class GameObjMethodsTest extends Code12Program
     public void deleteTest()
     {
         title.setText("delete Test");
+        ct.println("**delete Test**");
         testObjs = getBasicTestObjs(5, 50);
         for (int i = 0; i < testObjs.length; i++)
         {
@@ -300,6 +360,7 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i].setLineColorRGB(0, 255, 255);
             testObjs[i].getLayer();
             testObjs[i].setLayer(2);
+            testObjs[i].delete();
             testObjs[i].clicked();
             testObjs[i].containsPoint(50, 50);
             testObjs[i].hit(testObjs[i]);
@@ -322,6 +383,7 @@ public class GameObjMethodsTest extends Code12Program
     public void clickedTest()
     {
         title.setText("clicked Test");
+        ct.println("**clicked Test**");
         ct.println("Click an object");
         testObjs = getBasicTestObjs(5, 50);
     }
@@ -329,6 +391,7 @@ public class GameObjMethodsTest extends Code12Program
     public void containsPointTest()
     {
         title.setText("containsPoint Test");
+        ct.println("**containsPoint Test**");
         ct.println("The x-coords of the objects is 15");
         testObjs = getBasicTestObjs(6, 15);
         while (true)
@@ -349,6 +412,7 @@ public class GameObjMethodsTest extends Code12Program
     public void hitTest()
     {
         title.setText("hit Test");
+        ct.println("**hit Test**");
         ct.println("Drag objects to hit one another");
         testObjs = getBasicTestObjs(8, 50);
         testObjs[5] = ct.line(65, 40, 65, 50);
@@ -359,6 +423,7 @@ public class GameObjMethodsTest extends Code12Program
     public void objectHitInGroupTest()
     {
         title.setText("objectHitInGroup Test");
+        ct.println("**objectHitInGroup Test**");
         ct.println("Drag objects to hit one another");
         testObjs = getBasicTestObjs(13, 50);
         for (int i = 5; i < 9; i++)
@@ -497,49 +562,6 @@ public class GameObjMethodsTest extends Code12Program
             else if (testObjs[i].objectHitInGroup("green") != null)
                 ct.println(testObjs[i] + " hit group green " + testObjs[i].objectHitInGroup("green"));
         }
-    }
-
-    public void backButtonAction()
-    {
-        disableScreens();
-        enableMainScreen();
-    }
-
-    public void mainScreenAction(GameObj obj)
-    {
-        disableScreens();
-        backButton.visible = true;
-        backText.visible = true;
-        if (obj == screenButtons[0] || obj == screenLabels[0])
-            getTypeTest();
-        else if (obj == screenButtons[1] || obj == screenLabels[1])
-            getsetTextTest();
-        else if (obj == screenButtons[2] || obj == screenLabels[2])
-            toStringTest();
-        else if (obj == screenButtons[3] || obj == screenLabels[3])
-            setSizeTest();
-        else if (obj == screenButtons[4] || obj == screenLabels[4])
-            alignTest();
-        else if (obj == screenButtons[5] || obj == screenLabels[5])
-            setFillColorTest();
-        else if (obj == screenButtons[6] || obj == screenLabels[6])
-            setFillColorRGBTest();
-        else if (obj == screenButtons[7] || obj == screenLabels[7])
-            setLineColor();
-        else if (obj == screenButtons[8] || obj == screenLabels[8])
-            setLineColorRGBTest();
-        else if (obj == screenButtons[9] || obj == screenLabels[9])
-            getsetLayerTest();
-        else if (obj == screenButtons[10] || obj == screenLabels[10])
-            deleteTest();
-        else if (obj == screenButtons[11] || obj == screenLabels[11])
-            clickedTest();
-        else if (obj == screenButtons[12] || obj == screenLabels[12])
-            containsPointTest();
-        else if (obj == screenButtons[13] || obj == screenLabels[13])
-            hitTest();
-        else if (obj == screenButtons[14] || obj == screenLabels[14])
-            objectHitInGroupTest();
     }
 
     public GameObj[] getBasicTestObjs(int index, double x)
