@@ -244,6 +244,7 @@ local function loadSettings()
 				local level = t.syntaxLevel
 				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
 					userSettings.syntaxLevel = level
+					app.syntaxLevel = userSettings.syntaxLevel
 				end
 
 				-- Use the saved tabWidth if valid
