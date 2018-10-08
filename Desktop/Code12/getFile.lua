@@ -373,9 +373,6 @@ function getFile:create()
 	-- Background
 	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 0.9 ) 
 	
-	-- UI Elements
-	makeUIGroup( sceneGroup )
-
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
 end

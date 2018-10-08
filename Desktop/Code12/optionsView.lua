@@ -166,7 +166,7 @@ local function makeScrollView( parent )
 	if optionsGroup.width <= app.width then
 		scrollView:setIsLocked( true, "horizontal" )
 	end
-	if optionsGroup.height <= app.height then
+	if scrollView.y + optionsGroup.height <= app.height then
 		scrollView:setIsLocked( true, "vertical" )
 	end
 end
