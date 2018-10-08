@@ -77,7 +77,7 @@ end
 
 -- Show dialog to choose the user source code file
 local function openProgram()
-	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File" )
+	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File", "*.java", "Java Files (*.java)" )
 	if not path then
 		native.setActivityIndicator( false )
 	elseif string.sub( path, -5, -1 ) ~= ".java" then
@@ -169,7 +169,6 @@ local function newProgram()
 							"Do you wish the save your as ".. fileName .." instead of " .. className .. ".java?"
 					saveFile = env.showWarningAlert( "Unexpected File Name", message, "yesno" )
 				end
-				print( "saveFile", saveFile )
 				if saveFile then
 					-- Save the new program
 					writeNewProgramSkeleton( path )

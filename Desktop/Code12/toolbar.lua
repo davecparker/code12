@@ -46,11 +46,6 @@ local function onOptions()
 	composer.gotoScene( "optionsView" )
 end
 
--- Event handler for the Stop button
-local function onStop()
-	runtime.stop()
-end
-
 -- Show the toolbar buttons in given array btns and hide any other buttons
 local function showButtons( btns )
 	for i = 1, #toolbarBtns do
@@ -69,6 +64,7 @@ end
 
 -- Make the toolbar UI
 function toolbar.create()
+	local pauseBtnWidth = 80
 	toolbarGroup = g.makeGroup()
 	toolbarBtns = {}
 
@@ -85,15 +81,15 @@ function toolbar.create()
 	toolbarBtns[#toolbarBtns + 1] = chooseProgramBtn
 
 	-- Pause button
-	pauseBtn = buttons.newToolbarButton( toolbarGroup, "Pause", runtime.pause, "left" )
+	pauseBtn = buttons.newToolbarButton( toolbarGroup, "Pause", runtime.pause, "left", nil, pauseBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = pauseBtn
 
 	-- Resume button
-	resumeBtn = buttons.newToolbarButton( toolbarGroup, "Resume", runtime.resume, "left" )
+	resumeBtn = buttons.newToolbarButton( toolbarGroup, "Resume", runtime.resume, "left", nil, pauseBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = resumeBtn
 	
 	-- Stop button
-	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", onStop, "left", resumeBtn )
+	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", runtime.stop, "left", pauseBtn )
 	toolbarBtns[#toolbarBtns + 1] = stopBtn
 
 	-- Next Frame button
@@ -101,7 +97,7 @@ function toolbar.create()
 	toolbarBtns[#toolbarBtns + 1] = nextFrameBtn
 
 	-- Restart button
-	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", app.processUserFile, "left" )
+	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", app.processUserFile, "left", nil, pauseBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = restartBtn
 
 	-- Set the initial visibility of the toolbar buttons
@@ -127,13 +123,10 @@ function toolbar.update()
 		showButtons{ optionsBtn }
 	elseif runState == "running" then
 		showButtons{ stopBtn, pauseBtn }
-		stopBtn.x = pauseBtn.x + pauseBtn.width + app.margin
 	elseif runState == "waiting" then
 		showButtons{ stopBtn }
 	elseif runState == "paused" then
 		showButtons{ resumeBtn, stopBtn, nextFrameBtn }
-		stopBtn.x = resumeBtn.x + resumeBtn.width + app.margin
-		nextFrameBtn.x = stopBtn.x + stopBtn.width + app.margin
 	elseif runState == "stopped" or runState == "ended" then
 		showButtons{ restartBtn, chooseProgramBtn, optionsBtn }
 	elseif runState == "error" then

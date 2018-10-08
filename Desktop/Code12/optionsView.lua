@@ -36,6 +36,7 @@ local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
 local multiErrorPicker    -- Multi-error mode picker
+local addEditorBtn        -- Add a Text Editor button
 local openInEditorBtn     -- Open current source file in editor button
 local optionsGroup        -- Display group containing the options objects
 local scrollView          -- Scroll view widget containing optionsGroup
@@ -100,35 +101,47 @@ local function setSelectedOptions()
 	end
 end
 
-
---- Event Handlers ------------------------------------------------
-
--- Close Button handler
--- Save settings and process user file or go back to getFile view
-local function onClose()
-	app.saveSettings()
-	local prevScene = composer.getSceneName( "previous" )
-	if prevScene == "getFile" then
-		composer.gotoScene( prevScene )
-	else
-		app.processUserFile()
+local function makeEditorPicker( parent )
+	if editorPicker then
+		editorPicker:removeSelf()
+		editorPicker = nil
 	end
+	local editorNames = {}
+	for i = 1, #env.installedEditors do
+		editorNames[i] = env.installedEditors[i].name
+	end
+	editorPicker = buttons.newSettingPicker{
+		parent = parent,
+		header = "Text Editor:",
+		headerFont = native.systemFontBold,
+		headerFontSize = fontSize,
+		labels = editorNames,
+		labelsFont = native.systemFont,
+		labelsFontSize = fontSize,
+		style = "radio",
+		switchSize = switchSize,
+		x = 0,
+		y = multiErrorPicker.y + multiErrorPicker.height + margin,
+		onPress = 
+			function ( event )
+				app.editorPath = env.installedEditors[event.target.value].path
+				app.useDefaultEditor = app.editorPath == nil
+			end
+	}
 end
 
--- Syntax Level Switch handler
--- Set app.syntax level to selected level.
--- Fill all syntax level boxes for levels up to and including the 
--- selected level and clear the remaining boxes.
-local function onSyntaxLevelPress( event )
-	local syntaxLevel = event.target.value
-	app.syntaxLevel = syntaxLevel
-	fillBoxes( levelPicker.switches, syntaxLevel )
-end
-
--- Open In Editor Button handler
--- Open most recent program file in text editor
-local function onOpenInEditor()
-	env.openFileInEditor( app.recentSourceFilePaths[1] )
+local function setEditorButtons( repositionAddEditorBtn )
+	if repositionAddEditorBtn then
+		addEditorBtn.y = editorPicker.y + editorPicker.height + margin * 0.5
+	end
+	if #app.recentSourceFilePaths > 0 then
+		local _, filename = env.dirAndFilenameOfPath( app.recentSourceFilePaths[1] )
+		openInEditorBtn:setLabel( "Open " .. filename .. " in Editor" )
+		openInEditorBtn.y = addEditorBtn.y + addEditorBtn.height + margin * 0.5
+		openInEditorBtn.isVisible = true
+	else
+		openInEditorBtn.isVisible = false
+	end
 end
 
 -- Make the scroll view, insert it into the scene, and insert optionsGroup into it
@@ -156,6 +169,71 @@ local function makeScrollView( parent )
 	if optionsGroup.height <= app.height then
 		scrollView:setIsLocked( true, "vertical" )
 	end
+end
+
+
+--- Event Handlers ------------------------------------------------
+
+-- Close Button handler
+-- Save settings and process user file or go back to getFile view
+local function onClose()
+	app.saveSettings()
+	local prevScene = composer.getSceneName( "previous" )
+	if prevScene == "getFile" then
+		composer.gotoScene( prevScene )
+	else
+		app.processUserFile()
+	end
+end
+
+-- Syntax Level Switch handler
+-- Set app.syntax level to selected level.
+-- Fill all syntax level boxes for levels up to and including the 
+-- selected level and clear the remaining boxes.
+local function onSyntaxLevelPress( event )
+	local syntaxLevel = event.target.value
+	app.syntaxLevel = syntaxLevel
+	fillBoxes( levelPicker.switches, syntaxLevel )
+end
+
+-- Show dialog to choose the editor and add the path to installed editors
+-- and user's settings
+local function addEditor()
+	local editorPath = env.pathFromOpenFileDialog( "Choose a Text Editor", "*.exe", "Executables (*.exe)" )
+	if not editorPath then
+		native.setActivityIndicator( false )
+	elseif env.isWindows and string.sub( editorPath, -4, -1 ) ~= ".exe" then
+		env.showErrAlert( "Invalid File Extension", "Please choose a .exe file" )
+		addEditor()
+	elseif not env.isWindows and string.sub( editorPath, -4, -1 ) ~= ".app" then
+		env.showErrAlert( "Invalid File Extension", "Please choose a .app file" )
+		addEditor()
+	else
+		local _, editorName = env.dirAndFilenameOfPath( editorPath )
+
+		local newEditor = { name = editorName, path = editorPath }
+		env.installedEditors[#env.installedEditors + 1] = newEditor
+		app.customEditors[#app.customEditors + 1] = newEditor
+		app.editorPath = editorPath
+		app.saveSettings()
+		makeEditorPicker( optionsGroup )
+		setEditorButtons( true )
+		setSelectedOptions()
+		makeScrollView( optionsView.view )
+		native.setActivityIndicator( false )
+	end
+end
+
+-- Event handler for the Add Editor button
+local function onAddEditor()
+	native.setActivityIndicator( true )
+	timer.performWithDelay( 50, addEditor )
+end
+
+-- Open In Editor Button handler
+-- Open most recent program file in text editor
+local function onOpenInEditor()
+	env.openFileInEditor( app.recentSourceFilePaths[1] )
 end
 
 
@@ -246,6 +324,7 @@ function optionsView:create()
 		x = 0,
 		y = tabWidthHeader.y + tabWidthHeader.height + margin * 0.5,
 		segments = tabWidths,
+		segmentWidth = 30,
 		defaultSegment = app.tabWidth - 1,
 		labelSize = fontSize,
 		labelColor = { default = { 0 }, over = { 0 } },
@@ -257,43 +336,6 @@ function optionsView:create()
 	tabWidthPicker.anchorX = 0
 	tabWidthPicker.anchorY = 0
 	optionsGroup:insert( tabWidthPicker )
-
-	-- Editor picker
-	local editorNames = {}
-	for i = 1, #env.installedEditors do
-		editorNames[i] = env.installedEditors[i].name
-	end
-	editorPicker = buttons.newSettingPicker{
-		parent = optionsGroup,
-		header = "Text Editor:",
-		headerFont = native.systemFontBold,
-		headerFontSize = fontSize,
-		labels = editorNames,
-		labelsFont = native.systemFont,
-		labelsFontSize = fontSize,
-		style = "radio",
-		switchSize = switchSize,
-		x = 0,
-		y = tabWidthPicker.y + tabWidthPicker.height + margin,
-		onPress = 
-			function ( event )
-				app.editorPath = env.installedEditors[event.target.value].path
-				app.useDefaultEditor = app.editorPath == nil
-			end
-	}
-
-	-- Open In Editor button
-	openInEditorBtn = buttons.newOptionButton{
-		parent = optionsGroup,
-		x = 0,
-		y = editorPicker.y + editorPicker.height + margin * 0.5,
-		onRelease = onOpenInEditor,
-		label = "Open MyProgram.java in Editor",
-		font = native.systemFont,
-		fontSize = fontSize,
-		width = 350,
-		height = 35,
-	}
 
 	-- Multi-error picker
 	multiErrorPicker = buttons.newSettingPicker{
@@ -307,12 +349,34 @@ function optionsView:create()
 		style = "checkbox",
 		switchSize = switchSize,
 		x = 0,
-		y = openInEditorBtn.y + openInEditorBtn.height + margin,
+		y = tabWidthPicker.y + tabWidthPicker.height + margin,
 		onPress =
 			function ( event )
 				app.oneErrOnly = event.target.isOn
 			end
 	}
+
+	-- Editor picker
+	makeEditorPicker( optionsGroup )
+
+	-- Add Text Editor button
+	addEditorBtn = buttons.newOptionButton{
+		parent = optionsGroup,
+		x = 0,
+		y = editorPicker.y + editorPicker.height + margin * 0.5,
+		onRelease = onAddEditor,
+		label = "Add a Text Editor",
+	}
+
+	-- Open In Editor button
+	openInEditorBtn = buttons.newOptionButton{
+		parent = optionsGroup,
+		x = 0,
+		y = addEditorBtn.y + addEditorBtn.height + margin * 0.5,
+		onRelease = onOpenInEditor,
+		label = "",
+	}
+
 	-- Center options group
 	if app.width > optionsGroup.width then
 		optionsGroup.x = app.width / 2 - optionsGroup.width / 2
@@ -333,13 +397,7 @@ function optionsView:show( event )
 	if event.phase == "will" then
 		setSelectedOptions()
 		toolbar.show( false )
-		if #app.recentSourceFilePaths > 0 then
-			local _, filename = env.dirAndFilenameOfPath( app.recentSourceFilePaths[1] )
-			openInEditorBtn:setLabel( "Open " .. filename .. " in Editor" )
-			openInEditorBtn.isVisible = true
-		else
-			openInEditorBtn.isVisible = false
-		end
+		setEditorButtons()
 		if lastAppWidth ~= app.width or lastAppHeight ~= app.height then
 			self:resize()
 		end
