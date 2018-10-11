@@ -215,6 +215,7 @@ function app.saveSettings()
 	userSettings.oneErrOnly = app.oneErrOnly
 	userSettings.recentSourceFilePaths = app.recentSourceFilePaths
 	userSettings.openFilesInEditor = app.openFilesInEditor
+	userSettings.customEditors = app.customEditors
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -226,6 +227,11 @@ end
 
 -- Load the user settings
 local function loadSettings()
+	-- Initialize app.syntaxLevel if it is nil
+	if not app.syntaxLevel then
+		app.syntaxLevel = 12
+	end
+
 	-- Read the settings file
 	local file = io.open( settingsFilePath(), "r" )
 	if file then
@@ -275,6 +281,20 @@ local function loadSettings()
 				if type(t.openFilesInEditor) == "boolean" then
 					app.openFilesInEditor = t.openFilesInEditor
 				end
+
+				-- Use the saved customEditors
+				local customEditors = t.customEditors
+				if type(customEditors) == "table" then
+					app.customEditors = {}
+					for i = 1, #customEditors do
+						local customEditor = customEditors[i]
+						if type(customEditor) == "table" and 
+								type(customEditor.name) == "string" and 
+								type(customEditor.path) == "string" then
+							app.customEditors[#app.customEditors + 1] = customEditor
+						end
+					end
+				end
 			end
 		end
 	end
@@ -316,6 +336,7 @@ local function onEnterFrame()
 	if g.runState ~= runStateLast then
 		runStateLast = g.runState
 		statusBar.update()
+		toolbar.update()
 	end
 end
 
