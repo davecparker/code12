@@ -27,6 +27,7 @@ local err = require( "err" )
 local statusBar = require( "statusBar" )
 local toolbar = require( "toolbar" )
 local console = require( "console" )
+local varWatch = require( "varWatch" )
 
 -- File local state
 local runStateLast     -- last known runState (for status bar)
@@ -360,6 +361,7 @@ local function initApp()
 	-- Get initial window size and metrics
 	app.getWindowSize()
 	console.init()      -- gets and stores console font metrics
+	varWatch.init()
 
 	-- Create the UI bars that live in the global group
 	statusBar.create()

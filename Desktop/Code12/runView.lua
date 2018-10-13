@@ -18,6 +18,7 @@ local runtime = require("Code12.runtime")
 local app = require( "app" )
 local err = require( "err" )
 local console = require( "console" )
+local varWatch = require( "varWatch" )
 
 
 -- The runView module and scene
@@ -33,6 +34,7 @@ local outputGroup              -- display group for program output area
 local rightBar                 -- clipping bar to the right of the output area
 local paneSplit                -- pane split area
 local lowerGroup               -- display area below the pane split
+local varWatchGroup            -- display group for the variable watch window
 
 -- Program state
 local minConsoleHeight         -- min height of the console window (from pane split)
@@ -52,10 +54,12 @@ local function layoutPanes()
 	local width = app.outputWidth
 	local height = app.outputHeight
 
-	-- Position the right bar
+	-- Position the right bar and variable watch group
 	rightBar.x = width + 1
 	rightBar.width = app.width    -- more than enough
 	rightBar.height = app.height  -- more than enough
+	varWatchGroup.x = rightBar.x
+	-- TODO: varWatch.resize( app.width - width, height )
 
 	-- Position the pane split and lower group
 	paneSplit.y = app.dyToolbar + height
@@ -130,6 +134,8 @@ function runView:create()
 	paneSplit:addEventListener( "touch", onTouchPaneSplit )
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
+	varWatchGroup = g.makeGroup( sceneGroup, rightBar.x, rightBar.y )
+	varWatch.create( varWatchGroup, 10, 5 )
 
 	-- Layout the display areas
 	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines
@@ -158,6 +164,8 @@ function runView:show( event )
 		-- Automatically run a new program
 		if g.runState == nil then
 			runtime.run()
+			varWatch.getVars()
+			varWatch.makeVarsTable()
 		end
 	end
 end
