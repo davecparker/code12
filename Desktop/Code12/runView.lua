@@ -135,7 +135,7 @@ function runView:create()
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
 	varWatchGroup = g.makeGroup( sceneGroup, rightBar.x, rightBar.y )
-	varWatch.create( varWatchGroup, 10, 5, 0 )
+	varWatch.create( varWatchGroup, 10, 5 )
 
 	-- Layout the display areas
 	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines

@@ -32,7 +32,7 @@ local xCols                   -- table of x-values for the left of each column
 
 -- varWatch data
 local vars         			 -- array of user program's global variables
-local displayData            -- array of data for displaying variables
+local displayData = {}       -- array of data for displaying variables
 local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
                         "lineWidth", "visible", "clickable", "autoDelete", "group" }
 local numGameObjFields = #gameObjFields
@@ -113,18 +113,14 @@ function varWatch.init()
 end
 
 -- Create the variable watch window display group and store it in varWatch.group
-function varWatch.create( parent, x, y, height )
+function varWatch.create( parent, x, y )
 	local group = g.makeGroup( parent, x, y )
 	varWatch.group = group
-
-	-- Set the initial size
-	varWatch.resize( height )
 end
 
 -- Fill the vars array with the user program's global variables
 function varWatch.getVars()
 	vars = checkJava.globalVars()
-	-- make displayData
 end
 
 -- Fill the displayData array with data for displaying the user program's global variables
