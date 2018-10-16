@@ -59,7 +59,7 @@ local function layoutPanes()
 	rightBar.width = app.width    -- more than enough
 	rightBar.height = app.height  -- more than enough
 	varWatchGroup.x = rightBar.x
-	-- TODO: varWatch.resize( app.width - width, height )
+	varWatch.resize( height )
 
 	-- Position the pane split and lower group
 	paneSplit.y = app.dyToolbar + height
@@ -135,7 +135,7 @@ function runView:create()
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
 	varWatchGroup = g.makeGroup( sceneGroup, rightBar.x, rightBar.y )
-	varWatch.create( varWatchGroup, 10, 5 )
+	varWatch.create( varWatchGroup, 10, 5, 0 )
 
 	-- Layout the display areas
 	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines
@@ -164,8 +164,7 @@ function runView:show( event )
 		-- Automatically run a new program
 		if g.runState == nil then
 			runtime.run()
-			varWatch.getVars()
-			varWatch.makeVarsTable()
+			varWatch.startNewRun( outputAreaHeight() )
 		end
 	end
 end

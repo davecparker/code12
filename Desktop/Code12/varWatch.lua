@@ -16,23 +16,23 @@ local GameObj = require("Code12.GameObjAPI")
 
 
 -- The varWatch module
-local varWatch = {}
-
+local varWatch = {
+	group = nil,              -- the varWatch display group
+}
 
 -- UI constants
-local rowHeight = 20          -- height of each row
-local font = app.consoleFont
-local fontSize = app.consoleFontSize
-local margin = app.margin
-local centerColWidth = 100
+local rowHeight = 20          -- height of each row in the variable display
+local margin = app.margin     -- space between UI elements
+local centerColWidth = 125    -- width of the center column of the variable display
 
 -- Display state
-local displayRows             -- table of rows of 2 or 3 text display objects
-local varsTableGroup
-local displayData = {}
+local textObjRows = {}        -- table of rows of the variable display
+local numDisplayRows = 0      -- number of rows currently displayed
+local xCols                   -- table of x-values for the left of each column
 
 -- varWatch data
 local vars         			 -- array of user program's global variables
+local displayData            -- array of data for displaying variables
 local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
                         "lineWidth", "visible", "clickable", "autoDelete", "group" }
 local numGameObjFields = #gameObjFields
@@ -49,54 +49,30 @@ local mapVtToTypeName = {
 
 local function updateValues()
 	if vars and ct.userVars then
-		for i = 1, #displayData do
+		for i = 1, numDisplayRows do
 			local d = displayData[i]
 			local varName = d.varName
 			local value = ct.userVars[varName]
 			if not d.index and not d.field then
 				local valueStr
-				if d.varType == "primitive" then
-					valueStr = tostring(value)
-				elseif d.varType == "String" then
-					valueStr = value or "null"
-				elseif d.varType == "GameObj" then
-					if value then
-						valueStr = value._code12.typeName
+				if value == nil then
+					if d.typeName then
+						valueStr = d.typeName .. "[]"
 					else
 						valueStr = "null"
 					end
-					if d.valueStr == valueStr then
-						-- don't need to update display text
-						valueStr = nil
-					else
-						d.valueStr = valueStr
-					end
+				elseif d.varType == "String" then
+					valueStr = value
+				elseif d.varType == "GameObj" then
+					-- valueStr = value._code12.typeName
+					valueStr = value:toString()
 				elseif d.varType == "array" then
-					if value then
-						if value.length == d.length then
-							-- don't need to update display text
-						elseif d.var.isOpen then
-							-- length of array changed while display was open
-							varWatch.makeVarsTable()
-							return nil
-						else
-							valueStr = d.typeName .. "[".. value.length .. "]"
-						end
-					else
-						valueStr = d.typeName .. "[]"
-						if d.valueStr == valueStr then
-							-- don't need to update display text
-							valueStr = nil
-						else
-							-- array was set equal to an uninitiallize array while display was open
-							varWatch.makeVarsTable()
-							return nil
-						end
-					end
+					-- TODO: Remake variable display if length of array changes while open
+					valueStr = d.typeName .. "[".. value.length .. "]"
+				else
+					valueStr = tostring(value)
 				end
-				if valueStr then
-					displayRows[i][2].text = valueStr
-				end
+				textObjRows[i][2].text = valueStr
 			elseif not d.index and d.field then
 				-- TODO
 			elseif d.index and not d.field then
@@ -111,6 +87,24 @@ local function updateValues()
 	end
 end
 
+local function resetTextObjs()
+	if #textObjRows > #displayData then
+		for i = #displayData + 1, #textObjRows do
+			textObjRows[i]:removeSelf( )
+			textObjRows[i] = nil
+		end
+	end
+	for i = 1, #textObjRows do
+		local row = textObjRows[i]
+		row[1].text = displayData[i].initRowTexts[1]
+		if xCols then
+			for col = 2, 3 do
+				row[col].x = xCols[col]
+			end
+		end
+	end
+ end
+
 --- Module Functions ---------------------------------------------------------
 
 -- Init the variable watch window
@@ -119,62 +113,51 @@ function varWatch.init()
 end
 
 -- Create the variable watch window display group and store it in varWatch.group
-function varWatch.create( parent, x, y )
+function varWatch.create( parent, x, y, height )
 	local group = g.makeGroup( parent, x, y )
 	varWatch.group = group
+
+	-- Set the initial size
+	varWatch.resize( height )
 end
 
 -- Fill the vars array with the user program's global variables
 function varWatch.getVars()
 	vars = checkJava.globalVars()
+	-- make displayData
 end
 
--- Make the display data and text object tables
-function varWatch.makeVarsTable()
-	-- make varsTableGroup
-	if varsTableGroup then
-		varsTableGroup:removeSelf()
-		varsTableGroup = nil
-		displayRows = nil
-	end
-	varsTableGroup = g.makeGroup( varWatch.group )
-	-- make displayData
+-- Fill the displayData array with data for displaying the user program's global variables
+function varWatch.makeDisplayData()
 	displayData = {}
-	local iRow = 1
 	if vars then
+		local charWidth = app.consoleFontCharWidth
+		local maxVarNameWidth = 0
+		local iRow = 1
 		for i = 1, #vars do
 			local var = vars[i]
 			local vt = var.vt
 			local varName = var.nameID.str
+			local varNameWidth = string.len( varName ) * charWidth
+			if maxVarNameWidth < varNameWidth then
+				maxVarNameWidth = varNameWidth
+			end
 			local value = ct.userVars[varName]
 			local d = {}
 			d.var = var
 			d.varName = varName
+			d.initRowTexts = { varName, "", "" }
 			if vt == 0 or vt == 1 or vt == true then
 				d.varType = "primitive"
-			elseif vt == "String" then
+			elseif vt == "String" or vt == "GameObj" then
 				d.varType = vt
-			elseif vt == "GameObj" then
-				d.varType = vt
-				if value then
-					d.valueStr = value._code12.typeName
-				else
-					d.valueStr = "null"
-				end
 			elseif type(vt) == "table" then
 				d.varType = "array"
 				d.typeName = mapVtToTypeName[vt.vt]
-				if value then
-					d.length = value.length
-					d.valueStr = d.typeName .. "[" .. d.length .. "]"
-				else
-					d.length = -1
-					d.valueStr = d.typeName .. "[]"
-				end
 			end
 			displayData[iRow] = d
 			iRow = iRow + 1
-			if var.isOpen and type(value) == "table" then
+			if var.isOpen and d.varType == "GameObj" then
 				-- add GameObj data fields / array elements
 				if d.varType == "GameObj" then
 					for j = 1, numGameObjFields do
@@ -196,54 +179,56 @@ function varWatch.makeVarsTable()
 				end
 			end
 		end
-		-- make displayRows
-		displayRows = {}
-		for i = 1, #displayData do
-			local d = displayData[i]
-			local row = {}
-			local rowTexts
-			if not d.index and not d.field then
-				rowTexts = { d.varName, d.valueStr or "", "" }
-			elseif not d.index and d.field then
-				rowTexts = { d.field, "", "" }
-			elseif d.index and not d.field then
-				rowTexts = { " [" .. d.index .. "]", "", "" }
-			else
-				-- d.field and d.index
-				rowTexts = { " [".. d.index .. "]", " " .. d.field, "" }
-			end
-			local yRow = (i - 1) * rowHeight
+		xCols = { 0, maxVarNameWidth + margin, maxVarNameWidth + margin + centerColWidth }
+	end
+end
+
+-- Resize the variable watch window to fit the given size
+function varWatch.resize( height )
+	local prevNumDisplayRows = numDisplayRows
+
+	-- Determine the new number of display rows
+	numDisplayRows = math.floor( height / rowHeight )
+	numDisplayRows = math.min( numDisplayRows, #displayData )
+	local n = #textObjRows
+	if prevNumDisplayRows < numDisplayRows then
+		-- Make sure we have enough text objects
+		while n < numDisplayRows do
+			n = n + 1
+			textObjRows[n] = g.makeGroup( varWatch.group, 0, (n - 1) * rowHeight )
 			for col = 1, 3 do
-				row[col] = g.uiBlack ( display.newText{
-					parent = varsTableGroup,
-					text = rowTexts[col],
-					x = 0,
-					y = yRow,
-					font = font,
-					fontSize = fontSize,
+				g.uiBlack ( display.newText{
+					parent = textObjRows[n],
+					text = displayData[n].initRowTexts[col],
+					x = xCols[col],
+					-- y = (n - 1) * rowHeight,
+					y = 0,
+					font = app.consoleFont,
+					fontSize = app.consoleFontSize,
+					align = "left",
 				} )
 			end
-			displayRows[i] = row
 		end
-		-- Determine width of first column
-		local maxWidth = 0
-		for i = 1, #displayRows do
-			local width = displayRows[i][1].width
-			if maxWidth < width then
-				maxWidth = width
+		if n > prevNumDisplayRows then
+		-- Show rows in output area previously hidden
+			for i = prevNumDisplayRows + 1, numDisplayRows do
+				textObjRows[i].isVisible = true
 			end
 		end
-		-- Position columns 2 and 3 horizontally
-		local xCol2 = maxWidth + margin
-		local xCol3 = xCol2 + centerColWidth
-		for i = 1, #displayRows do
-			local row = displayRows[i]
-			row[2].x = xCol2
-			row[3].x = xCol3
+	elseif prevNumDisplayRows > numDisplayRows and n > numDisplayRows then
+		-- Hide any rows below the output area
+		for i = numDisplayRows + 1, prevNumDisplayRows do
+			textObjRows[i].isVisible = false
 		end
 	end
 end
 
+function varWatch.startNewRun( height )
+	varWatch.getVars()
+	varWatch.makeDisplayData()
+	varWatch.resize( height )
+	resetTextObjs()
+end
 
 ------------------------------------------------------------------------------
 
