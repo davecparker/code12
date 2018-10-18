@@ -7,11 +7,6 @@ import Code12.*;
 
 public class DuckHunt extends Code12Program
 {
-	// public static void main( String[] args )
-	// {
-	// 	Code12.run( new DuckHunt() ); 
-	// }
-
 	GameObj gun; // Gun at bottom of window that fires bullets
 	GameObj ducksHitDisplay; // Text display for percent of ducks hit
 	GameObj accuracyDisplay; // Text display for percent of shots on target   
@@ -161,13 +156,13 @@ public class DuckHunt extends Code12Program
 	// Deletes a bullet
 	void deleteBullet( int index )
 	{
-		GameObj bullet = bulletsArr[index];
-		bullet.delete();
+		bulletsArr[index].delete();
 		for( int i = index; i < bulletsCount - 1; i++ )
 		{
 			bulletsArr[i] = bulletsArr[i + 1];
 		}
 		bulletsCount--;
+		bulletsArr[bulletsCount] = null;
 	}
 
 	// Makes a duck to the right of the window at y-coordinate yStart
@@ -194,14 +189,14 @@ public class DuckHunt extends Code12Program
 	// Deletes a duck
 	void deleteDuck( int index )
 	{
-		GameObj duck = ducksArr[index];
-		duck.delete();
+		ducksArr[index].delete();
 		for( int i = index; i <  ducksCount - 1; i++ )
 		{
 			ducksArr[i] = ducksArr[i + 1];
 			duckYStartsArr[i] = duckYStartsArr[i + 1];
 		}
 		ducksCount--;
+		ducksArr[ducksCount] = null;
 	}
 
 	// Makes a dead duck at duck's position
@@ -227,5 +222,11 @@ public class DuckHunt extends Code12Program
 		double xStart = gun.x;
 		double yStart = gun.y - gun.height * 0.9;
 		fireBullet( xStart, yStart );
+	}
+
+	// Main method
+	public static void main( String[] args )
+	{
+		Code12.run( new DuckHunt() ); 
 	}
 }
