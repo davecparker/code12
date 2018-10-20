@@ -18,12 +18,7 @@
 import Code12.*;
 
 class DrawingProgram extends Code12Program
-{
-   public static void main(String[] args)
-   { 
-      Code12.run(new DrawingProgram()); 
-   }
-   
+{  
    double boxSize;         // size of toolbox items
    
    GameObj circle;         // clickable square for drawing circles
@@ -162,6 +157,11 @@ class DrawingProgram extends Code12Program
       selectedColorSwatch = white;
       selectedColorSwatch.lineWidth = 3;
    }
+
+   public void update()
+   {
+      
+   }
       
    public void onMousePress( GameObj obj, double x, double y )
    {
@@ -266,5 +266,10 @@ class DrawingProgram extends Code12Program
       }
       else if ( keyName.equals( "c" ) )
          ct.clearGroup( "drawing" );
+   }
+   
+   public static void main(String[] args)
+   { 
+      Code12.run(new DrawingProgram()); 
    }
 }
