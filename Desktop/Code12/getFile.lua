@@ -304,10 +304,7 @@ local function makeUIGroup( sceneGroup )
 	if numRecentSourceFilePaths > 0 then
 		local pathRemoved
 		for i = #app.recentSourceFilePaths, 1, -1 do
-			local file = io.open( app.recentSourceFilePaths[i], "r" )
-			if file then
-				io.close( file )
-			else
+			if not env.canRead( app.recentSourceFilePaths[i] ) then
 				table.remove( app.recentSourceFilePaths, i )
 				pathRemoved = true
 			end
