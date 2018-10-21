@@ -52,9 +52,13 @@ local mapVtToTypeName = {
 
 -- Update variable values displayed in the variable watch window
 local function updateValues()
-	if vars and ct.userVars then
+	if vars and (g.runState == "running" or g.runState == "paused") then
 		for i = 1, numDisplayRows do
 			local d = displayData[i]
+			if not d then
+				break
+				-- TODO: Handle changes to vars mid update?
+			end
 			local row = textObjRows[i]
 			local var = d.var
 			local varType = var.varType
@@ -62,9 +66,14 @@ local function updateValues()
 			local varName = var.varName
 			local value = ct.userVars[varName]
 			if not value then
-				if typeName then
+				row.dropDownBtn1.isVisible = false
+				var.wasNull = true
+				if var.isOpen then
+					-- Open GameObj became nil
+					var.isOpen = false
+					varWatch.reset( varWatchHeight )
+				elseif typeName then
 					row[2].text = typeName.."[]"
-					row.dropDownBtns[1].visible = false
 				else
 					row[2].text = "null"
 				end
@@ -75,13 +84,16 @@ local function updateValues()
 				elseif varType == "GameObj" then
 					-- row[2].text = value._code12.typeName
 					row[2].text = value:toString()
+					if var.wasNull then
+						row.dropDownBtn1.isVisible = true
+					end
 				elseif varType == "array" then
 					local prevLength = var.length
 					local length = value.length
 					var.length = length
 					if not prevLength then
 						-- Uninitialized array was initialized
-						row.dropDownBtns[1].visible = true
+						row.dropDownBtn1.isVisible = true
 					elseif prevLength ~= length and var.isOpen then
 						-- Open array was set equal to an array of different size
 						varWatch.reset( varWatchHeight )
@@ -103,10 +115,26 @@ local function updateValues()
 					elseif typeName == "boolean" then
 						row[2].text = " false"
 					else
+						if typeName == "GameObj" then
+							if var[d.index.."isOpen"] then
+								-- Open GameObj in array was set to null
+								var[d.index.."isOpen"] = false
+								varWatch.reset( varWatchHeight )
+								return nil
+							end
+							var[d.index.."wasNull"] = true
+							row.dropDownBtn2:setState{ isOn = false }
+							row.dropDownBtn2.isVisible = false
+						end
 						row[2].text = " null"
 					end
 				elseif type(valueAtIndex) == "table" then
+					-- valueAtIndex is a GameObj
 					row[2].text = " "..valueAtIndex:toString()
+					if var[d.index.."wasNull"] then
+						var[d.index.."wasNull"] = false
+						row.dropDownBtn2.isVisible = true
+					end
 				else
 					row[2].text = tostring(valueAtIndex)
 				end
@@ -267,15 +295,14 @@ function varWatch.resize( height )
 				} )
 			end
 			-- make drop down buttons for first and second columns
-			row.dropDownBtns = {}
 			local yBtn = row[1].y + row[1].height / 2
 			local btn1 = buttons.newDropDownButton( row, 0, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
 			btn1.rowNumber = n
-			row.dropDownBtns[1] = btn1
+			row.dropDownBtn1 = btn1
 			local btn2 = buttons.newDropDownButton( row, row[2].x + dropDownBtnSize, yBtn, dropDownBtnSize, dropDownBtnSize, 
 			                                        onDropDownBtn2 )
-			row.dropDownBtns[2] = btn2
 			btn2.rowNumber = n
+			row.dropDownBtn2 = btn2
 			textObjRows[n] = row
 			-- hide/show the buttons depending on the type of variable tracked in the textObjs
 			local var = d.var
@@ -293,19 +320,15 @@ function varWatch.resize( height )
 			end
 		end
 		if n > prevNumDisplayRows then
-		-- Show rows in output area previously hidden
+			-- Show rows in output area previously hidden
 			for i = prevNumDisplayRows + 1, numDisplayRows do
 				textObjRows[i].isVisible = true
-				-- local d = displayData[i]
-				-- showDropDownBtns( d, true )
 			end
 		end
 	elseif prevNumDisplayRows > numDisplayRows and n > numDisplayRows then
 		-- Hide any rows below the output area
 		for i = numDisplayRows + 1, prevNumDisplayRows do
 			textObjRows[i].isVisible = false
-			-- local d = displayData[i]
-			-- showDropDownBtns( d, false )
 		end
 	end
 	varWatchHeight = height
