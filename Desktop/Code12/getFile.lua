@@ -196,10 +196,15 @@ end
 -- Event handler for the list of recent programs
 local function onRecentProgram( event )
 	local path = event.target.path
-	updateSourceFile( path )
-	app.saveSettings()
-	if app.openFilesInEditor then
-		env.openFileInEditor( path )
+	if env.canRead( path ) then
+		updateSourceFile( path )
+		app.saveSettings()
+		if app.openFilesInEditor then
+			env.openFileInEditor( path )
+		end
+	else
+		env.showErrAlert( "File Not Readable", "There was an error reading file " .. path )
+		composer.gotoScene( "getFile" )
 	end
 end
 
@@ -294,6 +299,24 @@ local function makeUIGroup( sceneGroup )
 	recentProgramsGroup.anchorY = 0
 	UIGroup:insert( recentProgramsGroup )
 	local yBtn = 0
+	local numRecentSourceFilePaths = #app.recentSourceFilePaths
+	-- Check app.addRecentSourceFilePaths for missing files and update
+	if numRecentSourceFilePaths > 0 then
+		local pathRemoved
+		for i = #app.recentSourceFilePaths, 1, -1 do
+			local file = io.open( app.recentSourceFilePaths[i], "r" )
+			if file then
+				io.close( file )
+			else
+				table.remove( app.recentSourceFilePaths, i )
+				pathRemoved = true
+			end
+		end
+		if pathRemoved then
+			app.saveSettings()
+		end
+	end
+	-- Make recent programs list
 	for i = 1, #app.recentSourceFilePaths do
 		local path = app.recentSourceFilePaths[i]
 		-- Make icon button
