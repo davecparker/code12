@@ -203,8 +203,12 @@ end
 function runtime.runEventFunction( func, ... )
 	-- Is a coroutine already running?
 	if coRoutineUser then
-		local success, strErr = coroutine.resume(coRoutineUser)
-		return coroutineStatus(success, strErr)
+		if coroutine.status(coRoutineUser) == "dead" then
+			coRoutineUser = nil
+		else
+			local success, strErr = coroutine.resume(coRoutineUser)
+			return coroutineStatus(success, strErr)
+		end
 	end
 
 	-- Is there a valid function to start?

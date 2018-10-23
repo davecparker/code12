@@ -107,6 +107,10 @@ end
 -- Remove a GameObj and delete the display object.
 -- The GameObj will be subject to garbage collection when outstanding refs to it are gone.
 function GameObj:removeAndDelete()
+	if self._code12.deleted then  -- This object was already deleted
+		g.warning("Attempt to delete an object that was already deleted")
+		return
+	end
 	local obj = self._code12.obj
 	obj.code12GameObj = nil    -- remove display object's reference to the GameObj
 	obj:removeSelf()	       -- remove and destroy the display object
