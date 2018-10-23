@@ -60,7 +60,7 @@ local g = {
 	charTyped = nil,       -- char typed during this update frame (string), nil if none
 
 	-- The run state
-	runState = nil,    -- "running", "waiting", "paused", "stopped", "ended", "error", or nil
+	runState = nil,    -- "running", "waiting", "paused", "stopped", "error", or nil
 	userFn = nil,      -- Current user function to execute (start, update, or nil) 
 	startTime = nil,   -- System time in ms when start function began, or nil before
 }
