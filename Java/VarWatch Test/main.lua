@@ -11,7 +11,9 @@ this.intArr2 = { 5, 10, 15, length = 3 }
 function _fn.start()
 
 	this.gObj = nil
-end
+	local i = 1; while i < 100 do
+		ct.println(i); i = i + 1
+	end; end
 
 function _fn.update()
 
@@ -36,6 +38,7 @@ function _fn.onKeyPress(keyName)
 		if this.gObj == nil then
 
 			this.gObj = ct.rect(5, 10, 10, 10)
+			this.gObj.group = "rectangles"
 			this.gObj.xSpeed = 0.1
 		else
 

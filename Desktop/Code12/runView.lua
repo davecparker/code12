@@ -34,7 +34,6 @@ local outputGroup              -- display group for program output area
 local rightBar                 -- clipping bar to the right of the output area
 local paneSplit                -- pane split area
 local lowerGroup               -- display area below the pane split
-local varWatchGroup            -- display group for the variable watch window
 
 -- Program state
 local minConsoleHeight         -- min height of the console window (from pane split)
@@ -58,8 +57,8 @@ local function layoutPanes()
 	rightBar.x = width + 1
 	rightBar.width = app.width    -- more than enough
 	rightBar.height = app.height  -- more than enough
-	varWatchGroup.x = rightBar.x
-	varWatch.resize( height )
+	varWatch.group.x = rightBar.x
+	varWatch.resize( app.width - varWatch.group.x, height - 1 )
 
 	-- Position the pane split and lower group
 	paneSplit.y = app.dyToolbar + height
@@ -134,8 +133,7 @@ function runView:create()
 	paneSplit:addEventListener( "touch", onTouchPaneSplit )
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
-	varWatchGroup = g.makeGroup( sceneGroup, rightBar.x, rightBar.y )
-	varWatch.create( varWatchGroup, 10, 5 )
+	varWatch.create( sceneGroup, rightBar.x, rightBar.y, 0, 0 )
 
 	-- Layout the display areas
 	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines
@@ -164,7 +162,7 @@ function runView:show( event )
 		-- Automatically run a new program
 		if g.runState == nil then
 			runtime.run()
-			varWatch.startNewRun( outputAreaHeight() )
+			varWatch.startNewRun()
 		end
 	end
 end

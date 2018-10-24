@@ -11,6 +11,8 @@ class VarWatchTest extends Code12Program
 	public void start()
 	{
 		gObj = null;
+		for (int i=1; i<100; i++)
+			ct.println(i);
 	}
 	
 	public void update()
@@ -36,6 +38,7 @@ class VarWatchTest extends Code12Program
 			if ( gObj == null )
 			{
 				gObj = ct.rect(5, 10, 10, 10);
+				gObj.group = "rectangles";
 				gObj.xSpeed = 0.1;
 			}
 			else

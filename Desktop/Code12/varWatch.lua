@@ -13,6 +13,7 @@ local ct = require( "Code12.ct" )
 local app = require( "app" )
 local checkJava = require( "checkJava" )
 local buttons = require( "buttons" )
+local Scrollbar = require( "Scrollbar" )
 
 
 -- The varWatch module
@@ -21,21 +22,25 @@ local varWatch = {
 }
 
 -- UI constants
+local topMargin = 5           -- margin for the top of the variable watch window
 local rowHeight = 20          -- height of each row in the variable display
 local dropDownBtnSize = 10    -- width and height of the drop down buttons
+local trackVarBtnWidth = 10   -- width of the track variable buttons
 local margin = app.margin     -- space between UI elements
 local centerColWidth = 125    -- width of the center column of the variable display
+local xCol1 = trackVarBtnWidth + dropDownBtnSize + margin -- x-value for the first column of text objects
 
 -- Display state
 local textObjRows             -- table of rows of the variable display
-local numDisplayRows          -- number of rows currently displayed
+local numDisplayRows          -- number of rows that can currently be displayed
+local numRowsToUpdate         -- number of text obj rows that need to be updated
 local xCols                   -- table of x-values for the left of each column
 local charWidth               -- character width of the font used for text objects
-local varWatchHeight          -- current height of the variable watch window
 
 -- varWatch data
 local vars                   -- array of user program's global variables
 local displayData            -- array of data for displaying variables
+local scrollOffset = 0       -- starting line if scrolled back or nil if at end
 local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
                         "lineWidth", "visible", "clickable", "autoDelete", "group" }
 local numGameObjFields = #gameObjFields
@@ -50,20 +55,83 @@ local mapVtToTypeName = {
 
 --- Internal Functions ---------------------------------------------------------
 
+-- Update column widths
+local function updateColWidths()
+	-- update text obj and button positions
+	local xCol2 = xCols[2]
+	local xCol3 = xCols[3]
+	for i = 1, #textObjRows do
+		local row = textObjRows[i]
+		row[2].x = xCol2
+		row.dropDownBtn2.x = xCol2
+		row[3].x = xCol3
+	end
+end
+
+-- Update variable names, array indices, GameObj fields, and drop down buttons in the 
+-- variable watch window
+local function updateConstants( iTextObjRowStart, iTextObjRowEnd )
+	-- Adjust the scrollbar
+	if #displayData > numDisplayRows then
+		local rangeMax = math.max( 1, #displayData - numDisplayRows )
+		local ratio = 1 / (rangeMax + 1)
+		varWatch.scrollbar:adjust( 0, rangeMax, scrollOffset, ratio )
+	else
+		scrollOffset = 0
+		varWatch.scrollbar:hide()
+	end
+	-- Update text obj texts and visibility of rows and buttons
+	local numTextObjRows = #textObjRows
+	if iTextObjRowEnd > numTextObjRows then
+		iTextObjRowEnd = numTextObjRows
+	end
+	for i = iTextObjRowStart, iTextObjRowEnd do
+		local row = textObjRows[i]
+		local d = displayData[i + scrollOffset]
+		if d then
+			row.isVisible = true
+			for col = 1, 3 do
+				row[col].text = d.initRowTexts[col]
+			end
+			local btn1 = row.dropDownBtn1
+			local btn2 = row.dropDownBtn2
+			if not d.dropDownVisible then
+				btn1.isVisible = false
+				btn2.isVisible = false
+			elseif d.dropDownVisible == 1 then
+				btn1:setState{ isOn = d.var.isOpen or false }
+				btn1.isVisible = true
+				btn2.isVisible = false
+			elseif d.dropDownVisible == 2 then
+				btn2:setState{ isOn = d.var[d.index.."isOpen"] or false }
+				btn1.isVisible = false				
+				btn2.isVisible = true
+			end
+		else
+			row.isVisible = false
+		end
+	end
+	for i = numDisplayRows + 1, iTextObjRowEnd do
+		textObjRows[i].isVisible = false
+	end
+	-- Update numRowsToUpdate
+	numRowsToUpdate = math.min( numDisplayRows, #displayData - scrollOffset )
+end
+
 -- Update variable values displayed in the variable watch window
 local function updateValues()
 	if vars and (g.runState == "running" or g.runState == "paused") then
-		for i = 1, numDisplayRows do
-			local d = displayData[i]
-			if not d then
-				break
-				-- TODO: Handle changes to vars mid update?
-			end
+		for i = 1, numRowsToUpdate do
+			local d = displayData[i + scrollOffset]
+			-- if not d then
+			-- 	break
+			-- 	-- TODO: Handle changes to vars mid update?
+			-- end
 			local row = textObjRows[i]
 			local var = d.var
-			local varType = var.varType
-			local typeName = var.typeName
-			local varName = var.varName
+			local vt = var.vt
+			local arrayType = var.arrayType
+			local varName = var.nameID.str
 			local value = ct.userVars[varName]
 			if not value then
 				row.dropDownBtn1.isVisible = false
@@ -71,23 +139,24 @@ local function updateValues()
 				if var.isOpen then
 					-- Open GameObj became nil
 					var.isOpen = false
-					varWatch.reset( varWatchHeight )
-				elseif typeName then
-					row[2].text = typeName.."[]"
+					varWatch.reset()
+					return nil
+				elseif arrayType then
+					row[2].text = arrayType.."[]"
 				else
 					row[2].text = "null"
 				end
 			elseif not d.index and not d.field then
 				-- Value of a top-level variable
-				if varType == "String" then
+				if vt == "String" then
 					row[2].text = value
-				elseif varType == "GameObj" then
+				elseif vt == "GameObj" then
 					-- row[2].text = value._code12.typeName
 					row[2].text = value:toString()
 					if var.wasNull then
 						row.dropDownBtn1.isVisible = true
 					end
-				elseif varType == "array" then
+				elseif arrayType then
 					local prevLength = var.length
 					local length = value.length
 					var.length = length
@@ -96,10 +165,10 @@ local function updateValues()
 						row.dropDownBtn1.isVisible = true
 					elseif prevLength ~= length and var.isOpen then
 						-- Open array was set equal to an array of different size
-						varWatch.reset( varWatchHeight )
+						varWatch.reset()
 						return nil
 					end
-					row[2].text = typeName.."["..length.."]"
+					row[2].text = arrayType.."["..length.."]"
 				else
 					row[2].text = tostring(value)
 				end
@@ -110,16 +179,16 @@ local function updateValues()
 				-- Value of an indexed array
 				local valueAtIndex = value[d.index]
 				if not valueAtIndex then
-					if typeName == "int" or typeName == "double" then
+					if arrayType == "int" or arrayType == "double" then
 						row[2].text = " 0"
-					elseif typeName == "boolean" then
+					elseif arrayType == "boolean" then
 						row[2].text = " false"
 					else
-						if typeName == "GameObj" then
+						if arrayType == "GameObj" then
 							if var[d.index.."isOpen"] then
 								-- Open GameObj in array was set to null
 								var[d.index.."isOpen"] = false
-								varWatch.reset( varWatchHeight )
+								varWatch.reset()
 								return nil
 							end
 							var[d.index.."wasNull"] = true
@@ -155,17 +224,25 @@ end
 -- Event handler for variable drop down buttons in the first column
 local function onDropDownBtn1( event )
 	local btn = event.target
-	displayData[btn.rowNumber].var.isOpen = btn.isOn
-	varWatch.reset( varWatchHeight )
+	displayData[btn.rowNumber + scrollOffset].var.isOpen = btn.isOn
+	varWatch.reset()
 end
 
 -- Event handler for variable drop down buttons in the second column
 local function onDropDownBtn2( event )
 	local btn = event.target
-	local d = displayData[btn.rowNumber]
+	local d = displayData[btn.rowNumber + scrollOffset]
 	d.var[d.index.."isOpen"] = btn.isOn
-	varWatch.reset( varWatchHeight )
-end 
+	varWatch.reset()
+end
+
+-- Event handler for the variable watch window scrollbar
+local function onScroll( newPos )
+	scrollOffset = newPos or #displayData - numDisplayRows
+	updateConstants( 1, #textObjRows )
+	updateValues()
+end
+
 
 --- Module Functions ---------------------------------------------------------
 
@@ -179,8 +256,30 @@ function varWatch.init()
 end
 
 -- Create the variable watch window display group and store it in varWatch.group
-function varWatch.create( parent, x, y )
-	varWatch.group = g.makeGroup( parent, x, y )
+function varWatch.create( parent, x, y, width, height )
+	local group = g.makeGroup( parent, x, y )
+	varWatch.group = group
+	varWatch.width = width
+	varWatch.height = height
+
+	-- Scrollbar
+	varWatch.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )
+	varWatch.scrollbar:adjust( 1, 100, 1, 0.1 )
+	
+	-- TODO: remove once scrollbar is working
+	-- varWatch.scrollUpBtn = widget.newButton{
+	-- 	onPress = scrollUp,
+	-- 	label = "^",
+	-- 	textOnly = true;
+	-- }
+	-- group:insert( scrollUpBtn )
+	-- varWatch.scrollDownBtn = widget.newButton{
+	-- 	onPress = scrollDown,
+	-- 	label = "v",
+	-- 	textOnly = true;
+	-- }
+	-- group:insert( scrollDownBtn )
+
 end
 
 -- Fill the vars array with the user program's global variables
@@ -190,25 +289,17 @@ function varWatch.getVars()
 		local maxVarNameWidth = 100 -- minimum width to ensure space for GameObj fields
 		for i = 1, #vars do
 			local var = vars[i]
-			local vt = var.vt
-			local varName = var.nameID.str
-			var.varName = varName
-			local varNameWidth = string.len( varName ) * charWidth
+			local varNameWidth = string.len( var.nameID.str ) * charWidth
 			if maxVarNameWidth < varNameWidth then
 				maxVarNameWidth = varNameWidth
 			end
-			if vt == 0 or vt == 1 or vt == true then
-				var.varType = "primitive"
-			elseif vt == "String" then
-				var.varType = vt
-			elseif vt == "GameObj" then
-				var.varType = vt
-			elseif type(vt) == "table" then
-				var.varType = "array"
-				var.typeName = mapVtToTypeName[vt.vt]
+			local vt = var.vt
+			if type(vt) == "table" then
+				var.arrayType = mapVtToTypeName[vt.vt]
 			end
 		end
-		xCols = { 0, maxVarNameWidth + margin, maxVarNameWidth + margin + centerColWidth }
+		local xCol2 = xCol1 + maxVarNameWidth + dropDownBtnSize + margin
+		xCols = { xCol1, xCol2, xCol2 + centerColWidth }
 	end
 end
 
@@ -220,47 +311,43 @@ function varWatch.makeDisplayData()
 		for i = 1, #vars do
 			local var = vars[i]
 			local isOpen = var.isOpen
-			local varType = var.varType
-			local varName = var.varName
+			local vt = var.vt
+			local arrayType = var.arrayType
+			local varName = var.nameID.str
 			local value = ct.userVars[varName]
 			local d = {}
 			d.var = var
 			d.initRowTexts = { varName, "", "" }
-			d.rowAligns = { "left", "left", nil }
-			if varType == "GameObj" or varType == "array" then
+			if vt == "GameObj" or arrayType then
 				d.dropDownVisible = 1
 			end
 			displayData[iRow] = d
 			iRow = iRow + 1
-			if isOpen and varType == "GameObj" then
+			if isOpen and vt == "GameObj" then
 				-- add GameObj data fields
 				for j = 1, numGameObjFields do
 					local gameObjField = gameObjFields[j]
 					d = { var = var, field = gameObjField }
 					d.initRowTexts = { " "..gameObjField, "", "" }
-					d.rowAligns = { "center", "center", nil }
 					displayData[iRow] = d
 					iRow = iRow + 1
 				end
-			elseif isOpen and varType == "array" then
-				local typeName = var.typeName
+			elseif isOpen and arrayType then
 				-- add array indices
 				local len = value.length
 				for j = 1, len do
 					d = { var = var, index = j }
 					d.initRowTexts = { " ["..j.."]", "", "" }
-					d.rowAligns = { "center", "left", nil }
-					if typeName == "GameObj" then 
+					if arrayType == "GameObj" then 
 						d.dropDownVisible = 2
 					end
 					displayData[iRow] = d
 					iRow = iRow + 1
-					if typeName == "GameObj" and var[d.index.."isOpen"] then
+					if arrayType == "GameObj" and var[d.index.."isOpen"] then
 						for k = 1, numGameObjFields do
 							local gameObjField = gameObjFields[k]
 							d = { var = var, index = j, field = gameObjField }
 							d.initRowTexts = { "", "  "..gameObjField, "" }
-							d.rowAligns = { "left", "center", "center" }
 							displayData[iRow] = d
 							iRow = iRow + 1
 						end
@@ -272,83 +359,71 @@ function varWatch.makeDisplayData()
 end
 
 -- Resize the variable watch window to fit the given size
-function varWatch.resize( height )
+function varWatch.resize( width, height )
 	local prevNumDisplayRows = numDisplayRows
 	-- Determine the new number of display rows
-	numDisplayRows = math.floor( height / rowHeight )
-	numDisplayRows = math.min( numDisplayRows, #displayData )
-	local n = #textObjRows
-	if prevNumDisplayRows < numDisplayRows then
-		-- Make sure we have enough text objects
-		while n < numDisplayRows do
-			n = n + 1
-			local row = g.makeGroup( varWatch.group, 0, (n - 1) * rowHeight )
-			local d = displayData[n]
-			for col = 1, 3 do
-				g.uiBlack( display.newText{
-					parent = row,
-					text = d.initRowTexts[col],
-					x = xCols[col],
-					y = 0,
-					font = app.consoleFont,
-					fontSize = app.consoleFontSize,
-				} )
-			end
-			-- make drop down buttons for first and second columns
-			local yBtn = row[1].y + row[1].height / 2
-			local btn1 = buttons.newDropDownButton( row, 0, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
-			btn1.rowNumber = n
-			row.dropDownBtn1 = btn1
-			local btn2 = buttons.newDropDownButton( row, row[2].x + dropDownBtnSize, yBtn, dropDownBtnSize, dropDownBtnSize, 
-			                                        onDropDownBtn2 )
-			btn2.rowNumber = n
-			row.dropDownBtn2 = btn2
-			textObjRows[n] = row
-			-- hide/show the buttons depending on the type of variable tracked in the textObjs
-			local var = d.var
-			if not d.dropDownVisible then
-				btn1.isVisible = false
-				btn2.isVisible = false
-			elseif d.dropDownVisible == 1 then
-				btn1:setState{ isOn = var.isOpen or false }
-				btn1.isVisible = true
-				btn2.isVisible = false
-			elseif d.dropDownVisible == 2 then
-				btn2:setState{ isOn = var[d.index.."isOpen"] or false }
-				btn1.isVisible = false				
-				btn2.isVisible = true
-			end
-		end
-		if n > prevNumDisplayRows then
-			-- Show rows in output area previously hidden
-			for i = prevNumDisplayRows + 1, numDisplayRows do
-				textObjRows[i].isVisible = true
-			end
-		end
-	elseif prevNumDisplayRows > numDisplayRows and n > numDisplayRows then
-		-- Hide any rows below the output area
-		for i = numDisplayRows + 1, prevNumDisplayRows do
-			textObjRows[i].isVisible = false
-		end
+	if height > topMargin then
+		numDisplayRows = math.floor( (height - topMargin) / rowHeight )
+	else
+		numDisplayRows = 0
 	end
-	varWatchHeight = height
+	-- Make sure we have enough text objects
+	local n = #textObjRows
+	while n < numDisplayRows do
+		n = n + 1
+		local row = g.makeGroup( varWatch.group, 0, topMargin + (n - 1) * rowHeight )
+		for col = 1, 3 do
+			g.uiBlack( display.newText{
+				parent = row,
+				text = "",
+				x = xCol1 + 100 * ( col - 1 ),
+				y = 0,
+				font = app.consoleFont,
+				fontSize = app.consoleFontSize,
+		} )
+		end
+		-- make drop down buttons for first and second columns
+		local yBtn = row[1].y + row[1].height / 2
+		local btn1 = buttons.newDropDownButton( row, row[1].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
+		btn1.rowNumber = n
+		row.dropDownBtn1 = btn1
+		local btn2 = buttons.newDropDownButton( row, row[2].x + dropDownBtnSize, yBtn, dropDownBtnSize, dropDownBtnSize, 
+		                                        onDropDownBtn2 )
+		btn2.rowNumber = n
+		row.dropDownBtn2 = btn2
+		textObjRows[n] = row
+	end
+	-- Update display constants (variable names, buttons, etc)
+	if prevNumDisplayRows < numDisplayRows then
+		updateConstants( prevNumDisplayRows + 1, n )
+	else
+		updateConstants( numDisplayRows, prevNumDisplayRows )
+	end
+	-- Reposition the scrollbar
+	local scrollbar = varWatch.scrollbar
+	scrollbar:setPosition( width - Scrollbar.width, 0, height )
+	scrollbar:toFront()
 end
 
 -- Remakes the varWatch window after getting new display data
-function varWatch.reset( height )
-	for i = #textObjRows, 1, -1 do
-		textObjRows[i]:removeSelf()
-		textObjRows[i] = nil
-	end
+function varWatch.reset()
+	-- for i = #textObjRows, 1, -1 do
+	-- 	textObjRows[i]:removeSelf()
+	-- 	textObjRows[i] = nil
+	-- end
+	-- varWatch.makeDisplayData()
+	-- numDisplayRows = 0
+	-- varWatch.resize( varWatch.width, varWatch.height )
 	varWatch.makeDisplayData()
-	numDisplayRows = 0
-	varWatch.resize( height )
+	updateConstants( 1, #textObjRows )
+	updateValues()
 end
 
--- Starts a new run of the varWatch window based on the given height
-function varWatch.startNewRun( height )
+-- Starts a new run of the varWatch window based on the given width and height
+function varWatch.startNewRun()
 	varWatch.getVars()
-	varWatch.reset( height )
+	updateColWidths()
+	varWatch.reset()
 end
 
 ------------------------------------------------------------------------------
