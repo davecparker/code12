@@ -261,7 +261,8 @@ function GameObj:updateSizeText(scale)
 	local p = self._code12
 	local height = self.height
 	if scale ~= p.scalePrev or height ~= p.heightPrev then
-		p.obj.size = fontSizeFromHeight(height)   -- new font size
+		local fontSize = fontSizeFromHeight(height)   -- new font size
+		p.obj.size = math.max(1, fontSize)   -- 0 means default in Corona so 1 is as small we can go
 		self.width = self.width * height / p.heightPrev  -- new text width
 	end
 end
