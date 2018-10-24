@@ -107,6 +107,10 @@ end
 -- Remove a GameObj and delete the display object.
 -- The GameObj will be subject to garbage collection when outstanding refs to it are gone.
 function GameObj:removeAndDelete()
+	if self._code12.deleted then  -- This object was already deleted
+		g.warning("Attempt to delete an object that was already deleted")
+		return
+	end
 	local obj = self._code12.obj
 	obj.code12GameObj = nil    -- remove display object's reference to the GameObj
 	obj:removeSelf()	       -- remove and destroy the display object
@@ -257,7 +261,8 @@ function GameObj:updateSizeText(scale)
 	local p = self._code12
 	local height = self.height
 	if scale ~= p.scalePrev or height ~= p.heightPrev then
-		p.obj.size = fontSizeFromHeight(height)   -- new font size
+		local fontSize = fontSizeFromHeight(height)   -- new font size
+		p.obj.size = math.max(1, fontSize)   -- 0 means default in Corona so 1 is as small we can go
 		self.width = self.width * height / p.heightPrev  -- new text width
 	end
 end

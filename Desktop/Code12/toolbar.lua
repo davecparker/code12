@@ -127,7 +127,7 @@ function toolbar.update()
 		showButtons{ stopBtn }
 	elseif runState == "paused" then
 		showButtons{ resumeBtn, stopBtn, nextFrameBtn }
-	elseif runState == "stopped" or runState == "ended" then
+	elseif runState == "stopped" then
 		showButtons{ restartBtn, chooseProgramBtn, optionsBtn }
 	elseif runState == "error" then
 		showButtons{ chooseProgramBtn, optionsBtn }

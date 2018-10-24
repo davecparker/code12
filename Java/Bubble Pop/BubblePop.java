@@ -23,6 +23,7 @@ class BubblePop
          double size = ct.random(5, 20);
          GameObj bubble = ct.image("bubble.png", x, y, size);
          bubble.ySpeed = -1;
+         bubble.autoDelete = true;
       }
    }
    
