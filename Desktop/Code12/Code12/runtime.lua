@@ -2,7 +2,7 @@
 --
 -- runtime.lua
 --
--- Implementation of the main runtime object (ct) for the Code 12 Lua runtime.
+-- Implementation of the main runtime for the Code 12 Lua runtime.
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
@@ -51,11 +51,7 @@ local function onNewFrame()
 				if g.outputFile then
 					g.outputFile:flush()   -- flush any print output
 				end
-				if ct.userFns.update then
-					g.userFn = ct.userFns.update  -- now call update
-				else   -- no update function, so done after start
-					runtime.stop( "ended" )
-				end
+				g.userFn = ct.userFns.update  -- now start calling update if defined
 			end
 		elseif status == "aborted" then
 			return
@@ -82,8 +78,8 @@ local function onNewFrame()
 			if gameObj:shouldAutoDelete() then
 				gameObj:removeAndDelete()
 			else
-				-- Update objects if running and userFn completed
-				if g.runState == "running" and status == nil then
+				-- Update objects if running and userFn didn't yield
+				if g.runState == "running" and status ~= "yielded" then
 					gameObj:updateForNextFrame()
 				end
 				-- Always sync the objects so the display is correct
@@ -207,8 +203,12 @@ end
 function runtime.runEventFunction( func, ... )
 	-- Is a coroutine already running?
 	if coRoutineUser then
-		local success, strErr = coroutine.resume(coRoutineUser)
-		return coroutineStatus(success, strErr)
+		if coroutine.status(coRoutineUser) == "dead" then
+			coRoutineUser = nil
+		else
+			local success, strErr = coroutine.resume(coRoutineUser)
+			return coroutineStatus(success, strErr)
+		end
 	end
 
 	-- Is there a valid function to start?

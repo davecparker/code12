@@ -101,7 +101,14 @@ local function lookupID( nameToken, nameTable, noError )
 	-- Found but wrong case?
 	if strCorrectCase then
 		if not noError then
-			err.setErrNodeAndRef( nameToken, result,
+			-- Is the known name something in the program we can reference?
+			local refNode = nil
+			if result.s == "var" then
+				refNode = result.nameID   -- a variable
+			elseif result.func then
+				refNode = result.func.nameID    -- a user function
+			end
+			err.setErrNodeAndRef( nameToken, refNode,
 					"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
 		end
 		return nil, result, strCorrectCase

@@ -215,15 +215,24 @@ end
 
 -- API
 function GameObj:hit(gameObj, ...)
-	if gameObj == nil or not gameObj.visible
-			or gameObj._code12.deleted or self._code12.deleted then
-		return false
-	end
-
 	-- Check parameters
 	-- Note: If called as obj.hit, not detected due to gameObj (bummer)
+	if gameObj == nil then
+		return false
+	end
 	if g.checkGameObjMethodParams(self, "hit") then
 		g.check1Param("GameObj", gameObj, ...)
+	end
+
+	-- Make sure object is valid and visible
+	if gameObj._code12.deleted then
+		g.warning("Attempt to test for hit with a deleted object")
+		return false
+	elseif self._code12.deleted then
+		g.warning("Attempt to call hit method on a deleted object")
+		return false
+	elseif not gameObj.visible then
+		return false
 	end
 
 	-- Do hit test
