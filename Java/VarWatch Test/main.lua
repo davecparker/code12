@@ -7,13 +7,18 @@ this.gObj = nil
 this.intArr = nil
 this.intArr1 = { 1, 2, 3, 4, 5, length = 5 }
 this.intArr2 = { 5, 10, 15, length = 3 }
+this.gObjArr = { length = 5, default = nil }
+this.gObjArr1 = { length = 1, default = nil }
+this.gObjArr2 = { length = 2, default = nil }
 
 function _fn.start()
 
 	this.gObj = nil
 	local i = 1; while i < 100 do
 		ct.println(i); i = i + 1
-	end; end
+	end; ct.checkArrayIndex(this.gObjArr2, 0); this.gObjArr2[1+(0)] = ct.rect(50, 20, 30, 5)
+	ct.checkArrayIndex(this.gObjArr1, 0); this.gObjArr1[1+(0)] = ct.text("gObjArr1[0]", 50, 20, 5)
+end
 
 function _fn.update()
 
@@ -28,10 +33,16 @@ function _fn.update()
 function _fn.onKeyPress(keyName)
 
 	if (keyName == "1") then
+
 		this.intArr = this.intArr1
+		this.gObjArr = this.gObjArr1
 	elseif (keyName == "2") then
+
+
 		this.intArr = this.intArr2
+		this.gObjArr = this.gObjArr2
 	elseif (keyName == "3") then
+
 		this.doubleArr = { length = 10, default = 0 }
 	elseif (keyName == "g") then
 
@@ -45,7 +56,56 @@ function _fn.onKeyPress(keyName)
 
 			this.gObj:delete()
 			this.gObj = nil; end
-	end
+	elseif (keyName == "a") then
+
+
+
+		local len = this.gObjArr.length
+		if ct.indexArray(this.gObjArr, 0) == nil then
+
+			local i = 0; while i < len do
+
+				ct.checkArrayIndex(this.gObjArr, i); this.gObjArr[1+(i)] = ct.circle(0, 10 * i, 10)
+				ct.checkArrayIndex(this.gObjArr, i); this.gObjArr[1+(i)].group = "circles"
+				ct.checkArrayIndex(this.gObjArr, i); this.gObjArr[1+(i)].xSpeed = ct.random(0, 10) / 100.0
+				ct.checkArrayIndex(this.gObjArr, i); this.gObjArr[1+(i)].ySpeed = ct.random(0, 10) / 100.0; i = i + 1
+			end
+		else
+
+
+			local i = 0; while i < len do
+
+				if ct.indexArray(this.gObjArr, i) ~= nil then
+
+					ct.indexArray(this.gObjArr, i):delete()
+					ct.checkArrayIndex(this.gObjArr, i); this.gObjArr[1+(i)] = nil
+				end; i = i + 1
+			end; end
+
+		if this.gObj == nil then
+
+			this.gObj = ct.rect(5, 10, 10, 10)
+			this.gObj.group = "rectangles"
+		else   -- gObj.xSpeed = 0.1;
+
+
+
+			this.gObj:delete()
+			this.gObj = nil; end
+	elseif (keyName == "d") then
+
+
+
+		if ct.indexArray(this.gObjArr1, 0) ~= nil then
+
+			ct.indexArray(this.gObjArr1, 0):delete()
+			ct.checkArrayIndex(this.gObjArr1, 0); this.gObjArr1[1+(0)] = nil
+		end
+		if ct.indexArray(this.gObjArr2, 0) ~= nil then
+
+			ct.indexArray(this.gObjArr2, 0):delete()
+			ct.checkArrayIndex(this.gObjArr2, 0); this.gObjArr2[1+(0)] = nil
+		end; end
 
 end
 

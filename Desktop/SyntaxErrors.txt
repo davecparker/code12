@@ -80,3 +80,6 @@ imort Code12.*;
    void foo(in a, String s)
 	int[] intArr = new int[10]
 	int[] intArr2 = new int[];
+	GameObj[] = new GameObj[5];
+			int len = gObjArr.length
+aimport Code12.*;
