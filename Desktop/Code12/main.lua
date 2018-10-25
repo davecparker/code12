@@ -217,6 +217,7 @@ function app.saveSettings()
 	userSettings.recentSourceFilePaths = app.recentSourceFilePaths
 	userSettings.openFilesInEditor = app.openFilesInEditor
 	userSettings.customEditors = app.customEditors
+	userSettings.showVarWatch = app.showVarWatch
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -295,6 +296,12 @@ local function loadSettings()
 							app.customEditors[#app.customEditors + 1] = customEditor
 						end
 					end
+				end
+
+				-- Use the saved showVarWatch
+				local showVarWatch = t.showVarWatch
+				if type(showVarWatch) == "boolean" then
+					app.showVarWatch = showVarWatch
 				end
 			end
 		end

@@ -162,7 +162,11 @@ function runView:show( event )
 		-- Automatically run a new program
 		if g.runState == nil then
 			runtime.run()
-			varWatch.startNewRun()
+			if app.showVarWatch then
+				varWatch.startNewRun()
+			else
+				varWatch.hide()
+			end
 		end
 	end
 end

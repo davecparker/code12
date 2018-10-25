@@ -36,11 +36,12 @@ local numDisplayRows          -- number of rows that can currently be displayed
 local numRowsToUpdate         -- number of text obj rows that need to be updated
 local xCols                   -- table of x-values for the left of each column
 local charWidth               -- character width of the font used for text objects
+local showVarWatch            -- curent value of app.showVarWatch
 
 -- varWatch data
-local vars                   -- array of user program's global variables
-local displayData            -- array of data for displaying variables
-local scrollOffset = 0       -- starting line if scrolled back or nil if at end
+local vars                    -- array of user program's global variables
+local displayData             -- array of data for displaying variables
+local scrollOffset = 0        -- starting line if scrolled back or nil if at end
 local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
                         "lineWidth", "visible", "clickable", "autoDelete", "group" }
 local numGameObjFields = #gameObjFields
@@ -82,10 +83,6 @@ local function updateConstants( iTextObjRowStart, iTextObjRowEnd )
 		varWatch.scrollbar:hide()
 	end
 	-- Update text obj texts and visibility of rows and buttons
-	-- local numTextObjRows = #textObjRows
-	-- if iTextObjRowEnd > numTextObjRows then
-	-- 	iTextObjRowEnd = numTextObjRows
-	-- end
 	for i = iTextObjRowStart, iTextObjRowEnd do
 		local row = textObjRows[i]
 		local d = displayData[i + scrollOffset]
@@ -136,6 +133,9 @@ local function updateValues()
 				if var.isOpen then
 					-- Open GameObj became nil
 					var.isOpen = false
+					if d.field then
+						scrollOffset = var.iDisplayData - 1
+					end
 					varWatch.reset()
 					return nil
 				elseif arrayType then
@@ -186,8 +186,8 @@ local function updateValues()
 							if var[d.index.."isOpen"] then
 								-- Open GameObj in array was set to null
 								var[d.index.."isOpen"] = false
-							varWatch.reset()
-							return nil
+								varWatch.reset()
+								return nil
 							else
 								row.dropDownBtn2:setState{ isOn = false }
 								row.dropDownBtn2.isVisible = false
@@ -241,6 +241,12 @@ local function onScroll( newPos )
 	updateValues()
 end
 
+-- Update the variable watch window if it is on in the user's settings
+local function onNewFrame()
+	if showVarWatch then
+		updateValues()
+	end
+end
 
 --- Module Functions ---------------------------------------------------------
 
@@ -250,7 +256,7 @@ function varWatch.init()
 	displayData = {}
 	numDisplayRows = 0
 	charWidth = app.consoleFontCharWidth
-	Runtime:addEventListener( "enterFrame", updateValues )
+	Runtime:addEventListener( "enterFrame", onNewFrame )
 end
 
 -- Create the variable watch window display group and store it in varWatch.group
@@ -304,16 +310,21 @@ function varWatch.makeDisplayData()
 			if vt == "GameObj" or arrayType then
 				d.dropDownVisible = 1
 			end
+			var.iDisplayData = iRow
 			displayData[iRow] = d
 			iRow = iRow + 1
 			if isOpen and vt == "GameObj" then
-				-- add GameObj data fields
-				for j = 1, numGameObjFields do
-					local gameObjField = gameObjFields[j]
-					d = { var = var, field = gameObjField }
-					d.initRowTexts = { " "..gameObjField, "", "" }
-					displayData[iRow] = d
-					iRow = iRow + 1
+				if not value then
+					var.isOpen = false
+				else
+					-- add GameObj data fields
+					for j = 1, numGameObjFields do
+						local gameObjField = gameObjFields[j]
+						d = { var = var, field = gameObjField }
+						d.initRowTexts = { " "..gameObjField, "", "" }
+						displayData[iRow] = d
+						iRow = iRow + 1
+					end
 				end
 			elseif isOpen and arrayType then
 				-- add array indices
@@ -349,10 +360,13 @@ end
 function varWatch.resize( width, height )
 	local prevNumDisplayRows = numDisplayRows
 	-- Determine the new number of display rows
-	if height > topMargin then
-		numDisplayRows = math.floor( (height - topMargin) / rowHeight )
-	else
+	numDisplayRows = math.floor( (height - topMargin) / rowHeight )
+	if numDisplayRows <= 0 then
 		numDisplayRows = 0
+		for i = 1, prevNumDisplayRows do
+			textObjRows[i].isVisible = false
+		end
+		return nil
 	end
 	-- Make sure we have enough text objects
 	local n = #textObjRows
@@ -383,7 +397,7 @@ function varWatch.resize( width, height )
 	-- Update display constants (variable names, buttons, etc)
 	if prevNumDisplayRows < numDisplayRows then
 		updateConstants( prevNumDisplayRows + 1, n )
-	else
+	elseif prevNumDisplayRows > numDisplayRows then
 		updateConstants( numDisplayRows, prevNumDisplayRows )
 	end
 	-- Reposition the scrollbar
@@ -401,9 +415,16 @@ end
 
 -- Starts a new run of the varWatch window based on the given width and height
 function varWatch.startNewRun()
+	showVarWatch = true
+	varWatch.group.isVisible = true
 	varWatch.getVars()
 	updateColWidths()
 	varWatch.reset()
+end
+
+function varWatch.hide()
+	showVarWatch = false
+	varWatch.group.isVisible = false
 end
 
 ------------------------------------------------------------------------------
