@@ -133,7 +133,7 @@ function runView:create()
 	paneSplit:addEventListener( "touch", onTouchPaneSplit )
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
-	varWatch.create( sceneGroup, rightBar.x, rightBar.y, 0, 0 )
+	varWatch.create( sceneGroup, rightBar.x, rightBar.y, 0, 0, outputGroup )
 
 	-- Layout the display areas
 	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines

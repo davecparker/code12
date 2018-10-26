@@ -28,6 +28,8 @@ local radioBtnSheet = graphics.newImageSheet( "images/radiobutton.png", { width 
 local fillboxSheet = graphics.newImageSheet( "images/fillbox.png", { width = 256, height = 256, numFrames = 2 } )
 local checkboxSheet = graphics.newImageSheet( "images/checkbox.png", { width = 256, height = 256, numFrames = 2 } )
 local dropDownSheet = graphics.newImageSheet( "images/drop-down.png", { width = 512, height = 512, numFrames = 2 } )
+local trackVarSheet = graphics.newImageSheet( "images/track-var-arrow.png", { width = 626, height = 626,
+                                                                              numFrames = 2 } )
 
 
 --- Module Functions ------------------------------------------------
@@ -253,6 +255,24 @@ function buttons.newDropDownButton( parent, x, y, width, height, onPress )
 			y = y,
 		}
 	btn.anchorX = 1
+	parent:insert( btn )
+	return btn
+end
+
+-- Return a track variable button, inserted into given display group parent
+function buttons.newTrackVarButton( parent, x, y, width, height, onPress )
+	local btn = widget.newSwitch{
+		style = "checkbox",
+		width = width,
+		height = height,
+		onPress = onPress,
+		sheet = trackVarSheet,
+		frameOn = 1,
+		frameOff = 2,
+		x = x,
+		y = y,
+	}
+	btn.anchorX = 0
 	parent:insert( btn )
 	return btn
 end
