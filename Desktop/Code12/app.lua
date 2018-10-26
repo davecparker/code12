@@ -132,55 +132,33 @@ function app.iCharToICol( strLine, iCharStart, iCharEnd )
 	return iColStart, iColEnd
 end
 
--- Return the lower-case version of the given ASCII code
-local function lowerASCII( code )
-	if code >= 65 and code <= 90 then  -- A to Z
-		return code + 32
-	end
-	return code
-end
-
 -- Return the string with the first letter changed to uppercase if lowercase.
 function app.startWithCapital( str )
 	return string.upper( string.sub( str, 1, 1 ) ) .. (string.sub( str, 2 ) or "")
 end
 
--- Return a number from 0 to 1 representing a partial match of 
--- str1 to str2 (1.0 if they match exactly).
+
 function app.partialMatchString( str1, str2 )
-	-- Simple method for now: Count number of chars matching from front
-	-- and again from back and return weighted average.
-	local len1 = string.len( str1 )
-	local len2 = string.len( str2 )
-	local shorterLen, longerLen
-	if len1 > len2 then
-		shorterLen, longerLen = len2, len1
-	else
-		shorterLen, longerLen = len1, len2
-	end
-	local front = 0
-	local matchVal = 1
-	for i = 1, shorterLen do
-		if lowerASCII( string.byte( str1, i ) )
-				 == lowerASCII( string.byte( str2, i ) ) then
-			front = front + matchVal
-			matchVal = 1
-		else
-			matchVal = 0.5  -- half match when streak was broken
-		end
-	end
-	local back = 0
-	matchVal = 1
-	for i = 1, shorterLen do
-		if lowerASCII( string.byte( str1, len1 + 1 - i ) )
-				== lowerASCII( string.byte( str2, len2 + 1 - i ) ) then
-			back = back + matchVal
-			matchVal = 1
-		else
-			matchVal = 0.5  -- half match when streak was broken
-		end
-	end
-	return (front + back) / (2 * longerLen)
+	-- Computes levenshtein distance of two strings and returns it
+	str1 = string.lower(str1)
+    str2 = string.lower(str2)
+    local len1, len2 = #str1, #str2
+    local char1, char2, distance = {}, {}, {}
+    str1:gsub('.', function (c) table.insert(char1, c) end)
+    str2:gsub('.', function (c) table.insert(char2, c) end)
+    for i = 0, len1 do distance[i] = {} end
+    for i = 0, len1 do distance[i][0] = i end
+    for i = 0, len2 do distance[0][i] = i end
+    for i = 1, len1 do
+        for j = 1, len2 do
+            distance[i][j] = math.min( 
+            	distance[i-1][j  ] + 1, 
+            	distance[i  ][j-1] + 1,
+            	distance[i-1][j-1] + (char1[i] == char2[j] and 0 or 1)
+            	)
+        end
+    end
+    return distance[len1][len2]
 end
 
 -- Add given path to the end of app.recentSourceFilePaths and remove any other

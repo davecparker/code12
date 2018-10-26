@@ -106,23 +106,24 @@ end
 -- Return the similar string or nil if none.
 local function findMisspelledName( nameStr, nameTable )
 	-- Find best match in nameTable
-	local bestMatch = 0
+	local bestMatch = 4 --maximum Levenshtein distance accepted
 	local bestMatchStr
-	for entryStr, entry in pairs( nameTable ) do
-		if type(entry) == "table" then
-			local match = app.partialMatchString( nameStr, entryStr )
-			-- print( nameStr, entryStr, match )
-			if match > bestMatch then
-				bestMatch = match
-				bestMatchStr = entryStr
+    
+    for entryStr, entry in pairs( nameTable ) do
+    	if type(entry) == "table" then
+    		local match = app.partialMatchString( nameStr, entryStr )
+    		if match < bestMatch then--Tests if the name is closer to the name the user entered
+    			bestMatch = match
+    			bestMatchStr = entryStr
 			end
 		end
 	end
 
 	-- Consider it similar if match is greater than threshold
-	if bestMatch > 0.3 then
+	if bestMatch < 4 then
 		return bestMatchStr
 	end
+	
 	return nil
 end
 
