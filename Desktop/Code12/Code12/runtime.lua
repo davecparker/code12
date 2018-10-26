@@ -28,6 +28,7 @@ local runtime = {
 	--     print = function,         -- called by runtime for console output
 	--     println = function,       -- called by runtime for console output
 	--     runtimeErr = function,    -- called by runtime on runtime error
+	--     arrayAssigned = function, -- called by runtime when an array var is assigned
 	-- },
 }
 

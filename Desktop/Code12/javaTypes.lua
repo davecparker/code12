@@ -145,11 +145,13 @@ function javaTypes.vtCanAcceptVtExpr( vt, vtExpr )
 		return true    -- assigning to "Object", will accept anything
 	elseif vt == vtExpr then
 		return true  -- same types so directly compatible
-	elseif vtExpr == 0 and type(vt) == "number" then
+	end
+	local vtType = type(vt)
+	if vtExpr == 0 and vtType == "number" then
 		return true    -- int can silently promote to double
-	elseif vtExpr == "null" and type(vt) == "string" then
-		return true    -- null can be assigned to any object (String or GameObj)
-	elseif type(vt) == "table" and type(vtExpr) == "table" then
+	elseif vtExpr == "null" and (vtType == "string" or vtType == "table") then
+		return true    -- null can be assigned to String, GameObj, or an array
+	elseif vtType == "table" and type(vtExpr) == "table" then
 		return vt.vt == vtExpr.vt    -- array of same type
 	end
 	return false
