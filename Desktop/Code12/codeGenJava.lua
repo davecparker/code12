@@ -445,6 +445,12 @@ local function generateAssign( stmt )
 		addLua( exprCode( stmt.expr ) )
 		addLua( ")" )
 	end
+
+	-- When an array is (re)assigned, we need to notify the runtime
+	-- because the varWatch window may need to be rebuilt.
+	if type( stmt.lValue.vt ) == "table" then
+		addLua( "; ct.arrayAssigned()" )
+	end
 end
 
 -- Generate Lua code for the given if stmt
