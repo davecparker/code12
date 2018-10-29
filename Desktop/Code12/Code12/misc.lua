@@ -211,6 +211,13 @@ end
 
 -------------- Array Support Functions (not published) --------------
 
+-- Notify the app context (if any) that an array was assigned.
+function ct.arrayAssigned()
+	if runtime.appContext then
+		runtime.appContext.arrayAssigned()
+	end
+end
+
 -- Check the index of the array and generate a runtime error if invalid.
 -- Use errLevel (or default 2) for the Lua stack error level. 
 function ct.checkArrayIndex( array, index, errLevel )
