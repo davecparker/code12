@@ -195,7 +195,7 @@ local function makeDisplayData()
 end
 
 -- Updates display data and remakes the varWatch window using the given width and height
-local function remakeDisplayRows( width, height )
+local function makeDisplayRows( width, height )
 	if varWatch.table then
 		varWatch.table:removeSelf()
 		varWatch.table = nil
@@ -307,10 +307,10 @@ local function onScroll( newPos )
 	print( newPos, scrollOffset, #displayData, #displayRows, #displayData - #displayRows )
 	if newPos and scrollOffset ~= newPos then
 		scrollOffset = newPos
-		remakeDisplayRows( varWatch.width, varWatch.height )
+		makeDisplayRows( varWatch.width, varWatch.height )
 	elseif not newPos and scrollOffset ~= #displayData - #displayRows then
 		scrollOffset = #displayData - #displayRows
-		remakeDisplayRows( varWatch.width, varWatch.height )
+		makeDisplayRows( varWatch.width, varWatch.height )
 	end
 	if #displayData <= #displayRows and (not newPos or newPos == 0) then
 		varWatch.scrollbar:hide()
@@ -322,7 +322,7 @@ local function onDropDownBtn1( event )
 	local btn = event.target
 	displayData[btn.rowNumber + scrollOffset].var.isOpen = btn.isOn
 	makeDisplayData()
-	remakeDisplayRows( varWatch.width, varWatch.height )
+	makeDisplayRows( varWatch.width, varWatch.height )
 end
 
 -- Event handler for variable drop down buttons on GameObjs in arrays
@@ -331,7 +331,7 @@ local function onDropDownBtn2( event )
 	local d = displayData[btn.rowNumber + scrollOffset]
 	d.var[d.index.."isOpen"] = btn.isOn
 	makeDisplayData()
-	remakeDisplayRows( varWatch.width, varWatch.height )
+	makeDisplayRows( varWatch.width, varWatch.height )
 end
 
 -- -- Event handler for track variable buttons
@@ -473,12 +473,19 @@ function varWatch.startNewRun( width, height )
 	getVars()
 	makeDisplayData()
 	scrollOffset = 0
-	remakeDisplayRows( width, height )
+	makeDisplayRows( width, height )
 end
 
+-- Hides the variable watch window
 function varWatch.hide()
 	showVarWatch = false
 	varWatch.group.isVisible = false
+end
+
+-- Handles runtime event of array assigned
+function varWatch.arrayAssigned()
+	makeDisplayData()
+	makeDisplayRows( varWatch.width, varWatch.height )
 end
 
 ------------------------------------------------------------------------------

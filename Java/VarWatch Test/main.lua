@@ -43,16 +43,16 @@ function _fn.onKeyPress(keyName)
 
 	if (keyName == "1") then
 
-		this.intArr = this.intArr1
-		this.gObjArr = this.gObjArr1
+		this.intArr = this.intArr1; ct.arrayAssigned()
+		this.gObjArr = this.gObjArr1; ct.arrayAssigned()
 	elseif (keyName == "2") then
 
 
-		this.intArr = this.intArr2
-		this.gObjArr = this.gObjArr2
+		this.intArr = this.intArr2; ct.arrayAssigned()
+		this.gObjArr = this.gObjArr2; ct.arrayAssigned()
 	elseif (keyName == "3") then
 
-		this.doubleArr = { length = 10, default = 0 }
+		this.doubleArr = { length = 10, default = 0 }; ct.arrayAssigned()
 	elseif (keyName == "g") then
 
 		if this.gObj == nil then

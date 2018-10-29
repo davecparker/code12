@@ -159,7 +159,7 @@ function runView:create()
 	appContext.print = console.print
 	appContext.println = console.println
 	appContext.runtimeErr = showRuntimeError
-	appContext.arrayAssigned = function () console.println("Array assigned") end   -- TODO: e.g. varWatch.arrayAssigned
+	appContext.arrayAssigned = varWatch.arrayAssigned
 end
 
 -- Prepare to show the runView scene
