@@ -47,6 +47,11 @@ local function outputAreaHeight()
 	return app.height - app.dyToolbar - app.dyStatusBar - minConsoleHeight - dyPaneSplit
 end
 
+-- Return the available width and height for the variable watch window
+local function varWatchWidthAndHeight()
+	return app.width - rightBar.x, app.outputHeight - 1
+end
+
 -- Position the display panes
 local function layoutPanes()
 	-- Determine size of the top area (game or error output)
@@ -58,7 +63,7 @@ local function layoutPanes()
 	rightBar.width = app.width    -- more than enough
 	rightBar.height = app.height  -- more than enough
 	varWatch.group.x = rightBar.x
-	varWatch.resize( app.width - varWatch.group.x, height - 1 )
+	varWatch.resize( varWatchWidthAndHeight() )
 
 	-- Position the pane split and lower group
 	paneSplit.y = app.dyToolbar + height
@@ -127,13 +132,13 @@ function runView:create()
 	-- Make the display areas
 	outputGroup = g.makeGroup( sceneGroup, 0, app.dyToolbar )
 	rightBar = g.uiItem( display.newRect( sceneGroup, 0, app.dyToolbar, 0, 0 ), 
-						app.extraShade, app.borderShade )
+						0.95, app.borderShade )
 	paneSplit = g.uiItem( display.newRect( sceneGroup, 0, 0, 0, dyPaneSplit ), 
 						app.toolbarShade, app.borderShade )
 	paneSplit:addEventListener( "touch", onTouchPaneSplit )
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
-	varWatch.create( sceneGroup, rightBar.x, rightBar.y, 0, 0, outputGroup )
+	varWatch.create( sceneGroup, rightBar.x, rightBar.y, 0, 0 )
 
 	-- Layout the display areas
 	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines
@@ -163,7 +168,7 @@ function runView:show( event )
 		if g.runState == nil then
 			runtime.run()
 			if app.showVarWatch then
-				varWatch.startNewRun()
+				varWatch.startNewRun( varWatchWidthAndHeight() )
 			else
 				varWatch.hide()
 			end

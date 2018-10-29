@@ -2,7 +2,11 @@ package.path = package.path .. ';../../Desktop/Code12/?.lua;../../../Desktop/Cod
 local ct, this, _fn = require('Code12.ct').getTables()
 
 
-this.doubleArr = nil
+this.intVarrrrrrrrrrrrrrrr = 0
+this.dblVar = 0
+this.boolVar = false
+this.strVar = nil
+this.doubleArr = { length = 0, default = 0 }
 this.gObj = nil
 this.intArr = nil
 this.intArr1 = { 1, 2, 3, 4, 5, length = 5 }
@@ -27,8 +31,13 @@ function _fn.update()
 		ct.checkArrayIndex(this.intArr1, i); this.intArr1[1+(i)] = ct.indexArray(this.intArr1, i) + 1; i = i + 1
 	end; len = this.intArr2.length
 	local i = 0; while i < len do
-		ct.checkArrayIndex(this.intArr2, i); this.intArr2[1+(i)] = ct.indexArray(this.intArr2, i) + 1; i = i + 1
-	end; end
+		ct.checkArrayIndex(this.intArr2, i); this.intArr2[1+(i)] = ct.indexArray(this.intArr2, i) + (5); i = i + 1
+	end; if this.gObj ~= nil then
+
+		this.gObj.width = this.gObj.width + (0.01)
+		this.gObj.height = this.gObj.height + (0.01)
+	end
+end
 
 function _fn.onKeyPress(keyName)
 
@@ -51,6 +60,7 @@ function _fn.onKeyPress(keyName)
 			this.gObj = ct.rect(5, 10, 10, 10)
 			this.gObj.group = "rectangles"
 			this.gObj.xSpeed = 0.1
+			this.gObj.ySpeed = 0.1
 		else
 
 

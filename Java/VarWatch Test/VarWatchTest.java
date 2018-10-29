@@ -2,7 +2,11 @@ import Code12.*;
 
 class VarWatchTest extends Code12Program
 {
-	double[] doubleArr;
+	int intVarrrrrrrrrrrrrrrr;
+	double dblVar;
+	boolean boolVar;
+	String strVar;
+	double[] doubleArr = new double[0];
 	GameObj gObj;
 	int[] intArr;
 	int[] intArr1 = { 1, 2, 3, 4, 5 };
@@ -27,7 +31,12 @@ class VarWatchTest extends Code12Program
 			intArr1[i]++;
 		len = intArr2.length;
 		for (int i = 0; i < len; i++)
-			intArr2[i]++;
+			intArr2[i] += 5;
+		if ( gObj != null )
+		{
+			gObj.width += 0.01;
+			gObj.height += 0.01;
+		}
 	}
 
 	public void onKeyPress( String keyName )
@@ -51,6 +60,7 @@ class VarWatchTest extends Code12Program
 				gObj = ct.rect(5, 10, 10, 10);
 				gObj.group = "rectangles";
 				gObj.xSpeed = 0.1;
+				gObj.ySpeed = 0.1;
 			}
 			else
 			{

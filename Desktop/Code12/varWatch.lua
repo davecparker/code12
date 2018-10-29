@@ -11,6 +11,7 @@
 local g = require( "Code12.globals" )
 local ct = require( "Code12.ct" )
 local app = require( "app" )
+local javaTypes = require( "javaTypes" )
 local checkJava = require( "checkJava" )
 local buttons = require( "buttons" )
 local Scrollbar = require( "Scrollbar" )
@@ -19,348 +20,46 @@ local Scrollbar = require( "Scrollbar" )
 -- The varWatch module
 local varWatch = {
 	group = nil,              -- the varWatch display group
+	table = nil,              -- the display group containing the variable watch table
 }
 
 -- UI constants
 local topMargin = 5           -- margin for the top of the variable watch window
 local rowHeight = 20          -- height of each row in the variable display
 local dropDownBtnSize = 10    -- width and height of the drop down buttons
-local trackVarBtnWidth = 15   -- width of the track variable buttons
-local margin = app.margin     -- space between UI elements
+local margin = app.margin     -- space between UI elements 
 local centerColWidth = 125    -- width of the center column of the variable display
-local xCol1 = trackVarBtnWidth + dropDownBtnSize + margin -- x-value for the first column of text objects
+local rightColWidth = 125     -- width of the right most column of the variable display
+local varFont = app.consoleFont           -- font used in the variable display
+local varFontSize = app.consoleFontSize   -- font size used in the variable display
+local stdIndents = { 0, dropDownBtnSize } -- indents for standard top-level variable display rows
+local indexOrFieldIndents = { dropDownBtnSize, dropDownBtnSize * 2 }     -- indents for rows with an index xor a field
+local indexAndFieldIndents = { 0, dropDownBtnSize * 3, dropDownBtnSize } -- indents for rows with an index and a field
 
 -- Display state
-local textObjRows             -- table of rows of the variable display
-local numDisplayRows          -- number of rows that can currently be displayed
-local numRowsToUpdate         -- number of text obj rows that need to be updated
+local displayRows             -- table of rows of the variable display
+local numDisplayableRows      -- number of rows that can currently be displayed
 local xCols                   -- table of x-values for the left of each column
+local colWidths2              -- table of columns widths for rows with 2 columns
+local colWidths3              -- table of columns widths for rows with 3 columns
 local charWidth               -- character width of the font used for text objects
 local showVarWatch            -- curent value of app.showVarWatch
-local trackVarRect            -- rectangle for highlighting tracked variable
-local trackedVar              -- Variable currently being tracked (or nil)
+-- local trackVarRect            -- rectangle for highlighting tracked variable (TODO)
+-- local trackedVar              -- Variable currently being tracked (or nil) (TODO)
 
 -- varWatch data
 local vars                    -- array of user program's global variables
 local displayData             -- array of data for displaying variables
-local scrollOffset = 0        -- starting line if scrolled back or nil if at end
+local scrollOffset            -- starting line if scrolled back or nil if at end
 local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
                         "lineWidth", "visible", "clickable", "autoDelete", "group" }
 local numGameObjFields = #gameObjFields
-local mapVtToTypeName = {
-	[0]          = "int",
-	[1]          = "double",
-	[true]       = "boolean",
-	["String"]   = "String",
-	["GameObj"]  = "GameObj",
-}
 
 
 --- Internal Functions ---------------------------------------------------------
 
--- Return the Dorona display object associated with trackedVar
-local function getTrackedObj()
-	if trackedVar then
-		local value
-		local trackedIndex = trackedVar.trackedIndex
-		if trackedIndex then
-			value = ct.userVars[trackedVar.nameID.str][trackedIndex]
-		else
-			value = ct.userVars[trackedVar.nameID.str]
-		end
-		if value then
-			return value._code12.obj
-		end
-	end
-	return nil
-end
-
--- Turns of the trackVarRect
-local function turnOffTrackVar()
-	trackedVar = nil
-	if trackVarRect.btn then
-		trackVarRect.btn:setState{ isOn = false }
-		trackVarRect.btn = nil
-	end
-	trackVarRect.isVisible = false
-end
-
--- Update column widths
-local function updateColWidths()
-	-- update text obj and button positions
-	local xCol2 = xCols[2]
-	local xCol3 = xCols[3]
-	for i = 1, #textObjRows do
-		local row = textObjRows[i]
-		row[2].x = xCol2
-		row.dropDownBtn2.x = xCol2 + dropDownBtnSize
-		row[3].x = xCol3
-	end
-end
-
--- Update variable names, array indices, GameObj fields, and buttons
--- in the variable watch window
-local function updateConstants()
-	-- Update text obj texts and visibility of rows and buttons
-	for i = 1, numDisplayRows do
-		local row = textObjRows[i]
-		local d = displayData[i + scrollOffset]
-		if d then
-			row.isVisible = true
-			for col = 1, 3 do
-				row[col].text = d.initRowTexts[col]
-			end
-			if d.trackableVar then
-				row.trackVarBtn.isVisible = true
-			else
-				row.trackVarBtn.isVisible = false
-			end
-			local btn1 = row.dropDownBtn1
-			local btn2 = row.dropDownBtn2
-			if not d.dropDownVisible then
-				btn1.isVisible = false
-				btn2.isVisible = false
-			elseif d.dropDownVisible == 1 then
-				btn1:setState{ isOn = d.var.isOpen or false }
-				btn1.isVisible = true
-				btn2.isVisible = false
-			elseif d.dropDownVisible == 2 then
-				btn2:setState{ isOn = d.var[d.index.."isOpen"] or false }
-				btn1.isVisible = false				
-				btn2.isVisible = true
-			end
-		else
-			row.isVisible = false
-		end
-	end
-	for i = numDisplayRows + 1, #textObjRows do
-		textObjRows[i].isVisible = false
-	end
-	-- Update numRowsToUpdate
-	numRowsToUpdate = math.min( numDisplayRows, #displayData - scrollOffset )
-end
-
--- Update variable values displayed in the variable watch window
-local function updateValues()
-	if vars and (g.runState == "running" or g.runState == "paused") then
-		for i = 1, numRowsToUpdate do
-			local d = displayData[i + scrollOffset]
-			local row = textObjRows[i]
-			local var = d.var
-			local vt = var.vt
-			local arrayType = var.arrayType
-			local varName = var.nameID.str
-			local value = ct.userVars[varName]
-			if not value then
-				row.dropDownBtn1.isVisible = false
-				var.wasNull = true
-				if var.isOpen then
-					-- Open GameObj became nil
-					var.isOpen = false
-					if d.field then
-						scrollOffset = var.iDisplayData - 1
-					end
-					varWatch.reset()
-					return nil
-				elseif arrayType then
-					row[2].text = arrayType.."[]"
-				else
-					row[2].text = "null"
-				end
-			elseif not d.index and not d.field then
-				-- Value of a top-level variable
-				if vt == "String" then
-					row[2].text = value
-				elseif vt == "GameObj" then
-					-- row[2].text = value._code12.typeName
-					row[2].text = value:toString()
-					if var.wasNull then
-						row.dropDownBtn1.isVisible = true
-					end
-				elseif arrayType then
-					local prevLength = var.length
-					local length = value.length
-					var.length = length
-					if not prevLength then
-						-- Uninitialized array was initialized
-						row.dropDownBtn1.isVisible = true
-					elseif prevLength ~= length and var.isOpen then
-						-- Open array was set equal to an array of different size
-						varWatch.reset()
-						return nil
-					end
-					row[2].text = arrayType.."["..length.."]"
-				else
-					row[2].text = tostring(value)
-				end
-			elseif not d.index and d.field then
-				-- Value of a field of a GameObj
-				row[2].text = " "..tostring(value[d.field])
-			elseif d.index and not d.field then
-				-- Value of an indexed array
-				local valueAtIndex = value[d.index]
-				if not valueAtIndex then
-					if arrayType == "int" or arrayType == "double" then
-						row[2].text = " 0"
-					elseif arrayType == "boolean" then
-						row[2].text = " false"
-					else
-						if arrayType == "GameObj" then
-							var[d.index.."wasNull"] = true
-							if var[d.index.."isOpen"] then
-								-- Open GameObj in array was set to null
-								var[d.index.."isOpen"] = false
-								varWatch.reset()
-								return nil
-							else
-								row.dropDownBtn2:setState{ isOn = false }
-								row.dropDownBtn2.isVisible = false
-							end
-						end
-						row[2].text = " null"
-					end
-				elseif type(valueAtIndex) == "table" then
-					-- valueAtIndex is a GameObj
-					row[2].text = " "..valueAtIndex:toString()
-					if var[d.index.."wasNull"] then
-						var[d.index.."wasNull"] = false
-						row.dropDownBtn2.isVisible = true
-					end
-				else
-					row[2].text = tostring(valueAtIndex)
-				end
-			else
-				-- d.index and d.field
-				-- Value of a GameObj field of a GameObj in an array
-				local valueAtIndex = value[d.index]
-				if valueAtIndex then
-					row[3].text = " "..tostring(valueAtIndex[d.field])
-				else
-					row[3].text = " null"
-				end
-			end
-		end
-		if trackedVar then
-			local trackedObj = getTrackedObj()
-			if trackedObj then
-				trackVarRect.x = trackedObj.x
-				trackVarRect.y = trackedObj.y
-			else
-				turnOffTrackVar()
-			end
-		end
-	end
-end
-
--- Adjust the scrollbar
-local function adjustScrollbar()
-	-- Adjust the scrollbar
-	local numDisplayData = #displayData
-	if numDisplayData > numDisplayRows then
-		local rangeMax = math.max( 1, numDisplayData - numDisplayRows )
-		local ratio = numDisplayRows / numDisplayData
-		varWatch.scrollbar:adjust( 0, rangeMax, scrollOffset, ratio )
-	else
-		scrollOffset = 0
-		varWatch.scrollbar:hide()
-	end
-end
-
--- Event handler for track variable buttons
-local function onTrackVarBtn( event )
-	local btn = event.target
-	if not btn.isOn then
-		print( "TrackVarBtn off")
-		turnOffTrackVar()
-	else
-		print( "TrackVarBtn on")
-		if trackVarRect.btn then
-			trackVarRect.btn:setState{ isOn = false }
-		end
-		trackVarRect.btn = btn
-		local d = displayData[btn.rowNumber + scrollOffset]
-		trackedVar = d.var
-		trackedVar.trackedIndex = d.index
-		print("tracking", d.var.nameID.str, "index", d.index)
-		local obj = getTrackedObj()
-		if not obj then
-			print("no obj to track")
-			turnOffTrackVar()
-		else
-			trackVarRect.width = obj.width
-			trackVarRect.height = obj.height
-			trackVarRect.x = obj.x
-			trackVarRect.y = obj.y
-			trackVarRect.anchorX = obj.anchorX
-			trackVarRect.anchorY = obj.anchorY
-			trackVarRect.isVisible = true
-			trackVarRect:toFront()
-		end
-	end
-end
-
--- Event handler for variable drop down buttons in the first column
-local function onDropDownBtn1( event )
-	local btn = event.target
-	displayData[btn.rowNumber + scrollOffset].var.isOpen = btn.isOn
-	varWatch.reset()
-end
-
--- Event handler for variable drop down buttons in the second column
-local function onDropDownBtn2( event )
-	local btn = event.target
-	local d = displayData[btn.rowNumber + scrollOffset]
-	d.var[d.index.."isOpen"] = btn.isOn
-	varWatch.reset()
-end
-
--- Event handler for the variable watch window scrollbar
-local function onScroll( newPos )
-	scrollOffset = newPos or #displayData - numDisplayRows
-	updateConstants( 1, #textObjRows )
-	updateValues()
-end
-
--- Update the variable watch window if it is on in the user's settings
-local function onNewFrame()
-	if showVarWatch then
-		updateValues()
-	end
-end
-
-
---- Module Functions ---------------------------------------------------------
-
--- Init the variable watch window
-function varWatch.init()
-	textObjRows = {}
-	displayData = {}
-	numDisplayRows = 0
-	charWidth = app.consoleFontCharWidth
-	Runtime:addEventListener( "enterFrame", onNewFrame )
-end
-
--- Create the variable watch window display group and store it in varWatch.group
-function varWatch.create( parent, x, y, width, height, outputGroup )
-	local group = g.makeGroup( parent, x, y )
-	varWatch.group = group
-	varWatch.width = width
-	varWatch.height = height
-
-	-- Scrollbar
-	varWatch.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )
-	varWatch.scrollbar:adjust( 1, 100, 1, 0.1 )
-
-	-- trackVarRect
-	trackVarRect = display.newRect( outputGroup, 0, 0, 0, 0 )
-	trackVarRect.strokeWidth = 2
-	trackVarRect:setStrokeColor( 0, 1, 0 )
-	trackVarRect:setFillColor( 1, 0 )
-	trackVarRect.isVisible = false
-end
-
 -- Fill the vars array with the user program's global variables
-function varWatch.getVars()
+local function getVars()
 	vars = checkJava.globalVars()
 	if vars then
 		local maxVarNameWidth = 100 -- minimum width to ensure space for GameObj fields
@@ -372,16 +71,45 @@ function varWatch.getVars()
 			end
 			local vt = var.vt
 			if type(vt) == "table" then
-				var.arrayType = mapVtToTypeName[vt.vt]
+				var.arrayType = javaTypes.typeNameFromVt( vt.vt )
 			end
 		end
-		local xCol2 = xCol1 + maxVarNameWidth + trackVarBtnWidth + dropDownBtnSize + margin
-		xCols = { xCol1, xCol2, xCol2 + centerColWidth }
+		colWidths3 = { maxVarNameWidth, centerColWidth, rightColWidth }
+		colWidths2 = { maxVarNameWidth, centerColWidth + rightColWidth }
+		xCols = { margin }
+		xCols[2] = margin + colWidths3[1]
+		xCols[3] = xCols[2] + colWidths3[2]
 	end
 end
 
+-- Returns a string for the given (int, double, or boolean) value
+local function textForPrimitiveValue( value )
+	return tostring( value )
+end
+
+-- Returns a string for the given String value
+local function textForStringValue( value )
+	return value
+end
+
+-- Returns a string for the given GameObj value
+local function textForGameObjValue( value )
+	if value then
+		return value:toString()
+	end
+	return "null"
+end
+
+-- Returns a string for the given GameObj value and field
+local function textForGameObjField( value, field )
+	if value then
+		return " "..tostring(value[field])
+	end
+	return "-"
+end
+
 -- Fill the displayData array with data for displaying the user program's global variables
-function varWatch.makeDisplayData()
+local function makeDisplayData()
 	displayData = {}
 	if vars then
 		local iRow = 1
@@ -394,52 +122,70 @@ function varWatch.makeDisplayData()
 			local value = ct.userVars[varName]
 			local d = {}
 			d.var = var
-			d.initRowTexts = { varName, "", "" }
-			if vt == "GameObj" or arrayType then
+			d.initRowTexts = { varName, "" }
+			d.textIndents = stdIndents
+			d.colWidths = colWidths2
+			if vt == "String" then
+				d.textForValue = textForStringValue
+			elseif vt == "GameObj" then
+				d.textForValue = textForGameObjValue
 				d.dropDownVisible = 1
-				if vt == "GameObj" then
-					d.trackableVar = true
+				d.trackableVar = true
+			elseif arrayType then
+				-- d.textForValue = textForArrayValue
+				if value and value.length then
+					d.dropDownVisible = 1
+					d.initRowTexts[2] = arrayType.."["..value.length.."]"
+				else
+					d.initRowTexts[2] = "null"
 				end
+			else
+				d.textForValue = textForPrimitiveValue
 			end
-			var.iDisplayData = iRow
 			displayData[iRow] = d
 			iRow = iRow + 1
 			if isOpen and vt == "GameObj" then
-				if not value then
-					var.isOpen = false
-				else
-					-- add GameObj data fields
-					for j = 1, numGameObjFields do
-						local gameObjField = gameObjFields[j]
-						d = { var = var, field = gameObjField }
-						d.initRowTexts = { " "..gameObjField, "", "" }
-						displayData[iRow] = d
-						iRow = iRow + 1
-					end
+				-- add GameObj data fields
+				for j = 1, numGameObjFields do
+					local gameObjField = gameObjFields[j]
+					d = { var = var, field = gameObjField }
+					d.initRowTexts = { gameObjField, "" }
+					d.textIndents = indexOrFieldIndents
+					d.colWidths = colWidths2
+					d.textForValue = textForGameObjField
+					displayData[iRow] = d
+					iRow = iRow + 1
 				end
 			elseif isOpen and arrayType then
 				-- add array indices
-				local len = value.length
-				for j = 1, len do
+				for j = 1, value.length do
 					d = { var = var, index = j }
-					d.initRowTexts = { " ["..(j - 1).."]", "", "" }
-					if arrayType == "GameObj" then 
+					d.initRowTexts = { " ["..(j - 1).."]", "" }
+					d.textIndents = indexOrFieldIndents
+					d.colWidths = colWidths2
+					local arrVt = vt.vt
+					if arrVt == "String" then
+						d.textForValue = textForStringValue
+					elseif arrVt == "GameObj" then
+						d.textForValue = textForGameObjValue
 						d.dropDownVisible = 2
 						d.trackableVar = true
+					else
+						d.textForValue = textForPrimitiveValue
 					end
 					displayData[iRow] = d
 					iRow = iRow + 1
 					if arrayType == "GameObj" and var[j.."isOpen"] then
-						if not value[j] then
-							var[j.."isOpen"] = false
-						else
-							for k = 1, numGameObjFields do
-								local gameObjField = gameObjFields[k]
-								d = { var = var, index = j, field = gameObjField }
-								d.initRowTexts = { "", "  "..gameObjField, "" }
-								displayData[iRow] = d
-								iRow = iRow + 1
-							end
+						-- add GameObj fields for this open GameObj in array
+						for k = 1, numGameObjFields do
+							local gameObjField = gameObjFields[k]
+							d = { var = var, index = j, field = gameObjField, }
+							d.initRowTexts = { "", gameObjField, "" }
+							d.textIndents = indexAndFieldIndents
+							d.colWidths = colWidths3
+							d.textForValue = textForGameObjField
+							displayData[iRow] = d
+							iRow = iRow + 1
 						end
 					end
 				end
@@ -448,84 +194,286 @@ function varWatch.makeDisplayData()
 	end
 end
 
+-- Updates display data and remakes the varWatch window using the given width and height
+local function remakeDisplayRows( width, height )
+	if varWatch.table then
+		varWatch.table:removeSelf()
+		varWatch.table = nil
+	end
+	displayRows = {}
+	varWatch.table = g.makeGroup( varWatch.group )
+	varWatch.resize( width, height )
+end
+
+-- -- Return the Dorona display object associated with trackedVar (TODO)
+-- local function getTrackedObj()
+-- 	if trackedVar then
+-- 		local value
+-- 		local trackedIndex = trackedVar.trackedIndex
+-- 		if trackedIndex then
+-- 			value = ct.userVars[trackedVar.nameID.str][trackedIndex]
+-- 		else
+-- 			value = ct.userVars[trackedVar.nameID.str]
+-- 		end
+-- 		if value then
+-- 			return value._code12.obj
+-- 		end
+-- 	end
+-- 	return nil
+-- end
+
+-- -- Turns off the trackVarRect (TODO)
+-- local function turnOffTrackVar()
+-- 	trackedVar = nil
+-- 	if trackVarRect.btn then
+-- 		trackVarRect.btn:setState{ isOn = false }
+-- 		trackVarRect.btn = nil
+-- 	end
+-- 	trackVarRect.isVisible = false
+-- end
+
+-- Update variable values displayed in the variable watch window
+local function updateValues()
+	if vars then
+		for i = 1, #displayRows do
+			local d = displayData[i + scrollOffset]
+			if not d then
+				break
+			end
+			local index = d.index
+			local field = d.field
+			local var = d.var
+			local value = ct.userVars[var.nameID.str]
+			local textForValue = d.textForValue
+			if not index and not field then
+				-- Value of a top-level variable
+				if textForValue then
+					displayRows[i].col2.text = d.textForValue( value )
+				end
+			elseif not index and field then
+				-- Value of a field of a GameObj
+				displayRows[i].col2.text = d.textForValue( value, field )
+			elseif index and not field then
+				-- Value of an indexed array
+				displayRows[i].col2.text = d.textForValue( value[index] )
+			else
+				-- index and field
+				-- Value of a GameObj field of a GameObj in an array
+				local valueAtIndex = value[index]
+				if valueAtIndex then
+					displayRows[i].col3.text = tostring(valueAtIndex[field])
+				else
+					displayRows[i].col3.text = "null"
+				end
+			end
+		end
+		-- if trackedVar then
+		-- 	local trackedObj = getTrackedObj()
+		-- 	if trackedObj then
+		-- 		trackVarRect.x = trackedObj.x
+		-- 		trackVarRect.y = trackedObj.y
+		-- 	else
+		-- 		turnOffTrackVar()
+		-- 	end
+		-- end
+	end
+end
+
+-- Update the variable watch window if it is on in the user's settings
+local function onNewFrame()
+	if showVarWatch and (g.runState == "running" or g.runState == "paused") then
+		updateValues()
+	end
+end
+
+-- Adjust the scrollbar
+local function adjustScrollbar()
+	-- Adjust the scrollbar
+	local numDisplayData = #displayData
+	local numDisplayRows = #displayRows
+	if numDisplayData > numDisplayRows then
+		local rangeMax = math.max( 0, numDisplayData - numDisplayRows )
+		local ratio = numDisplayRows / numDisplayData
+		varWatch.scrollbar:adjust( 0, rangeMax, scrollOffset, ratio )
+	else
+		print("hide scrollbar")
+		scrollOffset = 0
+		varWatch.scrollbar:hide()
+	end
+end
+
+-- Event handler for the variable watch window scrollbar
+local function onScroll( newPos )
+	print( newPos, scrollOffset, #displayData, #displayRows, #displayData - #displayRows )
+	if newPos and scrollOffset ~= newPos then
+		scrollOffset = newPos
+		remakeDisplayRows( varWatch.width, varWatch.height )
+	elseif not newPos and scrollOffset ~= #displayData - #displayRows then
+		scrollOffset = #displayData - #displayRows
+		remakeDisplayRows( varWatch.width, varWatch.height )
+	end
+	if #displayData <= #displayRows and (not newPos or newPos == 0) then
+		varWatch.scrollbar:hide()
+	end
+end
+
+-- Event handler for variable drop down buttons on top-level variables
+local function onDropDownBtn1( event )
+	local btn = event.target
+	displayData[btn.rowNumber + scrollOffset].var.isOpen = btn.isOn
+	makeDisplayData()
+	remakeDisplayRows( varWatch.width, varWatch.height )
+end
+
+-- Event handler for variable drop down buttons on GameObjs in arrays
+local function onDropDownBtn2( event )
+	local btn = event.target
+	local d = displayData[btn.rowNumber + scrollOffset]
+	d.var[d.index.."isOpen"] = btn.isOn
+	makeDisplayData()
+	remakeDisplayRows( varWatch.width, varWatch.height )
+end
+
+-- -- Event handler for track variable buttons
+-- local function onTrackVarBtn( event )
+-- 	local btn = event.target
+-- 	if not btn.isOn then
+-- 		print( "TrackVarBtn off")
+-- 		turnOffTrackVar()
+-- 	else
+-- 		print( "TrackVarBtn on")
+-- 		if trackVarRect.btn then
+-- 			trackVarRect.btn:setState{ isOn = false }
+-- 		end
+-- 		trackVarRect.btn = btn
+-- 		local d = displayData[btn.rowNumber + scrollOffset]
+-- 		trackedVar = d.var
+-- 		trackedVar.trackedIndex = d.index
+-- 		print("tracking", d.var.nameID.str, "index", d.index)
+-- 		local obj = getTrackedObj()
+-- 		if not obj then
+-- 			print("no obj to track")
+-- 			turnOffTrackVar()
+-- 		else
+-- 			trackVarRect.width = obj.width
+-- 			trackVarRect.height = obj.height
+-- 			trackVarRect.x = obj.x
+-- 			trackVarRect.y = obj.y
+-- 			trackVarRect.anchorX = obj.anchorX
+-- 			trackVarRect.anchorY = obj.anchorY
+-- 			trackVarRect.isVisible = true
+-- 			trackVarRect:toFront()
+-- 		end
+-- 	end
+-- end
+
+
+--- Module Functions ---------------------------------------------------------
+
+-- Init the variable watch window
+function varWatch.init()
+	displayRows = {}
+	displayData = {}
+	numDisplayableRows = 0
+	scrollOffset = 0
+	charWidth = app.consoleFontCharWidth
+	Runtime:addEventListener( "enterFrame", onNewFrame )
+end
+
+-- Create the variable watch window display group and store it in varWatch.group
+function varWatch.create( parent, x, y, width, height )
+	local group = g.makeGroup( parent, x, y )
+	varWatch.group = group
+	varWatch.table = g.makeGroup( group )
+	varWatch.width = width
+	varWatch.height = height
+
+	-- Scrollbar
+	varWatch.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )
+end
+
 -- Resize the variable watch window to fit the given size
 function varWatch.resize( width, height )
-	local prevNumDisplayRows = numDisplayRows
 	-- Determine the new number of display rows
-	numDisplayRows = math.floor( (height - topMargin) / rowHeight )
-	if numDisplayRows <= 0 then
-		numDisplayRows = 0
-		for i = 1, prevNumDisplayRows do
-			textObjRows[i].isVisible = false
-		end
-		return nil
+	numDisplayableRows = math.floor( (height - topMargin) / rowHeight )
+	if numDisplayableRows <= 0 then
+		numDisplayableRows = 0
 	end
-	-- Make sure we have enough text objects
-	local n = #textObjRows
-	while n < numDisplayRows do
+	-- Make sure we have enough display rows
+	local n = #displayRows
+	while n < numDisplayableRows do
+		local d = displayData[n + 1 + scrollOffset]
+		if not d then
+			break
+		end
 		n = n + 1
-		local row = g.makeGroup( varWatch.group, 0, topMargin + (n - 1) * rowHeight )
-		for col = 1, 3 do
-			g.uiBlack( display.newText{
+		local row = g.makeGroup( varWatch.table, 0, topMargin + (n - 1) * rowHeight )
+		for colNum = 1, #d.initRowTexts do
+			local textObj = g.uiBlack( display.newText{
 				parent = row,
-				text = "",
-				x = xCol1 + 100 * ( col - 1 ),
+				text = d.initRowTexts[colNum],
+				x = xCols[colNum] + d.textIndents[colNum],
 				y = 0,
-				font = app.consoleFont,
-				fontSize = app.consoleFontSize,
-		} )
+				font = varFont,
+				fontSize = varFontSize,
+			} )
+			local outlineRect = g.uiItem( display.newRect( row, xCols[colNum], textObj.y, d.colWidths[colNum], rowHeight ) )
+			outlineRect:setFillColor( 1, 0 )
+			outlineRect:setStrokeColor( 0.5 )
+			outlineRect.strokeWidth = 1
+			row["col"..colNum] = textObj
 		end
 		-- make drop down buttons for first and second columns
 		local yBtn = row[1].y + row[1].height / 2
-		local trackVarBtn = buttons.newTrackVarButton( row, row.x + margin * 0.5, yBtn, trackVarBtnWidth, trackVarBtnWidth,
-		                                               onTrackVarBtn )
-		trackVarBtn.rowNumber = n
-		row.trackVarBtn = trackVarBtn
-		local btn1 = buttons.newDropDownButton( row, row[1].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
-		btn1.rowNumber = n
-		row.dropDownBtn1 = btn1
-		local btn2 = buttons.newDropDownButton( row, row[2].x + dropDownBtnSize, yBtn, dropDownBtnSize, dropDownBtnSize, 
-		                                        onDropDownBtn2 )
-		btn2.rowNumber = n
-		row.dropDownBtn2 = btn2
-		textObjRows[n] = row
+		if d.dropDownVisible then
+			if d.dropDownVisible == 1 then
+				local btn1 = buttons.newDropDownButton( row, row.col2.x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
+				btn1.rowNumber = n
+				btn1:setState{ isOn = d.var.isOpen or false }
+				row.dropDownBtn1 = btn1
+			else
+				local btn2 = buttons.newDropDownButton( row, row.col2.x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn2 )
+				btn2.rowNumber = n
+				btn2:setState{ isOn = d.var[d.index.."isOpen"] or false }
+				row.dropDownBtn2 = btn2
+			end
+		end
+		displayRows[n] = row
 	end
-	-- Update display constants (variable names, buttons, etc)
-	if prevNumDisplayRows ~= numDisplayRows then
-		updateConstants()
+	-- Make sure we don't have too many display rows
+	while n > numDisplayableRows do
+		displayRows[n]:removeSelf( )
+		displayRows[n] = nil
+		n = n - 1
 	end
 	-- Reposition the scrollbar
 	local scrollbar = varWatch.scrollbar
 	scrollbar:setPosition( width - Scrollbar.width, 0, height )
 	scrollbar:toFront()
 	adjustScrollbar()
-	-- Resize the trackVarRect
-	if trackedVar then
-		local trackedObj = getTrackedObj()
-		if trackedObj then
-			trackVarRect.width = trackedObj.width
-			trackVarRect.height = trackedObj.height
-		else
-			turnOffTrackVar()
-		end
-	end
-end
-
--- Remakes the varWatch window after getting new display data
-function varWatch.reset()
-	varWatch.makeDisplayData()
-	updateConstants()
-	adjustScrollbar()
-	updateValues()
+	-- Save new width and height
+	varWatch.width = width
+	varWatch.height = height
+	-- -- Resize the trackVarRect
+	-- if trackedVar then
+	-- 	local trackedObj = getTrackedObj()
+	-- 	if trackedObj then
+	-- 		trackVarRect.width = trackedObj.width
+	-- 		trackVarRect.height = trackedObj.height
+	-- 	else
+	-- 		turnOffTrackVar()
+	-- 	end
+	-- end
 end
 
 -- Starts a new run of the varWatch window based on the given width and height
-function varWatch.startNewRun()
+function varWatch.startNewRun( width, height )
 	showVarWatch = true
 	varWatch.group.isVisible = true
-	varWatch.getVars()
-	updateColWidths()
-	varWatch.reset()
+	getVars()
+	makeDisplayData()
+	scrollOffset = 0
+	remakeDisplayRows( width, height )
 end
 
 function varWatch.hide()
