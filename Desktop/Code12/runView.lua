@@ -63,7 +63,9 @@ local function layoutPanes()
 	rightBar.width = app.width    -- more than enough
 	rightBar.height = app.height  -- more than enough
 	varWatch.group.x = rightBar.x
-	varWatch.resize( varWatchWidthAndHeight() )
+	if app.showVarWatch then
+		varWatch.resize( varWatchWidthAndHeight() )
+	end
 
 	-- Position the pane split and lower group
 	paneSplit.y = app.dyToolbar + height
@@ -170,9 +172,17 @@ function runView:show( event )
 			runtime.run()
 			if app.showVarWatch then
 				varWatch.startNewRun( varWatchWidthAndHeight() )
-			else
-				varWatch.hide()
 			end
+		end
+	end
+end
+
+-- Prepare to hide the runView scene
+function runView:hide( event )
+	if event.phase == "will" then
+		-- Hide the varWatch table
+		if app.showVarWatch then
+			varWatch.hide()
 		end
 	end
 end
@@ -183,6 +193,7 @@ end
 -- Complete and return the composer scene
 runView:addEventListener( "create", runView )
 runView:addEventListener( "show", runView )
+runView:addEventListener( "hide", runView )
 return runView
 
 

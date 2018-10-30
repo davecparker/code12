@@ -24,6 +24,7 @@ local varWatch = {
 }
 
 -- UI constants
+local gridShade = 0.5         -- shade for the table gridlines
 local topMargin = 5           -- margin for the top of the variable watch window
 local rowHeight = 20          -- height of each row in the variable display
 local dropDownBtnSize = 10    -- width and height of the drop down buttons
@@ -248,23 +249,18 @@ local function updateValues()
 			if not index and not field then
 				-- Value of a top-level variable
 				if textForValue then
-					displayRows[i].col2.text = d.textForValue( value )
+					displayRows[i][2].text = textForValue( value )
 				end
 			elseif not index and field then
 				-- Value of a field of a GameObj
-				displayRows[i].col2.text = d.textForValue( value, field )
+				displayRows[i][2].text = textForValue( value, field )
 			elseif index and not field then
 				-- Value of an indexed array
-				displayRows[i].col2.text = d.textForValue( value[index] )
+				displayRows[i][2].text = textForValue( value[index] )
 			else
 				-- index and field
 				-- Value of a GameObj field of a GameObj in an array
-				local valueAtIndex = value[index]
-				if valueAtIndex then
-					displayRows[i].col3.text = tostring(valueAtIndex[field])
-				else
-					displayRows[i].col3.text = "null"
-				end
+				displayRows[i][3].text = textForValue( value[index], field )
 			end
 		end
 		-- if trackedVar then
@@ -281,7 +277,7 @@ end
 
 -- Update the variable watch window if it is on in the user's settings
 local function onNewFrame()
-	if showVarWatch and (g.runState == "running" or g.runState == "paused") then
+	if showVarWatch then
 		updateValues()
 	end
 end
@@ -296,7 +292,6 @@ local function adjustScrollbar()
 		local ratio = numDisplayRows / numDisplayData
 		varWatch.scrollbar:adjust( 0, rangeMax, scrollOffset, ratio )
 	else
-		print("hide scrollbar")
 		scrollOffset = 0
 		varWatch.scrollbar:hide()
 	end
@@ -304,7 +299,6 @@ end
 
 -- Event handler for the variable watch window scrollbar
 local function onScroll( newPos )
-	print( newPos, scrollOffset, #displayData, #displayRows, #displayData - #displayRows )
 	if newPos and scrollOffset ~= newPos then
 		scrollOffset = newPos
 		makeDisplayRows( varWatch.width, varWatch.height )
@@ -408,8 +402,10 @@ function varWatch.resize( width, height )
 		end
 		n = n + 1
 		local row = g.makeGroup( varWatch.table, 0, topMargin + (n - 1) * rowHeight )
-		for colNum = 1, #d.initRowTexts do
-			local textObj = g.uiBlack( display.newText{
+		local numColumns = #d.initRowTexts
+		-- Make row text objs
+		for colNum = 1, numColumns do
+			g.uiBlack( display.newText{
 				parent = row,
 				text = d.initRowTexts[colNum],
 				x = xCols[colNum] + d.textIndents[colNum],
@@ -417,22 +413,36 @@ function varWatch.resize( width, height )
 				font = varFont,
 				fontSize = varFontSize,
 			} )
-			local outlineRect = g.uiItem( display.newRect( row, xCols[colNum], textObj.y, d.colWidths[colNum], rowHeight ) )
-			outlineRect:setFillColor( 1, 0 )
-			outlineRect:setStrokeColor( 0.5 )
-			outlineRect.strokeWidth = 1
-			row["col"..colNum] = textObj
 		end
-		-- make drop down buttons for first and second columns
+		-- Make row gridlines
+		local x1 = xCols[1]
+		local y1 = row[1].y
+		local gridline
+		if n == 1 then
+			-- horizontal gridline on top of first row
+			gridline = display.newLine( row, x1, y1, x1 + 2000, y1 )
+			gridline:setStrokeColor( gridShade )
+		end
+		-- horizontal gridline on bottom of row
+		y1 = y1 + rowHeight
+		gridline = display.newLine( row, x1, y1, x1 + 2000, y1 )
+		gridline:setStrokeColor( gridShade )
+		-- vertical gridlines
+		for i = 1, numColumns do
+			x1 = xCols[i]
+			gridline = display.newLine( row, x1, y1, x1, y1 - rowHeight )
+			gridline:setStrokeColor( gridShade )
+		end
+		-- Make drop down button if needed
 		local yBtn = row[1].y + row[1].height / 2
 		if d.dropDownVisible then
 			if d.dropDownVisible == 1 then
-				local btn1 = buttons.newDropDownButton( row, row.col2.x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
+				local btn1 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
 				btn1.rowNumber = n
 				btn1:setState{ isOn = d.var.isOpen or false }
 				row.dropDownBtn1 = btn1
 			else
-				local btn2 = buttons.newDropDownButton( row, row.col2.x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn2 )
+				local btn2 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn2 )
 				btn2.rowNumber = n
 				btn2:setState{ isOn = d.var[d.index.."isOpen"] or false }
 				row.dropDownBtn2 = btn2
@@ -469,7 +479,6 @@ end
 -- Starts a new run of the varWatch window based on the given width and height
 function varWatch.startNewRun( width, height )
 	showVarWatch = true
-	varWatch.group.isVisible = true
 	getVars()
 	makeDisplayData()
 	scrollOffset = 0
@@ -479,11 +488,15 @@ end
 -- Hides the variable watch window
 function varWatch.hide()
 	showVarWatch = false
-	varWatch.group.isVisible = false
+	if varWatch.table then
+		varWatch.table:removeSelf()
+		varWatch.table = nil
+	end
 end
 
 -- Handles runtime event of array assigned
 function varWatch.arrayAssigned()
+	-- TODO: handle scrollOffset properly
 	makeDisplayData()
 	makeDisplayRows( varWatch.width, varWatch.height )
 end

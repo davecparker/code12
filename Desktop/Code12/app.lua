@@ -50,6 +50,7 @@ local app =  {
 	useDefaultEditor = false,    -- when true, use the OS default for opening user program files
 	openFilesInEditor = true,    -- when true, opened programs will also open in text editor
 	customEditors = {},          -- table of custom editors, e.g. { name = "Atom", path = "C:\...\atom.exe" }
+	showVarWatch = true,         -- when true, show the variable watch window
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
