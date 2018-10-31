@@ -50,6 +50,7 @@ local vars                    -- array of user program's global variables
 local displayData             -- array of data for displaying variables
 local scrollOffset            -- starting line if scrolled back or nil if at end
 local arrayAssigned           -- true when an array has been assigned and displayData needs to be updated 
+local scrollOffsetChanged     -- true when scrollOffset has changed and displayRows needs to be updated
 local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
                         "lineWidth", "visible", "clickable", "autoDelete", "group" }
 local numGameObjFields = #gameObjFields
@@ -298,6 +299,10 @@ local function onNewFrame()
 			makeDisplayRows( varWatch.width, varWatch.height )
 			arrayAssigned = false
 		end
+		if scrollOffsetChanged then
+			makeDisplayRows( varWatch.width, varWatch.height )
+			scrollOffsetChanged = false
+		end
 		updateValues()
 	end
 end
@@ -319,14 +324,16 @@ end
 
 -- Event handler for the variable watch window scrollbar
 local function onScroll( newPos )
+	local numDisplayData = #displayData
+	local numDisplayRows = #displayRows
 	if newPos and scrollOffset ~= newPos then
 		scrollOffset = newPos
-		makeDisplayRows( varWatch.width, varWatch.height )
-	elseif not newPos and scrollOffset ~= #displayData - #displayRows then
-		scrollOffset = #displayData - #displayRows
-		makeDisplayRows( varWatch.width, varWatch.height )
+		scrollOffsetChanged = true
+	elseif not newPos and scrollOffset ~= numDisplayData - numDisplayRows then
+		scrollOffset = numDisplayData - numDisplayRows
+		scrollOffsetChanged = true
 	end
-	if #displayData <= #displayRows and (not newPos or newPos == 0) then
+	if (not newPos or newPos == 0) and numDisplayData <= numDisplayRows then
 		varWatch.scrollbar:hide()
 	end
 end
