@@ -30,7 +30,6 @@ local rowHeight = 20          -- height of each row in the variable display
 local dropDownBtnSize = 10    -- width and height of the drop down buttons
 local margin = app.margin     -- space between UI elements 
 local centerColWidth = 125    -- width of the center column of the variable display
-local rightColWidth = 125     -- width of the right most column of the variable display
 local varFont = app.consoleFont           -- font used in the variable display
 local varFontSize = app.consoleFontSize   -- font size used in the variable display
 local stdIndents = { 0, dropDownBtnSize } -- indents for standard top-level variable display rows
@@ -41,8 +40,6 @@ local indexAndFieldIndents = { 0, dropDownBtnSize * 3, dropDownBtnSize } -- inde
 local displayRows             -- table of rows of the variable display
 local numDisplayableRows      -- number of rows that can currently be displayed
 local xCols                   -- table of x-values for the left of each column
-local colWidths2              -- table of columns widths for rows with 2 columns
-local colWidths3              -- table of columns widths for rows with 3 columns
 local charWidth               -- character width of the font used for text objects
 local showVarWatch            -- curent value of app.showVarWatch
 -- local trackVarRect            -- rectangle for highlighting tracked variable (TODO)
@@ -52,6 +49,7 @@ local showVarWatch            -- curent value of app.showVarWatch
 local vars                    -- array of user program's global variables
 local displayData             -- array of data for displaying variables
 local scrollOffset            -- starting line if scrolled back or nil if at end
+local arrayAssigned           -- true when an array has been assigned and displayData needs to be updated 
 local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
                         "lineWidth", "visible", "clickable", "autoDelete", "group" }
 local numGameObjFields = #gameObjFields
@@ -75,11 +73,7 @@ local function getVars()
 				var.arrayType = javaTypes.typeNameFromVt( vt.vt )
 			end
 		end
-		colWidths3 = { maxVarNameWidth, centerColWidth, rightColWidth }
-		colWidths2 = { maxVarNameWidth, centerColWidth + rightColWidth }
-		xCols = { margin }
-		xCols[2] = margin + colWidths3[1]
-		xCols[3] = xCols[2] + colWidths3[2]
+		xCols = { margin, margin + maxVarNameWidth, margin + maxVarNameWidth + centerColWidth }
 	end
 end
 
@@ -125,7 +119,6 @@ local function makeDisplayData()
 			d.var = var
 			d.initRowTexts = { varName, "" }
 			d.textIndents = stdIndents
-			d.colWidths = colWidths2
 			if vt == "String" then
 				d.textForValue = textForStringValue
 			elseif vt == "GameObj" then
@@ -152,41 +145,40 @@ local function makeDisplayData()
 					d = { var = var, field = gameObjField }
 					d.initRowTexts = { gameObjField, "" }
 					d.textIndents = indexOrFieldIndents
-					d.colWidths = colWidths2
 					d.textForValue = textForGameObjField
 					displayData[iRow] = d
 					iRow = iRow + 1
 				end
 			elseif isOpen and arrayType then
 				-- add array indices
-				for j = 1, value.length do
-					d = { var = var, index = j }
-					d.initRowTexts = { " ["..(j - 1).."]", "" }
-					d.textIndents = indexOrFieldIndents
-					d.colWidths = colWidths2
-					local arrVt = vt.vt
-					if arrVt == "String" then
-						d.textForValue = textForStringValue
-					elseif arrVt == "GameObj" then
-						d.textForValue = textForGameObjValue
-						d.dropDownVisible = 2
-						d.trackableVar = true
-					else
-						d.textForValue = textForPrimitiveValue
-					end
-					displayData[iRow] = d
-					iRow = iRow + 1
-					if arrayType == "GameObj" and var[j.."isOpen"] then
-						-- add GameObj fields for this open GameObj in array
-						for k = 1, numGameObjFields do
-							local gameObjField = gameObjFields[k]
-							d = { var = var, index = j, field = gameObjField, }
-							d.initRowTexts = { "", gameObjField, "" }
-							d.textIndents = indexAndFieldIndents
-							d.colWidths = colWidths3
-							d.textForValue = textForGameObjField
-							displayData[iRow] = d
-							iRow = iRow + 1
+				if value then
+					for j = 1, value.length do
+						d = { var = var, index = j }
+						d.initRowTexts = { " ["..(j - 1).."]", "" }
+						d.textIndents = indexOrFieldIndents
+						local arrVt = vt.vt
+						if arrVt == "String" then
+							d.textForValue = textForStringValue
+						elseif arrVt == "GameObj" then
+							d.textForValue = textForGameObjValue
+							d.dropDownVisible = 2
+							d.trackableVar = true
+						else
+							d.textForValue = textForPrimitiveValue
+						end
+						displayData[iRow] = d
+						iRow = iRow + 1
+						if arrayType == "GameObj" and var[j.."isOpen"] then
+							-- add GameObj fields for this open GameObj in array
+							for k = 1, numGameObjFields do
+								local gameObjField = gameObjFields[k]
+								d = { var = var, index = j, field = gameObjField, }
+								d.initRowTexts = { "", gameObjField, "" }
+								d.textIndents = indexAndFieldIndents
+								d.textForValue = textForGameObjField
+								displayData[iRow] = d
+								iRow = iRow + 1
+							end
 						end
 					end
 				end
@@ -278,6 +270,34 @@ end
 -- Update the variable watch window if it is on in the user's settings
 local function onNewFrame()
 	if showVarWatch then
+		if arrayAssigned then
+			local topData
+			if scrollOffset > 0 then
+				topData = displayData[scrollOffset + 1]
+			end
+			makeDisplayData()
+			if topData then
+				local topVarFound = false
+				scrollOffset = 0
+				for i = 1, #displayData do
+					local d = displayData[i]
+					if displayData[i].var == topData.var then
+						topVarFound = true
+						scrollOffset = i - 1
+						if not topData.index and not topData.field
+								or topData.index and not topData.field and d.index and d.index == topData.index
+								or not topData.index and topData.field and d.field and d.field == topData.field
+								or d.index and d.index == topData.index and d.field and d.field == topData.field then
+							break
+						end
+					elseif topVarFound then
+						break
+					end
+				end
+			end
+			makeDisplayRows( varWatch.width, varWatch.height )
+			arrayAssigned = false
+		end
 		updateValues()
 	end
 end
@@ -496,9 +516,7 @@ end
 
 -- Handles runtime event of array assigned
 function varWatch.arrayAssigned()
-	-- TODO: handle scrollOffset properly
-	makeDisplayData()
-	makeDisplayRows( varWatch.width, varWatch.height )
+	arrayAssigned = true
 end
 
 ------------------------------------------------------------------------------

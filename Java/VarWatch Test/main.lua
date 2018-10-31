@@ -115,7 +115,11 @@ function _fn.onKeyPress(keyName)
 
 			ct.indexArray(this.gObjArr2, 0):delete()
 			ct.checkArrayIndex(this.gObjArr2, 0); this.gObjArr2[1+(0)] = nil
-		end; end
+		end
+	elseif (keyName == "n") then
+
+
+		this.intArr = nil; ct.arrayAssigned(); end
 
 end
 

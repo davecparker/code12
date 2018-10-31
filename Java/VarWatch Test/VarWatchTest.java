@@ -117,6 +117,10 @@ class VarWatchTest extends Code12Program
 				gObjArr2[0] = null;
 			}
 		}
+		else if ( keyName.equals("n") )
+		{
+			intArr = null;
+		}
 	}
 
 	public static void main(String[] args)
