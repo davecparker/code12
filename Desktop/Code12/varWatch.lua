@@ -188,8 +188,8 @@ local function makeDisplayData()
 	end
 end
 
--- Updates display data and remakes the varWatch window using the given width and height
-local function makeDisplayRows( width, height )
+-- Remakes the varWatch display rows using the given width and height
+local function remakeDisplayRows( width, height )
 	if varWatch.table then
 		varWatch.table:removeSelf()
 		varWatch.table = nil
@@ -296,11 +296,11 @@ local function onNewFrame()
 					end
 				end
 			end
-			makeDisplayRows( varWatch.width, varWatch.height )
+			remakeDisplayRows( varWatch.width, varWatch.height )
 			arrayAssigned = false
 		end
 		if scrollOffsetChanged then
-			makeDisplayRows( varWatch.width, varWatch.height )
+			remakeDisplayRows( varWatch.width, varWatch.height )
 			scrollOffsetChanged = false
 		end
 		updateValues()
@@ -343,7 +343,7 @@ local function onDropDownBtn1( event )
 	local btn = event.target
 	displayData[btn.rowNumber + scrollOffset].var.isOpen = btn.isOn
 	makeDisplayData()
-	makeDisplayRows( varWatch.width, varWatch.height )
+	remakeDisplayRows( varWatch.width, varWatch.height )
 end
 
 -- Event handler for variable drop down buttons on GameObjs in arrays
@@ -352,7 +352,7 @@ local function onDropDownBtn2( event )
 	local d = displayData[btn.rowNumber + scrollOffset]
 	d.var[d.index.."isOpen"] = btn.isOn
 	makeDisplayData()
-	makeDisplayRows( varWatch.width, varWatch.height )
+	remakeDisplayRows( varWatch.width, varWatch.height )
 end
 
 -- -- Event handler for track variable buttons
@@ -509,7 +509,7 @@ function varWatch.startNewRun( width, height )
 	getVars()
 	makeDisplayData()
 	scrollOffset = 0
-	makeDisplayRows( width, height )
+	remakeDisplayRows( width, height )
 end
 
 -- Hides the variable watch window
