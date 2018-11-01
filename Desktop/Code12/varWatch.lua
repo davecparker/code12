@@ -249,7 +249,7 @@ local function updateValues()
 				displayRows[i][2].text = textForValue( value, field )
 			elseif index and not field then
 				-- Value of an indexed array
-				displayRows[i][2].text = textForValue( value[index] )
+				displayRows[i][2].text = textForValue( value[index] or value.default )
 			else
 				-- index and field
 				-- Value of a GameObj field of a GameObj in an array
@@ -525,6 +525,7 @@ end
 function varWatch.arrayAssigned()
 	arrayAssigned = true
 end
+
 
 ------------------------------------------------------------------------------
 
