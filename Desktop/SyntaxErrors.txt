@@ -78,3 +78,9 @@ imort Code12.*;
    void foo(int a :)
    void foo(8, String s)
    void foo(in a, String s)
+	int[] intArr = new int[10]
+	int[] intArr2 = new int[];
+	GameObj[] = new GameObj[5];
+			int len = gObjArr.length
+aimport Code12.*;
+		frameRateDisplay.

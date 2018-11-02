@@ -27,6 +27,7 @@ local err = require( "err" )
 local statusBar = require( "statusBar" )
 local toolbar = require( "toolbar" )
 local console = require( "console" )
+local varWatch = require( "varWatch" )
 
 -- File local state
 local runStateLast     -- last known runState (for status bar)
@@ -216,6 +217,7 @@ function app.saveSettings()
 	userSettings.recentSourceFilePaths = app.recentSourceFilePaths
 	userSettings.openFilesInEditor = app.openFilesInEditor
 	userSettings.customEditors = app.customEditors
+	userSettings.showVarWatch = app.showVarWatch
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -295,6 +297,12 @@ local function loadSettings()
 						end
 					end
 				end
+
+				-- Use the saved showVarWatch
+				local showVarWatch = t.showVarWatch
+				if type(showVarWatch) == "boolean" then
+					app.showVarWatch = showVarWatch
+				end
 			end
 		end
 	end
@@ -360,6 +368,7 @@ local function initApp()
 	-- Get initial window size and metrics
 	app.getWindowSize()
 	console.init()      -- gets and stores console font metrics
+	varWatch.init()
 
 	-- Create the UI bars that live in the global group
 	statusBar.create()

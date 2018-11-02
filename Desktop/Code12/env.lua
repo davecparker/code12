@@ -213,6 +213,16 @@ function env.strFromInputBoxDialog( title, message )
 	return nil
 end
 
+-- Return true if the given path can be opened for reading, false otherwise
+function env.canRead( path )
+	local file = io.open( path, "r" )
+	if file then
+		io.close( file )
+		return true
+	end
+	return false
+end
+
 
 --- Main Chunk -------------------------------------------------------
 

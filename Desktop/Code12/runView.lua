@@ -18,6 +18,7 @@ local runtime = require("Code12.runtime")
 local app = require( "app" )
 local err = require( "err" )
 local console = require( "console" )
+local varWatch = require( "varWatch" )
 
 
 -- The runView module and scene
@@ -46,16 +47,23 @@ local function outputAreaHeight()
 	return app.height - app.dyToolbar - app.dyStatusBar - minConsoleHeight - dyPaneSplit
 end
 
+-- Return the available width and height for the variable watch window
+local function varWatchWidthAndHeight()
+	return app.width - rightBar.x, app.outputHeight - 1
+end
+
 -- Position the display panes
 local function layoutPanes()
 	-- Determine size of the top area (game or error output)
 	local width = app.outputWidth
 	local height = app.outputHeight
 
-	-- Position the right bar
+	-- Position the right bar and variable watch group
 	rightBar.x = width + 1
 	rightBar.width = app.width    -- more than enough
 	rightBar.height = app.height  -- more than enough
+	varWatch.group.x = rightBar.x
+	varWatch.resize( varWatchWidthAndHeight() )
 
 	-- Position the pane split and lower group
 	paneSplit.y = app.dyToolbar + height
@@ -130,6 +138,7 @@ function runView:create()
 	paneSplit:addEventListener( "touch", onTouchPaneSplit )
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
+	varWatch.create( sceneGroup, rightBar.x, rightBar.y, 0, 0 )
 
 	-- Layout the display areas
 	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines
@@ -150,7 +159,7 @@ function runView:create()
 	appContext.print = console.print
 	appContext.println = console.println
 	appContext.runtimeErr = showRuntimeError
-	appContext.arrayAssigned = function () console.println("Array assigned") end   -- TODO: e.g. varWatch.arrayAssigned
+	appContext.arrayAssigned = varWatch.arrayAssigned
 end
 
 -- Prepare to show the runView scene
@@ -159,6 +168,19 @@ function runView:show( event )
 		-- Automatically run a new program
 		if g.runState == nil then
 			runtime.run()
+			if app.showVarWatch then
+				varWatch.startNewRun( varWatchWidthAndHeight() )
+			end
+		end
+	end
+end
+
+-- Prepare to hide the runView scene
+function runView:hide( event )
+	if event.phase == "will" then
+		-- Hide the varWatch table
+		if app.showVarWatch then
+			varWatch.hide()
 		end
 	end
 end
@@ -169,6 +191,7 @@ end
 -- Complete and return the composer scene
 runView:addEventListener( "create", runView )
 runView:addEventListener( "show", runView )
+runView:addEventListener( "hide", runView )
 return runView
 
 
