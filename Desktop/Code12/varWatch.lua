@@ -201,14 +201,19 @@ local function adjustScrollbar()
 	scrollbar:toFront()
 end
 
--- Remakes the varWatch display rows using the given width and height
-local function remakeDisplayRows()
+-- Clears the variable watch window table of display rows
+local function clearVarWatchTable()
 	if varWatch.table then
 		varWatch.table:removeSelf()
 		varWatch.table = nil
 	end
 	displayRows = {}
 	varWatch.table = g.makeGroup( varWatch.group )
+end
+
+-- Remakes the varWatch display rows using the given width and height
+local function remakeDisplayRows()
+	clearVarWatchTable()
 	varWatch.addDisplayRows()
 end
 
@@ -388,7 +393,7 @@ function varWatch.addDisplayRows()
 		end
 		-- Make drop down button if needed
 		if d.dropDownVisible then
-		local yBtn = row[1].y + row[1].height / 2
+			local yBtn = row[1].y + row[1].height / 2
 			if d.dropDownVisible == 1 then
 				local btn1 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
 				btn1.rowNumber = n
@@ -413,36 +418,35 @@ function varWatch.resize( width, height )
 	if numDisplayableRows <= 0 then
 		numDisplayableRows = 0
 	end
-	-- Make sure we have enough display rows
-	local n = varWatch.addDisplayRows()
-	-- Make sure we don't have too many display rows
-	while n > numDisplayableRows do
-		displayRows[n]:removeSelf( )
-		displayRows[n] = nil
-		n = n - 1
+	if showVarWatch then
+		-- Make sure we have enough display rows
+		local n = varWatch.addDisplayRows()
+		-- Make sure we don't have too many display rows
+		while n > numDisplayableRows do
+			displayRows[n]:removeSelf( )
+			displayRows[n] = nil
+			n = n - 1
+		end
+		-- Reposition the scrollbar
+		scrollbar:setPosition( width - Scrollbar.width, 0, height )
+		adjustScrollbar()
 	end
-	-- Reposition the scrollbar
-	scrollbar:setPosition( width - Scrollbar.width, 0, height )
-	adjustScrollbar()
 end
 
 -- Starts a new run of the varWatch window based on the given width and height
 function varWatch.startNewRun( width, height )
-	if varWatch.table then
-		varWatch.table:removeSelf()
-		varWatch.table = nil
-	end
-	varWatch.table = g.makeGroup( varWatch.group )
+	varWatch.group.isVisible = true
+	showVarWatch = true
+	clearVarWatchTable()
 	getVars()
 	makeDisplayData()
 	scrollOffset = 0
-	displayRows = {}
 	varWatch.resize( width, height )
-	showVarWatch = true
 end
 
 -- Hides the variable watch window
 function varWatch.hide()
+	varWatch.group.isVisible = false
 	showVarWatch = false
 end
 

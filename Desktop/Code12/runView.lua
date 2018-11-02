@@ -63,9 +63,7 @@ local function layoutPanes()
 	rightBar.width = app.width    -- more than enough
 	rightBar.height = app.height  -- more than enough
 	varWatch.group.x = rightBar.x
-	if app.showVarWatch then
-		varWatch.resize( varWatchWidthAndHeight() )
-	end
+	varWatch.resize( varWatchWidthAndHeight() )
 
 	-- Position the pane split and lower group
 	paneSplit.y = app.dyToolbar + height
