@@ -27,6 +27,8 @@ local function textForValue(value)
 		return value
 	elseif GameObj.isGameObj(value) then
 		return value:toString()
+	elseif type(value) == "table" and value.length then
+		return "[array of length " .. value.length .. "]"
 	else
 		return tostring(value)
 	end
