@@ -28,7 +28,7 @@ local gridShade = 0.8         -- shade for the table gridlines
 local topMargin = 5           -- margin for the top of the variable watch window
 local dropDownBtnSize = 10    -- width and height of the drop down buttons
 local margin = app.margin     -- space between UI elements 
-local centerColWidth = 125    -- width of the center column of the variable display
+local padding = 3             -- min space between the end of text and a vertical gridline
 local varFont = app.consoleFont           -- font used in the variable display
 local varFontSize = app.consoleFontSize   -- font size used in the variable display
 local stdIndents = { 0, dropDownBtnSize } -- indents for standard top-level variable display rows
@@ -41,6 +41,8 @@ local numDisplayableRows      -- number of rows that can currently be displayed
 local xCols                   -- table of x-values for the left of each column
 local charWidth               -- character width of the font used for text objects
 local rowHeight               -- height of each row in the variable display
+local maxGameObjFieldWidth       -- maximum space needed to fix longest GameObj field in the display
+local centerColWidth          -- width of the center column of the variable display
 local showVarWatch            -- curent value of app.showVarWatch
 
 -- varWatch data
@@ -61,7 +63,7 @@ local numGameObjFields = #gameObjFields
 local function getVars()
 	vars = checkJava.globalVars()
 	if vars then
-		local maxVarNameWidth = 101 -- minimum width to ensure space for GameObj fields
+		local maxVarNameWidth = dropDownBtnSize + maxGameObjFieldWidth -- minimum width to ensure space for GameObj fields
 		for i = 1, #vars do
 			local var = vars[i]
 			local varNameWidth = string.len( var.nameID.str ) * charWidth
@@ -73,7 +75,7 @@ local function getVars()
 				var.arrayType = javaTypes.typeNameFromVt( vt.vt )
 			end
 		end
-		xCols = { margin, margin + maxVarNameWidth + 1, margin + maxVarNameWidth + centerColWidth }
+		xCols = { margin, margin + maxVarNameWidth + padding, margin + maxVarNameWidth + padding + centerColWidth }
 	end
 end
 
@@ -341,6 +343,8 @@ function varWatch.init()
 	scrollOffset = 0
 	charWidth = app.consoleFontCharWidth
 	rowHeight = app.consoleFontHeight + 2
+	maxGameObjFieldWidth = charWidth * string.len(".autoDelete")
+	centerColWidth = dropDownBtnSize * 3 + maxGameObjFieldWidth + padding
 	Runtime:addEventListener( "enterFrame", onNewFrame )
 end
 
