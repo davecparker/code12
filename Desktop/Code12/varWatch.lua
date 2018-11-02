@@ -324,10 +324,10 @@ local function onNewFrame()
 					if displayData[i].var == topData.var then
 						topVarFound = true
 						scrollOffset = i - 1
-						if not topData.index and not topData.field
-								or topData.index and not topData.field and d.index and d.index == topData.index
-								or not topData.index and topData.field and d.field and d.field == topData.field
-								or d.index and d.index == topData.index and d.field and d.field == topData.field then
+						if not topData.index and not topData.field or 
+								topData.index and not topData.field and d.index and d.index == topData.index or
+								not topData.index and topData.field and d.field and d.field == topData.field or
+								d.index and d.index == topData.index and d.field and d.field == topData.field then
 							break
 						end
 					elseif topVarFound then
