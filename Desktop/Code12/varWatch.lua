@@ -48,6 +48,7 @@ local showVarWatch            -- curent value of app.showVarWatch
 -- varWatch data
 local vars                    -- array of user program's global variables
 local displayData             -- array of data for displaying variables
+local scrollbar               -- the varWatch scrollbar
 local scrollOffset            -- starting line if scrolled back or nil if at end
 local arrayAssigned           -- true when an array has been assigned and displayData needs to be updated 
 local scrollOffsetChanged     -- true when scrollOffset has changed and displayRows needs to be updated
@@ -188,18 +189,53 @@ local function makeDisplayData()
 	end
 end
 
+-- Adjust the scrollbar
+local function adjustScrollbar()
+	-- Adjust the scrollbar
+	local numDisplayData = #displayData
+	local numDisplayRows = #displayRows
+	if numDisplayData > numDisplayRows then
+		local rangeMax = math.max( 0, numDisplayData - numDisplayRows )
+		local ratio = numDisplayRows / numDisplayData
+		scrollbar:adjust( 0, rangeMax, scrollOffset, ratio )
+	else
+		scrollOffset = 0
+		scrollbar:hide()
+	end
+	scrollbar:toFront()
+end
+
 -- Remakes the varWatch display rows using the given width and height
-local function remakeDisplayRows( width, height )
+local function remakeDisplayRows()
 	if varWatch.table then
 		varWatch.table:removeSelf()
 		varWatch.table = nil
 	end
 	displayRows = {}
 	varWatch.table = g.makeGroup( varWatch.group )
-	varWatch.resize( width, height )
+	varWatch.addDisplayRows()
 end
 
--- -- Return the Dorona display object associated with trackedVar (TODO)
+-- Event handler for variable drop down buttons on top-level variables
+local function onDropDownBtn1( event )
+	local btn = event.target
+	displayData[btn.rowNumber + scrollOffset].var.isOpen = btn.isOn
+	makeDisplayData()
+	remakeDisplayRows()
+	adjustScrollbar()
+end
+
+-- Event handler for variable drop down buttons on GameObjs in arrays
+local function onDropDownBtn2( event )
+	local btn = event.target
+	local d = displayData[btn.rowNumber + scrollOffset]
+	d.var[d.index.."isOpen"] = btn.isOn
+	makeDisplayData()
+	remakeDisplayRows()
+	adjustScrollbar()
+end
+
+-- -- Return the Corona display object associated with trackedVar (TODO)
 -- local function getTrackedObj()
 -- 	if trackedVar then
 -- 		local value
@@ -272,12 +308,15 @@ end
 local function onNewFrame()
 	if showVarWatch then
 		if arrayAssigned then
+			-- save top row data if scrolled
 			local topData
 			if scrollOffset > 0 then
 				topData = displayData[scrollOffset + 1]
 			end
+			-- remake display data
 			makeDisplayData()
 			if topData then
+				-- set scrollOffset to make the first row as close as we can get to the previous first row before the change in display data
 				local topVarFound = false
 				scrollOffset = 0
 				for i = 1, #displayData do
@@ -296,29 +335,17 @@ local function onNewFrame()
 					end
 				end
 			end
-			remakeDisplayRows( varWatch.width, varWatch.height )
+			-- remake display rows
+			remakeDisplayRows()
+			adjustScrollbar()
 			arrayAssigned = false
 		end
 		if scrollOffsetChanged then
-			remakeDisplayRows( varWatch.width, varWatch.height )
+			remakeDisplayRows()
+			scrollbar:toFront()
 			scrollOffsetChanged = false
 		end
 		updateValues()
-	end
-end
-
--- Adjust the scrollbar
-local function adjustScrollbar()
-	-- Adjust the scrollbar
-	local numDisplayData = #displayData
-	local numDisplayRows = #displayRows
-	if numDisplayData > numDisplayRows then
-		local rangeMax = math.max( 0, numDisplayData - numDisplayRows )
-		local ratio = numDisplayRows / numDisplayData
-		varWatch.scrollbar:adjust( 0, rangeMax, scrollOffset, ratio )
-	else
-		scrollOffset = 0
-		varWatch.scrollbar:hide()
 	end
 end
 
@@ -334,25 +361,8 @@ local function onScroll( newPos )
 		scrollOffsetChanged = true
 	end
 	if (not newPos or newPos == 0) and numDisplayData <= numDisplayRows then
-		varWatch.scrollbar:hide()
+		scrollbar:hide()
 	end
-end
-
--- Event handler for variable drop down buttons on top-level variables
-local function onDropDownBtn1( event )
-	local btn = event.target
-	displayData[btn.rowNumber + scrollOffset].var.isOpen = btn.isOn
-	makeDisplayData()
-	remakeDisplayRows( varWatch.width, varWatch.height )
-end
-
--- Event handler for variable drop down buttons on GameObjs in arrays
-local function onDropDownBtn2( event )
-	local btn = event.target
-	local d = displayData[btn.rowNumber + scrollOffset]
-	d.var[d.index.."isOpen"] = btn.isOn
-	makeDisplayData()
-	remakeDisplayRows( varWatch.width, varWatch.height )
 end
 
 -- -- Event handler for track variable buttons
@@ -410,24 +420,19 @@ function varWatch.create( parent, x, y, width, height )
 	varWatch.height = height
 
 	-- Scrollbar
-	varWatch.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )
+	scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )
 end
 
--- Resize the variable watch window to fit the given size
-function varWatch.resize( width, height )
-	-- Determine the new number of display rows
-	numDisplayableRows = math.floor( (height - topMargin) / rowHeight )
-	if numDisplayableRows <= 0 then
-		numDisplayableRows = 0
-	end
-	-- Make sure we have enough display rows
+-- Adds rows to displayRows until the varWatch window is filled and return #displayRows
+-- Assumes numDisplayableRows is up to date since last resize
+function varWatch.addDisplayRows()
 	local n = #displayRows
 	while n < numDisplayableRows do
-		local d = displayData[n + 1 + scrollOffset]
-		if not d then
-			break
-		end
 		n = n + 1
+		local d = displayData[n + scrollOffset]
+		if not d then
+			return n - 1
+		end
 		local row = g.makeGroup( varWatch.table, 0, topMargin + (n - 1) * rowHeight )
 		local numColumns = #d.initRowTexts
 		-- Make row text objs
@@ -461,8 +466,8 @@ function varWatch.resize( width, height )
 			gridline:setStrokeColor( gridShade )
 		end
 		-- Make drop down button if needed
-		local yBtn = row[1].y + row[1].height / 2
 		if d.dropDownVisible then
+		local yBtn = row[1].y + row[1].height / 2
 			if d.dropDownVisible == 1 then
 				local btn1 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
 				btn1.rowNumber = n
@@ -477,6 +482,18 @@ function varWatch.resize( width, height )
 		end
 		displayRows[n] = row
 	end
+	return n
+end
+
+-- Resize the variable watch window to fit the given size
+function varWatch.resize( width, height )
+	-- Determine the new number of display rows
+	numDisplayableRows = math.floor( (height - topMargin) / rowHeight )
+	if numDisplayableRows <= 0 then
+		numDisplayableRows = 0
+	end
+	-- Make sure we have enough display rows
+	local n = varWatch.addDisplayRows()
 	-- Make sure we don't have too many display rows
 	while n > numDisplayableRows do
 		displayRows[n]:removeSelf( )
@@ -484,13 +501,9 @@ function varWatch.resize( width, height )
 		n = n - 1
 	end
 	-- Reposition the scrollbar
-	local scrollbar = varWatch.scrollbar
 	scrollbar:setPosition( width - Scrollbar.width, 0, height )
-	scrollbar:toFront()
 	adjustScrollbar()
-	-- Save new width and height
-	varWatch.width = width
-	varWatch.height = height
+
 	-- -- Resize the trackVarRect
 	-- if trackedVar then
 	-- 	local trackedObj = getTrackedObj()
@@ -505,20 +518,22 @@ end
 
 -- Starts a new run of the varWatch window based on the given width and height
 function varWatch.startNewRun( width, height )
-	showVarWatch = true
+	if varWatch.table then
+		varWatch.table:removeSelf()
+		varWatch.table = nil
+	end
+	varWatch.table = g.makeGroup( varWatch.group )
 	getVars()
 	makeDisplayData()
 	scrollOffset = 0
-	remakeDisplayRows( width, height )
+	displayRows = {}
+	varWatch.resize( width, height )
+	showVarWatch = true
 end
 
 -- Hides the variable watch window
 function varWatch.hide()
 	showVarWatch = false
-	if varWatch.table then
-		varWatch.table:removeSelf()
-		varWatch.table = nil
-	end
 end
 
 -- Handles runtime event of array assigned
