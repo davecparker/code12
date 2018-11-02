@@ -107,24 +107,76 @@ end
 local function findMisspelledName( nameStr, nameTable )
 	-- Find best match in nameTable
 	local bestMatch = 4 --maximum Levenshtein distance accepted
-	local bestMatchStr
-    
+    local matches = {} --Array of keywords of 4 or less Levenshtein distance from the string the user entered (nameStr)
+    local matchesDist = {} --Coresponding distances for keywords in matches
+
     for entryStr, entry in pairs( nameTable ) do
     	if type(entry) == "table" then
     		local match = app.partialMatchString( nameStr, entryStr )
-    		if match < bestMatch then--Tests if the name is closer to the name the user entered
+    		if match <= bestMatch then--Tests if the keyword is closer to entryStr
+    			table.insert(matches, entryStr) --Inserts the keyword to match array
+    			table.insert(matchesDist, match) --Inserts the coresponding distance to the match distance array
     			bestMatch = match
-    			bestMatchStr = entryStr
 			end
 		end
 	end
 
-	-- Consider it similar if match is greater than threshold
-	if bestMatch < 4 then
-		return bestMatchStr
+	if bestMatch == 4 then --Checks if no good match was found
+		return nil
 	end
-	
-	return nil
+
+	if #matches == 1 then --If there is only one good match return it
+		return matches[1]
+	else --If there is more than one keyword in matches filter out all that are not the closest or tied for closest to nameStr 
+		local temp = {} 
+		for i = 1,#matches do
+			if matchesDist[i] <= bestMatch then
+				table.insert(temp, matches[i] )
+			end
+		end
+		matches = temp
+	end
+
+	if #matches == 1 then --If there is only one match that is the closest to nameStr return it
+		return matches[1]
+	else --Check if the length of the matches is the same as nameStr
+		local temp = {}
+		for i = 1, #matches do
+			if string.len( matches[i] ) == string.len( nameStr ) then
+				table.insert( temp, matches[i])
+			end
+		end
+		matches = temp
+	end
+
+	if #matches == 1 then --If there is only one keyword that is the same length as nameStr return it
+		return matches[1] 
+	else --If there are more than one keyword the same length and distance from nameStr check for first/last character matching
+		for i = 1, #matches do
+			local temp = {}
+			local bonusMatch = 0
+
+			local tempStr = matches[i] --One point for first character matches
+
+			
+			if string.sub(tempStr, 1, 1) == string.sub(nameStr, 1, 1) then
+				bonusMatch =  bonusMatch + 1
+			end
+
+			if string.sub(tempStr, -1, -1) == string.sub(nameStr, -1, -1) then
+				bonusMatch =  bonusMatch + 1
+			end
+
+			if bonusMatch == 2 then--If a keyword has a first and last character match with nameStr return it
+				return matches[i]
+			else
+				table.insert( temp, matches[i] )
+			end
+		end
+		matches = temp
+	end
+
+	return matches[1]
 end
 
 -- Define the variable with the given var structure.

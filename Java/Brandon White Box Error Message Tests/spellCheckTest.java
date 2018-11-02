@@ -7,22 +7,49 @@ public class SpellCheckTest extends Code12Program
 	{
 		//Examples 
 
+		//GameObj
+		GameObj text = ct.text("Hello", 10, 10, 1);
+		int x = text.wdth;
+
+		//Math
+
+		//abs
+		Math.ab();
+		Math.abbs();
+		Math.abs();
+
+		//log
+		Math.log12();
+
+
 		// CT
+
+		//Print
+		ct.print();
 		ct.prin();
 		ct.prant();
 		ct.pront();
 
+		//Println
 		ct.printlnn();
 		ct.prinln();
 		ct.prontln();
 
+		//log
 		ct.lig();
 		ct.lof();
 
+		//logm
 		ct.logn();
-		ct.log<();
-		ct.log,();
 
+		//setOutputFile
+		ct.setOtputFile();
+		ct.setOutputFiles();
+		ct.setOtputFille();
+		ct.seoTutputFile();
+
+
+		//rect
 		ct.rest();
 		ct.rent();
 		ct.recct();
@@ -31,6 +58,7 @@ public class SpellCheckTest extends Code12Program
 		ct.rext();
 		ct.ract();
 
+		//circle
 		ct.circel();
 		ct.circ();
 		ct.cicrle();
@@ -46,8 +74,10 @@ public class SpellCheckTest extends Code12Program
 
 
 		//GameObj
-		GameObj.
-		//Math
+
+		
+
+
 
 		//String
 	}
