@@ -55,7 +55,7 @@ public class DuckHunt extends Code12Program
 		gun.align( "bottom", true );
 
 		// Initialize arrays
-		maxSize = 100;
+		maxSize = 20;
 		bulletsArr = new GameObj[maxSize];
 		ducksArr = new GameObj[maxSize];
 		duckYStartsArr = new double[maxSize];
@@ -125,12 +125,17 @@ public class DuckHunt extends Code12Program
 		}
 
 		// Update ducksHitDisplay
-		int percent = ct.round( 100.0 * ducksHit / (ducksHit + ducksMissed) );
-		ducksHitDisplay.setText( "Ducks hit: " + percent + "%" );
-
+		if ( ducksHit + ducksMissed > 0 )
+		{
+			int percent = ct.round( 100.0 * ducksHit / (ducksHit + ducksMissed) );
+			ducksHitDisplay.setText( "Ducks hit: " + percent + "%" );
+		}
 		// Update accuracyDisplay
-		percent = ct.round( 100.0 * ducksHit / (ducksHit + bulletsMissed) );
-		accuracyDisplay.setText( "Shot Accuracy: " + percent + "%" );
+		if ( ducksHit + bulletsMissed > 0 )
+		{
+			int percent = ct.round( 100.0 * ducksHit / (ducksHit + bulletsMissed) );
+			accuracyDisplay.setText( "Shot Accuracy: " + percent + "%" );
+		}
 	}
 
 	// Makes a bullet at position xStart, yStart that will then

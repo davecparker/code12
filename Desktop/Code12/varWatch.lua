@@ -24,9 +24,8 @@ local varWatch = {
 }
 
 -- UI constants
-local gridShade = 0.5         -- shade for the table gridlines
+local gridShade = 0.8         -- shade for the table gridlines
 local topMargin = 5           -- margin for the top of the variable watch window
-local rowHeight = 20          -- height of each row in the variable display
 local dropDownBtnSize = 10    -- width and height of the drop down buttons
 local margin = app.margin     -- space between UI elements 
 local centerColWidth = 125    -- width of the center column of the variable display
@@ -41,9 +40,8 @@ local displayRows             -- table of rows of the variable display
 local numDisplayableRows      -- number of rows that can currently be displayed
 local xCols                   -- table of x-values for the left of each column
 local charWidth               -- character width of the font used for text objects
+local rowHeight               -- height of each row in the variable display
 local showVarWatch            -- curent value of app.showVarWatch
--- local trackVarRect            -- rectangle for highlighting tracked variable (TODO)
--- local trackedVar              -- Variable currently being tracked (or nil) (TODO)
 
 -- varWatch data
 local vars                    -- array of user program's global variables
@@ -63,7 +61,7 @@ local numGameObjFields = #gameObjFields
 local function getVars()
 	vars = checkJava.globalVars()
 	if vars then
-		local maxVarNameWidth = 100 -- minimum width to ensure space for GameObj fields
+		local maxVarNameWidth = 101 -- minimum width to ensure space for GameObj fields
 		for i = 1, #vars do
 			local var = vars[i]
 			local varNameWidth = string.len( var.nameID.str ) * charWidth
@@ -75,7 +73,7 @@ local function getVars()
 				var.arrayType = javaTypes.typeNameFromVt( vt.vt )
 			end
 		end
-		xCols = { margin, margin + maxVarNameWidth, margin + maxVarNameWidth + centerColWidth }
+		xCols = { margin, margin + maxVarNameWidth + 1, margin + maxVarNameWidth + centerColWidth }
 	end
 end
 
@@ -100,7 +98,7 @@ end
 -- Returns a string for the given GameObj value and field
 local function textForGameObjField( value, field )
 	if value then
-		return " "..tostring(value[field])
+		return tostring(value[field])
 	end
 	return "-"
 end
@@ -126,7 +124,6 @@ local function makeDisplayData()
 			elseif vt == "GameObj" then
 				d.textForValue = textForGameObjValue
 				d.dropDownVisible = 1
-				d.trackableVar = true
 			elseif arrayType then
 				-- d.textForValue = textForArrayValue
 				if value and value.length then
@@ -145,7 +142,7 @@ local function makeDisplayData()
 				for j = 1, numGameObjFields do
 					local gameObjField = gameObjFields[j]
 					d = { var = var, field = gameObjField }
-					d.initRowTexts = { gameObjField, "" }
+					d.initRowTexts = { "."..gameObjField, "" }
 					d.textIndents = indexOrFieldIndents
 					d.textForValue = textForGameObjField
 					displayData[iRow] = d
@@ -156,7 +153,7 @@ local function makeDisplayData()
 				if value then
 					for j = 1, value.length do
 						d = { var = var, index = j }
-						d.initRowTexts = { " ["..(j - 1).."]", "" }
+						d.initRowTexts = { "["..(j - 1).."]", "" }
 						d.textIndents = indexOrFieldIndents
 						local arrVt = vt.vt
 						if arrVt == "String" then
@@ -164,7 +161,6 @@ local function makeDisplayData()
 						elseif arrVt == "GameObj" then
 							d.textForValue = textForGameObjValue
 							d.dropDownVisible = 2
-							d.trackableVar = true
 						else
 							d.textForValue = textForPrimitiveValue
 						end
@@ -175,7 +171,7 @@ local function makeDisplayData()
 							for k = 1, numGameObjFields do
 								local gameObjField = gameObjFields[k]
 								d = { var = var, index = j, field = gameObjField, }
-								d.initRowTexts = { "", gameObjField, "" }
+								d.initRowTexts = { "", "."..gameObjField, "" }
 								d.textIndents = indexAndFieldIndents
 								d.textForValue = textForGameObjField
 								displayData[iRow] = d
@@ -235,33 +231,6 @@ local function onDropDownBtn2( event )
 	adjustScrollbar()
 end
 
--- -- Return the Corona display object associated with trackedVar (TODO)
--- local function getTrackedObj()
--- 	if trackedVar then
--- 		local value
--- 		local trackedIndex = trackedVar.trackedIndex
--- 		if trackedIndex then
--- 			value = ct.userVars[trackedVar.nameID.str][trackedIndex]
--- 		else
--- 			value = ct.userVars[trackedVar.nameID.str]
--- 		end
--- 		if value then
--- 			return value._code12.obj
--- 		end
--- 	end
--- 	return nil
--- end
-
--- -- Turns off the trackVarRect (TODO)
--- local function turnOffTrackVar()
--- 	trackedVar = nil
--- 	if trackVarRect.btn then
--- 		trackVarRect.btn:setState{ isOn = false }
--- 		trackVarRect.btn = nil
--- 	end
--- 	trackVarRect.isVisible = false
--- end
-
 -- Update variable values displayed in the variable watch window
 local function updateValues()
 	if vars then
@@ -292,15 +261,6 @@ local function updateValues()
 				displayRows[i][3].text = textForValue( value[index], field )
 			end
 		end
-		-- if trackedVar then
-		-- 	local trackedObj = getTrackedObj()
-		-- 	if trackedObj then
-		-- 		trackVarRect.x = trackedObj.x
-		-- 		trackVarRect.y = trackedObj.y
-		-- 	else
-		-- 		turnOffTrackVar()
-		-- 	end
-		-- end
 	end
 end
 
@@ -365,39 +325,6 @@ local function onScroll( newPos )
 	end
 end
 
--- -- Event handler for track variable buttons
--- local function onTrackVarBtn( event )
--- 	local btn = event.target
--- 	if not btn.isOn then
--- 		print( "TrackVarBtn off")
--- 		turnOffTrackVar()
--- 	else
--- 		print( "TrackVarBtn on")
--- 		if trackVarRect.btn then
--- 			trackVarRect.btn:setState{ isOn = false }
--- 		end
--- 		trackVarRect.btn = btn
--- 		local d = displayData[btn.rowNumber + scrollOffset]
--- 		trackedVar = d.var
--- 		trackedVar.trackedIndex = d.index
--- 		print("tracking", d.var.nameID.str, "index", d.index)
--- 		local obj = getTrackedObj()
--- 		if not obj then
--- 			print("no obj to track")
--- 			turnOffTrackVar()
--- 		else
--- 			trackVarRect.width = obj.width
--- 			trackVarRect.height = obj.height
--- 			trackVarRect.x = obj.x
--- 			trackVarRect.y = obj.y
--- 			trackVarRect.anchorX = obj.anchorX
--- 			trackVarRect.anchorY = obj.anchorY
--- 			trackVarRect.isVisible = true
--- 			trackVarRect:toFront()
--- 		end
--- 	end
--- end
-
 
 --- Module Functions ---------------------------------------------------------
 
@@ -408,6 +335,7 @@ function varWatch.init()
 	numDisplayableRows = 0
 	scrollOffset = 0
 	charWidth = app.consoleFontCharWidth
+	rowHeight = app.consoleFontHeight + 2
 	Runtime:addEventListener( "enterFrame", onNewFrame )
 end
 
@@ -418,7 +346,6 @@ function varWatch.create( parent, x, y, width, height )
 	varWatch.table = g.makeGroup( group )
 	varWatch.width = width
 	varWatch.height = height
-
 	-- Scrollbar
 	scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )
 end
@@ -441,26 +368,20 @@ function varWatch.addDisplayRows()
 				parent = row,
 				text = d.initRowTexts[colNum],
 				x = xCols[colNum] + d.textIndents[colNum],
-				y = 0,
+				y = 1,
 				font = varFont,
 				fontSize = varFontSize,
 			} )
 		end
 		-- Make row gridlines
-		local x1 = xCols[1]
-		local y1 = row[1].y
 		local gridline
-		if n == 1 then
-			-- horizontal gridline on top of first row
-			gridline = display.newLine( row, x1, y1, x1 + 2000, y1 )
-			gridline:setStrokeColor( gridShade )
-		end
 		-- horizontal gridline on bottom of row
-		y1 = y1 + rowHeight
+		local x1 = xCols[1]
+		local y1 = rowHeight
 		gridline = display.newLine( row, x1, y1, x1 + 2000, y1 )
 		gridline:setStrokeColor( gridShade )
 		-- vertical gridlines
-		for i = 1, numColumns do
+		for i = 2, numColumns do
 			x1 = xCols[i]
 			gridline = display.newLine( row, x1, y1, x1, y1 - rowHeight )
 			gridline:setStrokeColor( gridShade )
@@ -503,17 +424,6 @@ function varWatch.resize( width, height )
 	-- Reposition the scrollbar
 	scrollbar:setPosition( width - Scrollbar.width, 0, height )
 	adjustScrollbar()
-
-	-- -- Resize the trackVarRect
-	-- if trackedVar then
-	-- 	local trackedObj = getTrackedObj()
-	-- 	if trackedObj then
-	-- 		trackVarRect.width = trackedObj.width
-	-- 		trackVarRect.height = trackedObj.height
-	-- 	else
-	-- 		turnOffTrackVar()
-	-- 	end
-	-- end
 end
 
 -- Starts a new run of the varWatch window based on the given width and height

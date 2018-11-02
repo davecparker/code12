@@ -12,7 +12,7 @@
 local app =  {
 	-- Gray shades for the UI
 	toolbarShade = 0.8,
-	extraShade = 0.9,
+	extraShade = 0.95,
 	borderShade = 0.5,
 	enabledShade = 0.3,
 	disabledShade = 0.7,

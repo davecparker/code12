@@ -134,7 +134,7 @@ function runView:create()
 	-- Make the display areas
 	outputGroup = g.makeGroup( sceneGroup, 0, app.dyToolbar )
 	rightBar = g.uiItem( display.newRect( sceneGroup, 0, app.dyToolbar, 0, 0 ), 
-						0.95, app.borderShade )
+						app.extraShade, app.borderShade )
 	paneSplit = g.uiItem( display.newRect( sceneGroup, 0, 0, 0, dyPaneSplit ), 
 						app.toolbarShade, app.borderShade )
 	paneSplit:addEventListener( "touch", onTouchPaneSplit )
