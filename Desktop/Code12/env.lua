@@ -82,13 +82,13 @@ function env.fileModTimeFromPath( path )
 	return lfs.attributes( path, "modification" )
 end
 
--- Run the Open File dialog with the given title.
+-- Run the Open File dialog with the given title, filterPatterns, and filterDescription.
+-- Parameters filterPatterns and filterDescription are optional and ignored in Mac environments.
 -- Return the string pathname chosen or nil if cancelled.
-function env.pathFromOpenFileDialog( title )
-	local filterPatterns, filterDescription
-	if env.isWindows then
-		filterPatterns = "*.java"
-		filterDescription = "Java Files (*.java)"
+function env.pathFromOpenFileDialog( title, filterPatterns, filterDescription )
+	if not env.isWindows then
+		filterPatterns = nil
+		filterDescription = nil
 	end
 	local result = fileDialogs.openFileDialog{
 		title = title,
@@ -182,7 +182,11 @@ function env.findInstalledEditors()
 	else
 		editors = macEditors
 	end
-	
+	-- Add user's saved custom editors
+	for i = 1, #app.customEditors do
+		editors[#editors + 1] = app.customEditors[i]
+	end
+	-- Find installed editors (skipping over duplicate names if the first path is good)
 	env.installedEditors = { { name = "System Default", path = nil } }
 	for i = 1, #editors do
 		local editor = editors[i]

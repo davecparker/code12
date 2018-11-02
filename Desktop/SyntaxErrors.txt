@@ -70,3 +70,11 @@ imort Code12.*;
         double x = ct.random(0, 100)
       c;setFillColor("blue");
       c:setFillColor("blue");
+      int tot 0;
+   void foo(int )
+   void foo(i)
+   void foo(40)
+   void foo(i, x)
+   void foo(int a :)
+   void foo(8, String s)
+   void foo(in a, String s)

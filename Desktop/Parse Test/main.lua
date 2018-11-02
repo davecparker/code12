@@ -8,11 +8,10 @@
 -----------------------------------------------------------------------------------------
 
 
--- The parsing module
 package.path = package.path .. ';../Code12/?.lua'
 local source = require( "source" )
-local javalex = require( "javalex" )
 local parseJava = require( "parseJava" )
+local parseProgram = require( "parseProgram" )
 local err = require( "err" )
 
 
@@ -64,9 +63,11 @@ local function parseTestCode()
 		error( "Cannot open output file " .. treeFilename )
 	end
 
-	-- Init error state for bulk error mode
+	-- Init error state for bulk error mode and parse the source
+	local startTime = system.getTimer()
 	err.initProgram()
 	err.bulkTestMode = true
+	parseProgram.parseLines( 12 )   -- max syntax level 12
 
 	-- Parse input and write output
 	output( "======= Test Started ==========================================" )
@@ -74,80 +75,52 @@ local function parseTestCode()
 	local numUnexpectedErrors = 0
 	local numExpectedErrors = 0
 	local numUncaughtErrors = 0
-	local startTime = system.getTimer()
-	local lineNum = 1
-	local startTokens = nil
-	local iLineStart = nil
-	local iLineCommentStart = nil   -- set when inside a block comment
-	while lineNum <= #source.strLines do
-		local strCode = source.strLines[lineNum]
-		local lineRec = { iLine = lineNum, str = strCode }
-		source.lines[lineNum] = lineRec
+	for lineNum = 1, #source.strLines do
+		local lineRec = source.lines[lineNum]
+		local strCode = lineRec.str
+
+		-- Check for the indicator for the expected errors section
+		if strCode == "// ERRORS" then
+			errorSection = true
+			output( "*** Beginning of Expected Errors Section ***" )
+		end
 
 		-- Output source for this line
 		outFile:write( "\n" .. lineNum .. ". " .. trim1( strCode ) .. "\n" )
 
-		-- Check for the indicator for the expected errors section
-		if strCode == "ERRORS" then
-			errorSection = true
-			output( "************** Beginning of Expected Errors Section **************" )
-		else
-			-- Parse this line  TODO: Use parseProgram?
-			local tree, tokens = parseJava.parseLine( lineRec, iLineCommentStart, 
-									startTokens, iLineStart ) -- TODO: Set and change syntax level?
+		-- Print the parse tree for this line, if any
+		local tree = lineRec.parseTree
+		if tree == false then
+			output( "-- Incomplete line carried forward" )
+		elseif tree and tree.p ~= "blank" then
+			parseJava.printParseTree( tree, 0, outFile )
+		end
 
-			-- Keep track of open block comments
-			if lineRec.openComment then
-				iLineCommentStart = lineRec.iLineCommentStart
+		-- Does this line have an error?
+		local errRec = lineRec.errRec
+		if errRec then
+			-- This line has an error on it. Output it and count the error
+			output( err.getErrString( errRec ) or "**** Missing error state!" )
+			if errorSection then
+				numExpectedErrors = numExpectedErrors + 1
 			else
-				iLineCommentStart = nil
+				numUnexpectedErrors = numUnexpectedErrors + 1
 			end
-
-			if tree == false then
-				-- This line is unfinished, carry the tokens forward to the next line
-				startTokens = tokens
-				if iLineStart == nil then
-					iLineStart = lineNum
-				end
-				outFile:write( "-- Incomplete line carried forward\n" )
-			else
-				startTokens = nil
-				local errRec = err.errRecForLine( lineNum )
-				if errRec then
-					-- This line has an error on it, output it.
-					output( err.getErrString( errRec ) or "*** Missing error state!" )
-
-					-- Count the error
-					if errorSection then
-						numExpectedErrors = numExpectedErrors + 1
-					else
-						numUnexpectedErrors = numUnexpectedErrors + 1
-					end
-				else
-					-- Successful parse. 
-					-- Did we expect an error on this line?
-					if errorSection then
-						-- Ignore blank lines
-						if tree.p ~= "blank" and tree.p ~= "comment" then
-							numUncaughtErrors = numUncaughtErrors + 1
-							outFile:write( "*** Uncaught Error "..numUncaughtErrors.."\n" )
-						end
-					end
-					if tree.p ~= "blank" then
-						-- Output parse tree to output file only
-						parseJava.printParseTree( tree, 0, outFile )
-					end
-				end
+		else
+			-- No error on this line. Did we expect one?
+			if errorSection and tree and tree.p ~= "blank" and tree.p ~= "comment" 
+					and lineRec.iLineStart == lineNum then
+				numUncaughtErrors = numUncaughtErrors + 1
+				outFile:write( "**** Uncaught Error " .. numUncaughtErrors .. "\n" )
 			end
 		end
-		lineNum = lineNum + 1
 	end
 	local endTime = math.round( system.getTimer() - startTime )  -- to nearest ms
 	output( "======= Test Complete =========================================" )
 	output( "" )
 
 	-- Output and display results
-	outputAndDisplay( string.format( "%d lines processed in %d ms", lineNum - 1, endTime ) )
+	outputAndDisplay( string.format( "%d lines processed in %d ms", #source.strLines, endTime ) )
 	outputAndDisplay( "" )
 	outputAndDisplay( string.format( "%d unexpected errors", numUnexpectedErrors ) )
 	outputAndDisplay( string.format( "%d uncaught errors (%d expected errors)", 

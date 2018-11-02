@@ -37,7 +37,7 @@ local parseProgram = {}
 --     { s = "block", iLineBegin, stmts, iLineEnd }
 --
 -- func:
---     { s = "func", iLine, nameID, vt, isPublic, isStatic, paramVars, block }
+--     { s = "func", iLine, nameID, vt, isPublic, isStatic, isError, paramVars, block }
 --
 -- stmt:
 --     { s = "var", iLine, nameID, vt, isConst, isGlobal, initExpr }
@@ -658,7 +658,7 @@ function getLineStmts( tree, stmts )
 
 	-- Add the stmt if successful
 	if stmt then
-		stmt.iLine = tree.iLine
+		stmt.iLine = tree.iLineStart or tree.iLine
 		stmts[#stmts + 1] = stmt
 		checkMultiLineIndent( tree )
 		return true
@@ -700,7 +700,6 @@ function getBlock()
 		if p == "begin" then
 			-- Ad-hoc blocks are not supported
 			err.setErrLineNum( tree.iLine, "Unexpected {" )
-			return nil
 		elseif p == "end" then
 			-- This ends our block
 			if currIndent ~= beginIndent then
@@ -770,14 +769,24 @@ function makeExpr( node )
 	end
 end
 
--- Make and return a function member given the parsed fields,
+-- Make and return a function member given the parsed nodes,
 -- including the contained statements, and move iTree past it.
+-- This function will get called even if the func has isError true
+-- and will try to process the func as much as possible but
+-- will set isError in the func if there is an error.
 -- If there is an error then set the error state and return nil.
 local function getFunc( nodes )
+	-- Any part of the nodes may have errors, so be careful and check
+	-- everything before using it, and set isError if an error is found.
+	local isError = nil
+
 	-- Determine the return type
 	local vt
 	local retType = nodes[2]
-	if retType.p == "void" then
+	if retType.t ~= "retType" or retType.isError then
+		vt = nil 
+		isError = true
+	elseif retType.p == "void" then
 		vt = false
 	else
 		vt = javaTypes.vtFromType( retType.nodes[1], retType.p == "array" )
@@ -786,13 +795,21 @@ local function getFunc( nodes )
 	-- Build the paramVars array
 	local paramVars = {}
 	local paramList = nodes[5]
-	if paramList then
+	if paramList and paramList.nodes then
 		for _, node in ipairs( paramList.nodes ) do
-			local ns = node.nodes
-			if node.p == "array" then
-				paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[4], nil, true )
+			if node.isError then
+				isError = true
 			else
-				paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[2] )
+				local ns = node.nodes
+				if not ns or ns.isError then
+					isError = true
+				else
+					if node.p == "array" then
+						paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[4], nil, true )
+					else
+						paramVars[#paramVars + 1] = makeVar( false, nil, ns[1], ns[2] )
+					end
+				end
 			end
 		end
 	end
@@ -800,13 +817,17 @@ local function getFunc( nodes )
 	-- Get the block
 	local block = getBlock()
 	if block == nil then
-		return nil
+		return nil   -- probably too malformed to even define it with isError
 	end
 
 	-- Make the func
 	local nameID = nodes[3]
-	local func = { s = "func", iLine = nameID.iLine, nameID = nameID, vt = vt,
-					paramVars = paramVars, block = block, entireLine = true }
+	if not nameID or nameID.tt ~= "ID" then
+		return nil   -- can't define it without a name
+	end
+	local func = { s = "func", iLine = nameID.iLine, nameID = nameID,
+					vt = vt, paramVars = paramVars, block = block, 
+					isError = isError, entireLine = true }
 
 	-- Add the access flags and return it
 	local access = nodes[1]
@@ -870,11 +891,17 @@ local function getMembers( programTree )
 		local nodes = tree.nodes
 		iTree = iTree + 1
 
-		if tree.isError then
-			-- Skip lines with syntax errors, but process blocks for bad func headers
-			if p == "func" then
-				getBlock()
+		if p == "func" then
+			-- Handle a func definition as best as possible even if tree.isError,
+			-- to try to maintain the structure and define known functions. 
+			if nodes[3] and nodes[3].str == "main" then
+				skipBlock()    -- skip body of main without checking it
+			else
+				funcs[#funcs + 1] = getFunc( nodes )
 			end
+			gotFunc = true
+		elseif tree.isError then
+			-- Skip misc. lines with syntax errors
 		elseif getVar( p, nodes, vars, true ) then
 			-- Added instance variable(s)
 			-- Code12 does not allow instance variables to follow member functions,
@@ -882,13 +909,6 @@ local function getMembers( programTree )
 			if gotFunc then
 				err.setErrNode( tree, "Class-level variables must be defined at the beginning of the class" )
 			end
-		elseif p == "func" then
-			if nodes[3].str == "main" then
-				skipBlock()    -- skip body of main without checking it
-			else
-				funcs[#funcs + 1] = getFunc( nodes )
-			end
-			gotFunc = true
 		elseif p == "end" then
 			-- The end of the class
 			if tree.indentLevel ~= 0 then
@@ -1020,9 +1040,12 @@ local function printStructureTree( node, indentLevel, file, label )
 	end
 end
 
+
+--- Module Functions ---------------------------------------------------------
+
 -- Parse source.strLines at the given syntaxLevel and store the results
 -- in source.lines, source.numLines, and source.syntaxLevel.
-local function parseLines( syntaxLevel )
+function parseProgram.parseLines( syntaxLevel )
 	-- Set the syntax level and purge the parse cache if it changed
 	if syntaxLevel ~= source.syntaxLevel then
 		source.purgeParseCache()
@@ -1036,39 +1059,29 @@ local function parseLines( syntaxLevel )
 	local lineRecCodePrev = nil     -- the last line so far with code on it
 	local strLines = source.strLines
 	local lines = source.lines
-	local numUnchangedLines = 0
 	local numCachedLines = 0
 	for lineNum = 1, #strLines do
-		local strLine = strLines[lineNum]
-		local lineRec = lines[lineNum]
-
-		-- if we've seen this line before, we may be able to reuse its
+		-- If we've seen this line before, we may be able to reuse its
 		-- cached parse results, but only if we are not in the middle of a 
 		-- block comment or incomplete line.
+		local strLine = strLines[lineNum]
 		local lineRecCached = (iLineCommentStart == nil and startTokens == nil) 
 								and source.lineCacheForStrLine[strLine]
-		if lineRecCached then  -- found in cache so we know its reusable
-			if lineRec and lineRec.str == strLine then
-				-- Same line at same line number as before, we can just reuse it as is
-				-- except that we need to clear the errRec that might have been set
-				-- after parsing
-				numUnchangedLines = numUnchangedLines + 1
-				lineRec.errRec = nil
-			else
-				-- Make a copy of the cached results found for this line number
-				lineRec = {
-					iLine = lineNum,
-					str = strLine,
-					commentStr = lineRecCached.commentStr,
-					hasCode = lineRecCached.hasCode,
-					indentLevel = lineRecCached.indentLevel,
-					indentStr = lineRecCached.indentStr,
-					parseTree = parseJava.copyLineParseTree( lineRecCached.parseTree, lineNum )
-				}
-				lines[lineNum] = lineRec
-				source.lineCacheForStrLine[strLine] = lineRec  -- update cache to newer one
-				numCachedLines = numCachedLines + 1
-			end
+		local lineRec
+		if lineRecCached then
+			-- Make a copy of the cached results found for this line
+			lineRec = {
+				iLine = lineNum,
+				str = strLine,
+				commentStr = lineRecCached.commentStr,
+				hasCode = lineRecCached.hasCode,
+				indentLevel = lineRecCached.indentLevel,
+				indentStr = lineRecCached.indentStr,
+				parseTree = parseJava.copyLineParseTree( lineRecCached.parseTree, lineNum )
+			}
+			lines[lineNum] = lineRec
+			source.lineCacheForStrLine[strLine] = lineRec  -- update cache to newer one
+			numCachedLines = numCachedLines + 1
 		else
 			-- We need to parse this line
 			lineRec = { iLine= lineNum, str = strLine }  
@@ -1123,11 +1136,9 @@ local function parseLines( syntaxLevel )
 	end
 
 	-- Print cache stats
-	print( string.format( "\n%d unchanged lines (%d%%)", 
-				numUnchangedLines, numUnchangedLines * 100 / source.numLines ) )
 	print( string.format( "%d lines copied from cache (%d%%)", 
 				numCachedLines, numCachedLines * 100 / source.numLines ) )
-	local numParsed = source.numLines - numUnchangedLines - numCachedLines
+	local numParsed = source.numLines - numCachedLines
 	print( string.format( "%d lines parsed (%d%%)", 
 				numParsed, numParsed * 100 / source.numLines ) )
 end
@@ -1151,15 +1162,12 @@ local function getParseTrees()
 				iLine = lineNum, iLineStart = lineNum, indentLevel = 0 }
 end
 
-
---- Module Functions ---------------------------------------------------------
-
 -- Parse the source at the given syntaxLevel and return the program structure.
 -- If there is an error then set the error state, and return nil if the error 
 -- is unrecoverable.
 function parseProgram.getProgramTree( syntaxLevel )
 	-- Get the parse trees and init the strucure parse state
-	parseLines( syntaxLevel )
+	parseProgram.parseLines( syntaxLevel )
 	getParseTrees()
 	iTree = 1
 

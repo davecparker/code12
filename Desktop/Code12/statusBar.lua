@@ -7,9 +7,6 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
--- Corona modules and plugins
-local widget = require( "widget" )
-
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
@@ -24,18 +21,6 @@ local statusBar = {}
 local statusBarGroup       -- display group for status bar
 local bgRect               -- background rect
 local fileText             -- filename text object
-local openFileBtn          -- Open in Editor button
-
-
---- Internal Functions ------------------------------------------------
-
--- Open the source file in the system default text editor for its file type
-local function openFileInEditor()
-	local path = source.path
-	if path then
-		env.openFileInEditor( path )
-	end
-end
 
 
 --- Module Functions ------------------------------------------------
@@ -45,7 +30,6 @@ function statusBar.update()
 	-- Set blank status bar if no file
 	if source.path == nil then
 		fileText.text = ""
-		openFileBtn.isVisible = false
 		return
 	end
 
@@ -76,17 +60,12 @@ function statusBar.update()
 		text = text .. " (" .. g.runState .. ")"
 	end 
 	fileText.text = text
-
-	-- Hide the Open button if there isn't enough room
-	local dxNeeded = fileText.contentWidth + openFileBtn.contentWidth + app.margin * 3
-	openFileBtn.isVisible = (app.width > dxNeeded)
 end
 
 -- Resize the status bar
 function statusBar.resize()
 	statusBarGroup.y = app.height - app.dyStatusBar
 	bgRect.width = app.width
-	openFileBtn.x = app.width - app.margin
 	statusBar.update()
 end
 
@@ -104,20 +83,6 @@ function statusBar.create()
 						native.systemFont, app.fontSizeUI )
 	fileText.anchorX = 0
 	fileText:setFillColor( 0 )
-
-	-- Open in Editor button
-	openFileBtn = widget.newButton{
-		x = app.width - app.margin,
-		y = yCenter,
-		onRelease = openFileInEditor,
-		textOnly = true,
-		label = "Open in Editor",
-		labelAlign = "right",
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-	}
-	statusBarGroup:insert( openFileBtn )
-	openFileBtn.anchorX = 1
 
 	-- Set initial state
 	statusBar.update()

@@ -23,10 +23,11 @@ local checkJava = {}
 -- File local state
 local syntaxLevel          -- the language (syntax) level
 
--- Table of variables that are currently defined. 
+-- Tables for variables that are currently defined, and those out of scope. 
 -- These map a name to a var structure. There are also entries of type string 
 -- that map a lowercase version of the name to the name with the correct case.
-local variables = {}
+local variables
+local variablesOutOfScope
 
 -- Table of user-defined methods that are currently defined. 
 -- These map a name to a table in the same format as the apiTables 
@@ -35,13 +36,16 @@ local variables = {}
 --            params = array of { name = str, vt = vtParam, var = var } }
 -- There are also entries of type string 
 -- that map a lowercase version of the name to the name with the correct case.
-local userMethods = {}
+local userMethods
 
 -- Set of funcs for names of event methods that the user has defined (overridden)
-local eventMethodFuncs = {}
+local eventMethodFuncs
+
+-- Array of global var structures in the order they were defined
+local globalVars
 
 -- Stack of local variable names, with an empty name "" marking the beginning of each block
-local localNameStack = {}
+local localNameStack
 
 -- Program processing state
 local beforeStart       -- true when checking code that will run before start()
@@ -69,9 +73,10 @@ end
 -- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
 -- If the name is found and the entry is a record (table) then return the record.
 -- If an entry has an index (name) differing only in case, then set the error state 
--- to a description of the error and return (nil, entryCorrectCase, strCorrectCase). 
+-- to a description of the error unless noError is true, and return 
+-- (nil, entryCorrectCase, strCorrectCase). 
 -- If the name is not found at all then return nil.
-local function lookupID( nameToken, nameTable )
+local function lookupID( nameToken, nameTable, noError )
 	assert( nameToken.tt == "ID" )
 	local name = nameToken.str
 
@@ -95,8 +100,17 @@ local function lookupID( nameToken, nameTable )
 
 	-- Found but wrong case?
 	if strCorrectCase then
-		err.setErrNode( nameToken, 
-				"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
+		if not noError then
+			-- Is the known name something in the program we can reference?
+			local refNode = nil
+			if result.s == "var" then
+				refNode = result.nameID   -- a variable
+			elseif result.func then
+				refNode = result.func.nameID    -- a user function
+			end
+			err.setErrNodeAndRef( nameToken, refNode,
+					"Names are case-sensitive, known name is \"%s\"", strCorrectCase )
+		end
 		return nil, result, strCorrectCase
 	end
 	return nil
@@ -191,13 +205,12 @@ local function defineVar( var )
 
 	-- Check for existing definition
 	local varName = nameNode.str
-	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables )
+	local varFound, varCorrectCase, nameCorrectCase = lookupID( nameNode, variables, true )
 	if varFound then
 		err.setErrNodeAndRef( var, varFound, 
 				"Variable %s was already defined", varName )
 		return false
 	elseif varCorrectCase then
-		err.clearErr( nameNode.iLine )
 		err.setErrNodeAndRef( var, varCorrectCase, 
 				"Variable %s differs only by upper/lower case from existing variable %s", 
 				varName, nameCorrectCase )
@@ -216,8 +229,10 @@ local function defineVar( var )
 		variables[varNameLower] = varName
 	end
 
-	-- Push local variables on the locals stack
-	if not var.isGlobal then
+	-- Add global vars to globalVars and push locals on the locals stack
+	if var.isGlobal then
+		globalVars[#globalVars + 1] = var
+	else
 		localNameStack[#localNameStack + 1] = nameNode.str
 	end
 	return true
@@ -235,7 +250,18 @@ local function getVariable( varNode, isVarAssign )
 	end
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
-		if isVarAssign then
+		-- Variable is undefined. Check old (out of scope) variables and choose an error.
+		local oldVar, oldVarCorrect, oldStrCorrect = 
+				lookupID( varNode, variablesOutOfScope, true )
+		if oldVar then
+			err.setErrNodeAndRef( varNode, oldVar, 
+					"Undefined variable (previous variable %s was defined in a different block)",
+					oldVar.nameID.str )
+		elseif oldStrCorrect then
+			err.setErrNodeAndRef( varNode, oldVarCorrect, 
+					"Undefined variable (previous similar variable %s was defined in a different block)",
+					oldStrCorrect )
+		elseif isVarAssign then
 			err.setErrNode( varNode, 
 					"Variable %s must be declared with a type before being assigned",
 					varNode.str )
@@ -327,13 +353,12 @@ local function defineMethod( func )
 
 	-- User-defined function: Check if already defined
 	local methodFound, methodCorrectCase, nameCorrectCase 
-			= lookupID( nameNode, userMethods )
+			= lookupID( nameNode, userMethods, true )
 	if methodFound then
 		err.setErrNodeAndRef( func, methodFound.func, 
 				"Function %s was already defined", fnName )
 		return
 	elseif methodCorrectCase then
-		err.clearErr( nameNode.iLine )
 		err.setErrNodeAndRef( func, methodCorrectCase.func, 
 				"Function %s differs only by upper/lower case from existing function %s", 
 				fnName, nameCorrectCase )
@@ -652,6 +677,9 @@ local function vtCheckCall( call )
 		return nil
 	end
 	local refFunc = method.func   -- for user-defined methods, nil for API
+	if refFunc and refFunc.isError then
+		return nil     -- don't check calls to funcs with isError
+	end
 
 	-- Check parameter count
 	local exprs = call.exprs
@@ -695,10 +723,9 @@ local function vtCheckCall( call )
 		local vtPassed = expr.vt
 		local vtNeeded = method.params[i].vt
 		if not javaTypes.vtCanAcceptVtExpr( vtNeeded, vtPassed ) then
-			print(call.class, method.name)
 			err.setErrNodeAndRef( expr, refFunc, 
-					"Parameter #%d of %s (%s) expects type %s, but %s was passed",
-					i, fnName, method.params[i].name, 
+					"Parameter #%d (%s) of %s expects type %s, but %s was passed",
+					i, method.params[i].name, fnName,
 					javaTypes.typeNameFromVt( vtNeeded ), 
 					javaTypes.typeNameFromVt( vtPassed ),
 					{ docLink = method.docLink } )
@@ -722,7 +749,7 @@ local function beginLocalBlock( paramVars )
 	end
 end
 
--- End a local variable block, discarding any definitions in the top block
+-- End a local variable block, moving any definitions in the top block out of scope
 local function endLocalBlock()
 	local iTop = #localNameStack
 	while iTop > 0 do
@@ -736,9 +763,13 @@ local function endLocalBlock()
 			break
 		end
 
-		-- Remove the definition of this variable and lowercase version too
+		-- Move the definition of this variable to variablesOutOfScope
+		-- and the lowercase version too
+		variablesOutOfScope[varName] = variables[varName]
+		local nameLower = string.lower( varName )
+		variablesOutOfScope[nameLower] = variables[nameLower]
 		variables[varName] = nil
-		variables[string.lower( varName )] = nil
+		variables[nameLower] = nil
 	end
 end
 
@@ -1298,8 +1329,10 @@ function checkJava.checkProgram( programTree, level )
 	-- Init program state
 	syntaxLevel = level
 	variables = {}
+	variablesOutOfScope = {}
 	userMethods = {}
 	eventMethodFuncs = {}
+	globalVars = {}
 	localNameStack = {}
 	beforeStart = true
 	currentFunc = nil
@@ -1345,6 +1378,11 @@ function checkJava.checkProgram( programTree, level )
 	end
 end
 
+-- Return an array of var structures for the user global variables
+-- in the order they were defined in the program.
+function checkJava.globalVars()
+	return globalVars
+end
 
 ------------------------------------------------------------------------------
 

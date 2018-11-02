@@ -17,7 +17,7 @@ settings =
     {
 		defaultViewWidth = 600,
 		defaultViewHeight = 800,
-		minViewWidth = 200,
+		minViewWidth = 320,
 		minViewHeight = 200,
 		resizable = true,
 		enableMaximizeButton = true,
