@@ -316,7 +316,7 @@ local function onNewFrame()
 			-- remake display data
 			makeDisplayData()
 			if topData then
-				-- set scrollOffset to make the first row as close as we can get to the previous first row before the change in display data
+				-- set scrollOffset to make the first row as close as we can to the prev first row before the change to displayData
 				local topVarFound = false
 				scrollOffset = 0
 				for i = 1, #displayData do
