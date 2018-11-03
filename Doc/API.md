@@ -1,5 +1,5 @@
-Code 12 API Documentation
-=========================
+% Code12 API Documentation
+
 The design of the Code 12 API is (c)Copyright 2018 by David C. Parker.
 
 ##### Global (ct) APIs
@@ -27,7 +27,6 @@ The design of the Code 12 API is (c)Copyright 2018 by David C. Parker.
 * [Color Names](#color-names)
 * [Key Names](#key-names)
 
-_____________________________________________________________________
 Text Output
 -----------
 
@@ -91,7 +90,6 @@ relative path starting from the source code folder, such as
 > `ct.setOutputFile()` to a certain filename, it will overwrite the
 > previous file. 
 
-_____________________________________________________________________
 Alerts and Input Dialogs
 ------------------------
 
@@ -147,7 +145,6 @@ The resulting String value is returned.
 > If the user presses the Enter key without entering any other
 > characters, then an empty string (`""`) will be returned.
 
-_____________________________________________________________________
 Screen Management
 -----------------
 
@@ -336,7 +333,6 @@ then the main project folder is checked first, followed by
 the `Code12/images` folder if not found in the project folder.
 
 
-_____________________________________________________________________
 GameObj Creation
 ----------------
 
@@ -412,7 +408,7 @@ Return the `GameObj` reference to the image object.
 
 The image file must be in PNG or JPG format.
 
-_____________________________________________________________________
+
 Mouse and Keyboard Input
 ------------------------
 ### ct.clicked()
@@ -494,7 +490,7 @@ will detect any time that the given character is typed.
 > will get a `true` result continuously (60 times per second),
 > and no delay after the first one.
 
-_____________________________________________________________________
+
 Audio
 -----
 ### ct.loadSound()
@@ -534,7 +530,7 @@ to `volume`, which should be between 0.0 and 1.0.
 The default sound volume is 1.0. If the volume is decreased
 then sounds are attenuated relative to the volume they were recorded at.
 
-_____________________________________________________________________
+
 Math and Misc.
 --------------
 ### ct.random()
@@ -631,7 +627,7 @@ function.
 > are running standalone under the Java runtime outside of the 
 > Code12 environment.
 
-_____________________________________________________________________
+
 Type Conversion
 ---------------
 ### ct.parseInt()
@@ -687,7 +683,7 @@ Return the value of `number` converted to a string.
 If numDigits is included, then format to this many digits,
 adding leading zeros as necessary.
 
-_____________________________________________________________________
+
 GameObj Public Data Fields
 --------------------------
 `GameObj` objects are graphics objects visible on the screen.
@@ -842,7 +838,7 @@ that will cause the function `ct.clearGroup()` to delete all objects with
 the matching group name. The default group name of an object is ""
 (empty string)
 
-_____________________________________________________________________
+
 GameObj Methods
 ---------------
 The following method functions must be called on an existing `GameObj`
@@ -1060,7 +1056,7 @@ will be considered.
 > matching object intersects `obj`, so you must check the return value
 > for `null` before using the `GameObj` returned.
 
-_____________________________________________________________________
+
 Java Math Class Methods and Fields Supported
 --------------------------------------------
 The following fields and functions from the Java `Math` class are supported.
@@ -1091,7 +1087,7 @@ double  Math.sqrt( double number )
 double  Math.tan( double angle )
 double  Math.tanh( double angle )
 ```
-_____________________________________________________________________
+
 Java String Class Methods Supported
 -----------------------------------
 The following methods from the Java `String` class are supported.
@@ -1106,7 +1102,7 @@ String   str.toLowerCase()
 String   str.toUpperCase()
 String   str.trim()
 ```
-_____________________________________________________________________
+
 Events
 ------
 The following functions, if defined in your program, will be called when
@@ -1266,7 +1262,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 > Some systems resize windows continuously in response to the user re-sizing
 > the window frame, so you may receive many `onResize` events in succession.
 
-_____________________________________________________________________
+
 Appendix: Pre-Defined Names
 ---------------------------
 

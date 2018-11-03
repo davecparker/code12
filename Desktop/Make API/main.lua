@@ -19,7 +19,7 @@ local err = require( "err" )
 
 
 -- Input and output files
-local apiSummaryFile = "../../API Summary.txt"
+local apiSummaryFile = "../../Doc/API Summary.txt"
 local apiTablesFile = "../Code12/apiTables.lua"
 local outFile           -- output Lua file
 
@@ -191,17 +191,18 @@ end
 -- given method name of the given class name, or nil if none.
 local function docLinkForMethod( className, methodName )
 	if className == "ct" then   
-		-- e.g. "#ct-circle-" for ct.circle
-		return "#ct-" .. string.lower( methodName ) .. "-"
+		-- e.g. "#ct.circle" for API ct.circle
+		return "#ct." .. string.lower( methodName )
 	elseif className == "GameObj" then   
-		-- e.g. "#obj-gettext-" for GameObj.getText
-		return "#obj-" .. string.lower( methodName ) .. "-"
+		-- e.g. "#obj.gettext" for method GameObj.getText
+		return "#obj." .. string.lower( methodName )
+	elseif className == "Code12Program" then
+		-- e.g. "#clickable" for field GameObj.clickable
+		return "#" .. string.lower( methodName )
 	elseif className == "Math" then
 		return "#java-math-class-methods-and-fields-supported"
 	elseif className == "String" then
 		return "#java-string-class-methods-supported"
-	elseif className == "Code12Program" then
-		return "#" .. string.lower( methodName )
 	end
 	return nil
 end
