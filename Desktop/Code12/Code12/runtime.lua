@@ -232,7 +232,7 @@ function runtime.blockAndYield(...)
 	end
 end
 
--- Handle a window resize (relevant for a standalone resizeable app)
+-- Handle a resize of the available output area
 function runtime.onResize()
 	-- Remember old height and get new metrics
 	local oldHeight = g.height

@@ -26,25 +26,34 @@ local runView = composer.newScene()
 
 
 -- UI metrics
-local dyPaneSplit = 10
-local defaultConsoleLines = 10
+local dxyPaneSplit = 10
+-- local defaultConsoleLines = 10    -- TODO: review/use
 
 -- Display objects and groups
 local outputGroup              -- display group for program output area
 local rightBar                 -- clipping bar to the right of the output area
-local paneSplit                -- pane split area
+local paneSplitConsole         -- pane split between output and console
+local paneSplitRight           -- pane split between output and varWatch window
 local lowerGroup               -- display area below the pane split
 
--- Program state
-local minConsoleHeight         -- min height of the console window (from pane split)
+-- UI state
 local paneDragOffset           -- when dragging the pane split
+local outputRatio              -- fraction of available height taken by output area
 
 
 --- Internal Functions ------------------------------------------------
 
+-- Return the available width for the output area
+local function maxOutputWidth()
+	if app.showVarWatch then
+		return app.width - dxyPaneSplit
+	end
+	return app.width
+end
+
 -- Return the available height for the output area
-local function outputAreaHeight()
-	return app.height - app.dyToolbar - app.dyStatusBar - minConsoleHeight - dyPaneSplit
+local function maxOutputHeight()
+	return app.height - app.dyToolbar - app.dyStatusBar - dxyPaneSplit
 end
 
 -- Return the available width and height for the variable watch window
@@ -54,58 +63,90 @@ end
 
 -- Position the display panes
 local function layoutPanes()
-	-- Determine size of the top area (game or error output)
+	-- Get the size of the program's graphics output area
 	local width = app.outputWidth
 	local height = app.outputHeight
 
-	-- Position the right bar and variable watch group
-	rightBar.x = width + 1
+	-- Position the right pane split, right bar, and variable watch group
+	-- The right pane spit is hidden if the varWatch has nothing to display.
+	if app.showVarWatch then
+		paneSplitRight.isVisible = true
+		paneSplitRight.x = width + 1
+		paneSplitRight.height = app.height  -- more than enough
+		rightBar.x = paneSplitRight.x + dxyPaneSplit + 1
+	else
+		paneSplitRight.isVisible = false
+		rightBar.x = width + 1
+	end
 	rightBar.width = app.width    -- more than enough
 	rightBar.height = app.height  -- more than enough
 	varWatch.group.x = rightBar.x
 	varWatch.resize( varWatchWidthAndHeight() )
 
-	-- Position the pane split and lower group
-	paneSplit.y = app.dyToolbar + height
-	paneSplit.width = app.width
-	lowerGroup.y = paneSplit.y + dyPaneSplit + 1
+	-- Position the console pane split and lower group
+	paneSplitConsole.y = outputGroup.y + height
+	paneSplitConsole.width = app.width
+	lowerGroup.y = paneSplitConsole.y + dxyPaneSplit + 1
 	local consoleHeight = app.height - lowerGroup.y - app.dyStatusBar
 	console.resize( app.width, consoleHeight )
 end
 
--- Runtime callback to set the output size being used
-local function setClipSize( widthP, heightP )
+-- Runtime callback to set the output pixel size being used
+local function setOutputSize( widthP, heightP )
 	app.outputWidth = math.floor( widthP )
 	app.outputHeight = math.floor( heightP )
 	layoutPanes()
 end
 
--- Window resize handler
-local function onResize()
-	-- Calculate the output space and tell the runtime we resized. 
+-- Resize the output area using width and height as the available space,
+-- or the max available size for either if nil.
+-- If split then the resize is due to a split bar move, else a window resize.
+local function resizeOutputArea( width, height, split )
+	-- Get maximum available area
+	local maxWidth = maxOutputWidth()
+	local maxHeight = maxOutputHeight()
+
+	-- Set the desired output size and tell the runtime it resized. 
 	-- This will result in a call to ct.setHeight() internally, 
-	-- which will then call us back at setClipSize().
-	app.getWindowSize()
-	runtime.appContext.widthP = math.max( app.width, 1 )
-	runtime.appContext.heightP = math.max( outputAreaHeight(), 1 )
-	if runtime.onResize then
-		runtime.onResize()
+	-- which will then call us back at setOutputSize() with the 
+	-- resulting size as constrained by the program's aspect ratio.
+	runtime.appContext.widthP = g.pinValue( width or maxWidth, 1, maxWidth )
+	runtime.appContext.heightP = g.pinValue( height or maxHeight, 1, maxHeight )
+	runtime.onResize()
+
+	-- Remember the user's desired output to console proportion if a split adjust
+	if split then
+		outputRatio = app.outputHeight / maxHeight
 	end
 end
 
--- Handle touch events on the pane split area.
--- Moving the split pane changes the minimum console height
-local function onTouchPaneSplit( event )
+-- Handle touch events on the console pane split.
+local function onTouchPaneSplitConsole( event )
 	local phase = event.phase
 	if phase == "began" then
-		g.setFocusObj( paneSplit )
-		paneDragOffset = event.y - lowerGroup.y
-	elseif g.focusObj == paneSplit and phase ~= "cancelled" then
-		-- Compute and set new console size below pane split
+		g.setFocusObj( paneSplitConsole )
+		paneDragOffset = event.y - paneSplitConsole.y
+	elseif g.focusObj == paneSplitConsole and phase ~= "cancelled" then
+		-- The console split affects the available output area height.
 		local y = event.y - paneDragOffset
-		minConsoleHeight = g.pinValue( app.height - y - app.dyStatusBar,
-				0, app.height - app.dyStatusBar )
-		onResize()
+		resizeOutputArea( nil, y - outputGroup.y, true )
+	end
+	if phase == "ended" or phase == "cancelled" then
+		g.setFocusObj(nil)
+	end
+	return true
+end
+
+-- Handle touch events on the right pane split.
+local function onTouchPaneSplitRight( event )
+	local phase = event.phase
+	if phase == "began" then
+		g.setFocusObj( paneSplitRight )
+		paneDragOffset = event.x - paneSplitRight.x
+	elseif g.focusObj == paneSplitRight and phase ~= "cancelled" then
+		-- The right split affects the available output area width.
+		local x = event.x - paneDragOffset
+		resizeOutputArea( x, nil, true )
 	end
 	if phase == "ended" or phase == "cancelled" then
 		g.setFocusObj(nil)
@@ -129,32 +170,36 @@ function runView:create()
 	-- Background rect
 	g.uiWhite( display.newRect( sceneGroup, 0, 0, 10000, 10000 ) ) 
 
-	-- Make the display areas
+	-- Make the display items
 	outputGroup = g.makeGroup( sceneGroup, 0, app.dyToolbar )
-	rightBar = g.uiItem( display.newRect( sceneGroup, 0, app.dyToolbar, 0, 0 ), 
+	rightBar = g.uiItem( display.newRect( sceneGroup, 0, outputGroup.y, 0, 0 ), 
 						app.extraShade, app.borderShade )
-	paneSplit = g.uiItem( display.newRect( sceneGroup, 0, 0, 0, dyPaneSplit ), 
+	paneSplitRight = g.uiItem( display.newRect( sceneGroup, 0, rightBar.y, 
+							dxyPaneSplit, 0 ), 
 						app.toolbarShade, app.borderShade )
-	paneSplit:addEventListener( "touch", onTouchPaneSplit )
+	paneSplitRight:addEventListener( "touch", onTouchPaneSplitRight )
+	paneSplitConsole = g.uiItem( display.newRect( sceneGroup, 0, 0, 0, dxyPaneSplit ), 
+						app.toolbarShade, app.borderShade )
+	paneSplitConsole:addEventListener( "touch", onTouchPaneSplitConsole )
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
-	varWatch.create( sceneGroup, rightBar.x, rightBar.y, 0, 0 )
+	varWatch.create( sceneGroup, 0, rightBar.y, 0, 0 )
 
 	-- Layout the display areas
-	minConsoleHeight = app.consoleFontHeight * defaultConsoleLines
-	app.outputWidth = app.width
-	app.outputHeight = outputAreaHeight()
+	app.outputWidth = maxOutputWidth()
+	app.outputHeight = maxOutputHeight()
 	layoutPanes()
+	outputRatio = app.outputHeight / maxOutputHeight()
 
 	-- Install resize handler
-	Runtime:addEventListener( "resize", onResize )
+	Runtime:addEventListener( "resize", self )
 
 	-- Set appContext data related to the view
 	local appContext = runtime.appContext
 	appContext.outputGroup = outputGroup
 	appContext.widthP = app.outputWidth
 	appContext.heightP = app.outputHeight
-	appContext.setClipSize = setClipSize
+	appContext.setClipSize = setOutputSize
 	appContext.clearConsole = console.clear
 	appContext.print = console.print
 	appContext.println = console.println
@@ -183,6 +228,14 @@ function runView:hide( event )
 			varWatch.hide()
 		end
 	end
+end
+
+-- Window resize handler
+function runView:resize()
+	-- Get the new window size and calculate a new output height,
+	-- trying to keep the outputRatio about the same.
+	app.getWindowSize()
+	resizeOutputArea( nil, maxOutputHeight() * outputRatio )
 end
 
 
