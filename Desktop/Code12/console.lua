@@ -14,55 +14,95 @@ local Scrollbar = require( "Scrollbar" )
 
 
 -- The console module
-local console = {
-	group = nil,             -- the console display group
-	scrollbar = nil,         -- the console scrollbar (a Scrollbar)
-}
+local console = {}
 
 -- UI constants
 local textMargin = 5                 -- margin for text items
-local maxLineLength = 500            -- max line length (since we clip and don't wrap)
+local maxLineLength = 500            -- max line length to allow
 local rgbTextDefault = { 0, 0, 0 }   -- default text color is black
 
--- Display state
-local bg                     -- background rect
-local textObjs = {}          -- array of text display objects
-local numDisplayLines = 0    -- number of lines we can display
+-- Computed metrics
 local fontHeight             -- measured font height
 local fontCharWidth          -- measured font char width
+
+-- Display objects
+local consoleGroup           -- display group for the console
+local textGroup              -- display group for text lines within consoleGroup
+local scrollbarV             -- vertical scrollbar
+local scrollbarH             -- horizontal scrollbar
+local bg                     -- background rect
+local textObjs = {}          -- array of text display objects
 
 -- Console data
 local completedLines         -- array of strings for completed text lines
 local rgbForLine             -- map line number to color to use (rgb 3-array) if any
 local currentLineStrings     -- array of strings making up the current line
 local currentLineLength      -- number of chars in current line
+local longestLineLength      -- number of chars in longest line
+
+-- Console display state
+local numDisplayLines        -- number of text lines we can display 
 local scrollStartLine        -- starting line if scrolled back or nil if at end
-local changed = false        -- true when contents have changed since last update 
+local changed = false        -- true when contents have changed since last update
+local resized = false        -- true if update needs to consider text area resize 
 
 
 --- Internal Functions ---------------------------------------------------------
 
--- Update the console
+-- Update the console as necessary
 local function updateConsole()
-	-- Determine number of lines we have to display
+	-- Determine number of data lines we have to display
 	local numCompletedLines = #completedLines
-	local hasIncompleteLine = (#currentLineStrings > 0)
 	local numLines = numCompletedLines
+	local hasIncompleteLine = (#currentLineStrings > 0)
 	if hasIncompleteLine then
 		numLines = numLines + 1
 	end
 
-	-- Load text lines into the text objects
+	-- Load text lines into the text objects and adjust scrollbars
 	local iText = 1
 	if numLines == 0 then
-		console.scrollbar:hide()
+		numDisplayLines = 0
 	else
-		-- Use scrollStartLine if any, otherwise use the scroll position 
+		-- Check horizontal scroll state if needed
+		if resized then
+			local dyLongestLine = longestLineLength * fontCharWidth + textMargin * 2
+			local textWidth = bg.width - Scrollbar.width
+			local textHeight = bg.height
+			if dyLongestLine <= textWidth then
+				scrollbarH:hide()
+				textGroup.x = 0
+			else
+				textGroup.x = -scrollbarH:adjust( 0, dyLongestLine - textWidth, 
+						-textGroup.x, textWidth / dyLongestLine )
+				textHeight = textHeight - Scrollbar.width
+				scrollbarH:setPosition( 0, textHeight, textWidth )
+			end
+			scrollbarV:setPosition( textWidth, 0, textHeight )
+			numDisplayLines = math.floor( (textHeight - textMargin ) / fontHeight )
+		end
+
+		-- Make sure we have enough text objects
+		local n = #textObjs 
+		while n < numDisplayLines do
+			n = n + 1
+			textObjs[n] = g.uiBlack ( display.newText{
+				parent = textGroup,
+				text = "",
+				x = textMargin,
+				y = textMargin + (n - 1) * fontHeight,
+				font = app.consoleFont,
+				fontSize = app.consoleFontSize,
+				align = "left",
+			} )
+		end
+
+		-- Use scrollStartLine if any, otherwise use the vertical scroll position 
 		-- that shows the end of the output.
 		local lastStartLine = math.max( numLines - numDisplayLines + 1, 1 )
 		local startLine = scrollStartLine or lastStartLine
 		local ratio = numDisplayLines / numLines
-		console.scrollbar:adjust( 1, lastStartLine, startLine, ratio )
+		scrollbarV:adjust( 1, lastStartLine, startLine, ratio )
 
 		-- Load the completed lines
 		local iLine = startLine
@@ -91,32 +131,38 @@ end
 
 -- Update the console if needed
 local function onNewFrame()
-	if changed and console.group then
+	if changed and consoleGroup then
 		updateConsole()
 		changed = false
+		resized = false
 	end
 end
 
--- Scroll callback for the console scrollbar
-local function onScroll( newPos )
-	scrollStartLine = newPos
+-- Scroll callback for the vertical scrollbar
+local function onScrollVert( newPos )
+	if scrollbarV:atRangeMax() then
+		scrollStartLine = nil
+	else
+		scrollStartLine = newPos
+	end
 	changed = true
 end
 
--- Scroll to the end of the text in the console
--- local function scrollToEnd()
--- 	if scrollStartLine then
--- 		scrollStartLine = nil
--- 		updateConsole()
--- 	end
--- end
+-- Scroll callback for the horizontal scrollbar
+local function onScrollHorz( newPos )
+	textGroup.x = -newPos
+end
 
 -- Add raw text to the console. The text should not contain any newlines.
 local function addText( text )
-	-- Ignore if the current line is really long and will clip anyway
+	-- Ignore if the current line is really long
 	if currentLineLength < maxLineLength then
 		currentLineStrings[#currentLineStrings + 1] = text
 		currentLineLength = currentLineLength + string.len( text )
+		if currentLineLength > longestLineLength then
+			longestLineLength = currentLineLength
+			resized = true
+		end
 		changed = true
 	end
 end
@@ -183,12 +229,29 @@ end
 
 -- Clear the console data and view
 function console.clear()
+	-- Init/clear console data
 	completedLines = {}
 	rgbForLine = {}
 	currentLineStrings = {}
 	currentLineLength = 0
+	longestLineLength = 0
+
+	-- Reset display state
+	numDisplayLines = 0
 	scrollStartLine = nil
 	changed = true
+	resized = true
+
+	-- Adjust display objects if necessary
+	if textGroup then
+		textGroup.x = 0
+	end
+	if scrollbarV then
+		scrollbarV:hide()
+	end
+	if scrollbarH then
+		scrollbarH:hide()
+	end
 end
 
 -- Resize the console to fit the given size
@@ -197,50 +260,36 @@ function console.resize( width, height )
 	bg.width = width
 	bg.height = height
 
-	-- Determine number of display lines and adjust the scrollbar
-	numDisplayLines = math.floor( (height - textMargin ) / fontHeight )
-	console.scrollbar:setPosition( width - Scrollbar.width, 0, height )
-
-	-- Make sure we have enough text objects
-	local n = #textObjs 
-	while n < numDisplayLines do
-		n = n + 1
-		textObjs[n] = g.uiBlack ( display.newText{
-			parent = console.group,
-			text = "",
-			x = textMargin,
-			y = textMargin + (n - 1) * fontHeight,
-			font = app.consoleFont,
-			fontSize = app.consoleFontSize,
-			align = "left",
-		} )
-	end
-	console.scrollbar:toFront()
-	changed = true  -- may need to display additional lines
+	-- Request full update
+	changed = true
+	resized = true
+	updateConsole()
 end
 
--- Create the console display group and store it in console.group
+-- Create the console display group and store it in consoleGroup
 function console.create( parent, x, y, width, height )
-	local group = g.makeGroup( parent, x, y )
-	console.group = group
+	-- Make the console group
+	consoleGroup = g.makeGroup( parent, x, y )
 
 	-- White background
-	bg = g.uiWhite( display.newRect( group, 0, 0, width, height ) )
+	bg = g.uiWhite( display.newRect( consoleGroup, 0, 0, width, height ) )
 	bg:addEventListener( "touch", onTouchConsole )
 
-	-- Scrollbar
-	console.scrollbar = Scrollbar:new( group, width - Scrollbar.width, 0, height, onScroll )
-	console.scrollbar:adjust( 0, 100, 10, 25 )
-
-	-- Set the initial size
-	console.resize( width, height )
+	-- Text group and scrollbars
+	textGroup = g.makeGroup( consoleGroup, 0, 0 )
+	scrollbarV = Scrollbar:new( consoleGroup, width - Scrollbar.width, 0, 
+								height, onScrollVert )
+	scrollbarH = Scrollbar:new( consoleGroup, 0, height - Scrollbar.width, 
+								width, onScrollHorz, true )
 end
 
--- Init the console
+-- Do one-time initialization for the console
 function console.init()
-	-- Get font metrics of console font
+	-- Get height of console font
 	local metrics = graphics.getFontMetrics( app.consoleFont, app.consoleFontSize )
 	fontHeight = math.round( metrics.height ) + 2   -- leading is reported as 0 for our font
+	app.consoleFontHeight = fontHeight
+
 	-- Get char width by measuring a text object since not in font metrics
 	local temp1 = display.newText( "-", 0, 0, app.consoleFont, app.consoleFontSize )
 	local temp11 = display.newText( "-1234567890", 0, 0, app.consoleFont, app.consoleFontSize )
@@ -248,7 +297,6 @@ function console.init()
 	temp1:removeSelf()
 	temp11:removeSelf()
 	app.consoleFontCharWidth = fontCharWidth
-	app.consoleFontHeight = fontHeight
 
 	-- Start out empty
 	console.clear()

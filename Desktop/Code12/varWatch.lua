@@ -318,14 +318,11 @@ end
 local function onScroll( newPos )
 	local numDisplayData = #displayData
 	local numDisplayRows = #displayRows
-	if newPos and scrollOffset ~= newPos then
+	if scrollOffset ~= newPos then
 		scrollOffset = newPos
 		scrollOffsetChanged = true
-	elseif not newPos and scrollOffset ~= numDisplayData - numDisplayRows then
-		scrollOffset = numDisplayData - numDisplayRows
-		scrollOffsetChanged = true
 	end
-	if (not newPos or newPos == 0) and numDisplayData <= numDisplayRows then
+	if newPos == 0 and numDisplayData <= numDisplayRows then
 		scrollbar:hide()
 	end
 end
