@@ -27,7 +27,6 @@ local runView = composer.newScene()
 
 -- UI metrics
 local dxyPaneSplit = 10
--- local defaultConsoleLines = 10    -- TODO: review/use
 
 -- Display objects and groups
 local outputGroup              -- display group for program output area
@@ -38,7 +37,8 @@ local lowerGroup               -- display area below the pane split
 
 -- UI state
 local paneDragOffset           -- when dragging the pane split
-local outputRatio              -- fraction of available height taken by output area
+local outputRatio              -- fraction of app height taken by output area
+local showVarWatchLast         -- last known value of app.showVarWatch
 
 
 --- Internal Functions ------------------------------------------------
@@ -66,9 +66,10 @@ local function layoutPanes()
 	-- Get the size of the program's graphics output area
 	local width = app.outputWidth
 	local height = app.outputHeight
+	print("layout panes", width, height)
 
 	-- Position the right pane split, right bar, and variable watch group
-	-- The right pane spit is hidden if the varWatch has nothing to display.
+	-- The right pane spit is hidden if the varWatch window is off.
 	if app.showVarWatch then
 		paneSplitRight.isVisible = true
 		paneSplitRight.x = width + 1
@@ -100,8 +101,8 @@ end
 
 -- Resize the output area using width and height as the available space,
 -- or the max available size for either if nil.
--- If split then the resize is due to a split bar move, else a window resize.
-local function resizeOutputArea( width, height, split )
+-- If keep then remember the vertical split ratio to use for window resizes.
+local function resizeOutputArea( width, height, keep )
 	-- Get maximum available area
 	local maxWidth = maxOutputWidth()
 	local maxHeight = maxOutputHeight()
@@ -114,10 +115,29 @@ local function resizeOutputArea( width, height, split )
 	runtime.appContext.heightP = g.pinValue( height or maxHeight, 1, maxHeight )
 	runtime.onResize()
 
-	-- Remember the user's desired output to console proportion if a split adjust
-	if split then
+	-- Remember the user's desired output to console proportion if asked for
+	if keep then
 		outputRatio = app.outputHeight / maxHeight
 	end
+end
+
+-- Set a default layout for the output areas
+local function setDefaultLayout()
+	-- Get available size
+	local width = maxOutputWidth()
+	local maxHeight = maxOutputHeight()
+	local height = maxHeight
+
+	-- If the varWatch window is enabled then make at least some room for it
+	if app.showVarWatch then
+		width = math.max( width * 0.5, width - 200 )
+	end
+
+	-- Make sure at least some console is showing
+	height = math.max( height * 0.75, height - 200 )
+
+	-- Set the layout
+	resizeOutputArea( width, height, true )
 end
 
 -- Handle touch events on the console pane split.
@@ -184,15 +204,7 @@ function runView:create()
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
 	varWatch.create( sceneGroup, 0, rightBar.y, 0, 0 )
-
-	-- Layout the display areas
-	app.outputWidth = maxOutputWidth()
-	app.outputHeight = maxOutputHeight()
-	layoutPanes()
-	outputRatio = app.outputHeight / maxOutputHeight()
-
-	-- Install resize handler
-	Runtime:addEventListener( "resize", self )
+	setOutputSize( maxOutputWidth(), maxOutputHeight() )
 
 	-- Set appContext data related to the view
 	local appContext = runtime.appContext
@@ -205,18 +217,30 @@ function runView:create()
 	appContext.println = console.println
 	appContext.runtimeErr = showRuntimeError
 	appContext.arrayAssigned = varWatch.arrayAssigned
+
+	-- Install window resize handler
+	Runtime:addEventListener( "resize", self )
 end
 
 -- Prepare to show the runView scene
 function runView:show( event )
 	if event.phase == "did" then
-		-- Automatically run a new program
 		if g.runState == nil then
+			-- Automatically run a new program
 			runtime.run()
+			setDefaultLayout()
 			if app.showVarWatch then
 				varWatch.startNewRun( varWatchWidthAndHeight() )
 			end
+		elseif app.showVarWatch ~= showVarWatchLast then
+			-- Reset layout when app.showVarWatch changes
+			if app.showVarWatch then
+				setDefaultLayout()
+			else
+				layoutPanes()
+			end
 		end
+		showVarWatchLast = app.showVarWatch
 	end
 end
 
