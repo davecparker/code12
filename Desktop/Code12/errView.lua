@@ -288,7 +288,7 @@ end
 local function showDocs( show )
 	if show then
 		docsWebView.isVisible = true
-		local url = "API.html"
+		local url = "docs/API.html"
 		if errRec.docLink then
 			url = url .. errRec.docLink
 		end
