@@ -24,7 +24,7 @@ local getFile = composer.newScene()
 
 -- UI Metrics
 local margin = app.margin       -- Distance between most UI elements
-local extraMargin = margin * 4  -- Extra distance between UI sections
+local extraMargin = margin * 2  -- Extra distance between UI sections
 local largeFontSize = 24        -- Font size for main labels (New Program, Open Program, etc.)
 local medFontSize = 14          -- Font size for recent program names
 local smallFontSize = 12        -- Font size for recent program paths
@@ -46,20 +46,39 @@ local function classNameOfPath( path )
 end
 
 -- Return true if given className is a valid java class name
--- Return false and an error message string otherwise
-local function isValidClassNameAndErrMessage( className )
+-- Return false otherwise
+local function isValidClassName( className )
 	local chFirst = string.byte( className, 1 )
 	if not chFirst then
-		return false, "No class name was entered."
+		-- no className
+		return false
 	elseif chFirst < 65 or chFirst > 90 then
-		return false, "By convention, your program class name should start with an upper-case letter."
+		-- className doesn't start with a capital letter
+		return false
 	end
 	local i, j = string.find( className, "[%a%d_]+" )
 	if i ~= 1 or j ~= string.len( className ) then
-		return false, "Java class names can only contain letters, digits, and underscores."
+		-- className contains characters other than letters, digits, and underscores
+		return false
 	end
 	return true
 end
+
+-- -- Return true if given className is a valid java class name
+-- -- Return false and an error message string otherwise
+-- local function isValidClassNameAndErrMessage( className )
+-- 	local chFirst = string.byte( className, 1 )
+-- 	if not chFirst then
+-- 		return false, "No class name was entered."
+-- 	elseif chFirst < 65 or chFirst > 90 then
+-- 		return false, "By convention, your program class name should start with an upper-case letter."
+-- 	end
+-- 	local i, j = string.find( className, "[%a%d_]+" )
+-- 	if i ~= 1 or j ~= string.len( className ) then
+-- 		return false, "Java class names can only contain letters, digits, and underscores."
+-- 	end
+-- 	return true
+-- end
 
 -- Update app.sourseFile and add path to app.recentSourceFilePaths
 -- and save user settings
@@ -136,54 +155,87 @@ local function writeNewProgramSkeleton( path )
 	end
 end
 
+-- Return the basename and extension of the given filename
+local function basenameAndExtFromFilename( filename )
+	-- Find the last "." if any
+	local iChar = string.len( filename )
+	while iChar > 0 do
+		if string.byte( filename, iChar ) == string.byte( "." ) then
+			break
+		end
+		iChar = iChar - 1
+	end
+	if iChar <= 0 then
+		return filename -- simple filename with no extension
+	end
+
+	-- Split the filename and return the parts
+	return string.sub( filename, 1, iChar - 1 ), string.sub( filename, iChar + 1 )
+end
+
 -- Show dialog to create a new user source code file
 local function newProgram()
 	-- Get className
-	local className = env.strFromInputBoxDialog( "New Program", "Enter a class name for your new program." )
-	if className then
+	local className
+	while true do -- breaks internally when valid class name is entered
+		className = env.strFromInputBoxDialog( "New Program", 
+				"Enter a name for your new program, then press OK to choose where to save it" )
+		if not className then
+			-- User clicked "Cancel" in new program dialog
+			native.setActivityIndicator( false )
+			return nil
+		end
 		-- Check for valid Java class name
-		local isValidClassName, errMessage = isValidClassNameAndErrMessage( className )
-		if isValidClassName then
-			-- Open Save As dialog for user to save file
-			local defaultPathAndFile
-			if env.isWindows then
-				local defaultPath = ""
-				if firstSave then
-					local userProfile = os.getenv( "USERPROFILE" )
-					defaultPath = userProfile .. [[\Documents\Code12 Programs\]]
-					lfs.mkdir( defaultPath )
-				end
-				defaultPathAndFile = defaultPath .. className .. [[.java]]
-			end
-			local path = env.pathFromSaveFileDialog( "Save New Program As", defaultPathAndFile )
-			if path then
-				local _, fileName = env.dirAndFilenameOfPath( path )
-				-- Append ".java" to file name if missing
-				if string.sub( fileName, -5, -1 ) ~= ".java" then
-					fileName = fileName .. ".java"
-				end
-				-- Check that fileName matches className.java
-				local saveFile = true
-				if fileName ~= className .. [[.java]] then
-					local message = "Java program file names should match the class name.\n" ..
-							"Do you wish the save your as ".. fileName .." instead of " .. className .. ".java?"
-					saveFile = env.showWarningAlert( "Unexpected File Name", message, "yesno" )
-				end
-				if saveFile then
-					-- Save the new program
-					writeNewProgramSkeleton( path )
-					updateSourceFile( path )
-					if app.openFilesInEditor then
-						env.openFileInEditor( path )
-					end
-					firstSave = false
-				end
-			end
+		if not isValidClassName( className ) then
+			env.showErrAlert( "Invalid File Name", "Program names must start with a capital letter, then contain only " ..
+					"letters and digits (no spaces), for example \"MazeGame\"" )
 		else
-			env.showErrAlert( "Invalid File Name", errMessage )
-			newProgram()
+			-- Valid class name entered
+			break
 		end
 	end
+	local defaultPath = ""
+	if env.isWindows and firstSave then
+		-- Make Save As dialog open on Code12 Programs folder
+		local userProfile = os.getenv( "USERPROFILE" )
+		defaultPath = userProfile .. [[\Documents\Code12 Programs\]]
+		lfs.mkdir( defaultPath )
+	end
+	-- Append className and ".java" to defaultPath
+	defaultPath = defaultPath .. className .. [[.java]]
+	-- Open Save As dialog for user to save file
+	local path
+	while true do -- breaks internally when path is valid
+		path = env.pathFromSaveFileDialog( "Save New Program As", defaultPath )
+		if not path then
+			-- User clicked "Cancel" in save program dialog
+			native.setActivityIndicator( false )
+			return nil
+		end
+		local _, fileName = env.dirAndFilenameOfPath( path )
+		local basename, ext = basenameAndExtFromFilename( fileName )
+		print("basename", basename, ext)
+		if not isValidClassName( basename ) then
+			env.showErrAlert( "Invalid File Name", "The filename must be a valid program name. It must start with a " .. 
+					"capital letter and contain only letters and digits." )
+		elseif not ext then
+			-- path is valid except missing extension
+			path = path .. ".java"
+			break
+		elseif ext ~= "java" then
+			env.showErrAlert( "Invalid File Name", "The filename extension must be .java" )
+		else
+			-- path is valid and includes extension
+			break
+		end
+	end	
+	-- Save the new program
+	writeNewProgramSkeleton( path )
+	updateSourceFile( path )
+	if app.openFilesInEditor then
+		env.openFileInEditor( path )
+	end
+	firstSave = false
 	native.setActivityIndicator( false )
 end
 
@@ -226,7 +278,7 @@ local function makeUIGroup( sceneGroup )
 	-- New Program Text Button
 	local newProgramTxtBtn = widget.newButton{
 		x = app.width / 2,
-		y = app.dyToolbar + extraMargin,
+		y = app.dyToolbar + extraMargin * 2,
 		onRelease = onNewProgram,
 		textOnly = true,
 		label = "New Program",
@@ -254,7 +306,7 @@ local function makeUIGroup( sceneGroup )
 	-- New Program Icon Button
 	local openProgramIcnBtn = widget.newButton{
 		x = leftMargin,
-		y = newProgramTxtBtn.y + newProgramTxtBtn.height + margin,
+		y = newProgramTxtBtn.y + newProgramTxtBtn.height + extraMargin,
 		onRelease = onOpenProgram,
 		width = iconSize,
 		height = iconSize,
