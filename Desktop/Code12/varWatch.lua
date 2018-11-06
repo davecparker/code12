@@ -432,6 +432,9 @@ function varWatch.resize( width, height )
 		scrollbar:setPosition( width - Scrollbar.width, 0, height )
 		adjustScrollbar()
 	end
+	if width < Scrollbar.width then
+		scrollbar:hide()
+	end
 end
 
 -- Starts a new run of the varWatch window based on the given width and height
