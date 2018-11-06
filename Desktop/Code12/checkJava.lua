@@ -119,8 +119,16 @@ end
 -- Look for a name similar to nameStr but misspelled in nameTable.
 -- Return the similar string or nil if none.
 local function findMisspelledName( nameStr, nameTable )
+	local nameStrLength = string.len(nameStr)
+
+	if nameStrLength < 2 or nameStrLength > 19 then --returns nil if nameStr is too long or short to be checked
+		return nil
+	end
+
+
 	-- Find best match in nameTable
-	local bestMatch = 4 --maximum Levenshtein distance accepted
+	local maxDist = math.ceil(  nameStrLength / 2.5 ) -- maximum accepted length is determined by size of nameStr
+	local bestMatch = maxDist 
     local matches = {} --Array of keywords of 4 or less Levenshtein distance from the string the user entered (nameStr)
     local matchesDist = {} --Coresponding distances for keywords in matches
 
@@ -135,7 +143,7 @@ local function findMisspelledName( nameStr, nameTable )
 		end
 	end
 
-	if bestMatch == 4 then --Checks if no good match was found
+	if bestMatch == maxDist then --Checks if no good match was found
 		return nil
 	end
 

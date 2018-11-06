@@ -5,27 +5,19 @@ public class SpellCheckTest extends Code12Program
 {
 	public void start()
 	{
+
+		//Counter Examples
+
+		ct.foo();
+		ct.fee();
+		ct.nonesense();
+		ct.word();
+		ct.fhqwdoib();
 		//Examples 
-
-		//GameObj
-		GameObj text = ct.text("Hello", 10, 10, 1);
-		int x = text.wdth;
-
-		//Math
-
-		//abs
-		Math.ab();
-		Math.abbs();
-		Math.abs();
-
-		//log
-		Math.log12();
-
 
 		// CT
 
 		//Print
-		ct.print();
 		ct.prin();
 		ct.prant();
 		ct.pront();
