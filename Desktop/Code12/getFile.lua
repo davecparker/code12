@@ -64,22 +64,6 @@ local function isValidClassName( className )
 	return true
 end
 
--- -- Return true if given className is a valid java class name
--- -- Return false and an error message string otherwise
--- local function isValidClassNameAndErrMessage( className )
--- 	local chFirst = string.byte( className, 1 )
--- 	if not chFirst then
--- 		return false, "No class name was entered."
--- 	elseif chFirst < 65 or chFirst > 90 then
--- 		return false, "By convention, your program class name should start with an upper-case letter."
--- 	end
--- 	local i, j = string.find( className, "[%a%d_]+" )
--- 	if i ~= 1 or j ~= string.len( className ) then
--- 		return false, "Java class names can only contain letters, digits, and underscores."
--- 	end
--- 	return true
--- end
-
 -- Update app.sourseFile and add path to app.recentSourceFilePaths
 -- and save user settings
 local function updateSourceFile( path )

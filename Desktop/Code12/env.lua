@@ -108,8 +108,6 @@ function env.pathFromSaveFileDialog( title, defaultPathAndFile )
 	local result = fileDialogs.saveFileDialog{
 		title = title,
 		default_path_and_file = defaultPathAndFile,
-		-- filter_patterns = "*.java",
-		-- filter_description = "Java Files (*.java)",
 	}
 	if type(result) == "string" then
 		return result
