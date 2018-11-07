@@ -198,7 +198,6 @@ local function newProgram()
 		end
 		local _, fileName = env.dirAndFilenameOfPath( path )
 		local basename, ext = basenameAndExtFromFilename( fileName )
-		print("basename", basename, ext)
 		if not isValidClassName( basename ) then
 			env.showErrAlert( "Invalid File Name", "The filename must be a valid program name. It must start with a " .. 
 					"capital letter and contain only letters and digits." )
