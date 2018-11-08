@@ -27,6 +27,8 @@ local runView = composer.newScene()
 
 -- UI metrics
 local dxyPaneSplit = 10
+local gridLabelsFontSize = 11
+local gridLineShade = 0.35
 
 -- Display objects and groups
 local outputGroup              -- display group for program output area
@@ -34,6 +36,7 @@ local rightBar                 -- clipping bar to the right of the output area
 local paneSplitConsole         -- pane split between output and console
 local paneSplitRight           -- pane split between output and varWatch window
 local lowerGroup               -- display area below the pane split
+local gridGroup                -- display group for the coordinate grideLines
 
 -- UI state
 local paneDragOffset           -- when dragging the pane split
@@ -59,6 +62,58 @@ end
 -- Return the available width and height for the variable watch window
 local function varWatchWidthAndHeight()
 	return app.width - rightBar.x, app.outputHeight - 1
+end
+
+-- Return a new text object at x, y which has been inserted into the gridGroup and has
+-- fill color set to gridLineShade
+local function newGridLabel( text, x, y )
+	local label = display.newText( gridGroup, text, x, y, native.systemFont, gridLabelsFontSize )
+	label:setFillColor( gridLineShade )
+	return label
+end
+
+-- Return an new line from x1, y1 to x2, y2 which has been inserted into the gridGroup and has
+-- stroke color set to grideLineShade
+local function newGridLine( x1, y1, x2, y2 )
+	local line = display.newLine( gridGroup, x1, y1, x2, y2 )
+	line:setStrokeColor( gridLineShade )
+	return line
+end
+
+-- Make the coordinate grideLines
+local function makeGrid( width, height )
+	local sceneGroup = runView.view
+	if sceneGroup then
+		-- Remove existing gridGroup, if any
+		if gridGroup then
+			gridGroup:removeSelf()
+			gridGroup = nil
+		end
+		-- Make gridGroup
+		gridGroup = g.makeGroup( sceneGroup, outputGroup.x, outputGroup.y )
+		-- Make vertical gride lines and labels
+		local dx = width / 10
+		for i = 1, 9 do
+			local label = newGridLabel( i .. "0", dx * i, 0 )
+			label.anchorY = 0
+			local x = dx * i
+			local y = label.height + 1
+			print(y)
+			newGridLine( x, y, x, height )
+		end
+		-- Make horizontal grideLines and labels
+		local rowNum = 1
+		local y = dx
+		while y < height do
+			local label = newGridLabel( rowNum .. "0", 0, y )
+			label.anchorX = 0
+			local x = label.width + 1
+			newGridLine( x, y, width, y )
+			rowNum = rowNum + 1
+			y = y + dx
+		end
+		paneSplitConsole:toFront() -- In case last label extends below top of pane split
+	end
 end
 
 -- Position the display panes
@@ -89,6 +144,11 @@ local function layoutPanes()
 	lowerGroup.y = paneSplitConsole.y + dxyPaneSplit + 1
 	local consoleHeight = app.height - lowerGroup.y - app.dyStatusBar
 	console.resize( app.width, consoleHeight )
+
+	-- Remake the coordinate grideLines if they are on
+	if app.gridOn then
+		makeGrid( width, height )
+	end
 end
 
 -- Runtime callback to set the output pixel size being used
@@ -259,6 +319,23 @@ function runView:resize()
 	-- trying to keep the outputRatio about the same.
 	app.getWindowSize()
 	resizeOutputArea( nil, maxOutputHeight() * outputRatio )
+end
+
+-- Toggle the coordinate grideLines on/off
+function runView.toggleGrid()
+	local gridOn = app.gridOn
+	if gridOn then
+		gridGroup.isVisible = false
+	else
+		makeGrid( app.outputWidth, app.outputHeight )
+	end
+	app.gridOn = not gridOn
+end
+
+-- Hide the coordinate grideLines
+function runView.hideGrid()
+	gridGroup.isVisible = false
+	app.gridOn = false
 end
 
 
