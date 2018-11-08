@@ -3,19 +3,29 @@ body {
     padding-right: 1em;
     padding-left: 1em;
     max-width: 70em; 
-    /* border-left: 1px solid black; */
-    /* border-right: 1px solid black; */
     color: #303030;
     font-family: Verdana, sans-serif;
     font-size: 11pt;
     line-height: 140%;
+    margin-top: 0;
+    padding-top: 0;
 }
+
+p {
+    margin-top: 0.2em;
+}
+
+blockquote {
+    font-style: italic;
+}
+
 pre {
     border: 1px dotted gray;
     background-color: #eeeeee;
     color: black;
     padding: 0.5em;
 }
+
 code {
     font-family: "NotoMono-Regular", "NotoMono", monospace;
     font-size: 10pt;
@@ -23,10 +33,10 @@ code {
     background-color: #eeeeee;
 }
 
-h1 a, h2 a, h3 a, h4 a, h5 a { 
+/* h1 a, h2 a, h3 a, h4 a, h5 a { 
     text-decoration: none;
     color: black; 
-}
+} */
 
 h1, h2, h3, h4, h5 { 
     font-family: "Roboto-Bold", "Roboto", "Verdana", sans-serif;
@@ -39,25 +49,33 @@ h1 {
     color: #0000C0;
 }
 
-h2 {    /* section names */
-    font-size: 200%;
+h2 {    /* API groups */
+    font-size: 220%;
     padding-top: 1em;
     border-top: double black;
 }
 
-h3 {   /* function names */
-    font-size: 150%;
+h3 {   /* API Functions */
+    font-size: 200%;
+    margin-top: 2em;
     padding-top: 1em;
     border-top: 1px solid gray;
     color: #0000C0;
 }
 
-h4 {
-    font-size: 120%;
+h4 {   /* e.g. "Syntax", "Examples" */
+    font-size: 140%;
+    margin-top: 2em;
+    margin-bottom: 0;
 }
 
-h5 {
+h5 {   /* parameters and return value */
     font-size: 110%;
+    line-height: 100%;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 h1.title {
@@ -69,9 +87,11 @@ h1.title {
     border: none;
 }
 
+/* 
 dt code {
     font-weight: bold;
 }
+
 dd p {
     margin-top: 0;
 }
@@ -82,3 +102,5 @@ dd p {
     color: gray;
     text-align: center;
 }
+
+*/
