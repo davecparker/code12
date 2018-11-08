@@ -35,7 +35,6 @@ local closeBtn            -- Close view button
 local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
-local multiErrorPicker    -- Multi-error mode picker
 local varWatchPicker      -- Variable watch window mode picker
 local addEditorBtn        -- Add a Text Editor button
 local openInEditorBtn     -- Open current source file in editor button
@@ -92,13 +91,6 @@ local function setSelectedOptions()
 			editorPicker.switches[2]:setState{ isOn = true }
 			app.editorPath = env.installedEditors[2].path
 		end
-	end
-
-	-- Set the checked box of the multiErrorPicker
-	if app.oneErrOnly then
-		multiErrorPicker.switches[1]:setState{ isOn = true }
-	else
-		multiErrorPicker.switches[1]:setState{ isOn = false }
 	end
 
 	-- Set the checked box of the varWatchPicker
@@ -345,25 +337,6 @@ function optionsView:create()
 	tabWidthPicker.anchorY = 0
 	optionsGroup:insert( tabWidthPicker )
 
-	-- Multi-error picker
-	multiErrorPicker = buttons.newSettingPicker{
-		parent = optionsGroup,
-		header = "Multi-Error Mode:",
-		headerFont = native.systemFontBold,
-		headerFontSize = fontSize,
-		labels = { "Show only one error at a time" },
-		labelsFont = native.systemFont,
-		labelsFontSize = fontSize,
-		style = "checkbox",
-		switchSize = switchSize,
-		x = 0,
-		y = tabWidthPicker.y + tabWidthPicker.height + margin,
-		onPress =
-			function ( event )
-				app.oneErrOnly = event.target.isOn
-			end
-	}
-
 	-- Variable Watch Window picker
 	varWatchPicker = buttons.newSettingPicker{
 		parent = optionsGroup,
@@ -376,7 +349,7 @@ function optionsView:create()
 		style = "checkbox",
 		switchSize = switchSize,
 		x = 0,
-		y = multiErrorPicker.y + multiErrorPicker.height + margin,
+		y = tabWidthPicker.y + tabWidthPicker.height + margin,
 		onPress =
 			function ( event )
 				app.showVarWatch = event.target.isOn

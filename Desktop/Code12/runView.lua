@@ -66,7 +66,6 @@ local function layoutPanes()
 	-- Get the size of the program's graphics output area
 	local width = app.outputWidth
 	local height = app.outputHeight
-	print("layout panes", width, height)
 
 	-- Position the right pane split, right bar, and variable watch group
 	-- The right pane spit is hidden if the varWatch window is off.
