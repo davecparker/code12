@@ -28,7 +28,7 @@ local runView = composer.newScene()
 -- UI metrics
 local dxyPaneSplit = 10
 local gridLabelsFontSize = 11
-local gridLineShade = 0.35
+local gridLineShade = 0.6
 
 -- Display objects and groups
 local outputGroup              -- display group for program output area
@@ -42,6 +42,7 @@ local gridGroup                -- display group for the coordinate grideLines
 local paneDragOffset           -- when dragging the pane split
 local outputRatio              -- fraction of app height taken by output area
 local showVarWatchLast         -- last known value of app.showVarWatch
+local layoutNeeded             -- true when the layout has changed
 
 
 --- Internal Functions ------------------------------------------------
@@ -98,7 +99,6 @@ local function makeGrid( width, height )
 			label.anchorY = 0
 			local x = dx * i
 			local y = label.height + 1
-			print(y)
 			newGridLine( x, y, x, height )
 		end
 		-- Make horizontal grideLines and labels
@@ -155,7 +155,7 @@ end
 local function setOutputSize( widthP, heightP )
 	app.outputWidth = math.floor( widthP )
 	app.outputHeight = math.floor( heightP )
-	layoutPanes()
+	layoutNeeded = true
 end
 
 -- Resize the output area using width and height as the available space,
@@ -239,6 +239,14 @@ local function showRuntimeError( lineNum, message )
 	composer.gotoScene( "errView" )
 end
 
+-- Handle new frame events by calling layoutPanes if needed
+local function onNewFrame()
+	if layoutNeeded then
+		layoutPanes()
+		layoutNeeded = false
+	end
+end
+
 
 --- Scene Methods ------------------------------------------------
 
@@ -279,6 +287,7 @@ function runView:create()
 
 	-- Install window resize handler
 	Runtime:addEventListener( "resize", self )
+	Runtime:addEventListener( "enterFrame", onNewFrame )
 end
 
 -- Prepare to show the runView scene
