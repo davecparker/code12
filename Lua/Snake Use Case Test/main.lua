@@ -7,7 +7,7 @@ prevCharTyped = "w"
 charTyped = "a"
 time = nil
 
-function start()
+function _fn.start()
     ct.setBackColor("dark gray")
     snake = {ct.rect(47.5, 47.5, 5, 5, "light red"), ct.rect(52.5, 47.5, 5, 5, "light red")}
     snake[1]:setLineColor("white")
@@ -17,7 +17,7 @@ function start()
     time = ct.getTimer()
 end
 
-function update()
+function _fn.update()
     if ct.getTimer() - time >= 150 then
         time = ct.getTimer()
         moveSnake()
@@ -73,7 +73,7 @@ function snakeEatsFood()
     snake[#snake]:setLineColor("white")
 end
 
-function onCharTyped(c)
+function _fn.onCharTyped(c)
     if (c == "a" or c == "d") and (prevCharTyped == "w" or prevCharTyped == "s") or
     (c == "w" or c == "s") and (prevCharTyped == "a" or prevCharTyped == "d") then
         charTyped = c

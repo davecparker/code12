@@ -8,14 +8,14 @@ results = nil
 isPlayerTurn = true
 time = 0
 
-function start()
+function _fn.start()
     ct.line(10, ct.getHeight() / 3, ct.getWidth() - 10, ct.getHeight() / 3, "light blue")
     ct.line(10, ct.getHeight() * 2 / 3, ct.getWidth() - 10, ct.getHeight() * 2 / 3, "light blue")
     ct.line(ct.getWidth() / 3, 25, ct.getWidth() / 3, ct.getHeight() - 25, "light blue")
     ct.line(ct.getWidth() * 2 / 3, 25, ct.getWidth() * 2 / 3, ct.getHeight() - 25, "light blue")
 end
 
-function update()
+function _fn.update()
     local winner = getWinner()
     if winner then
        results = ct.text(winner .. " Won", ct.getWidth() / 2, ct.getHeight() / 2, 15)
@@ -39,7 +39,7 @@ function update()
     end
 end
 
-function onMouseRelease(obj, x, y)
+function _fn.onMouseRelease(obj, x, y)
     if isPlayerTurn then
         local i, j = getIndex(x, y)
         if not board[i][j] then

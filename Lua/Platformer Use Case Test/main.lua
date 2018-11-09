@@ -6,7 +6,7 @@ time = nil
 steps = {}
 isOnStep = nil
 
-function start()
+function _fn.start()
     ct.setBackColor("dark gray")
     player = ct.rect(50, 20, 5, 5, "white")
     player.ySpeed = 2
@@ -18,14 +18,14 @@ function start()
     end
 end
 
-function onCharTyped(c)
+function _fn.onCharTyped(c)
     if c == " " and isOnStep then
         player.ySpeed = -0.25
         isOnStep = nil
     end
 end
 
-function onKeyPress(c)
+function _fn.onKeyPress(c)
     if c == "a" then
         player.xSpeed = -2
     elseif c == "d" then
@@ -35,13 +35,13 @@ function onKeyPress(c)
     end
 end
 
-function onKeyRelease(c)
+function _fn.onKeyRelease(c)
     if c == "a" or c == "d" then
         player.xSpeed = 0
     end
 end
 
-function update()
+function _fn.update()
     if player.ySpeed < 2 then
         player.ySpeed = player.ySpeed + 0.005
     end

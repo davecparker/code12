@@ -455,7 +455,7 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i].autoDelete = testObjs[i].autoDelete;
             testObjs[i].group = testObjs[i].group;
         }
-        ct.println("\tPassed deletion, nothing should appear");
+        ct.println("\tPassed deletion");
     }
 
     public void clickedTest()
