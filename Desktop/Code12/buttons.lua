@@ -27,6 +27,7 @@ local labelColor = { 0.082, 0.486, 0.976 } -- Corona blue
 local radioBtnSheet = graphics.newImageSheet( "images/radiobutton.png", { width = 1024, height = 1024, numFrames = 2 } )
 local fillboxSheet = graphics.newImageSheet( "images/fillbox.png", { width = 256, height = 256, numFrames = 2 } )
 local checkboxSheet = graphics.newImageSheet( "images/checkbox.png", { width = 256, height = 256, numFrames = 2 } )
+local dropDownSheet = graphics.newImageSheet( "images/drop-down.png", { width = 512, height = 512, numFrames = 2 } )
 
 
 --- Module Functions ------------------------------------------------
@@ -236,6 +237,24 @@ function buttons.newToolbarButton( parent, label, onRelease, placement, adjacent
 	end
 
 	return btnGroup
+end
+
+-- Return a drop down menu button, inserted into given display group parent
+function buttons.newDropDownButton( parent, x, y, width, height, onPress )
+	local btn = widget.newSwitch{
+			style = "checkbox",
+			width = width,
+			height = height,
+			onPress = onPress,
+			sheet = dropDownSheet,
+			frameOn = 1,
+			frameOff = 2,
+			x = x,
+			y = y,
+		}
+	btn.anchorX = 1
+	parent:insert( btn )
+	return btn
 end
 
 

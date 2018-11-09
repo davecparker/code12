@@ -35,7 +35,7 @@ local closeBtn            -- Close view button
 local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
-local multiErrorPicker    -- Multi-error mode picker
+local varWatchPicker      -- Variable watch window mode picker
 local addEditorBtn        -- Add a Text Editor button
 local openInEditorBtn     -- Open current source file in editor button
 local optionsGroup        -- Display group containing the options objects
@@ -93,11 +93,11 @@ local function setSelectedOptions()
 		end
 	end
 
-	-- Set the checked box of the multiErrorPicker
-	if app.oneErrOnly then
-		multiErrorPicker.switches[1]:setState{ isOn = true }
+	-- Set the checked box of the varWatchPicker
+	if app.showVarWatch then
+		varWatchPicker.switches[1]:setState{ isOn = true }
 	else
-		multiErrorPicker.switches[1]:setState{ isOn = false }
+		varWatchPicker.switches[1]:setState{ isOn = false }
 	end
 end
 
@@ -121,7 +121,7 @@ local function makeEditorPicker( parent )
 		style = "radio",
 		switchSize = switchSize,
 		x = 0,
-		y = multiErrorPicker.y + multiErrorPicker.height + margin,
+		y = varWatchPicker.y + varWatchPicker.height + margin,
 		onPress = 
 			function ( event )
 				app.editorPath = env.installedEditors[event.target.value].path
@@ -337,13 +337,13 @@ function optionsView:create()
 	tabWidthPicker.anchorY = 0
 	optionsGroup:insert( tabWidthPicker )
 
-	-- Multi-error picker
-	multiErrorPicker = buttons.newSettingPicker{
+	-- Variable Watch Window picker
+	varWatchPicker = buttons.newSettingPicker{
 		parent = optionsGroup,
-		header = "Multi-Error Mode:",
+		header = "Variable Watch Mode:",
 		headerFont = native.systemFontBold,
 		headerFontSize = fontSize,
-		labels = { "Show only one error at a time" },
+		labels = { "Show the variable watch window" },
 		labelsFont = native.systemFont,
 		labelsFontSize = fontSize,
 		style = "checkbox",
@@ -352,12 +352,12 @@ function optionsView:create()
 		y = tabWidthPicker.y + tabWidthPicker.height + margin,
 		onPress =
 			function ( event )
-				app.oneErrOnly = event.target.isOn
+				app.showVarWatch = event.target.isOn
 			end
 	}
 
 	-- Editor picker
-	makeEditorPicker( optionsGroup )
+	makeEditorPicker( optionsGroup, varWatchPicker )
 
 	-- Add Text Editor button
 	addEditorBtn = buttons.newOptionButton{

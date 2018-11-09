@@ -1,0 +1,151 @@
+Code12 Programming Concepts
+===========================
+
+The Code12 system is designed to allow students to concentrate
+on these 12 core programming concepts, ideally introduced in
+this order:
+
+
+Concept                     Example
+-------                     ----------
+1. Procedure Calls          ct.circle( 100, 200, 50 )
+2. Comments                 // Make the borders
+3. Variables                int x = 50;
+4. Expressions              (i * 3) + 20
+5. Function Calls           fish = ct.image( "goldfish.png", 100, 200, 50 )
+6. Object Data Fields       fish.x
+7. Object Method Calls      ball.setFillColor( "blue" )
+8. If-else                  if (fish.x < 0)
+9. Function Definitions     void updateScore()
+10. Parameters              GameObj makeAsteroid( double x, double y )
+11. Loops                   for (int i = 1; i < 10; i++)
+12. Arrays                  GameObj[] asteroids = new GameObj[10];
+
+
+Java Subset Restrictions
+========================
+
+In order to allow Code12 to do what it needs to do 
+(give better error messages, translate to Lua, etc.),
+we only support a subset of Java. The subset supports
+all of the above constructs. Intentionally left out are:
+
+* No class definitions. All code must live inside the MainProgram class.
+* The only object types allowed are GameObj and String.
+* No use of new, except for arrays. GameObj and String objects are returned by methods.
+* No use of the Java Class Library beyond the String and Math methods indicated, and System.out.print/ln.
+* No use of byte, char, short, long, or float (only int, double, and boolean).
+
+There will be other syntax restrictions as well, and some enforcement of style,
+for example:
+
+* No multi-statement lines.
+* Line breaks are only allowed after complete statements/constructs, 
+  with a few exceptions (such as after a comma in a parameter list).
+* if and else and the controlled statements must be all on their own lines.
+* { and } must always be on their own line.
+* Assignment operators (=, +=, etc.) and ++ and -- make statements not expressions.
+* Object field/method access cannot be chained, so no a.b.c or a().b
+* No overloading in user-defined functions (only one parameter list signature).
+* Indentation style is enforced.
+
+
+Ideas for Programming Concepts as Levels
+========================================
+If the 12 programming concepts are taught in order, then the user can progress
+through 12 programming levels, which each add a capability. Here are some ideas
+for ways to use the Code12 API at each level:
+
+1. Procedure Calls
+------------------
+* Print messages using ct.println()
+* Use mixtures of ct.print() and ct.println()
+* Show messages with ct.showAlert()
+* Use mixtures of ct.pritntln() and ct.showAlert()
+* Use ct.setBackColor(), ct.setBackColorRGB(), and ct.setBackImage()
+* Draw objects and scenes using ct.circle(), ct.rect(), ct.line(). ct.text(), and ct.image()
+* Play a sound with ct.sound()
+* Play sounds with ct.alert() separated by alerts with ct.showAlert() to sequence them
+
+2. Comments
+-----------
+* Make sequences of procedure calls easier to understand with comments before code lines
+* Draw a complex scene, broken up with comments and blank lines
+* Explain the purpose of a program with a comment at the beginning of the program
+* Put your name, date, assignment number, etc. in a program in a comment
+* Explain something about a procedure call with a comment at the end of the line
+* Disable a line by commenting it out with //, then bring it back by removing the //
+* Disable a large block of procedure calls with a block comment /* */
+
+3. Variables
+------------
+* Replace repeated uses of the same x or y coordinate with a variable and adjust it
+* Use a variable for a size and adjust it
+* Define int shade and use it for ct.setBackColorRRGB( shade, shade, shade )
+* Set a String variable to a message or ASCII art, and use it with repeated ct.println() calls
+* Try the above with 3-4 String variables to print the american flag.
+* Write a series of procedure calls to draw something with variables, then copy-paste it to re-use 
+  several times unmodified but with different variable assignments before each use.
+
+4. Expressions
+--------------
+* Use expressions to convert feet to inches, F to C, etc. and print results
+* Set a variable to a y-coordiante, then add offsets from it to draw nearby objects
+* Calculate the midpoint of two x values and use it to draw something in the middle
+* Draw a scene where coordiantes and sizes are calculated relative to a few variables
+* Draw several rectangles of the same aspect (a variable), at different positions and sizes
+* Write a series of procedure calls to draw something with variables, then copy-paste it to 
+  re-use several times unmodified but with y = y + 10 and similar between them.
+* Calculate and draw graphs and geometry. For example, draw coordinate axes, then plot 
+  y = mx + b given variables m and b
+
+5. Function Calls
+-----------------
+* Use ct.inputNumber() to ask for inputs to a calculation or game parameters
+* Use ct.inputString() to ask the user their name then display/output using it
+* Use ct.random() to draw objects at random positions and/or sizes
+* Use Math.sin() and other Math methods to calculate and draw things
+* Use ct.round(), ct.roundDecimal(), ct.intDiv(), ct.distance(), ct.getTimer(), ct.getVersion()
+* Use ct.toInt(), ct.formatDecimal(), ct.formatInt() to prepare data for display
+
+6. Object Data Fields
+---------------------
+* Make a GameObj move smoothly by setting its xSpeed and/or ySpeed field in start() 
+* Make a GameObj move smoothly by changing its x and/or y fields in update()
+* Make an object grow/shrink by changing its width or height in update()
+* Make a thick outline by setting an object's lineWidth field after creation
+* Use autoDelete = true so objects delete after going offscreen via xSpeed/ySpeed 
+* Set the group field of a set of objects that you want to delete in bulk via ct.clearGroup()  
+
+7. Object Method Calls
+----------------------
+* Any of the GameObj methods can now be used, for many different features
+* The supported String methods can now be used to manipulate strings
+
+8. If-else
+----------
+* Use the result of ct.inputYesNo() to see if the user wants to do something or not
+* Use ct.clicked(), ct.objectClicked(), and GameObj.clicked() to detect mouse clicks
+* Use ct.keyPressed() and ct.charTyped() to detect keyboard input
+* Detect when a GameObj goes off screen in update() and recycle or bounce it
+* Use GameObj.hit(), GameObj.containsPoint() and GameObj.objectHitIngroup() to detect hits
+
+9. Function Definitions
+-----------------------
+* Define your own functions to reduce repeated code, etc.
+
+10. Parameters
+--------------
+* Add parameters to functions you define to make them more reusable
+
+11. Loops
+---------
+* Create several obstacles or enemies at random locations
+* Create a row or column of objects with regular spacing
+
+12. Arrays
+----------
+* Keep track of groups of objects of different types, so that you can process them 
+  together with the same code with loops
+
+ 

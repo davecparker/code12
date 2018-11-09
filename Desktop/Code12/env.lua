@@ -108,8 +108,6 @@ function env.pathFromSaveFileDialog( title, defaultPathAndFile )
 	local result = fileDialogs.saveFileDialog{
 		title = title,
 		default_path_and_file = defaultPathAndFile,
-		filter_patterns = "*.java",
-		filter_description = "Java Files (*.java)",
 	}
 	if type(result) == "string" then
 		return result
@@ -211,6 +209,16 @@ function env.strFromInputBoxDialog( title, message )
 		return result
 	end
 	return nil
+end
+
+-- Return true if the given path can be opened for reading, false otherwise
+function env.canRead( path )
+	local file = io.open( path, "r" )
+	if file then
+		io.close( file )
+		return true
+	end
+	return false
 end
 
 

@@ -10,7 +10,7 @@ public class ErrorTest extends Code12Program
 	{
 
 		//Syntax Errors
-		public static final int MAX_UNITS = 25; //[Access specifiers are only allowed on class-level variables] {public static}
+		//public static final int MAX_UNITS = 25; //[Access specifiers are only allowed on class-level variables] {public static}
 		
 		String false = "test"; //[Syntax Error "false"] {false}
 		
@@ -84,5 +84,10 @@ public class ErrorTest extends Code12Program
 		intabsolutely = 12; //[Variable %s must be declared ...] {absolutely}
 
 	}	
+
+	public void update()
+	{
+		
+	}
 
 }
