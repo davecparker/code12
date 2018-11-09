@@ -132,13 +132,13 @@ local function findMisspelledName( nameStr, nameTable )
     local matches = {} --Array of keywords of 4 or less Levenshtein distance from the string the user entered (nameStr)
     local matchesDist = {} --Coresponding distances for keywords in matches
 
-    for entryStr, entry in pairs( nameTable ) do
-    	if type(entry) == "table" then
-    		local match = app.partialMatchString( nameStr, entryStr )
-    		if match <= bestMatch then--Tests if the keyword is closer to entryStr
-    			table.insert(matches, entryStr) --Inserts the keyword to match array
-    			table.insert(matchesDist, match) --Inserts the coresponding distance to the match distance array
-    			bestMatch = match
+	for entryStr, entry in pairs( nameTable ) do
+		if type(entry) == "table" then
+			local match = app.partialMatchString( nameStr, entryStr )
+			if match <= bestMatch then--Tests if the keyword is closer to entryStr
+				table.insert(matches, entryStr) --Inserts the keyword to match array
+				table.insert(matchesDist, match) --Inserts the coresponding distance to the match distance array
+				bestMatch = match
 			end
 		end
 	end
@@ -149,7 +149,9 @@ local function findMisspelledName( nameStr, nameTable )
 
 	if #matches == 1 then --If there is only one good match return it
 		return matches[1]
-	else --If there is more than one keyword in matches filter out all that are not the closest or tied for closest to nameStr 
+	else 
+		-- If there is more than one keyword in matches, filter out all that are not 
+		-- the closest or tied for closest to nameStr 
 		local temp = {} 
 		for i = 1,#matches do
 			if matchesDist[i] <= bestMatch then
@@ -173,9 +175,11 @@ local function findMisspelledName( nameStr, nameTable )
 
 	if #matches == 1 then --If there is only one keyword that is the same length as nameStr return it
 		return matches[1] 
-	else --If there are more than one keyword the same length and distance from nameStr check for first/last character matching
+	else 
+		-- If there are more than one keyword the same length and distance from nameStr, 
+		-- check for first/last character matching
+		local temp = {}
 		for i = 1, #matches do
-			local temp = {}
 			local bonusMatch = 0
 
 			local tempStr = matches[i] --One point for first character matches
