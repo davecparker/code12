@@ -139,51 +139,35 @@ local function writeNewProgramSkeleton( path )
 	end
 end
 
--- Return the basename and extension of the given filename
-local function basenameAndExtFromFilename( filename )
-	-- Find the last "." if any
-	local iChar = string.len( filename )
-	while iChar > 0 do
-		if string.byte( filename, iChar ) == string.byte( "." ) then
-			break
-		end
-		iChar = iChar - 1
-	end
-	if iChar <= 0 then
-		return filename -- simple filename with no extension
-	end
-
-	-- Split the filename and return the parts
-	return string.sub( filename, 1, iChar - 1 ), string.sub( filename, iChar + 1 )
-end
-
 -- Show dialog to create a new user source code file
 local function newProgram()
-	-- Get className
-	local className
-	while true do -- breaks internally when valid class name is entered
-		className = env.strFromInputBoxDialog( "New Program", 
-				"Enter a name for your new program, then press OK to choose where to save it" )
-		if not className then
+	-- Ask the user for a program name
+	local programName = nil
+	local className, ext
+	while true do -- breaks internally when valid program name is entered
+		programName = env.strFromInputBoxDialog( "New Program", 
+				"Enter a name for your new program, then press OK to choose where to save it",
+				programName )
+		if not programName then
 			-- User clicked "Cancel" in new program dialog
 			native.setActivityIndicator( false )
 			return nil
 		end
-		-- Check for valid Java class name
+		-- Check for valid Java class name, and ext must be .java if included
+		className, ext = env.basenameAndExtFromFilename( programName )
 		if not isValidClassName( className ) then
-			env.showErrAlert( "Invalid File Name", "Program names must start with a capital letter, then contain only " ..
-					"letters and digits (no spaces), for example \"MazeGame\"" )
+			env.showErrAlert( "Invalid Program Name", 
+					"Program names must start with a capital letter, then contain only letters and digits (no spaces)" )
+		elseif ext and ext ~= "java" then
+			env.showErrAlert( "Invalid Program Name", "Java programs must have an extension of .java" )
 		else
-			-- Valid class name entered
-			break
+			break  -- valid name entered
 		end
 	end
 	local defaultPath = ""
-	if env.isWindows and firstSave then
-		-- Make Save As dialog open on Code12 Programs folder
-		local userProfile = os.getenv( "USERPROFILE" )
-		defaultPath = userProfile .. [[\Documents\Code12 Programs\]]
-		lfs.mkdir( defaultPath )
+	if firstSave then
+		-- Try to default to Documents folder on first use
+		defaultPath = env.documentsPath()
 	end
 	-- Append className and ".java" to defaultPath
 	defaultPath = defaultPath .. className .. [[.java]]
@@ -197,16 +181,17 @@ local function newProgram()
 			return nil
 		end
 		local _, fileName = env.dirAndFilenameOfPath( path )
-		local basename, ext = basenameAndExtFromFilename( fileName )
-		if not isValidClassName( basename ) then
-			env.showErrAlert( "Invalid File Name", "The filename must be a valid program name. It must start with a " .. 
-					"capital letter and contain only letters and digits." )
+		className, ext = env.basenameAndExtFromFilename( fileName )
+		if not isValidClassName( className ) then
+			env.showErrAlert( "Invalid Filename", 
+					"The filename must be a valid program name. It must start with a " .. 
+							"capital letter and contain only letters and digits." )
 		elseif not ext then
 			-- path is valid except missing extension
 			path = path .. ".java"
 			break
 		elseif ext ~= "java" then
-			env.showErrAlert( "Invalid File Name", "The filename extension must be .java" )
+			env.showErrAlert( "Invalid Filename", "The filename extension must be .java" )
 		else
 			-- path is valid and includes extension
 			break

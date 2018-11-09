@@ -199,18 +199,33 @@ end
 -- Show dialog to choose the editor and add the path to installed editors
 -- and user's settings
 local function addEditor()
-	local editorPath = env.pathFromOpenFileDialog( "Choose a Text Editor", "*.exe", "Executables (*.exe)" )
-	if not editorPath then
-		native.setActivityIndicator( false )
-	elseif env.isWindows and string.sub( editorPath, -4, -1 ) ~= ".exe" then
-		env.showErrAlert( "Invalid File Extension", "Please choose a .exe file" )
-		addEditor()
-	elseif not env.isWindows and string.sub( editorPath, -4, -1 ) ~= ".app" then
-		env.showErrAlert( "Invalid File Extension", "Please choose a .app file" )
-		addEditor()
-	else
-		local _, editorName = env.dirAndFilenameOfPath( editorPath )
+	-- Ask user to find an editor application with an Open dialog
+	local editorPath
+	while true do  -- breaks internally
+		if env.isWindows then
+			editorPath = env.pathFromOpenFileDialog( "Choose a Text Editor", 
+								"*.exe", "Executables (*.exe)", [[C:\Program Files\]] )
+			if editorPath and string.sub( editorPath, -4, -1 ) ~= ".exe" then
+				env.showErrAlert( "Invalid File Extension", "Please choose a .exe file" )
+			else
+				break
+			end
+		else
+			editorPath = env.pathFromOpenFileDialog( "Choose a Text Editor", 
+								nil, nil, "/Applications/" )
+			if editorPath and string.sub( editorPath, -4, -1 ) ~= ".app" then
+				env.showErrAlert( "Invalid Application", "Please choose a .app file" )
+			else
+				break
+			end
+		end
+	end
+	native.setActivityIndicator( false )
 
+	-- Add the application chosen, if any
+	if editorPath then
+		local _, filename = env.dirAndFilenameOfPath( editorPath )
+		local editorName, _ = env.basenameAndExtFromFilename( filename )
 		local newEditor = { name = editorName, path = editorPath }
 		env.installedEditors[#env.installedEditors + 1] = newEditor
 		app.customEditors[#app.customEditors + 1] = newEditor
@@ -220,7 +235,6 @@ local function addEditor()
 		setEditorButtons( true )
 		setSelectedOptions()
 		makeScrollView( optionsView.view )
-		native.setActivityIndicator( false )
 	end
 end
 

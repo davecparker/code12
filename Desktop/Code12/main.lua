@@ -70,6 +70,7 @@ local function runLuaCode( luaCode )
 	end
 end
 
+--[[
 -- Write a Lua source code output file to save the generated code.
 -- Put it next to the Java source file.
 local function writeLuaCode( codeStr )
@@ -121,6 +122,7 @@ local function writeLuaCode( codeStr )
 	--print( "--- Lua Code: ---\n" ); 
 	--print( codeStr )
 end
+--]]
 
 -- Process the source (parse then run or show error), which has already been read. 
 function app.processUserFile()
@@ -156,7 +158,7 @@ function app.processUserFile()
 			local codeStr = codeGenJava.getLuaCode( programTree )
 			print( string.format( "\nFile processed in %.3f ms\n", 
 						system.getTimer() - startTime ) )
-			writeLuaCode( codeStr )
+			-- writeLuaCode( codeStr )    TODO: Put this in options screen
 			runLuaCode( codeStr )
 			return
 		end
