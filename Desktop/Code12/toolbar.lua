@@ -59,6 +59,14 @@ local function showButtons( btns )
 			end
 		end
 	end
+	if gridBtn.isVisible then
+		-- Check if it is overlapping choose program button or options button
+		local xMax = gridBtn.x + gridBtn.width + app.margin 
+		if chooseProgramBtn.isVisible and chooseProgramBtn.x < xMax or
+				optionsBtn.isVisible and optionsBtn.x < xMax then
+			gridBtn.isVisible = false
+		end
+	end
 end
 
 
@@ -120,6 +128,7 @@ function toolbar.resize()
 	bgRect.width = app.width
 	optionsBtn.x = app.width - app.margin - optionsBtn.width
 	chooseProgramBtn.x = optionsBtn.x - chooseProgramBtn.width - app.margin
+	toolbar.update()
 end
 
 -- Show/hide the toolbar
