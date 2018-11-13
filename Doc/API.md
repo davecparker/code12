@@ -1,94 +1,483 @@
 % Code12 API Documentation
 
-The design of the Code 12 API is (c)Copyright 2018 by David C. Parker.
+The Code12 API functions are built in to the Code12 application.
 
-##### Global (ct) APIs
+##### Global (ct) API Functions
+* [Graphic Object Creation](#graphic-object-creation)
 * [Text Output](#text-output)
 * [Alerts and Input Dialogs](#alerts-and-input-dialogs)
 * [Screen Management](#screen-management)
-* [GameObj Creation](#gameobj-creation)
 * [Mouse and Keyboard Input](#mouse-and-keyboard-input)
 * [Audio](#audio)
 * [Math and Misc.](#math-and-misc-)
 * [Type Conversion](#type-conversion)
 
 ##### GameObj Fields and Methods
-* [GameObj Public Data Fields](#gameobj-public-data-fields)
+* [GameObj Data Fields](#gameobj-data-fields)
 * [GameObj Methods](#gameobj-methods)
 
 ##### Java Class Methods and Fields Supported
 * [Math Class](#java-math-class-methods-and-fields-supported)
 * [String Class](#java-string-class-methods-supported)
 
-##### Events (Client Functions)
-* [Events](#events)
+##### Input and Program Control Events
+* [Event Functions](#event-functions)
 
-##### Appendix: Pre-Defined Names
+##### Additional Reference Information
+* [Graphics Coordinates](#graphics-coordinates)
+* [Java Data Types](#java-data-types)
 * [Color Names](#color-names)
 * [Key Names](#key-names)
 
+
+Graphic Object Creation
+-----------------------
+These functions allow you to create new graphics objects for display on the screen.
+
+* [ct.circle](#ct.circle)
+* [ct.rect](#ct.rect)
+* [ct.line](#ct.line)
+* [ct.text](#ct.text)
+* [ct.image](#ct.image)
+
+
+### ct.circle()
+Creates a new circle graphics object (GameObj).
+
+#### Syntax
+```
+ct.circle( x, y, diameter );
+ct.circle( x, y, diameter, color );
+```
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the center of the circle.
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates) 
+of the center of the circle.
+
+##### diameter
+([double](#java-data-types)) The diameter ([width](#graphics-coordinates)
+and [height](#graphics-coordinates)) of the circle.
+
+##### color
+([String](#java-data-types), optional). A [color name](#color-names)
+(for example, `"blue"`) for the fill color of the circle. If the `color`
+is not included, circle objects default to a fill color of `"red"`.
+
+##### *Return Value*
+([GameObj](#java-data-types)). A reference to the circle object is returned, 
+which can be used to access and modify the circle later 
+(see [GameObj Data Fields](#gameobj-data-fields) and [GameObj Methods](#gameobj-methods)).
+
+#### Examples
+```
+ct.circle( 50, 30, 20 );
+```
+```
+ct.circle( 50, 70, 40, "blue" );
+```
+```
+GameObj ball = ct.circle( 0, 50, 10, "yellow" );
+ball.xSpeed = 1;
+```
+
+
+### ct.rect()
+
+Creates a new rectangle graphics object (GameObj).
+
+#### Syntax
+```
+ct.rect( x, y, width, height );
+ct.rect( x, y, width, height, color );
+```
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the center of the rectangle.
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates) 
+of the center of the rectangle.
+
+##### width
+([double](#java-data-types)) The horizontal size ([width](#graphics-coordinates)) 
+of the rectangle.
+
+##### height
+([double](#java-data-types)) The vertical size ([height](#graphics-coordinates))
+of the rectangle.
+
+##### color
+([String](#java-data-types), optional). A [color name](#color-names) 
+(for example, `"blue"`) for the fill color of the rectangle. If the `color` 
+is not included, rectangle objects default to a fill color of `"yellow"`.
+
+##### *Return Value*
+([GameObj](#java-data-types)). A reference to the rectangle object is returned, 
+which can be used to access and modify the rectangle later 
+(see [GameObj Data Fields](#gameobj-data-fields) and [GameObj Methods](#gameobj-methods)).
+
+#### Examples
+```
+ct.rect( 50, 30, 40, 20 );
+```
+```
+ct.rect( 50, 70, 80, 40, "blue" );
+```
+```
+GameObj platform = ct.rect( 0, 50, 30, 8, "orange" );
+platform.xSpeed = 1;
+```
+
+
+### ct.line()
+
+Creates a new line graphics object (GameObj) drawn from a point (`x1`, `y2`) 
+to a second point (`x2`, `y2`).
+
+#### Syntax
+```
+ct.line( x1, y1, x2, y2 );
+ct.line( x1, y1, x2, y2, color );
+```
+##### x1
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the first point.
+
+##### y1
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates)
+of the first point.
+
+##### x2
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the second point.
+
+##### y2
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates)
+of the second point.
+
+##### color
+([String](#java-data-types), optional). A [color name](#color-names) 
+(for example, `"blue"`) for the color of the line. If the `color` 
+is not included, line objects default to a color of `"black"`.
+
+##### *Return Value*
+([GameObj](#java-data-types)). A reference to the line object is returned, 
+which can be used to access and modify the line later 
+(see [GameObj Data Fields](#gameobj-data-fields) and [GameObj Methods](#gameobj-methods)).
+
+#### Examples
+```
+ct.line( 10, 30, 90, 40 );
+```
+```
+ct.line( 10, 50, 90, 50, "blue" );
+```
+```
+GameObj border = ct.line( 0, 75, 100, 75, "red" );
+border.lineWidth = 3;
+```
+
+
+### ct.text()
+
+Creates a new text graphics object (GameObj), which can be used to display text
+on the graphics screen.
+
+#### Syntax
+```
+ct.text( text, x, y, height );
+ct.text( text, x, y, height, color );
+```
+##### text
+([String](#java-data-types)). The text to display.
+
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the center of the text object.
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates) 
+of the center of the text object.
+
+##### height
+([double](#java-data-types)) The [height](#graphics-coordinates) of the text object. 
+The font size of the text is determined automatically to fit within the `height`. 
+The text object's width is then determined automatically to be wide enough to contain 
+the `text` on one line.
+
+##### color
+([String](#java-data-types), optional). A [color name](#color-names) 
+(for example, `"blue"`) for the color of the text. If the `color` 
+is not included, text objects default to a text color of `"black"`.
+
+##### *Return Value*
+([GameObj](#java-data-types)). A reference to the text object is returned, 
+which can be used to access and modify the text object later 
+(see [GameObj Data Fields](#gameobj-data-fields) and [GameObj Methods](#gameobj-methods)).
+
+#### Examples
+```
+ct.text( "Zombie Attack!", 50, 40, 20 );
+```
+```
+ct.text( "Click anywhere to play", 50, 60, 5, "blue" );
+```
+```
+GameObj scoreText = ct.text( "Score: 0", 100, 20, 10, "green" );
+scoreText.align( "right" );
+```
+
+
+### ct.image()
+
+Creates a new graphics image object (GameObj) from an image file (.PNG or .JPG).
+
+#### Syntax
+```
+ct.image( filename, x, y, width );
+```
+##### filename
+([String](#java-data-types)). The filename of the image to display. 
+The image file must be in PNG or JPG format, for example "dragon.png", or "sky.jpg".
+For a simple filename such as "dragon.png", the image file must be copied
+into the same folder as your Java program (.java) file. You can also put image
+files into subfolders using, for example, "images/bullet.png".
+
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+for the center of the image.
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates) 
+for the center of the image.
+
+##### width
+([double](#java-data-types)) The [width](#graphics-coordinates) for the image object. 
+The image file itself can be any size, and it will be scaled to fit into the the 
+given `width`. The height of the image object is determined automatically to preserve 
+the original image's aspect ratio.
+
+> If you wish to stretch or distort the image to be different from its original
+> aspect ratio, you can do so using the [obj.setSize](#obj.setsize) method.
+
+##### *Return Value*
+([GameObj](#java-data-types)). A reference to the image object is returned, 
+which can be used to access and modify the image object later 
+(see [GameObj Data Fields](#gameobj-data-fields) and [GameObj Methods](#gameobj-methods)).
+
+#### Examples
+```
+ct.image( "dragon.png", 30, 50, 10 );
+```
+```
+// Stretch the sky image to fill the entire screen
+GameObj sky = ct.image( "sky.jpg", 50, 50, 100 );
+sky.setSize( 100, 100 );
+```
+
+
 Text Output
 -----------
+These functions allow you to output text to the console area, 
+which is below the graphics area in the Code12 application.
+Text in this area displays as a continuous scrolling stream of lines.
+You can also output to a text file on your computer.
+
+> To display text on the graphics screen, use [ct.text](#ct.text).
+
+* [ct.print](#ct.print)
+* [ct.println](#ct.println)
+* [ct.log](#ct.log)
+* [ct.logm](#ct.logm)
+* [ct.setOutputFile](#ct.setoutputfile)
+
 
 ### ct.print()
-```
-ct.print( Object value )
-```
-Print the text representation of a value to the console.
-The `value` can be a variable or expression of any type.
-No newline or extra characters are added.
 
-> This is equivalent to Java's `System.out.print`.
+Output text, or the text representation of any value, to the console.
+A newline is *not* added, so any subsequent text output will appear on
+the same line. 
+
+> This is equivalent to Java's `System.out.print()`.
+
+#### Syntax
+```
+ct.print( value );
+```
+##### value
+(Any type). The text or value to output.
+
+#### Examples
+```
+// These will output on the same line
+ct.print( "Hello" );
+ct.print( " there!" );
+```
+```
+String userName = "Jennifer";
+int score = 500;
+
+ct.print( "User " );
+ct.print( userName )
+ct.print( " has a score of " );
+ct.print( score );
+```
+
 
 ### ct.println()
-```
-ct.println( Object value )
-ct.println( )
-```
-Print the text representation of a value to the console,
-and add a newline afterwards.
-The `value` can be a variable or expression of any type.
-If `value` is not included, just a newline is printed.
 
-> This is equivalent to Java's `System.out.println`.
+Output text, or the text representation of any value, to the console.
+A newline is automatically added to end the line after the value. 
+
+> This is equivalent to Java's `System.out.println()`.
+
+#### Syntax
+```
+ct.println( value );
+ct.println();
+```
+##### value
+(Any type, optional). The text or value to output. If no value is given
+then only a newline is output.
+
+#### Examples
+```
+ct.println( "Hello World!" );
+```
+```
+ct.println( "This is line 1" );
+ct.println( "This is line 2" );
+ct.println();    // a blank line
+ct.println( "This is the next paragraph." );
+```
+```
+int totalScore = 250;
+int numTrys = 3;
+
+ct.println( "Your average score is " + (totalScore / numTrys) );
+```
+
 
 ### ct.log()
+
+Output any number of values to the console, on one line separated by commas. 
+[String](#java-data-types) values are output enclosed in `"double quotes"`, 
+and [GameObj](#java-data-types) objects are described in `[square brackets]`.
+
+#### Syntax
 ```
-ct.log( Object... values )
+ct.log( value, value2, ... );
 ```
-Print any number of values to the console.
-There can be any number of variables or expressions passed, of any types.
-If multiple values are given, they are printed on one line separated by commas.
-Strings are enclosed in ``"double quotes"``,
-and `GameObj` objects are described in `[square brackets]`.
+##### value, value2, ...
+(Any number of values, of any types). The values to output. You can pass any number
+of values of any type(s). The values will be output to the console on the same line, 
+separated by commas.
+
+> Unlike [ct.println()](#ct.println), String values will be automatically output 
+> enclosed in double quotes. 
+
+#### Examples
+```
+int count = 3;
+ct.log( count );
+```
+```
+String playerName = "Rick";
+int hits = 7;
+int misses = 4;
+int total = hits + misses;
+
+ct.log( playerName, hits, misses, total );
+```
+
 
 ### ct.logm()
+
+Output a text message followed by any number values to the console, 
+all on one line separated by commas. 
+[String](#java-data-types) values are output enclosed in `"double quotes"`, 
+and [GameObj](#java-data-types) objects are described in `[square brackets]`.
+
+#### Syntax
 ```
-ct.logm( String message, Object... values )
+ct.logm( message, value, value2, ... );
 ```
-Print the `message` followed by a space, then print the values
-(any number of variables or expressions) to the console.
-The values are output in the same way as `ct.logm()` (see above).
+##### message
+([String](#java-data-types)). A message to output at the beginning of the line.
+
+> Unlike a String value passed as a `value`, the message is not output with 
+> double quotes added.  
+
+##### value, value2, ...
+(Any number of values, of any types). The values to output. You can pass any number
+of values of any type(s). The values will be output to the console on the same line 
+after the `message` plus a space, separated by commas.
+
+> Unlike [ct.println()](#ct.println), String values will be automatically enclosed 
+> in double quotes. 
+
+#### Examples
+```
+int count = 3;
+ct.logm( "count", count );
+```
+```
+int runs = 3;
+int hits = 7;
+int errors = 1;
+
+ct.logm( "Current stats:", runs, hits, errors );
+```
+
 
 ### ct.setOutputFile()
-```
-ct.setOutputFile( String filename )
-```
-If you call `ct.setOutputFile()`, then any subsequent text output
-from `ct.print()`, `ct.println()`, `ct.log()`, and `ct.logm()` will be 
-written to a text file named `filename` in addition to being displayed
-in the console window. Call `ct.setOutputFile( null )` to restore output
-to appearing in the console only.
 
-The `filename` should be a simple filename such as `"output.txt"`,
-which will be written to the same folder as the source code file, or a
-relative path starting from the source code folder, such as
-`"output/nameList.txt"`.
+If you call `ct.setOutputFile( filename )`, then any subsequent text output
+from [ct.print](#ct.print), [ct.println](#ct.println), 
+[ct.log](#ct.log), and [ct.logm](#ct.logm) will be
+written to a text file with the given filename in addition to being output
+to the console. 
 
-> If there is an existing file named `filename` then it will be deleted
+#### Syntax
+```
+ct.setOutputFile( filename );
+ct.setOutputFile( null );
+```
+##### filename
+([String](#java-data-types)). The output filename. This should be a 
+simple filename such as `"output.txt"`, which will be written to the 
+same folder as the Java source code file, or a relative path starting 
+from the source code folder, such as `"output/nameList.txt"`.
+
+> If there is an existing file with the given name then it will be deleted
 > and written over. Note that each time you run your program and call 
-> `ct.setOutputFile()` to a certain filename, it will overwrite the
-> previous file. 
+> `ct.setOutputFile` with a certain filename, it will overwrite the
+> previous version of the file.
+
+Call `ct.setOutputFile( null )` to end output to a file and restore 
+output to the console only.
+
+> It is a good idea to call `ct.setOutputFile( null )` after you are 
+> finished writing to a file, to ensure that no buffered output is lost.
+
+#### Example
+```
+double a = 7;
+double b = 2;
+
+ct.setOutputFilename( "Math Test Results.txt" );
+ct.println( "Test of simple math operations" );
+ct.log( a, b );
+ct.println( "Sum = " + (a + b) );
+ct.println( "Difference = " + (a - b) );
+ct.println( "Product = " + (a * b) );
+ct.println( "Quotient = " + (a / b) );
+ct.setOutputFilename( null );
+```
+
 
 Alerts and Input Dialogs
 ------------------------
@@ -169,7 +558,7 @@ as a percent. The default height is 100.0, resulting in a square window.
 > Coordinate units are not pixels, because the Code12 graphics window 
 > scales your game up and down automatically when the window size changes.
 > You can think of coordinate units as a percent of the window width,
-> so an x-coordiante of 50 is always horizontally centered in the window.
+> so an x-coordinate of 50 is always horizontally centered in the window.
 
 > **Note**: On some platforms, you may have limited or no control over the
 > window size or aspect ratio. On mobile devices, the application will always 
@@ -331,82 +720,6 @@ while preserving the aspect ratio of the image.
 If `filename` is a simple filename (no path),
 then the main project folder is checked first, followed by
 the `Code12/images` folder if not found in the project folder.
-
-
-GameObj Creation
-----------------
-
-### ct.circle()
-```
-GameObj ct.circle( double x, double y, double diameter )
-GameObj ct.circle( double x, double y, double diameter, String color )
-```
-Create and add a circle object to the current screen
-with the given (`x`, `y`) location and `diameter`.
-Return the `GameObj` reference to the circle object.
-
-Circle objects default to a fill color of "red",
-a line color of "black", and a line width of 1.
-If `color` is included then set the circle's fill color
-to the given named color. See [Color Names](#color-names).
-
-### ct.rect()
-```
-GameObj ct.rect( double x, double y, double width, double height )
-GameObj ct.rect( double x, double y, double width, double height, String color )
-```
-Create and add a rectangle object to the current screen
-with the given (`x`, `y`) location and size given by `width` and `height`.
-Return the `GameObj` reference to the rectangle object.
-
-Rectangle objects default to a fill color of "yellow",
-a line color of "black", and a line width of 1.
-If `color` is included then set the rectangle's fill color
-to the given named color. See [Color Names](#color-names).
-
-### ct.line()
-```
-GameObj ct.line( double x1, double y1, double x2, double y2 )
-GameObj ct.line( double x1, double y1, double x2, double y2, String color )
-```
-Create and add a line object to the current screen
-from point (`x1`, `y1`) to point (`x2`, `y2`).
-Return the `GameObj` reference to the line object.
-
-Line objects default to a line color of "black", and a line width of 1.
-(Lines have no fill color).
-If `color` is included then set the line's color
-to the given named color See [Color Names](#color-names).
-
-### ct.text()
-```
-GameObj ct.text( String s, double x, double y, double height )
-GameObj ct.text( String s, double x, double y, double height, String color )
-```
-Create and add a text object to the current screen
-with text string `s`, at location (`x`, `y`),
-and height given by `height`. The font size is determined
-automatically to fit within the `height`.
-The object width is determined automatically
-to be wide enough to contain the string `s` on one line.
-Return the `GameObj` reference to the text object.
-
-Text objects default to a text (fill) color of "black"
-and have no line color.
-If `color` is included then set the text's color
-to the given named color. See [Color Names](#color-names).
-
-### ct.image()
-```
-GameObj ct.image( String filename, double x, double y, double width )
-```
-Create and add an image object to the current screen
-with the image `filename`, at location (`x`, `y`),
-and width given by `width`. The height is determined
-automatically to preserve the original image's aspect ratio.
-Return the `GameObj` reference to the image object.
-
-The image file must be in PNG or JPG format.
 
 
 Mouse and Keyboard Input
@@ -684,8 +997,8 @@ If numDigits is included, then format to this many digits,
 adding leading zeros as necessary.
 
 
-GameObj Public Data Fields
---------------------------
+GameObj Data Fields
+-------------------
 `GameObj` objects are graphics objects visible on the screen.
 See [GameObj Creation](#gameobj-creation) to create a `GameObj`.
 All `GameObj` objects have the following public data fields,
@@ -702,7 +1015,7 @@ in the application window, in graphics coordinates.
 By default, graphics coordinates range from 0 to 100 in both x and y
 if the window is square. If the window is not square (see `ct.setHeight()`),
 then x coordinates still range from 0 (left edge) to 100 (right edge),
-but y coordiantes will range from 0 (top edge) to the value returned
+but y coordinates will range from 0 (top edge) to the value returned
 by `ct.getHeight()` (bottom edge).
 
 > By default, objects are positioned by their center, so (`x`, `y`)
@@ -1103,8 +1416,8 @@ String   str.toUpperCase()
 String   str.trim()
 ```
 
-Events
-------
+Event Functions
+---------------
 The following functions, if defined in your program, will be called when
 indicated. Note that unlike all of the other functions and methods above,
 These functions are *implemented* in your program (you write the body of the
@@ -1263,12 +1576,94 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 > the window frame, so you may receive many `onResize` events in succession.
 
 
-Appendix: Pre-Defined Names
----------------------------
+Additional Reference Information
+--------------------------------
+
+### Graphics Coordinates
+
+Graphics objects in Code12 are positioned on the screen by (x, y) coordinates.
+The coordinate values are not pixels, but instead are in unit values relative 
+to the size of the graphics area, which we will call the "screen". 
+Size values (e.g. width and height) use the same units.
+
+##### X Coordinates, Width, and Objext Scaling
+The screen area is always 100 units wide, by definition, so an x-coordinate of 50 
+is always horizontally centered in the screen. So you can think of an x-coordinate
+value as a percent of the window width. An x value of 0 is at the left edge, 50 is 
+in the center, and 100 is at the right edge. Similarly, a width of 50 is half as
+wide as the screen.
+
+> If you resize the Code12 application or use the pane splits to change the size
+> of the graphics screen area, your graphics objects will automatically scale 
+> along with the screen, and the coordinates of the objects do not change. 
+
+##### Y Coordinates, Height, and Aspect Ratio
+By default, the screen area is square, so the screen is also 100 units high.
+A y value of 0 is at the top edge, 50 is centered vertically, and 100 is at 
+the bottom edge. Similarly, a height of 50 would be half as high as the default
+screen size.
+
+> Note that unlike in Algegra, the origin (0, 0) is at the top-left of the screen,
+> and y-coordinates increase downward, not upwards.
+
+If you want the screen area for your program to be taller or wider than square
+(e.g. a rectangle in "portrait" or "landscape" orientation), you can use the 
+[ct.setHeight](#ct.setheight) function to change the height of the screen area.
+
+##### Coordinate Precision
+Coordinate values are of type [double](#java-data-types), so they may include 
+non-integer precision (for example, you could have x = 8.25). Because coordinates
+are relative values, not pixels, the actual pixel locations of objects are 
+determined automatically and "on the fly" by the graphics system based on the size
+of the screen area.
+
+##### Positioning Objects Off-screen
+By default, x and y coordinates in the screen area range from 0 to 100. 
+However, it is not an error to position objects outside of the screen bounds.
+For example, you could position a circle at (-10, 150), which would put it
+slightly off-screen to the left and quite a bit off-screen beyond the bottom.
+Objects outside the screen area still exist but are simply not visible, and
+objects overlapping a screen edge are "clipped" at the edge.
+
+##### Changing the Screen Origin to Scroll the Screen
+By default the position (0, 0) is at the upper-left corner of the screen.
+However, you can use the [ct.setScreenOrigin](#ct.setscreenorigin) function to
+change the position of the origin, which will effectively "scroll" the screen.
+You can use this to more easily create games and other applications in which the 
+screen acts like a window into a larger world that you can move through.   
+
+
+### Java Data Types
+Code12 supports the standard Java data types `int`, `double`, `boolean`, and `String`,
+plus the `GameObj` type defined by Code12.
+
+#### int
+A number with an integer value. 
+Examples: `3`, `125`, `0`, `-1`, `43500`, `-1200`.
+
+#### double
+A number which can include optional decimal places. 
+Examples: `3.14`, `5`, `-67.456`, `0`, `154.003`, `-0.0001`
+
+#### boolean
+A logical (truth) value that can only be `true` or `false`.
+
+#### String
+A sequence of text characters. When the value of a string is given directly,
+it must be enclosed in double quotes. 
+Examples: `"hello"`, `"What is your name?"`, `"3"`, `"food4u*$-!)"`
+
+#### GameObj
+A `GameObj` (Game Object) is a reference to a graphical object (circle, rectangle, line, 
+text, or image) that you can create for display on the screen. To create a `GameObj`
+see [Graphic Object Creation](#graphic-object-creation). If you store a `GameObj` in
+a variable then you can also access and change the object later using 
+[GameObj Data Fields](#gameobj-data-fields) and [GameObj Methods](#gameobj-methods).
+
 
 ### Color Names
-The following named colors are supported.
-If a string used as a color is not recognized then "gray" is used.
+The following color names are supported.
+If a String value used as a color is not recognized then "gray" is used.
 ```
 Color Name       (red, green, blue)
 ----------       ------------------
