@@ -51,15 +51,16 @@ h1 {
 
 h2 {    /* API groups */
     font-size: 220%;
-    padding-top: 1em;
+    margin-top: 3em;
     border-top: double black;
+    padding-top: 1em;
 }
 
 h3 {   /* API Functions */
     font-size: 200%;
     margin-top: 2em;
-    padding-top: 1em;
     border-top: 1px solid gray;
+    padding-top: 1em;
     color: #0000C0;
 }
 

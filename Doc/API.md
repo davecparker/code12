@@ -16,9 +16,9 @@ The Code12 API functions are built in to the Code12 application.
 * [GameObj Data Fields](#gameobj-data-fields)
 * [GameObj Methods](#gameobj-methods)
 
-##### Java Class Methods and Fields Supported
-* [Math Class](#java-math-class-methods-and-fields-supported)
-* [String Class](#java-string-class-methods-supported)
+##### Math and String Operations
+* [Java Math Methods and Fields Supported](#java-math-methods-and-fields-supported)
+* [Java String Methods Supported](#java-string-methods-supported)
 
 ##### Input and Program Control Events
 * [Event Functions](#event-functions)
@@ -34,11 +34,11 @@ Graphic Object Creation
 -----------------------
 These functions allow you to create new graphics objects for display on the screen.
 
-* [ct.circle](#ct.circle)
-* [ct.rect](#ct.rect)
-* [ct.line](#ct.line)
-* [ct.text](#ct.text)
-* [ct.image](#ct.image)
+* [ct.circle()](#ct.circle)
+* [ct.rect()](#ct.rect)
+* [ct.line()](#ct.line)
+* [ct.text()](#ct.text)
+* [ct.image()](#ct.image)
 
 
 ### ct.circle()
@@ -241,10 +241,12 @@ ct.image( filename, x, y, width );
 ```
 ##### filename
 ([String](#java-data-types)). The filename of the image to display. 
-The image file must be in PNG or JPG format, for example "dragon.png", or "sky.jpg".
-For a simple filename such as "dragon.png", the image file must be copied
-into the same folder as your Java program (.java) file. You can also put image
-files into subfolders using, for example, "images/bullet.png".
+The image file must be in PNG or JPG format, for example 
+`"dragon.png"`, or `"sky.jpg"`.
+
+> For a simple filename such as `"dragon.png"`, the image file must be copied
+> into the same folder as your Java program (.java) file. You can also put image
+> files into subfolders using, for example, `"images/bullet.png"`.
 
 ##### x
 ([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
@@ -261,7 +263,7 @@ given `width`. The height of the image object is determined automatically to pre
 the original image's aspect ratio.
 
 > If you wish to stretch or distort the image to be different from its original
-> aspect ratio, you can do so using the [obj.setSize](#obj.setsize) method.
+> aspect ratio, you can do so using the [obj.setSize()](#obj.setsize) method.
 
 ##### *Return Value*
 ([GameObj](#java-data-types)). A reference to the image object is returned, 
@@ -286,13 +288,13 @@ which is below the graphics area in the Code12 application.
 Text in this area displays as a continuous scrolling stream of lines.
 You can also output to a text file on your computer.
 
-> To display text on the graphics screen, use [ct.text](#ct.text).
+> To display text on the graphics screen, use [ct.text()](#ct.text).
 
-* [ct.print](#ct.print)
-* [ct.println](#ct.println)
-* [ct.log](#ct.log)
-* [ct.logm](#ct.logm)
-* [ct.setOutputFile](#ct.setoutputfile)
+* [ct.print()](#ct.print)
+* [ct.println()](#ct.println)
+* [ct.log()](#ct.log)
+* [ct.logm()](#ct.logm)
+* [ct.setOutputFile()](#ct.setoutputfile)
 
 
 ### ct.print()
@@ -436,8 +438,8 @@ ct.logm( "Current stats:", runs, hits, errors );
 ### ct.setOutputFile()
 
 If you call `ct.setOutputFile( filename )`, then any subsequent text output
-from [ct.print](#ct.print), [ct.println](#ct.println), 
-[ct.log](#ct.log), and [ct.logm](#ct.logm) will be
+from [ct.print()](#ct.print), [ct.println()](#ct.println), 
+[ct.log()](#ct.log), and [ct.logm()](#ct.logm) will be
 written to a text file with the given filename in addition to being output
 to the console. 
 
@@ -481,245 +483,544 @@ ct.setOutputFilename( null );
 
 Alerts and Input Dialogs
 ------------------------
+These functions allow you to display a message box for the user
+and to prompt for input from the user.
+
+* [ct.showAlert()](#ct.showalert)
+* [ct.inputInt()](#ct.inputint)
+* [ct.inputNumber()](#ct.inputnumber)
+* [ct.inputYesNo()](#ct.inputyesno)
+* [ct.inputString()](#ct.inputstring)
+
 
 ### ct.showAlert()
-```
-ct.showAlert( String message )
-```
-Display `message` in a popup alert dialog. 
+
+Displays a message in a pop-up dialog box over the graphics screen.
 Execution of the program will pause and wait for the user to press
 the OK button on the dialog or press the Enter key on the keyboard.
 
-> The `message` can contain line breaks by embedding 
-> newline (`\n`) characters in the string.
+#### Syntax
+```
+ct.showAlert( message );
+```
+##### message
+([String](#java-data-types)). The message to display. The string can
+contain line breaks by embedding newline (`\n`) characters in it. 
+
+#### Example
+```
+ct.showAlert( "Game Over!" );
+```
+
 
 ### ct.inputInt()
-```
-int ct.inputInt( String message )
-```
-Display `message` in a popup dialog box that allows the user to
+
+Displays a message in a pop-up dialog box that asks the user to
 enter a number.
 Execution of the program will pause and wait until the user
 enters a valid integer. The resulting integer value is returned.
 
+#### Syntax
+```
+ct.inputInt( message );
+```
+##### message
+([String](#java-data-types)). The message to display. 
+
+##### *Return Value*
+([int](#java-data-types)). The number entered by the user. 
+
+#### Example
+```
+int numTargets = ct.inputInt( "How many targets would you like to have?" );
+```
+
+
 ### ct.inputNumber()
-```
-double ct.inputNumber( String message )
-```
-Display `message` in a popup dialog box that allows the user to
+
+Displays a message in a pop-up dialog box that asks the user to
 enter a number.
 Execution of the program will pause and wait until the user
 enters a valid number. The resulting numeric value is returned.
 
+#### Syntax
+```
+ct.inputNumber( message );
+```
+##### message
+([String](#java-data-types)). The message to display. 
+
+##### *Return Value*
+([double](#java-data-types)). The number entered by the user. 
+
+#### Example
+```
+double tempF = ct.inputNumber( "Enter the temperature in Farenheit" );
+```
+
+
 ### ct.inputYesNo()
-```
-boolean ct.inputYesNo( String message )
-```
-Display `message` in a popup dialog box that has two buttons
+
+Displays a message in a pop-up dialog box that has two buttons
 labelled Yes and No.
 Execution of the program will pause and wait until the user
-presses one of the buttons. The function returns `true` if the
-user presses Yes and `false` if they press No.
+presses one of the buttons.
+
+#### Syntax
+```
+ct.inputYesNo( message );
+```
+##### message
+([String](#java-data-types)). The message to display. 
+
+##### *Return Value*
+([boolean](#java-data-types)). `true` if the user presses Yes 
+and `false` if they press No. 
+
+#### Example
+```
+boolean playAgain = ct.inputYesNo( "Do you want to play again?" );
+```
+
 
 ### ct.inputString()
-```
-String ct.inputString( String message )
-```
-Display `message` in a popup dialog box that allows the user to
+
+Displays a message in a popup dialog box that allows the user to
 enter a text string.
 Execution of the program will pause and wait until the user
 presses the Enter key to end the text input. 
 The resulting String value is returned.
 
+#### Syntax
+```
+ct.inputString( message );
+```
+##### message
+([String](#java-data-types)). The message to display. 
+
+##### *Return Value*
+([String](#java-data-types)). The text entered by the user. 
+
 > If the user presses the Enter key without entering any other
 > characters, then an empty string (`""`) will be returned.
 
+#### Example
+```
+String name = ct.inputString( "Enter your name" );
+```
+
+
 Screen Management
 -----------------
+These functions allow you to control the size and appearance of the 
+background of your application, and to manage multiple screens and 
+groups of objects.
+
+* [ct.setTitle()](#ct.settitle)
+* [ct.setHeight()](#ct.setheight)
+* [ct.getWidth()](#ct.getwidth)
+* [ct.getHeight()](#ct.getheight)
+* [ct.getPixelsPerUnit()](#ct.getpixelsperunit)
+* [ct.getScreen()](#ct.getscreen)
+* [ct.setScreen()](#ct.setscreen)
+* [ct.setScreenOrigin()](#ct.setscreenorigin)
+* [ct.clearScreen()](#ct.clearscreen)
+* [ct.clearGroup()](#ct.cleargroup)
+* [ct.setBackColor()](#ct.setbackcolor)
+* [ct.setBackColorRGB()](#ct.setbackcolorrgb)
+* [ct.setBackImage()](#ct.setbackimage)
 
 ### ct.setTitle()
+
+Allows you to set the title of the application window.
+
+#### Syntax
 ```
-ct.setTitle( String title )
+ct.setTitle( title );
 ```
-Set the title of the application window to `title`.
-If and where the title displays depends on the platform that
-the application is running on.
-The title will not display on mobile devices.
+##### title
+([String](#java-data-types)). The title to display at the top of the
+application window. 
+
+#### Example
+```
+ct.setTitle( "Zombie Attack" );
+```
+
 
 ### ct.setHeight()
+
+Sets the height of the graphics output window in coordinate units,
+which effectively sets the aspect ratio of your application.
+
+#### Syntax
 ```
-ct.setHeight( double height )
+ct.setHeight( height );
 ```
-Set the height of the application window in coordinate units.
-The width of the application window in display units is always 100.0
-by definition, so this function sets the height relative to its width 
-as a percent. The default height is 100.0, resulting in a square window.
+##### height
+([double](#java-data-types)). The height for your application in 
+[coordinate units](#graphics-coordinates). The width of the application window 
+in [coordinate units](#graphics-coordinates) is always 100.0 by definition, 
+so this function effectively sets the application height relative to its width 
+as a percent.
 
-> Coordinate units are not pixels, because the Code12 graphics window 
-> scales your game up and down automatically when the window size changes.
-> You can think of coordinate units as a percent of the window width,
-> so an x-coordinate of 50 is always horizontally centered in the window.
-
-> **Note**: On some platforms, you may have limited or no control over the
-> window size or aspect ratio. On mobile devices, the application will always 
-> fill the entire device screen. In this case, `ct.setHeight()` will determine 
-> whether the application runs in portrait or landscape orientation.
-> If `height` is less than 100 then the application will run in landscape mode,
-> otherwise portrait mode.
-
-> After calling `ct.setHeight()`, you can call `ct.getHeight()` to determine the
-> actual height of the window.
-
-##### Examples
+#### Examples
 ```
 ct.setHeight( 100 );               // default square window
+```
+```
 ct.setHeight( 200 );               // window is twice as tall as wide
-ct.setHeight( 100.0 * 9 / 16 );    // 16:9 aspect landscape
-double height = ct.getHeight();    // get actual height used
+```
+```
+ct.setHeight( 100.0 * 9 / 16 );    // 16:9 landscape aspect
 ```
 
 ### ct.getWidth()
+
+This function always returns 100.0, which is the width of the application
+window in [coordinate units](#graphics-coordinates) by definition.
+
+#### Syntax
 ```
-double ct.getWidth( )
+ct.getWidth();
 ```
-This function always returns 100.0, which is the width of the
-application window in coordinate units by definition.
+##### *Return Value*
+([double](#java-data-types)). Always returns 100.0. 
+
+#### Example
+```
+// Get the screen size
+final double WIDTH = ct.getWidth();
+final double HEIGHT = ct.getHeight();
+
+// Make a rectangle that fills the entire screen
+ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );
+```
 
 ### ct.getHeight()
+
+Returns the height of the the application window in 
+[coordinate units](#graphics-coordinates).
+This is 100.0 by default, unless it is changed by [ct.setHeight()](#ct.setheight).
+
+#### Syntax
 ```
-double ct.getHeight( )
+ct.getHeight();
 ```
-Return the height of the the application window in coordinate units.
-This is 100.0 by default, unless it is changed by `ct.setHeight()`.
+##### *Return Value*
+([double](#java-data-types)). The height of the application window in
+[coordinate units](#graphics-coordinates). 
+
+#### Example
+```
+// Get the screen size
+final double WIDTH = ct.getWidth();
+final double HEIGHT = ct.getHeight();
+
+// Make a rectangle that fills the entire screen
+ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );
+```
+
 
 ### ct.getPixelsPerUnit()
+
+Returns the current graphics scale factor from 
+[coordinate units](#graphics-coordinates) to device pixels. 
+
+#### Syntax
 ```
-double ct.getPixelsPerUnit( )
+ct.getPixelsPerUnit();
 ```
-Return the current scale factor from display coordinate units
-to device pixels. The contents of your application scale automatically
-relative to the window size, and the width of the window is
-always defined as 100 in coordinate units. If you want to
-determine the physical size of the application window in pixels,
-you can calculate this as:
-```
-int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
-int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
-```
+##### *Return Value*
+([double](#java-data-types)). The current scale factor from 
+[coordinate units](#graphics-coordinates) to device pixels
+at the current window size.
+
+> Note that the scale factor changes if the application window
+> is resized or if the graphics window is resized using the 
+> pane splits.
+
 > Note that the definition of a "pixel" is platform-dependent,
 > and some devices with very high resolution (e.g. 4K or Retina)
 > may use more than 1 physical pixel per reported "pixel".
 
+#### Examples
+```
+// Determine the physical size of the game window in pixels
+int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
+int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
+```
+```
+// Create a circle that is 10 pixels in diameter at the current scale
+double diameter = 10 / ct.getPixelsPerUnit();
+ct.circle( 50, 50, diameter );
+```
+
+
 ### ct.getScreen()
+
+Returns the name of the current screen, which is the most recent
+screen set using [ct.setScreen()](#ct.setscreen).
+
+#### Syntax
 ```
-String ct.getScreen( )
+ct.getScreen();
 ```
-Return the name of the current screen.
-Your application can define multiple named screens
-and switch between them (see `ct.setScreen()`).
-The default screen name is "" (empty string) if it has
-not been changed.
+##### *Return Value*
+([String](#java-data-types)). The name of the current screen.
+The default screen name is `""` (empty string) if it has not been changed.
+
+#### Example
+```
+// If we are on the intro screen, then wait for a click 
+// to switch to the game screen.
+String screenName = ct.getScreen();
+if (screenName.equals( "intro" ))
+{
+    if (ct.clicked())
+    	ct.setScreen( "game" );
+}
+```
+
 
 ### ct.setScreen()
+
+Sets the current screen to the screen with the specified name.
+
+#### Syntax
 ```
-ct.setScreen( String name )
+ct.setScreen( name );
 ```
-Set the current application screen to the screen named `name`.
+#### Notes
 Your application can define multiple named screens
 and switch between them. Each screen has its own background
-and its own `GameObj` objects.
+and its own graphics (`GameObj`) objects.
 
-If a screen named `name` is not already known,
-then create a new empty screen with this name and set it as the
-current screen.
+When you call `ct.setScreen( name )`, if a screen with the specified 
+`name` has not already been created, then a new empty screen with this 
+name is created and set as the current screen.
 
-`GameObj` objects that are created are always created on
-the current screen, so to create two screens in your `start`
-function:
-1. Call `ct.setScreen()` to name the first screen
-2. Create `GameObj` objects for the first screen
-3. Call `ct.setScreen()` to name the second screen
-4. Create `GameObj` objects for the second screen
-5. At the end of `start`, call `ct.setScreen()` to set the
-desired starting screen for your application.
+> The names of the screens have no special meaning or special
+> behavior, and you can call them anything you want. 
+
+#### Examples
+```
+// If there are no lives left then create and show a Game Over screen
+if (numLives == 0)
+{
+	ct.setScreen( "end" );
+	ct.setBackColor( "light blue" );
+	ct.text( "Game Over", 50, 50, 20 );
+}
+```
+```
+// A game with two screens
+
+public void start()
+{
+	// Make the intro screen
+	ct.setScreen( "intro" );
+	ct.text( "Zombie Attack", 50, 30, 10 );
+	ct.text( "Click to begin", 50, 70, 5 );
+
+	// Make the game screen
+	ct.setScreen( "game" );
+	ct.backImage( "city.jpg" );
+	ct.image( "hero.png", 50, 50, 10 );
+	// etc.
+
+	// Start on the intro screen
+	ct.setScreen( "intro" );
+}
+
+public void update()
+{
+	// If we are on the intro screen, then wait for a click 
+	// to switch to the game screen.
+	String screenName = ct.getScreen();
+	if (screenName.equals( "intro" ))
+	{
+	    if (ct.clicked())
+	    	ct.setScreen( "game" );
+	}	
+}
+
+```
+
 
 ### ct.setScreenOrigin()
+
+Offsets the entire screen horizontally and/or vertically so that
+the coordinate at the upper-left of the screen is a specified (`x`, `y`).
+
+
+#### Syntax
 ```
-ct.setScreenOrigin( double x, double y )
+ct.setScreenOrigin( x, y );
 ```
-Offset the entire screen horizontally and/or vertically so that
-the coordinate at the upper-left of the screen is (`x`, `y`).
-Normally the coordinate of the upper-left corner of the screen
-is (0, 0). Using `ct.setScreenOrigin()` allows you to think of
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+for the left edge of the screen.
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates) 
+for the top of the screen.
+
+#### Notes
+
+Normally the coordinate at the upper-left corner of the screen
+is (0, 0). Using `ct.setScreenOrigin( x, y )` allows you to think of
 the screen as a window viewing part of a larger world, and you
 can pan ("scroll") the window where you want, in order to bring 
 objects that would normally be outside the window into view.
 
-> Using `ct.setScreenOrigin()` does not modify the (x, y) position
-> of any objects. Rather it determines which objects are visible
-> within the game window.
+Using `ct.setScreenOrigin()` does not modify the (x, y) position
+of any objects. Rather it determines which objects are visible
+within the game window and where they display.
 
-> Note that it is always OK to create or position objects outside 
-> of the normal screen bounds. The x-coordinate of the right edge
-> of the screen is normally 100. If you draw a small object at say
-> (150, 50), it will normally not be visible. If you then call
-> `ct.setScreenOrigin( 150, 0 )`, the game will "scroll" horizontally
-> and the object will become visible in the center of the game window.
-> Conversely, another object at (50, 0) will scroll off the screen
-> to the left and no longer be visible.
+Note that it is always OK to create or position objects outside 
+of the normal screen bounds. The [x coordinate](#graphics-coordinates)
+of the right edge of the screen is normally 100. 
+If you draw a small object at say (150, 50), then it will normally 
+not be visible. If you then call
+`ct.setScreenOrigin( 150, 0 )`, the game will "scroll" horizontally
+and the object will become visible in the center of the game window.
+Conversely, another object at (50, 0) will scroll off the screen
+to the left and no longer be visible.
 
-> The screen's background image (see [ct.setBackImage](#ctsetbackimage)),
-> if any, is not affected by the screen origin. If you want a background image
-> that scrolls, you can use [ct.image](#ctimage) to create and display one 
-> that is larger than the normal screen window.
+> A screen's background image created with [ct.setBackImage()](#ct.setbackimage)
+> is not affected by the screen origin. If you want a background image
+> that scrolls, you can instead use [ct.image()](#ct.image) to create and display 
+> one that is larger than the normal screen window.
+
+#### Example
+```
+ct.image( "mountains.png", 50, 50, 300 );   // wider than screen
+ct.image( "bear", 50, 70, 10 );
+ct.setScreenOrigin( 30, 0 );       // entire scene scrolls to the left
+```
+
 
 ### ct.clearScreen()
+
+Removes and deletes all graphics (`GameObj`) objects on the current screen.
+The background color or image is kept, if any.
+
+#### Syntax
 ```
 ct.clearScreen( )
 ```
-Remove and delete all `GameObj` objects on the current screen.
-The background color or image is kept.
+#### Example
+```
+ct.setBackColor( "red" )
+ct.circle( 50, 50, 20 );
+ct.rect( 50, 70, 40, 10 );
+ct.clearScreen();     // screen is now just solid red
+```
+
 
 ### ct.clearGroup()
-```
-ct.clearGroup( String group )
-```
-Remove and delete all `GameObj` objects on the current screen
-whose group name (see the `group` field of a `GameObj`)
-matches the `group` passed.
 
-The default group name for objects not assigned a group
-name is "" (empty string).
+Removes and deletes all graphics (`GameObj`) objects on the current screen
+whose [group name](#obj.group) matches the name passed.
+
+#### Syntax
+```
+ct.clearGroup( name )
+```
+##### name
+([String](#java-data-types)). The [group name](#obj.group) of objects to delete.
+
+> The default group name for objects not assigned a group
+> name is "" (empty string).
+
+#### Example
+```
+GameObj hero = ct.image( "hero.png", 50, 80, 10 );
+
+GameObj coin1 = ct.image( "coin.png", 30, 20, 10 );
+coin1.group = "coins";
+
+GameObj coin2 = ct.image( "coin.png", 60, 10, 10 );
+coin2.group = "coins";
+
+GameObj coin3 = ct.image( "coin.png", 90, 30, 10 );
+coin3.group = "coins";
+
+ct.clearGroup( "coins" );    // deletes all 3 coins
+```
 
 
 ### ct.setBackColor()
+
+Sets the background color of the current screen to a specified 
+[color name](#color-names).
+
+#### Syntax
 ```
-ct.setBackColor( String color )
+ct.setBackColor( color );
 ```
-Set the background color of the current screen to the
-pre-defined color named `color`. See [Color Names](#color-names).
+##### color
+([String](#java-data-types)). The [color name](#color-names) for the background.
+
+#### Example
+```
+ct.setBackColor( "light blue" );
+```
+
 
 ### ct.setBackColorRGB()
+
+Sets the background color of the current screen to a
+custom RGB color with specified `red`, `green`, and `blue` components.
+
+#### Syntax
 ```
-ct.setBackColorRGB( int red, int green, int blue )
+ct.setBackColorRGB( red, green, blue );
 ```
-Set the background color of the current screen to the
-custom RGB color with components `red`, `green`, and `blue`
-in the range 0-255.
+##### red
+([int](#java-data-types)). The red component for the color, from 0 to 255.
+
+##### green
+([int](#java-data-types)). The green component for the color, from 0 to 255.
+
+##### blue
+([int](#java-data-types)). The blue component for the color, from 0 to 255.
+
+#### Example
+```
+ct.setBackColorRGB( 0, 60, 255 );    // greenish blue
+```
+
 
 ### ct.setBackImage()
-```
-ct.setBackImage( String filename )
-```
-Set the background image of the current screen to the image `filename`.
-The image file must be in PNG or JPG format. The background image is
-centered and cropped automatically to show as much of the image as
-possible given the aspect ratio of the window,
-while preserving the aspect ratio of the image.
 
-If `filename` is a simple filename (no path),
-then the main project folder is checked first, followed by
-the `Code12/images` folder if not found in the project folder.
+Sets the background of the current screen to an image.
+The background image always displays behind all graphics (`GameObj`) objects
+on the screen.
+
+#### Syntax
+```
+ct.setBackImage( filename )
+```
+##### filename
+([String](#java-data-types)). The name of a file containing the image. 
+The image file must be in PNG or JPG format, for example `"sky.jpg"`.
+
+> For a simple filename such as `"sky.jpg"`, the image file must be copied
+> into the same folder as your Java program (.java) file. You can also put image
+> files into subfolders using, for example, `"images/sky.jpg"`.
+
+#### Notes
+The image file does not need to match the aspect ratio of the screen.
+The background image is centered and cropped automatically to show as much of 
+the image as possible while preserving the aspect ratio of the image.
+
+#### Example
+```
+ct.setBackImage( "sky.jpg" );
+```
+
 
 
 Mouse and Keyboard Input
@@ -1370,51 +1671,62 @@ will be considered.
 > for `null` before using the `GameObj` returned.
 
 
-Java Math Class Methods and Fields Supported
---------------------------------------------
-The following fields and functions from the Java `Math` class are supported.
+Java Math Methods and Fields Supported
+--------------------------------------
+Code12 supports the following fields and method functions from the Java `Math` class.
 ```
-double  Math.E
-double  Math.PI
-double  Math.abs( double number )
-int     Math.abs( int number )
-double  Math.acos( double number )
-double  Math.asin( double number )
-double  Math.atan( double number )
-double  Math.atan2( double y, double x)
-double  Math.ceil( double number )
-double  Math.cos( double angle )
-double  Math.cosh( double angle )
-double  Math.exp( double number )
-double  Math.floor( double number )
-double  Math.log( double number )
-double  Math.log10( double number )
-double  Math.max( double number1, double number2 )
-int     Math.max( int number1, int number2 )
-double  Math.min( double number1, double number2 )
-int     Math.min( int number1, int number2 )
-double  Math.pow( double number, double exponent )
-double  Math.sin( double angle )
-double  Math.sinh( double angle )
-double  Math.sqrt( double number )
-double  Math.tan( double angle )
-double  Math.tanh( double angle )
-```
+Field       Type
+-------     ------
+Math.E      double
+Math.PI     double
 
-Java String Class Methods Supported
------------------------------------
-The following methods from the Java `String` class are supported.
+Function               Parameter Type(s)   Return Type
+--------------------   -----------------   -----------
+Math.abs( number )     double              double
+Math.abs( number )     int                 int
+Math.acos( number )    double              double
+Math.asin( number )    double              double
+Math.atan( number )    double              double
+Math.atan2( y, x )     double, double      double
+Math.ceil( number )    double              double
+Math.cos( angle )      double              double
+Math.cosh( angle )     double              double
+Math.exp( number )     double              double
+Math.floor( number )   double              double
+Math.log( number )     double              double
+Math.log10( number )   double              double
+Math.max( a, b )       double, double      double
+Math.max( a, b )       int, int            int
+Math.min( a, b )       double, double      double
+Math.min( a, b )       int, int            int
+Math.pow( num, exp )   double, double      double
+Math.sin( angle )      double              double
+Math.sinh( angle )     double              double
+Math.sqrt( number )    double              double
+Math.tan( angle )      double              double
+Math.tanh( angle )     double              double
 ```
-int      str.compareTo( String str2 )
-boolean  str.equals( String str2 )
-int      str.indexOf( String strFind )
-int      str.length()
-String   str.substring( int beginIndex )
-String   str.substring( int beginIndex, int endIndex )
-String   str.toLowerCase()
-String   str.toUpperCase()
-String   str.trim()
+For more information, see the [Java Math Class](https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html).
+
+Java String Methods Supported
+-----------------------------
+Code12 supports the following method functions from the Java `String` class.
+String methods must operate on a variable of type [String](#java-data-types),
+shown below as `str`.
 ```
+Function                      Parameter Type(s)   Return Type
+---------------------------   -----------------   -----------
+str.compareTo( str2 )         String              int
+str.equals( str2 )            String              boolean
+str.indexOf( strFind )        String              int
+str.length()                                      int
+str.substring( begin )        int                 String
+str.substring( begin, end )   int, int            String
+str.toLowerCase()                                 String
+str.toUpperCase()                                 String
+str.trim()                                        String
+```
+For more information, see the [Java String Class](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html).
 
 Event Functions
 ---------------
