@@ -15,6 +15,7 @@ public class GameInput implements MouseListener, KeyListener
    GameObj mouseObj;           // object getting mouse events if mouseDown
    int xMouseP, yMouseP;       // last mouse pixel position
    boolean clicked;            // true if a click happened in this update cycle
+   double clickX, clickY;      // last click coordinates
    GameObj clickedObj;         // object considered clicked in this update cycle
    HashMap<String, Integer> keyNameToCode;  // map e.g. "up" to KeyEvent.UP
    String[] keyCodeToName;     // map e.g. KeyEvent.UP to "up"
@@ -32,6 +33,8 @@ public class GameInput implements MouseListener, KeyListener
       xMouseP = 0;
       yMouseP = 0;
       clicked = false;
+      clickX = 0;
+      clickY = 0;
       clickedObj = null;
       keyNameToCode = new HashMap<String, Integer>();
       keyCodeToName = new String[KeyEvent.KEY_LAST + 1];
@@ -55,6 +58,8 @@ public class GameInput implements MouseListener, KeyListener
       program.onMousePress(mouseObj, x, y);
       mouseDown = true;
       clicked = true;
+      clickX = x;
+      clickY = y;
       clickedObj = mouseObj;
    }
      

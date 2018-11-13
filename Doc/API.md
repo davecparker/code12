@@ -2,7 +2,7 @@
 
 The Code12 API functions are built in to the Code12 application.
 
-##### Global (ct) API Functions
+##### Code12 (ct) API Functions
 * [Graphic Object Creation](#graphic-object-creation)
 * [Text Output](#text-output)
 * [Alerts and Input Dialogs](#alerts-and-input-dialogs)
@@ -20,8 +20,9 @@ The Code12 API functions are built in to the Code12 application.
 * [Java Math Methods and Fields Supported](#java-math-methods-and-fields-supported)
 * [Java String Methods Supported](#java-string-methods-supported)
 
-##### Input and Program Control Events
-* [Event Functions](#event-functions)
+##### Input Events and Program Control Functions
+* [Program Control Functions](#program-control-functions)
+* [Input Event Functions](#input-event-functions)
 
 ##### Additional Reference Information
 * [Graphics Coordinates](#graphics-coordinates)
@@ -792,6 +793,7 @@ Sets the current screen to the screen with the specified name.
 ct.setScreen( name );
 ```
 #### Notes
+
 Your application can define multiple named screens
 and switch between them. Each screen has its own background
 and its own graphics (`GameObj`) objects.
@@ -1012,6 +1014,7 @@ The image file must be in PNG or JPG format, for example `"sky.jpg"`.
 > files into subfolders using, for example, `"images/sky.jpg"`.
 
 #### Notes
+
 The image file does not need to match the aspect ratio of the screen.
 The background image is centered and cropped automatically to show as much of 
 the image as possible while preserving the aspect ratio of the image.
@@ -1025,88 +1028,262 @@ ct.setBackImage( "sky.jpg" );
 
 Mouse and Keyboard Input
 ------------------------
-### ct.clicked()
-```
-boolean ct.clicked( )
-```
-Return `true` if a mouse click or touch occured in the application
-window during the last update cycle. Calling this function
-every time in your `update` function will detect all mouse clicks.
+These functions allow you to easily process mouse/touch and keyboard input
+in your `update()` function.
 
-If this function returns true then you can retrive the click location
+* [ct.clicked()](#ct.clicked)
+* [ct.clickX()](#ct.clickx)
+* [ct.clickY()](#ct.clicky)
+* [ct.objectClicked()](#ct.objectclicked)
+* [ct.keyPressed()](#ct.keypressed)
+* [ct.charTyped()](#ct.chartyped)
+
+Calling these functions in your `update()` function causes them to be called
+repeatedly, once for each animation frame (60 times per second), 
+which is fast enough to provide fast response to input.
+
+> Another more flexible way to handle mouse/touch and keyboard input,
+> which requires writing your own functions with parameters (syntax level 10),
+> is to write your own [Input Event Functions](#input-event-functions) 
+
+
+### ct.clicked()
+
+Returns `true` if a click (mouse button press) or touch (on touch screens)
+occured in the application window during the last animation frame. 
+
+#### Syntax
+```
+ct.clicked()
+```
+##### *Return Value*
+([boolean](#java-data-types)). `true` if a click occured, otherwise `false`.
+
+#### Notes
+
+Calling this function every time in your `update()` function will 
+detect all mouse clicks in your application window.
+
+If this function returns `true` then you can retrive the click location
 using `ct.clickX()` and `ct.clickY()`.
 
+#### Example
+```
+public void update()
+{
+	if (ct.clicked())
+	{
+		double x = ct.clickX();
+		double y = ct.clickY();
+		ct.logm( "Click at", x, y );
+	}
+}
+```
+
 ### ct.clickX()
+
+Returns the [x coordinate](#graphics-coordinates) of the last known click
+location in the application.
+
+#### Syntax
 ```
-double ct.clickX( )
+ct.clickX()
 ```
-Return the x-coordinate of the last known click, touch, or drag location
-in the application.
+##### *Return Value*
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates) of the click.
+
+#### Notes
+
+You should call [ct.clicked()](#ct.clicked) and test for a return value 
+of `true` to make sure a click has occured before calling `ct.clickX()`.
+
+#### Example
+```
+public void update()
+{
+	if (ct.clicked())
+	{
+		if (ct.clickX() < 50)
+			ct.println( "Left side" );
+		else
+			ct.println( "Right side" );
+	}
+}
+```
 
 ### ct.clickY()
+
+Returns the [y coordinate](#graphics-coordinates) of the last known click
+location in the application.
+
+#### Syntax
 ```
-double ct.clickY( )
+ct.clickY()
 ```
-Return the y-coordinate of the last known click, touch, or drag location
-in the application.
+##### *Return Value*
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates) of the click.
+
+#### Notes
+
+You should call [ct.clicked()](#ct.clicked) and test for a return value 
+of `true` to make sure a click has occured before calling `ct.clickY()`.
+
+#### Example
+```
+public void update()
+{
+	if (ct.clicked())
+	{
+		if (ct.clickY() < 50)
+			ct.println( "Top half" );
+		else
+			ct.println( "Bottom half" );
+	}
+}
+```
+
 
 ### ct.objectClicked()
+
+If a clickable graphics (`GameObj`) object was clicked during the 
+last animation frame, then `ct.objectClicked()` returns a reference 
+to that object, otherwise it returns `null` .
+
+#### Syntax
 ```
-GameObj ct.objectClicked( )
+ct.objectClicked()
 ```
-If a clickable `GameObj` object was clicked during the last update cycle, 
-then `ct.objectClicked()` returns a reference to that object, 
-otherwise it returns `null` .
-Calling this function every time in your `update` function will find 
+##### *Return Value*
+([GameObj](#java-data-types)). The object that was clicked.
+
+#### Notes
+
+Calling this function every time in your `update()` function will find 
 the topmost clickable object that was clicked, whenever the user clicks
 on one.
 
-> Any objects with the `clickable` field set to `false` will not be considered
-> when determining which object was clicked. See [clickable](#clickable). 
+> Any objects with the [clickable](#obj.clickable) field set to `false` 
+> will not be considered when determining which object was clicked. 
 
-> Note that `ct.objectClicked()` will return `null` if no object was
-> clicked, which is the case for most update cycles in a game 
+> **Note:** `ct.objectClicked()` will return `null` if no object was
+> clicked, which is the case for most animation frames in a game 
 > (they occur 60 times per second). So you must check the return value
-> for `null` before using the `GameObj` returned. Attempting to access a field
-> of a `GameObj` (such as `obj.x`) or call a method (such as `obj.delete()`)
+> for `null` before using the `GameObj` returned. Attempting to access 
+> a field of a `GameObj` (such as [obj.x](#obj.x)) or call a method 
+> (such as [obj.delete()](#obj.delete))
 > will generate a runtime error (a "crash") if the `GameObj` is `null`.
 
+#### Example
+```
+public void update()
+{
+	// Delete objects that get clicked
+	GameObj obj = ct.objectClicked();
+	if (obj != null)
+		obj.delete();
+}
+```
 
 ### ct.keyPressed()
+
+Returns `true` if the key with the specified [key name](#key-names)
+is currently pressed (the key is down).
+
+#### Syntax
 ```
-boolean ct.keyPressed( String keyName )
+ct.keyPressed( keyName )
 ```
-Return `true` if the key named `keyName` is currently pressed
-(the key is down). See [Key Names](#key-names).
-Note that multiple keys can be down at the same time.
+##### keyName
+([String](#java-data-types)). The [key name](#key-names)
+of the key to test.
+
+##### *Return Value*
+([boolean](#java-data-types)). `true` if the key is pressed, otherwise `false`.
+
+#### Notes
+
+If you call this function every time in your `update()` function,
+then it will return `true` for each animation frame where the key
+is being held down. Animation frames happen 60 times per second,
+so this function will typically trigger (return `true`) multiple 
+times for each key "press". This is useful to produce things like 
+continuous motion as long as a key is held down.
+
+> To get only a single trigger for each key press, consider using
+> [ct.charTyped()](#ct.keytyped) or the [onKeyPress event](#onkeypress).
+
+Note that multiple keys can be down at the same time, so you can
+also test for some key combinations such as `"up"` and `"left"`
+being pressed at the same time.
+
+#### Example
+```
+GameObj ball;
+
+public void start()
+{
+	ball = ct.circle( 0, 50, 10 );
+}
+
+public void update()
+{
+	// Move ball to the right when right arrow is held down
+	if (ct.keyPressed( "right" ))
+		ball.x += 0.25 
+}
+```
 
 ### ct.charTyped()
+
+Return `true` if the specified character was typed on the keyboard
+during the last animation frame.
+
+#### Syntax
 ```
-boolean ct.charTyped( String charString )
+ct.charTyped( charString )
 ```
-Return `true` if the printable character `charString` was typed
-during the last update cycle.
+##### charString
+([String](#java-data-types)). The character to test, for example `"a"`.
 
-Calling this function every time in your `update` function
-will detect any time that the given character is typed.
+> Unlike the key names used by [ct.keyPressed()](#ct.keypressed), 
+> the `charString` here is a printable character including the appropriate 
+> shift status. For example, holding the shift key down while pressing
+> the "a" key will cause `ct.charTyped( "a" )` to return `false` but
+> `ct.charTyped( "A" )` to return `true`.
+> Only printable characters can be detected, so special keys such as the
+> arrow keys and key sequences such as Ctrl+C do not result in characters.
 
-> Unlike the key names used by `ct.keyPressed()`, the `charString` here
-> is a printable character including the appropriate shift status
-> (e.g. "A" if a shifted "a" is typed, "$" or "4", "+" vs. "=", etc.).
-> Only printable characters are detected, so key sequences such as Ctrl+C
-> do not result in characters.
+##### *Return Value*
+([boolean](#java-data-types)). `true` if the character was typed, otherwise `false`.
 
-> Note that some platforms may have keys that auto-repeat when held down,
-> so if you check `ct.charTyped()` every time in your `update` function,
-> and the user holds down a key, you may get the first character,
-> then perhaps a 1 second delay, then repeats at around 8 characters
-> per second. Contrast this with using `ct.keyPressed()` instead, where you
-> will get a `true` result continuously (60 times per second),
-> and no delay after the first one.
+#### Notes
+
+Calling this function every time in your `update()` function
+will detect each time that the given character is typed.
+Unlike the behavior of [ct.keyPressed()](#ct.keypressed), 
+you will only get one `true` result for each typed character.
+However, most platforms have a keyboard "auto-repeat" feature,
+so if you check `ct.charTyped()` every time in your `update()` function,
+and the user holds down a key, you may get the first character,
+then perhaps a 1 second delay, then repeats at maybe 8 characters
+per second.
+
+#### Example
+```
+public void update()
+{
+	if (ct.charTyped( "w" ))
+		ct.println( "w was typed" );
+	
+	if (ct.charTyped( " " ))
+		ct.println( "Space bar" );
+}
+```
 
 
 Audio
 -----
+
 ### ct.loadSound()
 ```
 boolean ct.loadSound( String filename )
@@ -1305,7 +1482,7 @@ See [GameObj Creation](#gameobj-creation) to create a `GameObj`.
 All `GameObj` objects have the following public data fields,
 which can be accessed or assigned to at any time.
 If assigned to, the new value takes effect at the next
-update cycle.
+animation frame.
 
 ### x, y
 ```
@@ -1367,7 +1544,7 @@ and changes to the `width` field are undefined.
 > **Note:** When you change a text object's `height`, the `width`
 > will be recalculated automatically. However, the new value for
 > `width` is not available immediately. It will be recalculated
-> the next time the object draws (during the next update cycle).
+> the next time the object draws (at the next animation frame).
 
 ##### image
 Images are initially created with `height` calculated automatically
@@ -1382,8 +1559,8 @@ double xSpeed, ySpeed
 The `xSpeed` and `ySpeed` fields can be used to make an object move
 automatically at the specified speed and direction.
 The `xSpeed` and `ySpeed` values are added to the object's
-`x` and `y` fields at the beginning of each update cycle.
-Update cycles happen 60 times per second, so setting `xSpeed` to 1
+`x` and `y` fields before each new animation frame.
+Animation frames happen 60 times per second, so setting `xSpeed` to 1
 will make the object move 60 units per second to the right.
 The values for `xSpeed` and `ySpeed` can be positive or negative,
 and they both default to 0.
@@ -1626,10 +1803,10 @@ Remove and delete the object from the screen.
 boolean obj.clicked( )
 ```
 Return `true` if the object was clicked or touched during
-the last update cycle. Only objects with both the `visible` and `clickable`
+the last animation frame. Only objects with both the `visible` and `clickable`
 fields set to `true` will receive mouse/touch input.
 
-Calling this method for an object every time during your `update` function
+Calling this method for an object every time during your `update()` function
 will detect any clicks on the object.
 
 > If more than one visible and clickable object intersects with the
@@ -1653,7 +1830,7 @@ of the object, or on the border.
 boolean obj.hit( GameObj objTest )
 ```
 Return `true` if the object currently intersects with another 
-object `objTest`. If you call this method every time in your `update` 
+object `objTest`. If you call this method every time in your `update()` 
 function, it can be used to test if/when two objects "hit" each other.
 
 ### obj.objectHitInGroup( String group )
@@ -1708,6 +1885,7 @@ Math.tanh( angle )     double              double
 ```
 For more information, see the [Java Math Class](https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html).
 
+
 Java String Methods Supported
 -----------------------------
 Code12 supports the following method functions from the Java `String` class.
@@ -1728,23 +1906,9 @@ str.trim()                                        String
 ```
 For more information, see the [Java String Class](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html).
 
-Event Functions
----------------
-The following functions, if defined in your program, will be called when
-indicated. Note that unlike all of the other functions and methods above,
-These functions are *implemented* in your program (you write the body of the
-function) and are *called* by the runtime system with appropriate.
-They are called in response to "events" happening in your application.
 
-Implementing any of these functions is optional and "for your information".
-They are not necessary to use other functions and features of the system.
-For example, if you don't implement any of the mouse event functions,
-you can still call functions such as `ct.clicked()` to test for mouse clicks.
-
-> **Tip:** If your program has complex mouse or keyboard handling
-> (for example, many objects to check for clicks and many keys to test),
-> then doing your work in the event functions will be more efficient
-> than making many tests in your `update` function.
+Program Control Functions
+-------------------------
 
 ### start()
 ```
@@ -1759,21 +1923,21 @@ occurs while the application is running).
 ```
 void update( )
 ```
-The `update` function is called at the beginning of each update cycle.
-Update cycles start after the `start` function has completed and then
-repeat continuously at 60 times per second.
+The `update` function is called at the beginning of each animation frame.
+Animation frames start after the `start()` function has completed and then
+repeat continuously 60 times per second.
 
-One use of update cycles is to achieve object motion and animation.
+One use of animation frames is to achieve object motion and animation.
 For example, if you move an object 1 display unit to the right in
-your `update` function, then the object will move continuously
+your `update()` function, then the object will move continuously
 at 60 units per second.
 
-Another use of update cycles is to poll (check repeatedly) for user input,
+Another use of animation frames is to test repeatedly for user input,
 using functions such as `ct.clicked()`, `ct.keyPressed()`,
 and `ct.keyTyped()`, and the `GameObj` method `obj.clicked()`.
 
-You can also use update cycles to test repeatedly for object interactions
-that can occur during any update cycle when objects are moving. You can
+You can also use animation frames to test repeatedly for object interactions
+that can occur when objects are moving. You can
 examine object fields such as `x` and `y` directly, call the `GameObj` methods
 `obj.containsPoint()` and `obj.hit()`, call the function `ct.distance()` or
 write any code you want that tests what you need to detect.
@@ -1781,12 +1945,30 @@ write any code you want that tests what you need to detect.
 Finally, note that you can call `ct.getTimer()` to detect the passage
 of certain amounts of time if you want.
 
-> A common mistake is to create `GameObj` objects in the `update` function
+> A common mistake is to create `GameObj` objects in the `update()` function
 > in a way that causes many copies of the object to be created over
 > and over. Note that you should *not* call functions like `ct.circle()` to
 > "draw" a circle for each frame in an animation. Instead, you typically
 > want to call `ct.circle()` to create the object once in your `start` function,
-> then modify the existing circle in your `update` function.
+> then modify the existing circle in your `update()` function.
+
+Input Event Functions
+---------------------
+The following functions, if defined in your program, will be called when
+indicated. Note that unlike all of the other functions and methods above,
+These functions are *implemented* in your program (you write the body of the
+function) and are *called* by the runtime system with appropriate.
+They are called in response to "events" happening in your application.
+
+Implementing any of these functions is optional and "for your information".
+They are not necessary to use other functions and features of the system.
+For example, if you don't implement any of the mouse event functions,
+you can still call functions such as `ct.clicked()` to test for mouse clicks.
+
+> **Tip:** If your program has complex mouse or keyboard handling
+> (for example, many objects to check for clicks and many keys to test),
+> then doing your work in the event functions will be more efficient
+> than making many tests in your `update()` function.
 
 ### onMousePress()
 ```

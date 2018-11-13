@@ -83,10 +83,6 @@ local function clickEvent(event, gameObj)
 			return false
 		end
 
-		-- Set last drag location
-		g.clickX = x
-		g.clickY = y
-
 		-- Call client event
 		runtime.runEventFunction(ct.userFns.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)

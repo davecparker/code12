@@ -337,8 +337,8 @@ public class Game implements GameInterface
    //=============== Mouse and Keyboard Input API =====================
    
    public boolean clicked()         { return input.clicked; }  
-   public double clickX()           { return input.xMouseP / scaleLToP; }
-   public double clickY()           { return input.yMouseP / scaleLToP; }
+   public double clickX()           { return input.clickX; }
+   public double clickY()           { return input.clickY; }
    public GameObj objectClicked()   { return input.clickedObj; }
 
    
