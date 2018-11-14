@@ -762,25 +762,78 @@ public void update()
 }</code></pre>
 <h6 id="code12-function-reference-mouse-and-keyboard-input-ct.chartyped"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.chartyped">ct.charTyped()</a></h6>
 <h2 id="audio">Audio</h2>
+<p>These functions allow you to play sounds from audio files.</p>
+<ul>
+<li><a href="#ct.loadsound">ct.loadSound()</a></li>
+<li><a href="#ct.sound">ct.sound()</a></li>
+<li><a href="#ct.setsoundvolume">ct.setSoundVolume()</a></li>
+</ul>
 <h3 id="ct.loadsound">ct.loadSound()</h3>
-<pre><code>boolean ct.loadSound( String filename )</code></pre>
-<p>You can call <code>ct.loadSound</code> to pre-load the sound effect in the sound file <code>filename</code>, so that it will play quickly when <code>ct.sound( filename )</code> is called. Loading sounds before playing them is optional, but it reduces the slight delay that occurs the first time a certain sound is played.</p>
-<p>This function returns <code>true</code> if the sound was successfully loaded, or <code>false</code> if the filename could not be found or is not a supported sound format.</p>
+<p>Pre-loads an audio file into memory so that the first use will have no delay.</p>
+<h4 id="syntax-34">Syntax</h4>
+<pre><code>ct.loadSound( filename )</code></pre>
+<h5 id="filename-3">filename</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the audio file to pre-load.</p>
 <blockquote>
-<p>You will typically want to call <code>ct.loadSound</code> in your <code>start</code> function once for each sound that you want pre-loaded.</p>
+<p>Only standard formats of .WAV and .MP3 files are reliably supported on all operating systems.</p>
 </blockquote>
+<h5 id="return-value-19"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the sound was successfully loaded, otherwise <code>false</code>.</p>
+<h4 id="notes-11">Notes</h4>
+<p>You can call <code>ct.loadSound( filename )</code> to pre-load the sound effect in the <code>filename</code>, so that it will play quickly when played with <a href="#ct.sound">ct.sound()</a>. Pre-loading sounds before playing them is optional, but it reduces the slight delay that occurs the first time a sound is played.</p>
+<p>For a simple filename such as <code>&quot;ding.wav&quot;</code>, the audio file must be copied into the same folder as your Java program (.java) file. You can also put sound files into subfolders using, for example, <code>&quot;sounds/ding.wav&quot;</code>.</p>
+<p>You will typically want to call <code>ct.loadSound()</code> in your <a href="#start">start()</a> function once for each sound that you want pre-loaded.</p>
+<p>The <code>ct.loadSound()</code> function returns <code>true</code> if the sound was successfully loaded, or <code>false</code> if the <code>filename</code> could not be found or is not a supported sound format.</p>
+<h4 id="example-22">Example</h4>
+<pre><code>public void start
+{
+    ct.loadSound( &quot;ding.wav&quot; );
+}
+
+public void update()
+{
+    if (ct.clicked())
+        ct.sound( &quot;ding.wav&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-audio-ct.loadsound"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.loadsound">ct.loadSound()</a></h6>
 <h3 id="ct.sound">ct.sound()</h3>
-<pre><code>ct.sound( String filename )</code></pre>
-<p>Play the sound effect in the sound file <code>filename</code>.</p>
+<p>Play a sound effect from an audio file.</p>
+<h4 id="syntax-35">Syntax</h4>
+<pre><code>ct.sound( filename )</code></pre>
+<h5 id="filename-4">filename</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the audio file to play.</p>
 <blockquote>
-<p>Only standard formats of WAV sounds are reliable on all platforms, although most platforms will support MP3 also.</p>
+<p>Only standard formats of .WAV and .MP3 files are reliably supported on all operating systems.</p>
 </blockquote>
-<blockquote>
-<p>You can use <code>ct.loadSound</code> to reduce the short delay that might occur the first time a certain sound is played.</p>
-</blockquote>
+<h4 id="notes-12">Notes</h4>
+<p>For a simple filename such as <code>&quot;ding.wav&quot;</code>, the audio file must be copied into the same folder as your Java program (.java) file. You can also put sound files into subfolders using, for example, <code>&quot;sounds/ding.wav&quot;</code>.</p>
+<p>The <code>ct.sound()</code> function starts the sound then returns immediately. The sound will then continue to play “in the background”, while your program continues. If you start a second sound before the first sound is finished, the two sounds will mix if mixing is supported by the operating system.</p>
+<p>You can use <a href="#ct.loadsound">ct.loadSound()</a> to reduce the short delay that might occur the first time a sound is played.</p>
+<h4 id="examples-12">Examples</h4>
+<pre><code>ct.sound( &quot;ding.wav&quot; );</code></pre>
+<pre><code>public void start
+{
+    ct.sound( &quot;music.mp3&quot; );
+}
+
+public void update()
+{
+    if (ct.clicked())
+        ct.sound( &quot;ding.wav&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-audio-ct.sound"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.sound">ct.sound()</a></h6>
 <h3 id="ct.setsoundvolume">ct.setSoundVolume()</h3>
-<pre><code>ct.setSoundVolume( double volume )</code></pre>
-<p>Set the relative volume to use for sounds played by <code>ct.sound()</code> to <code>volume</code>, which should be between 0.0 and 1.0. The default sound volume is 1.0. If the volume is decreased then sounds are attenuated relative to the volume they were recorded at.</p>
+<p>Sets the relative volume to use for sounds played by <a href="#ct.sound">ct.sound()</a>.</p>
+<h4 id="syntax-36">Syntax</h4>
+<pre><code>ct.setSoundVolume( volume );</code></pre>
+<h5 id="volume">volume</h5>
+<p>(<a href="#java-data-types">double</a>). A volume number between 0.0 and 1.0.</p>
+<h4 id="notes-13">Notes</h4>
+<p>The default sound volume is 1.0. If the volume is decreased then sounds are attenuated relative to the volume they were recorded at.</p>
+<h4 id="example-23">Example</h4>
+<pre><code>ct.setSoundVolume( 0.2 );
+ct.sound( &quot;voices.mp3&quot; );</code></pre>
+<h6 id="code12-function-reference-audio-ct.setsoundvolume"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.setsoundvolume">ct.setSoundVolume()</a></h6>
 <h2 id="math-and-misc.">Math and Misc.</h2>
 <h3 id="ct.random">ct.random()</h3>
 <pre><code>int ct.random( int min, int max )</code></pre>
@@ -932,7 +985,7 @@ String ct.formatInt( int number, int numDigits )</code></pre>
 <h3 id="obj.tostring">obj.toString()</h3>
 <pre><code>String obj.toString()</code></pre>
 <p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
-<h5 id="examples-12">Examples:</h5>
+<h5 id="examples-13">Examples:</h5>
 <pre><code>[circle at (70, 25)]
 [text at (50, 10) &quot;Score 3200&quot;]
 [image at (21, 83) &quot;goldfish.png&quot;]
@@ -1117,7 +1170,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 <h2 id="additional-reference-information-1">Additional Reference Information</h2>
 <h3 id="graphics-coordinates">Graphics Coordinates</h3>
 <p>Graphics objects in Code12 are positioned on the screen by (x, y) coordinates. The coordinate values are not pixels, but instead are in unit values relative to the size of the graphics area, which we will call the “screen”. Size values (e.g. width and height) use the same units.</p>
-<h5 id="x-coordinates-width-and-objext-scaling">X Coordinates, Width, and Objext Scaling</h5>
+<h5 id="x-coordinates-width-and-object-scaling">X Coordinates, Width, and Object Scaling</h5>
 <p>The screen area is always 100 units wide, by definition, so an x-coordinate of 50 is always horizontally centered in the screen. So you can think of an x-coordinate value as a percent of the window width. An x value of 0 is at the left edge, 50 is in the center, and 100 is at the right edge. Similarly, a width of 50 is half as wide as the screen.</p>
 <blockquote>
 <p>If you resize the Code12 application or use the pane splits to change the size of the graphics screen area, your graphics objects will automatically scale along with the screen, and the coordinates of the objects do not change.</p>

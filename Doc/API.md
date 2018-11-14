@@ -1322,43 +1322,128 @@ public void update()
 
 Audio
 -----
+These functions allow you to play sounds from audio files.
+
+* [ct.loadSound()]
+* [ct.sound()]
+* [ct.setSoundVolume()]
+
 
 ### ct.loadSound()
-```
-boolean ct.loadSound( String filename )
-```
-You can call `ct.loadSound` to pre-load the sound effect in the sound file 
-`filename`, so that it will play quickly when `ct.sound( filename )` is 
-called. Loading sounds before playing them is optional, but it reduces the
-slight delay that occurs the first time a certain sound is played. 
+Pre-loads an audio file into memory so that the first use will have no delay.
 
-This function returns `true` if the sound was successfully loaded,
-or `false` if the filename could not be found or is not a supported 
+#### Syntax
+```
+ct.loadSound( filename )
+```
+##### filename
+([String](#java-data-types)). The name of the audio file to pre-load.
+
+> Only standard formats of .WAV and .MP3 files are reliably supported
+> on all operating systems.
+
+##### *Return Value*
+([boolean](#java-data-types)). `true` if the sound was successfully loaded, 
+otherwise `false`.
+
+#### Notes
+You can call `ct.loadSound( filename )` to pre-load the sound effect in the 
+`filename`, so that it will play quickly when played with [ct.sound()]. 
+Pre-loading sounds before playing them is optional, but it reduces the
+slight delay that occurs the first time a sound is played. 
+
+For a simple filename such as `"ding.wav"`, the audio file must be copied
+into the same folder as your Java program (.java) file. You can also put sound
+files into subfolders using, for example, `"sounds/ding.wav"`.
+
+You will typically want to call `ct.loadSound()` in your [start()] function
+once for each sound that you want pre-loaded.
+
+The `ct.loadSound()` function returns `true` if the sound was successfully 
+loaded, or `false` if the `filename` could not be found or is not a supported 
 sound format.
 
-> You will typically want to call `ct.loadSound` in your `start` function
-> once for each sound that you want pre-loaded.
+#### Example
+```
+public void start
+{
+	ct.loadSound( "ding.wav" );
+}
+
+public void update()
+{
+	if (ct.clicked())
+		ct.sound( "ding.wav" );
+}
+```
+###### [Code12 Function Reference](#top) > [Audio] > [ct.loadSound()]
+
 
 ### ct.sound()
-```
-ct.sound( String filename )
-```
-Play the sound effect in the sound file `filename`.
+Play a sound effect from an audio file.
 
-> Only standard formats of WAV sounds are reliable on all platforms,
-> although most platforms will support MP3 also.
+#### Syntax
+```
+ct.sound( filename )
+```
+##### filename
+([String](#java-data-types)). The name of the audio file to play.
 
-> You can use `ct.loadSound` to reduce the short delay that might occur
-> the first time a certain sound is played.
+> Only standard formats of .WAV and .MP3 files are reliably supported
+> on all operating systems.
+
+#### Notes
+For a simple filename such as `"ding.wav"`, the audio file must be copied
+into the same folder as your Java program (.java) file. You can also put sound
+files into subfolders using, for example, `"sounds/ding.wav"`.
+
+The `ct.sound()` function starts the sound then returns immediately. 
+The sound will then continue to play "in the background", while your program
+continues. If you start a second sound before the first sound is finished,
+the two sounds will mix if mixing is supported by the operating system. 
+
+You can use [ct.loadSound()] to reduce the short delay that might occur
+the first time a sound is played.
+
+#### Examples
+```
+ct.sound( "ding.wav" );
+```
+```
+public void start
+{
+	ct.sound( "music.mp3" );
+}
+
+public void update()
+{
+	if (ct.clicked())
+		ct.sound( "ding.wav" );
+}
+```
+###### [Code12 Function Reference](#top) > [Audio] > [ct.sound()]
+
 
 ### ct.setSoundVolume()
+Sets the relative volume to use for sounds played by [ct.sound()].
+
+#### Syntax
 ```
-ct.setSoundVolume( double volume )
+ct.setSoundVolume( volume );
 ```
-Set the relative volume to use for sounds played by `ct.sound()`
-to `volume`, which should be between 0.0 and 1.0.
+##### volume
+([double](#java-data-types)). A volume number between 0.0 and 1.0.
+
+#### Notes
 The default sound volume is 1.0. If the volume is decreased
 then sounds are attenuated relative to the volume they were recorded at.
+
+#### Example
+```
+ct.setSoundVolume( 0.2 );
+ct.sound( "voices.mp3" );
+```
+###### [Code12 Function Reference](#top) > [Audio] > [ct.setSoundVolume()]
 
 
 Math and Misc.
