@@ -92,6 +92,9 @@ public class DuckHuntLineHits extends Code12Program
 
 	public void update()
 	{
+		double screenOriginX = frameCount / 10.0;
+		ct.setScreenOrigin( screenOriginX, 0 );
+		frameRateDisplay.x = screenOriginX;
 		frameCount++;
 		if ( frameCount % 10 == 0 )
 		{
@@ -112,7 +115,7 @@ public class DuckHuntLineHits extends Code12Program
 			{
 				duckSpeed = -0.75;
 			}
-			double x = 105;
+			double x = 105 + screenOriginX;
 			double y = ct.random( 10, ct.toInt(yMax / 2) );
 			GameObj duck = createDuck( x, y, duckSpeed);
 		}

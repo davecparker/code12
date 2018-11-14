@@ -37,7 +37,6 @@ local paneSplitConsole         -- pane split between output and console
 local paneSplitRight           -- pane split between output and varWatch window
 local lowerGroup               -- display area below the pane split
 local gridGroup                -- display group for the coordinate grideLines
-local gridXLabels, gridYLabels -- arrays contating the grid labels
 
 -- UI state
 local paneDragOffset           -- when dragging the pane split
@@ -85,61 +84,41 @@ local function newGridLine( x1, y1, x2, y2 )
 end
 
 -- Make the coordinate grideLines
-local function makeGrid( width, height )
-	local sceneGroup = runView.view
-	if sceneGroup then
-		-- Remove existing gridGroup, if any
-		if gridGroup then
-			gridGroup:removeSelf()
-			gridGroup = nil
-		end
-		-- Make gridGroup
-		gridGroup = g.makeGroup( sceneGroup, outputGroup.x, outputGroup.y )
-		gridXLabels = {}
-		gridYLabels = {}
-		-- Calculated grid square size
-		local squareSize = width / 10
-		-- Make vertical gride lines and labels
-		local screen = g.screen
-		screenOriginX = screen.originX
-		for i = 1, 9 do
-			local labelText = math.round( (screenOriginX + i * 10) * 10 ) / 10
-			local label = newGridLabel( labelText, squareSize * i, 0 )
-			label.anchorY = 0
-			gridXLabels[i] = label
-			local x = squareSize * i
-			local y = label.height + 1
-			newGridLine( x, y, x, height )
-		end
-		-- Make horizontal grideLines and labels
-		screenOriginY = screen.originY
-		local rowNum = 1
-		local y = squareSize
-		while y < height do
-			local labelText = tostring( math.round( (screenOriginY + rowNum * 10) * 10 ) / 10 )
-			local label = newGridLabel( labelText, 0, y )
-			label.anchorX = 0
-			gridYLabels[rowNum] = label
-			local x = label.width + 1
-			newGridLine( x, y, width, y )
-			rowNum = rowNum + 1
-			y = y + squareSize
-		end
-		paneSplitConsole:toFront() -- In case last label extends below top of pane split
+local function makeGrid()
+	local width = app.outputWidth
+	local height = app.outputHeight
+	local scale = g.scale
+	local screen = g.screen
+	-- Remove existing gridGroup, if any
+	if gridGroup then
+		gridGroup:removeSelf()
+		gridGroup = nil
 	end
-end
-
--- Update the text in gridXLabels after a change to g.screen.originX
-local function updateGridXLabels( newScreenOriginX )
-	for i = 1, #gridXLabels do
-		gridXLabels[i].text = math.round( (newScreenOriginX + i * 10) * 10 ) / 10
+	-- Make gridGroup
+	gridGroup = display.newContainer( outputGroup, width * scale, height * scale )
+	-- Calculate x-value for first vertical grid line
+	screenOriginX = screen.originX
+	local xLine = math.floor( screenOriginX / 10 ) * 10 + 10
+	-- Make vertical grid lines and labels
+	local x = (xLine - screenOriginX) * scale
+	while x < width do
+		local label = newGridLabel( xLine, x, 0 )
+		label.anchorY = 0
+		newGridLine( x, label.height + 1, x, height )
+		xLine = xLine + 10
+		x = (xLine - screenOriginX) * scale
 	end
-end
-
--- Update the text in gridYLabels after a change to g.screen.originY
-local function updateGridYLabels( newScreenOriginY )
-	for i = 1, #gridYLabels do
-		gridYLabels[i].text = math.round( (newScreenOriginY + i * 10) * 10 ) / 10
+	-- Calculate y-value for first horizontal grid line
+	screenOriginY = screen.originY
+	local yLine = math.floor( screenOriginY / 10 ) * 10 + 10
+	local y = (yLine - screenOriginY) * scale
+	-- Make horizontal grideLines and labels
+	while y < height do
+		local label = newGridLabel( yLine, 0, y )
+		label.anchorX = 0
+		newGridLine( label.width + 1, y, width, y )
+		yLine = yLine + 10
+		y = (yLine - screenOriginY) * scale
 	end
 end
 
@@ -174,7 +153,7 @@ local function layoutPanes()
 
 	-- Remake the coordinate grideLines if they are on
 	if app.gridOn then
-		makeGrid( width, height )
+		makeGrid()
 	end
 end
 
@@ -275,18 +254,11 @@ local function onNewFrame()
 	end
 	-- Update grid labels if needed
 	local screen = g.screen
-	if screen then
-		local newScreenOriginX = screen.originX
-		if app.gridOn and screenOriginX ~= newScreenOriginX then
-			screenOriginX = newScreenOriginX
-			updateGridXLabels( newScreenOriginX )
+	-- if screen then
+		if app.gridOn and (screenOriginX ~= screen.originX or screenOriginY ~= screen.originY) then
+			makeGrid()
 		end
-		local newScreenOriginY = screen.originY
-		if app.gridOn and screenOriginY ~= newScreenOriginY then
-			screenOriginY = newScreenOriginY
-			updateGridYLabels( newScreenOriginY )
-		end
-	end
+	-- end
 end
 
 
@@ -378,7 +350,7 @@ function runView.toggleGrid()
 	if gridOn then
 		gridGroup.isVisible = false
 	else
-		makeGrid( app.outputWidth, app.outputHeight )
+		makeGrid()
 	end
 	app.gridOn = not gridOn
 end

@@ -35,7 +35,7 @@ class VarWatchTest extends Code12Program
 	public void update()
 	{
 		xOrigin += 0.1;
-		// yOrigin += 0.1;
+		yOrigin += 0.1;
 		ct.setScreenOrigin(xOrigin, yOrigin);
 		int len = intArr1.length;
 		for (int i = 0; i < len; i++)
