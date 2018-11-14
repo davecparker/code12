@@ -254,11 +254,9 @@ local function onNewFrame()
 	end
 	-- Update grid labels if needed
 	local screen = g.screen
-	-- if screen then
-		if app.gridOn and (screenOriginX ~= screen.originX or screenOriginY ~= screen.originY) then
-			makeGrid()
-		end
-	-- end
+	if app.gridOn and (screenOriginX ~= screen.originX or screenOriginY ~= screen.originY) then
+		makeGrid()
+	end
 end
 
 
