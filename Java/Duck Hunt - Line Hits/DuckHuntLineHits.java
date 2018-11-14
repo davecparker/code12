@@ -92,6 +92,9 @@ public class DuckHuntLineHits extends Code12Program
 
 	public void update()
 	{
+		double screenOriginX = frameCount / 10.0;
+		ct.setScreenOrigin( screenOriginX, 0 );
+		frameRateDisplay.x = screenOriginX;
 		frameCount++;
 		if ( frameCount % 10 == 0 )
 		{

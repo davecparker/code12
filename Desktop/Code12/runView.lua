@@ -37,12 +37,15 @@ local paneSplitConsole         -- pane split between output and console
 local paneSplitRight           -- pane split between output and varWatch window
 local lowerGroup               -- display area below the pane split
 local gridGroup                -- display group for the coordinate grideLines
+local gridXLabels, gridYLabels -- arrays contating the grid labels
 
 -- UI state
 local paneDragOffset           -- when dragging the pane split
 local outputRatio              -- fraction of app height taken by output area
 local showVarWatchLast         -- last known value of app.showVarWatch
 local layoutNeeded             -- true when the layout has changed
+local screenOriginX            -- value of g.screen.originX
+local screenOriginY            -- value of g.screen.originY
 
 
 --- Internal Functions ------------------------------------------------
@@ -92,27 +95,51 @@ local function makeGrid( width, height )
 		end
 		-- Make gridGroup
 		gridGroup = g.makeGroup( sceneGroup, outputGroup.x, outputGroup.y )
+		gridXLabels = {}
+		gridYLabels = {}
+		-- Calculated grid square size
+		local squareSize = width / 10
 		-- Make vertical gride lines and labels
-		local dx = width / 10
+		local screen = g.screen
+		screenOriginX = screen.originX
 		for i = 1, 9 do
-			local label = newGridLabel( i .. "0", dx * i, 0 )
+			local labelText = math.round( (screenOriginX + i * 10) * 10 ) / 10
+			local label = newGridLabel( labelText, squareSize * i, 0 )
 			label.anchorY = 0
-			local x = dx * i
+			gridXLabels[i] = label
+			local x = squareSize * i
 			local y = label.height + 1
 			newGridLine( x, y, x, height )
 		end
 		-- Make horizontal grideLines and labels
+		screenOriginY = screen.originY
 		local rowNum = 1
-		local y = dx
+		local y = squareSize
 		while y < height do
-			local label = newGridLabel( rowNum .. "0", 0, y )
+			local labelText = tostring( math.round( (screenOriginY + rowNum * 10) * 10 ) / 10 )
+			local label = newGridLabel( labelText, 0, y )
 			label.anchorX = 0
+			gridYLabels[rowNum] = label
 			local x = label.width + 1
 			newGridLine( x, y, width, y )
 			rowNum = rowNum + 1
-			y = y + dx
+			y = y + squareSize
 		end
 		paneSplitConsole:toFront() -- In case last label extends below top of pane split
+	end
+end
+
+-- Update the text in gridXLabels after a change to g.screen.originX
+local function updateGridXLabels( newScreenOriginX )
+	for i = 1, #gridXLabels do
+		gridXLabels[i].text = math.round( (newScreenOriginX + i * 10) * 10 ) / 10
+	end
+end
+
+-- Update the text in gridYLabels after a change to g.screen.originY
+local function updateGridYLabels( newScreenOriginY )
+	for i = 1, #gridYLabels do
+		gridYLabels[i].text = math.round( (newScreenOriginY + i * 10) * 10 ) / 10
 	end
 end
 
@@ -241,9 +268,24 @@ end
 
 -- Handle new frame events by calling layoutPanes if needed
 local function onNewFrame()
+	-- Update layout of panes if needed
 	if layoutNeeded then
 		layoutPanes()
 		layoutNeeded = false
+	end
+	-- Update grid labels if needed
+	local screen = g.screen
+	if screen then
+		local newScreenOriginX = screen.originX
+		if app.gridOn and screenOriginX ~= newScreenOriginX then
+			screenOriginX = newScreenOriginX
+			updateGridXLabels( newScreenOriginX )
+		end
+		local newScreenOriginY = screen.originY
+		if app.gridOn and screenOriginY ~= newScreenOriginY then
+			screenOriginY = newScreenOriginY
+			updateGridYLabels( newScreenOriginY )
+		end
 	end
 end
 

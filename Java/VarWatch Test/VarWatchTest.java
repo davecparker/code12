@@ -15,9 +15,12 @@ class VarWatchTest extends Code12Program
 	GameObj[] gObjArr1 = new GameObj[1];
 	GameObj[] gObjArr2 = new GameObj[2];
 	GameObj[] circles = new GameObj[100];
+	double xOrigin, yOrigin;
 
 	public void start()
 	{
+		xOrigin = 0;
+		yOrigin = 0;
 		ct.setHeight( 121 );
 		gObj = null;
 		for (int i=1; i<100; i++)
@@ -31,6 +34,9 @@ class VarWatchTest extends Code12Program
 	
 	public void update()
 	{
+		xOrigin += 0.1;
+		// yOrigin += 0.1;
+		ct.setScreenOrigin(xOrigin, yOrigin);
 		int len = intArr1.length;
 		for (int i = 0; i < len; i++)
 			intArr1[i]++;
