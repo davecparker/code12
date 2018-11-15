@@ -7,6 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+-- Command line launch arguments
+local launchArgs = ...
+
 -- Corona modules
 local composer = require( "composer" )
 local json = require( "json" )
@@ -229,6 +232,20 @@ function app.saveSettings()
 	end
 end
 
+-- Update app.sourseFile and add path to app.recentSourceFilePaths
+-- and save user settings
+function app.updateSourceFile( path )
+	if path then
+		source.path = path
+		source.timeLoaded = 0
+		source.timeModLast = 0
+		source.updated = false
+		source.numLines = 0
+		app.addRecentSourceFilePath( path )
+		app.saveSettings()
+	end
+end
+
 -- Load the user settings
 local function loadSettings()
 	-- Initialize app.syntaxLevel if it is nil
@@ -332,11 +349,22 @@ function app.setEditorPath()
 	end
 end
 
+-- Update the user source file and open the file in non-system default editor
+local function updateAndOpenSourceFile( path )
+	app.updateSourceFile( path )
+	if app.openFilesInEditor and app.editorPath then
+		-- env.showErrAlert( "editorPath", app.editorPath )
+		env.openFileInEditor( path )
+	end
+end
+
 -- Handle system events for the app
 local function onSystemEvent( event )
 	-- Save the user settings if the user switches out of or quits the app
 	if event.type == "applicationSuspend" or event.type == "applicationExit" then
 		app.saveSettings()
+	elseif event.type == "applicationOpen" then
+		updateAndOpenSourceFile( event.url )
 	end
 end
 
@@ -383,7 +411,14 @@ local function initApp()
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10, checkUserFile, 0 )        -- first check soon
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
-	composer.gotoScene( "getFile" )
+	
+	-- Handle launch with arguments
+	if launchArgs then
+		updateAndOpenSourceFile( launchArgs.args[1] )
+		composer.gotoScene( "runView" )
+	else
+		composer.gotoScene( "getFile" )
+	end
 end
 
 

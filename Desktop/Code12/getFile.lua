@@ -15,7 +15,6 @@ local composer = require( "composer" )
 local g = require( "Code12.globals" )
 local app = require( "app" )
 local env = require( "env" )
-local source = require( "source" )
 local buttons = require( "buttons" )
 
 
@@ -64,20 +63,6 @@ local function isValidClassName( className )
 	return true
 end
 
--- Update app.sourseFile and add path to app.recentSourceFilePaths
--- and save user settings
-local function updateSourceFile( path )
-	if path then
-		source.path = path
-		source.timeLoaded = 0
-		source.timeModLast = 0
-		source.updated = false
-		source.numLines = 0
-		app.addRecentSourceFilePath( path )
-		app.saveSettings()
-	end
-end
-
 -- Show dialog to choose the user source code file
 local function openProgram()
 	local path = env.pathFromOpenFileDialog( "Choose Java Source Code File", "*.java", "Java Files (*.java)" )
@@ -87,7 +72,7 @@ local function openProgram()
 		env.showErrAlert( "Wrong File Extension", "Please choose a .java file" )
 		openProgram()
 	else
-		updateSourceFile( path )
+		app.updateSourceFile( path )
 		if app.openFilesInEditor then
 			env.openFileInEditor( path )
 		end
@@ -199,7 +184,7 @@ local function newProgram()
 	end	
 	-- Save the new program
 	writeNewProgramSkeleton( path )
-	updateSourceFile( path )
+	app.updateSourceFile( path )
 	if app.openFilesInEditor then
 		env.openFileInEditor( path )
 	end
@@ -217,7 +202,7 @@ end
 local function onRecentProgram( event )
 	local path = event.target.path
 	if env.canRead( path ) then
-		updateSourceFile( path )
+		app.updateSourceFile( path )
 		app.saveSettings()
 		if app.openFilesInEditor then
 			env.openFileInEditor( path )
