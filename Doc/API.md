@@ -9,8 +9,9 @@ The Code12 API (Application Programming Interface) functions are built in to the
 * [Screen Management]
 * [Mouse and Keyboard Input]
 * [Audio]
-* [Math and Misc.]
+* [Math Utilities]
 * [Type Conversion]
+* [Program Control]
 
 ##### GameObj Fields and Methods
 * [GameObj Data Fields]
@@ -20,8 +21,8 @@ The Code12 API (Application Programming Interface) functions are built in to the
 * [Java Math Methods and Fields Supported]
 * [Java String Methods Supported]
 
-##### Input Events and Program Control Functions
-* [Program Control Functions]
+##### Input Events and Main Program Functions
+* [Main Program Functions]
 * [Input Event Functions]
 
 ##### Additional Reference Information
@@ -41,6 +42,7 @@ These functions allow you to create new graphics objects for display on the scre
 * [ct.text()]
 * [ct.image()]
 
+###### [Code12 Function Reference](#top) > [Graphic Object Creation]
 
 ### ct.circle()
 Creates a new circle graphics object (GameObj).
@@ -302,6 +304,8 @@ You can also output to a text file on your computer.
 * [ct.logm()]
 * [ct.setOutputFile()]
 
+###### [Code12 Function Reference](#top) > [Text Output]
+
 
 ### ct.print()
 
@@ -504,6 +508,8 @@ and to ask for input from the user.
 * [ct.inputYesNo()]
 * [ct.inputString()]
 
+###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs]
+
 
 ### ct.showAlert()
 
@@ -642,6 +648,9 @@ groups of objects.
 * [ct.setBackColor()]
 * [ct.setBackColorRGB()]
 * [ct.setBackImage()]
+
+###### [Code12 Function Reference](#top) > [Screen Management]
+
 
 ### ct.setTitle()
 
@@ -1056,7 +1065,6 @@ ct.setBackImage( "sky.jpg" );
 ###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setBackImage()]
 
 
-
 Mouse and Keyboard Input
 ------------------------
 These functions allow you to process mouse/touch input and keyboard input
@@ -1076,6 +1084,8 @@ which is fast enough to provide fast response to input.
 > Another more flexible way to handle mouse and keyboard input,
 > which requires writing your own functions with parameters (syntax level 10),
 > is to write your own [Input Event Functions]. 
+
+###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input]
 
 
 ### ct.clicked()
@@ -1328,6 +1338,8 @@ These functions allow you to play sounds from audio files.
 * [ct.sound()]
 * [ct.setSoundVolume()]
 
+###### [Code12 Function Reference](#top) > [Audio]
+
 
 ### ct.loadSound()
 Pre-loads an audio file into memory so that the first use will have no delay.
@@ -1446,101 +1458,203 @@ ct.sound( "voices.mp3" );
 ###### [Code12 Function Reference](#top) > [Audio] > [ct.setSoundVolume()]
 
 
-Math and Misc.
+Math Utilities
 --------------
+These functions provide a convenient way to do common calculations.
+
+* [ct.random()]
+* [ct.round()]
+* [ct.roundDecimal()]
+* [ct.distance()]
+* [ct.intDiv()]
+* [ct.isError()]
+
+For more math operations, see [Java Math Methods and Fields Supported].
+
+###### [Code12 Function Reference](#top) > [Math Utilities]
+
+
 ### ct.random()
+Returns a random integer within the specified range.
+
+#### Syntax
 ```
-int ct.random( int min, int max )
+ct.random( min, max )
 ```
-Return a random integer from `min` to `max` (inclusive).
+##### min
+([int](#java-data-types)). The lower bound of the range.
+
+##### max
+([int](#java-data-types)). The upper bound of the range.
+
+##### *Return Value*
+([int](#java-data-types)). A random integer from `min` to `max` (inclusive).
+
+#### Examples
+```
+int diceRoll = ct.random( 1, 6 );
+```
+```
+// Flip a coin
+if (ct.random( 0, 1 ) == 0)
+	ct.println( "heads" );
+else
+	ct.println( "tails" );
+```
+```
+// Create a ball at a random x position
+ct.circle( ct.random( 0, 100 ), 50, 10 );
+```
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.random()]
+
 
 ### ct.round()
+Returns a specified number rounded to the nearest integer.
+
+#### Syntax
 ```
-int ct.round( double number )
+ct.round( number )
 ```
-Return the `number` rounded to the nearest integer.
+##### number
+([double](#java-data-types)). The number to round.
+
+##### *Return Value*
+([int](#java-data-types)). The `number` rounded to the nearest integer.
+
+#### Example
+```
+double x = 10.75;
+int n = ct.round( x );    // sets n to 11
+```
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.round()]
+
 
 ### ct.roundDecimal()
-```
-double ct.roundDecimal( double number, int numPlaces )
-```
-Return the `number` rounded to `numPlaces` decimal places.
+Returns a number rounded to a specified number of decimal places.
 
-### ct.intDiv()
+#### Syntax
 ```
-int ct.intDiv( int numerator, int denominator )
+ct.roundDecimal( number, numPlaces )
 ```
-Return the result of an integer divide of `numerator / denominator`. 
-If `numerator / denominator` is not an integer, the result is rounded 
-down to the next smaller integer.
-If `denominator` is 0 then the result is a large positive integer 
-if `numerator` > 0, a large negative integer if `numerator` < 0, 
-and 0 if `numerator` is 0. 
+##### number
+([double](#java-data-types)). The number to round.
 
-### ct.isError()
+##### numPlaces
+([int](#java-data-types)). The number of decimal places to round to.
+
+##### *Return Value*
+([int](#java-data-types)). The `number` rounded to `numPlaces` decimal places.
+
+#### Example
 ```
-boolean ct.isError( double number )
+double amount = 24.3467;
+double price = ct.roundDecimal( amount, 2 );    // sets price to 24.35
 ```
-Return `true` if the value of `number` is an error value 
-(NaN = "Not a Number").
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.roundDecimal()]
+
 
 ### ct.distance()
-```
-double ct.distance( double x1, double y1, double x2, double y2 )
-```
-Return the distance between the points (`x1`, `y1`) and (`x2`, `y2`).
+Returns the geometric distance between two (x, y) coordinates.
 
-### ct.getTimer()
+#### Syntax
 ```
-int ct.getTimer()
+ct.distance( x1, y1, x2, y2 )
 ```
-Return the number of milliseconds since the application started.
-Time starts at the begining of the `start` function.
+##### x1
+([double](#java-data-types)). The first x coordinate.
 
-### ct.getVersion()
-```
-double getVersion()
-```
-Return the version number of the Code12 runtime system.
+##### y1
+([double](#java-data-types)). The first y coordinate.
 
-### ct.pause()
-```
-ct.pause()
-```
-Execution of the program is paused at this statement.
-You can then resume or stop execution using the toolbar buttons
-in the Code12 application. 
+##### x2
+([double](#java-data-types)). The second x coordinate.
 
-> You can use `ct.pause` to help you examine or debug your program
-> while running your program in the Code12 application.
-> The `ct.pause` function is not supported (ignored) when programs 
-> are running standalone outside of the Code12 application.
+##### y2
+([double](#java-data-types)). The second y coordinate.
 
-### ct.stop()
-```
-ct.stop()
-```
-Execution of the program is immediately stopped and ended at this statement.
-You can restart execution over from the beginning of the program using 
-the **Restart** toolbar button in the Code12 application. 
+##### *Return Value*
+([double](#java-data-types)). The geometric distance from (`x1`, `y1`)
+to (`x2`, `y2`).
 
-> You can use `ct.stop` to help you examine or debug your program
-> while running your program in the Code12 application.
-> The `ct.stop` function is not supported (ignored) when programs 
-> are running standalone outside of the Code12 application.
-
-### ct.restart()
+This is equivalent to: 
 ```
-ct.restart()
+Math.sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) )
 ```
-Execution of the program is immediately stopped and restarted from 
-the beginning of the program. Variables are re-initialized with their
-default/starting values, and execution starts over with your `start`
-function.
 
-> The `ct.restart` function is not supported (ignored) when programs 
-> are running standalone under the Java runtime outside of the 
-> Code12 environment.
+#### Example
+```
+GameObj ball1 = ct.circle( 30, 20, 10 );
+GameObj ball2 = ct.circle( 50, 70, 10 );
+
+double dist = ct.distance( ball1.x, ball1.y, ball2.x, ball2.y );
+ct.println( "The balls are " + dist + " units apart" );
+```
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.distance()]
+
+
+### ct.intDiv()
+Return the result of an integer division of two integers (discard any fractional part
+and round the result down to the nearest integer).
+
+#### Syntax
+```
+ct.intDiv( numerator, denominator )
+```
+##### numerator
+([int](#java-data-types)). The numerator of the division.
+
+##### denominator
+([int](#java-data-types)). The denominator of the division.
+
+##### *Return Value*
+([int](#java-data-types)). The value of `numerator` / `denominator` rounded down
+to the nearest integer.
+
+> The `ct.intDiv()` function also supports dividing by 0, which is normally
+> an error if done directly in Java. If `denominator` is 0 then the result is:
+
+> * a large positive integer if `numerator` > 0
+> * a large negative integer if `numerator` < 0 
+> * 0 if `numerator` is 0 
+
+#### Example
+```
+int n = ct.intDiv( 3, 2 );    // sets n to 1
+```
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.intDiv()]
+
+
+### ct.isError()
+Returns `true` if the value of the specified number is an error value 
+(NaN = "Not a Number").
+
+#### Syntax
+```
+ct.isError( number )
+```
+##### numerator
+([double](#java-data-types)). The number to test.
+
+##### *Return Value*
+([boolean](#java-data-types)). `true` if `number` is an error (NaN) value, or
+`false` if `number` is a valid number.
+
+An error (NaN or "Not a Number") value can result from certain calculations or
+functions that return a [double](#java-data-types) but the calculation results
+in an error or invalid number. See the examples below.
+
+#### Example
+```
+boolean error;
+
+// These all set error to true
+error = ct.isError( 0.0 / 0.0 );
+error = ct.isError( Math.sqrt( -1 ) );
+error = ct.isError( ct.parseNumber( "nope" ) );
+```
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.isError()]
+
+
 
 
 Type Conversion
@@ -1597,6 +1711,62 @@ String ct.formatInt( int number, int numDigits )
 Return the value of `number` converted to a string.
 If numDigits is included, then format to this many digits,
 adding leading zeros as necessary.
+
+
+Program Control
+---------------
+
+### ct.getTimer()
+```
+int ct.getTimer()
+```
+Return the number of milliseconds since the application started.
+Time starts at the begining of the `start` function.
+
+### ct.getVersion()
+```
+double getVersion()
+```
+Return the version number of the Code12 runtime system.
+
+### ct.pause()
+```
+ct.pause()
+```
+Execution of the program is paused at this statement.
+You can then resume or stop execution using the toolbar buttons
+in the Code12 application. 
+
+> You can use `ct.pause` to help you examine or debug your program
+> while running your program in the Code12 application.
+> The `ct.pause` function is not supported (ignored) when programs 
+> are running standalone outside of the Code12 application.
+
+### ct.stop()
+```
+ct.stop()
+```
+Execution of the program is immediately stopped and ended at this statement.
+You can restart execution over from the beginning of the program using 
+the **Restart** toolbar button in the Code12 application. 
+
+> You can use `ct.stop` to help you examine or debug your program
+> while running your program in the Code12 application.
+> The `ct.stop` function is not supported (ignored) when programs 
+> are running standalone outside of the Code12 application.
+
+### ct.restart()
+```
+ct.restart()
+```
+Execution of the program is immediately stopped and restarted from 
+the beginning of the program. Variables are re-initialized with their
+default/starting values, and execution starts over with your `start`
+function.
+
+> The `ct.restart` function is not supported (ignored) when programs 
+> are running standalone under the Java runtime outside of the 
+> Code12 environment.
 
 
 GameObj Data Fields
@@ -2037,8 +2207,8 @@ str.trim()                                        String
 For more information, see the [Java String Class](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html).
 
 
-Program Control Functions
--------------------------
+Main Program Functions
+----------------------
 
 ### start()
 ```

@@ -29,8 +29,9 @@
 <li><a href="#screen-management">Screen Management</a></li>
 <li><a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a></li>
 <li><a href="#audio">Audio</a></li>
-<li><a href="#math-and-misc.">Math and Misc.</a></li>
+<li><a href="#math-utilities">Math Utilities</a></li>
 <li><a href="#type-conversion">Type Conversion</a></li>
+<li><a href="#program-control">Program Control</a></li>
 </ul>
 <h5 id="gameobj-fields-and-methods">GameObj Fields and Methods</h5>
 <ul>
@@ -42,9 +43,9 @@
 <li><a href="#java-math-methods-and-fields-supported">Java Math Methods and Fields Supported</a></li>
 <li><a href="#java-string-methods-supported">Java String Methods Supported</a></li>
 </ul>
-<h5 id="input-events-and-program-control-functions">Input Events and Program Control Functions</h5>
+<h5 id="input-events-and-main-program-functions">Input Events and Main Program Functions</h5>
 <ul>
-<li><a href="#program-control-functions">Program Control Functions</a></li>
+<li><a href="#main-program-functions">Main Program Functions</a></li>
 <li><a href="#input-event-functions">Input Event Functions</a></li>
 </ul>
 <h5 id="additional-reference-information">Additional Reference Information</h5>
@@ -63,6 +64,7 @@
 <li><a href="#ct.text">ct.text()</a></li>
 <li><a href="#ct.image">ct.image()</a></li>
 </ul>
+<h6 id="code12-function-reference-graphic-object-creation"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a></h6>
 <h3 id="ct.circle">ct.circle()</h3>
 <p>Creates a new circle graphics object (GameObj).</p>
 <h4 id="syntax">Syntax</h4>
@@ -191,6 +193,7 @@ sky.setSize( 100, 100 );</code></pre>
 <li><a href="#ct.logm">ct.logm()</a></li>
 <li><a href="#ct.setoutputfile">ct.setOutputFile()</a></li>
 </ul>
+<h6 id="code12-function-reference-text-output"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a></h6>
 <h3 id="ct.print">ct.print()</h3>
 <p>Output text, or the text representation of any value, to the console. A newline is <em>not</em> added, so any subsequent text output will appear on the same line.</p>
 <blockquote>
@@ -317,6 +320,7 @@ ct.setOutputFilename( null );</code></pre>
 <li><a href="#ct.inputyesno">ct.inputYesNo()</a></li>
 <li><a href="#ct.inputstring">ct.inputString()</a></li>
 </ul>
+<h6 id="code12-function-reference-alerts-and-input-dialogs"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a></h6>
 <h3 id="ct.showalert">ct.showAlert()</h3>
 <p>Displays a message in a pop-up dialog box over the graphics screen. Execution of the program will pause and wait for the user to press the OK button on the dialog or press the Enter key on the keyboard.</p>
 <h4 id="syntax-10">Syntax</h4>
@@ -390,6 +394,7 @@ ct.setOutputFilename( null );</code></pre>
 <li><a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></li>
 <li><a href="#ct.setbackimage">ct.setBackImage()</a></li>
 </ul>
+<h6 id="code12-function-reference-screen-management"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a></h6>
 <h3 id="ct.settitle">ct.setTitle()</h3>
 <p>Allows you to set the title of the application window.</p>
 <h4 id="syntax-15">Syntax</h4>
@@ -629,6 +634,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
 <blockquote>
 <p>Another more flexible way to handle mouse and keyboard input, which requires writing your own functions with parameters (syntax level 10), is to write your own <a href="#input-event-functions">Input Event Functions</a>.</p>
 </blockquote>
+<h6 id="code12-function-reference-mouse-and-keyboard-input"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a></h6>
 <h3 id="ct.clicked">ct.clicked()</h3>
 <p>Returns <code>true</code> if a click (mouse button press) or touch (on touch screens) occured in the application window during the last animation frame.</p>
 <h4 id="syntax-28">Syntax</h4>
@@ -768,6 +774,7 @@ public void update()
 <li><a href="#ct.sound">ct.sound()</a></li>
 <li><a href="#ct.setsoundvolume">ct.setSoundVolume()</a></li>
 </ul>
+<h6 id="code12-function-reference-audio"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a></h6>
 <h3 id="ct.loadsound">ct.loadSound()</h3>
 <p>Pre-loads an audio file into memory so that the first use will have no delay.</p>
 <h4 id="syntax-34">Syntax</h4>
@@ -834,49 +841,127 @@ public void update()
 <pre><code>ct.setSoundVolume( 0.2 );
 ct.sound( &quot;voices.mp3&quot; );</code></pre>
 <h6 id="code12-function-reference-audio-ct.setsoundvolume"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.setsoundvolume">ct.setSoundVolume()</a></h6>
-<h2 id="math-and-misc.">Math and Misc.</h2>
+<h2 id="math-utilities">Math Utilities</h2>
+<p>These functions provide a convenient way to do common calculations.</p>
+<ul>
+<li><a href="#ct.random">ct.random()</a></li>
+<li><a href="#ct.round">ct.round()</a></li>
+<li><a href="#ct.rounddecimal">ct.roundDecimal()</a></li>
+<li><a href="#ct.distance">ct.distance()</a></li>
+<li><a href="#ct.intdiv">ct.intDiv()</a></li>
+<li><a href="#ct.iserror">ct.isError()</a></li>
+</ul>
+<p>For more math operations, see <a href="#java-math-methods-and-fields-supported">Java Math Methods and Fields Supported</a>.</p>
+<h6 id="code12-function-reference-math-utilities"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a></h6>
 <h3 id="ct.random">ct.random()</h3>
-<pre><code>int ct.random( int min, int max )</code></pre>
-<p>Return a random integer from <code>min</code> to <code>max</code> (inclusive).</p>
+<p>Returns a random integer within the specified range.</p>
+<h4 id="syntax-37">Syntax</h4>
+<pre><code>ct.random( min, max )</code></pre>
+<h5 id="min">min</h5>
+<p>(<a href="#java-data-types">int</a>). The lower bound of the range.</p>
+<h5 id="max">max</h5>
+<p>(<a href="#java-data-types">int</a>). The upper bound of the range.</p>
+<h5 id="return-value-20"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). A random integer from <code>min</code> to <code>max</code> (inclusive).</p>
+<h4 id="examples-13">Examples</h4>
+<pre><code>int diceRoll = ct.random( 1, 6 );</code></pre>
+<pre><code>// Flip a coin
+if (ct.random( 0, 1 ) == 0)
+    ct.println( &quot;heads&quot; );
+else
+    ct.println( &quot;tails&quot; );</code></pre>
+<pre><code>// Create a ball at a random x position
+ct.circle( ct.random( 0, 100 ), 50, 10 );</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.random"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.random">ct.random()</a></h6>
 <h3 id="ct.round">ct.round()</h3>
-<pre><code>int ct.round( double number )</code></pre>
-<p>Return the <code>number</code> rounded to the nearest integer.</p>
+<p>Returns a specified number rounded to the nearest integer.</p>
+<h4 id="syntax-38">Syntax</h4>
+<pre><code>ct.round( number )</code></pre>
+<h5 id="number">number</h5>
+<p>(<a href="#java-data-types">double</a>). The number to round.</p>
+<h5 id="return-value-21"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The <code>number</code> rounded to the nearest integer.</p>
+<h4 id="example-24">Example</h4>
+<pre><code>double x = 10.75;
+int n = ct.round( x );    // sets n to 11</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.round"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.round">ct.round()</a></h6>
 <h3 id="ct.rounddecimal">ct.roundDecimal()</h3>
-<pre><code>double ct.roundDecimal( double number, int numPlaces )</code></pre>
-<p>Return the <code>number</code> rounded to <code>numPlaces</code> decimal places.</p>
-<h3 id="ct.intdiv">ct.intDiv()</h3>
-<pre><code>int ct.intDiv( int numerator, int denominator )</code></pre>
-<p>Return the result of an integer divide of <code>numerator / denominator</code>. If <code>numerator / denominator</code> is not an integer, the result is rounded down to the next smaller integer. If <code>denominator</code> is 0 then the result is a large positive integer if <code>numerator</code> &gt; 0, a large negative integer if <code>numerator</code> &lt; 0, and 0 if <code>numerator</code> is 0.</p>
-<h3 id="ct.iserror">ct.isError()</h3>
-<pre><code>boolean ct.isError( double number )</code></pre>
-<p>Return <code>true</code> if the value of <code>number</code> is an error value (NaN = “Not a Number”).</p>
+<p>Returns a number rounded to a specified number of decimal places.</p>
+<h4 id="syntax-39">Syntax</h4>
+<pre><code>ct.roundDecimal( number, numPlaces )</code></pre>
+<h5 id="number-1">number</h5>
+<p>(<a href="#java-data-types">double</a>). The number to round.</p>
+<h5 id="numplaces">numPlaces</h5>
+<p>(<a href="#java-data-types">int</a>). The number of decimal places to round to.</p>
+<h5 id="return-value-22"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The <code>number</code> rounded to <code>numPlaces</code> decimal places.</p>
+<h4 id="example-25">Example</h4>
+<pre><code>double amount = 24.3467;
+double price = ct.roundDecimal( amount, 2 );    // sets price to 24.35</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.rounddecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.rounddecimal">ct.roundDecimal()</a></h6>
 <h3 id="ct.distance">ct.distance()</h3>
-<pre><code>double ct.distance( double x1, double y1, double x2, double y2 )</code></pre>
-<p>Return the distance between the points (<code>x1</code>, <code>y1</code>) and (<code>x2</code>, <code>y2</code>).</p>
-<h3 id="ct.gettimer">ct.getTimer()</h3>
-<pre><code>int ct.getTimer()</code></pre>
-<p>Return the number of milliseconds since the application started. Time starts at the begining of the <code>start</code> function.</p>
-<h3 id="ct.getversion">ct.getVersion()</h3>
-<pre><code>double getVersion()</code></pre>
-<p>Return the version number of the Code12 runtime system.</p>
-<h3 id="ct.pause">ct.pause()</h3>
-<pre><code>ct.pause()</code></pre>
-<p>Execution of the program is paused at this statement. You can then resume or stop execution using the toolbar buttons in the Code12 application.</p>
+<p>Returns the geometric distance between two (x, y) coordinates.</p>
+<h4 id="syntax-40">Syntax</h4>
+<pre><code>ct.distance( x1, y1, x2, y2 )</code></pre>
+<h5 id="x1-1">x1</h5>
+<p>(<a href="#java-data-types">double</a>). The first x coordinate.</p>
+<h5 id="y1-1">y1</h5>
+<p>(<a href="#java-data-types">double</a>). The first y coordinate.</p>
+<h5 id="x2-1">x2</h5>
+<p>(<a href="#java-data-types">double</a>). The second x coordinate.</p>
+<h5 id="y2-1">y2</h5>
+<p>(<a href="#java-data-types">double</a>). The second y coordinate.</p>
+<h5 id="return-value-23"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The geometric distance from (<code>x1</code>, <code>y1</code>) to (<code>x2</code>, <code>y2</code>).</p>
+<p>This is equivalent to:</p>
+<pre><code>Math.sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) )</code></pre>
+<h4 id="example-26">Example</h4>
+<pre><code>GameObj ball1 = ct.circle( 30, 20, 10 );
+GameObj ball2 = ct.circle( 50, 70, 10 );
+
+double dist = ct.distance( ball1.x, ball1.y, ball2.x, ball2.y );
+ct.println( &quot;The balls are &quot; + dist + &quot; units apart&quot; );</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.distance"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.distance">ct.distance()</a></h6>
+<h3 id="ct.intdiv">ct.intDiv()</h3>
+<p>Return the result of an integer division of two integers (discard any fractional part and round the result down to the nearest integer).</p>
+<h4 id="syntax-41">Syntax</h4>
+<pre><code>ct.intDiv( numerator, denominator )</code></pre>
+<h5 id="numerator">numerator</h5>
+<p>(<a href="#java-data-types">int</a>). The numerator of the division.</p>
+<h5 id="denominator">denominator</h5>
+<p>(<a href="#java-data-types">int</a>). The denominator of the division.</p>
+<h5 id="return-value-24"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The value of <code>numerator</code> / <code>denominator</code> rounded down to the nearest integer.</p>
 <blockquote>
-<p>You can use <code>ct.pause</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.pause</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
+<p>The <code>ct.intDiv()</code> function also supports dividing by 0, which is normally an error if done directly in Java. If <code>denominator</code> is 0 then the result is:</p>
 </blockquote>
-<h3 id="ct.stop">ct.stop()</h3>
-<pre><code>ct.stop()</code></pre>
-<p>Execution of the program is immediately stopped and ended at this statement. You can restart execution over from the beginning of the program using the <strong>Restart</strong> toolbar button in the Code12 application.</p>
 <blockquote>
-<p>You can use <code>ct.stop</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.stop</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
+<ul>
+<li>a large positive integer if <code>numerator</code> &gt; 0</li>
+<li>a large negative integer if <code>numerator</code> &lt; 0</li>
+<li>0 if <code>numerator</code> is 0</li>
+</ul>
 </blockquote>
-<h3 id="ct.restart">ct.restart()</h3>
-<pre><code>ct.restart()</code></pre>
-<p>Execution of the program is immediately stopped and restarted from the beginning of the program. Variables are re-initialized with their default/starting values, and execution starts over with your <code>start</code> function.</p>
-<blockquote>
-<p>The <code>ct.restart</code> function is not supported (ignored) when programs are running standalone under the Java runtime outside of the Code12 environment.</p>
-</blockquote>
+<h4 id="example-27">Example</h4>
+<pre><code>int n = ct.intDiv( 3, 2 );    // sets n to 1</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.intdiv"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.intdiv">ct.intDiv()</a></h6>
+<h3 id="ct.iserror">ct.isError()</h3>
+<p>Returns <code>true</code> if the value of the specified number is an error value (NaN = “Not a Number”).</p>
+<h4 id="syntax-42">Syntax</h4>
+<pre><code>ct.isError( number )</code></pre>
+<h5 id="numerator-1">numerator</h5>
+<p>(<a href="#java-data-types">double</a>). The number to test.</p>
+<h5 id="return-value-25"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if <code>number</code> is an error (NaN) value, or <code>false</code> if <code>number</code> is a valid number.</p>
+<p>An error (NaN or “Not a Number”) value can result from certain calculations or functions that return a <a href="#java-data-types">double</a> but the calculation results in an error or invalid number. See the examples below.</p>
+<h4 id="example-28">Example</h4>
+<pre><code>boolean error;
+
+// These all set error to true
+error = ct.isError( 0.0 / 0.0 );
+error = ct.isError( Math.sqrt( -1 ) );
+error = ct.isError( ct.parseNumber( &quot;nope&quot; ) );</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.iserror"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.iserror">ct.isError()</a></h6>
 <h2 id="type-conversion">Type Conversion</h2>
 <h3 id="ct.parseint">ct.parseInt()</h3>
 <pre><code>int ct.parseInt( String str )</code></pre>
@@ -904,6 +989,31 @@ String ct.formatDecimal( double number, int numPlaces )</code></pre>
 <pre><code>String ct.formatInt( int number )
 String ct.formatInt( int number, int numDigits )</code></pre>
 <p>Return the value of <code>number</code> converted to a string. If numDigits is included, then format to this many digits, adding leading zeros as necessary.</p>
+<h2 id="program-control">Program Control</h2>
+<h3 id="ct.gettimer">ct.getTimer()</h3>
+<pre><code>int ct.getTimer()</code></pre>
+<p>Return the number of milliseconds since the application started. Time starts at the begining of the <code>start</code> function.</p>
+<h3 id="ct.getversion">ct.getVersion()</h3>
+<pre><code>double getVersion()</code></pre>
+<p>Return the version number of the Code12 runtime system.</p>
+<h3 id="ct.pause">ct.pause()</h3>
+<pre><code>ct.pause()</code></pre>
+<p>Execution of the program is paused at this statement. You can then resume or stop execution using the toolbar buttons in the Code12 application.</p>
+<blockquote>
+<p>You can use <code>ct.pause</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.pause</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
+</blockquote>
+<h3 id="ct.stop">ct.stop()</h3>
+<pre><code>ct.stop()</code></pre>
+<p>Execution of the program is immediately stopped and ended at this statement. You can restart execution over from the beginning of the program using the <strong>Restart</strong> toolbar button in the Code12 application.</p>
+<blockquote>
+<p>You can use <code>ct.stop</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.stop</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
+</blockquote>
+<h3 id="ct.restart">ct.restart()</h3>
+<pre><code>ct.restart()</code></pre>
+<p>Execution of the program is immediately stopped and restarted from the beginning of the program. Variables are re-initialized with their default/starting values, and execution starts over with your <code>start</code> function.</p>
+<blockquote>
+<p>The <code>ct.restart</code> function is not supported (ignored) when programs are running standalone under the Java runtime outside of the Code12 environment.</p>
+</blockquote>
 <h2 id="gameobj-data-fields">GameObj Data Fields</h2>
 <p><code>GameObj</code> objects are graphics objects visible on the screen. See <a href="#gameobj-creation">GameObj Creation</a> to create a <code>GameObj</code>. All <code>GameObj</code> objects have the following public data fields, which can be accessed or assigned to at any time. If assigned to, the new value takes effect at the next animation frame.</p>
 <h3 id="obj.x">obj.x</h3>
@@ -985,7 +1095,7 @@ String ct.formatInt( int number, int numDigits )</code></pre>
 <h3 id="obj.tostring">obj.toString()</h3>
 <pre><code>String obj.toString()</code></pre>
 <p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
-<h5 id="examples-13">Examples:</h5>
+<h5 id="examples-14">Examples:</h5>
 <pre><code>[circle at (70, 25)]
 [text at (50, 10) &quot;Score 3200&quot;]
 [image at (21, 83) &quot;goldfish.png&quot;]
@@ -1104,7 +1214,7 @@ str.toLowerCase()                                 String
 str.toUpperCase()                                 String
 str.trim()                                        String</code></pre>
 <p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">Java String Class</a>.</p>
-<h2 id="program-control-functions">Program Control Functions</h2>
+<h2 id="main-program-functions">Main Program Functions</h2>
 <h3 id="start">start()</h3>
 <pre><code>void start()</code></pre>
 <p>The <code>start</code> function is called once at the beginning of your program. This is good place to create most of the objects for your program (except for any objects that get created as a result of an action that occurs while the application is running).</p>
