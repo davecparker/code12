@@ -173,7 +173,7 @@ function env.openFileInEditor( path )
 		-- Open using editorPath or system default
 		if env.isWindows then
 			if editorPath then
-				os.execute( [[""]] .. editorPath .. [[" "]] .. path .. [[""]] )
+				os.execute( 'start "" "' .. editorPath .. '" "' .. path .. '"' )
 			else
 				os.execute( 'start "" "' .. path .. '"' )
 			end

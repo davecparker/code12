@@ -95,7 +95,8 @@ local function makeGrid()
 		gridGroup = nil
 	end
 	-- Make gridGroup
-	gridGroup = display.newContainer( outputGroup, width * scale, height * scale )
+	gridGroup = g.makeGroup( outputGroup )
+	gridGroup:toFront()
 	-- Calculate x-value for first vertical grid line
 	screenOriginX = screen.originX
 	local xLine = math.floor( screenOriginX / 10 ) * 10 + 10
