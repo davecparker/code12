@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Code12 API Documentation</title>
+  <title>Code12 Function Reference</title>
   <style type="text/css">
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -18,10 +18,10 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">Code12 API Documentation</h1>
+<h1 class="title">Code12 Function Reference</h1>
 </header>
-<p>The Code12 API functions are built in to the Code12 application.</p>
-<h5 id="global-ct-api-functions">Global (ct) API Functions</h5>
+<p>The Code12 API (Application Programming Interface) functions are built in to the Code12 application.</p>
+<h5 id="code12-functions">Code12 Functions</h5>
 <ul>
 <li><a href="#graphic-object-creation">Graphic Object Creation</a></li>
 <li><a href="#text-output">Text Output</a></li>
@@ -29,22 +29,24 @@
 <li><a href="#screen-management">Screen Management</a></li>
 <li><a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a></li>
 <li><a href="#audio">Audio</a></li>
-<li><a href="#math-and-misc-">Math and Misc.</a></li>
+<li><a href="#math-utilities">Math Utilities</a></li>
 <li><a href="#type-conversion">Type Conversion</a></li>
+<li><a href="#program-control">Program Control</a></li>
 </ul>
 <h5 id="gameobj-fields-and-methods">GameObj Fields and Methods</h5>
 <ul>
 <li><a href="#gameobj-data-fields">GameObj Data Fields</a></li>
 <li><a href="#gameobj-methods">GameObj Methods</a></li>
 </ul>
-<h5 id="java-class-methods-and-fields-supported">Java Class Methods and Fields Supported</h5>
+<h5 id="math-and-string-operations">Math and String Operations</h5>
 <ul>
-<li><a href="#java-math-class-methods-and-fields-supported">Math Class</a></li>
-<li><a href="#java-string-class-methods-supported">String Class</a></li>
+<li><a href="#java-math-methods-and-fields-supported">Java Math Methods and Fields Supported</a></li>
+<li><a href="#java-string-methods-supported">Java String Methods Supported</a></li>
 </ul>
-<h5 id="input-and-program-control-events">Input and Program Control Events</h5>
+<h5 id="input-events-and-main-program-functions">Input Events and Main Program Functions</h5>
 <ul>
-<li><a href="#event-functions">Event Functions</a></li>
+<li><a href="#main-program-functions">Main Program Functions</a></li>
+<li><a href="#input-event-functions">Input Event Functions</a></li>
 </ul>
 <h5 id="additional-reference-information">Additional Reference Information</h5>
 <ul>
@@ -56,12 +58,13 @@
 <h2 id="graphic-object-creation">Graphic Object Creation</h2>
 <p>These functions allow you to create new graphics objects for display on the screen.</p>
 <ul>
-<li><a href="#ct.circle">ct.circle</a></li>
-<li><a href="#ct.rect">ct.rect</a></li>
-<li><a href="#ct.line">ct.line</a></li>
-<li><a href="#ct.text">ct.text</a></li>
-<li><a href="#ct.image">ct.image</a></li>
+<li><a href="#ct.circle">ct.circle()</a></li>
+<li><a href="#ct.rect">ct.rect()</a></li>
+<li><a href="#ct.line">ct.line()</a></li>
+<li><a href="#ct.text">ct.text()</a></li>
+<li><a href="#ct.image">ct.image()</a></li>
 </ul>
+<h6 id="code12-function-reference-graphic-object-creation"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a></h6>
 <h3 id="ct.circle">ct.circle()</h3>
 <p>Creates a new circle graphics object (GameObj).</p>
 <h4 id="syntax">Syntax</h4>
@@ -82,6 +85,7 @@ ct.circle( x, y, diameter, color );</code></pre>
 <pre><code>ct.circle( 50, 70, 40, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj ball = ct.circle( 0, 50, 10, &quot;yellow&quot; );
 ball.xSpeed = 1;</code></pre>
+<h6 id="code12-function-reference-graphic-object-creation-ct.circle"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.circle">ct.circle()</a></h6>
 <h3 id="ct.rect">ct.rect()</h3>
 <p>Creates a new rectangle graphics object (GameObj).</p>
 <h4 id="syntax-1">Syntax</h4>
@@ -104,6 +108,7 @@ ct.rect( x, y, width, height, color );</code></pre>
 <pre><code>ct.rect( 50, 70, 80, 40, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj platform = ct.rect( 0, 50, 30, 8, &quot;orange&quot; );
 platform.xSpeed = 1;</code></pre>
+<h6 id="code12-function-reference-graphic-object-creation-ct.rect"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.rect">ct.rect()</a></h6>
 <h3 id="ct.line">ct.line()</h3>
 <p>Creates a new line graphics object (GameObj) drawn from a point (<code>x1</code>, <code>y2</code>) to a second point (<code>x2</code>, <code>y2</code>).</p>
 <h4 id="syntax-2">Syntax</h4>
@@ -126,6 +131,7 @@ ct.line( x1, y1, x2, y2, color );</code></pre>
 <pre><code>ct.line( 10, 50, 90, 50, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj border = ct.line( 0, 75, 100, 75, &quot;red&quot; );
 border.lineWidth = 3;</code></pre>
+<h6 id="code12-function-reference-graphic-object-creation-ct.line"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.line">ct.line()</a></h6>
 <h3 id="ct.text">ct.text()</h3>
 <p>Creates a new text graphics object (GameObj), which can be used to display text on the graphics screen.</p>
 <h4 id="syntax-3">Syntax</h4>
@@ -148,12 +154,16 @@ ct.text( text, x, y, height, color );</code></pre>
 <pre><code>ct.text( &quot;Click anywhere to play&quot;, 50, 60, 5, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj scoreText = ct.text( &quot;Score: 0&quot;, 100, 20, 10, &quot;green&quot; );
 scoreText.align( &quot;right&quot; );</code></pre>
+<h6 id="code12-function-reference-graphic-object-creation-ct.text"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.text">ct.text()</a></h6>
 <h3 id="ct.image">ct.image()</h3>
 <p>Creates a new graphics image object (GameObj) from an image file (.PNG or .JPG).</p>
 <h4 id="syntax-4">Syntax</h4>
 <pre><code>ct.image( filename, x, y, width );</code></pre>
 <h5 id="filename">filename</h5>
-<p>(<a href="#java-data-types">String</a>). The filename of the image to display. The image file must be in PNG or JPG format, for example “dragon.png”, or “sky.jpg”. For a simple filename such as “dragon.png”, the image file must be copied into the same folder as your Java program (.java) file. You can also put image files into subfolders using, for example, “images/bullet.png”.</p>
+<p>(<a href="#java-data-types">String</a>). The filename of the image to display. The image file must be in PNG or JPG format, for example <code>&quot;dragon.png&quot;</code>, or <code>&quot;sky.jpg&quot;</code>.</p>
+<blockquote>
+<p>For a simple filename such as <code>&quot;dragon.png&quot;</code>, the image file must be copied into the same folder as your Java program (.java) file. You can also put image files into subfolders using, for example, <code>&quot;images/bullet.png&quot;</code>.</p>
+</blockquote>
 <h5 id="x-3">x</h5>
 <p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> for the center of the image.</p>
 <h5 id="y-3">y</h5>
@@ -161,7 +171,7 @@ scoreText.align( &quot;right&quot; );</code></pre>
 <h5 id="width-1">width</h5>
 <p>(<a href="#java-data-types">double</a>) The <a href="#graphics-coordinates">width</a> for the image object. The image file itself can be any size, and it will be scaled to fit into the the given <code>width</code>. The height of the image object is determined automatically to preserve the original image’s aspect ratio.</p>
 <blockquote>
-<p>If you wish to stretch or distort the image to be different from its original aspect ratio, you can do so using the <a href="#obj.setsize">obj.setSize</a> method.</p>
+<p>If you wish to stretch or distort the image to be different from its original aspect ratio, you can do so using the <a href="#obj.setsize">obj.setSize()</a> method.</p>
 </blockquote>
 <h5 id="return-value-4"><em>Return Value</em></h5>
 <p>(<a href="#java-data-types">GameObj</a>). A reference to the image object is returned, which can be used to access and modify the image object later (see <a href="#gameobj-data-fields">GameObj Data Fields</a> and <a href="#gameobj-methods">GameObj Methods</a>).</p>
@@ -170,27 +180,29 @@ scoreText.align( &quot;right&quot; );</code></pre>
 <pre><code>// Stretch the sky image to fill the entire screen
 GameObj sky = ct.image( &quot;sky.jpg&quot;, 50, 50, 100 );
 sky.setSize( 100, 100 );</code></pre>
+<h6 id="code12-function-reference-graphic-object-creation-ct.image"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.image">ct.image()</a></h6>
 <h2 id="text-output">Text Output</h2>
 <p>These functions allow you to output text to the console area, which is below the graphics area in the Code12 application. Text in this area displays as a continuous scrolling stream of lines. You can also output to a text file on your computer.</p>
 <blockquote>
-<p>To display text on the graphics screen, use <a href="#ct.text">ct.text</a>.</p>
+<p>To display text on the graphics screen, use <a href="#ct.text">ct.text()</a>.</p>
 </blockquote>
 <ul>
-<li><a href="#ct.print">ct.print</a></li>
-<li><a href="#ct.println">ct.println</a></li>
-<li><a href="#ct.log">ct.log</a></li>
-<li><a href="#ct.logm">ct.logm</a></li>
-<li><a href="#ct.setoutputfile">ct.setOutputFile</a></li>
+<li><a href="#ct.print">ct.print()</a></li>
+<li><a href="#ct.println">ct.println()</a></li>
+<li><a href="#ct.log">ct.log()</a></li>
+<li><a href="#ct.logm">ct.logm()</a></li>
+<li><a href="#ct.setoutputfile">ct.setOutputFile()</a></li>
 </ul>
+<h6 id="code12-function-reference-text-output"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a></h6>
 <h3 id="ct.print">ct.print()</h3>
 <p>Output text, or the text representation of any value, to the console. A newline is <em>not</em> added, so any subsequent text output will appear on the same line.</p>
 <blockquote>
-<p>This is equivalent to Java’s <code>System.out.print()</code>.</p>
+<p>This function is equivalent to Java’s <code>System.out.print()</code>.</p>
 </blockquote>
 <h4 id="syntax-5">Syntax</h4>
 <pre><code>ct.print( value );</code></pre>
 <h5 id="value">value</h5>
-<p>(Any type). The text or value to output.</p>
+<p>(<a href="#java-data-types">Any type</a>). The text or value to output.</p>
 <h4 id="examples-5">Examples</h4>
 <pre><code>// These will output on the same line
 ct.print( &quot;Hello&quot; );
@@ -202,16 +214,17 @@ ct.print( &quot;User &quot; );
 ct.print( userName )
 ct.print( &quot; has a score of &quot; );
 ct.print( score );</code></pre>
+<h6 id="code12-function-reference-text-output-ct.print"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.print">ct.print()</a></h6>
 <h3 id="ct.println">ct.println()</h3>
 <p>Output text, or the text representation of any value, to the console. A newline is automatically added to end the line after the value.</p>
 <blockquote>
-<p>This is equivalent to Java’s <code>System.out.println()</code>.</p>
+<p>This function is equivalent to Java’s <code>System.out.println()</code>.</p>
 </blockquote>
 <h4 id="syntax-6">Syntax</h4>
 <pre><code>ct.println( value );
 ct.println();</code></pre>
 <h5 id="value-1">value</h5>
-<p>(Any type, optional). The text or value to output. If no value is given then only a newline is output.</p>
+<p>(<a href="#java-data-types">Any type</a>, optional). The text or value to output. If no value is given then only a newline is output.</p>
 <h4 id="examples-6">Examples</h4>
 <pre><code>ct.println( &quot;Hello World!&quot; );</code></pre>
 <pre><code>ct.println( &quot;This is line 1&quot; );
@@ -222,15 +235,19 @@ ct.println( &quot;This is the next paragraph.&quot; );</code></pre>
 int numTrys = 3;
 
 ct.println( &quot;Your average score is &quot; + (totalScore / numTrys) );</code></pre>
+<h6 id="code12-function-reference-text-output-ct.println"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.println">ct.println()</a></h6>
 <h3 id="ct.log">ct.log()</h3>
-<p>Output any number of values to the console, on one line separated by commas. <a href="#java-data-types">String</a> values are output enclosed in <code>&quot;double quotes&quot;</code>, and <a href="#java-data-types">GameObj</a> objects are described in <code>[square brackets]</code>.</p>
+<p>Output any number of values to the console, on one line separated by commas.</p>
 <h4 id="syntax-7">Syntax</h4>
 <pre><code>ct.log( value, value2, ... );</code></pre>
 <h5 id="value-value2">value, value2, …</h5>
 <p>(Any number of values, of any types). The values to output. You can pass any number of values of any type(s). The values will be output to the console on the same line, separated by commas.</p>
-<blockquote>
-<p>Unlike <a href="#ct.println">ct.println()</a>, String values will be automatically output enclosed in double quotes.</p>
-</blockquote>
+<h4 id="notes">Notes</h4>
+<p>Unlike <a href="#ct.print">ct.print()</a> and <a href="#ct.println">ct.println()</a>,</p>
+<ul>
+<li>Output from <a href="#ct.log">ct.log()</a> and <a href="#ct.logm">ct.logm()</a> is colored blue in the console instead of black.</li>
+<li>String values are automatically enclosed in double quotes.</li>
+</ul>
 <h4 id="examples-7">Examples</h4>
 <pre><code>int count = 3;
 ct.log( count );</code></pre>
@@ -240,8 +257,9 @@ int misses = 4;
 int total = hits + misses;
 
 ct.log( playerName, hits, misses, total );</code></pre>
+<h6 id="code12-function-reference-text-output-ct.log"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.log">ct.log()</a></h6>
 <h3 id="ct.logm">ct.logm()</h3>
-<p>Output a text message followed by any number values to the console, all on one line separated by commas. <a href="#java-data-types">String</a> values are output enclosed in <code>&quot;double quotes&quot;</code>, and <a href="#java-data-types">GameObj</a> objects are described in <code>[square brackets]</code>.</p>
+<p>Output a text message followed by any number values to the console, all on one line separated by commas.</p>
 <h4 id="syntax-8">Syntax</h4>
 <pre><code>ct.logm( message, value, value2, ... );</code></pre>
 <h5 id="message">message</h5>
@@ -251,9 +269,12 @@ ct.log( playerName, hits, misses, total );</code></pre>
 </blockquote>
 <h5 id="value-value2-1">value, value2, …</h5>
 <p>(Any number of values, of any types). The values to output. You can pass any number of values of any type(s). The values will be output to the console on the same line after the <code>message</code> plus a space, separated by commas.</p>
-<blockquote>
-<p>Unlike <a href="#ct.println">ct.println()</a>, String values will be automatically enclosed in double quotes.</p>
-</blockquote>
+<h4 id="notes-1">Notes</h4>
+<p>Unlike <a href="#ct.print">ct.print()</a> and <a href="#ct.println">ct.println()</a>,</p>
+<ul>
+<li>Output from <a href="#ct.log">ct.log()</a> and <a href="#ct.logm">ct.logm()</a> is colored blue in the console instead of black.</li>
+<li>String values are automatically enclosed in double quotes.</li>
+</ul>
 <h4 id="examples-8">Examples</h4>
 <pre><code>int count = 3;
 ct.logm( &quot;count&quot;, count );</code></pre>
@@ -262,8 +283,9 @@ int hits = 7;
 int errors = 1;
 
 ct.logm( &quot;Current stats:&quot;, runs, hits, errors );</code></pre>
+<h6 id="code12-function-reference-text-output-ct.logm"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.logm">ct.logm()</a></h6>
 <h3 id="ct.setoutputfile">ct.setOutputFile()</h3>
-<p>If you call <code>ct.setOutputFile( filename )</code>, then any subsequent text output from <a href="#ct.print">ct.print</a>, <a href="#ct.println">ct.println</a>, <a href="#ct.log">ct.log</a>, and <a href="#ct.logm">ct.logm</a> will be written to a text file with the given filename in addition to being output to the console.</p>
+<p>If you call <code>ct.setOutputFile( filename )</code>, then any subsequent text output from <a href="#ct.print">ct.print()</a>, <a href="#ct.println">ct.println()</a>, <a href="#ct.log">ct.log()</a>, and <a href="#ct.logm">ct.logm()</a> will be written to a text file with the given filename in addition to being output to the console.</p>
 <h4 id="syntax-9">Syntax</h4>
 <pre><code>ct.setOutputFile( filename );
 ct.setOutputFile( null );</code></pre>
@@ -288,226 +310,809 @@ ct.println( &quot;Difference = &quot; + (a - b) );
 ct.println( &quot;Product = &quot; + (a * b) );
 ct.println( &quot;Quotient = &quot; + (a / b) );
 ct.setOutputFilename( null );</code></pre>
+<h6 id="code12-function-reference-text-output-ct.setoutputfile"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.setoutputfile">ct.setOutputFile()</a></h6>
 <h2 id="alerts-and-input-dialogs">Alerts and Input Dialogs</h2>
+<p>These functions allow you to display a message box for the user and to ask for input from the user.</p>
+<ul>
+<li><a href="#ct.showalert">ct.showAlert()</a></li>
+<li><a href="#ct.inputint">ct.inputInt()</a></li>
+<li><a href="#ct.inputnumber">ct.inputNumber()</a></li>
+<li><a href="#ct.inputyesno">ct.inputYesNo()</a></li>
+<li><a href="#ct.inputstring">ct.inputString()</a></li>
+</ul>
+<h6 id="code12-function-reference-alerts-and-input-dialogs"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a></h6>
 <h3 id="ct.showalert">ct.showAlert()</h3>
-<pre><code>ct.showAlert( String message )</code></pre>
-<p>Display <code>message</code> in a popup alert dialog. Execution of the program will pause and wait for the user to press the OK button on the dialog or press the Enter key on the keyboard.</p>
-<blockquote>
-<p>The <code>message</code> can contain line breaks by embedding newline (<code>\n</code>) characters in the string.</p>
-</blockquote>
+<p>Displays a message in a pop-up dialog box over the graphics screen. Execution of the program will pause and wait for the user to press the OK button on the dialog or press the Enter key on the keyboard.</p>
+<h4 id="syntax-10">Syntax</h4>
+<pre><code>ct.showAlert( message );</code></pre>
+<h5 id="message-1">message</h5>
+<p>(<a href="#java-data-types">String</a>). The message to display. The string can contain line breaks by embedding newline (<code>\n</code>) characters in it.</p>
+<h4 id="example-1">Example</h4>
+<pre><code>ct.showAlert( &quot;Game Over!&quot; );</code></pre>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.showalert"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.showalert">ct.showAlert()</a></h6>
 <h3 id="ct.inputint">ct.inputInt()</h3>
-<pre><code>int ct.inputInt( String message )</code></pre>
-<p>Display <code>message</code> in a popup dialog box that allows the user to enter a number. Execution of the program will pause and wait until the user enters a valid integer. The resulting integer value is returned.</p>
+<p>Displays a message in a pop-up dialog box that asks the user to enter a number. Execution of the program will pause and wait until the user enters a valid integer. The resulting integer value is returned.</p>
+<h4 id="syntax-11">Syntax</h4>
+<pre><code>ct.inputInt( message );</code></pre>
+<h5 id="message-2">message</h5>
+<p>(<a href="#java-data-types">String</a>). The message to display.</p>
+<h5 id="return-value-5"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The number entered by the user.</p>
+<h4 id="example-2">Example</h4>
+<pre><code>int numTargets = ct.inputInt( &quot;How many targets would you like to have?&quot; );</code></pre>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputint">ct.inputInt()</a></h6>
 <h3 id="ct.inputnumber">ct.inputNumber()</h3>
-<pre><code>double ct.inputNumber( String message )</code></pre>
-<p>Display <code>message</code> in a popup dialog box that allows the user to enter a number. Execution of the program will pause and wait until the user enters a valid number. The resulting numeric value is returned.</p>
+<p>Displays a message in a pop-up dialog box that asks the user to enter a number. Execution of the program will pause and wait until the user enters a valid number. The resulting numeric value is returned.</p>
+<h4 id="syntax-12">Syntax</h4>
+<pre><code>ct.inputNumber( message );</code></pre>
+<h5 id="message-3">message</h5>
+<p>(<a href="#java-data-types">String</a>). The message to display.</p>
+<h5 id="return-value-6"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The number entered by the user.</p>
+<h4 id="example-3">Example</h4>
+<pre><code>double tempF = ct.inputNumber( &quot;Enter the temperature in Farenheit&quot; );</code></pre>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputnumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputnumber">ct.inputNumber()</a></h6>
 <h3 id="ct.inputyesno">ct.inputYesNo()</h3>
-<pre><code>boolean ct.inputYesNo( String message )</code></pre>
-<p>Display <code>message</code> in a popup dialog box that has two buttons labelled Yes and No. Execution of the program will pause and wait until the user presses one of the buttons. The function returns <code>true</code> if the user presses Yes and <code>false</code> if they press No.</p>
+<p>Displays a message in a pop-up dialog box that has two buttons labelled Yes and No. Execution of the program will pause and wait until the user presses one of the buttons.</p>
+<h4 id="syntax-13">Syntax</h4>
+<pre><code>ct.inputYesNo( message );</code></pre>
+<h5 id="message-4">message</h5>
+<p>(<a href="#java-data-types">String</a>). The message to display.</p>
+<h5 id="return-value-7"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the user presses Yes and <code>false</code> if they press No.</p>
+<h4 id="example-4">Example</h4>
+<pre><code>boolean playAgain = ct.inputYesNo( &quot;Do you want to play again?&quot; );</code></pre>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputyesno"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputyesno">ct.inputYesNo()</a></h6>
 <h3 id="ct.inputstring">ct.inputString()</h3>
-<pre><code>String ct.inputString( String message )</code></pre>
-<p>Display <code>message</code> in a popup dialog box that allows the user to enter a text string. Execution of the program will pause and wait until the user presses the Enter key to end the text input. The resulting String value is returned.</p>
+<p>Displays a message in a popup dialog box that allows the user to enter a text string. Execution of the program will pause and wait until the user presses the Enter key to end the text input. The resulting String value is returned.</p>
+<h4 id="syntax-14">Syntax</h4>
+<pre><code>ct.inputString( message );</code></pre>
+<h5 id="message-5">message</h5>
+<p>(<a href="#java-data-types">String</a>). The message to display.</p>
+<h5 id="return-value-8"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). The text entered by the user.</p>
 <blockquote>
 <p>If the user presses the Enter key without entering any other characters, then an empty string (<code>&quot;&quot;</code>) will be returned.</p>
 </blockquote>
+<h4 id="example-5">Example</h4>
+<pre><code>String name = ct.inputString( &quot;Enter your name&quot; );</code></pre>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputstring"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputstring">ct.inputString()</a></h6>
 <h2 id="screen-management">Screen Management</h2>
+<p>These functions allow you to control the size and appearance of the background of your application, and to manage multiple screens and groups of objects.</p>
+<ul>
+<li><a href="#ct.settitle">ct.setTitle()</a></li>
+<li><a href="#ct.setheight">ct.setHeight()</a></li>
+<li><a href="#ct.getwidth">ct.getWidth()</a></li>
+<li><a href="#ct.getheight">ct.getHeight()</a></li>
+<li><a href="#ct.getpixelsperunit">ct.getPixelsPerUnit()</a></li>
+<li><a href="#ct.getscreen">ct.getScreen()</a></li>
+<li><a href="#ct.setscreen">ct.setScreen()</a></li>
+<li><a href="#ct.setscreenorigin">ct.setScreenOrigin()</a></li>
+<li><a href="#ct.clearscreen">ct.clearScreen()</a></li>
+<li><a href="#ct.cleargroup">ct.clearGroup()</a></li>
+<li><a href="#ct.setbackcolor">ct.setBackColor()</a></li>
+<li><a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></li>
+<li><a href="#ct.setbackimage">ct.setBackImage()</a></li>
+</ul>
+<h6 id="code12-function-reference-screen-management"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a></h6>
 <h3 id="ct.settitle">ct.setTitle()</h3>
-<pre><code>ct.setTitle( String title )</code></pre>
-<p>Set the title of the application window to <code>title</code>. If and where the title displays depends on the platform that the application is running on. The title will not display on mobile devices.</p>
+<p>Allows you to set the title of the application window.</p>
+<h4 id="syntax-15">Syntax</h4>
+<pre><code>ct.setTitle( title );</code></pre>
+<h5 id="title">title</h5>
+<p>(<a href="#java-data-types">String</a>). The title to display at the top of the application window.</p>
+<h4 id="example-6">Example</h4>
+<pre><code>ct.setTitle( &quot;Zombie Attack&quot; );</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.settitle"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.settitle">ct.setTitle()</a></h6>
 <h3 id="ct.setheight">ct.setHeight()</h3>
-<pre><code>ct.setHeight( double height )</code></pre>
-<p>Set the height of the application window in coordinate units. The width of the application window in display units is always 100.0 by definition, so this function sets the height relative to its width as a percent. The default height is 100.0, resulting in a square window.</p>
-<blockquote>
-<p>Coordinate units are not pixels, because the Code12 graphics window scales your game up and down automatically when the window size changes. You can think of coordinate units as a percent of the window width, so an x-coordinate of 50 is always horizontally centered in the window.</p>
-</blockquote>
-<blockquote>
-<p><strong>Note</strong>: On some platforms, you may have limited or no control over the window size or aspect ratio. On mobile devices, the application will always fill the entire device screen. In this case, <code>ct.setHeight()</code> will determine whether the application runs in portrait or landscape orientation. If <code>height</code> is less than 100 then the application will run in landscape mode, otherwise portrait mode.</p>
-</blockquote>
-<blockquote>
-<p>After calling <code>ct.setHeight()</code>, you can call <code>ct.getHeight()</code> to determine the actual height of the window.</p>
-</blockquote>
-<h5 id="examples-9">Examples</h5>
-<pre><code>ct.setHeight( 100 );               // default square window
-ct.setHeight( 200 );               // window is twice as tall as wide
-ct.setHeight( 100.0 * 9 / 16 );    // 16:9 aspect landscape
-double height = ct.getHeight();    // get actual height used</code></pre>
+<p>Sets the height of the graphics output window in coordinate units, which effectively sets the aspect ratio of your application.</p>
+<h4 id="syntax-16">Syntax</h4>
+<pre><code>ct.setHeight( height );</code></pre>
+<h5 id="height-2">height</h5>
+<p>(<a href="#java-data-types">double</a>). The height for your application in <a href="#graphics-coordinates">coordinate units</a>. The width of the application window in <a href="#graphics-coordinates">coordinate units</a> is always 100.0 by definition, so this function effectively sets the application height relative to its width as a percent.</p>
+<h4 id="examples-9">Examples</h4>
+<pre><code>ct.setHeight( 100 );               // default square window</code></pre>
+<pre><code>ct.setHeight( 200 );               // window is twice as tall as wide</code></pre>
+<pre><code>ct.setHeight( 100.0 * 9 / 16 );    // 16:9 landscape aspect</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.setheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setheight">ct.setHeight()</a></h6>
 <h3 id="ct.getwidth">ct.getWidth()</h3>
-<pre><code>double ct.getWidth( )</code></pre>
-<p>This function always returns 100.0, which is the width of the application window in coordinate units by definition.</p>
+<p>This function always returns 100.0, which is the width of the application window in <a href="#graphics-coordinates">coordinate units</a> by definition.</p>
+<h4 id="syntax-17">Syntax</h4>
+<pre><code>ct.getWidth()</code></pre>
+<h5 id="return-value-9"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). Always returns 100.0.</p>
+<h4 id="example-7">Example</h4>
+<pre><code>// Get the screen size
+final double WIDTH = ct.getWidth();
+final double HEIGHT = ct.getHeight();
+
+// Make a rectangle that fills the entire screen
+ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.getwidth"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.getwidth">ct.getWidth()</a></h6>
 <h3 id="ct.getheight">ct.getHeight()</h3>
-<pre><code>double ct.getHeight( )</code></pre>
-<p>Return the height of the the application window in coordinate units. This is 100.0 by default, unless it is changed by <code>ct.setHeight()</code>.</p>
+<p>Returns the height of the the application window in <a href="#graphics-coordinates">coordinate units</a>. This is 100.0 by default, unless it is changed by <a href="#ct.setheight">ct.setHeight()</a>.</p>
+<h4 id="syntax-18">Syntax</h4>
+<pre><code>ct.getHeight()</code></pre>
+<h5 id="return-value-10"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The height of the application window in <a href="#graphics-coordinates">coordinate units</a>.</p>
+<h4 id="example-8">Example</h4>
+<pre><code>// Get the screen size
+final double WIDTH = ct.getWidth();
+final double HEIGHT = ct.getHeight();
+
+// Make a rectangle that fills the entire screen
+ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.getheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.getheight">ct.getHeight()</a></h6>
 <h3 id="ct.getpixelsperunit">ct.getPixelsPerUnit()</h3>
-<pre><code>double ct.getPixelsPerUnit( )</code></pre>
-<p>Return the current scale factor from display coordinate units to device pixels. The contents of your application scale automatically relative to the window size, and the width of the window is always defined as 100 in coordinate units. If you want to determine the physical size of the application window in pixels, you can calculate this as:</p>
-<pre><code>int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
-int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pre>
+<p>Returns the current graphics scale factor from <a href="#graphics-coordinates">coordinate units</a> to device pixels.</p>
+<h4 id="syntax-19">Syntax</h4>
+<pre><code>ct.getPixelsPerUnit()</code></pre>
+<h5 id="return-value-11"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The current scale factor from <a href="#graphics-coordinates">coordinate units</a> to device pixels at the current window size.</p>
+<blockquote>
+<p>Note that the scale factor changes if the application window is resized or if the graphics window is resized using the pane splits.</p>
+</blockquote>
 <blockquote>
 <p>Note that the definition of a “pixel” is platform-dependent, and some devices with very high resolution (e.g. 4K or Retina) may use more than 1 physical pixel per reported “pixel”.</p>
 </blockquote>
+<h4 id="examples-10">Examples</h4>
+<pre><code>// Determine the physical size of the game window in pixels
+int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
+int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pre>
+<pre><code>// Create a circle that is 10 pixels in diameter at the current scale
+double diameter = 10 / ct.getPixelsPerUnit();
+ct.circle( 50, 50, diameter );</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.getpixelsperunit"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.getpixelsperunit">ct.getPixelsPerUnit()</a></h6>
 <h3 id="ct.getscreen">ct.getScreen()</h3>
-<pre><code>String ct.getScreen( )</code></pre>
-<p>Return the name of the current screen. Your application can define multiple named screens and switch between them (see <code>ct.setScreen()</code>). The default screen name is &quot;&quot; (empty string) if it has not been changed.</p>
+<p>Returns the name of the current screen, which is the most recent screen set using <a href="#ct.setscreen">ct.setScreen()</a>.</p>
+<h4 id="syntax-20">Syntax</h4>
+<pre><code>ct.getScreen()</code></pre>
+<h5 id="return-value-12"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). The name of the current screen. The default screen name is <code>&quot;&quot;</code> (empty string) if it has not been changed.</p>
+<h4 id="example-9">Example</h4>
+<pre><code>// If we are on the intro screen, then wait for a click 
+// to switch to the game screen.
+String screenName = ct.getScreen();
+if (screenName.equals( &quot;intro&quot; ))
+{
+    if (ct.clicked())
+        ct.setScreen( &quot;game&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.getscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.getscreen">ct.getScreen()</a></h6>
 <h3 id="ct.setscreen">ct.setScreen()</h3>
-<pre><code>ct.setScreen( String name )</code></pre>
-<p>Set the current application screen to the screen named <code>name</code>. Your application can define multiple named screens and switch between them. Each screen has its own background and its own <code>GameObj</code> objects.</p>
-<p>If a screen named <code>name</code> is not already known, then create a new empty screen with this name and set it as the current screen.</p>
-<p><code>GameObj</code> objects that are created are always created on the current screen, so to create two screens in your <code>start</code> function: 1. Call <code>ct.setScreen()</code> to name the first screen 2. Create <code>GameObj</code> objects for the first screen 3. Call <code>ct.setScreen()</code> to name the second screen 4. Create <code>GameObj</code> objects for the second screen 5. At the end of <code>start</code>, call <code>ct.setScreen()</code> to set the desired starting screen for your application.</p>
+<p>Sets the current screen to the screen with the specified name, creating a new screen if the screen name does not exist yet.</p>
+<h4 id="syntax-21">Syntax</h4>
+<pre><code>ct.setScreen( name );</code></pre>
+<h5 id="name">name</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the screen to create or switch to.</p>
+<h4 id="notes-2">Notes</h4>
+<p>Your application can define multiple named screens and switch between them. Each screen has its own background and its own graphics (<code>GameObj</code>) objects.</p>
+<p>When you call <code>ct.setScreen( name )</code>, if a screen with the specified <code>name</code> has not already been created, then a new empty screen with this name is created and set as the current screen.</p>
+<blockquote>
+<p>The names of the screens have no special meaning or special behavior, and you can call them anything you want.</p>
+</blockquote>
+<h4 id="examples-11">Examples</h4>
+<pre><code>// If there are no lives left then create and show a Game Over screen
+if (numLives == 0)
+{
+    ct.setScreen( &quot;end&quot; );
+    ct.setBackColor( &quot;light blue&quot; );
+    ct.text( &quot;Game Over&quot;, 50, 50, 20 );
+}</code></pre>
+<pre><code>// A game with two screens
+
+public void start()
+{
+    // Make the intro screen
+    ct.setScreen( &quot;intro&quot; );
+    ct.text( &quot;Zombie Attack&quot;, 50, 30, 10 );
+    ct.text( &quot;Click to begin&quot;, 50, 70, 5 );
+
+    // Make the game screen
+    ct.setScreen( &quot;game&quot; );
+    ct.backImage( &quot;city.jpg&quot; );
+    ct.image( &quot;hero.png&quot;, 50, 50, 10 );
+    // etc.
+
+    // Start on the intro screen
+    ct.setScreen( &quot;intro&quot; );
+}
+
+public void update()
+{
+    // If we are on the intro screen, then wait for a click 
+    // to switch to the game screen.
+    String screenName = ct.getScreen();
+    if (screenName.equals( &quot;intro&quot; ))
+    {
+        if (ct.clicked())
+            ct.setScreen( &quot;game&quot; );
+    }   
+}
+</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.setscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setscreen">ct.setScreen()</a></h6>
 <h3 id="ct.setscreenorigin">ct.setScreenOrigin()</h3>
-<pre><code>ct.setScreenOrigin( double x, double y )</code></pre>
-<p>Offset the entire screen horizontally and/or vertically so that the coordinate at the upper-left of the screen is (<code>x</code>, <code>y</code>). Normally the coordinate of the upper-left corner of the screen is (0, 0). Using <code>ct.setScreenOrigin()</code> allows you to think of the screen as a window viewing part of a larger world, and you can pan (“scroll”) the window where you want, in order to bring objects that would normally be outside the window into view.</p>
+<p>Offsets the entire screen horizontally and/or vertically so that the coordinate at the upper-left of the screen is a specified (<code>x</code>, <code>y</code>).</p>
+<h4 id="syntax-22">Syntax</h4>
+<pre><code>ct.setScreenOrigin( x, y );</code></pre>
+<h5 id="x-4">x</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> for the left edge of the screen.</p>
+<h5 id="y-4">y</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> for the top of the screen.</p>
+<h4 id="notes-3">Notes</h4>
+<p>Normally the coordinate at the upper-left corner of the screen is (0, 0). Using <code>ct.setScreenOrigin( x, y )</code> allows you to think of the screen as a window viewing part of a larger world, and you can pan (“scroll”) the window where you want, in order to bring objects that would normally be outside the window into view.</p>
+<p>Using <code>ct.setScreenOrigin()</code> does not modify the (x, y) position of any objects. Rather it determines which objects are visible within the game window and where they display.</p>
+<p>Note that it is always OK to create or position objects outside of the normal screen bounds. The <a href="#graphics-coordinates">x coordinate</a> of the right edge of the screen is normally 100. If you draw a small object at say (150, 50), then it will normally not be visible. If you then call <code>ct.setScreenOrigin( 150, 0 )</code>, the game will “scroll” horizontally and the object will become visible in the center of the game window. Conversely, another object at (50, 0) will scroll off the screen to the left and no longer be visible.</p>
 <blockquote>
-<p>Using <code>ct.setScreenOrigin()</code> does not modify the (x, y) position of any objects. Rather it determines which objects are visible within the game window.</p>
+<p>A screen’s background image created with <a href="#ct.setbackimage">ct.setBackImage()</a> is not affected by the screen origin. If you want a background image that scrolls, you can instead use <a href="#ct.image">ct.image()</a> to create and display one that is larger than the normal screen window.</p>
 </blockquote>
-<blockquote>
-<p>Note that it is always OK to create or position objects outside of the normal screen bounds. The x-coordinate of the right edge of the screen is normally 100. If you draw a small object at say (150, 50), it will normally not be visible. If you then call <code>ct.setScreenOrigin( 150, 0 )</code>, the game will “scroll” horizontally and the object will become visible in the center of the game window. Conversely, another object at (50, 0) will scroll off the screen to the left and no longer be visible.</p>
-</blockquote>
-<blockquote>
-<p>The screen’s background image (see <a href="#ctsetbackimage">ct.setBackImage</a>), if any, is not affected by the screen origin. If you want a background image that scrolls, you can use <a href="#ctimage">ct.image</a> to create and display one that is larger than the normal screen window.</p>
-</blockquote>
+<h4 id="example-10">Example</h4>
+<pre><code>ct.image( &quot;mountains.png&quot;, 50, 50, 300 );   // wider than screen
+ct.image( &quot;bear&quot;, 50, 70, 10 );
+ct.setScreenOrigin( 30, 0 );       // entire scene scrolls to the left</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.setscreenorigin"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setscreenorigin">ct.setScreenOrigin()</a></h6>
 <h3 id="ct.clearscreen">ct.clearScreen()</h3>
-<pre><code>ct.clearScreen( )</code></pre>
-<p>Remove and delete all <code>GameObj</code> objects on the current screen. The background color or image is kept.</p>
+<p>Removes and deletes all graphics (<code>GameObj</code>) objects on the current screen. The background color or image is kept, if any.</p>
+<h4 id="syntax-23">Syntax</h4>
+<pre><code>ct.clearScreen();</code></pre>
+<h4 id="example-11">Example</h4>
+<pre><code>ct.setBackColor( &quot;red&quot; )
+ct.circle( 50, 50, 20 );
+ct.rect( 50, 70, 40, 10 );
+ct.clearScreen();     // screen is now just solid red</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.clearscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.clearscreen">ct.clearScreen()</a></h6>
 <h3 id="ct.cleargroup">ct.clearGroup()</h3>
-<pre><code>ct.clearGroup( String group )</code></pre>
-<p>Remove and delete all <code>GameObj</code> objects on the current screen whose group name (see the <code>group</code> field of a <code>GameObj</code>) matches the <code>group</code> passed.</p>
+<p>Removes and deletes all graphics (<code>GameObj</code>) objects on the current screen whose <a href="#obj.group">group name</a> matches the name passed.</p>
+<h4 id="syntax-24">Syntax</h4>
+<pre><code>ct.clearGroup( name );</code></pre>
+<h5 id="name-1">name</h5>
+<p>(<a href="#java-data-types">String</a>). The <a href="#obj.group">group name</a> of objects to delete.</p>
+<blockquote>
 <p>The default group name for objects not assigned a group name is &quot;&quot; (empty string).</p>
+</blockquote>
+<h4 id="example-12">Example</h4>
+<pre><code>GameObj hero = ct.image( &quot;hero.png&quot;, 50, 80, 10 );
+
+GameObj coin1 = ct.image( &quot;coin.png&quot;, 30, 20, 10 );
+coin1.group = &quot;coins&quot;;
+
+GameObj coin2 = ct.image( &quot;coin.png&quot;, 60, 10, 10 );
+coin2.group = &quot;coins&quot;;
+
+GameObj coin3 = ct.image( &quot;coin.png&quot;, 90, 30, 10 );
+coin3.group = &quot;coins&quot;;
+
+ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.cleargroup"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.cleargroup">ct.clearGroup()</a></h6>
 <h3 id="ct.setbackcolor">ct.setBackColor()</h3>
-<pre><code>ct.setBackColor( String color )</code></pre>
-<p>Set the background color of the current screen to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>.</p>
+<p>Sets the background color of the current screen to a specified <a href="#color-names">color name</a>.</p>
+<h4 id="syntax-25">Syntax</h4>
+<pre><code>ct.setBackColor( color );</code></pre>
+<h5 id="color-4">color</h5>
+<p>(<a href="#java-data-types">String</a>). The <a href="#color-names">color name</a> for the background.</p>
+<h4 id="example-13">Example</h4>
+<pre><code>ct.setBackColor( &quot;light blue&quot; );</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.setbackcolor"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setbackcolor">ct.setBackColor()</a></h6>
 <h3 id="ct.setbackcolorrgb">ct.setBackColorRGB()</h3>
-<pre><code>ct.setBackColorRGB( int red, int green, int blue )</code></pre>
-<p>Set the background color of the current screen to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
+<p>Sets the background color of the current screen to a custom RGB color with specified <code>red</code>, <code>green</code>, and <code>blue</code> components.</p>
+<h4 id="syntax-26">Syntax</h4>
+<pre><code>ct.setBackColorRGB( red, green, blue );</code></pre>
+<h5 id="red">red</h5>
+<p>(<a href="#java-data-types">int</a>). The red component for the color, from 0 to 255.</p>
+<h5 id="green">green</h5>
+<p>(<a href="#java-data-types">int</a>). The green component for the color, from 0 to 255.</p>
+<h5 id="blue">blue</h5>
+<p>(<a href="#java-data-types">int</a>). The blue component for the color, from 0 to 255.</p>
+<h4 id="example-14">Example</h4>
+<pre><code>ct.setBackColorRGB( 0, 60, 255 );    // greenish blue</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.setbackcolorrgb"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></h6>
 <h3 id="ct.setbackimage">ct.setBackImage()</h3>
-<pre><code>ct.setBackImage( String filename )</code></pre>
-<p>Set the background image of the current screen to the image <code>filename</code>. The image file must be in PNG or JPG format. The background image is centered and cropped automatically to show as much of the image as possible given the aspect ratio of the window, while preserving the aspect ratio of the image.</p>
-<p>If <code>filename</code> is a simple filename (no path), then the main project folder is checked first, followed by the <code>Code12/images</code> folder if not found in the project folder.</p>
+<p>Sets the background of the current screen to an image. The background image always displays behind all graphics (<code>GameObj</code>) objects on the screen.</p>
+<h4 id="syntax-27">Syntax</h4>
+<pre><code>ct.setBackImage( filename );</code></pre>
+<h5 id="filename-2">filename</h5>
+<p>(<a href="#java-data-types">String</a>). The name of a file containing the image. The image file must be in PNG or JPG format, for example <code>&quot;sky.jpg&quot;</code>.</p>
+<blockquote>
+<p>For a simple filename such as <code>&quot;sky.jpg&quot;</code>, the image file must be copied into the same folder as your Java program (.java) file. You can also put image files into subfolders using, for example, <code>&quot;images/sky.jpg&quot;</code>.</p>
+</blockquote>
+<h4 id="notes-4">Notes</h4>
+<p>The image file does not need to match the aspect ratio of the screen. The background image is centered and cropped automatically to show as much of the image as possible while preserving the aspect ratio of the image.</p>
+<h4 id="example-15">Example</h4>
+<pre><code>ct.setBackImage( &quot;sky.jpg&quot; );</code></pre>
+<h6 id="code12-function-reference-screen-management-ct.setbackimage"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setbackimage">ct.setBackImage()</a></h6>
 <h2 id="mouse-and-keyboard-input">Mouse and Keyboard Input</h2>
+<p>These functions allow you to process mouse/touch input and keyboard input in your <a href="#update">update()</a> function.</p>
+<ul>
+<li><a href="#ct.clicked">ct.clicked()</a></li>
+<li><a href="#ct.clickx">ct.clickX()</a></li>
+<li><a href="#ct.clicky">ct.clickY()</a></li>
+<li><a href="#ct.objectclicked">ct.objectClicked()</a></li>
+<li><a href="#ct.keypressed">ct.keyPressed()</a></li>
+<li><a href="#ct.chartyped">ct.charTyped()</a></li>
+</ul>
+<p>Calling these functions in your <a href="#update">update()</a> function causes them to be called repeatedly, once for each animation frame (60 times per second), which is fast enough to provide fast response to input.</p>
+<blockquote>
+<p>Another more flexible way to handle mouse and keyboard input, which requires writing your own functions with parameters (syntax level 10), is to write your own <a href="#input-event-functions">Input Event Functions</a>.</p>
+</blockquote>
+<h6 id="code12-function-reference-mouse-and-keyboard-input"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a></h6>
 <h3 id="ct.clicked">ct.clicked()</h3>
-<pre><code>boolean ct.clicked( )</code></pre>
-<p>Return <code>true</code> if a mouse click or touch occured in the application window during the last update cycle. Calling this function every time in your <code>update</code> function will detect all mouse clicks.</p>
-<p>If this function returns true then you can retrive the click location using <code>ct.clickX()</code> and <code>ct.clickY()</code>.</p>
+<p>Returns <code>true</code> if a click (mouse button press) or touch (on touch screens) occured in the application window during the last animation frame.</p>
+<h4 id="syntax-28">Syntax</h4>
+<pre><code>ct.clicked()</code></pre>
+<h5 id="return-value-13"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if a click occured, otherwise <code>false</code>.</p>
+<h4 id="notes-5">Notes</h4>
+<p>Calling this function every time in your <a href="#update">update()</a> function will detect all mouse clicks in your application window.</p>
+<p>If this function returns <code>true</code> then you can retrive the click location using <a href="#ct.clickx">ct.clickX()</a> and <a href="#ct.clicky">ct.clickY()</a>.</p>
+<h4 id="example-16">Example</h4>
+<pre><code>public void update()
+{
+    if (ct.clicked())
+    {
+        double x = ct.clickX();
+        double y = ct.clickY();
+        ct.logm( &quot;Click at&quot;, x, y );
+    }
+}</code></pre>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clicked"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.clicked">ct.clicked()</a></h6>
 <h3 id="ct.clickx">ct.clickX()</h3>
-<pre><code>double ct.clickX( )</code></pre>
-<p>Return the x-coordinate of the last known click, touch, or drag location in the application.</p>
+<p>Returns the <a href="#graphics-coordinates">x coordinate</a> of the last known click location in the application.</p>
+<h4 id="syntax-29">Syntax</h4>
+<pre><code>ct.clickX()</code></pre>
+<h5 id="return-value-14"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of the click.</p>
+<h4 id="notes-6">Notes</h4>
+<p>You should call <a href="#ct.clicked">ct.clicked()</a> and test for a return value of <code>true</code> to make sure a click has occured before calling <code>ct.clickX()</code>.</p>
+<h4 id="example-17">Example</h4>
+<pre><code>public void update()
+{
+    if (ct.clicked())
+    {
+        if (ct.clickX() &lt; 50)
+            ct.println( &quot;Left side&quot; );
+        else
+            ct.println( &quot;Right side&quot; );
+    }
+}</code></pre>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clickx"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.clickx">ct.clickX()</a></h6>
 <h3 id="ct.clicky">ct.clickY()</h3>
-<pre><code>double ct.clickY( )</code></pre>
-<p>Return the y-coordinate of the last known click, touch, or drag location in the application.</p>
+<p>Returns the <a href="#graphics-coordinates">y coordinate</a> of the last known click location in the application.</p>
+<h4 id="syntax-30">Syntax</h4>
+<pre><code>ct.clickY()</code></pre>
+<h5 id="return-value-15"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of the click.</p>
+<h4 id="notes-7">Notes</h4>
+<p>You should call <a href="#ct.clicked">ct.clicked()</a> and test for a return value of <code>true</code> to make sure a click has occured before calling <code>ct.clickY()</code>.</p>
+<h4 id="example-18">Example</h4>
+<pre><code>public void update()
+{
+    if (ct.clicked())
+    {
+        if (ct.clickY() &lt; 50)
+            ct.println( &quot;Top half&quot; );
+        else
+            ct.println( &quot;Bottom half&quot; );
+    }
+}</code></pre>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clicky"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.clicky">ct.clickY()</a></h6>
 <h3 id="ct.objectclicked">ct.objectClicked()</h3>
-<pre><code>GameObj ct.objectClicked( )</code></pre>
-<p>If a clickable <code>GameObj</code> object was clicked during the last update cycle, then <code>ct.objectClicked()</code> returns a reference to that object, otherwise it returns <code>null</code> . Calling this function every time in your <code>update</code> function will find the topmost clickable object that was clicked, whenever the user clicks on one.</p>
+<p>If a clickable graphics object (<code>GameObj</code>) was clicked during the last animation frame, then <code>ct.objectClicked()</code> returns a reference to that object, otherwise it returns <code>null</code> .</p>
+<h4 id="syntax-31">Syntax</h4>
+<pre><code>ct.objectClicked()</code></pre>
+<h5 id="return-value-16"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">GameObj</a>). The object that was clicked, or <code>null</code> if none.</p>
 <blockquote>
-<p>Any objects with the <code>clickable</code> field set to <code>false</code> will not be considered when determining which object was clicked. See <a href="#clickable">clickable</a>.</p>
+<p><code>ct.objectClicked()</code> will return <code>null</code> if no object was clicked, which is the case for most animation frames in a game (they occur 60 times per second). So you must check the return value for <code>null</code> before using the <code>GameObj</code> returned. Attempting to access a field of a <code>GameObj</code> (such as <a href="#obj.x">obj.x</a>) or call a method (such as <a href="#obj.delete">obj.delete()</a>) will generate a runtime error (a “crash”) if the <code>GameObj</code> is <code>null</code>.</p>
 </blockquote>
-<blockquote>
-<p>Note that <code>ct.objectClicked()</code> will return <code>null</code> if no object was clicked, which is the case for most update cycles in a game (they occur 60 times per second). So you must check the return value for <code>null</code> before using the <code>GameObj</code> returned. Attempting to access a field of a <code>GameObj</code> (such as <code>obj.x</code>) or call a method (such as <code>obj.delete()</code>) will generate a runtime error (a “crash”) if the <code>GameObj</code> is <code>null</code>.</p>
-</blockquote>
+<h4 id="notes-8">Notes</h4>
+<p>Calling this function every time in your <a href="#update">update()</a> function will find the topmost clickable object that was clicked, whenever the user clicks on one. Any objects with the <a href="#obj.clickable">obj.clickable</a> field set to <code>false</code> will not be considered when determining which object was clicked.</p>
+<h4 id="example-19">Example</h4>
+<pre><code>public void update()
+{
+    // Delete objects that get clicked
+    GameObj obj = ct.objectClicked();
+    if (obj != null)
+        obj.delete();
+}</code></pre>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.objectclicked"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.objectclicked">ct.objectClicked()</a></h6>
 <h3 id="ct.keypressed">ct.keyPressed()</h3>
-<pre><code>boolean ct.keyPressed( String keyName )</code></pre>
-<p>Return <code>true</code> if the key named <code>keyName</code> is currently pressed (the key is down). See <a href="#key-names">Key Names</a>. Note that multiple keys can be down at the same time.</p>
+<p>Returns <code>true</code> if the key with the specified <a href="#key-names">key name</a> is currently pressed (the key is down).</p>
+<h4 id="syntax-32">Syntax</h4>
+<pre><code>ct.keyPressed( keyName )</code></pre>
+<h5 id="keyname">keyName</h5>
+<p>(<a href="#java-data-types">String</a>). The <a href="#key-names">key name</a> of the key to test.</p>
+<h5 id="return-value-17"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the key is pressed, otherwise <code>false</code>.</p>
+<h4 id="notes-9">Notes</h4>
+<p>If you call this function every time in your <a href="#update">update()</a> function, then it will return <code>true</code> for each animation frame where the key is being held down. Animation frames happen 60 times per second, so this function will typically trigger (return <code>true</code>) multiple times for each key “press”. This is useful to produce things like continuous motion as long as a key is held down.</p>
+<blockquote>
+<p>To get only a single trigger for each key press, consider using <a href="#ct.keytyped">ct.charTyped()</a> or the <a href="#onkeypress">onKeyPress event</a>.</p>
+</blockquote>
+<p>Note that multiple keys can be down at the same time, so you can also test for some key combinations such as <code>&quot;up&quot;</code> and <code>&quot;left&quot;</code> being pressed at the same time.</p>
+<h4 id="example-20">Example</h4>
+<pre><code>GameObj ball;
+
+public void start()
+{
+    ball = ct.circle( 0, 50, 10 );
+}
+
+public void update()
+{
+    // Move ball to the right when right arrow is held down
+    if (ct.keyPressed( &quot;right&quot; ))
+        ball.x += 0.25 
+}</code></pre>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.keypressed"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.keypressed">ct.keyPressed()</a></h6>
 <h3 id="ct.chartyped">ct.charTyped()</h3>
-<pre><code>boolean ct.charTyped( String charString )</code></pre>
-<p>Return <code>true</code> if the printable character <code>charString</code> was typed during the last update cycle.</p>
-<p>Calling this function every time in your <code>update</code> function will detect any time that the given character is typed.</p>
+<p>Return <code>true</code> if the specified character was typed on the keyboard during the last animation frame.</p>
+<h4 id="syntax-33">Syntax</h4>
+<pre><code>ct.charTyped( charString )</code></pre>
+<h5 id="charstring">charString</h5>
+<p>(<a href="#java-data-types">String</a>). The character to test, for example <code>&quot;a&quot;</code>.</p>
 <blockquote>
-<p>Unlike the key names used by <code>ct.keyPressed()</code>, the <code>charString</code> here is a printable character including the appropriate shift status (e.g. “A” if a shifted “a” is typed, “$” or “4”, “+” vs. “=”, etc.). Only printable characters are detected, so key sequences such as Ctrl+C do not result in characters.</p>
+<p>Unlike the key names used by <a href="#ct.keypressed">ct.keyPressed()</a>, the <code>charString</code> here is a printable character including the appropriate shift status. For example, holding the shift key down while pressing the “a” key will cause <code>ct.charTyped( &quot;a&quot; )</code> to return <code>false</code> but <code>ct.charTyped( &quot;A&quot; )</code> to return <code>true</code>. Only printable characters can be detected, so special keys such as the arrow keys and key sequences such as Ctrl+C do not result in characters.</p>
 </blockquote>
-<blockquote>
-<p>Note that some platforms may have keys that auto-repeat when held down, so if you check <code>ct.charTyped()</code> every time in your <code>update</code> function, and the user holds down a key, you may get the first character, then perhaps a 1 second delay, then repeats at around 8 characters per second. Contrast this with using <code>ct.keyPressed()</code> instead, where you will get a <code>true</code> result continuously (60 times per second), and no delay after the first one.</p>
-</blockquote>
+<h5 id="return-value-18"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the character was typed, otherwise <code>false</code>.</p>
+<h4 id="notes-10">Notes</h4>
+<p>Calling this function every time in your <a href="#update">update()</a> function will detect each time that the given character is typed. Unlike the behavior of <a href="#ct.keypressed">ct.keyPressed()</a>, you will only get one <code>true</code> result for each typed character. However, most platforms have a keyboard “auto-repeat” feature, so if you check <code>ct.charTyped()</code> every time in your <a href="#update">update()</a> function, and the user holds down a key, you may get the first character, then perhaps a 1 second delay, then repeats at maybe 8 characters per second.</p>
+<h4 id="example-21">Example</h4>
+<pre><code>public void update()
+{
+    if (ct.charTyped( &quot;w&quot; ))
+        ct.println( &quot;w was typed&quot; );
+    
+    if (ct.charTyped( &quot; &quot; ))
+        ct.println( &quot;Space bar&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.chartyped"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.chartyped">ct.charTyped()</a></h6>
 <h2 id="audio">Audio</h2>
+<p>These functions allow you to play sounds from audio files.</p>
+<ul>
+<li><a href="#ct.loadsound">ct.loadSound()</a></li>
+<li><a href="#ct.sound">ct.sound()</a></li>
+<li><a href="#ct.setsoundvolume">ct.setSoundVolume()</a></li>
+</ul>
+<h6 id="code12-function-reference-audio"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a></h6>
 <h3 id="ct.loadsound">ct.loadSound()</h3>
-<pre><code>boolean ct.loadSound( String filename )</code></pre>
-<p>You can call <code>ct.loadSound</code> to pre-load the sound effect in the sound file <code>filename</code>, so that it will play quickly when <code>ct.sound( filename )</code> is called. Loading sounds before playing them is optional, but it reduces the slight delay that occurs the first time a certain sound is played.</p>
-<p>This function returns <code>true</code> if the sound was successfully loaded, or <code>false</code> if the filename could not be found or is not a supported sound format.</p>
+<p>Pre-loads an audio file into memory so that the first use will have no delay.</p>
+<h4 id="syntax-34">Syntax</h4>
+<pre><code>ct.loadSound( filename )</code></pre>
+<h5 id="filename-3">filename</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the audio file to pre-load.</p>
 <blockquote>
-<p>You will typically want to call <code>ct.loadSound</code> in your <code>start</code> function once for each sound that you want pre-loaded.</p>
+<p>Only standard formats of .WAV and .MP3 files are reliably supported on all operating systems.</p>
 </blockquote>
+<h5 id="return-value-19"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the sound was successfully loaded, otherwise <code>false</code>.</p>
+<h4 id="notes-11">Notes</h4>
+<p>You can call <code>ct.loadSound( filename )</code> to pre-load the sound effect in the <code>filename</code>, so that it will play quickly when played with <a href="#ct.sound">ct.sound()</a>. Pre-loading sounds before playing them is optional, but it reduces the slight delay that occurs the first time a sound is played.</p>
+<p>For a simple filename such as <code>&quot;ding.wav&quot;</code>, the audio file must be copied into the same folder as your Java program (.java) file. You can also put sound files into subfolders using, for example, <code>&quot;sounds/ding.wav&quot;</code>.</p>
+<p>You will typically want to call <code>ct.loadSound()</code> in your <a href="#start">start()</a> function once for each sound that you want pre-loaded.</p>
+<p>The <code>ct.loadSound()</code> function returns <code>true</code> if the sound was successfully loaded, or <code>false</code> if the <code>filename</code> could not be found or is not a supported sound format.</p>
+<h4 id="example-22">Example</h4>
+<pre><code>public void start
+{
+    ct.loadSound( &quot;ding.wav&quot; );
+}
+
+public void update()
+{
+    if (ct.clicked())
+        ct.sound( &quot;ding.wav&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-audio-ct.loadsound"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.loadsound">ct.loadSound()</a></h6>
 <h3 id="ct.sound">ct.sound()</h3>
-<pre><code>ct.sound( String filename )</code></pre>
-<p>Play the sound effect in the sound file <code>filename</code>.</p>
+<p>Play a sound effect from an audio file.</p>
+<h4 id="syntax-35">Syntax</h4>
+<pre><code>ct.sound( filename )</code></pre>
+<h5 id="filename-4">filename</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the audio file to play.</p>
 <blockquote>
-<p>Only standard formats of WAV sounds are reliable on all platforms, although most platforms will support MP3 also.</p>
+<p>Only standard formats of .WAV and .MP3 files are reliably supported on all operating systems.</p>
 </blockquote>
-<blockquote>
-<p>You can use <code>ct.loadSound</code> to reduce the short delay that might occur the first time a certain sound is played.</p>
-</blockquote>
+<h4 id="notes-12">Notes</h4>
+<p>For a simple filename such as <code>&quot;ding.wav&quot;</code>, the audio file must be copied into the same folder as your Java program (.java) file. You can also put sound files into subfolders using, for example, <code>&quot;sounds/ding.wav&quot;</code>.</p>
+<p>The <code>ct.sound()</code> function starts the sound then returns immediately. The sound will then continue to play “in the background”, while your program continues. If you start a second sound before the first sound is finished, the two sounds will mix if mixing is supported by the operating system.</p>
+<p>You can use <a href="#ct.loadsound">ct.loadSound()</a> to reduce the short delay that might occur the first time a sound is played.</p>
+<h4 id="examples-12">Examples</h4>
+<pre><code>ct.sound( &quot;ding.wav&quot; );</code></pre>
+<pre><code>public void start
+{
+    ct.sound( &quot;music.mp3&quot; );
+}
+
+public void update()
+{
+    if (ct.clicked())
+        ct.sound( &quot;ding.wav&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-audio-ct.sound"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.sound">ct.sound()</a></h6>
 <h3 id="ct.setsoundvolume">ct.setSoundVolume()</h3>
-<pre><code>ct.setSoundVolume( double volume )</code></pre>
-<p>Set the relative volume to use for sounds played by <code>ct.sound()</code> to <code>volume</code>, which should be between 0.0 and 1.0. The default sound volume is 1.0. If the volume is decreased then sounds are attenuated relative to the volume they were recorded at.</p>
-<h2 id="math-and-misc.">Math and Misc.</h2>
+<p>Sets the relative volume to use for sounds played by <a href="#ct.sound">ct.sound()</a>.</p>
+<h4 id="syntax-36">Syntax</h4>
+<pre><code>ct.setSoundVolume( volume );</code></pre>
+<h5 id="volume">volume</h5>
+<p>(<a href="#java-data-types">double</a>). A volume number between 0.0 and 1.0.</p>
+<h4 id="notes-13">Notes</h4>
+<p>The default sound volume is 1.0. If the volume is decreased then sounds are attenuated relative to the volume they were recorded at.</p>
+<h4 id="example-23">Example</h4>
+<pre><code>ct.setSoundVolume( 0.2 );
+ct.sound( &quot;voices.mp3&quot; );</code></pre>
+<h6 id="code12-function-reference-audio-ct.setsoundvolume"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.setsoundvolume">ct.setSoundVolume()</a></h6>
+<h2 id="math-utilities">Math Utilities</h2>
+<p>These functions provide a convenient way to do common calculations.</p>
+<ul>
+<li><a href="#ct.random">ct.random()</a></li>
+<li><a href="#ct.round">ct.round()</a></li>
+<li><a href="#ct.rounddecimal">ct.roundDecimal()</a></li>
+<li><a href="#ct.distance">ct.distance()</a></li>
+<li><a href="#ct.intdiv">ct.intDiv()</a></li>
+<li><a href="#ct.iserror">ct.isError()</a></li>
+</ul>
+<p>For more math operations, see <a href="#java-math-methods-and-fields-supported">Java Math Methods and Fields Supported</a>.</p>
+<h6 id="code12-function-reference-math-utilities"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a></h6>
 <h3 id="ct.random">ct.random()</h3>
-<pre><code>int ct.random( int min, int max )</code></pre>
-<p>Return a random integer from <code>min</code> to <code>max</code> (inclusive).</p>
+<p>Returns a random integer within the specified range.</p>
+<h4 id="syntax-37">Syntax</h4>
+<pre><code>ct.random( min, max )</code></pre>
+<h5 id="min">min</h5>
+<p>(<a href="#java-data-types">int</a>). The lower bound of the range.</p>
+<h5 id="max">max</h5>
+<p>(<a href="#java-data-types">int</a>). The upper bound of the range.</p>
+<h5 id="return-value-20"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). A random integer from <code>min</code> to <code>max</code> (inclusive).</p>
+<h4 id="examples-13">Examples</h4>
+<pre><code>int diceRoll = ct.random( 1, 6 );</code></pre>
+<pre><code>// Flip a coin
+if (ct.random( 0, 1 ) == 0)
+    ct.println( &quot;heads&quot; );
+else
+    ct.println( &quot;tails&quot; );</code></pre>
+<pre><code>// Create a ball at a random x position
+ct.circle( ct.random( 0, 100 ), 50, 10 );</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.random"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.random">ct.random()</a></h6>
 <h3 id="ct.round">ct.round()</h3>
-<pre><code>int ct.round( double number )</code></pre>
-<p>Return the <code>number</code> rounded to the nearest integer.</p>
+<p>Returns a specified number rounded to the nearest integer.</p>
+<h4 id="syntax-38">Syntax</h4>
+<pre><code>ct.round( number )</code></pre>
+<h5 id="number">number</h5>
+<p>(<a href="#java-data-types">double</a>). The number to round.</p>
+<h5 id="return-value-21"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The <code>number</code> rounded to the nearest integer.</p>
+<h4 id="example-24">Example</h4>
+<pre><code>double x = 10.75;
+int n = ct.round( x );    // sets n to 11</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.round"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.round">ct.round()</a></h6>
 <h3 id="ct.rounddecimal">ct.roundDecimal()</h3>
-<pre><code>double ct.roundDecimal( double number, int numPlaces )</code></pre>
-<p>Return the <code>number</code> rounded to <code>numPlaces</code> decimal places.</p>
-<h3 id="ct.intdiv">ct.intDiv()</h3>
-<pre><code>int ct.intDiv( int numerator, int denominator )</code></pre>
-<p>Return the result of an integer divide of <code>numerator / denominator</code>. If <code>numerator / denominator</code> is not an integer, the result is rounded down to the next smaller integer. If <code>denominator</code> is 0 then the result is a large positive integer if <code>numerator</code> &gt; 0, a large negative integer if <code>numerator</code> &lt; 0, and 0 if <code>numerator</code> is 0.</p>
-<h3 id="ct.iserror">ct.isError()</h3>
-<pre><code>boolean ct.isError( double number )</code></pre>
-<p>Return <code>true</code> if the value of <code>number</code> is an error value (NaN = “Not a Number”).</p>
+<p>Returns a number rounded to a specified number of decimal places.</p>
+<h4 id="syntax-39">Syntax</h4>
+<pre><code>ct.roundDecimal( number, numPlaces )</code></pre>
+<h5 id="number-1">number</h5>
+<p>(<a href="#java-data-types">double</a>). The number to round.</p>
+<h5 id="numplaces">numPlaces</h5>
+<p>(<a href="#java-data-types">int</a>). The number of decimal places to round to.</p>
+<h5 id="return-value-22"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The <code>number</code> rounded to <code>numPlaces</code> decimal places.</p>
+<h4 id="example-25">Example</h4>
+<pre><code>double amount = 24.3467;
+double price = ct.roundDecimal( amount, 2 );    // sets price to 24.35</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.rounddecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.rounddecimal">ct.roundDecimal()</a></h6>
 <h3 id="ct.distance">ct.distance()</h3>
-<pre><code>double ct.distance( double x1, double y1, double x2, double y2 )</code></pre>
-<p>Return the distance between the points (<code>x1</code>, <code>y1</code>) and (<code>x2</code>, <code>y2</code>).</p>
+<p>Returns the geometric distance between two (x, y) coordinates.</p>
+<h4 id="syntax-40">Syntax</h4>
+<pre><code>ct.distance( x1, y1, x2, y2 )</code></pre>
+<h5 id="x1-1">x1</h5>
+<p>(<a href="#java-data-types">double</a>). The first x coordinate.</p>
+<h5 id="y1-1">y1</h5>
+<p>(<a href="#java-data-types">double</a>). The first y coordinate.</p>
+<h5 id="x2-1">x2</h5>
+<p>(<a href="#java-data-types">double</a>). The second x coordinate.</p>
+<h5 id="y2-1">y2</h5>
+<p>(<a href="#java-data-types">double</a>). The second y coordinate.</p>
+<h5 id="return-value-23"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The geometric distance from (<code>x1</code>, <code>y1</code>) to (<code>x2</code>, <code>y2</code>).</p>
+<p>This is equivalent to:</p>
+<pre><code>Math.sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) )</code></pre>
+<h4 id="example-26">Example</h4>
+<pre><code>GameObj ball1 = ct.circle( 30, 20, 10 );
+GameObj ball2 = ct.circle( 50, 70, 10 );
+
+double dist = ct.distance( ball1.x, ball1.y, ball2.x, ball2.y );
+ct.println( &quot;The balls are &quot; + dist + &quot; units apart&quot; );</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.distance"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.distance">ct.distance()</a></h6>
+<h3 id="ct.intdiv">ct.intDiv()</h3>
+<p>Return the result of an integer division of two integers (discard any fractional part and round the result down to the nearest integer).</p>
+<h4 id="syntax-41">Syntax</h4>
+<pre><code>ct.intDiv( numerator, denominator )</code></pre>
+<h5 id="numerator">numerator</h5>
+<p>(<a href="#java-data-types">int</a>). The numerator of the division.</p>
+<h5 id="denominator">denominator</h5>
+<p>(<a href="#java-data-types">int</a>). The denominator of the division.</p>
+<h5 id="return-value-24"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The value of <code>numerator</code> / <code>denominator</code> rounded down to the nearest integer.</p>
+<blockquote>
+<p>The <code>ct.intDiv()</code> function also supports dividing by 0, which is normally an error if done directly in Java. If <code>denominator</code> is 0 then the result is:</p>
+</blockquote>
+<blockquote>
+<ul>
+<li>a large positive integer if <code>numerator</code> &gt; 0</li>
+<li>a large negative integer if <code>numerator</code> &lt; 0</li>
+<li>0 if <code>numerator</code> is 0</li>
+</ul>
+</blockquote>
+<h4 id="example-27">Example</h4>
+<pre><code>int n = ct.intDiv( 3, 2 );    // sets n to 1</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.intdiv"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.intdiv">ct.intDiv()</a></h6>
+<h3 id="ct.iserror">ct.isError()</h3>
+<p>Returns <code>true</code> if the value of the specified number is an error value (NaN = “Not a Number”).</p>
+<h4 id="syntax-42">Syntax</h4>
+<pre><code>ct.isError( number )</code></pre>
+<h5 id="numerator-1">numerator</h5>
+<p>(<a href="#java-data-types">double</a>). The number to test.</p>
+<h5 id="return-value-25"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if <code>number</code> is an error (NaN) value, or <code>false</code> if <code>number</code> is a valid number.</p>
+<p>An error (NaN or “Not a Number”) value can result from certain calculations or functions that return a <a href="#java-data-types">double</a> but the calculation results in an error or invalid number. See the examples below.</p>
+<h4 id="example-28">Example</h4>
+<pre><code>boolean error;
+
+// These all set error to true
+error = ct.isError( 0.0 / 0.0 );
+error = ct.isError( Math.sqrt( -1 ) );
+error = ct.isError( ct.parseNumber( &quot;nope&quot; ) );</code></pre>
+<h6 id="code12-function-reference-math-utilities-ct.iserror"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.iserror">ct.isError()</a></h6>
+<h2 id="type-conversion">Type Conversion</h2>
+<p>These functions allow you to convert text strings to numbers and vice-versa.</p>
+<ul>
+<li><a href="#ct.parseint">ct.parseInt()</a></li>
+<li><a href="#ct.parsenumber">ct.parseNumber()</a></li>
+<li><a href="#ct.canparseint">ct.canParseInt()</a></li>
+<li><a href="#ct.canparsenumber">ct.canParseNumber()</a></li>
+<li><a href="#ct.formatint">ct.formatInt()</a></li>
+<li><a href="#ct.formatdecimal">ct.formatDecimal()</a></li>
+</ul>
+<h3 id="ct.parseint">ct.parseInt()</h3>
+<p>Reads an <a href="#java-data-types">int</a> value in a <a href="#java-data-types">String</a>.</p>
+<h4 id="syntax-43">Syntax</h4>
+<pre><code>ct.parseInt( str )</code></pre>
+<h5 id="str">str</h5>
+<p>(<a href="#java-data-types">String</a>). A string containing an integer, for example “34”.</p>
+<h5 id="return-value-26"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). If <code>str</code> is a valid integer in text form (digit characters), then the integer value is returned, otherwise 0 is returned.</p>
+<blockquote>
+<p>Since 0 is also a valid integer, it is a good idea to test the string with <a href="#ct.canparseint">ct.canParseInt()</a> first.</p>
+</blockquote>
+<h4 id="examples-14">Examples</h4>
+<pre><code>int a = ct.parseInt( &quot;546&quot; );      // sets a to 546
+int b = ct.parseInt( &quot;  -3 &quot; );    // sets b to -3</code></pre>
+<pre><code>int c = ct.parseInt( &quot;six&quot;);       // sets c to 0
+int d = ct.parseInt( &quot;4 more&quot; );   // sets d to 0</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.parseint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.parseint">ct.parseInt()</a></h6>
+<h3 id="ct.parsenumber">ct.parseNumber()</h3>
+<p>Reads a <a href="#java-data-types">double</a> value in a <a href="#java-data-types">String</a>.</p>
+<h4 id="syntax-44">Syntax</h4>
+<pre><code>ct.parseNumber( str )</code></pre>
+<h5 id="str-1">str</h5>
+<p>(<a href="#java-data-types">String</a>). A string containing an number, for example “-2.15”.</p>
+<h5 id="return-value-27"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). If <code>str</code> is a valid number in text form, then the numeric value is returned, otherwise the special error value NaN (Not a Number) is returned.</p>
+<blockquote>
+<p>To test for NaN, use <a href="#ct.iserror">ct.isError()</a></p>
+</blockquote>
+<h4 id="examples-15">Examples</h4>
+<pre><code>int a = ct.parseNumber( &quot;5&quot; );           // sets a to 5.0
+int b = ct.parseNumber( &quot;  -3.02 &quot; );    // sets b to -3.02</code></pre>
+<pre><code>String entry = &quot;$24.99&quot;;
+double amount = ct.parseNumber( entry );    // sets amount to NaN
+if (ct.isError( amount ))
+    ct.println( &quot;Invalid number format&quot; );</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.parsenumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.parsenumber">ct.parseNumber()</a></h6>
+<h3 id="ct.canparseint">ct.canParseInt()</h3>
+<p>Returns <code>true</code> if a specified <a href="#java-data-types">String</a> is a valid integer in text form.</p>
+<h4 id="syntax-45">Syntax</h4>
+<pre><code>ct.canParseInt( str )</code></pre>
+<h5 id="str-2">str</h5>
+<p>(<a href="#java-data-types">String</a>). The string to test.</p>
+<h5 id="return-value-28"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if <code>str</code> is a valid integer in text form, otherwise <code>false</code>.</p>
+<h4 id="example-29">Example</h4>
+<pre><code>String entry = &quot;13&quot;;
+
+if (ct.canParseInt( entry ))
+{
+    int n = ct.parseInt( entry );
+    ct.println( &quot;The number is &quot; + n );
+}
+else
+{
+    ct.println( &quot;Not a valid integer&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.canparseint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.canparseint">ct.canParseInt()</a></h6>
+<h3 id="ct.canparsenumber">ct.canParseNumber()</h3>
+<p>Returns <code>true</code> if a specified <a href="#java-data-types">String</a> is a valid number in text form.</p>
+<h4 id="syntax-46">Syntax</h4>
+<pre><code>ct.canParseNumber( str )</code></pre>
+<h5 id="str-3">str</h5>
+<p>(<a href="#java-data-types">String</a>). The string to test.</p>
+<h5 id="return-value-29"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if <code>str</code> is a valid number in text form, otherwise <code>false</code>.</p>
+<h4 id="example-30">Example</h4>
+<pre><code>String entry = &quot;-0.99&quot;;
+
+if (ct.canParseNumber( entry ))
+{
+    double num = ct.parseNumber( entry );
+    ct.println( &quot;The number is &quot; + num );
+}
+else
+{
+    ct.println( &quot;Not a valid number&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.canparsenumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.canparsenumber">ct.canParseNumber()</a></h6>
+<h3 id="ct.formatint">ct.formatInt()</h3>
+<p>Returns a text (<a href="#java-data-types">String</a>) representation of an integer (<a href="#java-data-types">int</a>).</p>
+<h4 id="syntax-47">Syntax</h4>
+<pre><code>ct.formatInt( num );
+ct.formatInt( num, numDigits );</code></pre>
+<h5 id="num">num</h5>
+<p>(<a href="#java-data-types">int</a>). An integer value, for example 32.</p>
+<h5 id="numdigits">numDigits</h5>
+<p>(<a href="#java-data-types">int</a>, optional). If <code>numDigits</code> is included, then the text returned will have at least this many characters, adding leading zeros as necessary.</p>
+<h5 id="return-value-30"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). The text representation of <code>num</code>, for example “32”.</p>
+<h4 id="examples-16">Examples</h4>
+<pre><code>String text = ct.formatInt( 32 );         // sets text to &quot;32&quot;</code></pre>
+<pre><code>int score = 520;
+String text = ct.formatInt( score, 6 );   // sets text to &quot;000520&quot;
+ct.text( text, 5, 20, 10 );               // displays score on the graphics screen</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.formatint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.formatint">ct.formatInt()</a></h6>
+<h3 id="ct.formatdecimal">ct.formatDecimal()</h3>
+<p>Returns a text (<a href="#java-data-types">String</a>) representation of a number (<a href="#java-data-types">double</a>).</p>
+<h4 id="syntax-48">Syntax</h4>
+<pre><code>ct.formatDecimal( number );
+ct.formatDecimal( number, numPlaces );</code></pre>
+<h5 id="number-2">number</h5>
+<p>(<a href="#java-data-types">double</a>). Any numeric value.</p>
+<h5 id="numplaces-1">numPlaces</h5>
+<p>(<a href="#java-data-types">int</a>, optional). If <code>numPlaces</code> is included, then the text is formatted to exactly this many places past the decimal point, rounding or adding extra zeros as necessary.</p>
+<h5 id="return-value-31"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). The text representation of <code>number</code>.</p>
+<h4 id="examples-17">Examples</h4>
+<pre><code>double x = 1.250;
+String text = ct.formatDecimal( x );       // sets text to &quot;1.25&quot;</code></pre>
+<pre><code>double a = 3.14159;
+String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.formatdecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.formatdecimal">ct.formatDecimal()</a></h6>
+<h2 id="program-control">Program Control</h2>
 <h3 id="ct.gettimer">ct.getTimer()</h3>
-<pre><code>int ct.getTimer( )</code></pre>
+<pre><code>int ct.getTimer()</code></pre>
 <p>Return the number of milliseconds since the application started. Time starts at the begining of the <code>start</code> function.</p>
 <h3 id="ct.getversion">ct.getVersion()</h3>
-<pre><code>double getVersion( )</code></pre>
+<pre><code>double getVersion()</code></pre>
 <p>Return the version number of the Code12 runtime system.</p>
 <h3 id="ct.pause">ct.pause()</h3>
-<pre><code>ct.pause( )</code></pre>
+<pre><code>ct.pause()</code></pre>
 <p>Execution of the program is paused at this statement. You can then resume or stop execution using the toolbar buttons in the Code12 application.</p>
 <blockquote>
 <p>You can use <code>ct.pause</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.pause</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
 </blockquote>
 <h3 id="ct.stop">ct.stop()</h3>
-<pre><code>ct.stop( )</code></pre>
+<pre><code>ct.stop()</code></pre>
 <p>Execution of the program is immediately stopped and ended at this statement. You can restart execution over from the beginning of the program using the <strong>Restart</strong> toolbar button in the Code12 application.</p>
 <blockquote>
 <p>You can use <code>ct.stop</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.stop</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
 </blockquote>
 <h3 id="ct.restart">ct.restart()</h3>
-<pre><code>ct.restart( )</code></pre>
+<pre><code>ct.restart()</code></pre>
 <p>Execution of the program is immediately stopped and restarted from the beginning of the program. Variables are re-initialized with their default/starting values, and execution starts over with your <code>start</code> function.</p>
 <blockquote>
 <p>The <code>ct.restart</code> function is not supported (ignored) when programs are running standalone under the Java runtime outside of the Code12 environment.</p>
 </blockquote>
-<h2 id="type-conversion">Type Conversion</h2>
-<h3 id="ct.parseint">ct.parseInt()</h3>
-<pre><code>int ct.parseInt( String str )</code></pre>
-<p>If <code>str</code> can be converted to (parsed as) an integer, then return the integer value, otherwise return 0.</p>
-<blockquote>
-<p>Since 0 is a valid integer, it is a good idea to test the string with <code>ct.canParseInt()</code> first.</p>
-</blockquote>
-<h3 id="ct.canparseint">ct.canParseInt()</h3>
-<pre><code>boolean ct.canParseInt( String str )</code></pre>
-<p>If <code>str</code> can be converted to (parsed as) an integer, then return <code>true</code>, otherwise return <code>false</code>.</p>
-<h3 id="ct.parsenumber">ct.parseNumber()</h3>
-<pre><code>double ct.parseNumber( String str )</code></pre>
-<p>If <code>str</code> can be converted to (parsed as) a number, then return the value as a <code>double</code>, otherwise return the NaN (Not a Number) error value.</p>
-<blockquote>
-<p>To test for NaN, use <code>ct.isError()</code></p>
-</blockquote>
-<h3 id="ct.canparsenumber">ct.canParseNumber()</h3>
-<pre><code>boolean ct.canParseNumber( String str )</code></pre>
-<p>If <code>str</code> can be converted to (parsed as) a number, then return <code>true</code>, otherwise return <code>false</code>.</p>
-<h3 id="ct.formatdecimal">ct.formatDecimal()</h3>
-<pre><code>String ct.formatDecimal( double number )
-String ct.formatDecimal( double number, int numPlaces )</code></pre>
-<p>Return the value of <code>number</code> converted to a string. If <code>numPlaces</code> is included, then format the output to exactly this many places past the decimal point, rounding or adding extra zeros as necessary.</p>
-<h3 id="ct.formatint">ct.formatInt()</h3>
-<pre><code>String ct.formatInt( int number )
-String ct.formatInt( int number, int numDigits )</code></pre>
-<p>Return the value of <code>number</code> converted to a string. If numDigits is included, then format to this many digits, adding leading zeros as necessary.</p>
 <h2 id="gameobj-data-fields">GameObj Data Fields</h2>
-<p><code>GameObj</code> objects are graphics objects visible on the screen. See <a href="#gameobj-creation">GameObj Creation</a> to create a <code>GameObj</code>. All <code>GameObj</code> objects have the following public data fields, which can be accessed or assigned to at any time. If assigned to, the new value takes effect at the next update cycle.</p>
-<h3 id="x-y">x, y</h3>
+<p><code>GameObj</code> objects are graphics objects visible on the screen. See <a href="#gameobj-creation">GameObj Creation</a> to create a <code>GameObj</code>. All <code>GameObj</code> objects have the following public data fields, which can be accessed or assigned to at any time. If assigned to, the new value takes effect at the next animation frame.</p>
+<h3 id="obj.x">obj.x</h3>
+<h3 id="obj.y">obj.y</h3>
 <pre><code>double x, y</code></pre>
 <p>The <code>x</code> and <code>y</code> fields specify the position of the object in the application window, in graphics coordinates. By default, graphics coordinates range from 0 to 100 in both x and y if the window is square. If the window is not square (see <code>ct.setHeight()</code>), then x coordinates still range from 0 (left edge) to 100 (right edge), but y coordinates will range from 0 (top edge) to the value returned by <code>ct.getHeight()</code> (bottom edge).</p>
 <blockquote>
@@ -516,74 +1121,76 @@ String ct.formatInt( int number, int numDigits )</code></pre>
 <blockquote>
 <p>It is not an error to position an object outside the application window, it will simply not be visible or will clip at the window boundary.</p>
 </blockquote>
-<h3 id="width-height">width, height</h3>
+<h3 id="obj.width">obj.width</h3>
+<h3 id="obj.height">obj.height</h3>
 <pre><code>double width, height</code></pre>
 <p>The <code>width</code> and <code>height</code> fields specify the size of the object in graphics coordinates. The different types of <code>GameObj</code> objects react somewhat differently to changes in size, as follows:</p>
-<h5 id="circle">circle</h5>
+<h5 id="circle-objects">circle Objects</h5>
 <p>Although circles are always created round, you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
-<h5 id="rect">rect</h5>
+<h5 id="rect-objects">rect Objects</h5>
 <p>Rectangles can be any size and adjust to any <code>width</code> and <code>height</code>.</p>
-<h5 id="line">line</h5>
+<h5 id="line-objects">line Objects</h5>
 <p>Line objects are created between two points. After creation, the <code>x</code> and <code>y</code> fields are the location of the first point, and the <code>width</code> and <code>height</code> fields specify signed offsets (can be negative) from the first point to the second point. Thus, the location of the second point is (<code>x</code> + <code>width</code>, <code>y</code> + <code>height</code>). You can change any of the <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> fields, and the line will adjust.</p>
 <blockquote>
 <p>Note that unlike any of the other <code>GameObj</code> object types, a line may have negative values for the <code>width</code> and <code>height</code> fields. The physical width and height of the line’s bounding box can be reliably determined with<br />
 <code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <code>lineWidth</code> below).</p>
 </blockquote>
-<h5 id="text-1">text</h5>
+<h5 id="text-objects">text Objects</h5>
 <p>Text objects use a font size that is automatically determined by the object’s <code>height</code>, and the object’s <code>width</code> is calculated automatically. So, changing <code>height</code> will change the font size, and changes to the <code>width</code> field are undefined.</p>
 <blockquote>
-<p><strong>Note:</strong> When you change a text object’s <code>height</code>, the <code>width</code> will be recalculated automatically. However, the new value for <code>width</code> is not available immediately. It will be recalculated the next time the object draws (during the next update cycle).</p>
+<p><strong>Note:</strong> When you change a text object’s <code>height</code>, the <code>width</code> will be recalculated automatically. However, the new value for <code>width</code> is not available immediately. It will be recalculated the next time the object draws (at the next animation frame).</p>
 </blockquote>
-<h5 id="image">image</h5>
+<h5 id="image-objects">image Objects</h5>
 <p>Images are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to fill the space.</p>
-<h3 id="xspeed-yspeed">xSpeed, ySpeed</h3>
+<h3 id="obj.xspeed">obj.xSpeed</h3>
+<h3 id="obj.yspeed">obj.ySpeed</h3>
 <pre><code>double xSpeed, ySpeed</code></pre>
-<p>The <code>xSpeed</code> and <code>ySpeed</code> fields can be used to make an object move automatically at the specified speed and direction. The <code>xSpeed</code> and <code>ySpeed</code> values are added to the object’s <code>x</code> and <code>y</code> fields at the beginning of each update cycle. Update cycles happen 60 times per second, so setting <code>xSpeed</code> to 1 will make the object move 60 units per second to the right. The values for <code>xSpeed</code> and <code>ySpeed</code> can be positive or negative, and they both default to 0.</p>
+<p>The <code>xSpeed</code> and <code>ySpeed</code> fields can be used to make an object move automatically at the specified speed and direction. The <code>xSpeed</code> and <code>ySpeed</code> values are added to the object’s <code>x</code> and <code>y</code> fields before each new animation frame. Animation frames happen 60 times per second, so setting <code>xSpeed</code> to 1 will make the object move 60 units per second to the right. The values for <code>xSpeed</code> and <code>ySpeed</code> can be positive or negative, and they both default to 0.</p>
 <blockquote>
 <p>You can change <code>xSpeed</code> and/or <code>ySpeed</code> at any time to change the speed or direction of an object.</p>
 </blockquote>
-<h3 id="linewidth">lineWidth</h3>
+<h3 id="obj.linewidth">obj.lineWidth</h3>
 <pre><code>int lineWidth</code></pre>
 <p>If an object has a line color (see the <code>GameObj</code> methods <code>obj.setLineColor()</code> and <code>obj.setLineColorRGB()</code>), then the object will be outlined in this color with a stroke of approximately <code>lineWidth</code> pixels. The default is 1.</p>
 <blockquote>
 <p>Unlike normal coordinate values, <code>lineWidth</code> values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and may vary, but the overall intent is that on a screen of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution screens may use multiple pixels, and some platforms may use partial pixels for a smoother appearance (anti-aliasing).</p>
 </blockquote>
-<h3 id="visible">visible</h3>
+<h3 id="obj.visible">obj.visible</h3>
 <pre><code>boolean visible</code></pre>
 <p>The <code>visible</code> field defaults to <code>true</code>, but you can set it to <code>false</code> to hide the object. Hidden objects are effectively disabled, and will not draw or respond to mouse/touch input.</p>
-<h3 id="clickable">clickable</h3>
+<h3 id="obj.clickable">obj.clickable</h3>
 <pre><code>boolean clickable</code></pre>
 <p>The <code>clickable</code> field defaults to <code>true</code>, so by default all <code>GameObj</code> objects can be used to respond to click/touch input (see <a href="#ctobjectclicked">ct.objectClicked</a>, <a href="#objclicked">obj.clicked</a>, and <a href="#onmousepress">onMousePress</a>). However, if you set an object’s <code>clickable</code> field to false, then it will ignore clicks and pass them through to the object below, if any.</p>
 <blockquote>
 <p>If you stack two objects and want to use the bottom object to test for hits (for example a rectangle with a text label on top of it), then you can set the <code>clickable</code> field of the top object to <code>false</code>, which will cause the click to “pass through” to the object below it.</p>
 </blockquote>
-<h3 id="autodelete">autoDelete</h3>
+<h3 id="obj.autodelete">obj.autoDelete</h3>
 <pre><code>boolean autoDelete     // auto delete if it goes from on to off-screen</code></pre>
 <p>If you set the <code>autoDelete</code> field of an object to <code>true</code> (default <code>false</code>), then the object will be automatically deleted if it moves off-screen (outside of the application window).</p>
 <blockquote>
 <p>If an object is created initially off-screen, it will not be automatically deleted until it has moved on-screen, then off-screen again.</p>
 </blockquote>
-<h3 id="group">group</h3>
+<h3 id="obj.group">obj.group</h3>
 <pre><code>String group</code></pre>
 <p>The <code>group</code> field is an optional name that you can assign to an object that will cause the function <code>ct.clearGroup()</code> to delete all objects with the matching group name. The default group name of an object is &quot;&quot; (empty string)</p>
 <h2 id="gameobj-methods">GameObj Methods</h2>
 <p>The following method functions must be called on an existing <code>GameObj</code> object (see <a href="#gameobj-creation">GameObj Creation</a>). In the syntax shown, the <code>obj</code> can be any variable of type <code>GameObj</code>.</p>
 <h3 id="obj.gettype">obj.getType()</h3>
-<pre><code>String obj.getType( )</code></pre>
+<pre><code>String obj.getType()</code></pre>
 <p>Return the type name of the <code>GameObj</code> object, which is one of: <code>&quot;circle&quot;</code>, <code>&quot;rect&quot;</code>, <code>&quot;line&quot;</code>, <code>&quot;text&quot;</code>, or <code>&quot;image&quot;</code>.</p>
 <h3 id="obj.gettext">obj.getText()</h3>
-<pre><code>String obj.getText( )</code></pre>
+<pre><code>String obj.getText()</code></pre>
 <p>Return the text of the object. For a <code>&quot;text&quot;</code> object, this is the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object. For an <code>&quot;image&quot;</code> object, the text defaults to the image filename, but you can change it to something else (see <code>obj.setText</code> below).</p>
 <blockquote>
 <p>The <code>obj.toString()</code> method (see below) includes the object text in the description of an object.</p>
 </blockquote>
 <h3 id="obj.settext">obj.setText()</h3>
 <pre><code>obj.setText( String text )</code></pre>
-<p>Set the text of an object to <code>text</code>. If the object is a text object, setting the text will cause the visible text to change. For other object types, the text is simply stored in the object (See <code>obj.getText( )</code> above).</p>
+<p>Set the text of an object to <code>text</code>. If the object is a text object, setting the text will cause the visible text to change. For other object types, the text is simply stored in the object (See <code>obj.getText()</code> above).</p>
 <h3 id="obj.tostring">obj.toString()</h3>
-<pre><code>String obj.toString( )</code></pre>
+<pre><code>String obj.toString()</code></pre>
 <p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
-<h5 id="examples-10">Examples:</h5>
+<h5 id="examples-18">Examples:</h5>
 <pre><code>[circle at (70, 25)]
 [text at (50, 10) &quot;Score 3200&quot;]
 [image at (21, 83) &quot;goldfish.png&quot;]
@@ -621,22 +1228,22 @@ obj.align( String alignment, boolean adjustY )</code></pre>
 <pre><code>obj.setLineColorRGB( int red, int green, int blue )</code></pre>
 <p>Set the line color of the object (the outline stroke color for objects other than line objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
 <h3 id="obj.getlayer">obj.getLayer()</h3>
-<pre><code>int obj.getLayer( )</code></pre>
+<pre><code>int obj.getLayer()</code></pre>
 <p>Return the layer number for the object. See <code>obj.setLayer()</code> below.</p>
 <h3 id="obj.setlayer">obj.setLayer()</h3>
 <pre><code>obj.setLayer( int layer )</code></pre>
 <p>Set the layer number for the object. The layer number can be used to easily control the stacking order of groups of objects. The default layer is 1, and you can set any integer value. After the background color or image, object layers are drawn from the lowest value first (in the back) to the highest values (in the front).</p>
 <p>Within a layer, objects are drawn in the order that they were created or set to that layer number. Calling <code>obj.setLayer()</code> always re-inserts an object at the top of that layer.</p>
 <h3 id="obj.delete">obj.delete()</h3>
-<pre><code>obj.delete( )</code></pre>
+<pre><code>obj.delete()</code></pre>
 <p>Remove and delete the object from the screen.</p>
 <blockquote>
 <p>Attempting to access the fields or methods of an object after it has been deleted may result in unpredictable behavior.</p>
 </blockquote>
 <h3 id="obj.clicked">obj.clicked()</h3>
-<pre><code>boolean obj.clicked( )</code></pre>
-<p>Return <code>true</code> if the object was clicked or touched during the last update cycle. Only objects with both the <code>visible</code> and <code>clickable</code> fields set to <code>true</code> will receive mouse/touch input.</p>
-<p>Calling this method for an object every time during your <code>update</code> function will detect any clicks on the object.</p>
+<pre><code>boolean obj.clicked()</code></pre>
+<p>Return <code>true</code> if the object was clicked or touched during the last animation frame. Only objects with both the <code>visible</code> and <code>clickable</code> fields set to <code>true</code> will receive mouse/touch input.</p>
+<p>Calling this method for an object every time during your <a href="#update">update()</a> function will detect any clicks on the object.</p>
 <blockquote>
 <p>If more than one visible and clickable object intersects with the location of a click or touch, the topmost one will receive the click. Objects that are not both visible and clickable are ignored when determining the object that was clicked.</p>
 </blockquote>
@@ -648,69 +1255,79 @@ obj.align( String alignment, boolean adjustY )</code></pre>
 </blockquote>
 <h3 id="obj.hit">obj.hit()</h3>
 <pre><code>boolean obj.hit( GameObj objTest )</code></pre>
-<p>Return <code>true</code> if the object currently intersects with another object <code>objTest</code>. If you call this method every time in your <code>update</code> function, it can be used to test if/when two objects “hit” each other.</p>
+<p>Return <code>true</code> if the object currently intersects with another object <code>objTest</code>. If you call this method every time in your <a href="#update">update()</a> function, it can be used to test if/when two objects “hit” each other.</p>
 <h3 id="obj.objecthitingroup-string-group">obj.objectHitInGroup( String group )</h3>
 <pre><code>GameObj obj.objectHitInGroup( String group )</code></pre>
 <p>If the object currently intersects with another <code>GameObj</code> object on the current screen that has its <a href="#group">group</a> field equal to <code>group</code>, then return a reference to the other object, otherwise return <code>null</code>. If the specified <code>group</code> is <code>null</code> then all objects on the current screen will be considered.</p>
 <blockquote>
 <p>Note that <code>obj.objectHitInGroup()</code> will return <code>null</code> if no matching object intersects <code>obj</code>, so you must check the return value for <code>null</code> before using the <code>GameObj</code> returned.</p>
 </blockquote>
-<h2 id="java-math-class-methods-and-fields-supported">Java Math Class Methods and Fields Supported</h2>
-<p>The following fields and functions from the Java <code>Math</code> class are supported.</p>
-<pre><code>double  Math.E
-double  Math.PI
-double  Math.abs( double number )
-int     Math.abs( int number )
-double  Math.acos( double number )
-double  Math.asin( double number )
-double  Math.atan( double number )
-double  Math.atan2( double y, double x)
-double  Math.ceil( double number )
-double  Math.cos( double angle )
-double  Math.cosh( double angle )
-double  Math.exp( double number )
-double  Math.floor( double number )
-double  Math.log( double number )
-double  Math.log10( double number )
-double  Math.max( double number1, double number2 )
-int     Math.max( int number1, int number2 )
-double  Math.min( double number1, double number2 )
-int     Math.min( int number1, int number2 )
-double  Math.pow( double number, double exponent )
-double  Math.sin( double angle )
-double  Math.sinh( double angle )
-double  Math.sqrt( double number )
-double  Math.tan( double angle )
-double  Math.tanh( double angle )</code></pre>
-<h2 id="java-string-class-methods-supported">Java String Class Methods Supported</h2>
-<p>The following methods from the Java <code>String</code> class are supported.</p>
-<pre><code>int      str.compareTo( String str2 )
-boolean  str.equals( String str2 )
-int      str.indexOf( String strFind )
-int      str.length()
-String   str.substring( int beginIndex )
-String   str.substring( int beginIndex, int endIndex )
-String   str.toLowerCase()
-String   str.toUpperCase()
-String   str.trim()</code></pre>
-<h2 id="event-functions">Event Functions</h2>
+<h2 id="java-math-methods-and-fields-supported">Java Math Methods and Fields Supported</h2>
+<p>Code12 supports the following fields and method functions from the Java <code>Math</code> class.</p>
+<pre><code>Field       Type
+-------     ------
+Math.E      double
+Math.PI     double
+
+Function               Parameter Type(s)   Return Type
+--------------------   -----------------   -----------
+Math.abs( number )     double              double
+Math.abs( number )     int                 int
+Math.acos( number )    double              double
+Math.asin( number )    double              double
+Math.atan( number )    double              double
+Math.atan2( y, x )     double, double      double
+Math.ceil( number )    double              double
+Math.cos( angle )      double              double
+Math.cosh( angle )     double              double
+Math.exp( number )     double              double
+Math.floor( number )   double              double
+Math.log( number )     double              double
+Math.log10( number )   double              double
+Math.max( a, b )       double, double      double
+Math.max( a, b )       int, int            int
+Math.min( a, b )       double, double      double
+Math.min( a, b )       int, int            int
+Math.pow( num, exp )   double, double      double
+Math.sin( angle )      double              double
+Math.sinh( angle )     double              double
+Math.sqrt( number )    double              double
+Math.tan( angle )      double              double
+Math.tanh( angle )     double              double</code></pre>
+<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html">Java Math Class</a>.</p>
+<h2 id="java-string-methods-supported">Java String Methods Supported</h2>
+<p>Code12 supports the following method functions from the Java <code>String</code> class. String methods must operate on a variable of type <a href="#java-data-types">String</a>, shown below as <code>str</code>.</p>
+<pre><code>Function                      Parameter Type(s)   Return Type
+---------------------------   -----------------   -----------
+str.compareTo( str2 )         String              int
+str.equals( str2 )            String              boolean
+str.indexOf( strFind )        String              int
+str.length()                                      int
+str.substring( begin )        int                 String
+str.substring( begin, end )   int, int            String
+str.toLowerCase()                                 String
+str.toUpperCase()                                 String
+str.trim()                                        String</code></pre>
+<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">Java String Class</a>.</p>
+<h2 id="main-program-functions">Main Program Functions</h2>
+<h3 id="start">start()</h3>
+<pre><code>void start()</code></pre>
+<p>The <code>start</code> function is called once at the beginning of your program. This is good place to create most of the objects for your program (except for any objects that get created as a result of an action that occurs while the application is running).</p>
+<h3 id="update">update()</h3>
+<pre><code>void update()</code></pre>
+<p>The <code>update</code> function is called at the beginning of each animation frame. Animation frames start after the <code>start()</code> function has completed and then repeat continuously 60 times per second.</p>
+<p>One use of animation frames is to achieve object motion and animation. For example, if you move an object 1 display unit to the right in your <a href="#update">update()</a> function, then the object will move continuously at 60 units per second.</p>
+<p>Another use of animation frames is to test repeatedly for user input, using functions such as <code>ct.clicked()</code>, <code>ct.keyPressed()</code>, and <code>ct.keyTyped()</code>, and the <code>GameObj</code> method <code>obj.clicked()</code>.</p>
+<p>You can also use animation frames to test repeatedly for object interactions that can occur when objects are moving. You can examine object fields such as <code>x</code> and <code>y</code> directly, call the <code>GameObj</code> methods <code>obj.containsPoint()</code> and <code>obj.hit()</code>, call the function <code>ct.distance()</code> or write any code you want that tests what you need to detect.</p>
+<p>Finally, note that you can call <code>ct.getTimer()</code> to detect the passage of certain amounts of time if you want.</p>
+<blockquote>
+<p>A common mistake is to create <code>GameObj</code> objects in the <a href="#update">update()</a> function in a way that causes many copies of the object to be created over and over. Note that you should <em>not</em> call functions like <code>ct.circle()</code> to “draw” a circle for each frame in an animation. Instead, you typically want to call <code>ct.circle()</code> to create the object once in your <code>start</code> function, then modify the existing circle in your <a href="#update">update()</a> function.</p>
+</blockquote>
+<h2 id="input-event-functions">Input Event Functions</h2>
 <p>The following functions, if defined in your program, will be called when indicated. Note that unlike all of the other functions and methods above, These functions are <em>implemented</em> in your program (you write the body of the function) and are <em>called</em> by the runtime system with appropriate. They are called in response to “events” happening in your application.</p>
 <p>Implementing any of these functions is optional and “for your information”. They are not necessary to use other functions and features of the system. For example, if you don’t implement any of the mouse event functions, you can still call functions such as <code>ct.clicked()</code> to test for mouse clicks.</p>
 <blockquote>
-<p><strong>Tip:</strong> If your program has complex mouse or keyboard handling (for example, many objects to check for clicks and many keys to test), then doing your work in the event functions will be more efficient than making many tests in your <code>update</code> function.</p>
-</blockquote>
-<h3 id="start">start()</h3>
-<pre><code>void start( )</code></pre>
-<p>The <code>start</code> function is called once at the beginning of your program. This is good place to create most of the objects for your program (except for any objects that get created as a result of an action that occurs while the application is running).</p>
-<h3 id="update">update()</h3>
-<pre><code>void update( )</code></pre>
-<p>The <code>update</code> function is called at the beginning of each update cycle. Update cycles start after the <code>start</code> function has completed and then repeat continuously at 60 times per second.</p>
-<p>One use of update cycles is to achieve object motion and animation. For example, if you move an object 1 display unit to the right in your <code>update</code> function, then the object will move continuously at 60 units per second.</p>
-<p>Another use of update cycles is to poll (check repeatedly) for user input, using functions such as <code>ct.clicked()</code>, <code>ct.keyPressed()</code>, and <code>ct.keyTyped()</code>, and the <code>GameObj</code> method <code>obj.clicked()</code>.</p>
-<p>You can also use update cycles to test repeatedly for object interactions that can occur during any update cycle when objects are moving. You can examine object fields such as <code>x</code> and <code>y</code> directly, call the <code>GameObj</code> methods <code>obj.containsPoint()</code> and <code>obj.hit()</code>, call the function <code>ct.distance()</code> or write any code you want that tests what you need to detect.</p>
-<p>Finally, note that you can call <code>ct.getTimer()</code> to detect the passage of certain amounts of time if you want.</p>
-<blockquote>
-<p>A common mistake is to create <code>GameObj</code> objects in the <code>update</code> function in a way that causes many copies of the object to be created over and over. Note that you should <em>not</em> call functions like <code>ct.circle()</code> to “draw” a circle for each frame in an animation. Instead, you typically want to call <code>ct.circle()</code> to create the object once in your <code>start</code> function, then modify the existing circle in your <code>update</code> function.</p>
+<p><strong>Tip:</strong> If your program has complex mouse or keyboard handling (for example, many objects to check for clicks and many keys to test), then doing your work in the event functions will be more efficient than making many tests in your <a href="#update">update()</a> function.</p>
 </blockquote>
 <h3 id="onmousepress">onMousePress()</h3>
 <pre><code>void onMousePress( GameObj obj, double x, double y )</code></pre>
@@ -758,7 +1375,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 <h2 id="additional-reference-information-1">Additional Reference Information</h2>
 <h3 id="graphics-coordinates">Graphics Coordinates</h3>
 <p>Graphics objects in Code12 are positioned on the screen by (x, y) coordinates. The coordinate values are not pixels, but instead are in unit values relative to the size of the graphics area, which we will call the “screen”. Size values (e.g. width and height) use the same units.</p>
-<h5 id="x-coordinates-width-and-objext-scaling">X Coordinates, Width, and Objext Scaling</h5>
+<h5 id="x-coordinates-width-and-object-scaling">X Coordinates, Width, and Object Scaling</h5>
 <p>The screen area is always 100 units wide, by definition, so an x-coordinate of 50 is always horizontally centered in the screen. So you can think of an x-coordinate value as a percent of the window width. An x value of 0 is at the left edge, 50 is in the center, and 100 is at the right edge. Similarly, a width of 50 is half as wide as the screen.</p>
 <blockquote>
 <p>If you resize the Code12 application or use the pane splits to change the size of the graphics screen area, your graphics objects will automatically scale along with the screen, and the coordinates of the objects do not change.</p>
@@ -832,5 +1449,8 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 &quot;tab&quot;                          (tab key)
 &quot;backspace&quot;                    (backspace or delete left key)
 &quot;escape&quot;                       (esc key)</code></pre>
+<footer>
+(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved.
+</footer>
 </body>
 </html>

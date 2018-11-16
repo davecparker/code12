@@ -1,3 +1,5 @@
+/* Style Sheet for the Code12 Function Reference */
+
 body {
     margin: auto;
     padding-right: 1em;
@@ -24,6 +26,7 @@ pre {
     background-color: #eeeeee;
     color: black;
     padding: 0.5em;
+    width: 50em;
 }
 
 code {
@@ -49,23 +52,35 @@ h1 {
     color: #0000C0;
 }
 
+h1.title {
+    font-size: 250%;
+    font-weight: bold;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    text-align: left;
+    border: none;
+}
+
 h2 {    /* API groups */
     font-size: 220%;
-    padding-top: 1em;
+    margin-top: 3em;
     border-top: double black;
+    padding-top: 1em;
 }
 
 h3 {   /* API Functions */
     font-size: 200%;
     margin-top: 2em;
-    padding-top: 1em;
     border-top: 1px solid gray;
+    padding-top: 1em;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.2em;
     color: #0000C0;
 }
 
 h4 {   /* e.g. "Syntax", "Examples" */
     font-size: 140%;
-    margin-top: 2em;
+    margin-top: 1.5em;
     margin-bottom: 0;
 }
 
@@ -78,29 +93,23 @@ h5 {   /* parameters and return value */
     padding-bottom: 0;
 }
 
-h1.title {
-    font-size: 250%;
-    font-weight: bold;
-    padding-top: 0.2em;
-    padding-bottom: 0.2em;
-    text-align: left;
-    border: none;
-}
-
-/* 
-dt code {
-    font-weight: bold;
-}
-
-dd p {
-    margin-top: 0;
-}
-
-#footer {
-    padding-top: 1em;
-    font-size: 70%;
-    color: gray;
+h6 {   /* Contents back links */
+    font-family: Verdana, sans-serif;
+    font-size: 10pt;
+    font-weight: normal;
+    line-height: 100%;
+    margin-bottom: 0;
+    margin-top: 3em;
+    padding-top: 0;
+    padding-bottom: 0;
     text-align: center;
 }
 
-*/
+footer {
+    margin-top: 6em; 
+    border-top: double black; 
+    padding-top: 2em;
+    margin-bottom: 10em;
+    text-align: center; 
+}
+
