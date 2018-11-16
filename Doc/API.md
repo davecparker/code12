@@ -1655,62 +1655,202 @@ error = ct.isError( ct.parseNumber( "nope" ) );
 ###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.isError()]
 
 
-
-
 Type Conversion
 ---------------
+These functions allow you to convert text strings to numbers and vice-versa.
+
+* [ct.parseInt()]
+* [ct.parseNumber()]
+* [ct.canParseInt()]
+* [ct.canParseNumber()]
+* [ct.formatInt()]
+* [ct.formatDecimal()]
+
 ### ct.parseInt()
-```
-int ct.parseInt( String str )
-```
-If `str` can be converted to (parsed as) an integer,
-then return the integer value, otherwise return 0.
+Reads an [int](#java-data-types) value in a [String](#java-data-types).
 
-> Since 0 is a valid integer, it is a good idea to
-> test the string with `ct.canParseInt()` first.
+#### Syntax
+```
+ct.parseInt( str )
+```
+##### str
+([String](#java-data-types)). A string containing an integer, for example "34".
 
-### ct.canParseInt()
+##### *Return Value*
+([int](#java-data-types)). If `str` is a valid integer in text form (digit characters),
+then the integer value is returned, otherwise 0 is returned.
+
+> Since 0 is also a valid integer, it is a good idea to
+> test the string with [ct.canParseInt()] first.
+
+#### Examples
 ```
-boolean ct.canParseInt( String str )
+int a = ct.parseInt( "546" );      // sets a to 546
+int b = ct.parseInt( "  -3 " );    // sets b to -3
 ```
-If `str` can be converted to (parsed as) an integer,
-then return `true`, otherwise return `false`.
+```
+int c = ct.parseInt( "six");       // sets c to 0
+int d = ct.parseInt( "4 more" );   // sets d to 0
+```
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.parseInt()]
+
 
 ### ct.parseNumber()
-```
-double ct.parseNumber( String str )
-```
-If `str` can be converted to (parsed as) a number,
-then return the value as a `double`,
-otherwise return the NaN (Not a Number) error value.
+Reads a [double](#java-data-types) value in a [String](#java-data-types).
 
-> To test for NaN, use `ct.isError()`
+#### Syntax
+```
+ct.parseNumber( str )
+```
+##### str
+([String](#java-data-types)). A string containing an number, for example "-2.15".
+
+##### *Return Value*
+([double](#java-data-types)). If `str` is a valid number in text form, then
+the numeric value is returned, otherwise the special error value NaN (Not a Number)
+is returned.
+
+> To test for NaN, use [ct.isError()]
+
+#### Examples
+```
+int a = ct.parseNumber( "5" );           // sets a to 5.0
+int b = ct.parseNumber( "  -3.02 " );    // sets b to -3.02
+```
+```
+String entry = "$24.99";
+double amount = ct.parseNumber( entry );    // sets amount to NaN
+if (ct.isError( amount ))
+	ct.println( "Invalid number format" );
+```
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.parseNumber()]
+
+
+### ct.canParseInt()
+Returns `true` if a specified [String](#java-data-types) is a valid integer 
+in text form.
+
+#### Syntax
+```
+ct.canParseInt( str )
+```
+##### str
+([String](#java-data-types)). The string to test.
+
+##### *Return Value*
+([boolean](#java-data-types)). `true` if `str` is a valid integer in text form,
+otherwise `false`.
+
+#### Example
+```
+String entry = "13";
+
+if (ct.canParseInt( entry ))
+{
+	int n = ct.parseInt( entry );
+	ct.println( "The number is " + n );
+}
+else
+{
+	ct.println( "Not a valid integer" );
+}
+```
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.canParseInt()]
+
 
 ### ct.canParseNumber()
-```
-boolean ct.canParseNumber( String str )
-```
-If `str` can be converted to (parsed as) a number,
-then return `true`, otherwise return `false`.
+Returns `true` if a specified [String](#java-data-types) is a valid number 
+in text form.
 
-### ct.formatDecimal()
+#### Syntax
 ```
-String ct.formatDecimal( double number )
-String ct.formatDecimal( double number, int numPlaces )
+ct.canParseNumber( str )
 ```
-Return the value of `number` converted to a string.
-If `numPlaces` is included, then format the output
-to exactly this many places past the decimal point,
-rounding or adding extra zeros as necessary.
+##### str
+([String](#java-data-types)). The string to test.
+
+##### *Return Value*
+([boolean](#java-data-types)). `true` if `str` is a valid number in text form,
+otherwise `false`.
+
+#### Example
+```
+String entry = "-0.99";
+
+if (ct.canParseNumber( entry ))
+{
+	double num = ct.parseNumber( entry );
+	ct.println( "The number is " + num );
+}
+else
+{
+	ct.println( "Not a valid number" );
+}
+```
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.canParseNumber()]
+
 
 ### ct.formatInt()
+Returns a text ([String](#java-data-types)) representation of an integer 
+([int](#java-data-types)).
+
+#### Syntax
 ```
-String ct.formatInt( int number )
-String ct.formatInt( int number, int numDigits )
+ct.formatInt( num );
+ct.formatInt( num, numDigits );
 ```
-Return the value of `number` converted to a string.
-If numDigits is included, then format to this many digits,
-adding leading zeros as necessary.
+##### num
+([int](#java-data-types)). An integer value, for example 32.
+
+##### numDigits
+([int](#java-data-types), optional). If `numDigits` is included, then the text
+returned will have at least this many characters, adding leading zeros as necessary.
+
+##### *Return Value*
+([String](#java-data-types)). The text representation of `num`, for example "32".
+
+#### Examples
+```
+String text = ct.formatInt( 32 );         // sets text to "32"
+```
+```
+int score = 520;
+String text = ct.formatInt( score, 6 );   // sets text to "000520"
+ct.text( text, 5, 20, 10 );               // displays score on the graphics screen
+```
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.formatInt()]
+
+
+### ct.formatDecimal()
+Returns a text ([String](#java-data-types)) representation of a number 
+([double](#java-data-types)).
+
+#### Syntax
+```
+ct.formatDecimal( number );
+ct.formatDecimal( number, numPlaces );
+```
+##### number
+([double](#java-data-types)). Any numeric value.
+
+##### numPlaces
+([int](#java-data-types), optional). If `numPlaces` is included, then the text
+is formatted to exactly this many places past the decimal point, rounding or 
+adding extra zeros as necessary.
+
+##### *Return Value*
+([String](#java-data-types)). The text representation of `number`.
+
+#### Examples
+```
+double x = 1.250;
+String text = ct.formatDecimal( x );       // sets text to "1.25"
+```
+```
+double a = 3.14159;
+String text = ct.formatDecimal( a, 4 );    // sets text to "3.1416"
+```
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.formatDecimal()]
 
 
 Program Control

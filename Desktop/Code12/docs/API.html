@@ -963,32 +963,127 @@ error = ct.isError( Math.sqrt( -1 ) );
 error = ct.isError( ct.parseNumber( &quot;nope&quot; ) );</code></pre>
 <h6 id="code12-function-reference-math-utilities-ct.iserror"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.iserror">ct.isError()</a></h6>
 <h2 id="type-conversion">Type Conversion</h2>
+<p>These functions allow you to convert text strings to numbers and vice-versa.</p>
+<ul>
+<li><a href="#ct.parseint">ct.parseInt()</a></li>
+<li><a href="#ct.parsenumber">ct.parseNumber()</a></li>
+<li><a href="#ct.canparseint">ct.canParseInt()</a></li>
+<li><a href="#ct.canparsenumber">ct.canParseNumber()</a></li>
+<li><a href="#ct.formatint">ct.formatInt()</a></li>
+<li><a href="#ct.formatdecimal">ct.formatDecimal()</a></li>
+</ul>
 <h3 id="ct.parseint">ct.parseInt()</h3>
-<pre><code>int ct.parseInt( String str )</code></pre>
-<p>If <code>str</code> can be converted to (parsed as) an integer, then return the integer value, otherwise return 0.</p>
+<p>Reads an <a href="#java-data-types">int</a> value in a <a href="#java-data-types">String</a>.</p>
+<h4 id="syntax-43">Syntax</h4>
+<pre><code>ct.parseInt( str )</code></pre>
+<h5 id="str">str</h5>
+<p>(<a href="#java-data-types">String</a>). A string containing an integer, for example “34”.</p>
+<h5 id="return-value-26"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). If <code>str</code> is a valid integer in text form (digit characters), then the integer value is returned, otherwise 0 is returned.</p>
 <blockquote>
-<p>Since 0 is a valid integer, it is a good idea to test the string with <code>ct.canParseInt()</code> first.</p>
+<p>Since 0 is also a valid integer, it is a good idea to test the string with <a href="#ct.canparseint">ct.canParseInt()</a> first.</p>
 </blockquote>
-<h3 id="ct.canparseint">ct.canParseInt()</h3>
-<pre><code>boolean ct.canParseInt( String str )</code></pre>
-<p>If <code>str</code> can be converted to (parsed as) an integer, then return <code>true</code>, otherwise return <code>false</code>.</p>
+<h4 id="examples-14">Examples</h4>
+<pre><code>int a = ct.parseInt( &quot;546&quot; );      // sets a to 546
+int b = ct.parseInt( &quot;  -3 &quot; );    // sets b to -3</code></pre>
+<pre><code>int c = ct.parseInt( &quot;six&quot;);       // sets c to 0
+int d = ct.parseInt( &quot;4 more&quot; );   // sets d to 0</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.parseint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.parseint">ct.parseInt()</a></h6>
 <h3 id="ct.parsenumber">ct.parseNumber()</h3>
-<pre><code>double ct.parseNumber( String str )</code></pre>
-<p>If <code>str</code> can be converted to (parsed as) a number, then return the value as a <code>double</code>, otherwise return the NaN (Not a Number) error value.</p>
+<p>Reads a <a href="#java-data-types">double</a> value in a <a href="#java-data-types">String</a>.</p>
+<h4 id="syntax-44">Syntax</h4>
+<pre><code>ct.parseNumber( str )</code></pre>
+<h5 id="str-1">str</h5>
+<p>(<a href="#java-data-types">String</a>). A string containing an number, for example “-2.15”.</p>
+<h5 id="return-value-27"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). If <code>str</code> is a valid number in text form, then the numeric value is returned, otherwise the special error value NaN (Not a Number) is returned.</p>
 <blockquote>
-<p>To test for NaN, use <code>ct.isError()</code></p>
+<p>To test for NaN, use <a href="#ct.iserror">ct.isError()</a></p>
 </blockquote>
+<h4 id="examples-15">Examples</h4>
+<pre><code>int a = ct.parseNumber( &quot;5&quot; );           // sets a to 5.0
+int b = ct.parseNumber( &quot;  -3.02 &quot; );    // sets b to -3.02</code></pre>
+<pre><code>String entry = &quot;$24.99&quot;;
+double amount = ct.parseNumber( entry );    // sets amount to NaN
+if (ct.isError( amount ))
+    ct.println( &quot;Invalid number format&quot; );</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.parsenumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.parsenumber">ct.parseNumber()</a></h6>
+<h3 id="ct.canparseint">ct.canParseInt()</h3>
+<p>Returns <code>true</code> if a specified <a href="#java-data-types">String</a> is a valid integer in text form.</p>
+<h4 id="syntax-45">Syntax</h4>
+<pre><code>ct.canParseInt( str )</code></pre>
+<h5 id="str-2">str</h5>
+<p>(<a href="#java-data-types">String</a>). The string to test.</p>
+<h5 id="return-value-28"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if <code>str</code> is a valid integer in text form, otherwise <code>false</code>.</p>
+<h4 id="example-29">Example</h4>
+<pre><code>String entry = &quot;13&quot;;
+
+if (ct.canParseInt( entry ))
+{
+    int n = ct.parseInt( entry );
+    ct.println( &quot;The number is &quot; + n );
+}
+else
+{
+    ct.println( &quot;Not a valid integer&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.canparseint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.canparseint">ct.canParseInt()</a></h6>
 <h3 id="ct.canparsenumber">ct.canParseNumber()</h3>
-<pre><code>boolean ct.canParseNumber( String str )</code></pre>
-<p>If <code>str</code> can be converted to (parsed as) a number, then return <code>true</code>, otherwise return <code>false</code>.</p>
-<h3 id="ct.formatdecimal">ct.formatDecimal()</h3>
-<pre><code>String ct.formatDecimal( double number )
-String ct.formatDecimal( double number, int numPlaces )</code></pre>
-<p>Return the value of <code>number</code> converted to a string. If <code>numPlaces</code> is included, then format the output to exactly this many places past the decimal point, rounding or adding extra zeros as necessary.</p>
+<p>Returns <code>true</code> if a specified <a href="#java-data-types">String</a> is a valid number in text form.</p>
+<h4 id="syntax-46">Syntax</h4>
+<pre><code>ct.canParseNumber( str )</code></pre>
+<h5 id="str-3">str</h5>
+<p>(<a href="#java-data-types">String</a>). The string to test.</p>
+<h5 id="return-value-29"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if <code>str</code> is a valid number in text form, otherwise <code>false</code>.</p>
+<h4 id="example-30">Example</h4>
+<pre><code>String entry = &quot;-0.99&quot;;
+
+if (ct.canParseNumber( entry ))
+{
+    double num = ct.parseNumber( entry );
+    ct.println( &quot;The number is &quot; + num );
+}
+else
+{
+    ct.println( &quot;Not a valid number&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.canparsenumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.canparsenumber">ct.canParseNumber()</a></h6>
 <h3 id="ct.formatint">ct.formatInt()</h3>
-<pre><code>String ct.formatInt( int number )
-String ct.formatInt( int number, int numDigits )</code></pre>
-<p>Return the value of <code>number</code> converted to a string. If numDigits is included, then format to this many digits, adding leading zeros as necessary.</p>
+<p>Returns a text (<a href="#java-data-types">String</a>) representation of an integer (<a href="#java-data-types">int</a>).</p>
+<h4 id="syntax-47">Syntax</h4>
+<pre><code>ct.formatInt( num );
+ct.formatInt( num, numDigits );</code></pre>
+<h5 id="num">num</h5>
+<p>(<a href="#java-data-types">int</a>). An integer value, for example 32.</p>
+<h5 id="numdigits">numDigits</h5>
+<p>(<a href="#java-data-types">int</a>, optional). If <code>numDigits</code> is included, then the text returned will have at least this many characters, adding leading zeros as necessary.</p>
+<h5 id="return-value-30"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). The text representation of <code>num</code>, for example “32”.</p>
+<h4 id="examples-16">Examples</h4>
+<pre><code>String text = ct.formatInt( 32 );         // sets text to &quot;32&quot;</code></pre>
+<pre><code>int score = 520;
+String text = ct.formatInt( score, 6 );   // sets text to &quot;000520&quot;
+ct.text( text, 5, 20, 10 );               // displays score on the graphics screen</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.formatint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.formatint">ct.formatInt()</a></h6>
+<h3 id="ct.formatdecimal">ct.formatDecimal()</h3>
+<p>Returns a text (<a href="#java-data-types">String</a>) representation of a number (<a href="#java-data-types">double</a>).</p>
+<h4 id="syntax-48">Syntax</h4>
+<pre><code>ct.formatDecimal( number );
+ct.formatDecimal( number, numPlaces );</code></pre>
+<h5 id="number-2">number</h5>
+<p>(<a href="#java-data-types">double</a>). Any numeric value.</p>
+<h5 id="numplaces-1">numPlaces</h5>
+<p>(<a href="#java-data-types">int</a>, optional). If <code>numPlaces</code> is included, then the text is formatted to exactly this many places past the decimal point, rounding or adding extra zeros as necessary.</p>
+<h5 id="return-value-31"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). The text representation of <code>number</code>.</p>
+<h4 id="examples-17">Examples</h4>
+<pre><code>double x = 1.250;
+String text = ct.formatDecimal( x );       // sets text to &quot;1.25&quot;</code></pre>
+<pre><code>double a = 3.14159;
+String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</code></pre>
+<h6 id="code12-function-reference-type-conversion-ct.formatdecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.formatdecimal">ct.formatDecimal()</a></h6>
 <h2 id="program-control">Program Control</h2>
 <h3 id="ct.gettimer">ct.getTimer()</h3>
 <pre><code>int ct.getTimer()</code></pre>
@@ -1095,7 +1190,7 @@ String ct.formatInt( int number, int numDigits )</code></pre>
 <h3 id="obj.tostring">obj.toString()</h3>
 <pre><code>String obj.toString()</code></pre>
 <p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
-<h5 id="examples-14">Examples:</h5>
+<h5 id="examples-18">Examples:</h5>
 <pre><code>[circle at (70, 25)]
 [text at (50, 10) &quot;Score 3200&quot;]
 [image at (21, 83) &quot;goldfish.png&quot;]
