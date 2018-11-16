@@ -34,12 +34,15 @@ local function clickEvent(event, gameObj)
 
 	-- Get logical click location 
 	local xP, yP = g.mainGroup:contentToLocal(event.x, event.y)
-	local x = xP / g.scale + g.screen.originX
-	local y = yP / g.scale + g.screen.originY
+	local xOrigin = g.screen.originX
+	local yOrigin = g.screen.originY
+	local x = xP / g.scale + xOrigin
+	local y = yP / g.scale + yOrigin
 
 	if phase == "began" then
 		-- Ignore click if not in the game area
-		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
+		if x < xOrigin or x > g.WIDTH + xOrigin 
+				or y < yOrigin or y > g.height + yOrigin then
 			return false
 		end
 
@@ -78,17 +81,10 @@ local function clickEvent(event, gameObj)
 	elseif event.target ~= focusObj then
 		return false    -- click did not begin on this object
 	elseif phase == "moved" then
-		-- Ignore this drag point if not in the game area
-		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
-			return false
-		end
-
-		-- Call client event
+		-- Call client move event
 		runtime.runEventFunction(ct.userFns.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
-		-- Call client event, forcing the final point inside the game area
-		x = g.pinValue(x, 0, g.WIDTH)
-		y = g.pinValue(y, 0, g.height)
+		-- Call client release event
 		runtime.runEventFunction(ct.userFns.onMouseRelease, gameObj, x, y)
 	end
 	return true
