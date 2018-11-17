@@ -1853,13 +1853,13 @@
                             block: block { #stmts = 1 }
                                 stmts:
 546.                                assign (=)
-                                        lValue: lValue { varID = img, fieldID = autoDelete }
+                                        lValue: lValue { varID = img, fieldID = clickable }
                                         expr: lValue { varID = img, fieldID = visible }
 547.                    assign (=)
                             lValue: lValue { varID = line, fieldID = group }
                             expr: lValue { varID = s }
 548.                    assign (=)
-                            lValue: lValue { varID = line, fieldID = autoDelete }
+                            lValue: lValue { varID = line, fieldID = clickable }
                             expr: (||)
                                 right: (&&)
                                     right: (==) { right = 1 }
@@ -2343,7 +2343,7 @@
 726.                    var exponentialNumberNoDot { vt = int, initExpr = 12e10 }
 728.                    var exponentialNumberWithDot { vt = int, initExpr = 3.42e2 }
 730.                    assign (=)
-                            lValue: lValue { varID = objVar, fieldID = autoDelete }
+                            lValue: lValue { varID = objVar, fieldID = clickable }
                             expr: lValue { varID = dblVar }
 732.                    assign (=) { expr = 3.14 }
                             lValue: lValue { varID = strVar }

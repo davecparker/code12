@@ -1158,12 +1158,6 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 <blockquote>
 <p>If you stack two objects and want to use the bottom object to test for hits (for example a rectangle with a text label on top of it), then you can set the <code>clickable</code> field of the top object to <code>false</code>, which will cause the click to “pass through” to the object below it.</p>
 </blockquote>
-<h3 id="obj.autodelete">obj.autoDelete</h3>
-<pre><code>boolean autoDelete     // auto delete if it goes from on to off-screen</code></pre>
-<p>If you set the <code>autoDelete</code> field of an object to <code>true</code> (default <code>false</code>), then the object will be automatically deleted if it moves off-screen (outside of the application window).</p>
-<blockquote>
-<p>If an object is created initially off-screen, it will not be automatically deleted until it has moved on-screen, then off-screen again.</p>
-</blockquote>
 <h3 id="obj.group">obj.group</h3>
 <pre><code>String group</code></pre>
 <p>The <code>group</code> field is an optional name that you can assign to an object that will cause the function <code>ct.clearGroup()</code> to delete all objects with the matching group name. The default group name of an object is &quot;&quot; (empty string)</p>

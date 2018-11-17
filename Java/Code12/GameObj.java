@@ -12,7 +12,6 @@ public abstract class GameObj implements GameObjInterface
    public double xSpeed, ySpeed;    // velocity
    public boolean visible;          // true if object is visible
    public boolean clickable;        // true if object is clickable
-   public boolean autoDelete;       // true to auto delete object if it goes off-screen
    public String group;             // group name, default ""
 
    // Protected instance variables
@@ -25,7 +24,6 @@ public abstract class GameObj implements GameObjInterface
    protected int lineWidth;         // line/frame thickness in pixels
    protected int layer;             // stacking layer, default 1
    protected String text;           // text to draw or use for log name, or null
-   protected boolean onScreenPrev;  // true if object was on-screen last time we checked
    protected boolean deleted;       // true when object is deleted from screen
 
 
@@ -40,7 +38,6 @@ public abstract class GameObj implements GameObjInterface
       ySpeed = 0;
       visible = true;
       clickable = true;
-      autoDelete = false;
       group = "";
 
       this.game = game;
@@ -52,7 +49,6 @@ public abstract class GameObj implements GameObjInterface
       lineWidth = 1;
       layer = 1;
       text = null;
-      onScreenPrev = false;
       deleted = false;
    }
 
@@ -184,25 +180,6 @@ public abstract class GameObj implements GameObjInterface
                        game.pinValue(b, 0, 255));
    }
 
-   // Return true if the object is at least partially within the screen area
-   private boolean onScreen()
-   {
-      // Test each side, taking alignment into account.
-      double left = x - (width * xAlignFactor);
-      if (left > game.getWidth())
-         return false;
-      double right = left + width;
-      if (right < 0)
-         return false;
-      double top =  y - (height * yAlignFactor);
-      if (top > game.getHeight())
-         return false;
-      double bottom = top + height;
-      if (bottom < 0)
-         return false;
-      return true;
-   }
-
    // Set xAlignFactor and yAlignFactor given alignment string
    private void setAlignFromString(String a)
    {
@@ -280,21 +257,6 @@ public abstract class GameObj implements GameObjInterface
       // Apply current velocity
       x += xSpeed;
       y += ySpeed;
-   }
-
-   // Return true if the object should be automatically deleted (autoDelete set,
-   // went off-screen, but was at one point on-screen).
-   protected boolean shouldAutoDelete()
-   {
-      if (!autoDelete)
-         return false;
-
-      boolean onScreenNow = onScreen();
-      boolean wentOff = false;
-      if (onScreenPrev)
-         wentOff = !onScreenNow;
-      onScreenPrev = onScreenNow;
-      return wentOff;
    }
    
    // Mark the object as deleted

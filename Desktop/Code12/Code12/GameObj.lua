@@ -62,7 +62,6 @@ function GameObj:new(typeName, x, y, width, height)
 		ySpeed = 0,
 		visible = true,
 		clickable = true,
-		autoDelete = false,
 		group = "",
 
 		-- Private fields
@@ -79,7 +78,6 @@ function GameObj:new(typeName, x, y, width, height)
 		widthPrev = 0,
 		heightPrev = 0,
 		scalePrev = 0,
-		onScreenPrev = false,
 	}
 
 	-- Assign default methods
@@ -585,45 +583,6 @@ function GameObj:lineHitObj(gameObj2)
       end
       return slantLineHitRect(self, left, right, top, bottom, left2, right2, top2, bottom2)
    end
-end
-
--- Return true if the object is at least partially within the screen area
-function GameObj:onScreen()
-	-- Test each side, taking alignment into account.
-	local obj = self.obj
-	local left = self.x - (self.width * obj.anchorX)
-	if left > g.WIDTH then
-		return false
-	end
-	local right = left + self.width
-	if right < 0 then
-		return false
-	end
-	local top =  self.y - (self.height * obj.anchorY)
-	if top > g.height then
-		return false
-	end
-	local bottom = top + self.height
-	if bottom < 0 then
-		return false
-	end         
-	return true   
-end
-
--- Return true if the object should be automatically deleted (autoDelete true
--- and went off-screen, but was at one point on-screen).
-function GameObj:shouldAutoDelete()
-	if not self.autoDelete then
-		return false
-	end
-
-	local onScreenNow = self:onScreen()
-	local wentOff = false
-	if self.onScreenPrev then
-		wentOff = not onScreenNow
-	end
-	self.onScreenPrev = onScreenNow
-	return wentOff
 end
 
 

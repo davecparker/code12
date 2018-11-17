@@ -119,8 +119,6 @@ return {
         ["yspeed"] = "ySpeed",
         ["visible"] = { vt = true },
         ["clickable"] = { vt = true },
-        ["autoDelete"] = { vt = true },
-        ["autodelete"] = "autoDelete",
         ["group"] = { vt = "String" },
     },
     methods = {

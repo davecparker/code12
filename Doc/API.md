@@ -2032,17 +2032,6 @@ clicks and pass them through to the object below, if any.
 > set the `clickable` field of the top object to `false`, which will cause
 > the click to "pass through" to the object below it.
 
-### obj.autoDelete
-```
-boolean autoDelete     // auto delete if it goes from on to off-screen
-```
-If you set the `autoDelete` field of an object to `true` (default `false`),
-then the object will be automatically deleted if it moves off-screen
-(outside of the application window).
-
-> If an object is created initially off-screen, it will not be automatically
-> deleted until it has moved on-screen, then off-screen again.
-
 ### obj.group
 ```
 String group

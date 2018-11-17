@@ -131,10 +131,10 @@ public class GameScreen
       {
          GameObj obj = objects.get(i);
          
-         // Check for autoDelete
-         if (obj.shouldAutoDelete())
-            objects.remove(i);
-         else
+         // TODO: Check for auto deletion
+         // if (obj.shouldAutoDelete())
+         //   objects.remove(i);
+         // else
          { 
             obj.update();
             i++;

@@ -78,11 +78,11 @@ local function onNewFrame()
 		local objs = g.screen.objs
 		local i = 1
 		while i <= objs.numChildren do
-			-- Check for autoDelete first
+			-- TODO: Check for auto deletion
 			local gameObj = objs[i].code12GameObj
-			if gameObj:shouldAutoDelete() then
-				gameObj:removeAndDelete()
-			else
+			-- if gameObj:shouldAutoDelete() then
+			--	gameObj:removeAndDelete()
+			--else
 				-- Update objects if running and userFn didn't yield
 				if g.runState == "running" and status ~= "yielded" then
 					gameObj:updateForNextFrame()
@@ -90,7 +90,7 @@ local function onNewFrame()
 				-- Always sync the objects so the display is correct
 				gameObj:sync()
 				i = i + 1
-			end
+			--end
 		end
 	end
 

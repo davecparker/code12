@@ -53,7 +53,7 @@ local scrollOffset            -- starting line if scrolled back or nil if at end
 local arrayAssigned           -- true when an array has been assigned and displayData needs to be updated 
 local scrollOffsetChanged     -- true when scrollOffset has changed and displayRows needs to be updated
 local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
-                        "visible", "clickable", "autoDelete", "group" }
+                        "visible", "clickable", "group" }
 local numGameObjFields = #gameObjFields
 
 
@@ -340,7 +340,7 @@ function varWatch.init()
 	scrollOffset = 0
 	charWidth = app.consoleFontCharWidth
 	rowHeight = app.consoleFontHeight + 2
-	maxGameObjFieldWidth = charWidth * string.len(".autoDelete")
+	maxGameObjFieldWidth = charWidth * string.len(".clickable")
 	centerColWidth = dropDownBtnSize * 3 + maxGameObjFieldWidth + padding
 	Runtime:addEventListener( "enterFrame", onNewFrame )
 end

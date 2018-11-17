@@ -71,7 +71,6 @@ class BasicTest extends Code12Program
          fish.clickable = true;
          ct.log(fish);
          fish.xSpeed = -1;
-         // fish.autoDelete = true;
       }
             
       ct.setSoundVolume(0.7);

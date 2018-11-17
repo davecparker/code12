@@ -543,9 +543,9 @@ int underIndentedInstanceVar;
 		if (img.visible)
 			img.clickable = true;
 		if (img.clickable != false)
-			img.autoDelete = img.visible;
+			img.clickable = img.visible;
 		line.group = s;
-		line.autoDelete = s.equals("hello") || s.equals("world") && s.indexOf(line.group) == 1;
+		line.clickable = s.equals("hello") || s.equals("world") && s.indexOf(line.group) == 1;
 		// Code12 API -- GameObj Methods
 		s = rect.getType();
 		ct.println(text.getText() + "more text");
@@ -727,7 +727,7 @@ int underIndentedInstanceVar;
 		// ERROR "Value of type double cannot be assigned to an int"
 		int exponentialNumberWithDot = 3.42e2;
 		// ERROR "Value of type double cannot be assigned to type boolean"
-		objVar.autoDelete = dblVar;
+		objVar.clickable = dblVar;
 		// ERROR "Value of type double cannot be assigned to a String"
 		strVar = 3.14;
 		// ERROR "Value of type double cannot be assigned to type GameObj"
