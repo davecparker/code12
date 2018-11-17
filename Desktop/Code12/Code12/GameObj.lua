@@ -66,23 +66,21 @@ function GameObj:new(typeName, x, y, width, height)
 		autoDelete = false,
 		group = "",
 
-		-- Private fields (hidden somewhat to prevent accidental access)
-		_code12 = {
-			typeName = typeName,     -- "circle", "rect", etc.
-			obj = nil,               -- the Corona display object
-			text = nil,
-			fillColor = nil,
-			lineColor = nil,
-			layer = 1,
-			adjustY = false,
-			deleted = false,
+		-- Private fields
+		typeName = typeName,     -- "circle", "rect", etc.
+		obj = nil,               -- the Corona display object
+		text = nil,
+		fillColor = nil,
+		lineColor = nil,
+		layer = 1,
+		adjustY = false,
+		deleted = false,
 
-			-- Stored previous values so we can detect changes on the fly
-			widthPrev = 0,
-			heightPrev = 0,
-			scalePrev = 0,
-			onScreenPrev = false,
-		},
+		-- Stored previous values so we can detect changes on the fly
+		widthPrev = 0,
+		heightPrev = 0,
+		scalePrev = 0,
+		onScreenPrev = false,
 	}
 
 	-- Assign default methods
@@ -103,26 +101,26 @@ end
 -- Set the Corona display object for a GameObj
 function GameObj:setObj(obj)
 	-- Both objects have a reference to each other
-	self._code12.obj = obj
+	self.obj = obj
 	if obj ~= nil then
 		obj.code12GameObj = self
 		obj:addEventListener("touch", g.onTouchGameObj)
-		self:setLayer(self._code12.layer)
+		self:setLayer(self.layer)
 	end
 end
 
 -- Remove a GameObj and delete the display object.
 -- The GameObj will be subject to garbage collection when outstanding refs to it are gone.
 function GameObj:removeAndDelete()
-	if self._code12.deleted then  -- This object was already deleted
+	if self.deleted then  -- This object was already deleted
 		runtime.warning("Attempt to delete an object that was already deleted")
 		return
 	end
-	local obj = self._code12.obj
+	local obj = self.obj
 	obj.code12GameObj = nil    -- remove display object's reference to the GameObj
 	obj:removeSelf()	       -- remove and destroy the display object
-	self._code12.obj = GameObj.dummyObj    -- dummy display object to help client avoid crashes
-	self._code12.deleted = true
+	self.obj = GameObj.dummyObj    -- dummy display object to help client avoid crashes
+	self.deleted = true
 	self.visible = false       -- to reduce impact of any stale references
 	self.clickable = false
 end
@@ -154,8 +152,8 @@ end
 function GameObj:newLine(group, x1, y1, x2, y2, colorName)
 	local gameObj = GameObj:new("line", x1, y1, x2 - x1, y2 - y1)
 	gameObj:setObj(display.newLine(group, x1, y1, x2, y2))
-	gameObj._code12.widthPrev = gameObj.width
-	gameObj._code12.heightPrev = gameObj.height
+	gameObj.widthPrev = gameObj.width
+	gameObj.heightPrev = gameObj.height
 	gameObj.updateSize = GameObj.updateSizeLine   -- override sizing method
 	gameObj.objContainsPoint = GameObj.lineContainsPoint   -- override hit test method
 	gameObj.hitObj = GameObj.lineHitObj   -- override collision test method
@@ -173,10 +171,10 @@ function GameObj:newText(group, text, x, y, height, colorName)
 	-- print("newText height vs obj height:", height, obj.height / g.scale)
 	gameObj:setObj(obj)
 	gameObj.width = obj.width / g.scale  -- Corona measured when obj created
-	gameObj._code12.widthPrev = gameObj.width
-	gameObj._code12.heightPrev = gameObj.height
+	gameObj.widthPrev = gameObj.width
+	gameObj.heightPrev = gameObj.height
 	gameObj.updateSize = GameObj.updateSizeText   -- override sizing method
-	gameObj._code12.text = text
+	gameObj.text = text
 	gameObj:setFillColorFromName(colorName or "black")
 	return gameObj
 end
@@ -223,12 +221,11 @@ end
 -- Sync the Corona display object for this GameObj
 function GameObj:sync()
 	-- Visibility
-	local p = self._code12
-	local obj = p.obj
+	local obj = self.obj
 	obj.isVisible = self.visible
 	if self.visible then
 		-- Line width
-		if self._code12.lineColor then
+		if self.lineColor then
 			obj.strokeWidth = self.lineWidth
 		else
 			obj.strokeWidth = 0
@@ -243,9 +240,9 @@ function GameObj:sync()
 		self:updateSize(scale)   -- calls type-specific methods below
 
 		-- Remember values used for last sync
-		p.widthPrev = self.width
-		p.heightPrev = self.height
-		p.scalePrev = scale
+		self.widthPrev = self.width
+		self.heightPrev = self.height
+		self.scalePrev = scale
 	end
 end
 
@@ -258,14 +255,14 @@ end
  
 -- Update the size for the display object for a rectangular object
 function GameObj:updateSizeRect(scale)
-	local obj = self._code12.obj
+	local obj = self.obj
 	obj.width = self.width * scale
 	obj.height = self.height * scale
 end
 
 -- Update the size for a circle object
 function GameObj:updateSizeCircle(scale)
-	local obj = self._code12.obj
+	local obj = self.obj
 	obj.path.radius = (self.width / 2) * scale
 	obj.yScale = self.height / self.width   -- to allow ellipses
 end
@@ -273,12 +270,11 @@ end
 -- Update the size for the display object for a text object
 function GameObj:updateSizeText(scale)
 	-- If height or scale changed then determine and set new font size
-	local p = self._code12
 	local height = self.height
-	if scale ~= p.scalePrev or height ~= p.heightPrev then
+	if scale ~= self.scalePrev or height ~= self.heightPrev then
 		local fontSize = fontSizeFromHeight(height)   -- new font size
-		p.obj.size = math.max(1, fontSize)   -- 0 means default in Corona so 1 is as small we can go
-		self.width = self.width * height / p.heightPrev  -- new text width
+		self.obj.size = math.max(1, fontSize)   -- 0 means default in Corona so 1 is as small we can go
+		self.width = self.width * height / self.heightPrev  -- new text width
 	end
 end
 
@@ -287,11 +283,10 @@ end
 function GameObj:updateSizeLine(scale)
 	-- Line endpoints cannot be changed in Corona, so if the endpoint changed
 	-- then we need to delete and re-create the line display object.
-	local p = self._code12
-	local obj = p.obj
+	local obj = self.obj
 	local width = self.width
 	local height = self.height
-	if scale ~= p.scalePrev or width ~= p.widthPrev or height ~= p.heightPrev then
+	if scale ~= self.scalePrev or width ~= self.widthPrev or height ~= self.heightPrev then
 		-- Find object index in parent group
 		local group = obj.parent
 		for i = 1, group.numChildren do
@@ -302,7 +297,7 @@ function GameObj:updateSizeLine(scale)
 				local newObj = display.newLine(x, y, x + width * scale, y + height * scale)
 				self:setObj(newObj)
 				group:insert(i, newObj)   -- insert at same z-order as old line
-				self:setLineColorFromColor(p.lineColor)
+				self:setLineColorFromColor(self.lineColor)
 				newObj.strokeWidth = obj.strokeWidth
 				obj:removeSelf()          -- remove old line
 				break
@@ -314,11 +309,11 @@ end
 -- Update the object as necessary for a window resize from oldHeight to newHeight
 function GameObj:adjustForWindowResize(oldHeight, newHeight)
 	-- Adjust y coordinate if this object has adjustY set
-	if self._code12.adjustY then
+	if self.adjustY then
 		self.y = self.y * (newHeight / oldHeight)
 
 		-- Adjust second point if this is a line object
-		if self._code12.typeName == "line" then
+		if self.typeName == "line" then
 			self.height = self.height * (newHeight / oldHeight)
 		end
 	end
@@ -330,7 +325,7 @@ end
 -- Return true if the object bounding box contains (xPoint, yPoint)
 function GameObj:boundsContainsPoint(xPoint, yPoint)
 	-- Test each side, taking alignment into account.
-	local obj = self._code12.obj
+	local obj = self.obj
 	local left = self.x - (self.width * obj.anchorX)
 	if xPoint < left then
 		return false
@@ -360,7 +355,7 @@ function GameObj:circleContainsPoint(xPoint, yPoint)
 	-- Find ellipse center point considering alignment
 	local w = self.width
 	local h = self.height
-	local obj = self._code12.obj
+	local obj = self.obj
 	local xCenter = self.x + (w * (0.5 - obj.anchorX)) 
 	local yCenter = self.y + (h * (0.5 - obj.anchorY))
 
@@ -422,11 +417,11 @@ end
 -- Return true if this object intersects with gameObj2
 function GameObj:hitObj(gameObj2)
 	-- Just do a rectangle intersection test on the bounding rects.
-	if gameObj2._code12.typeName == "line" then
+	if gameObj2.typeName == "line" then
       return gameObj2:hitObj(self)
    end
-	local obj = self._code12.obj
-	local obj2 = gameObj2._code12.obj
+	local obj = self.obj
+	local obj2 = gameObj2.obj
 	local left = self.x - (self.width * obj.anchorX)
 	local right = left + self.width;
 	local left2 = gameObj2.x - (gameObj2.width * obj2.anchorX)
@@ -488,7 +483,7 @@ end
 
 -- Return true if this line intersects with gameObj2
 function GameObj:lineHitObj(gameObj2)
-   if gameObj2._code12.typeName == "line" then
+   if gameObj2.typeName == "line" then
       -- Do a rectangle intersection test on the bounding rects.
       local halfW = (self.lineWidth / g.scale) / 2
       local halfW2 = (gameObj2.lineWidth / g.scale) / 2
@@ -566,7 +561,7 @@ function GameObj:lineHitObj(gameObj2)
    -- gameObj2 is not a line
    -- Do a rectangle intersection test on the bounding rects.
       local halfW = (self.lineWidth / g.scale) / 2
-      local obj2 = gameObj2._code12.obj
+      local obj2 = gameObj2.obj
       local x, width = self.x, self.width
       local left = x
       local right = left + width
@@ -609,7 +604,7 @@ end
 -- Return true if the object is at least partially within the screen area
 function GameObj:onScreen()
 	-- Test each side, taking alignment into account.
-	local obj = self._code12.obj
+	local obj = self.obj
 	local left = self.x - (self.width * obj.anchorX)
 	if left > g.WIDTH then
 		return false
@@ -638,10 +633,10 @@ function GameObj:shouldAutoDelete()
 
 	local onScreenNow = self:onScreen()
 	local wentOff = false
-	if self._code12.onScreenPrev then
+	if self.onScreenPrev then
 		wentOff = not onScreenNow
 	end
-	self._code12.onScreenPrev = onScreenNow
+	self.onScreenPrev = onScreenNow
 	return wentOff
 end
 
@@ -668,7 +663,7 @@ local alignments = {
 function GameObj:setAlignmentFromName(alignment)
 	local anchorXY = alignments[string.lower(alignment)]
 	if anchorXY then
-		local obj = self._code12.obj
+		local obj = self.obj
 		obj.anchorX = anchorXY[1]
 		obj.anchorY = anchorXY[2]
 	else
@@ -728,8 +723,8 @@ end
 
 -- Set a GameObj's fill color from a color 3-array (nil for none)
 function GameObj:setFillColorFromColor(color)
-	self._code12.fillColor = color
-	local obj = self._code12.obj
+	self.fillColor = color
+	local obj = self.obj
 	if obj.setFillColor then  -- lines don't have a setFillColor method
 		if color then
 			obj:setFillColor(
@@ -744,8 +739,8 @@ end
 
 -- Set a GameObj's line color from a color 3-array (nil for none)
 function GameObj:setLineColorFromColor(color)
-	self._code12.lineColor = color  -- nil will set 0 strokeWidth at update
-	local obj = self._code12.obj
+	self.lineColor = color  -- nil will set 0 strokeWidth at update
+	local obj = self.obj
 	if color then
 		obj:setStrokeColor(
 				g.pinValue(color[1], 0, 255) / 255, 
@@ -769,28 +764,28 @@ end
 
 -- API
 function GameObj:getType()
-	return self._code12.typeName
+	return self.typeName
 end
 
 -- API
 function GameObj:getText()
-	return self._code12.text
+	return self.text
 end
 
 -- API
 function GameObj:setText(text)
-	self._code12.text = text
-	self._code12.obj.text = text
+	self.text = text
+	self.obj.text = text
 	-- TODO: Re-measure text
 end
 
 -- API
 function GameObj:toString()
 	-- e.g. [text at (30, 20) "Game Over"]
-	local s = "[" .. self._code12.typeName .. " at (" .. 
+	local s = "[" .. self.typeName .. " at (" .. 
 			math.round(self.x) .. ", " .. math.round(self.y) .. ")"
-	if self._code12.text then
-		s = s .. " \"" .. self._code12.text .. "\""
+	if self.text then
+		s = s .. " \"" .. self.text .. "\""
 	end
 	return s .. "]"
 end
@@ -806,7 +801,7 @@ end
 function GameObj:align(alignment, adjustY)
 	-- Set object alignment and remember adjustY
 	self:setAlignmentFromName(alignment or "center")
-	self._code12.adjustY = adjustY
+	self.adjustY = adjustY
 end
 
 -- API
@@ -831,21 +826,21 @@ end
 
 -- API
 function GameObj:getLayer()
-	return self._code12.layer;
+	return self.layer;
 end
 
 -- API
 function GameObj:setLayer(layer)
 	-- Change the stored layer number
-	self._code12.layer = layer
+	self.layer = layer
 
 	-- Re-insert the display object at the top the layer
-	local obj = self._code12.obj
+	local obj = self.obj
 	local objs = obj.parent
 	local i = objs.numChildren
 	while i > 0 do
 		local gameObj = objs[i].code12GameObj
-		if gameObj and gameObj ~= self and gameObj._code12.layer <= layer then
+		if gameObj and gameObj ~= self and gameObj.layer <= layer then
 			break
 		end
 		i = i - 1
@@ -873,10 +868,10 @@ function GameObj:hit(gameObj)
 	-- Make sure object is valid and visible first
 	if gameObj == nil then
 		return false
-	elseif gameObj._code12.deleted then
+	elseif gameObj.deleted then
 		runtime.warning("Attempt to test for hit with a deleted object")
 		return false
-	elseif self._code12.deleted then
+	elseif self.deleted then
 		runtime.warning("Attempt to call hit method on a deleted object")
 		return false
 	elseif not gameObj.visible then

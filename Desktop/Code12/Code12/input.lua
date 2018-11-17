@@ -54,7 +54,7 @@ local function clickEvent(event, gameObj)
 			local objs = g.screen.objs
 			for i = 1, objs.numChildren do
 				local gObj = objs[i].code12GameObj
-				if gObj.clickable and gObj._code12.typeName == "line" then
+				if gObj.clickable and gObj.typeName == "line" then
 					if gObj:lineContainsPoint(x, y) then
 						gameObj = gObj
 						focusObj = objs[i]
