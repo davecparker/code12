@@ -23,6 +23,14 @@ local GameObj = {}
 
 ---------------- Internal Functions  ----------------------------------------
 
+-- Return 0 if num is negative, else num.
+local function forceNotNegative(num)
+	if num < 0 then
+		return 0
+	end
+	return num
+end
+
 -- Return the Corona font size to use for a given logical object height at the
 -- current drawing scale, so that the GameObj and drawing object heights match.
 local function fontSizeFromHeight(height)
@@ -121,6 +129,7 @@ end
 
 -- Circle constructor
 function GameObj:newCircle(group, x, y, diameter, colorName)
+	diameter = forceNotNegative(diameter)
 	local gameObj = GameObj:new("circle", x, y, diameter, diameter)
 	gameObj:setObj(display.newCircle(group, x, y, diameter / 2))
 	gameObj.updateSize = GameObj.updateSizeCircle    -- override sizing method
@@ -132,6 +141,8 @@ end
 
 -- Rect constructor
 function GameObj:newRect(group, x, y, width, height, colorName)
+	width = forceNotNegative(width)
+	height = forceNotNegative(height)
 	local gameObj = GameObj:new("rect", x, y, width, height)
 	gameObj:setObj(display.newRect(group, x, y, width, height))
 	gameObj:setFillColorFromName(colorName or "yellow")
@@ -155,6 +166,7 @@ end
 -- Text constructor
 function GameObj:newText(group, text, x, y, height, colorName)
 	text = text or ""
+	height = forceNotNegative(height)
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
 	local obj = display.newText(group, text, x, y, textObjectFont,
 						fontSizeFromHeight(height))
@@ -171,6 +183,10 @@ end
 
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
+	width = forceNotNegative(width)
+	if filename == "" then
+		filename = nil
+	end
 	local obj = nil
 	if filename ~= nil then
 		-- If an app context tells us the media directory then use it, else current dir.
@@ -782,8 +798,8 @@ end
 -- API
 function GameObj:setSize(width, height)
 	-- This is just a convenience method to set the public fields
-	self.width = math.min( 0, width )
-	self.height = math.min( 0, height )
+	self.width = forceNotNegative(width)
+	self.height = forceNotNegative(height)
 end
 
 -- API
