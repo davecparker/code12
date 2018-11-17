@@ -2,13 +2,14 @@
 --
 -- audio.lua
 --
--- Implementation of the audio APIs for the Code 12 Lua runtime.
+-- Implementation of the audio APIs for the Code12 Lua runtime.
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local ct = require("Code12.ct")
-local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
 
 
@@ -22,6 +23,9 @@ local soundVolume = 1.0     -- Sound volume from 0.0 to 1.0
 -- Load the sound file if necessary, and return the sound or nil if failure.
 local function getSound(filename)
 	-- Is this sound already loaded?
+	if filename == nil then
+		return nil
+	end
 	local sound = sounds[filename]
 	if sound then
 		return sound
@@ -43,7 +47,7 @@ local function getSound(filename)
 	if sound then 
 		sounds[filename] = sound   -- cache it
 	else
-		g.warning("Cannot find sound file", filename)
+		runtime.warning("Cannot find sound file", filename)
 	end
 	return sound
 end
@@ -52,29 +56,13 @@ end
 ---------------- Audio API ---------------------------------------------
 
 -- API
-function ct.loadSound(filename, ...)
-	-- Check parameters
-	if filename == nil then
-		return
-	end
-	if g.checkAPIParams("ct.loadSound") then
-		g.check1Param("string", filename, ...)
-	end
-
+function ct.loadSound(filename)
 	-- Load and cache the sound
 	return (getSound(filename) ~= nil)
 end
 
 -- API
-function ct.sound(filename, ...)
-	-- Check parameters
-	if filename == nil then
-		return
-	end
-	if g.checkAPIParams("ct.sound") then
-		g.check1Param("string", filename, ...)
-	end
-
+function ct.sound(filename)
 	-- Load then play sound if found
 	local sound = getSound(filename)
 	if sound then
@@ -89,12 +77,7 @@ function ct.sound(filename, ...)
 end
 
 -- API
-function ct.setSoundVolume(volume, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.setSoundVolume") then
-		g.check1Param("number", volume, ...)
-	end
-
+function ct.setSoundVolume(volume)
 	-- Set sound volume for future audio
 	soundVolume = volume
 end

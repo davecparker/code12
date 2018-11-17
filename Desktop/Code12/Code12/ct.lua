@@ -14,10 +14,7 @@ local ct = {
 	userVars = {},        -- table for user code class-level variables
 	userFns = {},         -- table for user code functions (including event functions)
 
-	-- Options
-	checkParams = true,    -- set to false to disable runtime API parameter checks
-
-	-- The ct.xxx API functions are added here by the Code12 API sub-modules
+	-- The ct.xxx API functions are added here by api.lua and the Code12 API sub-modules
 }
 
 

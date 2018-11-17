@@ -2,11 +2,13 @@
 --
 -- input.lua
 --
--- Implementation of the touch and key input handling for the Code 12 Lua runtime.
+-- Implementation of the touch and key input handling for the Code12 Lua runtime.
 --
 -- (c)Copyright 2018 by David C. Parker
 ----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
@@ -205,77 +207,35 @@ function g.onKey(event)
 end
 
 
----------------- Mouse and Keyboard API --------------------------------------
+---------------- Mouse and Keyboard Input API -------------------------
 
 -- API
-function ct.clicked(...)
-	-- Check params
-	if g.checkAPIParams("ct.clicked") then
-		g.checkNoParams(...)
-	end
-
-	-- Return polled clicked state
+function ct.clicked()
 	return g.clicked
 end
 
 -- API
-function ct.clickX(...)
-	-- Check params
-	if g.checkAPIParams("ct.clickX") then
-		g.checkNoParams(...)
-	end
-
-	-- Return last click x
+function ct.clickX()
 	return g.clickX
 end
 
 -- API
-function ct.clickY(...)
-	-- Check params
-	if g.checkAPIParams("ct.clickY") then
-		g.checkNoParams(...)
-	end
-
-	-- Return last click y
+function ct.clickY()
 	return g.clickY
 end
 
 -- API
-function ct.objectClicked(...)
-	-- Check params
-	if g.checkAPIParams("ct.objectClicked") then
-		g.checkNoParams(...)
-	end
-
-	-- Return clicked object if any
+function ct.objectClicked()
 	return g.gameObjClicked
 end
 
 -- API
-function ct.keyPressed(keyName, ...)
-	-- Check parameters
-	if keyName == nil then
-		return false
-	end
-	if g.checkAPIParams("ct.keyPressed") then
-		g.check1Param("string", keyName, ...)
-	end
-
-	-- Return true if this key is currently pressed, false if not
+function ct.keyPressed(keyName)
 	return keysDown[keyName] ~= nil
 end
 
 -- API
-function ct.charTyped(ch, ...)
-	-- Check parameters
-	if ch == nil  then
-		return false
-	end
-	if g.checkAPIParams("ct.charTyped") then
-		g.check1Param("string", ch, ...)
-	end
-
-	-- Return true if this char was typed during this frame
-	return g.charTyped == ch
+function ct.charTyped(ch)
+	return ch and g.charTyped == ch
 end
 

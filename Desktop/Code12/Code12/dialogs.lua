@@ -2,15 +2,18 @@
 --
 -- dialogs.lua
 --
--- Implementation of the alert and input dialog APIs for the Code 12 Lua runtime.
+-- Implementation of the alert and input dialog APIs for the Code12 Lua runtime.
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
 
+-- Corona modules
 local widget = require("widget")
 
 
@@ -265,62 +268,27 @@ end
 ---------------- Alert and Input Dialog APIs ---------------------------------
 
 -- API
-function ct.showAlert(message, ...)
-	-- Check parameters
-	message = message or ""
-	if g.checkAPIParams("ct.inputInt") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Show an alert
-	inputValue(message, nil)
+function ct.showAlert(message)
+	inputValue(message or "Alert", nil)
 end
 
 -- API
-function ct.inputInt(message, ...)
-	-- Check parameters
-	message = message or "Enter an integer"
-	if g.checkAPIParams("ct.inputInt") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Input the value from a dialog
-	return inputValue(message, "int")
+function ct.inputInt(message)
+	return inputValue(message or "Enter an integer", "int")
 end
 
 -- API
-function ct.inputNumber(message, ...)
-	-- Check parameters
-	message = message or "Enter a number"
-	if g.checkAPIParams("ct.inputNumber") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Input the value from a dialog
-	return inputValue(message, "double")
+function ct.inputNumber(message)
+	return inputValue(message or "Enter a number", "double")
 end
 
 -- API
-function ct.inputYesNo(message, ...)
-	-- Check parameters
-	message = message or "Press Yes or No"
-	if g.checkAPIParams("ct.inputYesNo") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Input the value from a dialog
-	return inputValue(message, "boolean")
+function ct.inputYesNo(message)
+	return inputValue(message or "Press Yes or No", "boolean")
 end
 
 -- API
-function ct.inputString(message, ...)
-	-- Check parameters
-	message = message or "Enter a text string"
-	if g.checkAPIParams("ct.inputString") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Input the value from a dialog
-	return inputValue(message, "string")
+function ct.inputString(message)
+	return inputValue(message or "Enter a text string", "string")
 end
 

@@ -2,17 +2,21 @@
 --
 -- GameObj.lua
 --
--- Implementation of the GameObj class for the Code 12 Lua runtime.
+-- Implementation of the GameObj class for the Code12 Lua runtime.
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
 
 
 -- Constants
 local textObjectFont = "Roboto-Bold.ttf"
+
+
 -- The GameObj class
 local GameObj = {}
 
@@ -32,11 +36,6 @@ local function initGameObjClass()
 	local obj = display.newRect(-1000, -1000, 1, 1)
 	obj.visible = false
 	GameObj.dummyObj = obj
-
-	-- Print available fonts
-	-- for _, fontName in ipairs(native.getFontNames()) do
-	-- 	print(fontName)
-	-- end
 end
 
 
@@ -108,7 +107,7 @@ end
 -- The GameObj will be subject to garbage collection when outstanding refs to it are gone.
 function GameObj:removeAndDelete()
 	if self._code12.deleted then  -- This object was already deleted
-		g.warning("Attempt to delete an object that was already deleted")
+		runtime.warning("Attempt to delete an object that was already deleted")
 		return
 	end
 	local obj = self._code12.obj
@@ -190,7 +189,7 @@ function GameObj:newImage(group, filename, x, y, width)
 	end
 	if not obj then
 		-- Can't open image, substitute a text object with a red X
-		g.warning("Cannot find image file", filename)
+		runtime.warning("Cannot find image file", filename)
 		return GameObj:newText(group, "[x]", x, y, width, "red")
 	end
 
@@ -657,7 +656,7 @@ function GameObj:setAlignmentFromName(alignment)
 		obj.anchorX = anchorXY[1]
 		obj.anchorY = anchorXY[2]
 	else
-		g.warning("Unknown alignment", alignment)
+		runtime.warning("Unknown alignment", alignment)
 	end
 end
 
@@ -707,7 +706,7 @@ local function colorFromName(colorName)
 	if color then
 		return color
 	end
-	g.warning("Unknown color name", colorName)
+	runtime.warning("Unknown color name", colorName)
 	return colors["gray"]
 end
 
@@ -747,6 +746,142 @@ end
 -- Set a GameObj's line color from a color name
 function GameObj:setLineColorFromName(colorName)
 	self:setLineColorFromColor(colorFromName(colorName))
+end
+
+
+---------- Public GameObj APIs -----------------------------------------------
+
+-- API
+function GameObj:getType()
+	return self._code12.typeName
+end
+
+-- API
+function GameObj:getText()
+	return self._code12.text
+end
+
+-- API
+function GameObj:setText(text)
+	self._code12.text = text
+	self._code12.obj.text = text
+	-- TODO: Re-measure text
+end
+
+-- API
+function GameObj:toString()
+	-- e.g. [text at (30, 20) "Game Over"]
+	local s = "[" .. self._code12.typeName .. " at (" .. 
+			math.round(self.x) .. ", " .. math.round(self.y) .. ")"
+	if self._code12.text then
+		s = s .. " \"" .. self._code12.text .. "\""
+	end
+	return s .. "]"
+end
+
+-- API
+function GameObj:setSize(width, height)
+	-- This is just a convenience method to set the public fields
+	self.width = math.min( 0, width )
+	self.height = math.min( 0, height )
+end
+
+-- API
+function GameObj:align(alignment, adjustY)
+	-- Set object alignment and remember adjustY
+	self:setAlignmentFromName(alignment or "center")
+	self._code12.adjustY = adjustY
+end
+
+-- API
+function GameObj:setFillColor(colorName)
+	self:setFillColorFromName(colorName)
+end
+
+-- API
+function GameObj:setFillColorRGB(red, green, blue)
+	self:setFillColorFromColor({red, green, blue})
+end
+
+-- API
+function GameObj:setLineColor(colorName)
+	self:setLineColorFromName(colorName)
+end
+
+-- API
+function GameObj:setLineColorRGB(red, green, blue)
+	self:setLineColorFromColor({red, green, blue})
+end
+
+-- API
+function GameObj:getLayer()
+	return self._code12.layer;
+end
+
+-- API
+function GameObj:setLayer(layer)
+	-- Change the stored layer number
+	self._code12.layer = layer
+
+	-- Re-insert the display object at the top the layer
+	local obj = self._code12.obj
+	local objs = obj.parent
+	local i = objs.numChildren
+	while i > 0 do
+		local gameObj = objs[i].code12GameObj
+		if gameObj and gameObj ~= self and gameObj._code12.layer <= layer then
+			break
+		end
+		i = i - 1
+	end
+	objs:insert(i + 1, obj)
+end
+
+-- API
+function GameObj:delete()
+	self:removeAndDelete()
+end
+
+-- API
+function GameObj:clicked()
+	return (g.gameObjClicked == self)
+end
+
+-- API
+function GameObj:containsPoint(x, y)
+	return self:objContainsPoint(x, y)
+end
+
+-- API
+function GameObj:hit(gameObj)
+	-- Make sure object is valid and visible first
+	if gameObj == nil then
+		return false
+	elseif gameObj._code12.deleted then
+		runtime.warning("Attempt to test for hit with a deleted object")
+		return false
+	elseif self._code12.deleted then
+		runtime.warning("Attempt to call hit method on a deleted object")
+		return false
+	elseif not gameObj.visible then
+		return false
+	end
+	return self:hitObj(gameObj)
+end
+
+-- API
+function GameObj:objectHitInGroup(group)
+	-- Hit test the matching objects
+	local objs = g.screen.objs
+	for i = 1, objs.numChildren do
+		local gObj = objs[i].code12GameObj
+		if gObj ~= self and (group == nil or gObj.group == group) then
+			if self:hit(gObj) then
+				return gObj
+			end
+		end
+	end
+	return nil
 end
 
 

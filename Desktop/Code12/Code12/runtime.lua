@@ -2,11 +2,13 @@
 --
 -- runtime.lua
 --
--- Implementation of the main runtime for the Code 12 Lua runtime.
+-- Implementation of the main runtime for the Code12 Lua runtime.
 --
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
 
@@ -36,6 +38,8 @@ local runtime = {
 -- File local state
 local codeFunction       -- function for the loaded Lua user program        
 local coRoutineUser      -- coroutine running an event or nil if none
+local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
+
 
 
 ---------------- Internal Runtime Functions ------------------------------------------
@@ -129,7 +133,7 @@ local function coroutineStatus(success, strErr)
 			runtime.stop()
 			return "aborted"
 		elseif strErr == "restart" then
-			-- User code requests a stop via ct.restart()
+			-- User code requests a restart via ct.restart()
 			runtime.restart()
 			return "aborted"
 		end
@@ -399,6 +403,30 @@ function runtime.printTextLine(text, rgb)
 		g.outputFile:write(text)   -- echo to text file
 		g.outputFile:write("\n")
 	end
+end
+
+-- Print a warning message with optional quoted name
+function runtime.warning(message, name)
+	-- Look back on the stack trace to find the user's code (string)
+	-- so we can get the line number.
+	local info
+	local level = 1
+	repeat
+		info = debug.getinfo(level, "Sl")
+		level = level + 1
+	until info == nil or info.short_src == '[string "..."]'
+	
+	-- Build and print the error	
+	local s
+	if info and info.currentline then
+		s = "WARNING (line " .. info.currentline .. "): " .. message
+	else
+		s = "WARNING: " .. message
+	end
+	if name then
+		s = s .. " \"" .. name .. "\""
+	end
+	runtime.printTextLine(s, rgbWarningText)
 end
 
 
