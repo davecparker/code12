@@ -130,7 +130,7 @@ ct.line( x1, y1, x2, y2, color );</code></pre>
 <pre><code>ct.line( 10, 30, 90, 40 );</code></pre>
 <pre><code>ct.line( 10, 50, 90, 50, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj border = ct.line( 0, 75, 100, 75, &quot;red&quot; );
-border.lineWidth = 3;</code></pre>
+border.setLineWidth( 3 );</code></pre>
 <h6 id="code12-function-reference-graphic-object-creation-ct.line"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.line">ct.line()</a></h6>
 <h3 id="ct.text">ct.text()</h3>
 <p>Creates a new text graphics object (GameObj), which can be used to display text on the graphics screen.</p>
@@ -1133,7 +1133,7 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 <p>Line objects are created between two points. After creation, the <code>x</code> and <code>y</code> fields are the location of the first point, and the <code>width</code> and <code>height</code> fields specify signed offsets (can be negative) from the first point to the second point. Thus, the location of the second point is (<code>x</code> + <code>width</code>, <code>y</code> + <code>height</code>). You can change any of the <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> fields, and the line will adjust.</p>
 <blockquote>
 <p>Note that unlike any of the other <code>GameObj</code> object types, a line may have negative values for the <code>width</code> and <code>height</code> fields. The physical width and height of the line’s bounding box can be reliably determined with<br />
-<code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <code>lineWidth</code> below).</p>
+<code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <a href="#obj.setlinewidth">obj.setLineWidth()</a>).</p>
 </blockquote>
 <h5 id="text-objects">text Objects</h5>
 <p>Text objects use a font size that is automatically determined by the object’s <code>height</code>, and the object’s <code>width</code> is calculated automatically. So, changing <code>height</code> will change the font size, and changes to the <code>width</code> field are undefined.</p>
@@ -1148,12 +1148,6 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 <p>The <code>xSpeed</code> and <code>ySpeed</code> fields can be used to make an object move automatically at the specified speed and direction. The <code>xSpeed</code> and <code>ySpeed</code> values are added to the object’s <code>x</code> and <code>y</code> fields before each new animation frame. Animation frames happen 60 times per second, so setting <code>xSpeed</code> to 1 will make the object move 60 units per second to the right. The values for <code>xSpeed</code> and <code>ySpeed</code> can be positive or negative, and they both default to 0.</p>
 <blockquote>
 <p>You can change <code>xSpeed</code> and/or <code>ySpeed</code> at any time to change the speed or direction of an object.</p>
-</blockquote>
-<h3 id="obj.linewidth">obj.lineWidth</h3>
-<pre><code>int lineWidth</code></pre>
-<p>If an object has a line color (see the <code>GameObj</code> methods <code>obj.setLineColor()</code> and <code>obj.setLineColorRGB()</code>), then the object will be outlined in this color with a stroke of approximately <code>lineWidth</code> pixels. The default is 1.</p>
-<blockquote>
-<p>Unlike normal coordinate values, <code>lineWidth</code> values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and may vary, but the overall intent is that on a screen of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution screens may use multiple pixels, and some platforms may use partial pixels for a smoother appearance (anti-aliasing).</p>
 </blockquote>
 <h3 id="obj.visible">obj.visible</h3>
 <pre><code>boolean visible</code></pre>
@@ -1224,6 +1218,12 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 <h3 id="obj.setlinecolorrgb">obj.setLineColorRGB()</h3>
 <pre><code>obj.setLineColorRGB( int red, int green, int blue )</code></pre>
 <p>Set the line color of the object (the outline stroke color for objects other than line objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
+<h3 id="obj.setlinewidth">obj.setLineWidth()</h3>
+<pre><code>obj.setLineWidth( int lineWidth )</code></pre>
+<p>If an object has a line color (see <a href="#obj.setlinecolor">obj.setLineColor()</a> and <a href="#obj.setlinecolorrgb">obj.setLineColorRGB()</a>), then the object will be outlined in this color with a stroke of approximately <code>lineWidth</code> pixels. The default is 1.</p>
+<blockquote>
+<p>Unlike normal coordinate values, <code>lineWidth</code> values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and may vary, but the overall intent is that on a screen of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution screens may use multiple pixels, and some platforms may use partial pixels for a smoother appearance (anti-aliasing).</p>
+</blockquote>
 <h3 id="obj.getlayer">obj.getLayer()</h3>
 <pre><code>int obj.getLayer()</code></pre>
 <p>Return the layer number for the object. See <code>obj.setLayer()</code> below.</p>

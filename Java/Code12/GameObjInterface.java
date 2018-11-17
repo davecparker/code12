@@ -14,11 +14,12 @@ public interface GameObjInterface
    public void setSize(double width, double height);
    public void align(String a);
    
-   // The object colors
+   // The fill and line
    public void setFillColor(String name);
    public void setFillColorRGB(int r, int g, int b);
    public void setLineColor(String name);
    public void setLineColorRGB(int r, int g, int b);
+   public void setLineWidth(int lineWidth);
 
    // Manipulate the object in the game's object list
    public int getLayer();

@@ -97,7 +97,6 @@ class GameObj
 	double x, y;
 	double width, height;
 	double xSpeed, ySpeed;   // at 60 fps
-	int lineWidth;           // in pixels
 	boolean visible;
 	boolean clickable;
 	boolean autoDelete;      // auto delete if it goes from on to off-screen
@@ -115,6 +114,7 @@ class GameObj
 	void setFillColorRGB( int red, int green, int blue )
 	void setLineColor( String color )
 	void setLineColorRGB( int red, int green, int blue )
+	void setLineWidth( int lineWidth );                // in pixels
 	int getLayer( )
 	void setLayer( int layer )                         // objects default to layer 1
 	void delete( )

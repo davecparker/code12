@@ -60,7 +60,6 @@ function GameObj:new(typeName, x, y, width, height)
 		height = height,
 		xSpeed = 0,
 		ySpeed = 0,
-		lineWidth = 1,
 		visible = true,
 		clickable = true,
 		autoDelete = false,
@@ -72,6 +71,7 @@ function GameObj:new(typeName, x, y, width, height)
 		text = nil,
 		fillColor = nil,
 		lineColor = nil,
+		lineWidth = 1,
 		layer = 1,
 		deleted = false,
 
@@ -223,7 +223,7 @@ function GameObj:sync()
 	local obj = self.obj
 	obj.isVisible = self.visible
 	if self.visible then
-		-- Line width
+		-- Stroke width  TODO: Set only on resize
 		if self.lineColor then
 			obj.strokeWidth = self.lineWidth
 		else
@@ -806,6 +806,11 @@ end
 -- API
 function GameObj:setLineColorRGB(red, green, blue)
 	self:setLineColorFromColor({red, green, blue})
+end
+
+-- API
+function GameObj:setLineWidth(lineWidth)
+	self.lineWidth = lineWidth    -- TODO: Recalc size
 end
 
 -- API

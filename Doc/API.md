@@ -182,7 +182,7 @@ ct.line( 10, 50, 90, 50, "blue" );
 ```
 ```
 GameObj border = ct.line( 0, 75, 100, 75, "red" );
-border.lineWidth = 3;
+border.setLineWidth( 3 );
 ```
 ###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.line()]
 
@@ -1971,7 +1971,7 @@ Thus, the location of the second point is
 > box can be reliably determined with  
 > `Math.abs(line.width)` and `Math.abs(line.height)`.
 > This does not include the thickness of the drawn line itself
-> (see `lineWidth` below).
+> (see [obj.setLineWidth()]).
 
 ##### text Objects
 Text objects use a font size that is automatically determined by
@@ -2007,23 +2007,6 @@ and they both default to 0.
 
 > You can change `xSpeed` and/or `ySpeed` at any time to change
 > the speed or direction of an object.
-
-### obj.lineWidth
-```
-int lineWidth
-```
-If an object has a line color (see the `GameObj` methods `obj.setLineColor()`
-and `obj.setLineColorRGB()`), then the object will be outlined in this color
-with a stroke of approximately `lineWidth` pixels. The default is 1.
-
-> Unlike normal coordinate values, `lineWidth` values are measured in
-> approximate device "pixels", so apparent line thickness does not scale
-> up as the window size is increased. The definition of "pixels" depends
-> on the platform and may vary, but the overall intent is that on a
-> screen of "normal" resolution (e.g. HD resolution, not 4K or Retina),
-> a `lineWidth` of 1 will result in an appoximate 1 pixel border.
-> High resolution screens may use multiple pixels, and some platforms
-> may use partial pixels for a smoother appearance (anti-aliasing).
 
 ### obj.visible
 ```
@@ -2194,6 +2177,24 @@ obj.setLineColorRGB( int red, int green, int blue )
 Set the line color of the object (the outline stroke color for objects
 other than line objects) to the custom RGB color with components
 `red`, `green`, and `blue` in the range 0-255.
+
+### obj.setLineWidth()
+```
+obj.setLineWidth( int lineWidth )
+```
+If an object has a line color (see [obj.setLineColor()]
+and [obj.setLineColorRGB()]), then the object will be outlined in this color
+with a stroke of approximately `lineWidth` pixels. The default is 1.
+
+> Unlike normal coordinate values, `lineWidth` values are measured in
+> approximate device "pixels", so apparent line thickness does not scale
+> up as the window size is increased. The definition of "pixels" depends
+> on the platform and may vary, but the overall intent is that on a
+> screen of "normal" resolution (e.g. HD resolution, not 4K or Retina),
+> a `lineWidth` of 1 will result in an appoximate 1 pixel border.
+> High resolution screens may use multiple pixels, and some platforms
+> may use partial pixels for a smoother appearance (anti-aliasing).
+
 
 ### obj.getLayer()
 ```

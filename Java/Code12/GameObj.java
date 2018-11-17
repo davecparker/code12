@@ -10,7 +10,6 @@ public abstract class GameObj implements GameObjInterface
    public double x, y;              // position of object or start point if line
    public double width, height;     // size of the object
    public double xSpeed, ySpeed;    // velocity
-   public int lineWidth;            // line/frame thickness in pixels
    public boolean visible;          // true if object is visible
    public boolean clickable;        // true if object is clickable
    public boolean autoDelete;       // true to auto delete object if it goes off-screen
@@ -23,6 +22,7 @@ public abstract class GameObj implements GameObjInterface
    protected double yAlignFactor;   // 0 for top, 0.5 for center, 1 for bottom
    protected Color fillColor;       // fill color or null for none
    protected Color lineColor;       // line/frame color or null for none
+   protected int lineWidth;         // line/frame thickness in pixels
    protected int layer;             // stacking layer, default 1
    protected String text;           // text to draw or use for log name, or null
    protected boolean onScreenPrev;  // true if object was on-screen last time we checked
@@ -38,7 +38,6 @@ public abstract class GameObj implements GameObjInterface
       this.height = height;
       xSpeed = 0;
       ySpeed = 0;
-      lineWidth = 1;
       visible = true;
       clickable = true;
       autoDelete = false;
@@ -50,6 +49,7 @@ public abstract class GameObj implements GameObjInterface
       yAlignFactor = 0.5;  // center
       fillColor = Color.BLACK;
       lineColor = Color.BLACK;
+      lineWidth = 1;
       layer = 1;
       text = null;
       onScreenPrev = false;
@@ -87,6 +87,7 @@ public abstract class GameObj implements GameObjInterface
    public void setFillColorRGB(int r, int g, int b)   { fillColor = makeColor(r, g, b); }
    public void setLineColor(String name)              { lineColor = colorFromName(name); }
    public void setLineColorRGB(int r, int g, int b)   { lineColor = makeColor(r, g, b); }
+   public void setLineWidth(int lineWidth)            { this.lineWidth = lineWidth; }
 
    public int getLayer()              { return layer; }
    public void setLayer(int layer)    { game.setObjLayer(this, layer); }

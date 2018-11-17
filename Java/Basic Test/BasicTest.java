@@ -60,7 +60,7 @@ class BasicTest extends Code12Program
       
       GameObj line = ct.line(0, 0, ct.getWidth(), ct.getHeight());
       line.setLineColorRGB(0, 100, 200);
-      line.lineWidth = 5;
+      line.setLineWidth(5);
       line.align("left");
             
       double x = 150; // ct.inputNumber("Enter x coordinate:");

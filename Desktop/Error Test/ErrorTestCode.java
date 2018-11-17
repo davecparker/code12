@@ -538,8 +538,6 @@ int underIndentedInstanceVar;
 		img.width = img.width * .9;
 		img.xSpeed = 0;
 		img.ySpeed = .5;
-		line.lineWidth = 3;
-		img.lineWidth = line.lineWidth * 2;
 		rect.visible = false;
 		circle.clickable = circle.visible;
 		if (img.visible)
@@ -564,6 +562,8 @@ int underIndentedInstanceVar;
 		circle.setFillColorRGB(i,j,k);
 		rect.setLineColor(colors[i]);
 		rect.setLineColorRGB(i, 255 - i, 0);
+		line.setLineWidth(i);
+		line.setLineWidth(3);
 		i = rect.getLayer();
 		if (rect.getLayer() >= circle.getLayer())
 			b =	colors[rect.getLayer()].equals("green");

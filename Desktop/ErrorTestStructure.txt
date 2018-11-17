@@ -1836,35 +1836,29 @@
                             lValue: lValue { varID = img, fieldID = xSpeed }
 540.                    assign (=) { expr = .5 }
                             lValue: lValue { varID = img, fieldID = ySpeed }
-541.                    assign (=) { expr = 3 }
-                            lValue: lValue { varID = line, fieldID = lineWidth }
-542.                    assign (=)
-                            lValue: lValue { varID = img, fieldID = lineWidth }
-                            expr: (*) { right = 2 }
-                                left: lValue { varID = line, fieldID = lineWidth }
-543.                    assign (=) { expr = false }
+541.                    assign (=) { expr = false }
                             lValue: lValue { varID = rect, fieldID = visible }
-544.                    assign (=)
+542.                    assign (=)
                             lValue: lValue { varID = circle, fieldID = clickable }
                             expr: lValue { varID = circle, fieldID = visible }
-545.                    if
+543.                    if
                             expr: lValue { varID = img, fieldID = visible }
                             block: block { #stmts = 1 }
                                 stmts:
-546.                                assign (=) { expr = true }
+544.                                assign (=) { expr = true }
                                         lValue: lValue { varID = img, fieldID = clickable }
-547.                    if
+545.                    if
                             expr: (!=) { right = false }
                                 left: lValue { varID = img, fieldID = clickable }
                             block: block { #stmts = 1 }
                                 stmts:
-548.                                assign (=)
+546.                                assign (=)
                                         lValue: lValue { varID = img, fieldID = autoDelete }
                                         expr: lValue { varID = img, fieldID = visible }
-549.                    assign (=)
+547.                    assign (=)
                             lValue: lValue { varID = line, fieldID = group }
                             expr: lValue { varID = s }
-550.                    assign (=)
+548.                    assign (=)
                             lValue: lValue { varID = line, fieldID = autoDelete }
                             expr: (||)
                                 right: (&&)
@@ -1876,85 +1870,93 @@
                                     left: call equals { #exprs = 1 }
                                         lValue: lValue { varID = s }
                                         exprs:
-550.                                        ("world")
+548.                                        ("world")
                                 left: call equals { #exprs = 1 }
                                     lValue: lValue { varID = s }
                                     exprs:
-550.                                    ("hello")
-552.                    assign (=)
+548.                                    ("hello")
+550.                    assign (=)
                             lValue: lValue { varID = s }
                             expr: call getType
                                 lValue: lValue { varID = rect }
-553.                    call println { #exprs = 1, class = ct }
+551.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+) { right = "more text" }
                                     left: call getText
                                         lValue: lValue { varID = text }
-554.                    call setText { #exprs = 1 }
+552.                    call setText { #exprs = 1 }
                             lValue: lValue { varID = img }
                             exprs:
-554.                            ("racecar.png")
-555.                    call setText { #exprs = 1 }
+552.                            ("racecar.png")
+553.                    call setText { #exprs = 1 }
                             lValue: lValue { varID = text }
                             exprs:
                                 (+) { left = "Score: " }
                                     right: lValue { varID = d }
-556.                    call setText { #exprs = 1 }
+554.                    call setText { #exprs = 1 }
                             lValue: lValue { varID = text }
                             exprs:
                                 (+) { left = "Score: " }
                                     right: lValue { varID = i }
-557.                    call log { #exprs = 1, class = ct }
+555.                    call log { #exprs = 1, class = ct }
                             exprs:
                                 call toString
                                     lValue: lValue { varID = line }
-558.                    call setSize { #exprs = 2 }
+556.                    call setSize { #exprs = 2 }
                             lValue: lValue { varID = img }
                             exprs:
                                 (*) { right = 1.1 }
                                     left: lValue { varID = img, fieldID = width }
                                 (*) { right = 1.1 }
                                     left: lValue { varID = img, fieldID = height }
-559.                    call align { #exprs = 1 }
+557.                    call align { #exprs = 1 }
                             lValue: lValue { varID = text }
                             exprs:
                                 lValue { varID = s }
-560.                    call align { #exprs = 1 }
+558.                    call align { #exprs = 1 }
                             lValue: lValue { varID = text }
                             exprs:
-560.                            ("left")
-561.                    call align { #exprs = 1 }
+558.                            ("left")
+559.                    call align { #exprs = 1 }
                             lValue: lValue { varID = text }
                             exprs:
-561.                            ("right")
-562.                    call setFillColor { #exprs = 1 }
+559.                            ("right")
+560.                    call setFillColor { #exprs = 1 }
                             lValue: lValue { varID = circle }
                             exprs:
                                 (+) { left = "light" }
                                     right: lValue { varID = s }
-563.                    call setFillColor { #exprs = 1 }
+561.                    call setFillColor { #exprs = 1 }
                             lValue: lValue { varID = circle }
                             exprs:
                                 call getText
                                     lValue: lValue { varID = text }
-564.                    call setFillColorRGB { #exprs = 3 }
+562.                    call setFillColorRGB { #exprs = 3 }
                             lValue: lValue { varID = circle }
                             exprs:
                                 lValue { varID = i }
                                 lValue { varID = j }
                                 lValue { varID = k }
-565.                    call setLineColor { #exprs = 1 }
+563.                    call setLineColor { #exprs = 1 }
                             lValue: lValue { varID = rect }
                             exprs:
                                 lValue { varID = colors }
                                     indexExpr: lValue { varID = i }
-566.                    call setLineColorRGB { #exprs = 3 }
+564.                    call setLineColorRGB { #exprs = 3 }
                             lValue: lValue { varID = rect }
                             exprs:
                                 lValue { varID = i }
                                 (-) { left = 255 }
                                     right: lValue { varID = i }
-566.                            (0)
+564.                            (0)
+565.                    call setLineWidth { #exprs = 1 }
+                            lValue: lValue { varID = line }
+                            exprs:
+                                lValue { varID = i }
+566.                    call setLineWidth { #exprs = 1 }
+                            lValue: lValue { varID = line }
+                            exprs:
+566.                            (3)
 567.                    assign (=)
                             lValue: lValue { varID = i }
                             expr: call getLayer
