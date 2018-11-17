@@ -13,7 +13,6 @@ public interface GameObjInterface
    // The object size and alignment
    public void setSize(double width, double height);
    public void align(String a);
-   public void align(String a, boolean adjustY);
    
    // The object colors
    public void setFillColor(String name);

@@ -557,8 +557,8 @@ int underIndentedInstanceVar;
 		ct.log(line.toString());
 		img.setSize(img.width * 1.1, img.height * 1.1);
 		text.align(s);
-		text.align(s, true);
-		text.align(s, false);
+		text.align("left");
+		text.align("right");
 		circle.setFillColor("light" + s);
 		circle.setFillColor(text.getText());
 		circle.setFillColorRGB(i,j,k);
@@ -786,7 +786,7 @@ int underIndentedInstanceVar;
 		// ERROR "expects type double, but GameObj was passed"
 		Math.exp( objVar );
 
-		// ERROR "expects type boolean, but int was passed"
+		// ERROR "Too many parameters"
 		objVar.align( "left", 0 );
 		// ERROR "expects type boolean, but double was passed"
 		boolFuncBoolStringGameObj( dblVar, strVar, objVar );
@@ -1191,7 +1191,7 @@ int underIndentedInstanceVar;
 
 		// ERROR "misspelled API function"
 		ct.prnitln();
-		// ERROR "misspelled API function"
+		// ERROR "Unknown API function"
 		ct.circ(0,0,10);
 
 		// ERROR "Unknown method"

@@ -136,7 +136,7 @@ return {
         ["tostring"] = "toString",
         ["setSize"] = { vt = false, params = {{ name = "width", vt = 1},{ name = "height", vt = 1}}, docLink = "#obj.setsize" },
         ["setsize"] = "setSize",
-        ["align"] = { vt = false, min = 1, params = {{ name = "alignment", vt = "String"},{ name = "adjustY", vt = true}}, docLink = "#obj.align" },
+        ["align"] = { vt = false, params = {{ name = "alignment", vt = "String"}}, docLink = "#obj.align" },
         ["setFillColor"] = { vt = false, params = {{ name = "color", vt = "String"}}, docLink = "#obj.setfillcolor" },
         ["setfillcolor"] = "setFillColor",
         ["setFillColorRGB"] = { vt = false, params = {{ name = "red", vt = 0},{ name = "green", vt = 0},{ name = "blue", vt = 0}}, docLink = "#obj.setfillcolorrgb" },

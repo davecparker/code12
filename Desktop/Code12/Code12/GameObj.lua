@@ -73,7 +73,6 @@ function GameObj:new(typeName, x, y, width, height)
 		fillColor = nil,
 		lineColor = nil,
 		layer = 1,
-		adjustY = false,
 		deleted = false,
 
 		-- Stored previous values so we can detect changes on the fly
@@ -302,19 +301,6 @@ function GameObj:updateSizeLine(scale)
 				obj:removeSelf()          -- remove old line
 				break
 			end
-		end
-	end
-end
-
--- Update the object as necessary for a window resize from oldHeight to newHeight
-function GameObj:adjustForWindowResize(oldHeight, newHeight)
-	-- Adjust y coordinate if this object has adjustY set
-	if self.adjustY then
-		self.y = self.y * (newHeight / oldHeight)
-
-		-- Adjust second point if this is a line object
-		if self.typeName == "line" then
-			self.height = self.height * (newHeight / oldHeight)
 		end
 	end
 end
@@ -798,10 +784,8 @@ function GameObj:setSize(width, height)
 end
 
 -- API
-function GameObj:align(alignment, adjustY)
-	-- Set object alignment and remember adjustY
+function GameObj:align(alignment)
 	self:setAlignmentFromName(alignment or "center")
-	self.adjustY = adjustY
 end
 
 -- API

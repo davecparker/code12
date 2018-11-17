@@ -21,7 +21,6 @@ public abstract class GameObj implements GameObjInterface
    protected String type;           // "circle", etc.
    protected double xAlignFactor;   // 0 for left, 0.5 for center, 1 for right
    protected double yAlignFactor;   // 0 for top, 0.5 for center, 1 for bottom
-   protected boolean adjustY;       // true to adjust y when screen aspect changes
    protected Color fillColor;       // fill color or null for none
    protected Color lineColor;       // line/frame color or null for none
    protected int layer;             // stacking layer, default 1
@@ -49,7 +48,6 @@ public abstract class GameObj implements GameObjInterface
       type = "GameObj";
       xAlignFactor = 0.5;  // center
       yAlignFactor = 0.5;  // center
-      adjustY = false;
       fillColor = Color.BLACK;
       lineColor = Color.BLACK;
       layer = 1;
@@ -83,12 +81,6 @@ public abstract class GameObj implements GameObjInterface
    public void align(String a)
    {
       setAlignFromString(a);
-   }
-
-   public void align(String a, boolean adjustY)
-   {
-      setAlignFromString(a);
-      this.adjustY = adjustY;
    }
 
    public void setFillColor(String name)              { fillColor = colorFromName(name); }
@@ -287,14 +279,6 @@ public abstract class GameObj implements GameObjInterface
       // Apply current velocity
       x += xSpeed;
       y += ySpeed;
-   }
-
-   // Update the object as necessary for a window resize from oldHeight to newHeight.
-   protected void updateForWindowResize(double oldHeight, double newHeight)
-   {
-      // Adjust y coordinate if object has adjustY set
-      if (adjustY)
-         y *= (newHeight / oldHeight);
    }
 
    // Return true if the object should be automatically deleted (autoDelete set,

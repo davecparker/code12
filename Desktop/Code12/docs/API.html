@@ -1200,8 +1200,7 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 <pre><code>obj.setSize( double width, double height )</code></pre>
 <p>Set the size of the object using <code>width</code> and <code>height</code>. This is just a convenience method that is equivalent to setting both the <code>width</code> and <code>height</code> fields. Note that different types of objects react differently to changes in width or height. (see <a href="#width-height">width, height</a> above).</p>
 <h3 id="obj.align">obj.align()</h3>
-<pre><code>obj.align( String alignment )
-obj.align( String alignment, boolean adjustY )</code></pre>
+<pre><code>obj.align( String alignment )</code></pre>
 <p>Set the alignment of the object to <code>alignment</code>. The alignment is a description of where where the object is positioned on screen relative to its <code>x</code> and <code>y</code> coordinates. By default, objects are positioned by their center point, so that (<code>x</code>, <code>y</code>) is at the horizontal and vertical center of the object.</p>
 <p>The following alignments are supported, which describe the location of (<code>x</code>, <code>y</code>) on the object:</p>
 <pre><code>&quot;top left&quot;
@@ -1213,8 +1212,6 @@ obj.align( String alignment, boolean adjustY )</code></pre>
 &quot;bottom left&quot;
 &quot;bottom&quot;          or &quot;bottom center&quot;
 &quot;bottom right&quot;</code></pre>
-<p>If <code>adjustY</code> is included and <code>true</code>, then the object will be automatically repositioned to maintain its relative vertical position in the application window if the window is resized and changes aspect ratio. This can be used to easily make objects stick to the bottom of the window, or stay in the vertical center of the window, etc.</p>
-<p>Note that all objects always automatically adjust their horizontal position when the window is resized (because display coordinates are relative to a width of 100), and that vertical positions are also relative to the window’s overall size, and thus also adjust when the window resizes. The effect of <code>adjustY</code> is only relevant to help adjust for changes in the aspect ratio of the window.</p>
 <h3 id="obj.setfillcolor">obj.setFillColor()</h3>
 <pre><code>obj.setFillColor( String color )</code></pre>
 <p>Set the fill color of the object (text color for text objects) to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>. If <code>color</code> is <code>null</code> then the fill is removed from the object.</p>

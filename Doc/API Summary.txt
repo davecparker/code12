@@ -111,7 +111,6 @@ class GameObj
 	String toString( )                                 // "[type at (x, y) "text"]"
 	void setSize( double width, double height )
 	void align( String alignment )                     // "top left", "top", "center", etc.
-	void align( String alignment, boolean adjustY )    // adjustY adjusts y when aspect changes
 	void setFillColor( String color )                  // "red", "white", etc. or null
 	void setFillColorRGB( int red, int green, int blue )
 	void setLineColor( String color )

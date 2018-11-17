@@ -238,20 +238,13 @@ end
 
 -- Handle a resize of the available output area
 function runtime.onResize()
-	-- Remember old height and get new metrics
-	local oldHeight = g.height
+	-- Get new metrics
 	getDeviceMetrics()
 
 	-- Set new logical height (sets g.height and g.scale)
 	ct.setHeight(g.WIDTH * g.window.height / g.window.width)
 
-	-- Adjust objects on the current screen as necessary
-	if oldHeight and g.screen then
-		local objs = g.screen.objs
-		for i = 1, objs.numChildren do
-			objs[i].code12GameObj:adjustForWindowResize(oldHeight, g.height)
-		end
-	end
+	-- Mark window as resized
 	g.window.resized = true
 
 	-- Send user event if necessary

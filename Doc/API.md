@@ -2139,7 +2139,6 @@ in width or height. (see [width, height](#width-height) above).
 ### obj.align()
 ```
 obj.align( String alignment )
-obj.align( String alignment, boolean adjustY )
 ```
 Set the alignment of the object to `alignment`.
 The alignment is a description of where where the object is
@@ -2162,19 +2161,6 @@ location of (`x`, `y`) on the object:
 "bottom"          or "bottom center"
 "bottom right"
 ```
-
-If `adjustY` is included and `true`, then the object will be automatically
-repositioned to maintain its relative vertical position in the
-application window if the window is resized and changes aspect ratio.
-This can be used to easily make objects stick to the bottom of the window,
-or stay in the vertical center of the window, etc.
-
-Note that all objects always automatically adjust their
-horizontal position when the window is resized (because display
-coordinates are relative to a width of 100), and that vertical positions
-are also relative to the window's overall size, and thus also adjust
-when the window resizes. The effect of `adjustY` is only relevant to
-help adjust for changes in the aspect ratio of the window.
 
 ### obj.setFillColor()
 ```

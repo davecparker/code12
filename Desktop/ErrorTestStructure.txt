@@ -1919,16 +1919,14 @@
                             lValue: lValue { varID = text }
                             exprs:
                                 lValue { varID = s }
-560.                    call align { #exprs = 2 }
+560.                    call align { #exprs = 1 }
                             lValue: lValue { varID = text }
                             exprs:
-                                lValue { varID = s }
-560.                            (true)
-561.                    call align { #exprs = 2 }
+560.                            ("left")
+561.                    call align { #exprs = 1 }
                             lValue: lValue { varID = text }
                             exprs:
-                                lValue { varID = s }
-561.                            (false)
+561.                            ("right")
 562.                    call setFillColor { #exprs = 1 }
                             lValue: lValue { varID = circle }
                             exprs:

@@ -98,16 +98,7 @@ public class GameScreen
             backObj.setSize(widthNew, heightNew);
          }
       }
-      
-      // If the height changed, adjust the objects as necessary.      
-      if (heightNew != height)
-      {         
-         for (GameObj obj: objects)
-         {
-            obj.updateForWindowResize(height, heightNew);
-         }
-      }
-      
+            
       // Store the new size
       width = widthNew;
       height = heightNew;

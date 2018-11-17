@@ -30,7 +30,7 @@ class BasicTest extends Code12Program
       ct.setScreen("end");
       ct.setBackColor("light yellow");
       GameObj m = ct.text("Game Over!", 50, ct.getHeight() / 2, 10);
-      m.align("center", true);
+      m.align("center");
 
       // Main screen
       ct.setScreen("main");
@@ -54,14 +54,14 @@ class BasicTest extends Code12Program
       cc.group = "dots";
             
       wall = ct.rect(50, ct.getHeight(), 10, 50);
-      wall.align("bottom", true);
+      wall.align("bottom");
       wall.setLayer(0);
       ct.log(wall);
       
       GameObj line = ct.line(0, 0, ct.getWidth(), ct.getHeight());
       line.setLineColorRGB(0, 100, 200);
       line.lineWidth = 5;
-      line.align("left", true);
+      line.align("left");
             
       double x = 150; // ct.inputNumber("Enter x coordinate:");
       if (!ct.isError(x))
