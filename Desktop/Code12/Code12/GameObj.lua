@@ -21,7 +21,7 @@ local textObjectFont = "Roboto-Bold.ttf"
 local GameObj = {}
 
 
----------------- Internal Functions  ----------------------------------------
+---------------- Misc. Internal Functions  ----------------------------
 
 -- Return 0 if num is negative, else num.
 local function forceNotNegative(num)
@@ -31,19 +31,77 @@ local function forceNotNegative(num)
 	return num
 end
 
--- Return the Corona font size to use for a given logical object height at the
--- current drawing scale, so that the GameObj and drawing object heights match.
-local function fontSizeFromHeight(height)
-	return height * g.scale * 0.85   -- TODO: is the fudge device-dependent?
-end
-
 -- Init the GameObj class
 local function initGameObjClass()
 	-- Create a dummy display object for deleted GameObj objects to reference,
 	-- to try to avoid crashes in buggy client code.
-	local obj = display.newRect(-1000, -1000, 1, 1)
-	obj.visible = false
+	local obj = display.newRect(-10000, -10000, 0, 0)
+	obj.isVisible = false
 	GameObj.dummyObj = obj
+end
+
+
+---------------- Object Sizing Methods --------------------------------
+ 
+-- Update the size for a rectangular object
+local function updateSizeRect(gameObj, width, height, scale)
+	gameObj.width = width
+	gameObj.height = height
+	local obj = gameObj.obj
+	obj.width = width * scale
+	obj.height = height * scale
+end
+
+-- Update the size for a circle object
+local function updateSizeCircle(gameObj, width, height, scale)
+	gameObj.width = width
+	gameObj.height = height
+	local obj = gameObj.obj
+	obj.path.radius = (width / 2) * scale
+	obj.yScale = height / width   -- to allow an ellipse in Corona
+end
+
+-- Return the Corona font size to use for a given logical object height at the
+-- given scale, so that the GameObj and drawing object heights match.
+local function fontSizeFromHeight(height, scale)
+	return height * scale * 0.85   -- TODO: is the fudge device-dependent?
+end
+
+-- Update the size for a text object (width is ignored)
+local function updateSizeText(gameObj, _, height, scale)
+	local prevHeight = gameObj.height
+	gameObj.height = height
+	-- Determine and set new font size
+	local fontSize = fontSizeFromHeight(height, scale)   -- new font size
+	gameObj.obj.size = math.max(1, fontSize)      -- 0 means default in Corona so 1 is as small we can go
+	-- Estimate the new width because Corona hasn't calculated it yet
+	gameObj.width = gameObj.width * height / prevHeight
+end
+
+-- Update the size for a line object. 
+-- Note that width and height are signed offsets to the second point.
+local function updateSizeLine(gameObj, width, height, scale)
+	gameObj.width = width
+	gameObj.height = height
+	-- Line endpoints cannot be changed in Corona, so when the endpoint changes
+	-- we need to delete and re-create the line display object.
+	-- Find object index in parent group
+	local obj = gameObj.obj
+	local group = obj.parent
+	for i = 1, group.numChildren do
+		if group[i] == obj then
+			-- Create the new line to replace this one
+			local x = obj.x
+			local y = obj.y
+			local newObj = display.newLine(x, y, x + width * scale, y + height * scale)
+			gameObj:setObj(newObj)
+			group:insert(i, newObj)   -- insert at same z-order as old line
+			gameObj:setLineColorFromColor(gameObj.lineColor)  -- sets color and stroke width
+			-- Remove old line
+			obj:removeSelf()
+			break
+		end
+	end
 end
 
 
@@ -73,15 +131,10 @@ function GameObj:new(typeName, x, y, width, height)
 		lineWidth = 1,
 		layer = 1,
 		deleted = false,
-
-		-- Stored previous values so we can detect changes on the fly
-		widthPrev = 0,
-		heightPrev = 0,
-		scalePrev = 0,
 	}
 
 	-- Assign default methods
-	gameObj.updateSize = GameObj.updateSizeRect
+	gameObj.updateSize = updateSizeRect
 	gameObj.objContainsPoint = GameObj.boundsContainsPoint
 
 	-- Set the object's metatable and return it
@@ -101,8 +154,13 @@ function GameObj:setObj(obj)
 	self.obj = obj
 	if obj ~= nil then
 		obj.code12GameObj = self
-		obj:addEventListener("touch", g.onTouchGameObj)
 		self:setLayer(self.layer)
+		obj:addEventListener("touch", g.onTouchGameObj)
+		obj:addEventListener("finalize", obj)
+
+		function obj:finalize()
+			self.code12GameObj = nil
+		end
 	end
 end
 
@@ -127,7 +185,7 @@ function GameObj:newCircle(group, x, y, diameter, colorName)
 	diameter = forceNotNegative(diameter)
 	local gameObj = GameObj:new("circle", x, y, diameter, diameter)
 	gameObj:setObj(display.newCircle(group, x, y, diameter / 2))
-	gameObj.updateSize = GameObj.updateSizeCircle    -- override sizing method
+	gameObj.updateSize = updateSizeCircle    -- override sizing method
 	gameObj.objContainsPoint = GameObj.circleContainsPoint  -- override hit test method
 	gameObj:setFillColorFromName(colorName or "red")
 	gameObj:setLineColorFromName("black")
@@ -149,9 +207,7 @@ end
 function GameObj:newLine(group, x1, y1, x2, y2, colorName)
 	local gameObj = GameObj:new("line", x1, y1, x2 - x1, y2 - y1)
 	gameObj:setObj(display.newLine(group, x1, y1, x2, y2))
-	gameObj.widthPrev = gameObj.width
-	gameObj.heightPrev = gameObj.height
-	gameObj.updateSize = GameObj.updateSizeLine   -- override sizing method
+	gameObj.updateSize = updateSizeLine   -- override sizing method
 	gameObj.objContainsPoint = GameObj.lineContainsPoint   -- override hit test method
 	gameObj.hitObj = GameObj.lineHitObj   -- override collision test method
 	gameObj:setLineColorFromName(colorName or "black")
@@ -164,13 +220,10 @@ function GameObj:newText(group, text, x, y, height, colorName)
 	height = forceNotNegative(height)
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
 	local obj = display.newText(group, text, x, y, textObjectFont,
-						fontSizeFromHeight(height))
-	-- print("newText height vs obj height:", height, obj.height / g.scale)
+						fontSizeFromHeight(height, g.scale))
 	gameObj:setObj(obj)
-	gameObj.width = obj.width / g.scale  -- Corona measured when obj created
-	gameObj.widthPrev = gameObj.width
-	gameObj.heightPrev = gameObj.height
-	gameObj.updateSize = GameObj.updateSizeText   -- override sizing method
+	gameObj.width = obj.width / g.scale   -- Corona measured when obj created
+	gameObj.updateSize = updateSizeText   -- override sizing method
 	gameObj.text = text
 	gameObj:setFillColorFromName(colorName or "black")
 	return gameObj
@@ -210,97 +263,6 @@ function GameObj:newImage(group, filename, x, y, width)
 	gameObj:setObj(obj)
 	gameObj:setText(filename)     -- set text field to filename by default
 	return gameObj
-end
-
-
----------------- Frame Update, Location and Sizing ---------------------------
-
--- Sync the Corona display object for this GameObj
-function GameObj:sync()
-	-- Visibility
-	local obj = self.obj
-	obj.isVisible = self.visible
-	if self.visible then
-		-- Stroke width  TODO: Set only on resize
-		if self.lineColor then
-			obj.strokeWidth = self.lineWidth
-		else
-			obj.strokeWidth = 0
-		end
-
-		-- Position
-		local scale = g.scale
-		obj.x = self.x * scale
-		obj.y = self.y * scale
-
-		-- Size (must be last because it may recreate the object)
-		self:updateSize(scale)   -- calls type-specific methods below
-
-		-- Remember values used for last sync
-		self.widthPrev = self.width
-		self.heightPrev = self.height
-		self.scalePrev = scale
-	end
-end
-
--- Move/update the GameObj as necessary for a new frame interval
-function GameObj:updateForNextFrame()
-	-- Move object by its velocity
-	self.x = self.x + self.xSpeed
-	self.y = self.y + self.ySpeed
-end
- 
--- Update the size for the display object for a rectangular object
-function GameObj:updateSizeRect(scale)
-	local obj = self.obj
-	obj.width = self.width * scale
-	obj.height = self.height * scale
-end
-
--- Update the size for a circle object
-function GameObj:updateSizeCircle(scale)
-	local obj = self.obj
-	obj.path.radius = (self.width / 2) * scale
-	obj.yScale = self.height / self.width   -- to allow ellipses
-end
-
--- Update the size for the display object for a text object
-function GameObj:updateSizeText(scale)
-	-- If height or scale changed then determine and set new font size
-	local height = self.height
-	if scale ~= self.scalePrev or height ~= self.heightPrev then
-		local fontSize = fontSizeFromHeight(height)   -- new font size
-		self.obj.size = math.max(1, fontSize)   -- 0 means default in Corona so 1 is as small we can go
-		self.width = self.width * height / self.heightPrev  -- new text width
-	end
-end
-
--- Update the size for a line object. 
--- Note that width and height are signed offsets to the second point.
-function GameObj:updateSizeLine(scale)
-	-- Line endpoints cannot be changed in Corona, so if the endpoint changed
-	-- then we need to delete and re-create the line display object.
-	local obj = self.obj
-	local width = self.width
-	local height = self.height
-	if scale ~= self.scalePrev or width ~= self.widthPrev or height ~= self.heightPrev then
-		-- Find object index in parent group
-		local group = obj.parent
-		for i = 1, group.numChildren do
-			if group[i] == obj then
-				-- Create the new line to replace this one
-				local x = obj.x
-				local y = obj.y
-				local newObj = display.newLine(x, y, x + width * scale, y + height * scale)
-				self:setObj(newObj)
-				group:insert(i, newObj)   -- insert at same z-order as old line
-				self:setLineColorFromColor(self.lineColor)
-				newObj.strokeWidth = obj.strokeWidth
-				obj:removeSelf()          -- remove old line
-				break
-			end
-		end
-	end
 end
 
 
@@ -684,13 +646,16 @@ end
 
 -- Set a GameObj's line color from a color 3-array (nil for none)
 function GameObj:setLineColorFromColor(color)
-	self.lineColor = color  -- nil will set 0 strokeWidth at update
+	self.lineColor = color
 	local obj = self.obj
 	if color then
 		obj:setStrokeColor(
 				g.pinValue(color[1], 0, 255) / 255, 
 				g.pinValue(color[2], 0, 255) / 255, 
 				g.pinValue(color[3], 0, 255) / 255)
+		obj.strokeWidth = self.lineWidth
+	else
+		obj.strokeWidth = 0
 	end
 end
 
@@ -724,9 +689,7 @@ end
 
 -- API
 function GameObj:setSize(width, height)
-	-- TODO: size object only when needed
-	self.width = forceNotNegative(width)
-	self.height = forceNotNegative(height)
+	self:updateSize(forceNotNegative(width), forceNotNegative(height), g.scale)
 end
 
 -- API
@@ -779,12 +742,13 @@ end
 
 -- API
 function GameObj:setLineWidth(lineWidth)
-	self.lineWidth = lineWidth    -- TODO: Recalc size
+	self.lineWidth = lineWidth
+	self:setLineColorFromColor(self.lineColor)    -- sets obj.strokeWidth
 end
 
 -- API
 function GameObj:getLayer()
-	return self.layer;
+	return self.layer
 end
 
 -- API

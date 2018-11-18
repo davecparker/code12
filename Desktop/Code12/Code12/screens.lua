@@ -100,7 +100,7 @@ function ct.setScreen(name)
 
 	-- Hide old screen if any
 	if g.screen then
-		g.screen.group.isVisible = false;
+		g.screen.group.isVisible = false
 	end
 
 	-- Does this screen name already exist?
@@ -124,16 +124,12 @@ function ct.setScreen(name)
 		g.screen = screen
 
 		-- Add default white background
-		ct.setBackColor("white")
+		ct.setBackColor("white")    -- sets backObj
 	end
 
-	-- Show new screen
-	screen.group.isVisible = true;
-
-	-- Update the screen's background object if any
-	if screen.backObj then
-		screen.backObj:updateBackObj()
-	end
+	-- Show new screen and make sure it does a full resize at next update
+	screen.group.isVisible = true
+	g.window.resized = true
 end
 
 -- API

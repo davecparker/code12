@@ -44,14 +44,44 @@ local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
 
 ---------------- Internal Runtime Functions ------------------------------------------
 
+-- Apply xSpeed and ySpeed to all the objects in group
+local function applyObjectSpeeds(group)
+	for i = 1, group.numChildren do
+		local gameObj = group[i].code12GameObj
+		gameObj.x = gameObj.x + gameObj.xSpeed
+		gameObj.y = gameObj.y + gameObj.ySpeed
+		-- TODO: put auto deletion here
+	end
+end
+
+-- Update the display objects in group from their GameObj positions and visibility
+-- at the scale. If setSize then update the object size as well for the new scale.
+local function syncObjects(group, scale, setSize)
+	for i = 1, group.numChildren do
+		local obj = group[i]
+		local gameObj = obj.code12GameObj
+		local visible = gameObj.visible
+		obj.isVisible = visible
+		if visible then
+			obj.x = gameObj.x * scale
+			obj.y = gameObj.y * scale
+			if setSize then
+				gameObj:updateSize(gameObj.width, gameObj.height, scale)
+			end
+		end
+	end
+end
+
 -- The enterFrame listener for each frame update
 local function onNewFrame()
 	-- Call or resume the current user function if not paused (start or update)
 	local status = false
-	if g.userFn and g.runState ~= "paused" then
-		status = runtime.runEventFunction(g.userFn)
+	local runState = g.runState
+	local userFn = g.userFn
+	if userFn and runState ~= "paused" then
+		status = runtime.runEventFunction(userFn)
 		if status == nil then   -- userFn finished
-			if g.userFn == ct.userFns.start then
+			if userFn == ct.userFns.start then
 				-- User's start function finished
 				if g.outputFile then
 					g.outputFile:flush()   -- flush any print output
@@ -69,33 +99,31 @@ local function onNewFrame()
 	g.charTyped = nil
 
 	-- Update drawing objects as necessary
-    if g.screen then
-		-- Update the background object if the screen resized since last time
-		if g.window.resized then
-			g.screen.backObj:updateBackObj()
+	local screen = g.screen
+    if screen then
+		local objs = screen.objs
+
+		-- Apply speed to objects if running and userFn didn't yield
+		if runState == "running" and status ~= "yielded" then
+			applyObjectSpeeds(objs)
 		end
-		-- Update and/or sync the user drawing objects
-		local objs = g.screen.objs
-		local i = 1
-		while i <= objs.numChildren do
-			-- TODO: Check for auto deletion
-			local gameObj = objs[i].code12GameObj
-			-- if gameObj:shouldAutoDelete() then
-			--	gameObj:removeAndDelete()
-			--else
-				-- Update objects if running and userFn didn't yield
-				if g.runState == "running" and status ~= "yielded" then
-					gameObj:updateForNextFrame()
-				end
-				-- Always sync the objects so the display is correct
-				gameObj:sync()
-				i = i + 1
-			--end
+
+		-- If the window resized then we need to resize all the contents
+		local scale = g.scale
+		if g.window.resized then
+			-- Background object
+			screen.backObj:updateBackObj()
+			-- Screen origin
+			objs.x = -screen.originX * scale
+			objs.y = -screen.originY * scale
+			-- Graphic objects
+			syncObjects(objs, scale, true);
+			g.window.resized = false
+		else
+			-- Just sync object positions and visibility
+			syncObjects(objs, scale);
 		end
 	end
-
-	-- We have now adapted to any window resize
-	g.window.resized = false
 end
 
 -- Global key event handler for the runtime
@@ -190,7 +218,7 @@ end
 
 -- Load the given string of Lua code as the user program and init the program.
 -- Return an error string if the program failed to load, or nil for success.
-function runtime.strErrLoadLuaCode( luaCode )
+function runtime.strErrLoadLuaCode(luaCode)
 	-- Load the code and execute the main chunk if successful
 	local strErr
 	codeFunction, strErr = loadstring( luaCode )
@@ -205,7 +233,7 @@ end
 -- passing the additional parameters given.
 -- Return the coroutine's status as "yielded", "aborted", nil if completed, or
 -- false if not run because func was nil or could not be run.
-function runtime.runEventFunction( func, ... )
+function runtime.runEventFunction(func, ...)
 	-- Is a coroutine already running?
 	if coRoutineUser then
 		if coroutine.status(coRoutineUser) == "dead" then
@@ -236,7 +264,27 @@ function runtime.blockAndYield(...)
 	end
 end
 
+-- Sync drawing objects on the current screen after possible changes
+function runtime.syncScreenObjects()
+	local screen = g.screen
+	if screen then
+		syncObjects(screen.objs, g.scale)
+	end
+end
+
+-- Run the user input (mouse or keyboard) event func if any.
+-- Return result per runtime.runEventFunction().
+function runtime.runInputEvent(func, ...)
+	if func then
+		local result = runtime.runEventFunction(func, ...)
+		runtime.syncScreenObjects()  -- in case screen redraws before next enterFrame
+		return result
+	end
+	return false
+end
+
 -- Handle a resize of the available output area
+-- TODO: max once per frame?
 function runtime.onResize()
 	-- Get new metrics
 	getDeviceMetrics()
