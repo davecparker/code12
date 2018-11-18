@@ -1939,57 +1939,6 @@ by `ct.getHeight()` (bottom edge).
 > It is not an error to position an object outside the application window,
 > it will simply not be visible or will clip at the window boundary.
 
-### obj.width
-
-### obj.height
-```
-double width, height
-```
-The `width` and `height` fields specify the size of the object
-in graphics coordinates. The different types of `GameObj` objects
-react somewhat differently to changes in size, as follows:
-
-##### circle Objects
-Although circles are always created round, you can create an ellipse
-by setting different `width` and `height` values.
-
-##### rect Objects
-Rectangles can be any size and adjust to any `width` and `height`.
-
-##### line Objects
-Line objects are created between two points. After creation,
-the `x` and `y` fields are the location of the first point,
-and the `width` and `height` fields specify signed offsets
-(can be negative) from the first point to the second point.
-Thus, the location of the second point is
-(`x` + `width`, `y` + `height`). You can change any of the
-`x`, `y`, `width`, or `height` fields, and the line will adjust.
-
-> Note that unlike any of the other `GameObj` object types,
-> a line may have negative values for the `width` and `height`
-> fields. The physical width and height of the line's bounding
-> box can be reliably determined with  
-> `Math.abs(line.width)` and `Math.abs(line.height)`.
-> This does not include the thickness of the drawn line itself
-> (see [obj.setLineWidth()]).
-
-##### text Objects
-Text objects use a font size that is automatically determined by
-the object's `height`, and the object's `width` is calculated
-automatically. So, changing `height` will change the font size,
-and changes to the `width` field are undefined.
-
-> **Note:** When you change a text object's `height`, the `width`
-> will be recalculated automatically. However, the new value for
-> `width` is not available immediately. It will be recalculated
-> the next time the object draws (at the next animation frame).
-
-##### image Objects
-Images are initially created with `height` calculated automatically
-to preserve the image's aspect ratio given the specified `width`.
-However, once created, you can set any values for `width` and `height`,
-and the image will scale and/or stretch as necessary to fill the space.
-
 ### obj.xSpeed
 
 ### obj.ySpeed
@@ -2098,15 +2047,64 @@ is enclosed in square brackets.
 [rect at (50, 100) "bottom wall"]
 ```
 
+### obj.getWidth()
+Returns the width of the object. See [obj.setSize()].
+
+
+### obj.getHeight()
+Returns the height of the object. See [obj.setSize()].
+
+
 ### obj.setSize()
 ```
 obj.setSize( double width, double height )
 ```
 Set the size of the object using `width` and `height`.
-This is just a convenience method that is equivalent to
-setting both the `width` and `height` fields.
+
 Note that different types of objects react differently to changes
-in width or height. (see [width, height](#width-height) above).
+in width or height, as follows:
+
+##### circle Objects
+Although circles are always created round, you can create an ellipse
+by setting different `width` and `height` values.
+
+##### rect Objects
+Rectangles can be any size and adjust to any `width` and `height`.
+
+##### line Objects
+Line objects are created between two points. After creation,
+the `x` and `y` fields are the location of the first point,
+and the `width` and `height` fields specify signed offsets
+(can be negative) from the first point to the second point.
+Thus, the location of the second point is
+(`x` + `width`, `y` + `height`). You can change any of the
+`x`, `y`, `width`, or `height` fields, and the line will adjust.
+
+> Note that unlike any of the other `GameObj` object types,
+> a line may have negative values for the `width` and `height`
+> fields. The physical width and height of the line's bounding
+> box can be reliably determined with  
+> `Math.abs(line.width)` and `Math.abs(line.height)`.
+> This does not include the thickness of the drawn line itself
+> (see [obj.setLineWidth()]).
+
+##### text Objects
+Text objects use a font size that is automatically determined by
+the object's `height`, and the object's `width` is calculated
+automatically. So, changing `height` will change the font size,
+and changes to the `width` field are undefined.
+
+> **Note:** When you change a text object's `height`, the `width`
+> will be recalculated automatically. However, the new value for
+> `width` is not available immediately. It will be recalculated
+> the next time the object draws (at the next animation frame).
+
+##### image Objects
+Images are initially created with `height` calculated automatically
+to preserve the image's aspect ratio given the specified `width`.
+However, once created, you can set any values for `width` and `height`,
+and the image will scale and/or stretch as necessary to fill the space.
+
 
 ### obj.align()
 ```

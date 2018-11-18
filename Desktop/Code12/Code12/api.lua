@@ -6,7 +6,7 @@
 -- See the definition of the Code12 API functions in API.html.
 -- The Lua implementation uses the Corona SDK.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
 

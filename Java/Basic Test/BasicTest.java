@@ -2,7 +2,10 @@ import Code12.*;
 
 class BasicTest extends Code12Program
 {
-   GameObj circle, fish, wall;  
+   String author = "Dave";
+   String title;
+   GameObj circle, fish, wall;
+   GameObj [] unused = new GameObj[3];  
 
    public static void main(String[] args)
    { 
@@ -110,9 +113,9 @@ class BasicTest extends Code12Program
          
       double scale = 1.2;
       if (ct.charTyped("+"))
-         fish.setSize(fish.width * scale, fish.height * scale);
+         fish.setSize(fish.getWidth() * scale, fish.getHeight() * scale);
       else if (ct.charTyped("-"))
-         fish.setSize(fish.width / scale, fish.height / scale);
+         fish.setSize(fish.getWidth() / scale, fish.getHeight() / scale);
          
    }
 

@@ -4,7 +4,7 @@
 --
 -- Implementation of the variable watch window for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
 -- Code12 app modules
@@ -52,8 +52,7 @@ local scrollbar               -- the varWatch scrollbar
 local scrollOffset            -- starting line if scrolled back or nil if at end
 local arrayAssigned           -- true when an array has been assigned and displayData needs to be updated 
 local scrollOffsetChanged     -- true when scrollOffset has changed and displayRows needs to be updated
-local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
-                        "visible", "clickable", "group" }
+local gameObjFields = { "x", "y", "xSpeed", "ySpeed", "visible", "clickable", "group" }
 local numGameObjFields = #gameObjFields
 
 
@@ -86,7 +85,10 @@ end
 
 -- Returns a string for the given String value
 local function textForStringValue( value )
-	return value
+	if value then
+		return '"' .. value .. '"'
+	end
+	return "null"
 end
 
 -- Returns a string for the given GameObj value
@@ -100,7 +102,13 @@ end
 -- Returns a string for the given GameObj value and field
 local function textForGameObjField( value, field )
 	if value then
-		return tostring(value[field])
+		local fieldValue = value[field]
+		if fieldValue == nil then
+			return "null"
+		elseif type(fieldValue) == "string" then
+			return '"' .. fieldValue .. '"'
+		end
+		return tostring(fieldValue)
 	end
 	return "-"
 end
@@ -251,21 +259,24 @@ local function updateValues()
 			local var = d.var
 			local value = ct.userVars[var.nameID.str]
 			local textForValue = d.textForValue
-			if not index and not field then
-				-- Value of a top-level variable
-				if textForValue then
-					displayRows[i][2].text = textForValue( value )
+			if index then
+				if field then
+					-- Value of a GameObj field of a GameObj in an array
+					displayRows[i][3].text = textForValue( value[index], field )
+				else
+					-- Value of an indexed array
+					displayRows[i][2].text = textForValue( value[index] or value.default )
 				end
-			elseif not index and field then
-				-- Value of a field of a GameObj
-				displayRows[i][2].text = textForValue( value, field )
-			elseif index and not field then
-				-- Value of an indexed array
-				displayRows[i][2].text = textForValue( value[index] or value.default )
 			else
-				-- index and field
-				-- Value of a GameObj field of a GameObj in an array
-				displayRows[i][3].text = textForValue( value[index], field )
+				if field then
+					-- Value of a field of a GameObj
+					displayRows[i][2].text = textForValue( value, field )
+				else
+					-- Value of a top-level variable
+					if textForValue then
+						displayRows[i][2].text = textForValue( value )
+					end  -- TODO: else what?
+				end
 			end
 		end
 	end

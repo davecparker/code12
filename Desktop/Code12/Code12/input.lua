@@ -4,7 +4,7 @@
 --
 -- Implementation of the touch and key input handling for the Code12 Lua runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 ----------------------------------------------------------------------------------------
 
 

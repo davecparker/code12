@@ -4,7 +4,7 @@
 --
 -- The global state and utility functions for the Code12 Lua Runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
 

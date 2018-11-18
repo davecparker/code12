@@ -1121,27 +1121,6 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 <blockquote>
 <p>It is not an error to position an object outside the application window, it will simply not be visible or will clip at the window boundary.</p>
 </blockquote>
-<h3 id="obj.width">obj.width</h3>
-<h3 id="obj.height">obj.height</h3>
-<pre><code>double width, height</code></pre>
-<p>The <code>width</code> and <code>height</code> fields specify the size of the object in graphics coordinates. The different types of <code>GameObj</code> objects react somewhat differently to changes in size, as follows:</p>
-<h5 id="circle-objects">circle Objects</h5>
-<p>Although circles are always created round, you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
-<h5 id="rect-objects">rect Objects</h5>
-<p>Rectangles can be any size and adjust to any <code>width</code> and <code>height</code>.</p>
-<h5 id="line-objects">line Objects</h5>
-<p>Line objects are created between two points. After creation, the <code>x</code> and <code>y</code> fields are the location of the first point, and the <code>width</code> and <code>height</code> fields specify signed offsets (can be negative) from the first point to the second point. Thus, the location of the second point is (<code>x</code> + <code>width</code>, <code>y</code> + <code>height</code>). You can change any of the <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> fields, and the line will adjust.</p>
-<blockquote>
-<p>Note that unlike any of the other <code>GameObj</code> object types, a line may have negative values for the <code>width</code> and <code>height</code> fields. The physical width and height of the line’s bounding box can be reliably determined with<br />
-<code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <a href="#obj.setlinewidth">obj.setLineWidth()</a>).</p>
-</blockquote>
-<h5 id="text-objects">text Objects</h5>
-<p>Text objects use a font size that is automatically determined by the object’s <code>height</code>, and the object’s <code>width</code> is calculated automatically. So, changing <code>height</code> will change the font size, and changes to the <code>width</code> field are undefined.</p>
-<blockquote>
-<p><strong>Note:</strong> When you change a text object’s <code>height</code>, the <code>width</code> will be recalculated automatically. However, the new value for <code>width</code> is not available immediately. It will be recalculated the next time the object draws (at the next animation frame).</p>
-</blockquote>
-<h5 id="image-objects">image Objects</h5>
-<p>Images are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to fill the space.</p>
 <h3 id="obj.xspeed">obj.xSpeed</h3>
 <h3 id="obj.yspeed">obj.ySpeed</h3>
 <pre><code>double xSpeed, ySpeed</code></pre>
@@ -1184,9 +1163,31 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 [image at (21, 83) &quot;goldfish.png&quot;]
 [image at (21, 83) &quot;hero&quot;]
 [rect at (50, 100) &quot;bottom wall&quot;]</code></pre>
+<h3 id="obj.getwidth">obj.getWidth()</h3>
+<p>Returns the width of the object. See <a href="#obj.setsize">obj.setSize()</a>.</p>
+<h3 id="obj.getheight">obj.getHeight()</h3>
+<p>Returns the height of the object. See <a href="#obj.setsize">obj.setSize()</a>.</p>
 <h3 id="obj.setsize">obj.setSize()</h3>
 <pre><code>obj.setSize( double width, double height )</code></pre>
-<p>Set the size of the object using <code>width</code> and <code>height</code>. This is just a convenience method that is equivalent to setting both the <code>width</code> and <code>height</code> fields. Note that different types of objects react differently to changes in width or height. (see <a href="#width-height">width, height</a> above).</p>
+<p>Set the size of the object using <code>width</code> and <code>height</code>.</p>
+<p>Note that different types of objects react differently to changes in width or height, as follows:</p>
+<h5 id="circle-objects">circle Objects</h5>
+<p>Although circles are always created round, you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
+<h5 id="rect-objects">rect Objects</h5>
+<p>Rectangles can be any size and adjust to any <code>width</code> and <code>height</code>.</p>
+<h5 id="line-objects">line Objects</h5>
+<p>Line objects are created between two points. After creation, the <code>x</code> and <code>y</code> fields are the location of the first point, and the <code>width</code> and <code>height</code> fields specify signed offsets (can be negative) from the first point to the second point. Thus, the location of the second point is (<code>x</code> + <code>width</code>, <code>y</code> + <code>height</code>). You can change any of the <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> fields, and the line will adjust.</p>
+<blockquote>
+<p>Note that unlike any of the other <code>GameObj</code> object types, a line may have negative values for the <code>width</code> and <code>height</code> fields. The physical width and height of the line’s bounding box can be reliably determined with<br />
+<code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <a href="#obj.setlinewidth">obj.setLineWidth()</a>).</p>
+</blockquote>
+<h5 id="text-objects">text Objects</h5>
+<p>Text objects use a font size that is automatically determined by the object’s <code>height</code>, and the object’s <code>width</code> is calculated automatically. So, changing <code>height</code> will change the font size, and changes to the <code>width</code> field are undefined.</p>
+<blockquote>
+<p><strong>Note:</strong> When you change a text object’s <code>height</code>, the <code>width</code> will be recalculated automatically. However, the new value for <code>width</code> is not available immediately. It will be recalculated the next time the object draws (at the next animation frame).</p>
+</blockquote>
+<h5 id="image-objects">image Objects</h5>
+<p>Images are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to fill the space.</p>
 <h3 id="obj.align">obj.align()</h3>
 <pre><code>obj.align( String alignment )</code></pre>
 <p>Set the alignment of the object to <code>alignment</code>. The alignment is a description of where where the object is positioned on screen relative to its <code>x</code> and <code>y</code> coordinates. By default, objects are positioned by their center point, so that (<code>x</code>, <code>y</code>) is at the horizontal and vertical center of the object.</p>

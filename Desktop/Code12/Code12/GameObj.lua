@@ -4,7 +4,7 @@
 --
 -- Implementation of the GameObj class for the Code12 Lua runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
 
@@ -56,8 +56,6 @@ function GameObj:new(typeName, x, y, width, height)
 		-- Public data fields (units here are logical unscaled)
 		x = x,
 		y = y,
-		width = width,
-		height = height,
 		xSpeed = 0,
 		ySpeed = 0,
 		visible = true,
@@ -66,6 +64,8 @@ function GameObj:new(typeName, x, y, width, height)
 
 		-- Private fields
 		typeName = typeName,     -- "circle", "rect", etc.
+		width = width,
+		height = height,
 		obj = nil,               -- the Corona display object
 		text = nil,
 		fillColor = nil,
@@ -713,6 +713,23 @@ function GameObj:getType()
 end
 
 -- API
+function GameObj:getWidth()
+	return self.width
+end
+
+-- API
+function GameObj:getHeight()
+	return self.height
+end
+
+-- API
+function GameObj:setSize(width, height)
+	-- TODO: size object only when needed
+	self.width = forceNotNegative(width)
+	self.height = forceNotNegative(height)
+end
+
+-- API
 function GameObj:getText()
 	return self.text
 end
@@ -733,13 +750,6 @@ function GameObj:toString()
 		s = s .. " \"" .. self.text .. "\""
 	end
 	return s .. "]"
-end
-
--- API
-function GameObj:setSize(width, height)
-	-- This is just a convenience method to set the public fields
-	self.width = forceNotNegative(width)
-	self.height = forceNotNegative(height)
 end
 
 -- API

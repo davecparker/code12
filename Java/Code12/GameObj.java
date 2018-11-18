@@ -8,7 +8,6 @@ public abstract class GameObj implements GameObjInterface
 {
    // Public instance variables (client can get or set these directly)
    public double x, y;              // position of object or start point if line
-   public double width, height;     // size of the object
    public double xSpeed, ySpeed;    // velocity
    public boolean visible;          // true if object is visible
    public boolean clickable;        // true if object is clickable
@@ -19,6 +18,7 @@ public abstract class GameObj implements GameObjInterface
    protected String type;           // "circle", etc.
    protected double xAlignFactor;   // 0 for left, 0.5 for center, 1 for right
    protected double yAlignFactor;   // 0 for top, 0.5 for center, 1 for bottom
+   protected double width, height;  // size of the object
    protected Color fillColor;       // fill color or null for none
    protected Color lineColor;       // line/frame color or null for none
    protected int lineWidth;         // line/frame thickness in pixels
@@ -32,8 +32,6 @@ public abstract class GameObj implements GameObjInterface
    {
       this.x = x;
       this.y = y;
-      this.width = width;
-      this.height = height;
       xSpeed = 0;
       ySpeed = 0;
       visible = true;
@@ -44,6 +42,8 @@ public abstract class GameObj implements GameObjInterface
       type = "GameObj";
       xAlignFactor = 0.5;  // center
       yAlignFactor = 0.5;  // center
+      this.width = width;
+      this.height = height;
       fillColor = Color.BLACK;
       lineColor = Color.BLACK;
       lineWidth = 1;
@@ -68,6 +68,9 @@ public abstract class GameObj implements GameObjInterface
       return s + "]";
    }
 
+   public double getWidth()           { return width; }
+   public double getHeight()          { return height; }
+   
    public void setSize(double width, double height)
    {
       this.width = width;

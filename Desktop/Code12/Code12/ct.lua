@@ -4,7 +4,7 @@
 --
 -- The ct table, which contains the Code12 API functions and user program data.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
 

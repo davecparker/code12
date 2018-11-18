@@ -95,7 +95,6 @@ class GameObj
 	// GameObj Public Data Fields
 	//---------------------------
 	double x, y;
-	double width, height;
 	double xSpeed, ySpeed;   // at 60 fps
 	boolean visible;
 	boolean clickable;
@@ -104,10 +103,12 @@ class GameObj
 	// GameObj Methods
 	// ---------------
 	String getType( )                                  // "circle", "image", etc.
+	double getWidth( )
+	double getHeight( )
+	void setSize( double width, double height )
 	String getText( )
 	void setText( String text )                        // included in print output
 	String toString( )                                 // "[type at (x, y) "text"]"
-	void setSize( double width, double height )
 	void align( String alignment )                     // "top left", "top", "center", etc.
 	void setFillColor( String color )                  // "red", "white", etc. or null
 	void setFillColorRGB( int red, int green, int blue )

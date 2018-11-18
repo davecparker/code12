@@ -11,6 +11,8 @@ public interface GameObjInterface
    public String toString();
    
    // The object size and alignment
+   public double getWidth();
+   public double getHeight();
    public void setSize(double width, double height);
    public void align(String a);
    
