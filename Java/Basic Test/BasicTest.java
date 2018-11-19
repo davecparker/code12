@@ -5,7 +5,7 @@ class BasicTest extends Code12Program
    String author = "Dave";
    String title;
    GameObj circle, fish, wall;
-   GameObj [] unused = new GameObj[3];  
+   GameObj [] fishes = new GameObj[3];  
 
    public static void main(String[] args)
    { 
@@ -42,6 +42,7 @@ class BasicTest extends Code12Program
       GameObj t = ct.text("Hello!", 50, 50, 10, "purple");
       t.align("left");
       t.setLayer(2);
+      t.setClickable(false);
       ct.log(t);
       ct.log(t.getText());
 
@@ -71,6 +72,7 @@ class BasicTest extends Code12Program
          // fish.setText("Bob");
          ct.log(fish);
          fish.setSpeed(-1, 0);
+         fishes[1] = fish;
       }
             
       ct.setSoundVolume(0.7);
@@ -97,6 +99,8 @@ class BasicTest extends Code12Program
          // ct.clearScreen();
          ct.setScreen("end");
       }
+      else if (ct.objectClicked() != null)
+         ct.logm("Object clicked", ct.objectClicked());
       else if (ct.clicked())
       {
          ct.logm("Click at", ct.clickX(), ct.clickY());
@@ -113,9 +117,14 @@ class BasicTest extends Code12Program
          fish.setSize(fish.getWidth() * scale, fish.getHeight() * scale);
       else if (ct.charTyped("-"))
          fish.setSize(fish.getWidth() / scale, fish.getHeight() / scale);
-      else if (ct.charTyped("g"))
+      else if (ct.charTyped("f"))
          fish.setSpeed(-1, 0);
-         
+      else if (ct.charTyped("r"))
+         fish.setSpeed(1, 0);         
+      else if (ct.charTyped("u"))
+         fish.setSpeed(0, -1);
+      else if (ct.charTyped("d"))
+         fish.setSpeed(0, 1);         
    }
 
 /*      

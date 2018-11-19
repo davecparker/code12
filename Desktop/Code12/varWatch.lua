@@ -199,9 +199,9 @@ local function makeDisplayData()
 								local gameObjField = gameObjFields[k]
 								d = { var = var, index = j, field = gameObjField, }
 								if k <= numPublicGameObjFields then
-									d.initRowTexts = { "." .. gameObjField, "" }
+									d.initRowTexts = { "", "." .. gameObjField, "" }
 								else
-									d.initRowTexts = { gameObjField, "" }
+									d.initRowTexts = { "", gameObjField, "" }
 								end
 								d.textIndents = indexAndFieldIndents
 								d.textForValue = textForGameObjField
