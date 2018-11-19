@@ -11,6 +11,7 @@
 local composer = require( "composer" )
 
 -- Code12 app modules
+local ct = require("Code12.ct")
 local g = require( "Code12.globals" )
 local app = require( "app" )
 local buttons = require( "buttons" )
@@ -59,6 +60,12 @@ local function showButtons( btns )
 	end
 end
 
+-- Execute the Stop button
+local function doStop()
+	runtime.message( "Program Stopped" )
+	runtime.stop()
+end
+
 
 --- Module Functions ------------------------------------------------
 
@@ -89,7 +96,7 @@ function toolbar.create()
 	toolbarBtns[#toolbarBtns + 1] = resumeBtn
 	
 	-- Stop button
-	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", runtime.stop, "left", pauseBtn )
+	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", doStop, "left", pauseBtn )
 	toolbarBtns[#toolbarBtns + 1] = stopBtn
 
 	-- Next Frame button
@@ -126,7 +133,11 @@ function toolbar.update()
 	elseif runState == "waiting" then
 		showButtons{ stopBtn }
 	elseif runState == "paused" then
-		showButtons{ resumeBtn, stopBtn, nextFrameBtn }
+		if runtime.canStepOneFrame() then
+			showButtons{ resumeBtn, stopBtn, nextFrameBtn }
+		else
+			showButtons{ resumeBtn, stopBtn }
+		end
 	elseif runState == "stopped" then
 		showButtons{ restartBtn, chooseProgramBtn, optionsBtn }
 	elseif runState == "error" then

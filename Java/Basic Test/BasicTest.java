@@ -46,11 +46,9 @@ class BasicTest extends Code12Program
       ct.log(t.getText());
 
       GameObj r = ct.rect(50, 50, 50, 50, "pink");
-      r.clickable = true;
       
       circle = ct.circle(50, 20, 10, "orange");
       circle.setFillColorRGB(400, 127, -50);
-      circle.clickable = true;
       circle.group = "dots";
 
       GameObj cc = ct.circle(50, 50, 10);
@@ -71,9 +69,8 @@ class BasicTest extends Code12Program
       {
          fish = ct.image("goldfish.png", x, 85, 20);
          // fish.setText("Bob");
-         fish.clickable = true;
          ct.log(fish);
-         fish.xSpeed = -1;
+         fish.setSpeed(-1, 0);
       }
             
       ct.setSoundVolume(0.7);
@@ -87,7 +84,7 @@ class BasicTest extends Code12Program
          fish.x = -30;
          
       if (fish.hit(wall))
-         fish.xSpeed = -fish.xSpeed;
+         fish.setSpeed(0, 0);
       
       if (circle.clicked())
       {
@@ -116,6 +113,8 @@ class BasicTest extends Code12Program
          fish.setSize(fish.getWidth() * scale, fish.getHeight() * scale);
       else if (ct.charTyped("-"))
          fish.setSize(fish.getWidth() / scale, fish.getHeight() / scale);
+      else if (ct.charTyped("g"))
+         fish.setSpeed(-1, 0);
          
    }
 

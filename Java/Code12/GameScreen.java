@@ -125,19 +125,21 @@ public class GameScreen
    // Update the objects for the next frame
    void update()
    {
-      // Update the objects. Note that objects may be deleted during the loop. 
-      int i = 0;
-      while (i < objects.size())
+      // Objects that move via xSpeed/ySpeed get automatically deleted if they
+      // go more then 100 units off-screen.
+      double xMin = xOrigin - 100;
+      double xMax = xMin + width + 200;
+      double yMin = yOrigin - 100;
+      double yMax = yMin + height + 200;
+      
+      // Update the objects. Note that objects may be deleted during the loop.
+      for (int i = objects.size() - 1; i >= 0; i--)
       {
          GameObj obj = objects.get(i);
-         
-         // TODO: Check for auto deletion
-         // if (obj.shouldAutoDelete())
-         //   objects.remove(i);
-         // else
-         { 
-            obj.update();
-            i++;
+         if (obj.update())    // true if the object moved via speed
+         {
+            if (obj.x < xMin || obj.x > xMax || obj.y < yMin || obj.y > yMax)
+               objects.remove(i);
          }
       }
    }

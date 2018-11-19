@@ -44,13 +44,32 @@ local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
 
 ---------------- Internal Runtime Functions ------------------------------------------
 
--- Apply xSpeed and ySpeed to all the objects in group
-local function applyObjectSpeeds(group)
-	for i = 1, group.numChildren do
-		local gameObj = group[i].code12GameObj
-		gameObj.x = gameObj.x + gameObj.xSpeed
-		gameObj.y = gameObj.y + gameObj.ySpeed
-		-- TODO: put auto deletion here
+-- Apply xSpeed and ySpeed to all the objects in the screen
+-- and delete any that went out of bounds.
+local function applyObjectSpeeds(screen)
+	-- Objects using xSpeed and ySpeed automatically get deleted if they
+	-- go more than 100 units off-screen. 
+	local xMin = screen.originX - 100
+	local xMax = xMin + g.WIDTH + 200
+	local yMin = screen.originY - 100
+	local yMax = yMin + g.height + 200
+
+	-- Look for objects with hasSpeed set
+	local objs = screen.objs
+	for i = objs.numChildren, 1, -1 do
+		local gameObj = objs[i].code12GameObj
+		if gameObj.hasSpeed then
+			-- Apply the speed
+			local x = gameObj.x + gameObj.xSpeed
+			local y = gameObj.y + gameObj.ySpeed
+			gameObj.x = x
+			gameObj.y = y
+
+			-- Delete object if it went out of bounds
+			if x < xMin or x > xMax or y < yMin or y > yMax then
+				gameObj:removeAndDelete()
+			end
+		end
 	end
 end
 
@@ -60,14 +79,11 @@ local function syncObjects(group, scale, setSize)
 	for i = 1, group.numChildren do
 		local obj = group[i]
 		local gameObj = obj.code12GameObj
-		local visible = gameObj.visible
-		obj.isVisible = visible
-		if visible then
-			obj.x = gameObj.x * scale
-			obj.y = gameObj.y * scale
-			if setSize then
-				gameObj:updateSize(gameObj.width, gameObj.height, scale)
-			end
+		obj.isVisible = gameObj.visible
+		obj.x = gameObj.x * scale
+		obj.y = gameObj.y * scale
+		if setSize then
+			gameObj:updateSize(gameObj.width, gameObj.height, scale)
 		end
 	end
 end
@@ -103,9 +119,10 @@ local function onNewFrame()
     if screen then
 		local objs = screen.objs
 
-		-- Apply speed to objects if running and userFn didn't yield
-		if runState == "running" and status ~= "yielded" then
-			applyObjectSpeeds(objs)
+		-- Apply speed to objects if screen has any and the program is running 
+		-- and userFn didn't yield (which interrupts the update cycle).
+		if screen.hasSpeed and runState == "running" and status ~= "yielded" then
+			applyObjectSpeeds(screen)
 		end
 
 		-- If the window resized then we need to resize all the contents
@@ -117,11 +134,11 @@ local function onNewFrame()
 			objs.x = -screen.originX * scale
 			objs.y = -screen.originY * scale
 			-- Graphic objects
-			syncObjects(objs, scale, true);
+			syncObjects(objs, scale, true)
 			g.window.resized = false
 		else
 			-- Just sync object positions and visibility
-			syncObjects(objs, scale);
+			syncObjects(objs, scale)
 		end
 	end
 end
@@ -324,6 +341,12 @@ function runtime.stepOneFrame()
 	end
 end
 
+-- Return true if the stepOneFrame operation can currently be performed.
+function runtime.canStepOneFrame()
+	-- Can step if we are between frames, not pause in user code
+	return coRoutineUser == nil
+end
+
 -- Stop a run and set the runState to endState (default "stopped")
 function runtime.stop( endState )
 	-- Abort the user coRoutine if necessary
@@ -446,8 +469,8 @@ function runtime.printTextLine(text, rgb)
 	end
 end
 
--- Print a warning message with optional quoted name
-function runtime.warning(message, name)
+-- Return the current line number in the user's code or nil if unknown
+local function userLineNumber()
 	-- Look back on the stack trace to find the user's code (string)
 	-- so we can get the line number.
 	local info
@@ -456,11 +479,28 @@ function runtime.warning(message, name)
 		info = debug.getinfo(level, "Sl")
 		level = level + 1
 	until info == nil or info.short_src == '[string "..."]'
-	
-	-- Build and print the error	
+	if info then
+		return info.currentline
+	end
+	return nil
+end
+
+-- Print a runtime message to the console, followed by "at line #"
+-- if the user's code line number can be determined.
+function runtime.message(message)
+	local lineNum = userLineNumber()
+	if lineNum then
+		message = message .. " at line " .. lineNum
+	end
+	runtime.printTextLine(message, rgbWarningText)
+end
+
+-- Print a warning message to the console with optional quoted name
+function runtime.warning(message, name)
 	local s
-	if info and info.currentline then
-		s = "WARNING (line " .. info.currentline .. "): " .. message
+	local lineNum = userLineNumber()
+	if lineNum then
+		s = "WARNING (line " .. lineNum .. "): " .. message
 	else
 		s = "WARNING: " .. message
 	end

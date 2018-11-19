@@ -12,6 +12,7 @@
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
+local GameObj = require("Code12.GameObj")
 
 
 ---------------- Touch Tracking ----------------------------------------------
@@ -48,19 +49,13 @@ local function clickEvent(event, gameObj)
 			return false
 		end
 
-		-- If gameObj is nil, check if a line was clicked
+		-- If gameObj is nil then check if a line was clicked
+		-- because Corona doesn't sent touch events to lines.
 		focusObj = event.target
 		if gameObj == nil then
-			local objs = g.screen.objs
-			for i = 1, objs.numChildren do
-				local gObj = objs[i].code12GameObj
-				if gObj.clickable and gObj.typeName == "line" then
-					if gObj:lineContainsPoint(x, y) then
-						gameObj = gObj
-						focusObj = objs[i]
-						break
-					end
-				end
+			gameObj = GameObj.hitTestLines(x, y)
+			if gameObj then
+				focusObj = gameObj.obj
 			end
 		end
 

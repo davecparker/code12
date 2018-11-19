@@ -10,10 +10,11 @@ public interface GameObjInterface
    public void setText(String text);
    public String toString();
    
-   // The object size and alignment
+   // Object positioning
    public double getWidth();
    public double getHeight();
    public void setSize(double width, double height);
+   public void setSpeed(double xSpeed, double ySpeed);
    public void align(String a);
    
    // The fill and line
@@ -29,6 +30,7 @@ public interface GameObjInterface
    public void delete();
    
    // Polled input
+   public void setClickable(boolean clickable);
    public boolean clicked();
    
    // Geometry

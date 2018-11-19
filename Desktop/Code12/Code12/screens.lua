@@ -114,9 +114,10 @@ function ct.setScreen(name)
 			name = name,
 			group = display.newGroup(),
 			objs = display.newGroup(),   -- layer above background obj
-			backObj = nil,    -- background object, set below
 			originX = 0,
 			originY = 0,
+			-- backObj = nil,     -- background object, set below
+			-- hasSpeed = nil,    -- true if any objs use xSpeed/ySpeed
 		}
 		g.mainGroup:insert(screen.group)
 		screen.group:insert(screen.objs)

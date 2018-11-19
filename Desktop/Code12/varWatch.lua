@@ -52,8 +52,16 @@ local scrollbar               -- the varWatch scrollbar
 local scrollOffset            -- starting line if scrolled back or nil if at end
 local arrayAssigned           -- true when an array has been assigned and displayData needs to be updated 
 local scrollOffsetChanged     -- true when scrollOffset has changed and displayRows needs to be updated
-local gameObjFields = { "x", "y", "xSpeed", "ySpeed", "visible", "clickable", "group" }
-local numGameObjFields = #gameObjFields
+
+-- Names of GameObj public data fields to show
+local gameObjFields = { 
+	-- Public fields
+	"x", "y", "visible", "group", 
+	-- Additional fields
+	"width", "height", "xSpeed", "ySpeed", "text", "fillColor", "lineColor", 
+	"lineWidth", "layer", "clickable",
+}
+local numPublicGameObjFields = 4
 
 
 --- Internal Functions ---------------------------------------------------------
@@ -65,7 +73,7 @@ local function getVars()
 		local maxVarNameWidth = dropDownBtnSize + maxGameObjFieldWidth -- minimum width to ensure space for GameObj fields
 		for i = 1, #vars do
 			local var = vars[i]
-			local varNameWidth = string.len( var.nameID.str ) * charWidth
+			local varNameWidth = math.ceil( string.len( var.nameID.str ) * charWidth )
 			if maxVarNameWidth < varNameWidth then
 				maxVarNameWidth = varNameWidth
 			end
@@ -93,22 +101,27 @@ end
 
 -- Returns a string for the given GameObj value
 local function textForGameObjValue( value )
-	if value then
-		return value:toString()
+	if value == nil then
+		return "null"
+	elseif value.deleted then
+		return "(deleted GameObj)"
 	end
-	return "null"
+	return value:toString()
 end
 
 -- Returns a string for the given GameObj value and field
 local function textForGameObjField( value, field )
 	if value then
-		local fieldValue = value[field]
-		if fieldValue == nil then
+		local v = value[field]
+		local t = type(v)
+		if t == "nil" then
 			return "null"
-		elseif type(fieldValue) == "string" then
-			return '"' .. fieldValue .. '"'
+		elseif t == "string" then
+			return '"' .. v .. '"'
+		elseif t == "table" then   -- { r, g, b }
+			return "(" .. v[1] .. "," .. v[2] .. "," .. v[3] .. ")"
 		end
-		return tostring(fieldValue)
+		return tostring(v)
 	end
 	return "-"
 end
@@ -149,10 +162,14 @@ local function makeDisplayData()
 			iRow = iRow + 1
 			if isOpen and vt == "GameObj" then
 				-- add GameObj data fields
-				for j = 1, numGameObjFields do
+				for j = 1, #gameObjFields do
 					local gameObjField = gameObjFields[j]
 					d = { var = var, field = gameObjField }
-					d.initRowTexts = { "."..gameObjField, "" }
+					if j <= numPublicGameObjFields then
+						d.initRowTexts = { "." .. gameObjField, "" }
+					else
+						d.initRowTexts = { gameObjField, "" }
+					end
 					d.textIndents = indexOrFieldIndents
 					d.textForValue = textForGameObjField
 					displayData[iRow] = d
@@ -178,10 +195,14 @@ local function makeDisplayData()
 						iRow = iRow + 1
 						if arrayType == "GameObj" and var[j.."isOpen"] then
 							-- add GameObj fields for this open GameObj in array
-							for k = 1, numGameObjFields do
+							for k = 1, #gameObjFields do
 								local gameObjField = gameObjFields[k]
 								d = { var = var, index = j, field = gameObjField, }
-								d.initRowTexts = { "", "."..gameObjField, "" }
+								if k <= numPublicGameObjFields then
+									d.initRowTexts = { "." .. gameObjField, "" }
+								else
+									d.initRowTexts = { gameObjField, "" }
+								end
 								d.textIndents = indexAndFieldIndents
 								d.textForValue = textForGameObjField
 								displayData[iRow] = d
@@ -351,7 +372,7 @@ function varWatch.init()
 	scrollOffset = 0
 	charWidth = app.consoleFontCharWidth
 	rowHeight = app.consoleFontHeight + 2
-	maxGameObjFieldWidth = charWidth * string.len(".clickable")
+	maxGameObjFieldWidth = math.ceil( charWidth * string.len("clickable") )
 	centerColWidth = dropDownBtnSize * 3 + maxGameObjFieldWidth + padding
 	Runtime:addEventListener( "enterFrame", onNewFrame )
 end

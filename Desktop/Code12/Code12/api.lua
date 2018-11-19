@@ -184,6 +184,7 @@ function ct.pause()
 	-- This API is ignored if not running in the Code12 app
 	if runtime.appContext then 
 		-- Change run state to paused then block and yield
+		runtime.message("ct.pause()")
 		g.runState = "paused"
 		repeat
 			if runtime.blockAndYield() == "abort" then
@@ -200,6 +201,7 @@ function ct.stop()
 	if runtime.appContext then 
 		-- Block, signal the main thread to stop, and wait for the
 		-- main thread to kill the user coroutine.
+		runtime.message("Program stopped by ct.stop()")
 		repeat
 			if runtime.blockAndYield("stop") == "abort" then
 				error("stopped")   -- caught by the runtime

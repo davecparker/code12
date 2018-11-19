@@ -95,10 +95,8 @@ class GameObj
 	// GameObj Public Data Fields
 	//---------------------------
 	double x, y;
-	double xSpeed, ySpeed;   // at 60 fps
 	boolean visible;
-	boolean clickable;
-	String group;            // for ct.clearGroup(), default ""
+	String group;             // default ""
 
 	// GameObj Methods
 	// ---------------
@@ -106,6 +104,7 @@ class GameObj
 	double getWidth( )
 	double getHeight( )
 	void setSize( double width, double height )
+	void setSpeed( double xSpeed, double ySpeed )      // at 60 fps
 	String getText( )
 	void setText( String text )                        // included in print output
 	String toString( )                                 // "[type at (x, y) "text"]"
@@ -118,6 +117,7 @@ class GameObj
 	int getLayer( )
 	void setLayer( int layer )                         // objects default to layer 1
 	void delete( )
+	void setClickable( boolean clickable )             // default true
 	boolean clicked( )
 	boolean containsPoint( double x, double y )
 	boolean hit( GameObj objTest )

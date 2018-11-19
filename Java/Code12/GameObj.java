@@ -8,9 +8,7 @@ public abstract class GameObj implements GameObjInterface
 {
    // Public instance variables (client can get or set these directly)
    public double x, y;              // position of object or start point if line
-   public double xSpeed, ySpeed;    // velocity
    public boolean visible;          // true if object is visible
-   public boolean clickable;        // true if object is clickable
    public String group;             // group name, default ""
 
    // Protected instance variables
@@ -19,11 +17,13 @@ public abstract class GameObj implements GameObjInterface
    protected double xAlignFactor;   // 0 for left, 0.5 for center, 1 for right
    protected double yAlignFactor;   // 0 for top, 0.5 for center, 1 for bottom
    protected double width, height;  // size of the object
+   protected double xSpeed, ySpeed; // velocity
    protected Color fillColor;       // fill color or null for none
    protected Color lineColor;       // line/frame color or null for none
    protected int lineWidth;         // line/frame thickness in pixels
    protected int layer;             // stacking layer, default 1
    protected String text;           // text to draw or use for log name, or null
+   protected boolean clickable;     // true if object is clickable
    protected boolean deleted;       // true when object is deleted from screen
 
 
@@ -32,32 +32,58 @@ public abstract class GameObj implements GameObjInterface
    {
       this.x = x;
       this.y = y;
-      xSpeed = 0;
-      ySpeed = 0;
       visible = true;
-      clickable = true;
       group = "";
 
       this.game = game;
       type = "GameObj";
-      xAlignFactor = 0.5;  // center
-      yAlignFactor = 0.5;  // center
+      xAlignFactor = 0.5;      // center
+      yAlignFactor = 0.5;      // center
       this.width = width;
       this.height = height;
+      xSpeed = 0;
+      ySpeed = 0;
       fillColor = Color.BLACK;
       lineColor = Color.BLACK;
       lineWidth = 1;
       layer = 1;
       text = null;
+      clickable = true;
       deleted = false;
    }
 
 
    //========================== API Methods =================================
 
-   public String getType()                      { return type; }
-   public String getText()                      { return text; }
-   public void setText(String text)             { this.text = text; }
+   public String getType()                            { return type; }
+   public double getWidth()                           { return width; }
+   public double getHeight()                          { return height; }
+   public String getText()                            { return text; }
+   public void setText(String text)                   { this.text = text; }
+   public void align(String a)                        { setAlignFromString(a); }
+   public void setFillColor(String name)              { fillColor = colorFromName(name); }
+   public void setFillColorRGB(int r, int g, int b)   { fillColor = makeColor(r, g, b); }
+   public void setLineColor(String name)              { lineColor = colorFromName(name); }
+   public void setLineColorRGB(int r, int g, int b)   { lineColor = makeColor(r, g, b); }
+   public void setLineWidth(int lineWidth)            { this.lineWidth = lineWidth; }
+   public int getLayer()                              { return layer; }
+   public void setLayer(int layer)                    { game.setObjLayer(this, layer); }
+   public void delete()                               { game.deleteObj(this); }
+   public void setClickable(boolean clickable)        { this.clickable = clickable; }
+   public boolean clicked()                           { return (game.input.clickedObj == this); }
+   public GameObj objectHitInGroup(String group)      { return game.hitTestGroup(this, group); }
+
+   public void setSize(double width, double height)
+   {
+      this.width = width;
+      this.height = height;
+   }
+
+   public void setSpeed(double xSpeed, double ySpeed)
+   {
+      this.xSpeed = xSpeed;
+      this.ySpeed = ySpeed;
+   }
 
    public String toString()
    {
@@ -67,32 +93,6 @@ public abstract class GameObj implements GameObjInterface
          s += " \"" + text + "\"";
       return s + "]";
    }
-
-   public double getWidth()           { return width; }
-   public double getHeight()          { return height; }
-   
-   public void setSize(double width, double height)
-   {
-      this.width = width;
-      this.height = height;
-   }
-
-   public void align(String a)
-   {
-      setAlignFromString(a);
-   }
-
-   public void setFillColor(String name)              { fillColor = colorFromName(name); }
-   public void setFillColorRGB(int r, int g, int b)   { fillColor = makeColor(r, g, b); }
-   public void setLineColor(String name)              { lineColor = colorFromName(name); }
-   public void setLineColorRGB(int r, int g, int b)   { lineColor = makeColor(r, g, b); }
-   public void setLineWidth(int lineWidth)            { this.lineWidth = lineWidth; }
-
-   public int getLayer()              { return layer; }
-   public void setLayer(int layer)    { game.setObjLayer(this, layer); }
-   public void delete()               { game.deleteObj(this); }
-
-   public boolean clicked()           { return (game.input.clickedObj == this); }
 
    public boolean containsPoint(double xPoint, double yPoint)
    {
@@ -136,38 +136,14 @@ public abstract class GameObj implements GameObjInterface
       return true;
    }
    
-   public GameObj objectHitInGroup(String group)
-   {
-      return game.hitTestGroup(this, group);
-   }
-
 
    //======================= Internal Methods =========================
 
-   protected double boundingBoxLeft()
-   {
-		return x - (width * xAlignFactor);
-   }
-
-   protected double boundingBoxRight()
-   {
-		return x - (width * xAlignFactor) + width;
-   }
-
-   protected double boundingBoxTop()
-   {
-   	return y - (height * yAlignFactor);
-   }
-
-   protected double boundingBoxBottom()
-   {
-   	return y - (height * yAlignFactor) + height;
-   }
-
-   protected boolean isLine()
-   {
-   	return false;
-   }
+   protected double boundingBoxLeft()    { return x - (width * xAlignFactor); }
+   protected double boundingBoxRight()   { return x - (width * xAlignFactor) + width; }
+   protected double boundingBoxTop()     { return y - (height * yAlignFactor); }
+   protected double boundingBoxBottom()  { return y - (height * yAlignFactor) + height; }
+   protected boolean isLine()            { return false; }
 
    // Returns the lineWidth of the GameObj in logical units
    protected double lineWidthLU()
@@ -254,12 +230,14 @@ public abstract class GameObj implements GameObjInterface
    // Draw the object into the given graphics surface (subclasses must implement)
    abstract protected void draw(Graphics2D g);
 
-   // Update the object's state for the next animation frame
-   protected void update()
+   // Update the object's state for the next animation frame.
+   // Return true if the object moved via xSpeed/ySpeed, else false.
+   protected boolean update()
    {
       // Apply current velocity
       x += xSpeed;
       y += ySpeed;
+      return (xSpeed != 0 || ySpeed != 0);
    }
    
    // Mark the object as deleted
