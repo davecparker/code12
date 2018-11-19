@@ -11,7 +11,6 @@
 local composer = require( "composer" )
 
 -- Code12 app modules
-local ct = require("Code12.ct")
 local g = require( "Code12.globals" )
 local app = require( "app" )
 local buttons = require( "buttons" )

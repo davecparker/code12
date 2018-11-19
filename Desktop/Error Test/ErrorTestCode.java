@@ -504,7 +504,7 @@ int underIndentedInstanceVar;
 		b = ct.isError(d / i);
 		b = ct.isError(0.0 / 0);
 		d = ct.distance(circle.x, circle.y, rect.x, rect.y);
-		if (ct.distance(circle.x, circle.y, rect.x, rect.y) < (circle.width + rect.width) / 2)
+		if (ct.distance(circle.x, circle.y, rect.x, rect.y) < (circle.getWidth()) / 2)
 			i = ct.getTimer();
 		i = ct.getTimer() - i;
 		d = ct.getVersion();
@@ -530,22 +530,15 @@ int underIndentedInstanceVar;
 		s = ct.formatDecimal(6.0221, 7) + ":00";
 		s = ct.formatInt(i);
 		s = ct.formatInt(i + 1, j + k);
-		// Code12 API -- GameObj Public Data Fieldss
+		// Code12 API -- GameObj Public Data Fields
+		img.x = 3;
 		rect.x = circle.y - 10;
-		circle.width = circle.height * 1.5;
-		rect.height = img.height * 1.1;
-		line.x = line.x + line.width;
-		img.width = img.width * .9;
-		img.xSpeed = 0;
-		img.ySpeed = .5;
 		rect.visible = false;
-		circle.clickable = circle.visible;
-		if (img.visible)
-			img.clickable = true;
-		if (img.clickable != false)
-			img.clickable = img.visible;
+		circle.visible = rect.visible;
 		line.group = s;
-		line.clickable = s.equals("hello") || s.equals("world") && s.indexOf(line.group) == 1;
+		circle.group = "dots";
+		rect.group = circle.group;
+		line.visible = s.equals("hello") || s.equals("world") && s.indexOf(line.group) == 1;
 		// Code12 API -- GameObj Methods
 		s = rect.getType();
 		ct.println(text.getText() + "more text");
@@ -553,7 +546,11 @@ int underIndentedInstanceVar;
 		text.setText("Score: " + d);
 		text.setText("Score: " + i);
 		ct.log(line.toString());
-		img.setSize(img.width * 1.1, img.height * 1.1);
+		img.setSize(img.getWidth() * 1.1, img.getHeight() * 1.1);
+		rect.setSize(10, 30);
+		d = img.getHeight();
+		circle.setSpeed(0, 3);
+		rect.setSpeed(0.1, d / 2);
 		text.align(s);
 		text.align("left");
 		text.align("right");
@@ -569,6 +566,9 @@ int underIndentedInstanceVar;
 			b =	colors[rect.getLayer()].equals("green");
 		img.setLayer(-42);
 		img.delete();
+		img.setClickable(true);
+		circle.setClickable(false);
+		rect.setClickable(rect.x > 0);
 		b = img.clicked();
 		b = img.containsPoint( ct.clickX(), ct.clickY() );
 		if ( img.containsPoint( ct.clickX(), ct.clickY() ) )
@@ -727,7 +727,7 @@ int underIndentedInstanceVar;
 		// ERROR "Value of type double cannot be assigned to an int"
 		int exponentialNumberWithDot = 3.42e2;
 		// ERROR "Value of type double cannot be assigned to type boolean"
-		objVar.clickable = dblVar;
+		objVar.visible = dblVar;
 		// ERROR "Value of type double cannot be assigned to a String"
 		strVar = 3.14;
 		// ERROR "Value of type double cannot be assigned to type GameObj"
@@ -738,7 +738,7 @@ int underIndentedInstanceVar;
 		// ERROR "Value of type boolean cannot be assigned to type double"
 		objVar.x = boolVar;
 		// ERROR "Value of type boolean cannot be assigned to type double"
-		objVar.xSpeed = false;
+		objVar.x = false;
 		// ERROR "Value of type boolean cannot be assigned to type String"
 		objVar.group = boolVar;
 		// ERROR "Value of type boolean cannot be assigned to type GameObj"
@@ -747,7 +747,7 @@ int underIndentedInstanceVar;
 		// ERROR "A String cannot be assigned to an int"
 		intVar = objVar.group;
 		// ERROR "A String cannot be assigned to a double"
-		objVar.ySpeed = "fast";
+		objVar.y = "fast";
 		// ERROR "Value of type String cannot be assigned to type boolean"
 		boolVar = strVar;
 		// ERROR "Value of type String cannot be assigned to type GameObj"
@@ -756,7 +756,7 @@ int underIndentedInstanceVar;
 		// ERROR "Value of type GameObj cannot be assigned to type int"
 		intVar = objVar;
 		// ERROR "Value of type GameObj cannot be assigned to type double"
-		objVar.width = objVar;
+		objVar.x = objVar;
 		// ERROR "Value of type GameObj cannot be assigned to type boolean"
 		boolVar = objVar;
 		// ERROR "A GameObj cannot be assigned to a String"
