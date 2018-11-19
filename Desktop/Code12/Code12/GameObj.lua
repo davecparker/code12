@@ -800,7 +800,8 @@ function GameObj:setLayer(layer)
 	-- Re-insert the display object at the top the layer
 	local obj = self.obj
 	local objs = obj.parent
-	local i = objs.numChildren
+	local count = objs.numChildren
+	local i = count
 	while i > 0 do
 		local gameObj = objs[i].code12GameObj
 		if gameObj and gameObj ~= self and gameObj.layer <= layer then
@@ -809,6 +810,13 @@ function GameObj:setLayer(layer)
 		i = i - 1
 	end
 	objs:insert(i + 1, obj)
+
+	-- Give a warning if the object count now exceeds 1000, which is
+	-- likely due to a logic error in the user's program.
+	if count > 1000 and not g.screen.objsWarning then
+		runtime.warning("GameObj count now exceeds 1000")
+		g.screen.objsWarning = true
+	end
 end
 
 -- API

@@ -281,19 +281,15 @@ local function updateValues()
 			local value = ct.userVars[var.nameID.str]
 			local textForValue = d.textForValue
 			if index then
-				if field then
-					-- Value of a GameObj field of a GameObj in an array
+				if field then  -- Value of a GameObj field of a GameObj in an array
 					displayRows[i][3].text = textForValue( value[index], field )
-				else
-					-- Value of an indexed array
+				else           -- Value of an indexed array
 					displayRows[i][2].text = textForValue( value[index] or value.default )
 				end
 			else
-				if field then
-					-- Value of a field of a GameObj
+				if field then  -- Value of a field of a GameObj
 					displayRows[i][2].text = textForValue( value, field )
-				else
-					-- Value of a top-level variable
+				else           -- Value of a top-level variable
 					if textForValue then
 						displayRows[i][2].text = textForValue( value )
 					end  -- TODO: else what?

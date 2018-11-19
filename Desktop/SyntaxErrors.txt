@@ -84,3 +84,6 @@ imort Code12.*;
 			int len = gObjArr.length
 aimport Code12.*;
 		frameRateDisplay.
+		ct.circle(ct.random(0, 100), ct.random(0, 100), 5;)
+	int numObjects 0;
+		int time = ct.getTimer()
