@@ -92,14 +92,24 @@ public class DuckHuntLineHits extends Code12Program
 
 	public void update()
 	{
+		// Move screenOrigin
 		double screenOriginX = frameCount / 10.0;
 		ct.setScreenOrigin( screenOriginX, 0 );
+		// Move displays and walls
 		frameRateDisplay.x = screenOriginX;
+		ducksHitDisplay.x = screenOriginX;
+		accuracyDisplay.x = screenOriginX + 100;
+		topWall.x = screenOriginX;
+		leftWall.x = screenOriginX;
+		// Update frameCount
 		frameCount++;
-		if ( frameCount % 10 == 0 )
+
+		// Update frameRateDisplay
+		int numFrames = 20;
+		if ( frameCount % numFrames == 0 )
 		{
 			int endTime = ct.getTimer();
-			int frameRate = ct.round( 10000.0 / (endTime - startTime) );
+			int frameRate = ct.round( numFrames * 1000.0 / (endTime - startTime) );
 			frameRateDisplay.setText( "FrameRate: " + frameRate);
 			startTime = endTime;
 		}
@@ -258,6 +268,7 @@ public class DuckHuntLineHits extends Code12Program
 	// is clicked
 	public void onMousePress( GameObj obj, double x, double y )
 	{
+		// ct.log("mouse press", obj, x, y);
 		// Play squirt sound
 		ct.sound( "squirt.wav" );
 

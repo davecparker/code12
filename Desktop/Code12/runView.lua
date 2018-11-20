@@ -36,7 +36,10 @@ local rightBar                 -- clipping bar to the right of the output area
 local paneSplitConsole         -- pane split between output and console
 local paneSplitRight           -- pane split between output and varWatch window
 local lowerGroup               -- display area below the pane split
-local gridGroup                -- display group for the coordinate grideLines
+local gridLinesGroup           -- display group for grid lines
+local gridXLabels              -- array of text objs to label the vertical grid lines
+local gridYLabels              -- array of text objs to label the horizontal grid lines
+local gridGroup                -- display group for gridLinesGroup, gridXLabels and gridYLabels
 
 -- UI state
 local paneDragOffset           -- when dragging the pane split
@@ -78,7 +81,7 @@ end
 -- Return an new line from x1, y1 to x2, y2 which has been inserted into the gridGroup and has
 -- stroke color set to grideLineShade
 local function newGridLine( x1, y1, x2, y2 )
-	local line = display.newLine( gridGroup, x1, y1, x2, y2 )
+	local line = display.newLine( gridLinesGroup, x1, y1, x2, y2 )
 	line:setStrokeColor( gridLineShade )
 	return line
 end
@@ -89,38 +92,82 @@ local function makeGrid()
 	local height = app.outputHeight
 	local scale = g.scale
 	local screen = g.screen
-	-- Remove existing gridGroup, if any
-	if gridGroup then
-		gridGroup:removeSelf()
-		gridGroup = nil
+	-- Remove existing grid lines
+	if gridLinesGroup then
+		gridLinesGroup:removeSelf()
+		gridLinesGroup = nil
 	end
-	-- Make gridGroup
-	gridGroup = g.makeGroup( outputGroup )
+	-- Make grid lines group
+	gridLinesGroup = g.makeGroup( gridGroup )
 	gridGroup:toFront()
-	-- Calculate x-value for first vertical grid line
+	-- Calculate x-value for first vertical grid line and label
 	screenOriginX = screen.originX
 	local xLine = math.floor( screenOriginX / 10 ) * 10 + 10
-	-- Make vertical grid lines and labels
 	local x = (xLine - screenOriginX) * scale
+	-- Make vertical grid lines and labels
+	local numLabels = #gridXLabels
+	local label
+	local n = 0 -- number of labels updated/created 
 	while x < width do
-		local label = newGridLabel( xLine, x, 0 )
-		label.anchorY = 0
+		n = n + 1
+		if n <= numLabels then
+			-- Move existing label into new position and update its text
+			label = gridXLabels[n]
+			label.text = xLine
+			label.x = x
+			label.isVisible = true
+		else
+			-- Make new label
+			label = newGridLabel( xLine, x, 0 )
+			label.anchorY = 0
+			numLabels = numLabels + 1
+			gridXLabels[numLabels] = label
+		end
+		-- Make new gridline
 		newGridLine( x, label.height + 1, x, height )
+		-- Update loop variables
 		xLine = xLine + 10
 		x = (xLine - screenOriginX) * scale
+	end
+	-- Hide any extra labels
+	while n < numLabels do
+		n = n + 1
+		gridXLabels[n].isVisible = false
 	end
 	-- Calculate y-value for first horizontal grid line
 	screenOriginY = screen.originY
 	local yLine = math.floor( screenOriginY / 10 ) * 10 + 10
 	local y = (yLine - screenOriginY) * scale
 	-- Make horizontal grideLines and labels
+	numLabels = #gridYLabels
+	n = 0
 	while y < height do
-		local label = newGridLabel( yLine, 0, y )
-		label.anchorX = 0
+		n = n + 1
+		if n <= numLabels then
+			-- Move existing label into new position and update its text
+			label = gridYLabels[n]
+			label.text = yLine
+			label.y = y
+			label.isVisible = true
+		else
+			-- Make new label
+			label = newGridLabel( yLine, 0, y )
+			label.anchorX = 0
+			numLabels = numLabels + 1
+			gridYLabels[numLabels] = label
+		end
+		-- Make new grid line
 		newGridLine( label.width + 1, y, width, y )
+		-- Update loop variables
 		yLine = yLine + 10
 		y = (yLine - screenOriginY) * scale
 	end
+	-- Hide any extra labels
+	while n < numLabels do
+		n = n + 1
+		gridYLabels[n].isVisible = false
+	end
+	print("numXLabels", #gridXLabels, "numYLabels", #gridYLabels)
 end
 
 -- Position the display panes
@@ -272,6 +319,9 @@ function runView:create()
 
 	-- Make the display items
 	outputGroup = g.makeGroup( sceneGroup, 0, app.dyToolbar )
+	gridGroup = g.makeGroup( outputGroup )
+	gridXLabels = {}
+	gridYLabels = {}
 	rightBar = g.uiItem( display.newRect( sceneGroup, 0, outputGroup.y, 0, 0 ), 
 						app.extraShade, app.borderShade )
 	paneSplitRight = g.uiItem( display.newRect( sceneGroup, 0, rightBar.y, 
