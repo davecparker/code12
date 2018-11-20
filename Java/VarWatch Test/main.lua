@@ -14,16 +14,21 @@ this.intArr2 = { 5, 10, 15, length = 3 }
 this.gObjArr = { length = 5, default = nil }
 this.gObjArr1 = { length = 1, default = nil }
 this.gObjArr2 = { length = 2, default = nil }
+this.circles = { length = 100, default = nil }
 
 function _fn.start()
 
+	ct.setHeight(121)
 	this.gObj = nil
 	local i = 1; while i < 100 do
 		ct.println(i); i = i + 1
 	end; ct.checkArrayIndex(this.gObjArr2, 0); this.gObjArr2[1+(0)] = ct.rect(50, 20, 30, 5)
 	ct.checkArrayIndex(this.gObjArr1, 0); this.gObjArr1[1+(0)] = ct.text("gObjArr1[0]", 50, 20, 5)
-end
-
+	local i = 0; while i < 10 do
+		local j = 0; while j < 10 do
+			ct.checkArrayIndex(this.circles, i + j * 10); this.circles[1+(i + j * 10)] = ct.circle(10 * (i + 1), 10 * (j + 1), 2, "gray"); j = j + 1
+		end; i = i + 1
+	end; end
 function _fn.update()
 
 	local len = this.intArr1.length

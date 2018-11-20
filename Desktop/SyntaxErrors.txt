@@ -84,3 +84,10 @@ imort Code12.*;
 			int len = gObjArr.length
 aimport Code12.*;
 		frameRateDisplay.
+   public final String[] LEVEL1 =  
+        "111111111111111111111111111111"
+     ArrayList<GameObj> platforms = new ArrayList<GameObj>();
+     ArrayList<GameObj> coins = new ArrayList<GameObj>();
+     ArrayList<GameObj> enemies = new ArrayList<GameObj>();
+      Iterator<GameObj> it = coins.iterator();
+         player = ct.image("player_forwards.png", platforms.get(0).x, platforms.get(0).y, 5);
