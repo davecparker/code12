@@ -1855,219 +1855,313 @@ String text = ct.formatDecimal( a, 4 );    // sets text to "3.1416"
 
 Program Control
 ---------------
+These functions allow you to get information about and control the 
+execution of your program.
+
+* [ct.getTimer()]
+* [ct.getVersion()]
+* [ct.pause()]
+* [ct.stop()]
+* [ct.restart()]
 
 ### ct.getTimer()
+Return the number of milliseconds since your program started.
+
+#### Syntax
 ```
-int ct.getTimer()
+ct.getTimer()
 ```
-Return the number of milliseconds since the application started.
-Time starts at the begining of the `start` function.
+##### *Return Value*
+([int](#java-data-types)). The number of milliseconds since your program started.
+
+#### Examples
+```
+public void update()
+{
+	ct.println( ct.getTimer() );
+}
+```
+```
+boolean timerStarted = false;
+int startTime;
+
+public void update()
+{
+	// Start a timer when the user clicks
+	if (ct.clicked())
+	{
+		ct.println( "Timer started" );
+		timerStarted = true;
+		startTime = ct.getTimer();
+	}
+
+	// Print a message 3 seconds after the timer started
+	if (timerStarted && ct.getTimer() - startTime > 3000)
+	{
+		ct.println( "3 seconds have passed" );
+		timerStarted = false;
+	}
+}
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.getTimer()]
+
 
 ### ct.getVersion()
+Returns the version number of the Code12 runtime system.
+
+#### Syntax
 ```
-double getVersion()
+ct.getVersion()
 ```
-Return the version number of the Code12 runtime system.
+##### *Return Value*
+([double](#java-data-types)). The Code12 version number (for example 1.0).
+
+#### Examples
+```
+if (ct.getVersion() > 1.0)
+	ct.println( "We have the update" )
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.getVersion()]
+
 
 ### ct.pause()
-```
-ct.pause()
-```
-Execution of the program is paused at this statement.
+Pauses execution of your program at this statement.
 You can then resume or stop execution using the toolbar buttons
 in the Code12 application. 
 
-> You can use `ct.pause` to help you examine or debug your program
-> while running your program in the Code12 application.
-> The `ct.pause` function is not supported (ignored) when programs 
-> are running standalone outside of the Code12 application.
+#### Syntax
+```
+ct.pause();
+```
+#### Notes
+You can use `ct.pause()` to help you examine or debug your program
+while it is running. Any motion on the screen will pause so you
+can inspect it, and you can also check variable values in the 
+variable watch window. 
+
+#### Example
+```
+public void start()
+{
+	// Make a circle on the left
+	ct.circle( 30, 50, 20 );
+
+	// Wait for the Resume toolbar button to be pressed
+	ct.pause();
+
+	// Make a circle on the right
+	ct.circle( 70, 50, 20 );
+}
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.pause()]
+
 
 ### ct.stop()
-```
-ct.stop()
-```
-Execution of the program is immediately stopped and ended at this statement.
+Stops execution of your program immediately at this statement.
 You can restart execution over from the beginning of the program using 
-the **Restart** toolbar button in the Code12 application. 
+the Restart toolbar button in the Code12 application. 
 
-> You can use `ct.stop` to help you examine or debug your program
-> while running your program in the Code12 application.
-> The `ct.stop` function is not supported (ignored) when programs 
-> are running standalone outside of the Code12 application.
+#### Syntax
+```
+ct.stop();
+```
+#### Notes
+You can use `ct.stop()` to terminate your program if something 
+unexpected happens. No more code will execute, and the values of 
+your variables will stay as they were when `ct.stop()` was called
+so you can examine them in the variable watch window.
+
+#### Example
+```
+if (hero.x < 0)
+	ct.stop();    // Oops, how did he get off-screen?
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.stop()]
+
 
 ### ct.restart()
-```
-ct.restart()
-```
-Execution of the program is immediately stopped and restarted from 
-the beginning of the program. Variables are re-initialized with their
-default/starting values, and execution starts over with your `start`
-function.
+Immediately stops and and then restarts your program from the beginning.
 
-> The `ct.restart` function is not supported (ignored) when programs 
-> are running standalone under the Java runtime outside of the 
-> Code12 environment.
+#### Syntax
+```
+ct.restart();
+```
+#### Notes
+After calling `ct.restart()`, your program immediately restarts from
+the beginning. Variables are re-initialized with their default/starting 
+values, and execution starts over with your [start()] function.
+
+#### Example
+```
+if (ct.inputYesNo( "Would you like to play again?" ))
+	ct.restart();
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.restart()]
 
 
 GameObj Data Fields
 -------------------
-`GameObj` objects are graphics objects visible on the screen.
-See [GameObj Creation](#gameobj-creation) to create a `GameObj`.
-All `GameObj` objects have the following public data fields,
-which can be accessed or assigned to at any time.
-If assigned to, the new value takes effect at the next
-animation frame.
+Each graphics object ([GameObj](#java-data-types)) that you create 
+(see [Graphic Object Creation]) has several data variables that live inside it. 
+These variables store information such as the position, size, 
+and color of the object. Each `GameObj` has its own copy of these variables. 
+You can access or change some of these data variables directly.
+Java refers to these directly accessible variables as *public data fields*.
+
+Each `GameObj` has public data fields named `x`, `y`, `visible`, and `group`.
+To access these fields, you need a variable of type [GameObj](#java-data-types),
+which you put before the data field name followed by a dot (.) character.
+
+In the general descriptions below, the `GameObj` variable is shown as `obj`.
+In your program, you will replace `obj` with the name of the `GameObj` variable
+that you wish to access.
+
+* [obj.x]
+* [obj.y]
+* [obj.visible]
+* [obj.group]
+
 
 ### obj.x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates) of
+a [GameObj](#java-data-types).
+
+#### Syntax
+```
+obj.x
+```
+#### Notes
+The `obj` is any [GameObj](#java-data-types) variable. 
+You can access ("get") or change ("set") the [x coordinate](#graphics-coordinates)
+of a `GameObj` at any time.
+
+#### Example
+```
+GameObj dot;
+
+public void start()
+{
+	dot = ct.circle( 0, 50, 10 );	
+}
+
+public void update()
+{
+	// Move dot a little to right each animation frame
+	dot.x = dot.x + 1;
+
+	// If dot goes off-screen to the right, start over at the left
+	if (dot.x > 100)
+		dot.x = 0;
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.x]
+
 
 ### obj.y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates) of
+a [GameObj](#java-data-types).
+
+#### Syntax
 ```
-double x, y
+obj.y
 ```
-The `x` and `y` fields specify the position of the object
-in the application window, in graphics coordinates.
-By default, graphics coordinates range from 0 to 100 in both x and y
-if the window is square. If the window is not square (see `ct.setHeight()`),
-then x coordinates still range from 0 (left edge) to 100 (right edge),
-but y coordinates will range from 0 (top edge) to the value returned
-by `ct.getHeight()` (bottom edge).
+#### Notes
+The `obj` is any [GameObj](#java-data-types) variable. 
+You can access ("get") or change ("set") the [y coordinate](#graphics-coordinates)
+of a `GameObj` at any time.
 
-> By default, objects are positioned by their center, so (`x`, `y`)
-> will be the center of the object. However, this can be modified
-> by the `GameObj` method `obj.align()`.
-
-> It is not an error to position an object outside the application window,
-> it will simply not be visible or will clip at the window boundary.
-
-### obj.width
-
-### obj.height
+#### Example
 ```
-double width, height
+GameObj slab;
+
+public void start()
+{
+	slab = ct.rect( 50, 0, 40, 10 );	
+}
+
+public void update()
+{
+	// Move slab down a little each animation frame
+	slab.y = slab.y + 1;
+
+	// If slab reaches the bottom, start over at the top
+	if (slab.y > ct.getHeight())
+		slab.y = 0;
+}
 ```
-The `width` and `height` fields specify the size of the object
-in graphics coordinates. The different types of `GameObj` objects
-react somewhat differently to changes in size, as follows:
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.y]
 
-##### circle Objects
-Although circles are always created round, you can create an ellipse
-by setting different `width` and `height` values.
-
-##### rect Objects
-Rectangles can be any size and adjust to any `width` and `height`.
-
-##### line Objects
-Line objects are created between two points. After creation,
-the `x` and `y` fields are the location of the first point,
-and the `width` and `height` fields specify signed offsets
-(can be negative) from the first point to the second point.
-Thus, the location of the second point is
-(`x` + `width`, `y` + `height`). You can change any of the
-`x`, `y`, `width`, or `height` fields, and the line will adjust.
-
-> Note that unlike any of the other `GameObj` object types,
-> a line may have negative values for the `width` and `height`
-> fields. The physical width and height of the line's bounding
-> box can be reliably determined with  
-> `Math.abs(line.width)` and `Math.abs(line.height)`.
-> This does not include the thickness of the drawn line itself
-> (see `lineWidth` below).
-
-##### text Objects
-Text objects use a font size that is automatically determined by
-the object's `height`, and the object's `width` is calculated
-automatically. So, changing `height` will change the font size,
-and changes to the `width` field are undefined.
-
-> **Note:** When you change a text object's `height`, the `width`
-> will be recalculated automatically. However, the new value for
-> `width` is not available immediately. It will be recalculated
-> the next time the object draws (at the next animation frame).
-
-##### image Objects
-Images are initially created with `height` calculated automatically
-to preserve the image's aspect ratio given the specified `width`.
-However, once created, you can set any values for `width` and `height`,
-and the image will scale and/or stretch as necessary to fill the space.
-
-### obj.xSpeed
-
-### obj.ySpeed
-```
-double xSpeed, ySpeed
-```
-The `xSpeed` and `ySpeed` fields can be used to make an object move
-automatically at the specified speed and direction.
-The `xSpeed` and `ySpeed` values are added to the object's
-`x` and `y` fields before each new animation frame.
-Animation frames happen 60 times per second, so setting `xSpeed` to 1
-will make the object move 60 units per second to the right.
-The values for `xSpeed` and `ySpeed` can be positive or negative,
-and they both default to 0.
-
-> You can change `xSpeed` and/or `ySpeed` at any time to change
-> the speed or direction of an object.
-
-### obj.lineWidth
-```
-int lineWidth
-```
-If an object has a line color (see the `GameObj` methods `obj.setLineColor()`
-and `obj.setLineColorRGB()`), then the object will be outlined in this color
-with a stroke of approximately `lineWidth` pixels. The default is 1.
-
-> Unlike normal coordinate values, `lineWidth` values are measured in
-> approximate device "pixels", so apparent line thickness does not scale
-> up as the window size is increased. The definition of "pixels" depends
-> on the platform and may vary, but the overall intent is that on a
-> screen of "normal" resolution (e.g. HD resolution, not 4K or Retina),
-> a `lineWidth` of 1 will result in an appoximate 1 pixel border.
-> High resolution screens may use multiple pixels, and some platforms
-> may use partial pixels for a smoother appearance (anti-aliasing).
 
 ### obj.visible
-```
-boolean visible
-```
-The `visible` field defaults to `true`, but you can set it to `false`
-to hide the object. Hidden objects are effectively disabled, and will
-not draw or respond to mouse/touch input.
+([boolean](#java-data-types)). `true` if the object should be displayed
+as normal, or `false` to hide the object and not display it.
 
-### obj.clickable
+#### Syntax
 ```
-boolean clickable
+obj.visible
 ```
-The `clickable` field defaults to `true`, so by default all `GameObj` objects 
-can be used to respond to click/touch input
-(see [ct.objectClicked](#ctobjectclicked), [obj.clicked](#objclicked), and
-[onMousePress](#onmousepress)).
-However, if you set an object's `clickable` field to false, then it will ignore
-clicks and pass them through to the object below, if any. 
- 
-> If you stack two objects and want to use the bottom object to test for hits
-> (for example a rectangle with a text label on top of it), then you can
-> set the `clickable` field of the top object to `false`, which will cause
-> the click to "pass through" to the object below it.
+#### Notes
+Objects default to visible when created. If you set the `visible` field to
+`false`, the object will be hidden and disappear from the display. 
+Hidden objects still exist (they are not deleted), and they can be brought 
+back by setting `visible` back to `true`.
 
-### obj.autoDelete
-```
-boolean autoDelete     // auto delete if it goes from on to off-screen
-```
-If you set the `autoDelete` field of an object to `true` (default `false`),
-then the object will be automatically deleted if it moves off-screen
-(outside of the application window).
+> In addition to not being displayed, hidden objects do not respond to 
+> mouse clicks (from [ct.objectClicked()], for example) and do not
+> register as "hitting" other objects (see [obj.hit()], for example])
 
-> If an object is created initially off-screen, it will not be automatically
-> deleted until it has moved on-screen, then off-screen again.
+#### Example
+```
+// Hide objects that are clicked
+GameObj target = ct.objectClicked();
+if (target != null)
+	target.visible = false;
+```
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.visible]
+
+
 
 ### obj.group
+([String](#java-data-types)). An optional name that you can assigned to an object
+to associate it with other similar objects.
+
+#### Syntax
 ```
-String group
+obj.group
 ```
-The `group` field is an optional name that you can assign to an object
-that will cause the function `ct.clearGroup()` to delete all objects with
-the matching group name. The default group name of an object is ""
-(empty string)
+#### Notes
+The default group name for an object is `""` (empty string) when it is created.
+If you assign a group name, you can access and check it when you have an
+unknown object reference to see what kind it is.
+
+The `group` field is also used by the functions [ct.clearGroup()] 
+and [obj.objectHitInGroup()].
+
+#### Examples
+```
+GameObj block;
+GameObj coin1, coin2;
+
+public void start()
+{
+	block = ct.rect( 50, 70, 20, 20 );
+
+	coin1 = ct.circle( 30, 30, 10 );
+	coin1.group = "coins";
+
+	coin2 = ct.circle( 70, 30, 10 );
+	coin2.group = "coins";
+}
+
+public void update()
+{
+	// Hide coins that get clicked
+	GameObj target = ct.objectClicked();
+	if (target != null && target.group.equals("coins"))
+		target.visible = false;	
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.group]
 
 
 GameObj Methods
@@ -2131,10 +2225,63 @@ is enclosed in square brackets.
 obj.setSize( double width, double height )
 ```
 Set the size of the object using `width` and `height`.
-This is just a convenience method that is equivalent to
-setting both the `width` and `height` fields.
-Note that different types of objects react differently to changes
-in width or height. (see [width, height](#width-height) above).
+
+The different types of `GameObj` objects
+react somewhat differently to changes in size, as follows:
+
+##### circle Objects
+Although circles are always created round, you can create an ellipse
+by setting different `width` and `height` values.
+
+##### rect Objects
+Rectangles can be any size and adjust to any `width` and `height`.
+
+##### line Objects
+Line objects are created between two points. After creation,
+the `x` and `y` fields are the location of the first point,
+and the `width` and `height` fields specify signed offsets
+(can be negative) from the first point to the second point.
+Thus, the location of the second point is
+(`x` + `width`, `y` + `height`). You can change any of the
+`x`, `y`, `width`, or `height` fields, and the line will adjust.
+
+> Note that unlike any of the other `GameObj` object types,
+> a line may have negative values for the `width` and `height`
+> fields. The physical width and height of the line's bounding
+> box can be reliably determined with  
+> `Math.abs(line.width)` and `Math.abs(line.height)`.
+> This does not include the thickness of the drawn line itself
+> (see `lineWidth` below).
+
+##### text Objects
+Text objects use a font size that is automatically determined by
+the object's `height`, and the object's `width` is calculated
+automatically. So, changing `height` will change the font size,
+and changes to the `width` field are undefined.
+
+> **Note:** When you change a text object's `height`, the `width`
+> will be recalculated automatically. However, the new value for
+> `width` is not available immediately. It will be recalculated
+> the next time the object draws (at the next animation frame).
+
+##### image Objects
+Images are initially created with `height` calculated automatically
+to preserve the image's aspect ratio given the specified `width`.
+However, once created, you can set any values for `width` and `height`,
+and the image will scale and/or stretch as necessary to fill the space.
+
+
+### obj.setSpeed()
+
+The `xSpeed` and `ySpeed` fields can be used to make an object move
+automatically at the specified speed and direction.
+The `xSpeed` and `ySpeed` values are added to the object's
+`x` and `y` fields before each new animation frame.
+Animation frames happen 60 times per second, so setting `xSpeed` to 1
+will make the object move 60 units per second to the right.
+The values for `xSpeed` and `ySpeed` can be positive or negative,
+and they both default to 0.
+
 
 ### obj.align()
 ```
@@ -2209,6 +2356,21 @@ Set the line color of the object (the outline stroke color for objects
 other than line objects) to the custom RGB color with components
 `red`, `green`, and `blue` in the range 0-255.
 
+### obj.setLineWidth()
+
+If an object has a line color (see the `GameObj` methods `obj.setLineColor()`
+and `obj.setLineColorRGB()`), then the object will be outlined in this color
+with a stroke of approximately `lineWidth` pixels. The default is 1.
+
+> Unlike normal coordinate values, `lineWidth` values are measured in
+> approximate device "pixels", so apparent line thickness does not scale
+> up as the window size is increased. The definition of "pixels" depends
+> on the platform and may vary, but the overall intent is that on a
+> screen of "normal" resolution (e.g. HD resolution, not 4K or Retina),
+> a `lineWidth` of 1 will result in an appoximate 1 pixel border.
+> High resolution screens may use multiple pixels, and some platforms
+> may use partial pixels for a smoother appearance (anti-aliasing).
+
 ### obj.getLayer()
 ```
 int obj.getLayer()
@@ -2237,6 +2399,20 @@ Remove and delete the object from the screen.
 
 > Attempting to access the fields or methods of an object after it has
 > been deleted may result in unpredictable behavior.
+
+### obj.setClickable()
+
+The `clickable` field defaults to `true`, so by default all `GameObj` objects 
+can be used to respond to click/touch input
+(see [ct.objectClicked](#ctobjectclicked), [obj.clicked](#objclicked), and
+[onMousePress](#onmousepress)).
+However, if you set an object's `clickable` field to false, then it will ignore
+clicks and pass them through to the object below, if any. 
+ 
+> If you stack two objects and want to use the bottom object to test for hits
+> (for example a rectangle with a text label on top of it), then you can
+> set the `clickable` field of the top object to `false`, which will cause
+> the click to "pass through" to the object below it.
 
 ### obj.clicked()
 ```
@@ -2273,7 +2449,7 @@ Return `true` if the object currently intersects with another
 object `objTest`. If you call this method every time in your [update()] 
 function, it can be used to test if/when two objects "hit" each other.
 
-### obj.objectHitInGroup( String group )
+### obj.objectHitInGroup()
 ```
 GameObj obj.objectHitInGroup( String group )
 ```

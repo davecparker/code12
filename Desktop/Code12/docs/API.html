@@ -705,7 +705,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
 <p><code>ct.objectClicked()</code> will return <code>null</code> if no object was clicked, which is the case for most animation frames in a game (they occur 60 times per second). So you must check the return value for <code>null</code> before using the <code>GameObj</code> returned. Attempting to access a field of a <code>GameObj</code> (such as <a href="#obj.x">obj.x</a>) or call a method (such as <a href="#obj.delete">obj.delete()</a>) will generate a runtime error (a “crash”) if the <code>GameObj</code> is <code>null</code>.</p>
 </blockquote>
 <h4 id="notes-8">Notes</h4>
-<p>Calling this function every time in your <a href="#update">update()</a> function will find the topmost clickable object that was clicked, whenever the user clicks on one. Any objects with the <a href="#obj.clickable">obj.clickable</a> field set to <code>false</code> will not be considered when determining which object was clicked.</p>
+<p>Calling this function every time in your <a href="#update">update()</a> function will find the topmost clickable object that was clicked, whenever the user clicks on one. Any objects with the [obj.clickable] field set to <code>false</code> will not be considered when determining which object was clicked.</p>
 <h4 id="example-19">Example</h4>
 <pre><code>public void update()
 {
@@ -1085,94 +1085,198 @@ String text = ct.formatDecimal( x );       // sets text to &quot;1.25&quot;</cod
 String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</code></pre>
 <h6 id="code12-function-reference-type-conversion-ct.formatdecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.formatdecimal">ct.formatDecimal()</a></h6>
 <h2 id="program-control">Program Control</h2>
+<p>These functions allow you to get information about and control the execution of your program.</p>
+<ul>
+<li><a href="#ct.gettimer">ct.getTimer()</a></li>
+<li><a href="#ct.getversion">ct.getVersion()</a></li>
+<li><a href="#ct.pause">ct.pause()</a></li>
+<li><a href="#ct.stop">ct.stop()</a></li>
+<li><a href="#ct.restart">ct.restart()</a></li>
+</ul>
 <h3 id="ct.gettimer">ct.getTimer()</h3>
-<pre><code>int ct.getTimer()</code></pre>
-<p>Return the number of milliseconds since the application started. Time starts at the begining of the <code>start</code> function.</p>
+<p>Return the number of milliseconds since your program started.</p>
+<h4 id="syntax-49">Syntax</h4>
+<pre><code>ct.getTimer()</code></pre>
+<h5 id="return-value-32"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The number of milliseconds since your program started.</p>
+<h4 id="examples-18">Examples</h4>
+<pre><code>public void update()
+{
+    ct.println( ct.getTimer() );
+}</code></pre>
+<pre><code>boolean timerStarted = false;
+int startTime;
+
+public void update()
+{
+    // Start a timer when the user clicks
+    if (ct.clicked())
+    {
+        ct.println( &quot;Timer started&quot; );
+        timerStarted = true;
+        startTime = ct.getTimer();
+    }
+
+    // Print a message 3 seconds after the timer started
+    if (timerStarted &amp;&amp; ct.getTimer() - startTime &gt; 3000)
+    {
+        ct.println( &quot;3 seconds have passed&quot; );
+        timerStarted = false;
+    }
+}</code></pre>
+<h6 id="code12-function-reference-program-control-ct.gettimer"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control">Program Control</a> &gt; <a href="#ct.gettimer">ct.getTimer()</a></h6>
 <h3 id="ct.getversion">ct.getVersion()</h3>
-<pre><code>double getVersion()</code></pre>
-<p>Return the version number of the Code12 runtime system.</p>
+<p>Returns the version number of the Code12 runtime system.</p>
+<h4 id="syntax-50">Syntax</h4>
+<pre><code>ct.getVersion()</code></pre>
+<h5 id="return-value-33"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The Code12 version number (for example 1.0).</p>
+<h4 id="examples-19">Examples</h4>
+<pre><code>if (ct.getVersion() &gt; 1.0)
+    ct.println( &quot;We have the update&quot; )</code></pre>
+<h6 id="code12-function-reference-program-control-ct.getversion"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control">Program Control</a> &gt; <a href="#ct.getversion">ct.getVersion()</a></h6>
 <h3 id="ct.pause">ct.pause()</h3>
-<pre><code>ct.pause()</code></pre>
-<p>Execution of the program is paused at this statement. You can then resume or stop execution using the toolbar buttons in the Code12 application.</p>
-<blockquote>
-<p>You can use <code>ct.pause</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.pause</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
-</blockquote>
+<p>Pauses execution of your program at this statement. You can then resume or stop execution using the toolbar buttons in the Code12 application.</p>
+<h4 id="syntax-51">Syntax</h4>
+<pre><code>ct.pause();</code></pre>
+<h4 id="notes-14">Notes</h4>
+<p>You can use <code>ct.pause()</code> to help you examine or debug your program while it is running. Any motion on the screen will pause so you can inspect it, and you can also check variable values in the variable watch window.</p>
+<h4 id="example-31">Example</h4>
+<pre><code>public void start()
+{
+    // Make a circle on the left
+    ct.circle( 30, 50, 20 );
+
+    // Wait for the Resume toolbar button to be pressed
+    ct.pause();
+
+    // Make a circle on the right
+    ct.circle( 70, 50, 20 );
+}</code></pre>
+<h6 id="code12-function-reference-program-control-ct.pause"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control">Program Control</a> &gt; <a href="#ct.pause">ct.pause()</a></h6>
 <h3 id="ct.stop">ct.stop()</h3>
-<pre><code>ct.stop()</code></pre>
-<p>Execution of the program is immediately stopped and ended at this statement. You can restart execution over from the beginning of the program using the <strong>Restart</strong> toolbar button in the Code12 application.</p>
-<blockquote>
-<p>You can use <code>ct.stop</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.stop</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
-</blockquote>
+<p>Stops execution of your program immediately at this statement. You can restart execution over from the beginning of the program using the Restart toolbar button in the Code12 application.</p>
+<h4 id="syntax-52">Syntax</h4>
+<pre><code>ct.stop();</code></pre>
+<h4 id="notes-15">Notes</h4>
+<p>You can use <code>ct.stop()</code> to terminate your program if something unexpected happens. No more code will execute, and the values of your variables will stay as they were when <code>ct.stop()</code> was called so you can examine them in the variable watch window.</p>
+<h4 id="example-32">Example</h4>
+<pre><code>if (hero.x &lt; 0)
+    ct.stop();    // Oops, how did he get off-screen?</code></pre>
+<h6 id="code12-function-reference-program-control-ct.stop"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control">Program Control</a> &gt; <a href="#ct.stop">ct.stop()</a></h6>
 <h3 id="ct.restart">ct.restart()</h3>
-<pre><code>ct.restart()</code></pre>
-<p>Execution of the program is immediately stopped and restarted from the beginning of the program. Variables are re-initialized with their default/starting values, and execution starts over with your <code>start</code> function.</p>
-<blockquote>
-<p>The <code>ct.restart</code> function is not supported (ignored) when programs are running standalone under the Java runtime outside of the Code12 environment.</p>
-</blockquote>
+<p>Immediately stops and and then restarts your program from the beginning.</p>
+<h4 id="syntax-53">Syntax</h4>
+<pre><code>ct.restart();</code></pre>
+<h4 id="notes-16">Notes</h4>
+<p>After calling <code>ct.restart()</code>, your program immediately restarts from the beginning. Variables are re-initialized with their default/starting values, and execution starts over with your <a href="#start">start()</a> function.</p>
+<h4 id="example-33">Example</h4>
+<pre><code>if (ct.inputYesNo( &quot;Would you like to play again?&quot; ))
+    ct.restart();</code></pre>
+<h6 id="code12-function-reference-program-control-ct.restart"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control">Program Control</a> &gt; <a href="#ct.restart">ct.restart()</a></h6>
 <h2 id="gameobj-data-fields">GameObj Data Fields</h2>
-<p><code>GameObj</code> objects are graphics objects visible on the screen. See <a href="#gameobj-creation">GameObj Creation</a> to create a <code>GameObj</code>. All <code>GameObj</code> objects have the following public data fields, which can be accessed or assigned to at any time. If assigned to, the new value takes effect at the next animation frame.</p>
+<p>Each graphics object (<a href="#java-data-types">GameObj</a>) that you create (see <a href="#graphic-object-creation">Graphic Object Creation</a>) has several data variables that live inside it. These variables store information such as the position, size, and color of the object. Each <code>GameObj</code> has its own copy of these variables. You can access or change some of these data variables directly. Java refers to these directly accessible variables as <em>public data fields</em>.</p>
+<p>Each <code>GameObj</code> has public data fields named <code>x</code>, <code>y</code>, <code>visible</code>, and <code>group</code>. To access these fields, you need a variable of type <a href="#java-data-types">GameObj</a>, which you put before the data field name followed by a dot (.) character.</p>
+<p>In the general descriptions below, the <code>GameObj</code> variable is shown as <code>obj</code>. In your program, you will replace <code>obj</code> with the name of the <code>GameObj</code> variable that you wish to access.</p>
+<ul>
+<li><a href="#obj.x">obj.x</a></li>
+<li><a href="#obj.y">obj.y</a></li>
+<li><a href="#obj.visible">obj.visible</a></li>
+<li><a href="#obj.group">obj.group</a></li>
+</ul>
 <h3 id="obj.x">obj.x</h3>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-54">Syntax</h4>
+<pre><code>obj.x</code></pre>
+<h4 id="notes-17">Notes</h4>
+<p>The <code>obj</code> is any <a href="#java-data-types">GameObj</a> variable. You can access (“get”) or change (“set”) the <a href="#graphics-coordinates">x coordinate</a> of a <code>GameObj</code> at any time.</p>
+<h4 id="example-34">Example</h4>
+<pre><code>GameObj dot;
+
+public void start()
+{
+    dot = ct.circle( 0, 50, 10 );   
+}
+
+public void update()
+{
+    // Move dot a little to right each animation frame
+    dot.x = dot.x + 1;
+
+    // If dot goes off-screen to the right, start over at the left
+    if (dot.x &gt; 100)
+        dot.x = 0;
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-data-fields-obj.x"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields">GameObj Data Fields</a> &gt; <a href="#obj.x">obj.x</a></h6>
 <h3 id="obj.y">obj.y</h3>
-<pre><code>double x, y</code></pre>
-<p>The <code>x</code> and <code>y</code> fields specify the position of the object in the application window, in graphics coordinates. By default, graphics coordinates range from 0 to 100 in both x and y if the window is square. If the window is not square (see <code>ct.setHeight()</code>), then x coordinates still range from 0 (left edge) to 100 (right edge), but y coordinates will range from 0 (top edge) to the value returned by <code>ct.getHeight()</code> (bottom edge).</p>
-<blockquote>
-<p>By default, objects are positioned by their center, so (<code>x</code>, <code>y</code>) will be the center of the object. However, this can be modified by the <code>GameObj</code> method <code>obj.align()</code>.</p>
-</blockquote>
-<blockquote>
-<p>It is not an error to position an object outside the application window, it will simply not be visible or will clip at the window boundary.</p>
-</blockquote>
-<h3 id="obj.width">obj.width</h3>
-<h3 id="obj.height">obj.height</h3>
-<pre><code>double width, height</code></pre>
-<p>The <code>width</code> and <code>height</code> fields specify the size of the object in graphics coordinates. The different types of <code>GameObj</code> objects react somewhat differently to changes in size, as follows:</p>
-<h5 id="circle-objects">circle Objects</h5>
-<p>Although circles are always created round, you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
-<h5 id="rect-objects">rect Objects</h5>
-<p>Rectangles can be any size and adjust to any <code>width</code> and <code>height</code>.</p>
-<h5 id="line-objects">line Objects</h5>
-<p>Line objects are created between two points. After creation, the <code>x</code> and <code>y</code> fields are the location of the first point, and the <code>width</code> and <code>height</code> fields specify signed offsets (can be negative) from the first point to the second point. Thus, the location of the second point is (<code>x</code> + <code>width</code>, <code>y</code> + <code>height</code>). You can change any of the <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> fields, and the line will adjust.</p>
-<blockquote>
-<p>Note that unlike any of the other <code>GameObj</code> object types, a line may have negative values for the <code>width</code> and <code>height</code> fields. The physical width and height of the line’s bounding box can be reliably determined with<br />
-<code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <code>lineWidth</code> below).</p>
-</blockquote>
-<h5 id="text-objects">text Objects</h5>
-<p>Text objects use a font size that is automatically determined by the object’s <code>height</code>, and the object’s <code>width</code> is calculated automatically. So, changing <code>height</code> will change the font size, and changes to the <code>width</code> field are undefined.</p>
-<blockquote>
-<p><strong>Note:</strong> When you change a text object’s <code>height</code>, the <code>width</code> will be recalculated automatically. However, the new value for <code>width</code> is not available immediately. It will be recalculated the next time the object draws (at the next animation frame).</p>
-</blockquote>
-<h5 id="image-objects">image Objects</h5>
-<p>Images are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to fill the space.</p>
-<h3 id="obj.xspeed">obj.xSpeed</h3>
-<h3 id="obj.yspeed">obj.ySpeed</h3>
-<pre><code>double xSpeed, ySpeed</code></pre>
-<p>The <code>xSpeed</code> and <code>ySpeed</code> fields can be used to make an object move automatically at the specified speed and direction. The <code>xSpeed</code> and <code>ySpeed</code> values are added to the object’s <code>x</code> and <code>y</code> fields before each new animation frame. Animation frames happen 60 times per second, so setting <code>xSpeed</code> to 1 will make the object move 60 units per second to the right. The values for <code>xSpeed</code> and <code>ySpeed</code> can be positive or negative, and they both default to 0.</p>
-<blockquote>
-<p>You can change <code>xSpeed</code> and/or <code>ySpeed</code> at any time to change the speed or direction of an object.</p>
-</blockquote>
-<h3 id="obj.linewidth">obj.lineWidth</h3>
-<pre><code>int lineWidth</code></pre>
-<p>If an object has a line color (see the <code>GameObj</code> methods <code>obj.setLineColor()</code> and <code>obj.setLineColorRGB()</code>), then the object will be outlined in this color with a stroke of approximately <code>lineWidth</code> pixels. The default is 1.</p>
-<blockquote>
-<p>Unlike normal coordinate values, <code>lineWidth</code> values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and may vary, but the overall intent is that on a screen of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution screens may use multiple pixels, and some platforms may use partial pixels for a smoother appearance (anti-aliasing).</p>
-</blockquote>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-55">Syntax</h4>
+<pre><code>obj.y</code></pre>
+<h4 id="notes-18">Notes</h4>
+<p>The <code>obj</code> is any <a href="#java-data-types">GameObj</a> variable. You can access (“get”) or change (“set”) the <a href="#graphics-coordinates">y coordinate</a> of a <code>GameObj</code> at any time.</p>
+<h4 id="example-35">Example</h4>
+<pre><code>GameObj slab;
+
+public void start()
+{
+    slab = ct.rect( 50, 0, 40, 10 );    
+}
+
+public void update()
+{
+    // Move slab down a little each animation frame
+    slab.y = slab.y + 1;
+
+    // If slab reaches the bottom, start over at the top
+    if (slab.y &gt; ct.getHeight())
+        slab.y = 0;
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-data-fields-obj.y"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields">GameObj Data Fields</a> &gt; <a href="#obj.y">obj.y</a></h6>
 <h3 id="obj.visible">obj.visible</h3>
-<pre><code>boolean visible</code></pre>
-<p>The <code>visible</code> field defaults to <code>true</code>, but you can set it to <code>false</code> to hide the object. Hidden objects are effectively disabled, and will not draw or respond to mouse/touch input.</p>
-<h3 id="obj.clickable">obj.clickable</h3>
-<pre><code>boolean clickable</code></pre>
-<p>The <code>clickable</code> field defaults to <code>true</code>, so by default all <code>GameObj</code> objects can be used to respond to click/touch input (see <a href="#ctobjectclicked">ct.objectClicked</a>, <a href="#objclicked">obj.clicked</a>, and <a href="#onmousepress">onMousePress</a>). However, if you set an object’s <code>clickable</code> field to false, then it will ignore clicks and pass them through to the object below, if any.</p>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the object should be displayed as normal, or <code>false</code> to hide the object and not display it.</p>
+<h4 id="syntax-56">Syntax</h4>
+<pre><code>obj.visible</code></pre>
+<h4 id="notes-19">Notes</h4>
+<p>Objects default to visible when created. If you set the <code>visible</code> field to <code>false</code>, the object will be hidden and disappear from the display. Hidden objects still exist (they are not deleted), and they can be brought back by setting <code>visible</code> back to <code>true</code>.</p>
 <blockquote>
-<p>If you stack two objects and want to use the bottom object to test for hits (for example a rectangle with a text label on top of it), then you can set the <code>clickable</code> field of the top object to <code>false</code>, which will cause the click to “pass through” to the object below it.</p>
+<p>In addition to not being displayed, hidden objects do not respond to mouse clicks (from <a href="#ct.objectclicked">ct.objectClicked()</a>, for example) and do not register as “hitting” other objects (see <a href="#obj.hit">obj.hit()</a>, for example])</p>
 </blockquote>
-<h3 id="obj.autodelete">obj.autoDelete</h3>
-<pre><code>boolean autoDelete     // auto delete if it goes from on to off-screen</code></pre>
-<p>If you set the <code>autoDelete</code> field of an object to <code>true</code> (default <code>false</code>), then the object will be automatically deleted if it moves off-screen (outside of the application window).</p>
-<blockquote>
-<p>If an object is created initially off-screen, it will not be automatically deleted until it has moved on-screen, then off-screen again.</p>
-</blockquote>
+<h4 id="example-36">Example</h4>
+<pre><code>// Hide objects that are clicked
+GameObj target = ct.objectClicked();
+if (target != null)
+    target.visible = false;</code></pre>
+<h6 id="code12-function-reference-gameobj-data-fields-obj.visible"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields">GameObj Data Fields</a> &gt; <a href="#obj.visible">obj.visible</a></h6>
 <h3 id="obj.group">obj.group</h3>
-<pre><code>String group</code></pre>
-<p>The <code>group</code> field is an optional name that you can assign to an object that will cause the function <code>ct.clearGroup()</code> to delete all objects with the matching group name. The default group name of an object is &quot;&quot; (empty string)</p>
+<p>(<a href="#java-data-types">String</a>). An optional name that you can assigned to an object to associate it with other similar objects.</p>
+<h4 id="syntax-57">Syntax</h4>
+<pre><code>obj.group</code></pre>
+<h4 id="notes-20">Notes</h4>
+<p>The default group name for an object is <code>&quot;&quot;</code> (empty string) when it is created. If you assign a group name, you can access and check it when you have an unknown object reference to see what kind it is.</p>
+<p>The <code>group</code> field is also used by the functions <a href="#ct.cleargroup">ct.clearGroup()</a> and <a href="#obj.objecthitingroup">obj.objectHitInGroup()</a>.</p>
+<h4 id="examples-20">Examples</h4>
+<pre><code>GameObj block;
+GameObj coin1, coin2;
+
+public void start()
+{
+    block = ct.rect( 50, 70, 20, 20 );
+
+    coin1 = ct.circle( 30, 30, 10 );
+    coin1.group = &quot;coins&quot;;
+
+    coin2 = ct.circle( 70, 30, 10 );
+    coin2.group = &quot;coins&quot;;
+}
+
+public void update()
+{
+    // Hide coins that get clicked
+    GameObj target = ct.objectClicked();
+    if (target != null &amp;&amp; target.group.equals(&quot;coins&quot;))
+        target.visible = false; 
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-data-fields-obj.group"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields">GameObj Data Fields</a> &gt; <a href="#obj.group">obj.group</a></h6>
 <h2 id="gameobj-methods">GameObj Methods</h2>
 <p>The following method functions must be called on an existing <code>GameObj</code> object (see <a href="#gameobj-creation">GameObj Creation</a>). In the syntax shown, the <code>obj</code> can be any variable of type <code>GameObj</code>.</p>
 <h3 id="obj.gettype">obj.getType()</h3>
@@ -1190,7 +1294,7 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 <h3 id="obj.tostring">obj.toString()</h3>
 <pre><code>String obj.toString()</code></pre>
 <p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
-<h5 id="examples-18">Examples:</h5>
+<h5 id="examples-21">Examples:</h5>
 <pre><code>[circle at (70, 25)]
 [text at (50, 10) &quot;Score 3200&quot;]
 [image at (21, 83) &quot;goldfish.png&quot;]
@@ -1198,7 +1302,27 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 [rect at (50, 100) &quot;bottom wall&quot;]</code></pre>
 <h3 id="obj.setsize">obj.setSize()</h3>
 <pre><code>obj.setSize( double width, double height )</code></pre>
-<p>Set the size of the object using <code>width</code> and <code>height</code>. This is just a convenience method that is equivalent to setting both the <code>width</code> and <code>height</code> fields. Note that different types of objects react differently to changes in width or height. (see <a href="#width-height">width, height</a> above).</p>
+<p>Set the size of the object using <code>width</code> and <code>height</code>.</p>
+<p>The different types of <code>GameObj</code> objects react somewhat differently to changes in size, as follows:</p>
+<h5 id="circle-objects">circle Objects</h5>
+<p>Although circles are always created round, you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
+<h5 id="rect-objects">rect Objects</h5>
+<p>Rectangles can be any size and adjust to any <code>width</code> and <code>height</code>.</p>
+<h5 id="line-objects">line Objects</h5>
+<p>Line objects are created between two points. After creation, the <code>x</code> and <code>y</code> fields are the location of the first point, and the <code>width</code> and <code>height</code> fields specify signed offsets (can be negative) from the first point to the second point. Thus, the location of the second point is (<code>x</code> + <code>width</code>, <code>y</code> + <code>height</code>). You can change any of the <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> fields, and the line will adjust.</p>
+<blockquote>
+<p>Note that unlike any of the other <code>GameObj</code> object types, a line may have negative values for the <code>width</code> and <code>height</code> fields. The physical width and height of the line’s bounding box can be reliably determined with<br />
+<code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <code>lineWidth</code> below).</p>
+</blockquote>
+<h5 id="text-objects">text Objects</h5>
+<p>Text objects use a font size that is automatically determined by the object’s <code>height</code>, and the object’s <code>width</code> is calculated automatically. So, changing <code>height</code> will change the font size, and changes to the <code>width</code> field are undefined.</p>
+<blockquote>
+<p><strong>Note:</strong> When you change a text object’s <code>height</code>, the <code>width</code> will be recalculated automatically. However, the new value for <code>width</code> is not available immediately. It will be recalculated the next time the object draws (at the next animation frame).</p>
+</blockquote>
+<h5 id="image-objects">image Objects</h5>
+<p>Images are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to fill the space.</p>
+<h3 id="obj.setspeed">obj.setSpeed()</h3>
+<p>The <code>xSpeed</code> and <code>ySpeed</code> fields can be used to make an object move automatically at the specified speed and direction. The <code>xSpeed</code> and <code>ySpeed</code> values are added to the object’s <code>x</code> and <code>y</code> fields before each new animation frame. Animation frames happen 60 times per second, so setting <code>xSpeed</code> to 1 will make the object move 60 units per second to the right. The values for <code>xSpeed</code> and <code>ySpeed</code> can be positive or negative, and they both default to 0.</p>
 <h3 id="obj.align">obj.align()</h3>
 <pre><code>obj.align( String alignment )
 obj.align( String alignment, boolean adjustY )</code></pre>
@@ -1227,6 +1351,11 @@ obj.align( String alignment, boolean adjustY )</code></pre>
 <h3 id="obj.setlinecolorrgb">obj.setLineColorRGB()</h3>
 <pre><code>obj.setLineColorRGB( int red, int green, int blue )</code></pre>
 <p>Set the line color of the object (the outline stroke color for objects other than line objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
+<h3 id="obj.setlinewidth">obj.setLineWidth()</h3>
+<p>If an object has a line color (see the <code>GameObj</code> methods <code>obj.setLineColor()</code> and <code>obj.setLineColorRGB()</code>), then the object will be outlined in this color with a stroke of approximately <code>lineWidth</code> pixels. The default is 1.</p>
+<blockquote>
+<p>Unlike normal coordinate values, <code>lineWidth</code> values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and may vary, but the overall intent is that on a screen of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution screens may use multiple pixels, and some platforms may use partial pixels for a smoother appearance (anti-aliasing).</p>
+</blockquote>
 <h3 id="obj.getlayer">obj.getLayer()</h3>
 <pre><code>int obj.getLayer()</code></pre>
 <p>Return the layer number for the object. See <code>obj.setLayer()</code> below.</p>
@@ -1239,6 +1368,11 @@ obj.align( String alignment, boolean adjustY )</code></pre>
 <p>Remove and delete the object from the screen.</p>
 <blockquote>
 <p>Attempting to access the fields or methods of an object after it has been deleted may result in unpredictable behavior.</p>
+</blockquote>
+<h3 id="obj.setclickable">obj.setClickable()</h3>
+<p>The <code>clickable</code> field defaults to <code>true</code>, so by default all <code>GameObj</code> objects can be used to respond to click/touch input (see <a href="#ctobjectclicked">ct.objectClicked</a>, <a href="#objclicked">obj.clicked</a>, and <a href="#onmousepress">onMousePress</a>). However, if you set an object’s <code>clickable</code> field to false, then it will ignore clicks and pass them through to the object below, if any.</p>
+<blockquote>
+<p>If you stack two objects and want to use the bottom object to test for hits (for example a rectangle with a text label on top of it), then you can set the <code>clickable</code> field of the top object to <code>false</code>, which will cause the click to “pass through” to the object below it.</p>
 </blockquote>
 <h3 id="obj.clicked">obj.clicked()</h3>
 <pre><code>boolean obj.clicked()</code></pre>
@@ -1256,7 +1390,7 @@ obj.align( String alignment, boolean adjustY )</code></pre>
 <h3 id="obj.hit">obj.hit()</h3>
 <pre><code>boolean obj.hit( GameObj objTest )</code></pre>
 <p>Return <code>true</code> if the object currently intersects with another object <code>objTest</code>. If you call this method every time in your <a href="#update">update()</a> function, it can be used to test if/when two objects “hit” each other.</p>
-<h3 id="obj.objecthitingroup-string-group">obj.objectHitInGroup( String group )</h3>
+<h3 id="obj.objecthitingroup">obj.objectHitInGroup()</h3>
 <pre><code>GameObj obj.objectHitInGroup( String group )</code></pre>
 <p>If the object currently intersects with another <code>GameObj</code> object on the current screen that has its <a href="#group">group</a> field equal to <code>group</code>, then return a reference to the other object, otherwise return <code>null</code>. If the specified <code>group</code> is <code>null</code> then all objects on the current screen will be considered.</p>
 <blockquote>
