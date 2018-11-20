@@ -399,14 +399,9 @@ function runView.toggleGrid()
 		gridGroup.isVisible = false
 	else
 		makeGrid()
+		gridGroup.isVisible = true
 	end
 	app.gridOn = not gridOn
-end
-
--- Hide the coordinate grideLines
-function runView.hideGrid()
-	gridGroup.isVisible = false
-	app.gridOn = false
 end
 
 
