@@ -167,7 +167,6 @@ local function makeGrid()
 		n = n + 1
 		gridYLabels[n].isVisible = false
 	end
-	print("numXLabels", #gridXLabels, "numYLabels", #gridYLabels)
 end
 
 -- Position the display panes
