@@ -1058,6 +1058,7 @@ error = ct.isError( ct.parseNumber( &quot;nope&quot; ) );</code></pre>
 <li><a href="#ct.formatint">ct.formatInt()</a></li>
 <li><a href="#ct.formatdecimal">ct.formatDecimal()</a></li>
 </ul>
+<h6 id="code12-function-reference-type-conversion"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion-1">Type Conversion</a></h6>
 <h3 id="ct.parseint">ct.parseInt()</h3>
 <p>Reads an <a href="#java-data-types">int</a> value in a <a href="#java-data-types">String</a>.</p>
 <h4 id="syntax-43">Syntax</h4>
@@ -1179,6 +1180,7 @@ String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</c
 <li><a href="#ct.stop">ct.stop()</a></li>
 <li><a href="#ct.restart">ct.restart()</a></li>
 </ul>
+<h6 id="code12-function-reference-program-control"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control-1">Program Control</a></h6>
 <h3 id="ct.gettimer">ct.getTimer()</h3>
 <p>Return the number of milliseconds since your program started.</p>
 <h4 id="syntax-49">Syntax</h4>
@@ -1261,21 +1263,24 @@ public void update()
     ct.restart();</code></pre>
 <h6 id="code12-function-reference-program-control-ct.restart"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control-1">Program Control</a> &gt; <a href="#ct.restart">ct.restart()</a></h6>
 <h2 id="gameobj-data-fields-1">GameObj Data Fields</h2>
-<p>Each graphics object (<a href="#java-data-types">GameObj</a>) that you create (see <a href="#graphic-object-creation-1">Graphic Object Creation</a>) has several data variables that live inside it. These variables store information such as the position, size, and color of the object. Each <code>GameObj</code> has its own copy of these variables. You can access or change some of these data variables directly. Java refers to these directly accessible variables as <em>public data fields</em>.</p>
-<p>Each <code>GameObj</code> has public data fields named <code>x</code>, <code>y</code>, <code>visible</code>, and <code>group</code>. To access these fields, you need a variable of type <a href="#java-data-types">GameObj</a>, which you put before the data field name followed by a dot (.) character.</p>
-<p>In the general descriptions below, the <code>GameObj</code> variable is shown as <code>obj</code>. In your program, you will replace <code>obj</code> with the name of the <code>GameObj</code> variable that you wish to access.</p>
+<p>Each graphics object (<a href="#java-data-types">GameObj</a>) that you create (see <a href="#graphic-object-creation-1">Graphic Object Creation</a>) has several data variables that live inside it. These variables store information such as the position, size, and color of the object. Each <a href="#java-data-types">GameObj</a> has its own copy of these variables. You can access or change some of these data variables directly. Java refers to these directly accessible variables as <em>public data fields</em>.</p>
+<p>Each <a href="#java-data-types">GameObj</a> has public data fields named <code>x</code>, <code>y</code>, <code>visible</code>, and <code>group</code>. To access these fields, you need a variable of type <a href="#java-data-types">GameObj</a>, which you put before the data field name followed by a dot (.) character.</p>
+<p>In the general descriptions below, the <a href="#java-data-types">GameObj</a> variable is shown as <code>obj</code>. In your program, you will replace <code>obj</code> with the name of the <a href="#java-data-types">GameObj</a> variable that you wish to access.</p>
 <ul>
 <li><a href="#obj.x">obj.x</a></li>
 <li><a href="#obj.y">obj.y</a></li>
 <li><a href="#obj.visible">obj.visible</a></li>
 <li><a href="#obj.group">obj.group</a></li>
 </ul>
+<h6 id="code12-function-reference-gameobj-data-fields"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a></h6>
 <h3 id="obj.x">obj.x</h3>
-<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of a <a href="#java-data-types">GameObj</a>.</p>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
 <h4 id="syntax-54">Syntax</h4>
 <pre><code>obj.x</code></pre>
+<h5 id="obj">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
 <h4 id="notes-17">Notes</h4>
-<p>The <code>obj</code> is any <a href="#java-data-types">GameObj</a> variable. You can access (“get”) or change (“set”) the <a href="#graphics-coordinates">x coordinate</a> of a <code>GameObj</code> at any time.</p>
+<p>You can access (“get”) or change (“set”) the <a href="#graphics-coordinates">x coordinate</a> of a <a href="#java-data-types">GameObj</a> at any time.</p>
 <h4 id="example-34">Example</h4>
 <pre><code>GameObj dot;
 
@@ -1295,11 +1300,13 @@ public void update()
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-data-fields-obj.x"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.x">obj.x</a></h6>
 <h3 id="obj.y">obj.y</h3>
-<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of a <a href="#java-data-types">GameObj</a>.</p>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
 <h4 id="syntax-55">Syntax</h4>
 <pre><code>obj.y</code></pre>
+<h5 id="obj-1">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
 <h4 id="notes-18">Notes</h4>
-<p>The <code>obj</code> is any <a href="#java-data-types">GameObj</a> variable. You can access (“get”) or change (“set”) the <a href="#graphics-coordinates">y coordinate</a> of a <code>GameObj</code> at any time.</p>
+<p>You can access (“get”) or change (“set”) the <a href="#graphics-coordinates">y coordinate</a> of a <a href="#java-data-types">GameObj</a> at any time.</p>
 <h4 id="example-35">Example</h4>
 <pre><code>GameObj slab;
 
@@ -1319,11 +1326,13 @@ public void update()
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-data-fields-obj.y"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.y">obj.y</a></h6>
 <h3 id="obj.visible">obj.visible</h3>
-<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the object should be displayed as normal, or <code>false</code> to hide the object and not display it.</p>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if a graphics object (<a href="#java-data-types">GameObj</a>) should be displayed as normal, or <code>false</code> to hide the object and not display it.</p>
 <h4 id="syntax-56">Syntax</h4>
 <pre><code>obj.visible</code></pre>
+<h5 id="obj-2">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
 <h4 id="notes-19">Notes</h4>
-<p>Objects default to visible when created. If you set the <code>visible</code> field to <code>false</code>, the object will be hidden and disappear from the display. Hidden objects still exist (they are not deleted), and they can be brought back by setting <code>visible</code> back to <code>true</code>.</p>
+<p>Graphics objects default to visible when created. If you set the <code>visible</code> field to <code>false</code>, the object will be hidden and disappear from the display. Hidden objects still exist (they are not deleted), and they can be brought back by setting <code>visible</code> back to <code>true</code>.</p>
 <blockquote>
 <p>In addition to not being displayed, hidden objects do not respond to mouse clicks (from <a href="#ct.objectclicked">ct.objectClicked()</a>, for example) and do not register as “hitting” other objects (see <a href="#obj.hit">obj.hit()</a>, for example])</p>
 </blockquote>
@@ -1334,9 +1343,11 @@ if (target != null)
     target.visible = false;</code></pre>
 <h6 id="code12-function-reference-gameobj-data-fields-obj.visible"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.visible">obj.visible</a></h6>
 <h3 id="obj.group">obj.group</h3>
-<p>(<a href="#java-data-types">String</a>). An optional name that you can assigned to an object to associate it with other similar objects.</p>
+<p>(<a href="#java-data-types">String</a>). An optional name that you can assigned to a graphics object (<a href="#java-data-types">GameObj</a>) to associate it with other similar objects.</p>
 <h4 id="syntax-57">Syntax</h4>
 <pre><code>obj.group</code></pre>
+<h5 id="obj-3">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
 <h4 id="notes-20">Notes</h4>
 <p>The default group name for an object is <code>&quot;&quot;</code> (empty string) when it is created. If you assign a group name, you can access and check it when you have an unknown object reference to see what kind it is.</p>
 <p>The <code>group</code> field is also used by the functions <a href="#ct.cleargroup">ct.clearGroup()</a> and <a href="#obj.objecthitingroup">obj.objectHitInGroup()</a>.</p>
@@ -1364,7 +1375,7 @@ public void update()
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-data-fields-obj.group"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.group">obj.group</a></h6>
 <h2 id="gameobj-methods-1">GameObj Methods</h2>
-<p>The following method functions must be called on an existing <code>GameObj</code> object (see <a href="#gameobj-creation">GameObj Creation</a>). In the syntax shown, the <code>obj</code> can be any variable of type <code>GameObj</code>.</p>
+<p>The following method functions must be called on an existing <a href="#java-data-types">GameObj</a> object (see <a href="#gameobj-creation">GameObj Creation</a>). In the syntax descriptions shown, the <code>obj</code> can be any variable of type <a href="#java-data-types">GameObj</a>. The method function will access or modify the <code>obj</code> variable you specify.</p>
 <ul>
 <li><a href="#obj.gettype">obj.getType()</a></li>
 <li><a href="#obj.getwidth">obj.getWidth()</a></li>
@@ -1389,54 +1400,85 @@ public void update()
 <li><a href="#obj.hit">obj.hit()</a></li>
 <li><a href="#obj.objecthitingroup">obj.objectHitInGroup()</a></li>
 </ul>
+<h6 id="code12-function-reference-gameobj-methods"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a></h6>
 <h3 id="obj.gettype">obj.getType()</h3>
-<pre><code>String obj.getType()</code></pre>
-<p>Return the type name of the <code>GameObj</code> object, which is one of: <code>&quot;circle&quot;</code>, <code>&quot;rect&quot;</code>, <code>&quot;line&quot;</code>, <code>&quot;text&quot;</code>, or <code>&quot;image&quot;</code>.</p>
+<p>Returns the type name of a graphics object (<a href="#java-data-types">GameObj</a>), for example, <code>&quot;circle&quot;</code>.</p>
+<h4 id="syntax-58">Syntax</h4>
+<pre><code>obj.getType()</code></pre>
+<h5 id="obj-4">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-34"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). One of: <code>&quot;circle&quot;</code>, <code>&quot;rect&quot;</code>, <code>&quot;line&quot;</code>, <code>&quot;text&quot;</code>, or <code>&quot;image&quot;</code>.</p>
+<h4 id="example-37">Example</h4>
+<pre><code>GameObj target = ct.objectClicked();
+String type = target.getType();
+if (type.equals( &quot;circle&quot; ))
+    ct.println( &quot;You clicked a circle&quot; );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.gettype"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.gettype">obj.getType()</a></h6>
 <h3 id="obj.getwidth">obj.getWidth()</h3>
-<pre><code>double obj.getWidth()</code></pre>
-<p>Returns the width (horizontal size) of the object.</p>
+<p>Returns the <a href="#graphics-coordinates">width</a> (horizontal size) of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
+<h4 id="syntax-59">Syntax</h4>
+<pre><code>obj.getWidth()</code></pre>
+<h5 id="obj-5">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-35"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">width</a> of the object.</p>
+<h4 id="notes-21">Notes</h4>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the width returned is the x offset (positive or negative) from the first point to the second point, not the physical width of the line, and unrelated to the thickness of the line as set by [ct.setLineWidth()].</p>
+<h4 id="example-38">Example</h4>
+<pre><code>GameObj title = ct.text( &quot;Zombie Attack&quot;, 50, 30, 10 );
+double titleWidth = title.getWidth();</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.getwidth"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.getwidth">obj.getWidth()</a></h6>
 <h3 id="obj.getheight">obj.getHeight()</h3>
-<pre><code>double obj.getHeight()</code></pre>
-<p>Returns the height (vertical size) of the object.</p>
-<h3 id="obj.gettext">obj.getText()</h3>
-<pre><code>String obj.getText()</code></pre>
-<p>Return the text of the object. For a <code>&quot;text&quot;</code> object, this is the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object. For an <code>&quot;image&quot;</code> object, the text defaults to the image filename, but you can change it to something else (see <code>obj.setText</code> below).</p>
-<blockquote>
-<p>The <code>obj.toString()</code> method (see below) includes the object text in the description of an object.</p>
-</blockquote>
-<h3 id="obj.settext">obj.setText()</h3>
-<pre><code>obj.setText( String text )</code></pre>
-<p>Set the text of an object to <code>text</code>. If the object is a text object, setting the text will cause the visible text to change. For other object types, the text is simply stored in the object (See <code>obj.getText()</code> above).</p>
-<h3 id="obj.tostring">obj.toString()</h3>
-<pre><code>String obj.toString()</code></pre>
-<p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
-<h5 id="examples-21">Examples:</h5>
-<pre><code>[circle at (70, 25)]
-[text at (50, 10) &quot;Score 3200&quot;]
-[image at (21, 83) &quot;goldfish.png&quot;]
-[image at (21, 83) &quot;hero&quot;]
-[rect at (50, 100) &quot;bottom wall&quot;]</code></pre>
+<p>Returns the <a href="#graphics-coordinates">height</a> (vertical size) of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
+<h4 id="syntax-60">Syntax</h4>
+<pre><code>obj.getHeight()</code></pre>
+<h5 id="obj-6">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-36"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">height</a> of the object.</p>
+<h4 id="notes-22">Notes</h4>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the height returned is the y offset (positive or negative) from the first point to the second point, not the physical height of the line.</p>
+<h4 id="example-39">Example</h4>
+<pre><code>GameObj hero = ct.image( &quot;dragon.png&quot;, 50, 70, 10 );
+double heroHeight = hero.getHeight();</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.getheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.getheight">obj.getHeight()</a></h6>
 <h3 id="obj.setsize">obj.setSize()</h3>
-<pre><code>obj.setSize( double width, double height )</code></pre>
-<p>Set the size of the object using <code>width</code> and <code>height</code>.</p>
-<p>The different types of <code>GameObj</code> objects react somewhat differently to changes in size, as follows:</p>
+<p>Sets the size (<a href="#graphics-coordinates">width</a> and <a href="#graphics-coordinates">height</a>) of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
+<h4 id="syntax-61">Syntax</h4>
+<pre><code>obj.setSize( width, height );</code></pre>
+<h5 id="obj-7">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="width-2">width</h5>
+<p>(<a href="#java-data-types">double</a>). The new <a href="#graphics-coordinates">width</a> for the object.</p>
+<h5 id="height-3">height</h5>
+<p>(<a href="#java-data-types">double</a>). The new <a href="#graphics-coordinates">height</a> for the object.</p>
+<h4 id="notes-23">Notes</h4>
+<p>The different types of <a href="#java-data-types">GameObj</a> objects react somewhat differently to changes in size, as follows:</p>
+<blockquote>
 <h5 id="circle-objects">circle Objects</h5>
 <p>Although circles are always created round, you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
+</blockquote>
+<blockquote>
 <h5 id="rect-objects">rect Objects</h5>
 <p>Rectangles can be any size and adjust to any <code>width</code> and <code>height</code>.</p>
+</blockquote>
+<blockquote>
 <h5 id="line-objects">line Objects</h5>
-<p>Line objects are created between two points. After creation, the <code>x</code> and <code>y</code> fields are the location of the first point, and the <code>width</code> and <code>height</code> fields specify signed offsets (can be negative) from the first point to the second point. Thus, the location of the second point is (<code>x</code> + <code>width</code>, <code>y</code> + <code>height</code>). You can change any of the <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> fields, and the line will adjust.</p>
-<blockquote>
-<p>Note that unlike any of the other <code>GameObj</code> object types, a line may have negative values for the <code>width</code> and <code>height</code> fields. The physical width and height of the line’s bounding box can be reliably determined with<br />
-<code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <code>lineWidth</code> below).</p>
+<p>Line objects are created between two points. After creation, the <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> fields are the location of the first point. Calling <code>obj.setSize( width, height )</code> can be used to change the second point. The <code>width</code> and <code>height</code> specify offsets (positive or negative) from the first point to the second point.</p>
 </blockquote>
+<blockquote>
 <h5 id="text-objects">text Objects</h5>
-<p>Text objects use a font size that is automatically determined by the object’s <code>height</code>, and the object’s <code>width</code> is calculated automatically. So, changing <code>height</code> will change the font size, and changes to the <code>width</code> field are undefined.</p>
-<blockquote>
-<p><strong>Note:</strong> When you change a text object’s <code>height</code>, the <code>width</code> will be recalculated automatically. However, the new value for <code>width</code> is not available immediately. It will be recalculated the next time the object draws (at the next animation frame).</p>
+<p>Text objects ignore the <code>width</code> passed. The <code>height</code> is used to determine the new font size for the object, and the object’s width is recalculated automatically.</p>
 </blockquote>
+<blockquote>
 <h5 id="image-objects">image Objects</h5>
 <p>Images are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to fill the space.</p>
+</blockquote>
+<h4 id="example-40">Example</h4>
+<pre><code>GameObj blob = ct.circle( 50, 50, 30 );
+blob.setSize( 50, 30 );      // makes an ellipse</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setsize"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setsize">obj.setSize()</a></h6>
 <h3 id="obj.setspeed">obj.setSpeed()</h3>
 <p>The <code>xSpeed</code> and <code>ySpeed</code> fields can be used to make an object move automatically at the specified speed and direction. The <code>xSpeed</code> and <code>ySpeed</code> values are added to the object’s <code>x</code> and <code>y</code> fields before each new animation frame. Animation frames happen 60 times per second, so setting <code>xSpeed</code> to 1 will make the object move 60 units per second to the right. The values for <code>xSpeed</code> and <code>ySpeed</code> can be positive or negative, and they both default to 0.</p>
 <h3 id="obj.align">obj.align()</h3>
@@ -1455,6 +1497,45 @@ obj.align( String alignment, boolean adjustY )</code></pre>
 &quot;bottom right&quot;</code></pre>
 <p>If <code>adjustY</code> is included and <code>true</code>, then the object will be automatically repositioned to maintain its relative vertical position in the application window if the window is resized and changes aspect ratio. This can be used to easily make objects stick to the bottom of the window, or stay in the vertical center of the window, etc.</p>
 <p>Note that all objects always automatically adjust their horizontal position when the window is resized (because display coordinates are relative to a width of 100), and that vertical positions are also relative to the window’s overall size, and thus also adjust when the window resizes. The effect of <code>adjustY</code> is only relevant to help adjust for changes in the aspect ratio of the window.</p>
+<h3 id="obj.gettext">obj.getText()</h3>
+<p>Returns the text of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
+<h4 id="syntax-62">Syntax</h4>
+<pre><code>obj.getText()</code></pre>
+<h5 id="obj-8">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-37"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). The text of the object. For a text object (see <a href="#ct.text">ct.text()</a>), this is the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object (see <a href="#obj.settext">obj.setText()</a>).</p>
+<h4 id="notes-24">Notes</h4>
+<p>For an image object (see <a href="#ct.image">ct.image()</a>), the text defaults to the image filename, but you can change it to something else (see <a href="#obj.settext">obj.setText()</a>).</p>
+<p>The <a href="#obj.tostring">obj.toString()</a> method includes the object text in the description of an object.</p>
+<h4 id="example-41">Example</h4>
+<pre><code>public void start()
+{
+    GameObj dot = ct.circle( 50, 50, 10 );
+    dot.setText( &quot;bomb&quot; );
+}
+
+public void update()
+{
+    GameObj target = ct.objectClicked();
+    String text = target.getText();
+    if (text.equals( &quot;bomb&quot; ))
+        ct.println( &quot;You clicked a bomb&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.gettext"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.gettext">obj.getText()</a></h6>
+<h3 id="obj.settext">obj.setText()</h3>
+<p>Sets the text of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
+<p>If the object is a text object, setting the text will cause the visible text to change. For other object types, the text is simply stored in the object (See <code>obj.getText()</code> above).</p>
+<pre><code>obj.setText( String text )</code></pre>
+<h3 id="obj.tostring">obj.toString()</h3>
+<pre><code>String obj.toString()</code></pre>
+<p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
+<h5 id="examples-21">Examples:</h5>
+<pre><code>[circle at (70, 25)]
+[text at (50, 10) &quot;Score 3200&quot;]
+[image at (21, 83) &quot;goldfish.png&quot;]
+[image at (21, 83) &quot;hero&quot;]
+[rect at (50, 100) &quot;bottom wall&quot;]</code></pre>
 <h3 id="obj.setfillcolor">obj.setFillColor()</h3>
 <pre><code>obj.setFillColor( String color )</code></pre>
 <p>Set the fill color of the object (text color for text objects) to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>. If <code>color</code> is <code>null</code> then the fill is removed from the object.</p>
@@ -1514,6 +1595,7 @@ obj.align( String alignment, boolean adjustY )</code></pre>
 </blockquote>
 <h2 id="java-math-methods">Java Math Methods</h2>
 <p>Code12 supports the following method functions and fields from the Java <code>Math</code> class.</p>
+<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html">Java Math Class</a>.</p>
 <pre><code>Function               Parameter Type(s)   Return Type
 --------------------   -----------------   -----------
 Math.abs( number )     double              double
@@ -1545,9 +1627,10 @@ Field       Type
 Math.E      double
 Math.PI     double
 </code></pre>
-<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html">Java Math Class</a>.</p>
+<h6 id="code12-function-reference-java-math-methods"><a href="#top">Code12 Function Reference</a> &gt; <a href="#java-math-methods">Java Math Methods</a></h6>
 <h2 id="java-string-methods">Java String Methods</h2>
 <p>Code12 supports the following method functions from the Java <code>String</code> class. String methods must operate on a variable of type <a href="#java-data-types">String</a>, shown below as <code>str</code>.</p>
+<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">Java String Class</a>.</p>
 <pre><code>Function                      Parameter Type(s)   Return Type
 ---------------------------   -----------------   -----------
 str.compareTo( str2 )         String              int
@@ -1559,7 +1642,7 @@ str.substring( begin, end )   int, int            String
 str.toLowerCase()                                 String
 str.toUpperCase()                                 String
 str.trim()                                        String</code></pre>
-<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">Java String Class</a>.</p>
+<h6 id="code12-function-reference-java-string-methods"><a href="#top">Code12 Function Reference</a> &gt; <a href="#java-string-methods">Java String Methods</a></h6>
 <h2 id="main-program-functions">Main Program Functions</h2>
 <h3 id="start">start()</h3>
 <pre><code>void start()</code></pre>
@@ -1574,6 +1657,7 @@ str.trim()                                        String</code></pre>
 <blockquote>
 <p>A common mistake is to create <code>GameObj</code> objects in the <a href="#update">update()</a> function in a way that causes many copies of the object to be created over and over. Note that you should <em>not</em> call functions like <code>ct.circle()</code> to “draw” a circle for each frame in an animation. Instead, you typically want to call <code>ct.circle()</code> to create the object once in your <code>start</code> function, then modify the existing circle in your <a href="#update">update()</a> function.</p>
 </blockquote>
+<h6 id="code12-function-reference-main-program-functions"><a href="#top">Code12 Function Reference</a> &gt; <a href="#main-program-functions">Main Program Functions</a></h6>
 <h2 id="input-event-functions">Input Event Functions</h2>
 <p>The following functions, if defined in your program, will be called when indicated. Note that unlike all of the other functions and methods above, These functions are <em>implemented</em> in your program (you write the body of the function) and are <em>called</em> by the runtime system with appropriate. They are called in response to “events” happening in your application.</p>
 <p>Implementing any of these functions is optional and “for your information”. They are not necessary to use other functions and features of the system. For example, if you don’t implement any of the mouse event functions, you can still call functions such as <code>ct.clicked()</code> to test for mouse clicks.</p>
@@ -1623,6 +1707,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 <blockquote>
 <p>Some systems resize windows continuously in response to the user re-sizing the window frame, so you may receive many <code>onResize</code> events in succession.</p>
 </blockquote>
+<h6 id="code12-function-reference-input-event-functions"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a></h6>
 <h2 id="additional-reference-information">Additional Reference Information</h2>
 <h3 id="graphics-coordinates">Graphics Coordinates</h3>
 <p>Graphics objects in Code12 are positioned on the screen by (x, y) coordinates. The coordinate values are not pixels, but instead are in unit values relative to the width of the graphics area, or “screen”. Size values (e.g. width and height) use the same units.</p>

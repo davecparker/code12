@@ -136,6 +136,7 @@ These functions allow you to create new graphics objects for display on the scre
 
 ###### [Code12 Function Reference](#top) > [Graphic Object Creation]
 
+
 ### ct.circle()
 Creates a new circle graphics object (GameObj).
 
@@ -1756,6 +1757,9 @@ These functions allow you to convert text strings to numbers and vice-versa.
 * [ct.formatInt()]
 * [ct.formatDecimal()]
 
+###### [Code12 Function Reference](#top) > [Type Conversion]
+
+
 ### ct.parseInt()
 Reads an [int](#java-data-types) value in a [String](#java-data-types).
 
@@ -1954,6 +1958,9 @@ execution of your program.
 * [ct.stop()]
 * [ct.restart()]
 
+###### [Code12 Function Reference](#top) > [Program Control]
+
+
 ### ct.getTimer()
 Return the number of milliseconds since your program started.
 
@@ -2093,37 +2100,42 @@ GameObj Data Fields
 -------------------
 Each graphics object ([GameObj](#java-data-types)) that you create 
 (see [Graphic Object Creation]) has several data variables that live inside it. 
-These variables store information such as the position, size, 
-and color of the object. Each `GameObj` has its own copy of these variables. 
+These variables store information such as the position, size, and color of the object. 
+Each [GameObj](#java-data-types) has its own copy of these variables. 
 You can access or change some of these data variables directly.
 Java refers to these directly accessible variables as *public data fields*.
 
-Each `GameObj` has public data fields named `x`, `y`, `visible`, and `group`.
+Each [GameObj](#java-data-types) has public data fields named `x`, `y`, 
+`visible`, and `group`. 
 To access these fields, you need a variable of type [GameObj](#java-data-types),
 which you put before the data field name followed by a dot (.) character.
 
-In the general descriptions below, the `GameObj` variable is shown as `obj`.
-In your program, you will replace `obj` with the name of the `GameObj` variable
-that you wish to access.
+In the general descriptions below, the [GameObj](#java-data-types) variable is 
+shown as `obj`. In your program, you will replace `obj` with the name of the 
+[GameObj](#java-data-types) variable that you wish to access.
 
 * [obj.x]
 * [obj.y]
 * [obj.visible]
 * [obj.group]
 
+###### [Code12 Function Reference](#top) > [GameObj Data Fields]
+
 
 ### obj.x
 ([double](#java-data-types)). The [x coordinate](#graphics-coordinates) of
-a [GameObj](#java-data-types).
+a graphics object ([GameObj](#java-data-types)).
 
 #### Syntax
 ```
 obj.x
 ```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
 #### Notes
-The `obj` is any [GameObj](#java-data-types) variable. 
 You can access ("get") or change ("set") the [x coordinate](#graphics-coordinates)
-of a `GameObj` at any time.
+of a [GameObj](#java-data-types) at any time.
 
 #### Example
 ```
@@ -2149,16 +2161,18 @@ public void update()
 
 ### obj.y
 ([double](#java-data-types)). The [y coordinate](#graphics-coordinates) of
-a [GameObj](#java-data-types).
+a graphics object ([GameObj](#java-data-types)).
 
 #### Syntax
 ```
 obj.y
 ```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
 #### Notes
-The `obj` is any [GameObj](#java-data-types) variable. 
 You can access ("get") or change ("set") the [y coordinate](#graphics-coordinates)
-of a `GameObj` at any time.
+of a [GameObj](#java-data-types) at any time.
 
 #### Example
 ```
@@ -2183,16 +2197,20 @@ public void update()
 
 
 ### obj.visible
-([boolean](#java-data-types)). `true` if the object should be displayed
-as normal, or `false` to hide the object and not display it.
+([boolean](#java-data-types)). `true` if a graphics object 
+([GameObj](#java-data-types)) should be displayed as normal, 
+or `false` to hide the object and not display it.
 
 #### Syntax
 ```
 obj.visible
 ```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
 #### Notes
-Objects default to visible when created. If you set the `visible` field to
-`false`, the object will be hidden and disappear from the display. 
+Graphics objects default to visible when created. If you set the `visible` 
+field to `false`, the object will be hidden and disappear from the display. 
 Hidden objects still exist (they are not deleted), and they can be brought 
 back by setting `visible` back to `true`.
 
@@ -2212,13 +2230,17 @@ if (target != null)
 
 
 ### obj.group
-([String](#java-data-types)). An optional name that you can assigned to an object
-to associate it with other similar objects.
+([String](#java-data-types)). An optional name that you can assigned to a 
+graphics object ([GameObj](#java-data-types)) to associate it with other 
+similar objects.
 
 #### Syntax
 ```
 obj.group
 ```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
 #### Notes
 The default group name for an object is `""` (empty string) when it is created.
 If you assign a group name, you can access and check it when you have an
@@ -2256,9 +2278,10 @@ public void update()
 
 GameObj Methods
 ---------------
-The following method functions must be called on an existing `GameObj`
-object (see [GameObj Creation](#gameobj-creation)). In the syntax shown,
-the `obj` can be any variable of type `GameObj`.
+The following method functions must be called on an existing [GameObj](#java-data-types)
+object (see [GameObj Creation](#gameobj-creation)). In the syntax descriptions shown,
+the `obj` can be any variable of type [GameObj](#java-data-types). 
+The method function will access or modify the `obj` variable you specify.
 
 * [obj.getType()]
 * [obj.getWidth()]
@@ -2283,118 +2306,141 @@ the `obj` can be any variable of type `GameObj`.
 * [obj.hit()]
 * [obj.objectHitInGroup()]
 
+###### [Code12 Function Reference](#top) > [GameObj Methods]
+
 
 ### obj.getType()
+Returns the type name of a graphics object ([GameObj](#java-data-types)), 
+for example, `"circle"`.
+
+#### Syntax
 ```
-String obj.getType()
+obj.getType()
 ```
-Return the type name of the `GameObj` object, which is one of:
-`"circle"`, `"rect"`, `"line"`, `"text"`, or `"image"`.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([String](#java-data-types)). One of: `"circle"`, `"rect"`, `"line"`, `"text"`, or `"image"`.
+
+#### Example
+```
+GameObj target = ct.objectClicked();
+String type = target.getType();
+if (type.equals( "circle" ))
+	ct.println( "You clicked a circle" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getType()]
+
 
 ### obj.getWidth()
+Returns the [width](#graphics-coordinates) (horizontal size) of a 
+graphics object ([GameObj](#java-data-types)).
+
+#### Syntax
 ```
-double obj.getWidth()
+obj.getWidth()
 ```
-Returns the width (horizontal size) of the object.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([double](#java-data-types)). The [width](#graphics-coordinates) of the object.
+
+#### Notes
+For line objects (see [ct.line()]), the width returned is the x offset
+(positive or negative) from the first point to the second point,
+not the physical width of the line, and unrelated to the thickness
+of the line as set by [ct.setLineWidth()].
+
+#### Example
+```
+GameObj title = ct.text( "Zombie Attack", 50, 30, 10 );
+double titleWidth = title.getWidth();
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getWidth()]
+
 
 ### obj.getHeight()
-```
-double obj.getHeight()
-```
-Returns the height (vertical size) of the object.
+Returns the [height](#graphics-coordinates) (vertical size) of a 
+graphics object ([GameObj](#java-data-types)).
 
-### obj.getText()
+#### Syntax
 ```
-String obj.getText()
+obj.getHeight()
 ```
-Return the text of the object.
-For a `"text"` object, this is the visible text.
-For other objects, this is just a string kept inside the object,
-which can be used to identity or describe the object.
-For an `"image"` object,  the text defaults to the image filename,
-but you can change it to something else (see `obj.setText` below).
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
 
-> The `obj.toString()` method (see below) includes the object text
-> in the description of an object.
+##### *Return Value*
+([double](#java-data-types)). The [height](#graphics-coordinates) of the object.
 
-### obj.setText()
-```
-obj.setText( String text )
-```
-Set the text of an object to `text`. If the object is a text object,
-setting the text will cause the visible text to change.
-For other object types, the text is simply stored in the object
-(See `obj.getText()` above).
+#### Notes
+For line objects (see [ct.line()]), the height returned is the y offset
+(positive or negative) from the first point to the second point,
+not the physical height of the line.
 
-### obj.toString()
+#### Example
 ```
-String obj.toString()
+GameObj hero = ct.image( "dragon.png", 50, 70, 10 );
+double heroHeight = hero.getHeight();
 ```
-Return a string description of the object suitable for printing
-for diagnostic purposes (via `ct.println()`, `ct.log()`, etc.)
-The string will include the type name of the object,
-the (`x`, `y`) coordinates rounded to the nearest integer,
-and the text of the object, if any. The entire string
-is enclosed in square brackets.
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getHeight()]
 
-##### Examples:
-```
-[circle at (70, 25)]
-[text at (50, 10) "Score 3200"]
-[image at (21, 83) "goldfish.png"]
-[image at (21, 83) "hero"]
-[rect at (50, 100) "bottom wall"]
-```
 
 ### obj.setSize()
-```
-obj.setSize( double width, double height )
-```
-Set the size of the object using `width` and `height`.
+Sets the size ([width](#graphics-coordinates) and [height](#graphics-coordinates)) 
+of a graphics object ([GameObj](#java-data-types)).
 
-The different types of `GameObj` objects
+#### Syntax
+```
+obj.setSize( width, height );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### width
+([double](#java-data-types)). The new [width](#graphics-coordinates) for the object. 
+
+##### height
+([double](#java-data-types)). The new [height](#graphics-coordinates) for the object. 
+
+#### Notes
+
+The different types of [GameObj](#java-data-types) objects
 react somewhat differently to changes in size, as follows:
 
-##### circle Objects
-Although circles are always created round, you can create an ellipse
-by setting different `width` and `height` values.
+> ##### circle Objects
+> Although circles are always created round, you can create an ellipse
+> by setting different `width` and `height` values.
 
-##### rect Objects
-Rectangles can be any size and adjust to any `width` and `height`.
+> ##### rect Objects
+> Rectangles can be any size and adjust to any `width` and `height`.
 
-##### line Objects
-Line objects are created between two points. After creation,
-the `x` and `y` fields are the location of the first point,
-and the `width` and `height` fields specify signed offsets
-(can be negative) from the first point to the second point.
-Thus, the location of the second point is
-(`x` + `width`, `y` + `height`). You can change any of the
-`x`, `y`, `width`, or `height` fields, and the line will adjust.
+> ##### line Objects
+> Line objects are created between two points. After creation,
+> the [obj.x] and [obj.y] fields are the location of the first point.
+> Calling `obj.setSize( width, height )` can be used to change the 
+> second point. The `width` and `height` specify offsets
+> (positive or negative) from the first point to the second point.
 
-> Note that unlike any of the other `GameObj` object types,
-> a line may have negative values for the `width` and `height`
-> fields. The physical width and height of the line's bounding
-> box can be reliably determined with  
-> `Math.abs(line.width)` and `Math.abs(line.height)`.
-> This does not include the thickness of the drawn line itself
-> (see `lineWidth` below).
+> ##### text Objects
+> Text objects ignore the `width` passed. The `height` is used to
+> determine the new font size for the object, and the object's width 
+> is recalculated automatically.
 
-##### text Objects
-Text objects use a font size that is automatically determined by
-the object's `height`, and the object's `width` is calculated
-automatically. So, changing `height` will change the font size,
-and changes to the `width` field are undefined.
+> ##### image Objects
+> Images are initially created with `height` calculated automatically
+> to preserve the image's aspect ratio given the specified `width`.
+> However, once created, you can set any values for `width` and `height`,
+> and the image will scale and/or stretch as necessary to fill the space.
 
-> **Note:** When you change a text object's `height`, the `width`
-> will be recalculated automatically. However, the new value for
-> `width` is not available immediately. It will be recalculated
-> the next time the object draws (at the next animation frame).
-
-##### image Objects
-Images are initially created with `height` calculated automatically
-to preserve the image's aspect ratio given the specified `width`.
-However, once created, you can set any values for `width` and `height`,
-and the image will scale and/or stretch as necessary to fill the space.
+#### Example
+```
+GameObj blob = ct.circle( 50, 50, 30 );
+blob.setSize( 50, 30 );      // makes an ellipse
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSize()]
 
 
 ### obj.setSpeed()
@@ -2448,6 +2494,82 @@ coordinates are relative to a width of 100), and that vertical positions
 are also relative to the window's overall size, and thus also adjust
 when the window resizes. The effect of `adjustY` is only relevant to
 help adjust for changes in the aspect ratio of the window.
+
+
+### obj.getText()
+Returns the text of a graphics object ([GameObj](#java-data-types)).
+
+#### Syntax
+```
+obj.getText()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([String](#java-data-types)). The text of the object.
+For a text object (see [ct.text()]), this is the visible text.
+For other objects, this is just a string kept inside the object,
+which can be used to identity or describe the object (see [obj.setText()]).
+
+#### Notes
+For an image object (see [ct.image()]), the text defaults to the 
+image filename, but you can change it to something else (see [obj.setText()]).
+
+The [obj.toString()] method includes the object text in the description 
+of an object.
+
+#### Example
+```
+public void start()
+{
+	GameObj dot = ct.circle( 50, 50, 10 );
+	dot.setText( "bomb" );
+}
+
+public void update()
+{
+	GameObj target = ct.objectClicked();
+	String text = target.getText();
+	if (text.equals( "bomb" ))
+		ct.println( "You clicked a bomb" );
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getText()]
+
+
+### obj.setText()
+Sets the text of a graphics object ([GameObj](#java-data-types)).
+
+
+If the object is a text object, setting the text will cause the visible text to change.
+For other object types, the text is simply stored in the object
+(See `obj.getText()` above).
+```
+obj.setText( String text )
+```
+
+
+### obj.toString()
+```
+String obj.toString()
+```
+Return a string description of the object suitable for printing
+for diagnostic purposes (via `ct.println()`, `ct.log()`, etc.)
+The string will include the type name of the object,
+the (`x`, `y`) coordinates rounded to the nearest integer,
+and the text of the object, if any. The entire string
+is enclosed in square brackets.
+
+##### Examples:
+```
+[circle at (70, 25)]
+[text at (50, 10) "Score 3200"]
+[image at (21, 83) "goldfish.png"]
+[image at (21, 83) "hero"]
+[rect at (50, 100) "bottom wall"]
+```
+
 
 ### obj.setFillColor()
 ```
@@ -2593,6 +2715,10 @@ will be considered.
 Java Math Methods
 -----------------
 Code12 supports the following method functions and fields from the Java `Math` class.
+
+For more information, see the 
+[Java Math Class](https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html).
+
 ```
 Function               Parameter Type(s)   Return Type
 --------------------   -----------------   -----------
@@ -2626,7 +2752,8 @@ Math.E      double
 Math.PI     double
 
 ```
-For more information, see the [Java Math Class](https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html).
+
+###### [Code12 Function Reference](#top) > [Java Math Methods]
 
 
 Java String Methods
@@ -2634,6 +2761,10 @@ Java String Methods
 Code12 supports the following method functions from the Java `String` class.
 String methods must operate on a variable of type [String](#java-data-types),
 shown below as `str`.
+
+For more information, see the 
+[Java String Class](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html).
+
 ```
 Function                      Parameter Type(s)   Return Type
 ---------------------------   -----------------   -----------
@@ -2647,7 +2778,8 @@ str.toLowerCase()                                 String
 str.toUpperCase()                                 String
 str.trim()                                        String
 ```
-For more information, see the [Java String Class](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html).
+
+###### [Code12 Function Reference](#top) > [Java String Methods]
 
 
 Main Program Functions
@@ -2694,6 +2826,9 @@ of certain amounts of time if you want.
 > "draw" a circle for each frame in an animation. Instead, you typically
 > want to call `ct.circle()` to create the object once in your `start` function,
 > then modify the existing circle in your [update()] function.
+
+###### [Code12 Function Reference](#top) > [Main Program Functions]
+
 
 Input Event Functions
 ---------------------
@@ -2811,6 +2946,8 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 
 > Some systems resize windows continuously in response to the user re-sizing
 > the window frame, so you may receive many `onResize` events in succession.
+
+###### [Code12 Function Reference](#top) > [Input Event Functions]
 
 
 Additional Reference Information
@@ -2963,6 +3100,6 @@ so typing 'A' uses the "a" key, and typing '$' uses the "4" key.
 
 <footer>
 	Code12 Version 1.0
-	
+
 	(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved. 
 </footer> 
