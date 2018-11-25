@@ -224,7 +224,7 @@ ct.line( x1, y1, x2, y2, color );</code></pre>
 <pre><code>ct.line( 10, 30, 90, 40 );</code></pre>
 <pre><code>ct.line( 10, 50, 90, 50, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj border = ct.line( 0, 75, 100, 75, &quot;red&quot; );
-border.lineWidth = 3;</code></pre>
+border.setLineWidth( 3 );</code></pre>
 <h6 id="code12-function-reference-graphic-object-creation-ct.line"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation-1">Graphic Object Creation</a> &gt; <a href="#ct.line">ct.line()</a></h6>
 <h3 id="ct.text">ct.text()</h3>
 <p>Creates a new text graphics object (GameObj), which can be used to display text on the graphics screen.</p>
@@ -1424,7 +1424,7 @@ if (type.equals( &quot;circle&quot; ))
 <h5 id="return-value-35"><em>Return Value</em></h5>
 <p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">width</a> of the object.</p>
 <h4 id="notes-21">Notes</h4>
-<p>For line objects (see <a href="#ct.line">ct.line()</a>), the width returned is the x offset (positive or negative) from the first point to the second point, not the physical width of the line, and unrelated to the thickness of the line as set by [ct.setLineWidth()].</p>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the width returned is the x offset (positive or negative) from the first point to the second point, not the physical width of the line, and unrelated to the thickness of the line as set by <a href="#obj.setlinewidth">obj.setLineWidth()</a>.</p>
 <h4 id="example-38">Example</h4>
 <pre><code>GameObj title = ct.text( &quot;Zombie Attack&quot;, 50, 30, 10 );
 double titleWidth = title.getWidth();</code></pre>
@@ -1457,58 +1457,84 @@ double heroHeight = hero.getHeight();</code></pre>
 <p>The different types of <a href="#java-data-types">GameObj</a> objects react somewhat differently to changes in size, as follows:</p>
 <blockquote>
 <h5 id="circle-objects">circle Objects</h5>
-<p>Although circles are always created round, you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
+<p>Although circles are always created round (see <a href="#ct.circle">ct.circle()</a>), you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
 </blockquote>
 <blockquote>
 <h5 id="rect-objects">rect Objects</h5>
-<p>Rectangles can be any size and adjust to any <code>width</code> and <code>height</code>.</p>
+<p>Rectangles (see <a href="#ct.rect">ct.rect()</a>) can be adjusted to any <code>width</code> and <code>height</code>.</p>
 </blockquote>
 <blockquote>
 <h5 id="line-objects">line Objects</h5>
-<p>Line objects are created between two points. After creation, the <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> fields are the location of the first point. Calling <code>obj.setSize( width, height )</code> can be used to change the second point. The <code>width</code> and <code>height</code> specify offsets (positive or negative) from the first point to the second point.</p>
+<p>For line objects, the <code>width</code> and <code>height</code> specify offsets (positive or negative) from the first point to the second point. Line objects are created between two points (see <a href="#ct.line">ct.line()</a>). After creation, the <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> fields are the location of the first point. Calling <code>obj.setSize( width, height )</code> can be used to change the second point relative to the first point.</p>
 </blockquote>
 <blockquote>
 <h5 id="text-objects">text Objects</h5>
-<p>Text objects ignore the <code>width</code> passed. The <code>height</code> is used to determine the new font size for the object, and the object’s width is recalculated automatically.</p>
+<p>Text objects (see <a href="#ct.text">ct.text()</a>) ignore the <code>width</code> passed. The <code>height</code> is used to set the new height and determine the new font size for the object, and the object’s width is recalculated automatically.</p>
 </blockquote>
 <blockquote>
 <h5 id="image-objects">image Objects</h5>
-<p>Images are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to fill the space.</p>
+<p>Images (see <a href="#ct.image">ct.image()</a>) are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to match the specified size.</p>
 </blockquote>
 <h4 id="example-40">Example</h4>
 <pre><code>GameObj blob = ct.circle( 50, 50, 30 );
 blob.setSize( 50, 30 );      // makes an ellipse</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.setsize"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setsize">obj.setSize()</a></h6>
 <h3 id="obj.setspeed">obj.setSpeed()</h3>
-<p>The <code>xSpeed</code> and <code>ySpeed</code> fields can be used to make an object move automatically at the specified speed and direction. The <code>xSpeed</code> and <code>ySpeed</code> values are added to the object’s <code>x</code> and <code>y</code> fields before each new animation frame. Animation frames happen 60 times per second, so setting <code>xSpeed</code> to 1 will make the object move 60 units per second to the right. The values for <code>xSpeed</code> and <code>ySpeed</code> can be positive or negative, and they both default to 0.</p>
+<p>Sets the speed of a graphics object (<a href="#java-data-types">GameObj</a>) so that it moves on its own.</p>
+<h4 id="syntax-62">Syntax</h4>
+<pre><code>obj.setSpeed( xSpeed, ySpeed );</code></pre>
+<h5 id="obj-8">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="xspeed">xSpeed</h5>
+<p>(<a href="#java-data-types">double</a>). The horizontal speed for the object in <a href="#graphics-coordinates">x coordinate</a> units per animation frame.</p>
+<h5 id="yspeed">ySpeed</h5>
+<p>(<a href="#java-data-types">double</a>). The vertical speed for the object in <a href="#graphics-coordinates">y coordinate</a> units per animation frame.</p>
+<h4 id="notes-24">Notes</h4>
+<p>Before each new animation frame, the <code>xSpeed</code> and <code>ySpeed</code> are added to the <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> fields of the object, respectively. Animation frames occur 60 times per second, so an <code>xSpeed</code> of <code>1.0</code> will cause the object to move to the right at 60 units per second.</p>
+<p>The <code>xSpeed</code> and <code>ySpeed</code> can be negative, so for example, a <code>ySpeed</code> of <code>-0.5</code> will cause the object to move up at 30 units per second.</p>
+<h4 id="example-41">Example</h4>
+<pre><code>GameObj dot = ct.circle( 0, 50, 10 );
+dot.setSpeed( 0.3, 0 );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setspeed"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setspeed">obj.setSpeed()</a></h6>
 <h3 id="obj.align">obj.align()</h3>
-<pre><code>obj.align( String alignment )
-obj.align( String alignment, boolean adjustY )</code></pre>
-<p>Set the alignment of the object to <code>alignment</code>. The alignment is a description of where where the object is positioned on screen relative to its <code>x</code> and <code>y</code> coordinates. By default, objects are positioned by their center point, so that (<code>x</code>, <code>y</code>) is at the horizontal and vertical center of the object.</p>
-<p>The following alignments are supported, which describe the location of (<code>x</code>, <code>y</code>) on the object:</p>
-<pre><code>&quot;top left&quot;
-&quot;top&quot;             or &quot;top center&quot;
-&quot;top right&quot;
-&quot;left&quot;            (vertically centered)
-&quot;center&quot;          (vertically centered)
-&quot;right&quot;           (vertically centered)
-&quot;bottom left&quot;
-&quot;bottom&quot;          or &quot;bottom center&quot;
-&quot;bottom right&quot;</code></pre>
-<p>If <code>adjustY</code> is included and <code>true</code>, then the object will be automatically repositioned to maintain its relative vertical position in the application window if the window is resized and changes aspect ratio. This can be used to easily make objects stick to the bottom of the window, or stay in the vertical center of the window, etc.</p>
-<p>Note that all objects always automatically adjust their horizontal position when the window is resized (because display coordinates are relative to a width of 100), and that vertical positions are also relative to the window’s overall size, and thus also adjust when the window resizes. The effect of <code>adjustY</code> is only relevant to help adjust for changes in the aspect ratio of the window.</p>
+<p>Sets the alignment of a graphics object (<a href="#java-data-types">GameObj</a>), which determines where it is located relative to its <a href="#graphics-coordinates">(x, y) coordinates</a>.</p>
+<h4 id="syntax-63">Syntax</h4>
+<pre><code>obj.align( alignment );</code></pre>
+<h5 id="obj-9">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="alignment">alignment</h5>
+<p>(<a href="#java-data-types">String</a>). One of the following strings describing the placement of an object relative to its (x, y):</p>
+<pre><code>alignment         horizontal            vertical
+--------------    -----------------     ------------------------
+&quot;top left&quot;        to the right of x     below y
+&quot;top&quot;             centered at x         below y
+&quot;top right&quot;       to the left of x      below y
+&quot;left&quot;            to the right of x     vertically centered at y
+&quot;center&quot;          centered at x         vertically centered at y
+&quot;right&quot;           to the left of x      vertically centered at y
+&quot;bottom left&quot;     to the right of x     above y
+&quot;bottom&quot;          centered at x         above y
+&quot;bottom right&quot;    to the left of x      above y</code></pre>
+<h4 id="notes-25">Notes</h4>
+<p>The default alignment is <code>&quot;center&quot;</code>, so that objects are horizontally and vertically centered around the (x, y) coordinates of the object.</p>
+<h4 id="example-42">Example</h4>
+<pre><code>// Make the score text right-aligned in the upper right of the screen
+GameObj score = ct.text( &quot;Score: 0&quot;, 100, 0 );
+score.align( &quot;top right&quot; )</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.align"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.align">obj.align()</a></h6>
 <h3 id="obj.gettext">obj.getText()</h3>
 <p>Returns the text of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
-<h4 id="syntax-62">Syntax</h4>
+<h4 id="syntax-64">Syntax</h4>
 <pre><code>obj.getText()</code></pre>
-<h5 id="obj-8">obj</h5>
+<h5 id="obj-10">obj</h5>
 <p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
 <h5 id="return-value-37"><em>Return Value</em></h5>
 <p>(<a href="#java-data-types">String</a>). The text of the object. For a text object (see <a href="#ct.text">ct.text()</a>), this is the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object (see <a href="#obj.settext">obj.setText()</a>).</p>
-<h4 id="notes-24">Notes</h4>
+<h4 id="notes-26">Notes</h4>
 <p>For an image object (see <a href="#ct.image">ct.image()</a>), the text defaults to the image filename, but you can change it to something else (see <a href="#obj.settext">obj.setText()</a>).</p>
-<p>The <a href="#obj.tostring">obj.toString()</a> method includes the object text in the description of an object.</p>
-<h4 id="example-41">Example</h4>
+<p>For circle, rect, and line objects, the default text is <code>null</code> (none).</p>
+<p>The <a href="#obj.tostring">obj.toString()</a> method includes the object text, if any, in the description of an object.</p>
+<h4 id="example-43">Example</h4>
 <pre><code>public void start()
 {
     GameObj dot = ct.circle( 50, 50, 10 );
@@ -1519,40 +1545,155 @@ public void update()
 {
     GameObj target = ct.objectClicked();
     String text = target.getText();
-    if (text.equals( &quot;bomb&quot; ))
+    if (text != null &amp;&amp; text.equals( &quot;bomb&quot; ))
         ct.println( &quot;You clicked a bomb&quot; );
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.gettext"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.gettext">obj.getText()</a></h6>
 <h3 id="obj.settext">obj.setText()</h3>
 <p>Sets the text of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
-<p>If the object is a text object, setting the text will cause the visible text to change. For other object types, the text is simply stored in the object (See <code>obj.getText()</code> above).</p>
-<pre><code>obj.setText( String text )</code></pre>
+<h4 id="syntax-65">Syntax</h4>
+<pre><code>obj.setText( text )</code></pre>
+<h5 id="obj-11">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="text-1">text</h5>
+<p>(<a href="#java-data-types">String</a>). The text to store in the object. For a text object (see <a href="#ct.text">ct.text()</a>), this becomes the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object (see <a href="#obj.gettext">obj.getText()</a>).</p>
+<h4 id="notes-27">Notes</h4>
+<p>For an image object (see <a href="#ct.image">ct.image()</a>), the text defaults to the image filename, but you can change it to something else.</p>
+<p>For circle, rect, and line objects, the default text is <code>null</code> (none).</p>
+<p>The <a href="#obj.tostring">obj.toString()</a> method includes the object text, if any, in the description of an object.</p>
+<h4 id="example-44">Example</h4>
+<pre><code>GameObj message;
+
+public void start()
+{
+    message = ct.text( &quot;Waiting for a click&quot;, 50, 50, 10 );
+}
+
+public void update()
+{
+    if (ct.clicked())
+        message.text = &quot;You clicked&quot;;
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.settext"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.settext">obj.setText()</a></h6>
 <h3 id="obj.tostring">obj.toString()</h3>
-<pre><code>String obj.toString()</code></pre>
-<p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
-<h5 id="examples-21">Examples:</h5>
+<p>Returns a text (<a href="#java-data-types">String</a>) description of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
+<h4 id="syntax-66">Syntax</h4>
+<pre><code>obj.toString()</code></pre>
+<h5 id="obj-12">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-38"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). A description of the object. The string will include the type name of the object, the (x, y) coordinates rounded to the nearest integer, and the text of the object, if any (see <a href="#obj.settext">obj.setText()</a>). The entire string is enclosed in square brackets. Examples:</p>
 <pre><code>[circle at (70, 25)]
 [text at (50, 10) &quot;Score 3200&quot;]
 [image at (21, 83) &quot;goldfish.png&quot;]
 [image at (21, 83) &quot;hero&quot;]
 [rect at (50, 100) &quot;bottom wall&quot;]</code></pre>
+<h4 id="notes-28">Notes</h4>
+<p>The text output functions <a href="#ct.print">ct.print()</a>, <a href="#ct.println">ct.println()</a>, <a href="#ct.log">ct.log()</a>, and <a href="#ct.logm">ct.logm()</a> automatically call <code>obj.toString()</code> internally if you print a <a href="#java-data-types">GameObj</a> directly, so there is no need to explicitly call <code>obj.toString()</code> to print a <a href="#java-data-types">GameObj</a> description with these functions.</p>
+<h4 id="example-45">Example</h4>
+<pre><code>GameObj message;
+
+public void start()
+{
+    message = ct.text( &quot;&quot;, 50, 20, 10 );
+    ct.circle( 30, 50, 10 );
+    ct.rect( 70, 50, 10, 10 );
+}
+
+public void update()
+{
+    GameObj target = ct.objectClicked();
+    if (target != null)
+        message.text = target.toString();
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.tostring"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.tostring">obj.toString()</a></h6>
 <h3 id="obj.setfillcolor">obj.setFillColor()</h3>
-<pre><code>obj.setFillColor( String color )</code></pre>
-<p>Set the fill color of the object (text color for text objects) to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>. If <code>color</code> is <code>null</code> then the fill is removed from the object.</p>
-<h3 id="obj.setfillcolorrgb">obj.setFillColorRGB()</h3>
-<pre><code>obj.setFillColorRGB( int red, int green, int blue )</code></pre>
-<p>Set the fill color of the object (text color for text objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
-<h3 id="obj.setlinecolor">obj.setLineColor()</h3>
-<pre><code>obj.setLineColor( String color )</code></pre>
-<p>Set the line color of the object (the outline stroke color for objects other than line objects) to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>. If <code>color</code> is <code>null</code> then the stroke is removed from the object.</p>
-<h3 id="obj.setlinecolorrgb">obj.setLineColorRGB()</h3>
-<pre><code>obj.setLineColorRGB( int red, int green, int blue )</code></pre>
-<p>Set the line color of the object (the outline stroke color for objects other than line objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
-<h3 id="obj.setlinewidth">obj.setLineWidth()</h3>
-<p>If an object has a line color (see the <code>GameObj</code> methods <code>obj.setLineColor()</code> and <code>obj.setLineColorRGB()</code>), then the object will be outlined in this color with a stroke of approximately <code>lineWidth</code> pixels. The default is 1.</p>
+<p>Sets the fill color of a graphics object (<a href="#java-data-types">GameObj</a>) to one of the pre-defined <a href="#color-names">color names</a>.</p>
+<h4 id="syntax-67">Syntax</h4>
+<pre><code>obj.setFillColor( color );</code></pre>
+<h5 id="obj-13">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="color-5">color</h5>
+<p>(<a href="#java-data-types">String</a>). A <a href="#color-names">color name</a>, for example <code>&quot;blue&quot;</code>. If <code>color</code> is <code>null</code> then the fill is removed from the object.</p>
+<h4 id="notes-29">Notes</h4>
+<p>For a text object (see <a href="#ct.text">ct.text()</a>), the color of the text is set.</p>
 <blockquote>
-<p>Unlike normal coordinate values, <code>lineWidth</code> values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and may vary, but the overall intent is that on a screen of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution screens may use multiple pixels, and some platforms may use partial pixels for a smoother appearance (anti-aliasing).</p>
+<p>If you want a solid “background color” for a text object, use <a href="#ct.rect">ct.rect()</a> to create a rectangle behind the text object.</p>
 </blockquote>
+<h4 id="example-46">Example</h4>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+dot.setFillColor( &quot;blue&quot; );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setfillcolor"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setfillcolor">obj.setFillColor()</a></h6>
+<h3 id="obj.setfillcolorrgb">obj.setFillColorRGB()</h3>
+<p>Sets the fill color of a graphics object (<a href="#java-data-types">GameObj</a>) to a custom RGB color with red, green, and blue component values.</p>
+<h4 id="syntax-68">Syntax</h4>
+<pre><code>obj.setFillColorRGB( red, green, blue );</code></pre>
+<h5 id="obj-14">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="red-1">red</h5>
+<p>(<a href="#java-data-types">int</a>). The red component for the color, from 0 to 255.</p>
+<h5 id="green-1">green</h5>
+<p>(<a href="#java-data-types">int</a>). The green component for the color, from 0 to 255.</p>
+<h5 id="blue-1">blue</h5>
+<p>(<a href="#java-data-types">int</a>). The blue component for the color, from 0 to 255.</p>
+<h4 id="notes-30">Notes</h4>
+<p>For a text object (see <a href="#ct.text">ct.text()</a>), the color of the text is set.</p>
+<blockquote>
+<p>If you want a solid “background color” for a text object, use <a href="#ct.rect">ct.rect()</a> to create a rectangle behind the text object.</p>
+</blockquote>
+<h4 id="example-47">Example</h4>
+<pre><code>GameObj blob = ct.circle( 50, 50, 20 );
+blob.setFillColorRGB( 0, 60, 255 );     // greenish-blue</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setfillcolorrgb"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setfillcolorrgb">obj.setFillColorRGB()</a></h6>
+<h3 id="obj.setlinecolor">obj.setLineColor()</h3>
+<p>Sets the line color of a graphics object (<a href="#java-data-types">GameObj</a>) to one of the pre-defined <a href="#color-names">color names</a>.</p>
+<h4 id="syntax-69">Syntax</h4>
+<pre><code>obj.setLineColor( color );</code></pre>
+<h5 id="obj-15">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="color-6">color</h5>
+<p>(<a href="#java-data-types">String</a>). A <a href="#color-names">color name</a>, for example <code>&quot;blue&quot;</code>. If <code>color</code> is <code>null</code> then the outline is removed from the object.</p>
+<h4 id="notes-31">Notes</h4>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the color of the line is set. For other object types, the color of the outlined border of the object is set.</p>
+<h4 id="example-48">Example</h4>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+dot.setLineColor( &quot;green&quot; );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setlinecolor"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setlinecolor">obj.setLineColor()</a></h6>
+<h3 id="obj.setlinecolorrgb">obj.setLineColorRGB()</h3>
+<p>Sets the line color of a graphics object (<a href="#java-data-types">GameObj</a>) to a custom RGB color with red, green, and blue component values.</p>
+<h4 id="syntax-70">Syntax</h4>
+<pre><code>obj.setLineColorRGB( red, green, blue );</code></pre>
+<h5 id="obj-16">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="red-2">red</h5>
+<p>(<a href="#java-data-types">int</a>). The red component for the color, from 0 to 255.</p>
+<h5 id="green-2">green</h5>
+<p>(<a href="#java-data-types">int</a>). The green component for the color, from 0 to 255.</p>
+<h5 id="blue-2">blue</h5>
+<p>(<a href="#java-data-types">int</a>). The blue component for the color, from 0 to 255.</p>
+<h4 id="notes-32">Notes</h4>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the color of the line is set. For other object types, the color of the outlined border of the object is set.</p>
+<h4 id="example-49">Example</h4>
+<pre><code>GameObj blob = ct.circle( 50, 50, 20 );
+blob.setLineColorRGB( 0, 60, 255 );     // greenish-blue outline</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setlinecolorrgb"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setlinecolorrgb">obj.setLineColorRGB()</a></h6>
+<h3 id="obj.setlinewidth">obj.setLineWidth()</h3>
+<p>Sets the line width (thickness) of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
+<h4 id="syntax-71">Syntax</h4>
+<pre><code>obj.setLineWidth( lineWidth );</code></pre>
+<h5 id="obj-17">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="linewidth">lineWidth</h5>
+<p>(<a href="#java-data-types">int</a>). The line thickness in pixels.</p>
+<h4 id="notes-33">Notes</h4>
+<p>If an object has a line color (see <a href="#obj.setlinecolor">obj.setLineColor()</a> and <a href="#obj.setlinecolorrgb">obj.setLineColorRGB()</a>), then the object will be outlined with a stroke (pen thickness) of approximately <code>lineWidth</code> pixels. The default is line width 1.</p>
+<blockquote>
+<p>Unlike normal <a href="#graphics-coordinates">coordinate values</a>, <code>lineWidth</code> values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and may vary, but the overall intent is that on a screen of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution screens may use multiple pixels, and some platforms may use partial pixels for a smoother appearance (anti-aliasing).</p>
+</blockquote>
+<h4 id="example-50">Example</h4>
+<pre><code>GameObj frame = ct.rect( 50, 50, 60, 30 );
+frame.setLineWidth( 5 );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setlinewidth"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setlinewidth">obj.setLineWidth()</a></h6>
 <h3 id="obj.getlayer">obj.getLayer()</h3>
 <pre><code>int obj.getLayer()</code></pre>
 <p>Return the layer number for the object. See <code>obj.setLayer()</code> below.</p>

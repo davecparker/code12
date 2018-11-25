@@ -275,7 +275,7 @@ ct.line( 10, 50, 90, 50, "blue" );
 ```
 ```
 GameObj border = ct.line( 0, 75, 100, 75, "red" );
-border.lineWidth = 3;
+border.setLineWidth( 3 );
 ```
 ###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.line()]
 
@@ -2351,7 +2351,7 @@ obj.getWidth()
 For line objects (see [ct.line()]), the width returned is the x offset
 (positive or negative) from the first point to the second point,
 not the physical width of the line, and unrelated to the thickness
-of the line as set by [ct.setLineWidth()].
+of the line as set by [obj.setLineWidth()].
 
 #### Example
 ```
@@ -2411,29 +2411,32 @@ The different types of [GameObj](#java-data-types) objects
 react somewhat differently to changes in size, as follows:
 
 > ##### circle Objects
-> Although circles are always created round, you can create an ellipse
-> by setting different `width` and `height` values.
+> Although circles are always created round (see [ct.circle()]), you can create 
+> an ellipse by setting different `width` and `height` values.
 
 > ##### rect Objects
-> Rectangles can be any size and adjust to any `width` and `height`.
+> Rectangles (see [ct.rect()]) can be adjusted to any `width` and `height`.
 
 > ##### line Objects
-> Line objects are created between two points. After creation,
-> the [obj.x] and [obj.y] fields are the location of the first point.
-> Calling `obj.setSize( width, height )` can be used to change the 
-> second point. The `width` and `height` specify offsets
+> For line objects, the `width` and `height` specify offsets
 > (positive or negative) from the first point to the second point.
+> Line objects are created between two points (see [ct.line()]). 
+> After creation, the [obj.x] and [obj.y] fields are the location 
+> of the first point.
+> Calling `obj.setSize( width, height )` can be used to change the 
+> second point relative to the first point.
 
 > ##### text Objects
-> Text objects ignore the `width` passed. The `height` is used to
-> determine the new font size for the object, and the object's width 
-> is recalculated automatically.
+> Text objects (see [ct.text()]) ignore the `width` passed. 
+> The `height` is used to set the new height and determine the 
+> new font size for the object, 
+> and the object's width is recalculated automatically.
 
 > ##### image Objects
-> Images are initially created with `height` calculated automatically
-> to preserve the image's aspect ratio given the specified `width`.
+> Images (see [ct.image()]) are initially created with `height` calculated 
+> automatically to preserve the image's aspect ratio given the specified `width`.
 > However, once created, you can set any values for `width` and `height`,
-> and the image will scale and/or stretch as necessary to fill the space.
+> and the image will scale and/or stretch as necessary to match the specified size.
 
 #### Example
 ```
@@ -2444,56 +2447,82 @@ blob.setSize( 50, 30 );      // makes an ellipse
 
 
 ### obj.setSpeed()
+Sets the speed of a graphics object ([GameObj](#java-data-types)) so that
+it moves on its own.
 
-The `xSpeed` and `ySpeed` fields can be used to make an object move
-automatically at the specified speed and direction.
-The `xSpeed` and `ySpeed` values are added to the object's
-`x` and `y` fields before each new animation frame.
-Animation frames happen 60 times per second, so setting `xSpeed` to 1
-will make the object move 60 units per second to the right.
-The values for `xSpeed` and `ySpeed` can be positive or negative,
-and they both default to 0.
+#### Syntax
+```
+obj.setSpeed( xSpeed, ySpeed );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### xSpeed
+([double](#java-data-types)). The horizontal speed for the object in 
+[x coordinate](#graphics-coordinates) units per animation frame. 
+
+##### ySpeed
+([double](#java-data-types)). The vertical speed for the object in 
+[y coordinate](#graphics-coordinates) units per animation frame.  
+
+#### Notes
+Before each new animation frame, the `xSpeed` and `ySpeed` are added to
+the [obj.x] and [obj.y] fields of the object, respectively. 
+Animation frames occur 60 times per second, so an `xSpeed` of `1.0` will 
+cause the object to  move to the right at 60 units per second.
+
+The `xSpeed` and `ySpeed` can be negative, so for example, a `ySpeed`
+of `-0.5` will cause the object to move up at 30 units per second.
+
+#### Example
+```
+GameObj dot = ct.circle( 0, 50, 10 );
+dot.setSpeed( 0.3, 0 );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSpeed()]
 
 
 ### obj.align()
-```
-obj.align( String alignment )
-obj.align( String alignment, boolean adjustY )
-```
-Set the alignment of the object to `alignment`.
-The alignment is a description of where where the object is
-positioned on screen relative to its `x` and `y` coordinates.
-By default, objects are positioned by their center point,
-so that (`x`, `y`) is at the horizontal and vertical center
-of the object.
+Sets the alignment of a graphics object ([GameObj](#java-data-types)),
+which determines where it is located relative to its 
+[(x, y) coordinates](#graphics-coordinates).
 
-The following alignments are supported, which describe the
-location of (`x`, `y`) on the object:
+#### Syntax
+```
+obj.align( alignment );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### alignment
+([String](#java-data-types)). One of the following strings
+describing the placement of an object relative to its (x, y):
 
 ```
-"top left"
-"top"             or "top center"
-"top right"
-"left"            (vertically centered)
-"center"          (vertically centered)
-"right"           (vertically centered)
-"bottom left"
-"bottom"          or "bottom center"
-"bottom right"
+alignment         horizontal            vertical
+--------------    -----------------     ------------------------
+"top left"        to the right of x     below y
+"top"             centered at x         below y
+"top right"       to the left of x      below y
+"left"            to the right of x     vertically centered at y
+"center"          centered at x         vertically centered at y
+"right"           to the left of x      vertically centered at y
+"bottom left"     to the right of x     above y
+"bottom"          centered at x         above y
+"bottom right"    to the left of x      above y
 ```
 
-If `adjustY` is included and `true`, then the object will be automatically
-repositioned to maintain its relative vertical position in the
-application window if the window is resized and changes aspect ratio.
-This can be used to easily make objects stick to the bottom of the window,
-or stay in the vertical center of the window, etc.
+#### Notes
+The default alignment is `"center"`, so that objects are horizontally
+and vertically centered around the (x, y) coordinates of the object.
 
-Note that all objects always automatically adjust their
-horizontal position when the window is resized (because display
-coordinates are relative to a width of 100), and that vertical positions
-are also relative to the window's overall size, and thus also adjust
-when the window resizes. The effect of `adjustY` is only relevant to
-help adjust for changes in the aspect ratio of the window.
+#### Example
+```
+// Make the score text right-aligned in the upper right of the screen
+GameObj score = ct.text( "Score: 0", 100, 0 );
+score.align( "top right" )
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.align()]
 
 
 ### obj.getText()
@@ -2516,8 +2545,10 @@ which can be used to identity or describe the object (see [obj.setText()]).
 For an image object (see [ct.image()]), the text defaults to the 
 image filename, but you can change it to something else (see [obj.setText()]).
 
-The [obj.toString()] method includes the object text in the description 
-of an object.
+For circle, rect, and line objects, the default text is `null` (none). 
+
+The [obj.toString()] method includes the object text, if any,
+in the description of an object.
 
 #### Example
 ```
@@ -2531,7 +2562,7 @@ public void update()
 {
 	GameObj target = ct.objectClicked();
 	String text = target.getText();
-	if (text.equals( "bomb" ))
+	if (text != null && text.equals( "bomb" ))
 		ct.println( "You clicked a bomb" );
 }
 ```
@@ -2541,27 +2572,64 @@ public void update()
 ### obj.setText()
 Sets the text of a graphics object ([GameObj](#java-data-types)).
 
+#### Syntax
+```
+obj.setText( text )
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
 
-If the object is a text object, setting the text will cause the visible text to change.
-For other object types, the text is simply stored in the object
-(See `obj.getText()` above).
+##### text
+([String](#java-data-types)). The text to store in the object.
+For a text object (see [ct.text()]), this becomes the visible text.
+For other objects, this is just a string kept inside the object,
+which can be used to identity or describe the object (see [obj.getText()]).
+
+#### Notes
+For an image object (see [ct.image()]), the text defaults to the 
+image filename, but you can change it to something else.
+
+For circle, rect, and line objects, the default text is `null` (none). 
+
+The [obj.toString()] method includes the object text, if any,
+in the description of an object.
+
+#### Example
 ```
-obj.setText( String text )
+GameObj message;
+
+public void start()
+{
+	message = ct.text( "Waiting for a click", 50, 50, 10 );
+}
+
+public void update()
+{
+	if (ct.clicked())
+		message.text = "You clicked";
+}
 ```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setText()]
+
 
 
 ### obj.toString()
-```
-String obj.toString()
-```
-Return a string description of the object suitable for printing
-for diagnostic purposes (via `ct.println()`, `ct.log()`, etc.)
-The string will include the type name of the object,
-the (`x`, `y`) coordinates rounded to the nearest integer,
-and the text of the object, if any. The entire string
-is enclosed in square brackets.
+Returns a text ([String](#java-data-types)) description of a graphics object 
+([GameObj](#java-data-types)).
 
-##### Examples:
+#### Syntax
+```
+obj.toString()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([String](#java-data-types)). A description of the object.
+The string will include the type name of the object,
+the (x, y) coordinates rounded to the nearest integer,
+and the text of the object, if any (see [obj.setText()]). 
+The entire string is enclosed in square brackets. Examples:
 ```
 [circle at (70, 25)]
 [text at (50, 10) "Score 3200"]
@@ -2569,55 +2637,195 @@ is enclosed in square brackets.
 [image at (21, 83) "hero"]
 [rect at (50, 100) "bottom wall"]
 ```
+#### Notes
+The text output functions [ct.print()], [ct.println()], 
+[ct.log()], and [ct.logm()] automatically call `obj.toString()`
+internally if you print a [GameObj](#java-data-types) directly,
+so there is no need to explicitly call `obj.toString()` to print
+a [GameObj](#java-data-types) description with these functions.
+
+#### Example
+```
+GameObj message;
+
+public void start()
+{
+	message = ct.text( "", 50, 20, 10 );
+	ct.circle( 30, 50, 10 );
+	ct.rect( 70, 50, 10, 10 );
+}
+
+public void update()
+{
+	GameObj target = ct.objectClicked();
+	if (target != null)
+		message.text = target.toString();
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.toString()]
 
 
 ### obj.setFillColor()
+Sets the fill color of a graphics object ([GameObj](#java-data-types))
+to one of the pre-defined [color names](#color-names).
+
+#### Syntax
 ```
-obj.setFillColor( String color )
+obj.setFillColor( color );
 ```
-Set the fill color of the object (text color for text objects) to the
-pre-defined color named `color`. See [Color Names](#color-names).
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### color
+([String](#java-data-types)). A [color name](#color-names), for example `"blue"`.
 If `color` is `null` then the fill is removed from the object.
 
+#### Notes
+For a text object (see [ct.text()]), the color of the text is set.
+
+> If you want a solid "background color" for a text object,
+> use [ct.rect()] to create a rectangle behind the text object.
+
+#### Example
+```
+GameObj dot = ct.circle( 50, 50, 20 );
+dot.setFillColor( "blue" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setFillColor()]
+
+
 ### obj.setFillColorRGB()
+Sets the fill color of a graphics object ([GameObj](#java-data-types))
+to a custom RGB color with red, green, and blue component values.
+
+#### Syntax
 ```
-obj.setFillColorRGB( int red, int green, int blue )
+obj.setFillColorRGB( red, green, blue );
 ```
-Set the fill color of the object (text color for text objects) to 
-the custom RGB color with components `red`, `green`, and `blue` 
-in the range 0-255.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### red
+([int](#java-data-types)). The red component for the color, from 0 to 255.
+
+##### green
+([int](#java-data-types)). The green component for the color, from 0 to 255.
+
+##### blue
+([int](#java-data-types)). The blue component for the color, from 0 to 255.
+
+#### Notes
+For a text object (see [ct.text()]), the color of the text is set.
+
+> If you want a solid "background color" for a text object,
+> use [ct.rect()] to create a rectangle behind the text object.
+
+#### Example
+```
+GameObj blob = ct.circle( 50, 50, 20 );
+blob.setFillColorRGB( 0, 60, 255 );     // greenish-blue
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setFillColorRGB()]
+
 
 ### obj.setLineColor()
+Sets the line color of a graphics object ([GameObj](#java-data-types))
+to one of the pre-defined [color names](#color-names).
+
+#### Syntax
 ```
-obj.setLineColor( String color )
+obj.setLineColor( color );
 ```
-Set the line color of the object (the outline stroke color for objects
-other than line objects) to the pre-defined color named `color`.
-See [Color Names](#color-names).
-If `color` is `null` then the stroke is removed from the object.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### color
+([String](#java-data-types)). A [color name](#color-names), for example `"blue"`.
+If `color` is `null` then the outline is removed from the object.
+
+#### Notes
+For line objects (see [ct.line()]), the color of the line is set.
+For other object types, the color of the outlined border of the object is set.
+
+#### Example
+```
+GameObj dot = ct.circle( 50, 50, 20 );
+dot.setLineColor( "green" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineColor()]
+
 
 ### obj.setLineColorRGB()
+Sets the line color of a graphics object ([GameObj](#java-data-types))
+to a custom RGB color with red, green, and blue component values.
+
+#### Syntax
 ```
-obj.setLineColorRGB( int red, int green, int blue )
+obj.setLineColorRGB( red, green, blue );
 ```
-Set the line color of the object (the outline stroke color for objects
-other than line objects) to the custom RGB color with components
-`red`, `green`, and `blue` in the range 0-255.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### red
+([int](#java-data-types)). The red component for the color, from 0 to 255.
+
+##### green
+([int](#java-data-types)). The green component for the color, from 0 to 255.
+
+##### blue
+([int](#java-data-types)). The blue component for the color, from 0 to 255.
+
+#### Notes
+For line objects (see [ct.line()]), the color of the line is set.
+For other object types, the color of the outlined border of the object is set.
+
+#### Example
+```
+GameObj blob = ct.circle( 50, 50, 20 );
+blob.setLineColorRGB( 0, 60, 255 );     // greenish-blue outline
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineColorRGB()]
+
 
 ### obj.setLineWidth()
+Sets the line width (thickness) of a graphics object ([GameObj](#java-data-types)).
 
-If an object has a line color (see the `GameObj` methods `obj.setLineColor()`
-and `obj.setLineColorRGB()`), then the object will be outlined in this color
-with a stroke of approximately `lineWidth` pixels. The default is 1.
+#### Syntax
+```
+obj.setLineWidth( lineWidth );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
 
-> Unlike normal coordinate values, `lineWidth` values are measured in
-> approximate device "pixels", so apparent line thickness does not scale
-> up as the window size is increased. The definition of "pixels" depends
-> on the platform and may vary, but the overall intent is that on a
-> screen of "normal" resolution (e.g. HD resolution, not 4K or Retina),
+##### lineWidth
+([int](#java-data-types)). The line thickness in pixels.
+
+#### Notes
+If an object has a line color (see [obj.setLineColor()] 
+and [obj.setLineColorRGB()]), then the object will be outlined
+with a stroke (pen thickness) of approximately `lineWidth` pixels. 
+The default is line width 1.
+
+> Unlike normal [coordinate values](#graphics-coordinates), 
+> line thickness values are measured in approximate device "pixels", 
+> so apparent line thickness does not scale up as the window size is increased. 
+> The definition of "pixels" depends on the platform and the display, 
+> but the overall intent is that on a display of "normal" resolution 
+> (e.g. HD resolution, not 4K or Retina),
 > a `lineWidth` of 1 will result in an appoximate 1 pixel border.
-> High resolution screens may use multiple pixels, and some platforms
+> High resolution displays may use multiple pixels, and some displays
 > may use partial pixels for a smoother appearance (anti-aliasing).
+
+#### Example
+```
+GameObj frame = ct.rect( 50, 50, 60, 30 );
+frame.setLineWidth( 5 );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineWidth()]
+
+
+
+
 
 ### obj.getLayer()
 ```
