@@ -167,7 +167,6 @@ local function makeGrid()
 		n = n + 1
 		gridYLabels[n].isVisible = false
 	end
-	print("numXLabels", #gridXLabels, "numYLabels", #gridYLabels)
 end
 
 -- Position the display panes
@@ -400,14 +399,9 @@ function runView.toggleGrid()
 		gridGroup.isVisible = false
 	else
 		makeGrid()
+		gridGroup.isVisible = true
 	end
 	app.gridOn = not gridOn
-end
-
--- Hide the coordinate grideLines
-function runView.hideGrid()
-	gridGroup.isVisible = false
-	app.gridOn = false
 end
 
 
