@@ -198,6 +198,12 @@ local function checkUserFile()
 	end
 end
 
+-- Show the reference docs
+function app.showHelp()
+	-- TODO: Get error context if any
+	system.openURL( "http://code12.org" )
+end
+
 -- Handle resize event for the window
 local function onResizeWindow()
 	app.getWindowSize()

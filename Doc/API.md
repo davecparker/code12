@@ -1,28 +1,5 @@
-% Code12 Reference
+% Code12 Function Reference
 
-<div class="summary">
-<div class="summaryColumn">
-
-* [Code12 Function Reference]
-
-</div>
-<div class="summaryColumn">
-
-* [Graphics Coordinates]
-* [Java Data Types]
-
-</div>
-<div class="summaryColumn">
-
-* [Color Names]
-* [Key Names]
-
-</div>
-</div>
-
-
-Code12 Function Reference
-========================
 <div class="summary">
 <div class="summaryColumn">
 
@@ -136,7 +113,7 @@ Code12 Function Reference
 * [obj.objectHitInGroup()]
 
 ##### Other Functions Supported
-* [Java Math Methods and Fields]
+* [Java Math Methods]
 * [Java String Methods]
 * [Main Program Functions]
 * [Input Event Functions]
@@ -144,7 +121,7 @@ Code12 Function Reference
 </div>
 </div>
 
-###### [Code12 Reference](#top) > [Code12 Function Reference]
+###### Code12 Version 1.0
 
 
 Graphic Object Creation
@@ -157,7 +134,7 @@ These functions allow you to create new graphics objects for display on the scre
 * [ct.text()]
 * [ct.image()]
 
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Graphic Object Creation]
+###### [Code12 Function Reference](#top) > [Graphic Object Creation]
 
 ### ct.circle()
 Creates a new circle graphics object (GameObj).
@@ -200,7 +177,7 @@ ct.circle( 50, 70, 40, "blue" );
 GameObj ball = ct.circle( 0, 50, 10, "yellow" );
 ball.xSpeed = 1;
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Graphic Object Creation] > [ct.circle()]
+###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.circle()]
 
 
 ### ct.rect()
@@ -249,7 +226,7 @@ ct.rect( 50, 70, 80, 40, "blue" );
 GameObj platform = ct.rect( 0, 50, 30, 8, "orange" );
 platform.xSpeed = 1;
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Graphic Object Creation] > [ct.rect()]
+###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.rect()]
 
 
 ### ct.line()
@@ -299,7 +276,7 @@ ct.line( 10, 50, 90, 50, "blue" );
 GameObj border = ct.line( 0, 75, 100, 75, "red" );
 border.lineWidth = 3;
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Graphic Object Creation] > [ct.line()]
+###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.line()]
 
 
 ### ct.text()
@@ -350,7 +327,7 @@ ct.text( "Click anywhere to play", 50, 60, 5, "blue" );
 GameObj scoreText = ct.text( "Score: 0", 100, 20, 10, "green" );
 scoreText.align( "right" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Graphic Object Creation] > [ct.text()]
+###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.text()]
 
 
 ### ct.image()
@@ -401,7 +378,7 @@ ct.image( "dragon.png", 30, 50, 10 );
 GameObj sky = ct.image( "sky.jpg", 50, 50, 100 );
 sky.setSize( 100, 100 );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Graphic Object Creation] > [ct.image()]
+###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.image()]
 
 
 Text Output
@@ -419,7 +396,7 @@ You can also output to a text file on your computer.
 * [ct.logm()]
 * [ct.setOutputFile()]
 
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Text Output]
+###### [Code12 Function Reference](#top) > [Text Output]
 
 
 ### ct.print()
@@ -452,7 +429,7 @@ ct.print( userName )
 ct.print( " has a score of " );
 ct.print( score );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Text Output] > [ct.print()]
+###### [Code12 Function Reference](#top) > [Text Output] > [ct.print()]
 
 
 ### ct.println()
@@ -487,7 +464,7 @@ int numTrys = 3;
 
 ct.println( "Your average score is " + (totalScore / numTrys) );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Text Output] > [ct.println()]
+###### [Code12 Function Reference](#top) > [Text Output] > [ct.println()]
 
 
 ### ct.log()
@@ -504,10 +481,9 @@ of values of any type(s). The values will be output to the console on the same l
 separated by commas.
 
 #### Notes
-Unlike [ct.print()] and [ct.println()],
-
-* Output from [ct.log()] and [ct.logm()] is colored blue in the console instead of black.
-* String values are automatically enclosed in double quotes. 
+Unlike [ct.print()] and [ct.println()], output from [ct.log()] and [ct.logm()] 
+is colored blue in the console instead of black, and String values are automatically 
+enclosed in double quotes. 
 
 #### Examples
 ```
@@ -522,7 +498,7 @@ int total = hits + misses;
 
 ct.log( playerName, hits, misses, total );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Text Output] > [ct.log()]
+###### [Code12 Function Reference](#top) > [Text Output] > [ct.log()]
 
 
 ### ct.logm()
@@ -546,10 +522,9 @@ of values of any type(s). The values will be output to the console on the same l
 after the `message` plus a space, separated by commas.
 
 #### Notes
-Unlike [ct.print()] and [ct.println()],
-
-* Output from [ct.log()] and [ct.logm()] is colored blue in the console instead of black.
-* String values are automatically enclosed in double quotes. 
+Unlike [ct.print()] and [ct.println()], output from [ct.log()] and [ct.logm()] 
+is colored blue in the console instead of black, and String values are automatically 
+enclosed in double quotes. 
 
 #### Examples
 ```
@@ -563,7 +538,7 @@ int errors = 1;
 
 ct.logm( "Current stats:", runs, hits, errors );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Text Output] > [ct.logm()]
+###### [Code12 Function Reference](#top) > [Text Output] > [ct.logm()]
 
 
 ### ct.setOutputFile()
@@ -609,7 +584,7 @@ ct.println( "Product = " + (a * b) );
 ct.println( "Quotient = " + (a / b) );
 ct.setOutputFilename( null );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Text Output] > [ct.setOutputFile()]
+###### [Code12 Function Reference](#top) > [Text Output] > [ct.setOutputFile()]
 
 
 Alerts and Input Dialogs
@@ -623,7 +598,7 @@ and to ask for input from the user.
 * [ct.inputYesNo()]
 * [ct.inputString()]
 
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Alerts and Input Dialogs]
+###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs]
 
 
 ### ct.showAlert()
@@ -644,7 +619,7 @@ contain line breaks by embedding newline (`\n`) characters in it.
 ```
 ct.showAlert( "Game Over!" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Alerts and Input Dialogs] > [ct.showAlert()]
+###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.showAlert()]
 
 
 ### ct.inputInt()
@@ -667,7 +642,7 @@ ct.inputInt( message );
 ```
 int numTargets = ct.inputInt( "How many targets would you like to have?" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Alerts and Input Dialogs] > [ct.inputInt()]
+###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputInt()]
 
 
 ### ct.inputNumber()
@@ -690,7 +665,7 @@ ct.inputNumber( message );
 ```
 double tempF = ct.inputNumber( "Enter the temperature in Farenheit" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Alerts and Input Dialogs] > [ct.inputNumber()]
+###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputNumber()]
 
 
 ### ct.inputYesNo()
@@ -714,7 +689,7 @@ and `false` if they press No.
 ```
 boolean playAgain = ct.inputYesNo( "Do you want to play again?" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Alerts and Input Dialogs] > [ct.inputYesNo()]
+###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputYesNo()]
 
 
 ### ct.inputString()
@@ -741,7 +716,7 @@ ct.inputString( message );
 ```
 String name = ct.inputString( "Enter your name" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Alerts and Input Dialogs] > [ct.inputString()]
+###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputString()]
 
 
 Screen Management
@@ -764,7 +739,7 @@ groups of objects.
 * [ct.setBackColorRGB()]
 * [ct.setBackImage()]
 
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management]
+###### [Code12 Function Reference](#top) > [Screen Management]
 
 
 ### ct.setTitle()
@@ -783,7 +758,7 @@ application window.
 ```
 ct.setTitle( "Zombie Attack" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.setTitle()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setTitle()]
 
 
 ### ct.setHeight()
@@ -812,7 +787,7 @@ ct.setHeight( 200 );               // window is twice as tall as wide
 ```
 ct.setHeight( 100.0 * 9 / 16 );    // 16:9 landscape aspect
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.setHeight()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setHeight()]
 
 
 ### ct.getWidth()
@@ -836,7 +811,7 @@ final double HEIGHT = ct.getHeight();
 // Make a rectangle that fills the entire screen
 ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.getWidth()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.getWidth()]
 
 
 ### ct.getHeight()
@@ -862,7 +837,7 @@ final double HEIGHT = ct.getHeight();
 // Make a rectangle that fills the entire screen
 ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.getHeight()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.getHeight()]
 
 
 ### ct.getPixelsPerUnit()
@@ -898,7 +873,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
 double diameter = 10 / ct.getPixelsPerUnit();
 ct.circle( 50, 50, diameter );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.getPixelsPerUnit()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.getPixelsPerUnit()]
 
 
 ### ct.getScreen()
@@ -925,7 +900,7 @@ if (screenName.equals( "intro" ))
     	ct.setScreen( "game" );
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.getScreen()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.getScreen()]
 
 
 ### ct.setScreen()
@@ -996,7 +971,7 @@ public void update()
 }
 
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.setScreen()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setScreen()]
 
 
 ### ct.setScreenOrigin()
@@ -1050,7 +1025,7 @@ ct.image( "mountains.png", 50, 50, 300 );   // wider than screen
 ct.image( "bear", 50, 70, 10 );
 ct.setScreenOrigin( 30, 0 );       // entire scene scrolls to the left
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.setScreenOrigin()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setScreenOrigin()]
 
 
 ### ct.clearScreen()
@@ -1069,7 +1044,7 @@ ct.circle( 50, 50, 20 );
 ct.rect( 50, 70, 40, 10 );
 ct.clearScreen();     // screen is now just solid red
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.clearScreen()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.clearScreen()]
 
 
 ### ct.clearGroup()
@@ -1102,7 +1077,7 @@ coin3.group = "coins";
 
 ct.clearGroup( "coins" );    // deletes all 3 coins
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.clearGroup()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.clearGroup()]
 
 
 ### ct.setBackColor()
@@ -1121,7 +1096,7 @@ ct.setBackColor( color );
 ```
 ct.setBackColor( "light blue" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.setBackColor()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setBackColor()]
 
 
 ### ct.setBackColorRGB()
@@ -1146,7 +1121,7 @@ ct.setBackColorRGB( red, green, blue );
 ```
 ct.setBackColorRGB( 0, 60, 255 );    // greenish blue
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.setBackColorRGB()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setBackColorRGB()]
 
 
 ### ct.setBackImage()
@@ -1177,7 +1152,7 @@ the image as possible while preserving the aspect ratio of the image.
 ```
 ct.setBackImage( "sky.jpg" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Screen Management] > [ct.setBackImage()]
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setBackImage()]
 
 
 Mouse and Keyboard Input
@@ -1200,7 +1175,7 @@ which is fast enough to provide fast response to input.
 > which requires writing your own functions with parameters (syntax level 10),
 > is to write your own [Input Event Functions]. 
 
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Mouse and Keyboard Input]
+###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input]
 
 
 ### ct.clicked()
@@ -1235,7 +1210,7 @@ public void update()
 	}
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Mouse and Keyboard Input] > [ct.clicked()]
+###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input] > [ct.clicked()]
 
 
 ### ct.clickX()
@@ -1268,7 +1243,7 @@ public void update()
 	}
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Mouse and Keyboard Input] > [ct.clickX()]
+###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input] > [ct.clickX()]
 
 
 ### ct.clickY()
@@ -1301,7 +1276,7 @@ public void update()
 	}
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Mouse and Keyboard Input] > [ct.clickY()]
+###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input] > [ct.clickY()]
 
 
 ### ct.objectClicked()
@@ -1342,7 +1317,7 @@ public void update()
 		obj.delete();
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Mouse and Keyboard Input] > [ct.objectClicked()]
+###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input] > [ct.objectClicked()]
 
 
 ### ct.keyPressed()
@@ -1393,7 +1368,7 @@ public void update()
 		ball.x += 0.25 
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Mouse and Keyboard Input] > [ct.keyPressed()]
+###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input] > [ct.keyPressed()]
 
 
 ### ct.charTyped()
@@ -1442,7 +1417,7 @@ public void update()
 		ct.println( "Space bar" );
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Mouse and Keyboard Input] > [ct.charTyped()]
+###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input] > [ct.charTyped()]
 
 
 Audio
@@ -1453,7 +1428,7 @@ These functions allow you to play sounds from audio files.
 * [ct.sound()]
 * [ct.setSoundVolume()]
 
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Audio]
+###### [Code12 Function Reference](#top) > [Audio]
 
 
 ### ct.loadSound()
@@ -1503,7 +1478,7 @@ public void update()
 		ct.sound( "ding.wav" );
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Audio] > [ct.loadSound()]
+###### [Code12 Function Reference](#top) > [Audio] > [ct.loadSound()]
 
 
 ### ct.sound()
@@ -1548,7 +1523,7 @@ public void update()
 		ct.sound( "ding.wav" );
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Audio] > [ct.sound()]
+###### [Code12 Function Reference](#top) > [Audio] > [ct.sound()]
 
 
 ### ct.setSoundVolume()
@@ -1570,7 +1545,7 @@ then sounds are attenuated relative to the volume they were recorded at.
 ct.setSoundVolume( 0.2 );
 ct.sound( "voices.mp3" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Audio] > [ct.setSoundVolume()]
+###### [Code12 Function Reference](#top) > [Audio] > [ct.setSoundVolume()]
 
 
 Math Utilities
@@ -1584,9 +1559,9 @@ These functions provide a convenient way to do common calculations.
 * [ct.intDiv()]
 * [ct.isError()]
 
-For more math operations, see [Java Math Methods and Fields].
+For more math operations, see [Java Math Methods].
 
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Math Utilities]
+###### [Code12 Function Reference](#top) > [Math Utilities]
 
 
 ### ct.random()
@@ -1620,7 +1595,7 @@ else
 // Create a ball at a random x position
 ct.circle( ct.random( 0, 100 ), 50, 10 );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Math Utilities] > [ct.random()]
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.random()]
 
 
 ### ct.round()
@@ -1641,7 +1616,7 @@ ct.round( number )
 double x = 10.75;
 int n = ct.round( x );    // sets n to 11
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Math Utilities] > [ct.round()]
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.round()]
 
 
 ### ct.roundDecimal()
@@ -1665,7 +1640,7 @@ ct.roundDecimal( number, numPlaces )
 double amount = 24.3467;
 double price = ct.roundDecimal( amount, 2 );    // sets price to 24.35
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Math Utilities] > [ct.roundDecimal()]
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.roundDecimal()]
 
 
 ### ct.distance()
@@ -1704,7 +1679,7 @@ GameObj ball2 = ct.circle( 50, 70, 10 );
 double dist = ct.distance( ball1.x, ball1.y, ball2.x, ball2.y );
 ct.println( "The balls are " + dist + " units apart" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Math Utilities] > [ct.distance()]
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.distance()]
 
 
 ### ct.intDiv()
@@ -1736,7 +1711,7 @@ to the nearest integer.
 ```
 int n = ct.intDiv( 3, 2 );    // sets n to 1
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Math Utilities] > [ct.intDiv()]
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.intDiv()]
 
 
 ### ct.isError()
@@ -1767,7 +1742,7 @@ error = ct.isError( 0.0 / 0.0 );
 error = ct.isError( Math.sqrt( -1 ) );
 error = ct.isError( ct.parseNumber( "nope" ) );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Math Utilities] > [ct.isError()]
+###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.isError()]
 
 
 Type Conversion
@@ -1807,7 +1782,7 @@ int b = ct.parseInt( "  -3 " );    // sets b to -3
 int c = ct.parseInt( "six");       // sets c to 0
 int d = ct.parseInt( "4 more" );   // sets d to 0
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Type Conversion] > [ct.parseInt()]
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.parseInt()]
 
 
 ### ct.parseNumber()
@@ -1838,7 +1813,7 @@ double amount = ct.parseNumber( entry );    // sets amount to NaN
 if (ct.isError( amount ))
 	ct.println( "Invalid number format" );
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Type Conversion] > [ct.parseNumber()]
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.parseNumber()]
 
 
 ### ct.canParseInt()
@@ -1870,7 +1845,7 @@ else
 	ct.println( "Not a valid integer" );
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Type Conversion] > [ct.canParseInt()]
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.canParseInt()]
 
 
 ### ct.canParseNumber()
@@ -1902,7 +1877,7 @@ else
 	ct.println( "Not a valid number" );
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Type Conversion] > [ct.canParseNumber()]
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.canParseNumber()]
 
 
 ### ct.formatInt()
@@ -1933,7 +1908,7 @@ int score = 520;
 String text = ct.formatInt( score, 6 );   // sets text to "000520"
 ct.text( text, 5, 20, 10 );               // displays score on the graphics screen
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Type Conversion] > [ct.formatInt()]
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.formatInt()]
 
 
 ### ct.formatDecimal()
@@ -1965,7 +1940,7 @@ String text = ct.formatDecimal( x );       // sets text to "1.25"
 double a = 3.14159;
 String text = ct.formatDecimal( a, 4 );    // sets text to "3.1416"
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Type Conversion] > [ct.formatDecimal()]
+###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.formatDecimal()]
 
 
 Program Control
@@ -2018,7 +1993,7 @@ public void update()
 	}
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Program Control] > [ct.getTimer()]
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.getTimer()]
 
 
 ### ct.getVersion()
@@ -2036,7 +2011,7 @@ ct.getVersion()
 if (ct.getVersion() > 1.0)
 	ct.println( "We have the update" )
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Program Control] > [ct.getVersion()]
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.getVersion()]
 
 
 ### ct.pause()
@@ -2068,7 +2043,7 @@ public void start()
 	ct.circle( 70, 50, 20 );
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Program Control] > [ct.pause()]
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.pause()]
 
 
 ### ct.stop()
@@ -2091,7 +2066,7 @@ so you can examine them in the variable watch window.
 if (hero.x < 0)
 	ct.stop();    // Oops, how did he get off-screen?
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Program Control] > [ct.stop()]
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.stop()]
 
 
 ### ct.restart()
@@ -2111,7 +2086,7 @@ values, and execution starts over with your [start()] function.
 if (ct.inputYesNo( "Would you like to play again?" ))
 	ct.restart();
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [Program Control] > [ct.restart()]
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.restart()]
 
 
 GameObj Data Fields
@@ -2169,7 +2144,7 @@ public void update()
 		dot.x = 0;
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [GameObj Data Fields] > [obj.x]
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.x]
 
 
 ### obj.y
@@ -2204,7 +2179,7 @@ public void update()
 		slab.y = 0;
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [GameObj Data Fields] > [obj.y]
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.y]
 
 
 ### obj.visible
@@ -2232,7 +2207,7 @@ GameObj target = ct.objectClicked();
 if (target != null)
 	target.visible = false;
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [GameObj Data Fields] > [obj.visible]
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.visible]
 
 
 
@@ -2276,7 +2251,7 @@ public void update()
 		target.visible = false;	
 }
 ```
-###### [Code12 Reference](#top) > [Code12 Function Reference] > [GameObj Data Fields] > [obj.group]
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.group]
 
 
 GameObj Methods
@@ -2615,15 +2590,10 @@ will be considered.
 > for `null` before using the `GameObj` returned.
 
 
-Java Math Methods and Fields
-----------------------------
-Code12 supports the following fields and method functions from the Java `Math` class.
+Java Math Methods
+-----------------
+Code12 supports the following method functions and fields from the Java `Math` class.
 ```
-Field       Type
--------     ------
-Math.E      double
-Math.PI     double
-
 Function               Parameter Type(s)   Return Type
 --------------------   -----------------   -----------
 Math.abs( number )     double              double
@@ -2649,6 +2619,12 @@ Math.sinh( angle )     double              double
 Math.sqrt( number )    double              double
 Math.tan( angle )      double              double
 Math.tanh( angle )     double              double
+
+Field       Type
+-------     ------
+Math.E      double
+Math.PI     double
+
 ```
 For more information, see the [Java Math Class](https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html).
 
@@ -2844,12 +2820,12 @@ Additional Reference Information
 
 Graphics objects in Code12 are positioned on the screen by (x, y) coordinates.
 The coordinate values are not pixels, but instead are in unit values relative 
-to the size of the graphics area, which we will call the "screen". 
+to the width of the graphics area, or "screen". 
 Size values (e.g. width and height) use the same units.
 
 ##### X Coordinates, Width, and Object Scaling
 The screen area is always 100 units wide, by definition, so an x-coordinate of 50 
-is always horizontally centered in the screen. So you can think of an x-coordinate
+is always horizontally centered in the screen. You can think of an x-coordinate
 value as a percent of the window width. An x value of 0 is at the left edge, 50 is 
 in the center, and 100 is at the right edge. Similarly, a width of 50 is half as
 wide as the screen.
@@ -2888,10 +2864,12 @@ objects overlapping a screen edge are "clipped" at the edge.
 
 ##### Changing the Screen Origin to Scroll the Screen
 By default the position (0, 0) is at the upper-left corner of the screen.
-However, you can use the [ct.setScreenOrigin](#ct.setscreenorigin) function to
-change the position of the origin, which will effectively "scroll" the screen.
+However, you can use the [ct.setScreenOrigin()] function to change the position 
+of the origin, which will effectively "scroll" the screen.
 You can use this to more easily create games and other applications in which the 
 screen acts like a window into a larger world that you can move through.   
+
+###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Graphics Coordinates]
 
 
 ### Java Data Types
@@ -2920,6 +2898,8 @@ text, or image) that you can create for display on the screen. To create a `Game
 see [Graphic Object Creation](#graphic-object-creation). If you store a `GameObj` in
 a variable then you can also access and change the object later using 
 [GameObj Data Fields](#gameobj-data-fields) and [GameObj Methods](#gameobj-methods).
+
+###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Java Data Types]
 
 
 ### Color Names
@@ -2959,6 +2939,8 @@ Color Name       (red, green, blue)
 "dark yellow"    (127, 127, 0)
 
 ```
+###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Color Names]
+
 
 ### Key Names
 The following key names are supported.
@@ -2976,7 +2958,11 @@ so typing 'A' uses the "a" key, and typing '$' uses the "4" key.
 "escape"                       (esc key)
 ```
 
+###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Key Names]
+
 
 <footer>
+	Code12 Version 1.0
+	
 	(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved. 
 </footer> 

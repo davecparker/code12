@@ -91,3 +91,5 @@ aimport Code12.*;
      ArrayList<GameObj> enemies = new ArrayList<GameObj>();
       Iterator<GameObj> it = coins.iterator();
          player = ct.image("player_forwards.png", platforms.get(0).x, platforms.get(0).y, 5);
+      ct.setBackImage("underwater.jpg" 
+      ct.setBackImage("underwater.jpg", ); 
