@@ -3,6 +3,18 @@
 
 class CT
 {
+	// Graphic Object Creation
+	//------------------------
+	GameObj circle( double x, double y, double diameter )
+	GameObj circle( double x, double y, double diameter, String color )
+	GameObj rect( double x, double y, double width, double height )
+	GameObj rect( double x, double y, double width, double height, String color )
+	GameObj line( double x1, double y1, double x2, double y2 )
+	GameObj line( double x1, double y1, double x2, double y2, String color )
+	GameObj text( String s, double x, double y, double height )
+	GameObj text( String s, double x, double y, double height, String color )
+	GameObj image( String filename, double x, double y, double width )
+
 	// Text Output
 	//------------
 	void print( Object value )       // any type, no newline added
@@ -36,18 +48,6 @@ class CT
 	void setBackColorRGB( int red, int green, int blue )
 	void setBackImage( String filename )
 
-	// GameObj Creation
-	//-----------------
-	GameObj circle( double x, double y, double diameter )
-	GameObj circle( double x, double y, double diameter, String color )
-	GameObj rect( double x, double y, double width, double height )
-	GameObj rect( double x, double y, double width, double height, String color )
-	GameObj line( double x1, double y1, double x2, double y2 )
-	GameObj line( double x1, double y1, double x2, double y2, String color )
-	GameObj text( String s, double x, double y, double height )
-	GameObj text( String s, double x, double y, double height, String color )
-	GameObj image( String filename, double x, double y, double width )
-
 	// Mouse and Keyboard Input
 	//-------------------------
 	boolean clicked( )
@@ -63,62 +63,65 @@ class CT
 	void sound( String filename )
 	void setSoundVolume( double volume )
 
-	// Math and Misc.
+	// Math Utilities
 	//---------------
 	int random( int min, int max )
 	int round( double number )
 	double roundDecimal( double number, int numPlaces )
+	double distance( double x1, double y1, double x2, double y2 )
 	int intDiv( int numerator, int denominator )
 	boolean isError( double number )
-	double distance( double x1, double y1, double x2, double y2 )
+
+	// Type Conversion
+	//----------------
+	int toInt( double number )             // (deprecated) truncates
+	int parseInt( String str )             // 0 if failure
+	double parseNumber( String str )       // NaN if failure
+	boolean canParseInt( String str )
+	boolean canParseNumber( String str )
+	String formatInt( int number )
+	String formatInt( int number, int numDigits )    // uses leading 0's
+	String formatDecimal( double number )
+	String formatDecimal( double number, int numPlaces )
+
+	// Program Control
+	//----------------
 	int getTimer( )
 	double getVersion( )
 	void pause( )
 	void stop( )
 	void restart( )
-
-	// Type Conversion
-	//----------------
-	int toInt( double number )           // truncates
-	int parseInt( String str )             // 0 if failure
-	boolean canParseInt( String str )
-	double parseNumber( String str )       // NaN if failure
-	boolean canParseNumber( String str )
-	String formatDecimal( double number )
-	String formatDecimal( double number, int numPlaces )
-	String formatInt( int number )
-	String formatInt( int number, int numDigits )    // uses leading 0's
 }
 
 class GameObj
 {
-	// GameObj Public Data Fields
-	//---------------------------
-	double x, y;
-	double width, height;
-	double xSpeed, ySpeed;   // at 60 fps
-	int lineWidth;           // in pixels
-	boolean visible;
-	boolean clickable;
-	boolean autoDelete;      // auto delete if it goes from on to off-screen
-	String group;            // for ct.clearGroup(), default ""
+	// GameObj Data Fields
+	//--------------------
+	double x;
+	double y;
+	boolean visible;          // default true
+	String group;             // default ""
 
 	// GameObj Methods
 	// ---------------
 	String getType( )                                  // "circle", "image", etc.
+	double getWidth( )
+	double getHeight( )
+	void setSize( double width, double height )
+	void setSpeed( double xSpeed, double ySpeed )      // at 60 fps
+	void align( String alignment )                     // "top left", "top", "center", etc.
 	String getText( )
 	void setText( String text )                        // included in print output
 	String toString( )                                 // "[type at (x, y) "text"]"
-	void setSize( double width, double height )
-	void align( String alignment )                     // "top left", "top", "center", etc.
-	void align( String alignment, boolean adjustY )    // adjustY adjusts y when aspect changes
 	void setFillColor( String color )                  // "red", "white", etc. or null
 	void setFillColorRGB( int red, int green, int blue )
 	void setLineColor( String color )
 	void setLineColorRGB( int red, int green, int blue )
+	void setLineWidth( int lineWidth );                // in pixels
 	int getLayer( )
 	void setLayer( int layer )                         // objects default to layer 1
 	void delete( )
+	void setClickable( boolean clickable )             // default true
 	boolean clicked( )
 	boolean containsPoint( double x, double y )
 	boolean hit( GameObj objTest )
@@ -127,13 +130,13 @@ class GameObj
 
 class MATH
 {
-	// Java Math Class Fields Supported
-	//----------------------------------
+	// Java Math Fields Supported
+	//---------------------------
 	double  E;
 	double  PI;
 
-	// Java Math Class Methods Supported
-	//----------------------------------
+	// Java Math Methods Supported
+	//----------------------------
 	double  abs( double number )
 	int     abs( int number )
 	double  acos( double number )
@@ -161,8 +164,8 @@ class MATH
 
 class String
 {
-	// Java String Class Methods Supported
-	//------------------------------------
+	// Java String Methods Supported
+	//------------------------------
 	int      compareTo( String str2 )
 	boolean  equals( String str2 )
 	int      indexOf( String strFind )
@@ -184,10 +187,14 @@ class PrintStream
 
 class Code12Program
 {
-	// Events in Code12Program
-	//------------------------
+	// Main Program Functions
+	//-----------------------
 	void start( )
 	void update( )
+	void main( String[] args )         // for Java runtime only
+
+	// Input Event Functions
+	//----------------------
 	void onMousePress( GameObj obj, double x, double y ) 
 	void onMouseDrag( GameObj obj, double x, double y ) 
 	void onMouseRelease( GameObj obj, double x, double y )
@@ -195,8 +202,4 @@ class Code12Program
 	void onKeyRelease( String keyName )      // key code name e.g. "a", "up"
 	void onCharTyped( String charString )        // "a", "A", "$", etc.
 	void onResize( ) 
-
-	// The main function
-	//------------------
-	void main( String[] args )
 }
