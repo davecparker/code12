@@ -129,13 +129,22 @@ local function updateConsole()
 	end
 end
 
+local consoleTime = 0
+local frameCount = 0
+
 -- Update the console if needed
 local function onNewFrame()
+	frameCount = frameCount + 1
+	local startTime = system.getTimer()
+
 	if changed and consoleGroup then
 		updateConsole()
 		changed = false
 		resized = false
 	end
+	
+	consoleTime = consoleTime + system.getTimer() - startTime
+	-- print("console", consoleTime / frameCount)
 end
 
 -- Scroll callback for the vertical scrollbar

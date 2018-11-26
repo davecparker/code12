@@ -271,8 +271,14 @@ local function updateValues()
 	end
 end
 
+local time = 0
+local frameCount = 0
+
 -- Update the variable watch window if it is on in the user's settings
 local function onNewFrame()
+	frameCount = frameCount + 1
+	local startTime = system.getTimer()
+
 	if showVarWatch then
 		if arrayAssigned then
 			-- save top row data if scrolled
@@ -314,6 +320,9 @@ local function onNewFrame()
 		end
 		updateValues()
 	end
+
+	time = time + system.getTimer() - startTime
+	-- print("varWatch", time / frameCount)
 end
 
 -- Event handler for the variable watch window scrollbar

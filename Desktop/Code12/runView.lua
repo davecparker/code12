@@ -293,8 +293,14 @@ local function showRuntimeError( lineNum, message )
 	composer.gotoScene( "errView" )
 end
 
+local time = 0
+local frameCount = 0
+
 -- Handle new frame events by calling layoutPanes if needed
 local function onNewFrame()
+	frameCount = frameCount + 1
+	local startTime = system.getTimer()
+
 	-- Update layout of panes if needed
 	if layoutNeeded then
 		layoutPanes()
@@ -305,6 +311,9 @@ local function onNewFrame()
 	if app.gridOn and (screenOriginX ~= screen.originX or screenOriginY ~= screen.originY) then
 		makeGrid()
 	end
+
+	time = time + system.getTimer() - startTime
+	-- print("runView", time / frameCount)
 end
 
 

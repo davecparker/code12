@@ -367,14 +367,23 @@ local function onSystemEvent( event )
 	end
 end
 
+local time = 0
+local frameCount = 0
+
 -- Handle enterFrame events
 local function onEnterFrame()
+	frameCount = frameCount + 1
+	local startTime = system.getTimer()
+
 	-- Update UI if the run state changed
 	if g.runState ~= runStateLast then
 		runStateLast = g.runState
 		statusBar.update()
 		toolbar.update()
 	end
+
+	time = time + system.getTimer() - startTime
+	-- print("main", time / frameCount)
 end
 
 -- Init the app
