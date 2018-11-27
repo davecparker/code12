@@ -131,10 +131,17 @@ end
 
 -- Update the console if needed
 local function onNewFrame()
+	local startTime = system.getTimer()
+
 	if changed and consoleGroup then
 		updateConsole()
 		changed = false
 		resized = false
+	end
+
+	g.consoleTime = g.consoleTime + system.getTimer() - startTime
+	if g.frameCount % 500 == 0 then
+		print("console ", g.frameCount, g.consoleTime / g.frameCount)
 	end
 end
 

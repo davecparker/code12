@@ -38,7 +38,6 @@ local userSettings = {
 	syntaxLevel = app.numSyntaxLevels,      -- user's syntax level setting
 }
 
-
 --- Functions ----------------------------------------------------------------
 
 -- Run the given lua code string dynamically, showing the runView if 
@@ -340,13 +339,26 @@ local function onSystemEvent( event )
 	end
 end
 
+g.frameCount = 0
+g.mainTime = 0
+g.consoleTime = 0
+g.varWatchTime = 0
+
 -- Handle enterFrame events
 local function onEnterFrame()
+	g.frameCount = g.frameCount + 1
+	local startTime = system.getTimer()
+
 	-- Update UI if the run state changed
 	if g.runState ~= runStateLast then
 		runStateLast = g.runState
 		statusBar.update()
 		toolbar.update()
+	end
+
+	g.mainTime = g.mainTime + system.getTimer() - startTime
+	if g.frameCount % 500 == 0 then
+		print("main    ", g.frameCount, g.mainTime / g.frameCount)
 	end
 end
 

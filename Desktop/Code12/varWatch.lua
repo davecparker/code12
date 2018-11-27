@@ -301,6 +301,8 @@ end
 
 -- Update the variable watch window if it is on in the user's settings
 local function onNewFrame()
+	local startTime = system.getTimer()
+
 	if showVarWatch then
 		if arrayAssigned then
 			-- save top row data if scrolled
@@ -341,6 +343,11 @@ local function onNewFrame()
 			scrollOffsetChanged = false
 		end
 		updateValues()
+	end
+
+	g.varWatchTime = g.varWatchTime + system.getTimer() - startTime
+	if g.frameCount % 500 == 0 then
+		print("varWatch", g.frameCount, g.varWatchTime / g.frameCount)
 	end
 end
 

@@ -41,7 +41,6 @@ local coRoutineUser      -- coroutine running an event or nil if none
 local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
 
 
-
 ---------------- Internal Runtime Functions ------------------------------------------
 
 -- Apply xSpeed and ySpeed to all the objects in the screen
@@ -88,8 +87,18 @@ local function syncObjects(group, scale, setSize)
 	end
 end
 
+---[[ Frame rate test variables init
+local TotalNewFrameTime = 0
+local TotalSyncTime = 0
+--]]
+
 -- The enterFrame listener for each frame update
 local function onNewFrame()
+	---[[ time test init
+	local syncTime
+	local newFrameStartTime = system.getTimer()
+	--]]
+
 	-- Call or resume the current user function if not paused (start or update)
 	local status = false
 	local runState = g.runState
@@ -127,9 +136,15 @@ local function onNewFrame()
 
 		-- If the window resized then we need to resize all the contents
 		local scale = g.scale
+
+		---[[ time test syncObjects start
+		local syncStartTime = system.getTimer()
+		--]]
+
 		if g.window.resized then
 			-- Background object
 			screen.backObj:updateBackObj()
+
 			-- Screen origin
 			objs.x = -screen.originX * scale
 			objs.y = -screen.originY * scale
@@ -140,6 +155,20 @@ local function onNewFrame()
 			-- Just sync object positions and visibility
 			syncObjects(objs, scale)
 		end
+
+		---[[ time test syncObjects
+		local syncTime = system.getTimer() - syncStartTime
+		local newFrameTime = system.getTimer() - newFrameStartTime
+		TotalNewFrameTime = TotalNewFrameTime + newFrameTime
+		local newFrameTimeAvg = TotalNewFrameTime / g.frameCount
+
+		TotalSyncTime = TotalSyncTime + syncTime
+		local syncTimeAvg = TotalSyncTime / g.frameCount
+		if g.frameCount % 500 == 0 then
+			print("runtime ", g.frameCount, newFrameTimeAvg)
+			print("sync    ", g.frameCount, syncTimeAvg)
+		end
+		--]]
 	end
 end
 
@@ -437,6 +466,15 @@ function runtime:clearProgram()
 	ct.userFns = nil
 	codeFunction = nil
 	g.runState = nil
+
+	---[[ time test reset vars
+	g.frameCount = 0
+	g.mainTime = 0
+	g.consoleTime = 0
+	g.varWatchTime = 0
+	TotalNewFrameTime = 0
+	TotalSyncTime = 0
+	--]]
 end
 
 -- Output the given text to where console output should go
