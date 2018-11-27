@@ -96,3 +96,4 @@ aimport Code12.*;
          player = ct.image("player_forwards.png", platforms.get(0).x, platforms.get(0).y, 5);
       ct.setBackImage("underwater.jpg" 
       ct.setBackImage("underwater.jpg", ); 
+			double average = (GameO) "Hey";

@@ -1140,10 +1140,10 @@ int underIndentedInstanceVar;
 		// ERROR "Inequality operator (>=) can only apply to numbers"
 		dblVar = dblVar >= intArr;
 
-		// ERROR "Integer divide has remainder. Use double or ct.intDiv()"
+		// ERROR "Integer divide has remainder"
 		intVar = 1 / 2;
-		// ERROR "Integer divide has remainder. Use double or ct.intDiv()"
-		dblVar = 3 / 8;
+		// ERROR "Integer divide may lose remainder"
+		dblVar = intVar / 8;
 
 		// ERROR "Variable intVar was already defined"
 		int intVar = 13;
@@ -1467,8 +1467,8 @@ int underIndentedInstanceVar;
 		private int privateInt = 0;
 		// ERROR "Access specifiers are only allowed on class-level variables"
 		public double publicDouble = 0;
-		// ERROR "The only type cast supported by Code12 is (int)"
-		double halfIntVar = (double) intVar / 2;
+		// ERROR "(double) type cast can only be applied to type int"
+		double halfIntVar = (double) "3";
 		if (false)
 		// ERROR "Variable declarations are not allowed here"
 			int bogusVarInit = 0;

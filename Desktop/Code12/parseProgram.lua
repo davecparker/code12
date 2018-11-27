@@ -394,14 +394,9 @@ local function makeCall( nodes )
 end
 
 -- Make and return a cast structure given the parse tree nodes. 
--- The only supported type cast is currently (int). 
--- In other cases, set the error state.
 local function makeCast( nodes )
-	local typeNode = nodes[2]
-	if typeNode.str ~= "int" then
-		err.setErrNode( typeNode, "The only type cast supported by Code12 is (int)" )
-	end
-	return { s = "cast", vtCast = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
+	local vt = javaTypes.vtFromType( nodes[2] )
+	return { s = "cast", vtCast = vt, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
