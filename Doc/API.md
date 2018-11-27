@@ -3220,22 +3220,64 @@ str.trim()                                        String
 
 Main Program Functions
 ----------------------
+The functions [start()] and [update()] are two functions that your program
+provides to contain the code for your program. Unlike other Code12 functions,
+you do not call the [start()] or [update()] functions. Instead, you *write*
+these functions by providing the function body in { brackets }, and *Code12
+will call them* when appropriate.
+
+Your [start()] function is called once at the beginning of each new run of
+your program, and then [update()] is called before each new animation frame
+is drawn (60 times per second).
+
+The sequence of events for a Code12 program is:
+
+1. Any class-level variables that you declare are initialized.
+2. Code in your [start()] function is executed.
+3. Code12 draws the graphics screen for the first time.
+4. The following steps are now repeated until the program is stopped:
+	a. The system waits until the next animation frame (about 1/60th of a second).
+ 	b. Code in your [update()] function is executed.
+	c. The system redraws the graphics screen.
+
+###### [Code12 Function Reference](#top) > [Main Program Functions]
+
 
 ### start()
+Your `start()` function is executed once at the beginning of the program.
+
+#### Syntax
 ```
-void start()
+public void start()
+{
+	// Code you write here runs once at the beginning of the program
+}
 ```
-The `start` function is called once at the beginning of your program.
-This is good place to create most of the objects for your program
-(except for any objects that get created as a result of an action that
-occurs while the application is running).
+#### Example
+```
+public void start()
+{
+	ct.rect( 50, 50, 70, 30 );
+	ct.text( "Welcome to Code12!", 50, 50, 10 );
+	ct.println( "This is the text output area" );
+}
+```
+###### [Code12 Function Reference](#top) > [start()]
+
 
 ### update()
+Your `update()` function is executed before each animation frame 
+is drawn (60 times per second).
+
+#### Syntax
 ```
-void update()
+public void update()
+{
+	// Code you write here runs before each animation frame is drawn
+}
 ```
-The `update` function is called at the beginning of each animation frame.
-Animation frames start after the `start()` function has completed and then
+#### Notes
+Animation frames start after the [start()] function has completed and then
 repeat continuously 60 times per second.
 
 One use of animation frames is to achieve object motion and animation.
@@ -3243,147 +3285,383 @@ For example, if you move an object 1 display unit to the right in
 your [update()] function, then the object will move continuously
 at 60 units per second.
 
+> A common mistake is to create [GameObj](#java-data-types) objects 
+> in the [update()] function in a way that causes many copies of an object 
+> to be created over and over. Note that you should not call functions 
+> like [ct.image()] to "draw" an image for each frame in an animation. 
+> Instead, you typically want to call [ct.image()] to create the object 
+> once in your [start()] function then modify the existing image
+> (e.g. change its [obj.x] and [obj.y]) in your [update()] function.
+
 Another use of animation frames is to test repeatedly for user input,
-using functions such as `ct.clicked()`, `ct.keyPressed()`,
-and `ct.keyTyped()`, and the `GameObj` method `obj.clicked()`.
+using functions such as [ct.clicked()], [ct.keyPressed()],
+and [ct.keyTyped()], and [obj.clicked()].
 
 You can also use animation frames to test repeatedly for object interactions
-that can occur when objects are moving. You can
-examine object fields such as `x` and `y` directly, call the `GameObj` methods
-`obj.containsPoint()` and `obj.hit()`, call the function `ct.distance()` or
-write any code you want that tests what you need to detect.
+that can occur when objects are moving. You can call functions such as
+[obj.containsPoint()] and [obj.hit()], or examine object locations
+using [obj.x] and [obj.y] and write any code you want that tests what you 
+need to detect.
 
-Finally, note that you can call `ct.getTimer()` to detect the passage
-of certain amounts of time if you want.
+Finally, note that you can call [ct.getTimer()] to detect the passage
+of certain amounts of time if you want to do something less frequently 
+than every animation frame.
 
-> A common mistake is to create `GameObj` objects in the [update()] 
-> function in a way that causes many copies of the object to be created over
-> and over. Note that you should *not* call functions like `ct.circle()` to
-> "draw" a circle for each frame in an animation. Instead, you typically
-> want to call `ct.circle()` to create the object once in your `start` function,
-> then modify the existing circle in your [update()] function.
+#### Examples
+```
+int frameCount = 0;
 
-###### [Code12 Function Reference](#top) > [Main Program Functions]
+public void start()
+{
+	ct.println( "Program started" );
+}
+
+public void update()
+{
+	frameCount++;
+	ct.println( "Frame #" + frameCount );
+}
+```
+```
+GameObj dot;
+
+public void start()
+{
+	dot = ct.circle( 0, 50, 10 );
+}
+
+public void update()
+{
+	dot.x++;
+}
+```
+###### [Code12 Function Reference](#top) > [update()]
 
 
 Input Event Functions
 ---------------------
-The following functions, if defined in your program, will be called when
-indicated. Note that unlike all of the other functions and methods above,
-These functions are *implemented* in your program (you write the body of the
-function) and are *called* by the runtime system with appropriate.
-They are called in response to "events" happening in your application.
+Input event functions are optional functions that you can provide to 
+handle mouse/touch and keyboard input and to respond to system events.
+Like your [Main Program Functions], input event functions are *written*
+by you and *called by the Code12 system*. 
 
-Implementing any of these functions is optional and "for your information".
-They are not necessary to use other functions and features of the system.
-For example, if you don't implement any of the mouse event functions,
-you can still call functions such as `ct.clicked()` to test for mouse clicks.
+> Using input event functions is optional and not required to handle
+> mouse/touch or keyboard input. You can also use the 
+> [Mouse and Keyboard Input] functions. Using input event functions
+> is a more advanced technique that can be more flexible and more
+> efficent.
 
-> **Tip:** If your program has complex mouse or keyboard handling
-> (for example, many objects to check for clicks and many keys to test),
-> then doing your work in the event functions will be more efficient
-> than making many tests in your [update()] function.
+If defined in your program, the following functions will be called 
+by the system when the corresponding input event occurs:
+
+* [onMousePress()]
+* [onMouseDrag()]
+* [onMouseRelease()]
+* [onKeyPress()]
+* [onKeyRelease()]
+* [onCharTyped()]
+* [onResize()]
+
+###### [Code12 Function Reference](#top) > [Input Event Functions]
+
 
 ### onMousePress()
-```
-void onMousePress( GameObj obj, double x, double y )
-```
-This event is called each time a mouse click or touch is detected.
-The point (`x`, `y`) is the location of the click in display coordinates
-(relative to the top-left of the application window).
+If defined in your program, this function is called whenever the user
+clicks in the graphics screen (or touches it with a touch screen).
 
-If `obj` is not `null`, then it indicates that the click occured on
-that object. Note that `GameObj` objects must have both their
-`visible` and `clickable` fields `true` to receive clicks.
-If `obj` is null, then the click occured outside of any clickable object.
+#### Syntax
+```
+public void onMousePress( GameObj obj, double x, double y )
+{
+	// Your code goes here
+}
+```
+##### obj
+([GameObj](#java-data-types)). The [GameObj](#java-data-types) that was
+clicked, or `null` if none (if the background was clicked).
+
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the click. 
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates)
+of the click. 
+
+#### Example
+```
+public void start()
+{
+	ct.circle( 30, 50, 10 );
+	ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMousePress( GameObj obj, double x, double y )
+{
+	if (obj != null)
+		ct.logm( "Press", obj, x, y );
+	else
+		ct.logm( "Press", x, y );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onMousePress()]
+
 
 ### onMouseDrag()
-```
-void onMouseDrag( GameObj obj, double x, double y )
-```
-After a click or touch has happened, if the user's mouse or finger is still
-"down" and drags across the screen, then `onMouseDrag` will be called
-each time the position changes (you may get many calls in succession).
-The point (`x`, `y`) is the new location of the mouse/finger.
+If defined in your program, after a click or touch has happened, 
+if the user's mouse or finger is still "down" and drags across the screen, 
+then this function will be called each time the drag location changes.
 
-If `obj` is not `null`, then it indicates that the original click occured
-on that clickable object (see `onMousePress` above).
+#### Syntax
+```
+public void onMouseDrag( GameObj obj, double x, double y )
+{
+	// Your code goes here
+}
+```
+##### obj
+([GameObj](#java-data-types)). The [GameObj](#java-data-types) that the
+click that started this drag was on, or `null` if none.
 
-> Note: Once a click occurs on a clickable `GameObj`, all drag events
+> Once a click occurs on a clickable object, all drag events
 > will be sent indicating this `obj`, even if the (`x`, `y`) location
-> is no longer on the object (`GameObj` objects automatically take the
-> mouse/touch "focus" when clicked).
+> is no longer on the object.
+
+##### x
+([double](#java-data-types)). The current [x coordinate](#graphics-coordinates)
+of the drag. 
+
+##### y
+([double](#java-data-types)). The current [y coordinate](#graphics-coordinates)
+of the drag. 
+
+#### Notes
+Because the system checks frequently for changes in the mouse/touch position,
+you may get many `onMouseDrag()` events in rapid succession.
+
+#### Example
+```
+public void start()
+{
+	ct.circle( 30, 50, 10 );
+	ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMouseDrag( GameObj obj, double x, double y )
+{
+	if (obj != null)
+		ct.logm( "Drag", obj, x, y );
+	else
+		ct.logm( "Drag", x, y );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onMouseDrag()]
 
 
 ### onMouseRelease()
-```
-void onMouseRelease( GameObj obj, double x, double y )
-```
-This event is called when a mouse click or touch ends, and the mouse button
-or finger is "released". The point (`x`, `y`) is the location of the
-mouse/finger at the time of the release.
+If defined in your program, after a click or touch has happened, 
+this function will be called when the click or touch is released.
 
-If `obj` is not `null`, then it indicates that the original click occured
-on that clickable object (see `onMousePress` above).
+#### Syntax
+```
+public void onMouseRelease( GameObj obj, double x, double y )
+{
+	// Your code goes here
+}
+```
+##### obj
+([GameObj](#java-data-types)). The [GameObj](#java-data-types) that the
+click was originally on, or `null` if none.
 
-> Note: When a click occurs on a clickable `GameObj`, the release event
-> will always be sent indicating this `obj`, even if the (`x`, `y`)
-> location of the release is no longer on the object.
+> Once a click occurs on a clickable object, the release event
+> will be sent indicating this `obj`, even if the (`x`, `y`) location
+> is no longer on the object.
+
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the mouse/touch at the time of the release. 
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates)
+of the mouse/touch at the time of the release.
+
+#### Example
+```
+public void start()
+{
+	ct.circle( 30, 50, 10 );
+	ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMouseRelease( GameObj obj, double x, double y )
+{
+	if (obj != null)
+		ct.logm( "Release", obj, x, y );
+	else
+		ct.logm( "Release", x, y );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onMouseRelease()]
+
 
 ### onKeyPress()
+If defined in your program, this function is called when 
+a key on the keyboard has been pressed down. 
+
+#### Syntax
 ```
-void onKeyPress( String keyName )     // key code name e.g. "a", "up"
+public void onKeyPress( String keyName )
+{
+	// Your code goes here
+}
 ```
-This event is called when a keyboard key has been pressed down.
-The event is only called once for each separate press/release,
+##### keyName
+([String](#java-data-types)). The name of the key.
+Only certain keys are supported, see [Key Names].
+
+#### Notes
+This function is only called once for each separate key press and release,
 when the key is first pressed down, reagardless of how long the key
 is held down.
 
-The `keyName` is the name of the key. See [Key Names](#key-names).
+#### Example
+```
+public void start()
+{
+	ct.println( "Press some keys" );
+}
+
+public void onKeyPress( String keyName )
+{
+	ct.logm( "Press", keyName );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onKeyPress()]
+
 
 ### onKeyRelease()
+If defined in your program, this function is called when 
+a key on the keyboard has been released after being pressed. 
+
+#### Syntax
 ```
-void onKeyRelease( String keyName )   // key code name e.g. "a", "up"
+public void onKeyRelease( String keyName )
+{
+	// Your code goes here
+}
 ```
-This event is called when the keyboard key named `keyName`
-has been released (after being pressed). See [Key Names](#key-names).
+##### keyName
+([String](#java-data-types)). The name of the key.
+Only certain keys are supported, see [Key Names].
+
+#### Example
+```
+public void start()
+{
+	ct.println( "Press some keys" );
+}
+
+public void onKeyRelease( String keyName )
+{
+	ct.logm( "Release", keyName );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onKeyRelease()]
+
 
 ### onCharTyped()
-```
-void onCharTyped( String charString )     // "a", "A", "$", etc.
-```
-This event is called when keyboard action results in a printable
-character being generated.
+If defined in your program, this function is called when 
+keyboard action results in a printable character being generated.
 
-> Unlike the key names used by `onkeyPressed` above, the `charString`
-> here is a printable character including the appropriate shift status
-> (e.g. "A" if a shifted "a" is typed, "$" or "4", "+" vs. "=", etc.).
-> Only printable characters are detected, so key sequences such as Ctrl+C
-> do not result in characters.
+#### Syntax
+```
+public void onCharTyped( String charString )
+{
+	// Your code goes here
+}
+```
+##### charString
+([String](#java-data-types)). The printable character generated, 
+for example `"a"`, `"A"`, `"$"`, `" "`, etc.
 
-> Note that some platforms may have keys that auto-repeat,
-> so you may get multiple `onCharTyped` events if a key is held down.
+#### Notes
+Unlike the key names used by [onKeyPress()], the `charString`
+here is a printable character including the appropriate shift status
+(e.g. "A" if a shifted "a" is typed, "$" or "4", "+" vs. "=", etc.).
+Only printable characters are detected, so special keys such as 
+arrow keys and key sequences such as Ctrl+C do not result in characters.
+
+Most computers have a keyboard "auto-repeat" feature, so if the user
+holds down a key, you may get the first character, then perhaps
+a 1 second delay, then repeats at maybe 8 characters per second.
+                 
+#### Example
+```
+public void start()
+{
+	ct.println( "Press some keys" );
+}
+
+public void onCharTyped( String charString )
+{
+	ct.logm( "Character", charString );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onCharTyped()]
+
 
 ### onResize()
+If defined in your program, this function is called if the application window
+is resized by the user when running in a standalone window.
+
+#### Syntax
 ```
-void onResize()
-```
-This event is called if the application window is resized by the user,
-to allow you to change any object positions or otherwise react as desired.
-The contents of your application scale automatically relative to the window
-size, so you don't need to do anything in the normal case. However, if your
-object layout depends on the window aspect ratio or the physical pixel size,
-then you can determine these as follows:
-```
-double aspectRatio = ct.getWidth() / ct.getHeight();
-int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
-int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
+public void onResize()
+{
+	// Your code goes here
+}
 ```
 
-> Some systems resize windows continuously in response to the user re-sizing
-> the window frame, so you may receive many `onResize` events in succession.
+#### Notes
+This function is *not* called when your program is running within
+the Code12 application. The Code12 application scales your application
+automatically and maintains a constant aspect ratio for your application
+if the user resizes the Code12 window or uses the pane splits.
 
-###### [Code12 Function Reference](#top) > [Input Event Functions]
+If you are using the Code12 Java runtime and your program is running
+in its own window, this function will notify you if the user resizes
+the window, to allow you to change any object positions or otherwise 
+react as desired.
+
+> Most systems resize windows continuously in response to the user dragging
+> the window frame, so you may receive many `onResize()` events in succession.
+
+Note that the contents of your application scale automatically relative 
+to the overall window size, so in many cases you don't need to do anything. 
+However, if your object layout depends on the window aspect ratio or the 
+physical pixel size of the window, then you can determine these as follows:
+
+```
+double width = ct.getWidth();
+double height = ct.getHeight();
+double aspectRatio = width / height;
+int pixelWidth = ct.round( width * ct.getPixelsPerUnit() );
+int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );
+```
+
+#### Example
+```
+public void start()
+{
+	ct.println( "Run this using the Code12 Java runtime" );
+}
+
+public void onResize()
+{
+	ct.logm( "New size", ct.getWidth(), ct.getHeight() );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onResize()]
 
 
 Additional Reference Information
@@ -3467,9 +3745,9 @@ Examples: `"hello"`, `"What is your name?"`, `"3"`, `"food4u*$-!)"`
 
 #### GameObj
 A `GameObj` (Game Object) is a reference to a graphical object (circle, rectangle, 
-line, text, or image) that you can create for display on the screen. To create a `GameObj`
+line, text, or image) that you can create for display on the screen. To create a `GameObj`,
 see [Graphics Object Creation]. If you store a `GameObj` in a variable then you can 
-also access and change the object later using [GameObj Data Fields] and [GameObj Methods].
+also access and change the object later using the [GameObj Data Fields] and [GameObj Methods].
 
 ###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Java Data Types]
 

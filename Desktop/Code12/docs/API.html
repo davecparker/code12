@@ -1950,70 +1950,280 @@ str.toUpperCase()                                 String
 str.trim()                                        String</code></pre>
 <h6 id="code12-function-reference-java-string-methods"><a href="#top">Code12 Function Reference</a> &gt; <a href="#java-string-methods">Java String Methods</a></h6>
 <h2 id="main-program-functions">Main Program Functions</h2>
-<h3 id="start">start()</h3>
-<pre><code>void start()</code></pre>
-<p>The <code>start</code> function is called once at the beginning of your program. This is good place to create most of the objects for your program (except for any objects that get created as a result of an action that occurs while the application is running).</p>
-<h3 id="update">update()</h3>
-<pre><code>void update()</code></pre>
-<p>The <code>update</code> function is called at the beginning of each animation frame. Animation frames start after the <code>start()</code> function has completed and then repeat continuously 60 times per second.</p>
-<p>One use of animation frames is to achieve object motion and animation. For example, if you move an object 1 display unit to the right in your <a href="#update">update()</a> function, then the object will move continuously at 60 units per second.</p>
-<p>Another use of animation frames is to test repeatedly for user input, using functions such as <code>ct.clicked()</code>, <code>ct.keyPressed()</code>, and <code>ct.keyTyped()</code>, and the <code>GameObj</code> method <code>obj.clicked()</code>.</p>
-<p>You can also use animation frames to test repeatedly for object interactions that can occur when objects are moving. You can examine object fields such as <code>x</code> and <code>y</code> directly, call the <code>GameObj</code> methods <code>obj.containsPoint()</code> and <code>obj.hit()</code>, call the function <code>ct.distance()</code> or write any code you want that tests what you need to detect.</p>
-<p>Finally, note that you can call <code>ct.getTimer()</code> to detect the passage of certain amounts of time if you want.</p>
-<blockquote>
-<p>A common mistake is to create <code>GameObj</code> objects in the <a href="#update">update()</a> function in a way that causes many copies of the object to be created over and over. Note that you should <em>not</em> call functions like <code>ct.circle()</code> to “draw” a circle for each frame in an animation. Instead, you typically want to call <code>ct.circle()</code> to create the object once in your <code>start</code> function, then modify the existing circle in your <a href="#update">update()</a> function.</p>
-</blockquote>
+<p>The functions <a href="#start">start()</a> and <a href="#update">update()</a> are two functions that your program provides to contain the code for your program. Unlike other Code12 functions, you do not call the <a href="#start">start()</a> or <a href="#update">update()</a> functions. Instead, you <em>write</em> these functions by providing the function body in { brackets }, and <em>Code12 will call them</em> when appropriate.</p>
+<p>Your <a href="#start">start()</a> function is called once at the beginning of each new run of your program, and then <a href="#update">update()</a> is called before each new animation frame is drawn (60 times per second).</p>
+<p>The sequence of events for a Code12 program is:</p>
+<ol type="1">
+<li>Any class-level variables that you declare are initialized.</li>
+<li>Code in your <a href="#start">start()</a> function is executed.</li>
+<li>Code12 draws the graphics screen for the first time.</li>
+<li>The following steps are now repeated until the program is stopped:
+<ol type="a">
+<li>The system waits until the next animation frame (about 1/60th of a second).</li>
+<li>Code in your <a href="#update">update()</a> function is executed.</li>
+<li>The system redraws the graphics screen.</li>
+</ol></li>
+</ol>
 <h6 id="code12-function-reference-main-program-functions"><a href="#top">Code12 Function Reference</a> &gt; <a href="#main-program-functions">Main Program Functions</a></h6>
+<h3 id="start">start()</h3>
+<p>Your <code>start()</code> function is executed once at the beginning of the program.</p>
+<h4 id="syntax-80">Syntax</h4>
+<pre><code>public void start()
+{
+    // Code you write here runs once at the beginning of the program
+}</code></pre>
+<h4 id="example-58">Example</h4>
+<pre><code>public void start()
+{
+    ct.rect( 50, 50, 70, 30 );
+    ct.text( &quot;Welcome to Code12!&quot;, 50, 50, 10 );
+    ct.println( &quot;This is the text output area&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-start"><a href="#top">Code12 Function Reference</a> &gt; <a href="#start">start()</a></h6>
+<h3 id="update">update()</h3>
+<p>Your <code>update()</code> function is executed before each animation frame is drawn (60 times per second).</p>
+<h4 id="syntax-81">Syntax</h4>
+<pre><code>public void update()
+{
+    // Code you write here runs before each animation frame is drawn
+}</code></pre>
+<h4 id="notes-41">Notes</h4>
+<p>Animation frames start after the <a href="#start">start()</a> function has completed and then repeat continuously 60 times per second.</p>
+<p>One use of animation frames is to achieve object motion and animation. For example, if you move an object 1 display unit to the right in your <a href="#update">update()</a> function, then the object will move continuously at 60 units per second.</p>
+<blockquote>
+<p>A common mistake is to create <a href="#java-data-types">GameObj</a> objects in the <a href="#update">update()</a> function in a way that causes many copies of an object to be created over and over. Note that you should not call functions like <a href="#ct.image">ct.image()</a> to “draw” an image for each frame in an animation. Instead, you typically want to call <a href="#ct.image">ct.image()</a> to create the object once in your <a href="#start">start()</a> function then modify the existing image (e.g. change its <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a>) in your <a href="#update">update()</a> function.</p>
+</blockquote>
+<p>Another use of animation frames is to test repeatedly for user input, using functions such as <a href="#ct.clicked">ct.clicked()</a>, <a href="#ct.keypressed">ct.keyPressed()</a>, and [ct.keyTyped()], and <a href="#obj.clicked">obj.clicked()</a>.</p>
+<p>You can also use animation frames to test repeatedly for object interactions that can occur when objects are moving. You can call functions such as <a href="#obj.containspoint">obj.containsPoint()</a> and <a href="#obj.hit">obj.hit()</a>, or examine object locations using <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> and write any code you want that tests what you need to detect.</p>
+<p>Finally, note that you can call <a href="#ct.gettimer">ct.getTimer()</a> to detect the passage of certain amounts of time if you want to do something less frequently than every animation frame.</p>
+<h4 id="examples-22">Examples</h4>
+<pre><code>int frameCount = 0;
+
+public void start()
+{
+    ct.println( &quot;Program started&quot; );
+}
+
+public void update()
+{
+    frameCount++;
+    ct.println( &quot;Frame #&quot; + frameCount );
+}</code></pre>
+<pre><code>GameObj dot;
+
+public void start()
+{
+    dot = ct.circle( 0, 50, 10 );
+}
+
+public void update()
+{
+    dot.x++;
+}</code></pre>
+<h6 id="code12-function-reference-update"><a href="#top">Code12 Function Reference</a> &gt; <a href="#update">update()</a></h6>
 <h2 id="input-event-functions">Input Event Functions</h2>
-<p>The following functions, if defined in your program, will be called when indicated. Note that unlike all of the other functions and methods above, These functions are <em>implemented</em> in your program (you write the body of the function) and are <em>called</em> by the runtime system with appropriate. They are called in response to “events” happening in your application.</p>
-<p>Implementing any of these functions is optional and “for your information”. They are not necessary to use other functions and features of the system. For example, if you don’t implement any of the mouse event functions, you can still call functions such as <code>ct.clicked()</code> to test for mouse clicks.</p>
+<p>Input event functions are optional functions that you can provide to handle mouse/touch and keyboard input and to respond to system events. Like your <a href="#main-program-functions">Main Program Functions</a>, input event functions are <em>written</em> by you and <em>called by the Code12 system</em>.</p>
 <blockquote>
-<p><strong>Tip:</strong> If your program has complex mouse or keyboard handling (for example, many objects to check for clicks and many keys to test), then doing your work in the event functions will be more efficient than making many tests in your <a href="#update">update()</a> function.</p>
+<p>Using input event functions is optional and not required to handle mouse/touch or keyboard input. You can also use the <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a> functions. Using input event functions is a more advanced technique that can be more flexible and more efficent.</p>
 </blockquote>
-<h3 id="onmousepress">onMousePress()</h3>
-<pre><code>void onMousePress( GameObj obj, double x, double y )</code></pre>
-<p>This event is called each time a mouse click or touch is detected. The point (<code>x</code>, <code>y</code>) is the location of the click in display coordinates (relative to the top-left of the application window).</p>
-<p>If <code>obj</code> is not <code>null</code>, then it indicates that the click occured on that object. Note that <code>GameObj</code> objects must have both their <code>visible</code> and <code>clickable</code> fields <code>true</code> to receive clicks. If <code>obj</code> is null, then the click occured outside of any clickable object.</p>
-<h3 id="onmousedrag">onMouseDrag()</h3>
-<pre><code>void onMouseDrag( GameObj obj, double x, double y )</code></pre>
-<p>After a click or touch has happened, if the user’s mouse or finger is still “down” and drags across the screen, then <code>onMouseDrag</code> will be called each time the position changes (you may get many calls in succession). The point (<code>x</code>, <code>y</code>) is the new location of the mouse/finger.</p>
-<p>If <code>obj</code> is not <code>null</code>, then it indicates that the original click occured on that clickable object (see <code>onMousePress</code> above).</p>
-<blockquote>
-<p>Note: Once a click occurs on a clickable <code>GameObj</code>, all drag events will be sent indicating this <code>obj</code>, even if the (<code>x</code>, <code>y</code>) location is no longer on the object (<code>GameObj</code> objects automatically take the mouse/touch “focus” when clicked).</p>
-</blockquote>
-<h3 id="onmouserelease">onMouseRelease()</h3>
-<pre><code>void onMouseRelease( GameObj obj, double x, double y )</code></pre>
-<p>This event is called when a mouse click or touch ends, and the mouse button or finger is “released”. The point (<code>x</code>, <code>y</code>) is the location of the mouse/finger at the time of the release.</p>
-<p>If <code>obj</code> is not <code>null</code>, then it indicates that the original click occured on that clickable object (see <code>onMousePress</code> above).</p>
-<blockquote>
-<p>Note: When a click occurs on a clickable <code>GameObj</code>, the release event will always be sent indicating this <code>obj</code>, even if the (<code>x</code>, <code>y</code>) location of the release is no longer on the object.</p>
-</blockquote>
-<h3 id="onkeypress">onKeyPress()</h3>
-<pre><code>void onKeyPress( String keyName )     // key code name e.g. &quot;a&quot;, &quot;up&quot;</code></pre>
-<p>This event is called when a keyboard key has been pressed down. The event is only called once for each separate press/release, when the key is first pressed down, reagardless of how long the key is held down.</p>
-<p>The <code>keyName</code> is the name of the key. See <a href="#key-names">Key Names</a>.</p>
-<h3 id="onkeyrelease">onKeyRelease()</h3>
-<pre><code>void onKeyRelease( String keyName )   // key code name e.g. &quot;a&quot;, &quot;up&quot;</code></pre>
-<p>This event is called when the keyboard key named <code>keyName</code> has been released (after being pressed). See <a href="#key-names">Key Names</a>.</p>
-<h3 id="onchartyped">onCharTyped()</h3>
-<pre><code>void onCharTyped( String charString )     // &quot;a&quot;, &quot;A&quot;, &quot;$&quot;, etc.</code></pre>
-<p>This event is called when keyboard action results in a printable character being generated.</p>
-<blockquote>
-<p>Unlike the key names used by <code>onkeyPressed</code> above, the <code>charString</code> here is a printable character including the appropriate shift status (e.g. “A” if a shifted “a” is typed, “$” or “4”, “+” vs. “=”, etc.). Only printable characters are detected, so key sequences such as Ctrl+C do not result in characters.</p>
-</blockquote>
-<blockquote>
-<p>Note that some platforms may have keys that auto-repeat, so you may get multiple <code>onCharTyped</code> events if a key is held down.</p>
-</blockquote>
-<h3 id="onresize">onResize()</h3>
-<pre><code>void onResize()</code></pre>
-<p>This event is called if the application window is resized by the user, to allow you to change any object positions or otherwise react as desired. The contents of your application scale automatically relative to the window size, so you don’t need to do anything in the normal case. However, if your object layout depends on the window aspect ratio or the physical pixel size, then you can determine these as follows:</p>
-<pre><code>double aspectRatio = ct.getWidth() / ct.getHeight();
-int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
-int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pre>
-<blockquote>
-<p>Some systems resize windows continuously in response to the user re-sizing the window frame, so you may receive many <code>onResize</code> events in succession.</p>
-</blockquote>
+<p>If defined in your program, the following functions will be called by the system when the corresponding input event occurs:</p>
+<ul>
+<li><a href="#onmousepress">onMousePress()</a></li>
+<li><a href="#onmousedrag">onMouseDrag()</a></li>
+<li><a href="#onmouserelease">onMouseRelease()</a></li>
+<li><a href="#onkeypress">onKeyPress()</a></li>
+<li><a href="#onkeyrelease">onKeyRelease()</a></li>
+<li><a href="#onchartyped">onCharTyped()</a></li>
+<li><a href="#onresize">onResize()</a></li>
+</ul>
 <h6 id="code12-function-reference-input-event-functions"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a></h6>
+<h3 id="onmousepress">onMousePress()</h3>
+<p>If defined in your program, this function is called whenever the user clicks in the graphics screen (or touches it with a touch screen).</p>
+<h4 id="syntax-82">Syntax</h4>
+<pre><code>public void onMousePress( GameObj obj, double x, double y )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="obj-26">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The <a href="#java-data-types">GameObj</a> that was clicked, or <code>null</code> if none (if the background was clicked).</p>
+<h5 id="x-6">x</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of the click.</p>
+<h5 id="y-6">y</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of the click.</p>
+<h4 id="example-59">Example</h4>
+<pre><code>public void start()
+{
+    ct.circle( 30, 50, 10 );
+    ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMousePress( GameObj obj, double x, double y )
+{
+    if (obj != null)
+        ct.logm( &quot;Press&quot;, obj, x, y );
+    else
+        ct.logm( &quot;Press&quot;, x, y );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onmousepress"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onmousepress">onMousePress()</a></h6>
+<h3 id="onmousedrag">onMouseDrag()</h3>
+<p>If defined in your program, after a click or touch has happened, if the user’s mouse or finger is still “down” and drags across the screen, then this function will be called each time the drag location changes.</p>
+<h4 id="syntax-83">Syntax</h4>
+<pre><code>public void onMouseDrag( GameObj obj, double x, double y )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="obj-27">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The <a href="#java-data-types">GameObj</a> that the click that started this drag was on, or <code>null</code> if none.</p>
+<blockquote>
+<p>Once a click occurs on a clickable object, all drag events will be sent indicating this <code>obj</code>, even if the (<code>x</code>, <code>y</code>) location is no longer on the object.</p>
+</blockquote>
+<h5 id="x-7">x</h5>
+<p>(<a href="#java-data-types">double</a>). The current <a href="#graphics-coordinates">x coordinate</a> of the drag.</p>
+<h5 id="y-7">y</h5>
+<p>(<a href="#java-data-types">double</a>). The current <a href="#graphics-coordinates">y coordinate</a> of the drag.</p>
+<h4 id="notes-42">Notes</h4>
+<p>Because the system checks frequently for changes in the mouse/touch position, you may get many <code>onMouseDrag()</code> events in rapid succession.</p>
+<h4 id="example-60">Example</h4>
+<pre><code>public void start()
+{
+    ct.circle( 30, 50, 10 );
+    ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMouseDrag( GameObj obj, double x, double y )
+{
+    if (obj != null)
+        ct.logm( &quot;Drag&quot;, obj, x, y );
+    else
+        ct.logm( &quot;Drag&quot;, x, y );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onmousedrag"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onmousedrag">onMouseDrag()</a></h6>
+<h3 id="onmouserelease">onMouseRelease()</h3>
+<p>If defined in your program, after a click or touch has happened, this function will be called when the click or touch is released.</p>
+<h4 id="syntax-84">Syntax</h4>
+<pre><code>public void onMouseRelease( GameObj obj, double x, double y )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="obj-28">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The <a href="#java-data-types">GameObj</a> that the click was originally on, or <code>null</code> if none.</p>
+<blockquote>
+<p>Once a click occurs on a clickable object, the release event will be sent indicating this <code>obj</code>, even if the (<code>x</code>, <code>y</code>) location is no longer on the object.</p>
+</blockquote>
+<h5 id="x-8">x</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of the mouse/touch at the time of the release.</p>
+<h5 id="y-8">y</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of the mouse/touch at the time of the release.</p>
+<h4 id="example-61">Example</h4>
+<pre><code>public void start()
+{
+    ct.circle( 30, 50, 10 );
+    ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMouseRelease( GameObj obj, double x, double y )
+{
+    if (obj != null)
+        ct.logm( &quot;Release&quot;, obj, x, y );
+    else
+        ct.logm( &quot;Release&quot;, x, y );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onmouserelease"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onmouserelease">onMouseRelease()</a></h6>
+<h3 id="onkeypress">onKeyPress()</h3>
+<p>If defined in your program, this function is called when a key on the keyboard has been pressed down.</p>
+<h4 id="syntax-85">Syntax</h4>
+<pre><code>public void onKeyPress( String keyName )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="keyname-1">keyName</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the key. Only certain keys are supported, see <a href="#key-names">Key Names</a>.</p>
+<h4 id="notes-43">Notes</h4>
+<p>This function is only called once for each separate key press and release, when the key is first pressed down, reagardless of how long the key is held down.</p>
+<h4 id="example-62">Example</h4>
+<pre><code>public void start()
+{
+    ct.println( &quot;Press some keys&quot; );
+}
+
+public void onKeyPress( String keyName )
+{
+    ct.logm( &quot;Press&quot;, keyName );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onkeypress"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onkeypress">onKeyPress()</a></h6>
+<h3 id="onkeyrelease">onKeyRelease()</h3>
+<p>If defined in your program, this function is called when a key on the keyboard has been released after being pressed.</p>
+<h4 id="syntax-86">Syntax</h4>
+<pre><code>public void onKeyRelease( String keyName )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="keyname-2">keyName</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the key. Only certain keys are supported, see <a href="#key-names">Key Names</a>.</p>
+<h4 id="example-63">Example</h4>
+<pre><code>public void start()
+{
+    ct.println( &quot;Press some keys&quot; );
+}
+
+public void onKeyRelease( String keyName )
+{
+    ct.logm( &quot;Release&quot;, keyName );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onkeyrelease"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onkeyrelease">onKeyRelease()</a></h6>
+<h3 id="onchartyped">onCharTyped()</h3>
+<p>If defined in your program, this function is called when keyboard action results in a printable character being generated.</p>
+<h4 id="syntax-87">Syntax</h4>
+<pre><code>public void onCharTyped( String charString )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="charstring-1">charString</h5>
+<p>(<a href="#java-data-types">String</a>). The printable character generated, for example <code>&quot;a&quot;</code>, <code>&quot;A&quot;</code>, <code>&quot;$&quot;</code>, <code>&quot; &quot;</code>, etc.</p>
+<h4 id="notes-44">Notes</h4>
+<p>Unlike the key names used by <a href="#onkeypress">onKeyPress()</a>, the <code>charString</code> here is a printable character including the appropriate shift status (e.g. “A” if a shifted “a” is typed, “$” or “4”, “+” vs. “=”, etc.). Only printable characters are detected, so special keys such as arrow keys and key sequences such as Ctrl+C do not result in characters.</p>
+<p>Most computers have a keyboard “auto-repeat” feature, so if the user holds down a key, you may get the first character, then perhaps a 1 second delay, then repeats at maybe 8 characters per second.</p>
+<h4 id="example-64">Example</h4>
+<pre><code>public void start()
+{
+    ct.println( &quot;Press some keys&quot; );
+}
+
+public void onCharTyped( String charString )
+{
+    ct.logm( &quot;Character&quot;, charString );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onchartyped"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onchartyped">onCharTyped()</a></h6>
+<h3 id="onresize">onResize()</h3>
+<p>If defined in your program, this function is called if the application window is resized by the user when running in a standalone window.</p>
+<h4 id="syntax-88">Syntax</h4>
+<pre><code>public void onResize()
+{
+    // Your code goes here
+}</code></pre>
+<h4 id="notes-45">Notes</h4>
+<p>This function is <em>not</em> called when your program is running within the Code12 application. The Code12 application scales your application automatically and maintains a constant aspect ratio for your application if the user resizes the Code12 window or uses the pane splits.</p>
+<p>If you are using the Code12 Java runtime and your program is running in its own window, this function will notify you if the user resizes the window, to allow you to change any object positions or otherwise react as desired.</p>
+<blockquote>
+<p>Most systems resize windows continuously in response to the user dragging the window frame, so you may receive many <code>onResize()</code> events in succession.</p>
+</blockquote>
+<p>Note that the contents of your application scale automatically relative to the overall window size, so in many cases you don’t need to do anything. However, if your object layout depends on the window aspect ratio or the physical pixel size of the window, then you can determine these as follows:</p>
+<pre><code>double width = ct.getWidth();
+double height = ct.getHeight();
+double aspectRatio = width / height;
+int pixelWidth = ct.round( width * ct.getPixelsPerUnit() );
+int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );</code></pre>
+<h4 id="example-65">Example</h4>
+<pre><code>public void start()
+{
+    ct.println( &quot;Run this using the Code12 Java runtime&quot; );
+}
+
+public void onResize()
+{
+    ct.logm( &quot;New size&quot;, ct.getWidth(), ct.getHeight() );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onresize"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onresize">onResize()</a></h6>
 <h2 id="additional-reference-information">Additional Reference Information</h2>
 <h3 id="graphics-coordinates">Graphics Coordinates</h3>
 <p>Graphics objects in Code12 are positioned on the screen by (x, y) coordinates. The coordinate values are not pixels, but instead are in unit values relative to the width of the graphics area, or “screen”. Size values (e.g. width and height) use the same units.</p>
@@ -2046,7 +2256,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 <h4 id="string">String</h4>
 <p>A sequence of text characters. When the value of a string is given directly, it must be enclosed in double quotes. Examples: <code>&quot;hello&quot;</code>, <code>&quot;What is your name?&quot;</code>, <code>&quot;3&quot;</code>, <code>&quot;food4u*$-!)&quot;</code></p>
 <h4 id="gameobj">GameObj</h4>
-<p>A <code>GameObj</code> (Game Object) is a reference to a graphical object (circle, rectangle, line, text, or image) that you can create for display on the screen. To create a <code>GameObj</code> see <a href="#graphics-object-creation-1">Graphics Object Creation</a>. If you store a <code>GameObj</code> in a variable then you can also access and change the object later using <a href="#gameobj-data-fields-1">GameObj Data Fields</a> and <a href="#gameobj-methods-1">GameObj Methods</a>.</p>
+<p>A <code>GameObj</code> (Game Object) is a reference to a graphical object (circle, rectangle, line, text, or image) that you can create for display on the screen. To create a <code>GameObj</code>, see <a href="#graphics-object-creation-1">Graphics Object Creation</a>. If you store a <code>GameObj</code> in a variable then you can also access and change the object later using the <a href="#gameobj-data-fields-1">GameObj Data Fields</a> and <a href="#gameobj-methods-1">GameObj Methods</a>.</p>
 <h6 id="code12-function-reference-additional-reference-information-java-data-types"><a href="#top">Code12 Function Reference</a> &gt; <a href="#additional-reference-information">Additional Reference Information</a> &gt; <a href="#java-data-types">Java Data Types</a></h6>
 <h3 id="color-names">Color Names</h3>
 <p>The following color names are supported. If a String value used as a color is not recognized then “gray” is used.</p>
