@@ -175,7 +175,7 @@ end
 
 -- Return a display group containing a new button and its icon for the toolbar.
 -- Placement can be "left" or "right" to place the button on that side of the toolbar.
-function buttons.newToolbarButton( parent, label, onRelease, placement, adjacentBtn, width )
+function buttons.newToolbarButton( parent, label, imageFile, onRelease, placement, adjacentBtn, width )
 	local iconSize = 15
 	local padding = 10
 	-- Make button display group
@@ -184,7 +184,7 @@ function buttons.newToolbarButton( parent, label, onRelease, placement, adjacent
 	btnGroup.anchorX = 0
 	btnGroup.y = app.dyToolbar / 2
 	-- Make button icon
-	local icon = display.newImageRect( parent, "images/" .. label .. ".png", iconSize, iconSize )
+	local icon = display.newImageRect( parent, "images/" .. imageFile, iconSize, iconSize )
 	icon.anchorX = 0
 	icon.x = padding / 2
 	icon:setFillColor( unpack( labelColor ) )
