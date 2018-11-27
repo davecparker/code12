@@ -12,9 +12,9 @@ class FramerateTest
 		// Your code here runs once at the start of running the program
 		for (int i = 0; i < numObjs; i++)
 		{
-			// objs[i] = ct.rect(50, 50, 10, 10);
+			objs[i] = ct.rect(50, 50, 10, 10);
 			// objs[i] = ct.circle(50, 50, 10);
-			objs[i] = ct.text("Hello World", 50, 50, 10);
+			// objs[i] = ct.text("Hello World", 50, 50, 10);
 			// objs[i] = ct.image("block.png", 50, 50, 10);
 			// objs[i] = ct.image("koopa.png", 50, 50, 10);
 		}

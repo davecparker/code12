@@ -309,7 +309,7 @@ local function onNewFrame()
 
 	g.runViewTime = g.runViewTime + system.getTimer() - startTime
 	if g.frameCount % 500 == 0 then
-		print("console ", g.frameCount, g.runViewTime / g.frameCount)
+		print("runView ", g.frameCount, g.runViewTime / g.frameCount)
 	end
 end
 
