@@ -1,40 +1,133 @@
 % Code12 Function Reference
 
-The Code12 API (Application Programming Interface) functions are built in to the Code12 application.
+<div class="summary">
+<div class="summaryColumn">
 
-##### Code12 Functions
-* [Graphic Object Creation]
-* [Text Output]
-* [Alerts and Input Dialogs]
-* [Screen Management]
-* [Mouse and Keyboard Input]
-* [Audio]
-* [Math Utilities]
-* [Type Conversion]
-* [Program Control]
+##### [Graphics Object Creation]
+* [ct.circle()]
+* [ct.rect()]
+* [ct.line()]
+* [ct.text()]
+* [ct.image()]
 
-##### GameObj Fields and Methods
-* [GameObj Data Fields]
-* [GameObj Methods]
+##### [Text Output]
+* [ct.print()]
+* [ct.println()]
+* [ct.log()]
+* [ct.logm()]
+* [ct.setOutputFile()]
 
-##### Math and String Operations
-* [Java Math Methods and Fields Supported]
-* [Java String Methods Supported]
+##### [Alerts and Input Dialogs]
+* [ct.showAlert()]
+* [ct.inputInt()]
+* [ct.inputNumber()]
+* [ct.inputYesNo()]
+* [ct.inputString()]
 
-##### Input Events and Main Program Functions
+##### [Screen Management]
+* [ct.setTitle()]
+* [ct.setHeight()]
+* [ct.getWidth()]
+* [ct.getHeight()]
+* [ct.getPixelsPerUnit()]
+* [ct.getScreen()]
+* [ct.setScreen()]
+* [ct.setScreenOrigin()]
+* [ct.clearScreen()]
+* [ct.clearGroup()]
+* [ct.setBackColor()]
+* [ct.setBackColorRGB()]
+* [ct.setBackImage()]
+
+</div>
+<div class="summaryColumn">
+
+##### [Mouse and Keyboard Input]
+* [ct.clicked()]
+* [ct.clickX()]
+* [ct.clickY()]
+* [ct.objectClicked()]
+* [ct.keyPressed()]
+* [ct.charTyped()]
+
+##### [Audio]
+* [ct.loadSound()]
+* [ct.sound()]
+* [ct.setSoundVolume()]
+
+##### [Math Utilities]
+* [ct.random()]
+* [ct.round()]
+* [ct.roundDecimal()]
+* [ct.distance()]
+* [ct.intDiv()]
+* [ct.isError()]
+
+##### [Type Conversion]
+* [ct.parseInt()]
+* [ct.parseNumber()]
+* [ct.canParseInt()]
+* [ct.canParseNumber()]
+* [ct.formatInt()]
+* [ct.formatDecimal()]
+
+##### [Program Control]
+* [ct.getTimer()]
+* [ct.getVersion()]
+* [ct.pause()]
+* [ct.stop()]
+* [ct.restart()]
+
+
+</div>
+<div class="summaryColumn">
+
+##### [GameObj Data Fields]
+* [obj.x]
+* [obj.y]
+* [obj.visible]
+* [obj.group]
+
+##### [GameObj Methods]	
+* [obj.getType()]
+* [obj.getWidth()]
+* [obj.getHeight()]
+* [obj.setSize()]
+* [obj.setSpeed()]
+* [obj.align()]
+* [obj.getText()]
+* [obj.setText()]
+* [obj.toString()]
+* [obj.setFillColor()]
+* [obj.setFillColorRGB()]
+* [obj.setLineColor()]
+* [obj.setLineColorRGB()]
+* [obj.setLineWidth()]
+* [obj.getLayer()]
+* [obj.setLayer()]
+* [obj.delete()]
+* [obj.setClickable()]
+* [obj.clicked()]
+* [obj.containsPoint()]
+* [obj.hit()]
+* [obj.objectHitInGroup()]
+
+##### Other Functions Supported
+* [Java Math Methods]
+* [Java String Methods]
 * [Main Program Functions]
 * [Input Event Functions]
 
-##### Additional Reference Information
-* [Graphics Coordinates]
-* [Java Data Types]
-* [Color Names]
-* [Key Names]
+</div>
+</div>
+
+###### Code12 Version 1.0
 
 
-Graphic Object Creation
------------------------
-These functions allow you to create new graphics objects for display on the screen.
+Graphics Object Creation
+------------------------
+These functions allow you to create a new graphics object 
+([GameObj](#java-data-types)) for display on the screen.
 
 * [ct.circle()]
 * [ct.rect()]
@@ -42,10 +135,11 @@ These functions allow you to create new graphics objects for display on the scre
 * [ct.text()]
 * [ct.image()]
 
-###### [Code12 Function Reference](#top) > [Graphic Object Creation]
+###### [Code12 Function Reference](#top) > [Graphics Object Creation]
+
 
 ### ct.circle()
-Creates a new circle graphics object (GameObj).
+Creates a new circle graphics object ([GameObj](#java-data-types)).
 
 #### Syntax
 ```
@@ -85,12 +179,11 @@ ct.circle( 50, 70, 40, "blue" );
 GameObj ball = ct.circle( 0, 50, 10, "yellow" );
 ball.xSpeed = 1;
 ```
-###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.circle()]
+###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.circle()]
 
 
 ### ct.rect()
-
-Creates a new rectangle graphics object (GameObj).
+Creates a new rectangle graphics object ([GameObj](#java-data-types)).
 
 #### Syntax
 ```
@@ -134,13 +227,12 @@ ct.rect( 50, 70, 80, 40, "blue" );
 GameObj platform = ct.rect( 0, 50, 30, 8, "orange" );
 platform.xSpeed = 1;
 ```
-###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.rect()]
+###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.rect()]
 
 
 ### ct.line()
-
-Creates a new line graphics object (GameObj) drawn from a point (`x1`, `y2`) 
-to a second point (`x2`, `y2`).
+Creates a new line graphics object ([GameObj](#java-data-types))
+drawn from a point (`x1`, `y2`) to a second point (`x2`, `y2`).
 
 #### Syntax
 ```
@@ -184,13 +276,12 @@ ct.line( 10, 50, 90, 50, "blue" );
 GameObj border = ct.line( 0, 75, 100, 75, "red" );
 border.setLineWidth( 3 );
 ```
-###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.line()]
+###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.line()]
 
 
 ### ct.text()
-
-Creates a new text graphics object (GameObj), which can be used to display text
-on the graphics screen.
+Creates a new text graphics object ([GameObj](#java-data-types)), 
+which can be used to display text on the graphics screen.
 
 #### Syntax
 ```
@@ -235,12 +326,12 @@ ct.text( "Click anywhere to play", 50, 60, 5, "blue" );
 GameObj scoreText = ct.text( "Score: 0", 100, 20, 10, "green" );
 scoreText.align( "right" );
 ```
-###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.text()]
+###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.text()]
 
 
 ### ct.image()
-
-Creates a new graphics image object (GameObj) from an image file (.PNG or .JPG).
+Creates a new image graphics object ([GameObj](#java-data-types)) 
+from an image file (.PNG or .JPG).
 
 #### Syntax
 ```
@@ -286,7 +377,7 @@ ct.image( "dragon.png", 30, 50, 10 );
 GameObj sky = ct.image( "sky.jpg", 50, 50, 100 );
 sky.setSize( 100, 100 );
 ```
-###### [Code12 Function Reference](#top) > [Graphic Object Creation] > [ct.image()]
+###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.image()]
 
 
 Text Output
@@ -296,7 +387,7 @@ which is below the graphics area in the Code12 application.
 Text in this area displays as a continuous scrolling stream of lines.
 You can also output to a text file on your computer.
 
-> To display text on the graphics screen, use [ct.text()].
+Note: To display text on the graphics screen, use [ct.text()].
 
 * [ct.print()]
 * [ct.println()]
@@ -308,7 +399,6 @@ You can also output to a text file on your computer.
 
 
 ### ct.print()
-
 Output text, or the text representation of any value, to the console.
 A newline is *not* added, so any subsequent text output will appear on
 the same line. 
@@ -341,7 +431,6 @@ ct.print( score );
 
 
 ### ct.println()
-
 Output text, or the text representation of any value, to the console.
 A newline is automatically added to end the line after the value. 
 
@@ -376,7 +465,6 @@ ct.println( "Your average score is " + (totalScore / numTrys) );
 
 
 ### ct.log()
-
 Output any number of values to the console, on one line separated by commas. 
 
 #### Syntax
@@ -389,10 +477,9 @@ of values of any type(s). The values will be output to the console on the same l
 separated by commas.
 
 #### Notes
-Unlike [ct.print()] and [ct.println()],
-
-* Output from [ct.log()] and [ct.logm()] is colored blue in the console instead of black.
-* String values are automatically enclosed in double quotes. 
+Unlike [ct.print()] and [ct.println()], output from [ct.log()] and [ct.logm()] 
+is colored blue in the console instead of black, and String values are automatically 
+enclosed in double quotes. 
 
 #### Examples
 ```
@@ -411,7 +498,6 @@ ct.log( playerName, hits, misses, total );
 
 
 ### ct.logm()
-
 Output a text message followed by any number values to the console, 
 all on one line separated by commas.
 
@@ -431,10 +517,9 @@ of values of any type(s). The values will be output to the console on the same l
 after the `message` plus a space, separated by commas.
 
 #### Notes
-Unlike [ct.print()] and [ct.println()],
-
-* Output from [ct.log()] and [ct.logm()] is colored blue in the console instead of black.
-* String values are automatically enclosed in double quotes. 
+Unlike [ct.print()] and [ct.println()], output from [ct.log()] and [ct.logm()] 
+is colored blue in the console instead of black, and String values are automatically 
+enclosed in double quotes. 
 
 #### Examples
 ```
@@ -452,7 +537,6 @@ ct.logm( "Current stats:", runs, hits, errors );
 
 
 ### ct.setOutputFile()
-
 If you call `ct.setOutputFile( filename )`, then any subsequent text output
 from [ct.print()], [ct.println()], [ct.log()], and [ct.logm()] will be
 written to a text file with the given filename in addition to being output
@@ -512,7 +596,6 @@ and to ask for input from the user.
 
 
 ### ct.showAlert()
-
 Displays a message in a pop-up dialog box over the graphics screen.
 Execution of the program will pause and wait for the user to press
 the OK button on the dialog or press the Enter key on the keyboard.
@@ -533,7 +616,6 @@ ct.showAlert( "Game Over!" );
 
 
 ### ct.inputInt()
-
 Displays a message in a pop-up dialog box that asks the user to enter 
 a number. Execution of the program will pause and wait until the user
 enters a valid integer. The resulting integer value is returned.
@@ -556,7 +638,6 @@ int numTargets = ct.inputInt( "How many targets would you like to have?" );
 
 
 ### ct.inputNumber()
-
 Displays a message in a pop-up dialog box that asks the user to enter
 a number. Execution of the program will pause and wait until the user
 enters a valid number. The resulting numeric value is returned.
@@ -579,7 +660,6 @@ double tempF = ct.inputNumber( "Enter the temperature in Farenheit" );
 
 
 ### ct.inputYesNo()
-
 Displays a message in a pop-up dialog box that has two buttons
 labelled Yes and No. Execution of the program will pause and wait until 
 the user presses one of the buttons.
@@ -603,7 +683,6 @@ boolean playAgain = ct.inputYesNo( "Do you want to play again?" );
 
 
 ### ct.inputString()
-
 Displays a message in a popup dialog box that allows the user to
 enter a text string. Execution of the program will pause and wait
 until the user presses the Enter key to end the text input. 
@@ -653,7 +732,6 @@ groups of objects.
 
 
 ### ct.setTitle()
-
 Allows you to set the title of the application window.
 
 #### Syntax
@@ -672,7 +750,6 @@ ct.setTitle( "Zombie Attack" );
 
 
 ### ct.setHeight()
-
 Sets the height of the graphics output window in coordinate units,
 which effectively sets the aspect ratio of your application.
 
@@ -701,7 +778,6 @@ ct.setHeight( 100.0 * 9 / 16 );    // 16:9 landscape aspect
 
 
 ### ct.getWidth()
-
 This function always returns 100.0, which is the width of the application
 window in [coordinate units](#graphics-coordinates) by definition.
 
@@ -725,7 +801,6 @@ ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );
 
 
 ### ct.getHeight()
-
 Returns the height of the the application window in 
 [coordinate units](#graphics-coordinates).
 This is 100.0 by default, unless it is changed by [ct.setHeight()].
@@ -751,7 +826,6 @@ ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );
 
 
 ### ct.getPixelsPerUnit()
-
 Returns the current graphics scale factor from 
 [coordinate units](#graphics-coordinates) to device pixels. 
 
@@ -787,7 +861,6 @@ ct.circle( 50, 50, diameter );
 
 
 ### ct.getScreen()
-
 Returns the name of the current screen, which is the most recent
 screen set using [ct.setScreen()].
 
@@ -814,7 +887,6 @@ if (screenName.equals( "intro" ))
 
 
 ### ct.setScreen()
-
 Sets the current screen to the screen with the specified name,
 creating a new screen if the screen name does not exist yet.
 
@@ -885,10 +957,8 @@ public void update()
 
 
 ### ct.setScreenOrigin()
-
 Offsets the entire screen horizontally and/or vertically so that
 the coordinate at the upper-left of the screen is a specified (`x`, `y`).
-
 
 #### Syntax
 ```
@@ -903,7 +973,6 @@ for the left edge of the screen.
 for the top of the screen.
 
 #### Notes
-
 Normally the coordinate at the upper-left corner of the screen
 is (0, 0). Using `ct.setScreenOrigin( x, y )` allows you to think of
 the screen as a window viewing part of a larger world, and you
@@ -939,7 +1008,6 @@ ct.setScreenOrigin( 30, 0 );       // entire scene scrolls to the left
 
 
 ### ct.clearScreen()
-
 Removes and deletes all graphics (`GameObj`) objects on the current screen.
 The background color or image is kept, if any.
 
@@ -958,7 +1026,6 @@ ct.clearScreen();     // screen is now just solid red
 
 
 ### ct.clearGroup()
-
 Removes and deletes all graphics (`GameObj`) objects on the current screen
 whose [group name](#obj.group) matches the name passed.
 
@@ -991,7 +1058,6 @@ ct.clearGroup( "coins" );    // deletes all 3 coins
 
 
 ### ct.setBackColor()
-
 Sets the background color of the current screen to a specified 
 [color name](#color-names).
 
@@ -1010,7 +1076,6 @@ ct.setBackColor( "light blue" );
 
 
 ### ct.setBackColorRGB()
-
 Sets the background color of the current screen to a
 custom RGB color with specified `red`, `green`, and `blue` components.
 
@@ -1035,7 +1100,6 @@ ct.setBackColorRGB( 0, 60, 255 );    // greenish blue
 
 
 ### ct.setBackImage()
-
 Sets the background of the current screen to an image.
 The background image always displays behind all graphics (`GameObj`) objects
 on the screen.
@@ -1089,7 +1153,6 @@ which is fast enough to provide fast response to input.
 
 
 ### ct.clicked()
-
 Returns `true` if a click (mouse button press) or touch (on touch screens)
 occured in the application window during the last animation frame. 
 
@@ -1101,7 +1164,6 @@ ct.clicked()
 ([boolean](#java-data-types)). `true` if a click occured, otherwise `false`.
 
 #### Notes
-
 Calling this function every time in your [update()] function will 
 detect all mouse clicks in your application window.
 
@@ -1124,7 +1186,6 @@ public void update()
 
 
 ### ct.clickX()
-
 Returns the [x coordinate](#graphics-coordinates) of the last known click
 location in the application.
 
@@ -1136,7 +1197,6 @@ ct.clickX()
 ([double](#java-data-types)). The [x coordinate](#graphics-coordinates) of the click.
 
 #### Notes
-
 You should call [ct.clicked()] and test for a return value 
 of `true` to make sure a click has occured before calling `ct.clickX()`.
 
@@ -1157,7 +1217,6 @@ public void update()
 
 
 ### ct.clickY()
-
 Returns the [y coordinate](#graphics-coordinates) of the last known click
 location in the application.
 
@@ -1169,7 +1228,6 @@ ct.clickY()
 ([double](#java-data-types)). The [y coordinate](#graphics-coordinates) of the click.
 
 #### Notes
-
 You should call [ct.clicked()] and test for a return value 
 of `true` to make sure a click has occured before calling `ct.clickY()`.
 
@@ -1190,7 +1248,6 @@ public void update()
 
 
 ### ct.objectClicked()
-
 If a clickable graphics object (`GameObj`) was clicked during the 
 last animation frame, then `ct.objectClicked()` returns a reference 
 to that object, otherwise it returns `null` .
@@ -1211,7 +1268,6 @@ ct.objectClicked()
 > will generate a runtime error (a "crash") if the `GameObj` is `null`.
 
 #### Notes
-
 Calling this function every time in your [update()] function will 
 find the topmost clickable object that was clicked, whenever the user clicks
 on one. Any objects with the [obj.clickable] field set to `false` 
@@ -1231,7 +1287,6 @@ public void update()
 
 
 ### ct.keyPressed()
-
 Returns `true` if the key with the specified [key name](#key-names)
 is currently pressed (the key is down).
 
@@ -1247,7 +1302,6 @@ of the key to test.
 ([boolean](#java-data-types)). `true` if the key is pressed, otherwise `false`.
 
 #### Notes
-
 If you call this function every time in your [update()] function,
 then it will return `true` for each animation frame where the key
 is being held down. Animation frames happen 60 times per second,
@@ -1282,7 +1336,6 @@ public void update()
 
 
 ### ct.charTyped()
-
 Return `true` if the specified character was typed on the keyboard
 during the last animation frame.
 
@@ -1305,7 +1358,6 @@ ct.charTyped( charString )
 ([boolean](#java-data-types)). `true` if the character was typed, otherwise `false`.
 
 #### Notes
-
 Calling this function every time in your [update()] function
 will detect each time that the given character is typed.
 Unlike the behavior of [ct.keyPressed()](#ct.keypressed), 
@@ -1469,7 +1521,7 @@ These functions provide a convenient way to do common calculations.
 * [ct.intDiv()]
 * [ct.isError()]
 
-For more math operations, see [Java Math Methods and Fields Supported].
+For more math operations, see [Java Math Methods].
 
 ###### [Code12 Function Reference](#top) > [Math Utilities]
 
@@ -1666,6 +1718,9 @@ These functions allow you to convert text strings to numbers and vice-versa.
 * [ct.formatInt()]
 * [ct.formatDecimal()]
 
+###### [Code12 Function Reference](#top) > [Type Conversion]
+
+
 ### ct.parseInt()
 Reads an [int](#java-data-types) value in a [String](#java-data-types).
 
@@ -1855,190 +1910,687 @@ String text = ct.formatDecimal( a, 4 );    // sets text to "3.1416"
 
 Program Control
 ---------------
+These functions allow you to get information about and control the 
+execution of your program.
+
+* [ct.getTimer()]
+* [ct.getVersion()]
+* [ct.pause()]
+* [ct.stop()]
+* [ct.restart()]
+
+###### [Code12 Function Reference](#top) > [Program Control]
+
 
 ### ct.getTimer()
+Return the number of milliseconds since your program started.
+
+#### Syntax
 ```
-int ct.getTimer()
+ct.getTimer()
 ```
-Return the number of milliseconds since the application started.
-Time starts at the begining of the `start` function.
+##### *Return Value*
+([int](#java-data-types)). The number of milliseconds since your program started.
+
+#### Examples
+```
+public void update()
+{
+	ct.println( ct.getTimer() );
+}
+```
+```
+boolean timerStarted = false;
+int startTime;
+
+public void update()
+{
+	// Start a timer when the user clicks
+	if (ct.clicked())
+	{
+		ct.println( "Timer started" );
+		timerStarted = true;
+		startTime = ct.getTimer();
+	}
+
+	// Print a message 3 seconds after the timer started
+	if (timerStarted && ct.getTimer() - startTime > 3000)
+	{
+		ct.println( "3 seconds have passed" );
+		timerStarted = false;
+	}
+}
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.getTimer()]
+
 
 ### ct.getVersion()
+Returns the version number of the Code12 runtime system.
+
+#### Syntax
 ```
-double getVersion()
+ct.getVersion()
 ```
-Return the version number of the Code12 runtime system.
+##### *Return Value*
+([double](#java-data-types)). The Code12 version number (for example 1.0).
+
+#### Examples
+```
+if (ct.getVersion() > 1.0)
+	ct.println( "We have the update" )
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.getVersion()]
+
 
 ### ct.pause()
-```
-ct.pause()
-```
-Execution of the program is paused at this statement.
+Pauses execution of your program at this statement.
 You can then resume or stop execution using the toolbar buttons
 in the Code12 application. 
 
-> You can use `ct.pause` to help you examine or debug your program
-> while running your program in the Code12 application.
-> The `ct.pause` function is not supported (ignored) when programs 
-> are running standalone outside of the Code12 application.
+#### Syntax
+```
+ct.pause();
+```
+#### Notes
+You can use `ct.pause()` to help you examine or debug your program
+while it is running. Any motion on the screen will pause so you
+can inspect it, and you can also check variable values in the 
+variable watch window. 
+
+#### Example
+```
+public void start()
+{
+	// Make a circle on the left
+	ct.circle( 30, 50, 20 );
+
+	// Wait for the Resume toolbar button to be pressed
+	ct.pause();
+
+	// Make a circle on the right
+	ct.circle( 70, 50, 20 );
+}
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.pause()]
+
 
 ### ct.stop()
-```
-ct.stop()
-```
-Execution of the program is immediately stopped and ended at this statement.
+Stops execution of your program immediately at this statement.
 You can restart execution over from the beginning of the program using 
-the **Restart** toolbar button in the Code12 application. 
+the Restart toolbar button in the Code12 application. 
 
-> You can use `ct.stop` to help you examine or debug your program
-> while running your program in the Code12 application.
-> The `ct.stop` function is not supported (ignored) when programs 
-> are running standalone outside of the Code12 application.
+#### Syntax
+```
+ct.stop();
+```
+#### Notes
+You can use `ct.stop()` to terminate your program if something 
+unexpected happens. No more code will execute, and the values of 
+your variables will stay as they were when `ct.stop()` was called
+so you can examine them in the variable watch window.
+
+#### Example
+```
+if (hero.x < 0)
+	ct.stop();    // Oops, how did he get off-screen?
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.stop()]
+
 
 ### ct.restart()
-```
-ct.restart()
-```
-Execution of the program is immediately stopped and restarted from 
-the beginning of the program. Variables are re-initialized with their
-default/starting values, and execution starts over with your `start`
-function.
+Immediately stops and and then restarts your program from the beginning.
 
-> The `ct.restart` function is not supported (ignored) when programs 
-> are running standalone under the Java runtime outside of the 
-> Code12 environment.
+#### Syntax
+```
+ct.restart();
+```
+#### Notes
+After calling `ct.restart()`, your program immediately restarts from
+the beginning. Variables are re-initialized with their default/starting 
+values, and execution starts over with your [start()] function.
+
+#### Example
+```
+if (ct.inputYesNo( "Would you like to play again?" ))
+	ct.restart();
+```
+###### [Code12 Function Reference](#top) > [Program Control] > [ct.restart()]
 
 
 GameObj Data Fields
 -------------------
-`GameObj` objects are graphics objects visible on the screen.
-See [GameObj Creation](#gameobj-creation) to create a `GameObj`.
-All `GameObj` objects have the following public data fields,
-which can be accessed or assigned to at any time.
-If assigned to, the new value takes effect at the next
-animation frame.
+Each graphics object ([GameObj](#java-data-types)) that you create 
+(see [Graphics Object Creation]) has several data variables that live inside it. 
+These variables store information such as the position, size, and color of the object. 
+Each [GameObj](#java-data-types) has its own copy of these variables. 
+You can access or change some of these data variables directly.
+Java refers to these object variables as *public data fields*.
+
+Each [GameObj](#java-data-types) has public data fields named `x`, `y`, 
+`visible`, and `group`. 
+To access these fields, you need a variable of type [GameObj](#java-data-types),
+which you put before the data field name followed by a dot (.) character,
+for example `hero.x`.
+
+In the general descriptions below, the [GameObj](#java-data-types) variable is 
+shown as `obj`. In your program, you will replace `obj` with the name of the 
+[GameObj](#java-data-types) variable that you wish to access.
+
+* [obj.x]
+* [obj.y]
+* [obj.visible]
+* [obj.group]
+
+###### [Code12 Function Reference](#top) > [GameObj Data Fields]
+
 
 ### obj.x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates) of
+a [GameObj](#java-data-types).
+
+#### Syntax
+```
+obj.x
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+#### Notes
+You can access ("get") or change ("set") the [x coordinate](#graphics-coordinates)
+of a [GameObj](#java-data-types) at any time.
+
+#### Example
+```
+GameObj dot;
+
+public void start()
+{
+	dot = ct.circle( 0, 50, 10 );	
+}
+
+public void update()
+{
+	// Move dot a little to the right each animation frame
+	dot.x = dot.x + 1;
+
+	// If dot goes off-screen to the right, start over at the left
+	if (dot.x > 100)
+		dot.x = 0;
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.x]
+
 
 ### obj.y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates) of
+a [GameObj](#java-data-types).
+
+#### Syntax
 ```
-double x, y
+obj.y
 ```
-The `x` and `y` fields specify the position of the object
-in the application window, in graphics coordinates.
-By default, graphics coordinates range from 0 to 100 in both x and y
-if the window is square. If the window is not square (see `ct.setHeight()`),
-then x coordinates still range from 0 (left edge) to 100 (right edge),
-but y coordinates will range from 0 (top edge) to the value returned
-by `ct.getHeight()` (bottom edge).
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
 
-> By default, objects are positioned by their center, so (`x`, `y`)
-> will be the center of the object. However, this can be modified
-> by the `GameObj` method `obj.align()`.
+#### Notes
+You can access ("get") or change ("set") the [y coordinate](#graphics-coordinates)
+of a [GameObj](#java-data-types) at any time.
 
-> It is not an error to position an object outside the application window,
-> it will simply not be visible or will clip at the window boundary.
-
-### obj.xSpeed
-
-### obj.ySpeed
+#### Example
 ```
-double xSpeed, ySpeed
-```
-The `xSpeed` and `ySpeed` fields can be used to make an object move
-automatically at the specified speed and direction.
-The `xSpeed` and `ySpeed` values are added to the object's
-`x` and `y` fields before each new animation frame.
-Animation frames happen 60 times per second, so setting `xSpeed` to 1
-will make the object move 60 units per second to the right.
-The values for `xSpeed` and `ySpeed` can be positive or negative,
-and they both default to 0.
+GameObj slab;
 
-> You can change `xSpeed` and/or `ySpeed` at any time to change
-> the speed or direction of an object.
+public void start()
+{
+	slab = ct.rect( 50, 0, 40, 10 );	
+}
+
+public void update()
+{
+	// Move slab down a little each animation frame
+	slab.y = slab.y + 1;
+
+	// If slab reaches the bottom, start over at the top
+	if (slab.y > ct.getHeight())
+		slab.y = 0;
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.y]
+
 
 ### obj.visible
-```
-boolean visible
-```
-The `visible` field defaults to `true`, but you can set it to `false`
-to hide the object. Hidden objects are effectively disabled, and will
-not draw or respond to mouse/touch input.
+([boolean](#java-data-types)). `true` if a [GameObj](#java-data-types)
+should be displayed as normal, or `false` to hide the object and not display it.
 
-### obj.clickable
+#### Syntax
 ```
-boolean clickable
+obj.visible
 ```
-The `clickable` field defaults to `true`, so by default all `GameObj` objects 
-can be used to respond to click/touch input
-(see [ct.objectClicked](#ctobjectclicked), [obj.clicked](#objclicked), and
-[onMousePress](#onmousepress)).
-However, if you set an object's `clickable` field to false, then it will ignore
-clicks and pass them through to the object below, if any. 
- 
-> If you stack two objects and want to use the bottom object to test for hits
-> (for example a rectangle with a text label on top of it), then you can
-> set the `clickable` field of the top object to `false`, which will cause
-> the click to "pass through" to the object below it.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+#### Notes
+Graphics objects default to visible when created. If you set the `visible` 
+field to `false`, the object will be hidden and disappear from the display. 
+Hidden objects still exist (they are not deleted), and they can be brought 
+back by setting `visible` back to `true`.
+
+> In addition to not being displayed, hidden objects do not respond to 
+> mouse clicks (from [ct.objectClicked()], for example) and do not
+> register as "hitting" other objects (see [obj.hit()], for example]).
+
+#### Example
+```
+// Hide objects that are clicked
+GameObj target = ct.objectClicked();
+if (target != null)
+	target.visible = false;
+```
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.visible]
+
+
 
 ### obj.group
+([String](#java-data-types)). An optional name that you can assign to a 
+[GameObj](#java-data-types) to associate it with other 
+similar objects.
+
+#### Syntax
 ```
-String group
+obj.group
 ```
-The `group` field is an optional name that you can assign to an object
-that will cause the function `ct.clearGroup()` to delete all objects with
-the matching group name. The default group name of an object is ""
-(empty string)
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+#### Notes
+The default group name for an object is `""` (empty string) when it is created.
+If you assign a group name, you can access and check it when you have an
+unknown object reference to see what kind it is.
+
+The `group` field is also used by the functions [ct.clearGroup()] 
+and [obj.objectHitInGroup()].
+
+#### Examples
+```
+GameObj block;
+GameObj coin1, coin2;
+
+public void start()
+{
+	block = ct.rect( 50, 70, 20, 20 );
+
+	coin1 = ct.circle( 30, 30, 10 );
+	coin1.group = "coins";
+
+	coin2 = ct.circle( 70, 30, 10 );
+	coin2.group = "coins";
+}
+
+public void update()
+{
+	// Hide coins that get clicked
+	GameObj target = ct.objectClicked();
+	if (target != null && target.group.equals("coins"))
+		target.visible = false;	
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.group]
 
 
 GameObj Methods
 ---------------
-The following method functions must be called on an existing `GameObj`
-object (see [GameObj Creation](#gameobj-creation)). In the syntax shown,
-the `obj` can be any variable of type `GameObj`.
+The following method functions must be called on an existing graphics object
+([GameObj](#java-data-types)). To create a [GameObj](#java-data-types), 
+see [Graphics Object Creation]. In the syntax descriptions shown,
+the `obj` can be any variable of type [GameObj](#java-data-types). 
+The method function will access or modify the `obj` variable you specify.
+
+* [obj.getType()]
+* [obj.getWidth()]
+* [obj.getHeight()]
+* [obj.setSize()]
+* [obj.setSpeed()]
+* [obj.align()]
+* [obj.getText()]
+* [obj.setText()]
+* [obj.toString()]
+* [obj.setFillColor()]
+* [obj.setFillColorRGB()]
+* [obj.setLineColor()]
+* [obj.setLineColorRGB()]
+* [obj.setLineWidth()]
+* [obj.getLayer()]
+* [obj.setLayer()]
+* [obj.delete()]
+* [obj.setClickable()]
+* [obj.clicked()]
+* [obj.containsPoint()]
+* [obj.hit()]
+* [obj.objectHitInGroup()]
+
+###### [Code12 Function Reference](#top) > [GameObj Methods]
+
 
 ### obj.getType()
+Returns the type name of a [GameObj](#java-data-types), 
+for example, `"circle"`.
+
+#### Syntax
 ```
-String obj.getType()
+obj.getType()
 ```
-Return the type name of the `GameObj` object, which is one of:
-`"circle"`, `"rect"`, `"line"`, `"text"`, or `"image"`.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([String](#java-data-types)). One of: `"circle"`, `"rect"`, `"line"`, `"text"`, or `"image"`.
+
+#### Example
+```
+GameObj target = ct.objectClicked();
+String type = target.getType();
+if (type.equals( "circle" ))
+	ct.println( "You clicked a circle" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getType()]
+
+
+### obj.getWidth()
+Returns the [width](#graphics-coordinates) (horizontal size) of a 
+[GameObj](#java-data-types).
+
+#### Syntax
+```
+obj.getWidth()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([double](#java-data-types)). The [width](#graphics-coordinates) of the object.
+
+#### Notes
+For line objects (see [ct.line()]), the width returned is the x offset
+(positive or negative) from the first point to the second point,
+not the physical width of the line, and unrelated to the thickness
+of the line as set by [obj.setLineWidth()].
+
+#### Example
+```
+GameObj title = ct.text( "Zombie Attack", 50, 30, 10 );
+double titleWidth = title.getWidth();
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getWidth()]
+
+
+### obj.getHeight()
+Returns the [height](#graphics-coordinates) (vertical size) of a 
+[GameObj](#java-data-types).
+
+#### Syntax
+```
+obj.getHeight()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([double](#java-data-types)). The [height](#graphics-coordinates) of the object.
+
+#### Notes
+For line objects (see [ct.line()]), the height returned is the y offset
+(positive or negative) from the first point to the second point,
+not the physical height of the line.
+
+#### Example
+```
+GameObj hero = ct.image( "dragon.png", 50, 70, 10 );
+double heroHeight = hero.getHeight();
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getHeight()]
+
+
+### obj.setSize()
+Sets the size ([width](#graphics-coordinates) and [height](#graphics-coordinates)) 
+of a [GameObj](#java-data-types).
+
+#### Syntax
+```
+obj.setSize( width, height );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### width
+([double](#java-data-types)). The new [width](#graphics-coordinates) for the object. 
+
+##### height
+([double](#java-data-types)). The new [height](#graphics-coordinates) for the object. 
+
+#### Notes
+The different types of [GameObj](#java-data-types) objects
+react somewhat differently to changes in size, as follows:
+
+> ##### circle Objects
+> Although circles are always created round (see [ct.circle()]), you can create 
+> an ellipse by setting different `width` and `height` values.
+
+> ##### rect Objects
+> Rectangles (see [ct.rect()]) can be adjusted to any `width` and `height`.
+
+> ##### line Objects
+> For line objects (see [ct.line()]), the `width` and `height` specify 
+> offsets (positive or negative) from the first point to the second point.
+> The [obj.x] and [obj.y] data fields specify the location of the first point.
+> Calling `obj.setSize( width, height )` can be used to change the 
+> second point relative to the first point.
+
+> ##### text Objects
+> Text objects (see [ct.text()]) ignore the `width` passed. 
+> The `height` is used to set the new height and determine the 
+> new font size for the object, 
+> and the object's width is recalculated automatically.
+
+> ##### image Objects
+> Images (see [ct.image()]) are initially created with `height` calculated 
+> automatically to preserve the image's aspect ratio given the specified `width`.
+> However, once created, you can set any values for `width` and `height`,
+> and the image will scale and/or stretch as necessary to match the specified size.
+
+#### Example
+```
+GameObj blob = ct.circle( 50, 50, 30 );
+blob.setSize( 50, 30 );      // makes an ellipse
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSize()]
+
+
+### obj.setSpeed()
+Sets the speed of a [GameObj](#java-data-types) so that
+it moves on its own.
+
+#### Syntax
+```
+obj.setSpeed( xSpeed, ySpeed );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### xSpeed
+([double](#java-data-types)). The horizontal speed for the object in 
+[x coordinate](#graphics-coordinates) units per animation frame. 
+
+##### ySpeed
+([double](#java-data-types)). The vertical speed for the object in 
+[y coordinate](#graphics-coordinates) units per animation frame.  
+
+#### Notes
+Before each new animation frame, the `xSpeed` and `ySpeed` are added to
+the [obj.x] and [obj.y] fields of the object, respectively. 
+Animation frames occur 60 times per second, so an `xSpeed` of `1.0` will 
+cause the object to  move to the right at 60 units per second.
+
+The `xSpeed` and `ySpeed` can be negative, so for example, a `ySpeed`
+of `-0.5` will cause the object to move up at 30 units per second.
+
+#### Example
+```
+GameObj dot = ct.circle( 0, 50, 10 );
+dot.setSpeed( 0.3, 0 );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSpeed()]
+
+
+### obj.align()
+Sets the alignment of a [GameObj](#java-data-types),
+which determines where it is located relative to its 
+[(x, y) coordinates](#graphics-coordinates).
+
+#### Syntax
+```
+obj.align( alignment );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### alignment
+([String](#java-data-types)). One of the following strings
+describing the placement of an object relative to its (x, y):
+
+```
+alignment         horizontal            vertical
+--------------    -----------------     ------------------------
+"top left"        to the right of x     below y
+"top"             centered at x         below y
+"top right"       to the left of x      below y
+"left"            to the right of x     vertically centered at y
+"center"          centered at x         vertically centered at y
+"right"           to the left of x      vertically centered at y
+"bottom left"     to the right of x     above y
+"bottom"          centered at x         above y
+"bottom right"    to the left of x      above y
+```
+
+#### Notes
+The default alignment is `"center"`, so that objects are horizontally
+and vertically centered around the (x, y) coordinates of the object.
+
+Line objects (see [ct.line()]) ignore the alignment setting and are 
+always drawn from the first point to the second point.
+
+#### Example
+```
+// Make the score text right-aligned in the upper right of the screen
+GameObj score = ct.text( "Score: 0", 100, 0 );
+score.align( "top right" )
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.align()]
+
 
 ### obj.getText()
-```
-String obj.getText()
-```
-Return the text of the object.
-For a `"text"` object, this is the visible text.
-For other objects, this is just a string kept inside the object,
-which can be used to identity or describe the object.
-For an `"image"` object,  the text defaults to the image filename,
-but you can change it to something else (see `obj.setText` below).
+Returns the text of a [GameObj](#java-data-types).
 
-> The `obj.toString()` method (see below) includes the object text
-> in the description of an object.
+#### Syntax
+```
+obj.getText()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([String](#java-data-types)). The text of the object.
+For a text object (see [ct.text()]), this is the visible text.
+For other objects, this is just a string kept inside the object,
+which can be used to identity or describe the object (see [obj.setText()]).
+
+#### Notes
+For an image object (see [ct.image()]), the text defaults to the 
+image filename, but you can change it to something else (see [obj.setText()]).
+
+For circle, rect, and line objects, the default text is `null` (none). 
+
+The [obj.toString()] method includes the object text, if any,
+in the description of an object.
+
+#### Example
+```
+public void start()
+{
+	GameObj dot = ct.circle( 50, 50, 10 );
+	dot.setText( "bomb" );
+}
+
+public void update()
+{
+	GameObj target = ct.objectClicked();
+	String text = target.getText();
+	if (text != null && text.equals( "bomb" ))
+		ct.println( "You clicked a bomb" );
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getText()]
+
 
 ### obj.setText()
+Sets the text of a [GameObj](#java-data-types).
+
+#### Syntax
 ```
-obj.setText( String text )
+obj.setText( text )
 ```
-Set the text of an object to `text`. If the object is a text object,
-setting the text will cause the visible text to change.
-For other object types, the text is simply stored in the object
-(See `obj.getText()` above).
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### text
+([String](#java-data-types)). The text to store in the object.
+For a text object (see [ct.text()]), this becomes the visible text.
+For other objects, this is just a string kept inside the object,
+which can be used to identity or describe the object (see [obj.getText()]).
+
+#### Notes
+For an image object (see [ct.image()]), the text defaults to the 
+image filename, but you can change it to something else.
+
+For circle, rect, and line objects, the default text is `null` (none). 
+
+The [obj.toString()] method includes the object text, if any,
+in the description of an object.
+
+#### Example
+```
+GameObj message;
+
+public void start()
+{
+	message = ct.text( "Waiting for a click", 50, 50, 10 );
+}
+
+public void update()
+{
+	if (ct.clicked())
+		message.text = "You clicked";
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setText()]
+
 
 ### obj.toString()
-```
-String obj.toString()
-```
-Return a string description of the object suitable for printing
-for diagnostic purposes (via `ct.println()`, `ct.log()`, etc.)
-The string will include the type name of the object,
-the (`x`, `y`) coordinates rounded to the nearest integer,
-and the text of the object, if any. The entire string
-is enclosed in square brackets.
+Returns a text ([String](#java-data-types)) description of a graphics object 
+([GameObj](#java-data-types)).
 
-##### Examples:
+#### Syntax
+```
+obj.toString()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([String](#java-data-types)). A description of the object.
+The string will include the type name of the object,
+the (x, y) coordinates rounded to the nearest integer,
+and the text of the object, if any (see [obj.setText()]). 
+The entire string is enclosed in square brackets. Examples:
 ```
 [circle at (70, 25)]
 [text at (50, 10) "Score 3200"]
@@ -2046,231 +2598,564 @@ is enclosed in square brackets.
 [image at (21, 83) "hero"]
 [rect at (50, 100) "bottom wall"]
 ```
+#### Notes
+The text output functions [ct.print()], [ct.println()], 
+[ct.log()], and [ct.logm()] automatically call `obj.toString()`
+internally if you print a [GameObj](#java-data-types) directly,
+so there is no need to explicitly call `obj.toString()` to print
+a [GameObj](#java-data-types) description with these functions.
 
-### obj.getWidth()
-Returns the width of the object. See [obj.setSize()].
-
-
-### obj.getHeight()
-Returns the height of the object. See [obj.setSize()].
-
-
-### obj.setSize()
+#### Example
 ```
-obj.setSize( double width, double height )
+GameObj message;
+
+public void start()
+{
+	message = ct.text( "", 50, 20, 10 );
+	ct.circle( 30, 50, 10 );
+	ct.rect( 70, 50, 10, 10 );
+}
+
+public void update()
+{
+	GameObj target = ct.objectClicked();
+	if (target != null)
+		message.text = target.toString();
+}
 ```
-Set the size of the object using `width` and `height`.
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.toString()]
 
-Note that different types of objects react differently to changes
-in width or height, as follows:
-
-##### circle Objects
-Although circles are always created round, you can create an ellipse
-by setting different `width` and `height` values.
-
-##### rect Objects
-Rectangles can be any size and adjust to any `width` and `height`.
-
-##### line Objects
-Line objects are created between two points. After creation,
-the `x` and `y` fields are the location of the first point,
-and the `width` and `height` fields specify signed offsets
-(can be negative) from the first point to the second point.
-Thus, the location of the second point is
-(`x` + `width`, `y` + `height`). You can change any of the
-`x`, `y`, `width`, or `height` fields, and the line will adjust.
-
-> Note that unlike any of the other `GameObj` object types,
-> a line may have negative values for the `width` and `height`
-> fields. The physical width and height of the line's bounding
-> box can be reliably determined with  
-> `Math.abs(line.width)` and `Math.abs(line.height)`.
-> This does not include the thickness of the drawn line itself
-> (see [obj.setLineWidth()]).
-
-##### text Objects
-Text objects use a font size that is automatically determined by
-the object's `height`, and the object's `width` is calculated
-automatically. So, changing `height` will change the font size,
-and changes to the `width` field are undefined.
-
-> **Note:** When you change a text object's `height`, the `width`
-> will be recalculated automatically. However, the new value for
-> `width` is not available immediately. It will be recalculated
-> the next time the object draws (at the next animation frame).
-
-##### image Objects
-Images are initially created with `height` calculated automatically
-to preserve the image's aspect ratio given the specified `width`.
-However, once created, you can set any values for `width` and `height`,
-and the image will scale and/or stretch as necessary to fill the space.
-
-
-### obj.align()
-```
-obj.align( String alignment )
-```
-Set the alignment of the object to `alignment`.
-The alignment is a description of where where the object is
-positioned on screen relative to its `x` and `y` coordinates.
-By default, objects are positioned by their center point,
-so that (`x`, `y`) is at the horizontal and vertical center
-of the object.
-
-The following alignments are supported, which describe the
-location of (`x`, `y`) on the object:
-
-```
-"top left"
-"top"             or "top center"
-"top right"
-"left"            (vertically centered)
-"center"          (vertically centered)
-"right"           (vertically centered)
-"bottom left"
-"bottom"          or "bottom center"
-"bottom right"
-```
 
 ### obj.setFillColor()
+Sets the fill color of a [GameObj](#java-data-types)
+to one of the pre-defined [color names](#color-names).
+
+#### Syntax
 ```
-obj.setFillColor( String color )
+obj.setFillColor( color );
 ```
-Set the fill color of the object (text color for text objects) to the
-pre-defined color named `color`. See [Color Names](#color-names).
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### color
+([String](#java-data-types)). A [color name](#color-names), for example `"blue"`.
 If `color` is `null` then the fill is removed from the object.
 
+#### Notes
+For a text object (see [ct.text()]), the color of the text is set.
+
+> If you want a solid "background color" for a text object,
+> use [ct.rect()] to create a rectangle behind the text object.
+
+#### Example
+```
+GameObj dot = ct.circle( 50, 50, 20 );
+dot.setFillColor( "blue" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setFillColor()]
+
+
 ### obj.setFillColorRGB()
+Sets the fill color of a [GameObj](#java-data-types)
+to a custom RGB color with red, green, and blue component values.
+
+#### Syntax
 ```
-obj.setFillColorRGB( int red, int green, int blue )
+obj.setFillColorRGB( red, green, blue );
 ```
-Set the fill color of the object (text color for text objects) to 
-the custom RGB color with components `red`, `green`, and `blue` 
-in the range 0-255.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### red
+([int](#java-data-types)). The red component for the color, from 0 to 255.
+
+##### green
+([int](#java-data-types)). The green component for the color, from 0 to 255.
+
+##### blue
+([int](#java-data-types)). The blue component for the color, from 0 to 255.
+
+#### Notes
+For a text object (see [ct.text()]), the color of the text is set.
+
+> If you want a solid "background color" for a text object,
+> use [ct.rect()] to create a rectangle behind the text object.
+
+#### Example
+```
+GameObj blob = ct.circle( 50, 50, 20 );
+blob.setFillColorRGB( 0, 60, 255 );     // greenish-blue
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setFillColorRGB()]
+
 
 ### obj.setLineColor()
+Sets the line color of a [GameObj](#java-data-types)
+to one of the pre-defined [color names](#color-names).
+
+#### Syntax
 ```
-obj.setLineColor( String color )
+obj.setLineColor( color );
 ```
-Set the line color of the object (the outline stroke color for objects
-other than line objects) to the pre-defined color named `color`.
-See [Color Names](#color-names).
-If `color` is `null` then the stroke is removed from the object.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### color
+([String](#java-data-types)). A [color name](#color-names), for example `"blue"`.
+If `color` is `null` then the outline is removed from the object.
+
+#### Notes
+For line objects (see [ct.line()]), the color of the line is set.
+For other object types, the color of the outlined border of the object is set.
+
+#### Example
+```
+GameObj dot = ct.circle( 50, 50, 20 );
+dot.setLineColor( "green" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineColor()]
+
 
 ### obj.setLineColorRGB()
+Sets the line color of a [GameObj](#java-data-types)
+to a custom RGB color with red, green, and blue component values.
+
+#### Syntax
 ```
-obj.setLineColorRGB( int red, int green, int blue )
+obj.setLineColorRGB( red, green, blue );
 ```
-Set the line color of the object (the outline stroke color for objects
-other than line objects) to the custom RGB color with components
-`red`, `green`, and `blue` in the range 0-255.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### red
+([int](#java-data-types)). The red component for the color, from 0 to 255.
+
+##### green
+([int](#java-data-types)). The green component for the color, from 0 to 255.
+
+##### blue
+([int](#java-data-types)). The blue component for the color, from 0 to 255.
+
+#### Notes
+For line objects (see [ct.line()]), the color of the line is set.
+For other object types, the color of the outlined border of the object is set.
+
+#### Example
+```
+GameObj blob = ct.circle( 50, 50, 20 );
+blob.setLineColorRGB( 0, 60, 255 );     // greenish-blue outline
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineColorRGB()]
+
 
 ### obj.setLineWidth()
-```
-obj.setLineWidth( int lineWidth )
-```
-If an object has a line color (see [obj.setLineColor()]
-and [obj.setLineColorRGB()]), then the object will be outlined in this color
-with a stroke of approximately `lineWidth` pixels. The default is 1.
+Sets the line width (thickness) of a [GameObj](#java-data-types).
 
-> Unlike normal coordinate values, `lineWidth` values are measured in
-> approximate device "pixels", so apparent line thickness does not scale
-> up as the window size is increased. The definition of "pixels" depends
-> on the platform and may vary, but the overall intent is that on a
-> screen of "normal" resolution (e.g. HD resolution, not 4K or Retina),
+#### Syntax
+```
+obj.setLineWidth( lineWidth );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### lineWidth
+([int](#java-data-types)). The line thickness in pixels.
+
+#### Notes
+If an object has a line color (see [obj.setLineColor()] 
+and [obj.setLineColorRGB()]), then the object will be outlined
+with a stroke (pen thickness) of approximately `lineWidth` pixels. 
+The default is line width 1.
+
+> Unlike normal [coordinate values](#graphics-coordinates), 
+> line thickness values are measured in approximate device "pixels", 
+> so apparent line thickness does not scale up as the window size is increased. 
+> The definition of "pixels" depends on the platform and the display, 
+> but the overall intent is that on a display of "normal" resolution 
+> (e.g. HD resolution, not 4K or Retina),
 > a `lineWidth` of 1 will result in an appoximate 1 pixel border.
-> High resolution screens may use multiple pixels, and some platforms
+> High resolution displays may use multiple pixels, and some displays
 > may use partial pixels for a smoother appearance (anti-aliasing).
+
+#### Example
+```
+GameObj frame = ct.rect( 50, 50, 60, 30 );
+frame.setLineWidth( 5 );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineWidth()]
 
 
 ### obj.getLayer()
+Returns the layer number for a [GameObj](#java-data-types). 
+See [obj.setLayer()].
+
+#### Syntax
 ```
-int obj.getLayer()
+obj.getLayer()
 ```
-Return the layer number for the object. See `obj.setLayer()` below.
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([int](#java-data-types)). The layer number as set by [obj.setLayer()], which
+helps determine the stacking order of objects.
+
+#### Example
+```
+GameObj target = ct.objectClicked();
+if (target != null && target.getLayer() == 0)
+	ct.println( "You clicked on one of the background items" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getLayer()]
+
 
 ### obj.setLayer()
+Sets the layer number for a [GameObj](#java-data-types),
+which helps controls the stacking order of objects on the screen.
+
+#### Syntax
 ```
-obj.setLayer( int layer )
+obj.setLayer( layer )
 ```
-Set the layer number for the object. The layer number can be used to
-easily control the stacking order of groups of objects. The default
-layer is 1, and you can set any integer value. After the background
-color or image, object layers are drawn from the lowest value first
-(in the back) to the highest values (in the front).
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### layer
+([int](#java-data-types)). The layer number to set for the object.
+
+#### Notes
+By default, [GameObj](#java-data-types) objects are all assigned 
+a layer number of 1 when they are created. You can use `obj.setLayer()`
+to change an object's layer number to any integer value. The layer
+numbers themselves have no special meaning; they are just used to
+order objects relative to other layer numbers.
+
+After the screen background color or image is drawn (as set by [ct.setBackColor()],
+[ct.setBackColorRGB()], or [ct.setBackImage()]), graphics object layers are 
+drawn from the lowest layer number first (in the back) to the highest number 
+(in the front).
 
 Within a layer, objects are drawn in the order that they were created
-or set to that layer number. Calling `obj.setLayer()` always re-inserts
-an object at the top of that layer.
+or set to that layer number. Calling `obj.setLayer( layer )` always re-inserts
+an object at the top of `layer`, on top of any other objects with that same
+layer number.
+
+You can use any layer number values to help organize your screen how you
+want. As an example, you might assign various background object in a game
+to layer 0, floating objects such as score readouts and messages to layer 2, 
+and leave the normal game objects in the default layer 1. Thus if you create 
+new game objects during the game, they will be properly placed above the 
+background objects but below the floating objects.
+
+#### Examples
+```
+public void start()
+{
+	// Make some walls in the back
+	GameObj border = ct.rect( 50, 0, 100, 20 );
+	border.setLayer( 0 );
+	border = ct.rect( 50, 100, 100, 20 );
+	border.setLayer( 0 );
+	border = ct.rect( 0, 0, 20, 100 );
+	border.setLayer( 0 );
+	border = ct.rect( 100, 0, 20, 100 );
+	border.setLayer( 0 );
+
+	// Make the score readout
+	GameObj score = ct.text( "Score: 0", 50, 30, 10 );
+	score.setLayer( 2 );
+}
+
+public void update()
+{
+	// Make dots whereever the user clicks
+	if (ct.clicked())
+		ct.circle( ct.clickX(), ct.clickY(), 10 );
+}
+```
+```
+// Move an object to the top of the layer it is currently in
+target.setLayer( target.getLayer() );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLayer()]
+
 
 ### obj.delete()
-```
-obj.delete()
-```
-Remove and delete the object from the screen.
+Removes and deletes a [GameObj](#java-data-types) 
+from the screen.
 
-> Attempting to access the fields or methods of an object after it has
-> been deleted may result in unpredictable behavior.
+#### Syntax
+```
+obj.delete();
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+#### Notes
+The object is removed from the screen and deleted.
+Unlike hiding an object using the [obj.visible] field,
+deleting an object is permanent, and it cannot be brought back.
+
+> Once an object has been deleted, any variables referencing that
+> object will still exist, but accessing the fields or methods of
+> the object is undefined and may result in unpredictable behavior.
+
+#### Example
+```
+public void update()
+{
+	// Delete any objects that get clicked
+	GameObj target = ct.objectClicked();
+	if (target != null)
+		target.delete();
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.delete()]
+
+
+### obj.setClickable()
+Specifies whether or not a [GameObj](#java-data-types) 
+should accept mouse/touch input.
+
+#### Syntax
+```
+obj.setClickable( clickable );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### clickable
+([boolean](#java-data-types)). `true` to allow the object to accept 
+mouse/touch input, or `false` to disable it.
+
+#### Notes
+By default, all [GameObj](#java-data-types) objects will detect and accept 
+mouse/touch input (clicks), but you can disable click detection for an object 
+by using `obj.setClickable( false )`.
+
+The functions [ct.objectClicked()] and [obj.clicked()], and the input event 
+functions [ct.onMousePress()], [ct.onMouseDrag()], and [ct.onMouseRelease()] 
+can all be be used to identify if a [GameObj](#java-data-types) was clicked 
+and which object it was. 
+
+If more than one object intersects the click location, then normally
+the topmost object will be considered to be the target of the click.
+However if an object has had click input disabled with `obj.setClickable( false )`, 
+then the click will "pass through" to the next lower object that intersects
+the click location (if any), or to the background if none.
+
+#### Example
+```
+GameObj button;
+
+public void start()
+{
+	// Make a button with both text and a background rect, but let the rect
+	// handle the click detection, so we don't have to test both.
+	button = ct.rect( 50, 50, 30, 15 );
+	GameObj text = ct.text( "Click me", 50, 50, 10 );
+	text.setClickable( false );   // change to true to see the difference
+}
+
+public void update()
+{
+	if (button.clicked())
+		ct.println( "Button was clicked");
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setClickable()]
+
 
 ### obj.clicked()
-```
-boolean obj.clicked()
-```
-Return `true` if the object was clicked or touched during
-the last animation frame. Only objects with both the `visible` and `clickable`
-fields set to `true` will receive mouse/touch input.
+Returns `true` if a [GameObj](#java-data-types) was clicked/touched 
+during the last animation frame. 
 
+#### Syntax
+```
+obj.clicked()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([boolean](#java-data-types)). `true` if the object was clicked/touched during
+the last animation frame, or `false` if not.
+
+#### Notes
 Calling this method for an object every time during your [update()] 
 function will detect any clicks on the object.
 
-> If more than one visible and clickable object intersects with the
-> location of a click or touch, the topmost one will receive the click.
-> Objects that are not both visible and clickable are ignored when
-> determining the object that was clicked.
+> Calling `obj.clicked()` in your [start()] function will have no effect,
+> because [start()] is only called once before animation frames have begun.
+
+If an object is currently hidden because [obj.visible] was set to `false`,
+or if the object has click input disabled (see [obj.setClickable()]),
+then `obj.clicked()` will always return `false`.
+
+If more than one visible and clickable object intersects with the
+location of a click or touch, the topmost one will receive the click.
+
+#### Example
+```
+GameObj dot;
+
+public void start()
+{
+	dot = ct.circle( 50, 50, 10 );
+}
+
+public void update()
+{
+	if (dot.clicked())
+		ct.println( "The dot was clicked");
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.clicked()]
+
 
 ### obj.containsPoint()
-```
-boolean obj.containsPoint( double x, double y )
-```
-Return `true` if the point (`x`, `y`) lies within the interior
-of the object, or on the border.
+Returns `true` if a specified (x, y) location is within the interior
+of a [GameObj](#java-data-types).
 
-> Text and image objects use the rectangular bounds of the object
-> for the test. Circles (or ellipses) use the curved shape.
-> Lines have no interior and always return `false`.
+#### Syntax
+```
+obj.containsPoint( x, y )
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the point to test. 
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates)
+of the point to test. 
+
+##### *Return Value*
+([boolean](#java-data-types)). `true` if (`x`, `y`) is inside the object, 
+or `false` if not.
+
+#### Notes
+Text ([ct.text()]) and image ([ct.image()]) objects test the rectangular 
+bounds of the object.
+
+Except for line objects ([ct.line()]), the thickness of the border of the
+object (see [obj.setLineWidth()]) is not included as part of the object area.
+
+#### Example
+```
+if (hero.containsPoint( 50, 50 ))
+	ct.println( "Hero is over the center of the screen" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.containsPoint()]
+
 
 ### obj.hit()
-```
-boolean obj.hit( GameObj objTest )
-```
-Return `true` if the object currently intersects with another 
-object `objTest`. If you call this method every time in your [update()] 
-function, it can be used to test if/when two objects "hit" each other.
+Return `true` if a [GameObj](#java-data-types) currently intersects 
+another specified [GameObj](#java-data-types).
 
-### obj.objectHitInGroup( String group )
+#### Syntax
 ```
-GameObj obj.objectHitInGroup( String group )
+obj.hit( objTest )
 ```
-If the object currently intersects with another `GameObj` object
-on the current screen that has its [group](#group) field equal to `group`,
-then return a reference to the other object, otherwise return `null`.
-If the specified `group` is `null` then all objects on the current screen
-will be considered.
+##### obj
+([GameObj](#java-data-types)). A graphics object. 
 
-> Note that `obj.objectHitInGroup()` will return `null` if no 
-> matching object intersects `obj`, so you must check the return value
-> for `null` before using the `GameObj` returned.
+##### objTest
+([GameObj](#java-data-types)). Another graphics object. 
 
+##### *Return Value*
+([boolean](#java-data-types)). `true` if `obj` and `objTest` are
+currently overlapping (or partially overlapping) on the screen.
 
-Java Math Methods and Fields Supported
---------------------------------------
-Code12 supports the following fields and method functions from the Java `Math` class.
+#### Notes
+Calling this method every time in your [update()] function
+can be used to test if/when two objects "hit" each other.
+
+Text ([ct.text()]) and image ([ct.image()]) objects test the rectangular 
+bounds of the object.
+
+Except for line objects ([ct.line()]), the thickness of the border of the
+object (see [obj.setLineWidth()]) is not included as part of the object area.
+
+#### Example
 ```
-Field       Type
--------     ------
-Math.E      double
-Math.PI     double
+GameObj block, dot;
 
+public void start()
+{
+	block = ct.rect( 70, 50, 10, 10 );
+	dot = ct.circle( 20, 50, 10 );
+	dot.setSpeed( 1, 0 );
+}
+
+public void update()
+{
+	if (dot.hit( block ))
+	{
+		ct.println( "The dot hit the block" );
+		dot.setSpeed( 0, 0 );
+	}
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.hit()]
+
+
+### obj.objectHitInGroup()
+Determines if a [GameObj](#java-data-types) currently intersects 
+another [GameObj](#java-data-types) in the specified group.
+
+#### Syntax
+```
+obj.objectHitInGroup( group )
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### group
+([String](#java-data-types)). A group name for objects (see [obj.group]),
+or `null` to consider all objects. 
+
+##### *Return Value*
+([GameObj](#java-data-types)). If `obj` currently intersects
+(overlaps or partially overlaps) another [GameObj](#java-data-types)
+that has [obj.group] equal to `group` (or any object if `group` is `null`), 
+then the other [GameObj](#java-data-types) is returned, otherwise `null` 
+is returned.
+
+> Note that `null` is returned if no intersecting object is found, 
+> so you must check the return value for `null` before using the 
+> [GameObj](#java-data-types) returned. 
+
+#### Notes
+Calling this method every time in your [update()] function
+can be used to test if/when an object "hits" any other objects
+that you are interested in.
+
+Text ([ct.text()]) and image ([ct.image()]) objects test the rectangular 
+bounds of the object.
+
+Except for line objects ([ct.line()]), the thickness of the border of the
+object (see [obj.setLineWidth()]) is not included as part of the object area.
+
+#### Example
+```
+GameObj target = bullet.objectHitInGroup( "targets" );
+if (target != null)
+	target.delete();
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.objectHitInGroup()]
+
+
+Java Math Methods
+-----------------
+Code12 supports the following method functions and fields from the Java `Math` class.
+
+For more information, see the 
+[Java Math Class](https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html).
+
+```
 Function               Parameter Type(s)   Return Type
 --------------------   -----------------   -----------
 Math.abs( number )     double              double
@@ -2296,15 +3181,26 @@ Math.sinh( angle )     double              double
 Math.sqrt( number )    double              double
 Math.tan( angle )      double              double
 Math.tanh( angle )     double              double
+
+Field       Type
+-------     ------
+Math.E      double
+Math.PI     double
+
 ```
-For more information, see the [Java Math Class](https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html).
+
+###### [Code12 Function Reference](#top) > [Java Math Methods]
 
 
-Java String Methods Supported
------------------------------
+Java String Methods
+-------------------
 Code12 supports the following method functions from the Java `String` class.
 String methods must operate on a variable of type [String](#java-data-types),
 shown below as `str`.
+
+For more information, see the 
+[Java String Class](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html).
+
 ```
 Function                      Parameter Type(s)   Return Type
 ---------------------------   -----------------   -----------
@@ -2318,27 +3214,70 @@ str.toLowerCase()                                 String
 str.toUpperCase()                                 String
 str.trim()                                        String
 ```
-For more information, see the [Java String Class](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html).
+
+###### [Code12 Function Reference](#top) > [Java String Methods]
 
 
 Main Program Functions
 ----------------------
+The functions [start()] and [update()] are two functions that your program
+provides to contain the code for your program. Unlike other Code12 functions,
+you do not call the [start()] or [update()] functions. Instead, you *write*
+these functions by providing the function body in { brackets }, and *Code12
+will call them* when appropriate.
+
+Your [start()] function is called once at the beginning of each new run of
+your program, and then [update()] is called before each new animation frame
+is drawn (60 times per second).
+
+The sequence of events for a Code12 program is:
+
+1. Any class-level variables that you declare are initialized.
+2. Code in your [start()] function is executed.
+3. Code12 draws the graphics screen for the first time.
+4. The following steps are now repeated until the program is stopped:
+	a. The system waits until the next animation frame (about 1/60th of a second).
+ 	b. Code in your [update()] function is executed.
+	c. The system redraws the graphics screen.
+
+###### [Code12 Function Reference](#top) > [Main Program Functions]
+
 
 ### start()
+Your `start()` function is executed once at the beginning of the program.
+
+#### Syntax
 ```
-void start()
+public void start()
+{
+	// Code you write here runs once at the beginning of the program
+}
 ```
-The `start` function is called once at the beginning of your program.
-This is good place to create most of the objects for your program
-(except for any objects that get created as a result of an action that
-occurs while the application is running).
+#### Example
+```
+public void start()
+{
+	ct.rect( 50, 50, 70, 30 );
+	ct.text( "Welcome to Code12!", 50, 50, 10 );
+	ct.println( "This is the text output area" );
+}
+```
+###### [Code12 Function Reference](#top) > [start()]
+
 
 ### update()
+Your `update()` function is executed before each animation frame 
+is drawn (60 times per second).
+
+#### Syntax
 ```
-void update()
+public void update()
+{
+	// Code you write here runs before each animation frame is drawn
+}
 ```
-The `update` function is called at the beginning of each animation frame.
-Animation frames start after the `start()` function has completed and then
+#### Notes
+Animation frames start after the [start()] function has completed and then
 repeat continuously 60 times per second.
 
 One use of animation frames is to achieve object motion and animation.
@@ -2346,142 +3285,383 @@ For example, if you move an object 1 display unit to the right in
 your [update()] function, then the object will move continuously
 at 60 units per second.
 
+> A common mistake is to create [GameObj](#java-data-types) objects 
+> in the [update()] function in a way that causes many copies of an object 
+> to be created over and over. Note that you should not call functions 
+> like [ct.image()] to "draw" an image for each frame in an animation. 
+> Instead, you typically want to call [ct.image()] to create the object 
+> once in your [start()] function then modify the existing image
+> (e.g. change its [obj.x] and [obj.y]) in your [update()] function.
+
 Another use of animation frames is to test repeatedly for user input,
-using functions such as `ct.clicked()`, `ct.keyPressed()`,
-and `ct.keyTyped()`, and the `GameObj` method `obj.clicked()`.
+using functions such as [ct.clicked()], [ct.keyPressed()],
+and [ct.keyTyped()], and [obj.clicked()].
 
 You can also use animation frames to test repeatedly for object interactions
-that can occur when objects are moving. You can
-examine object fields such as `x` and `y` directly, call the `GameObj` methods
-`obj.containsPoint()` and `obj.hit()`, call the function `ct.distance()` or
-write any code you want that tests what you need to detect.
+that can occur when objects are moving. You can call functions such as
+[obj.containsPoint()] and [obj.hit()], or examine object locations
+using [obj.x] and [obj.y] and write any code you want that tests what you 
+need to detect.
 
-Finally, note that you can call `ct.getTimer()` to detect the passage
-of certain amounts of time if you want.
+Finally, note that you can call [ct.getTimer()] to detect the passage
+of certain amounts of time if you want to do something less frequently 
+than every animation frame.
 
-> A common mistake is to create `GameObj` objects in the [update()] 
-> function in a way that causes many copies of the object to be created over
-> and over. Note that you should *not* call functions like `ct.circle()` to
-> "draw" a circle for each frame in an animation. Instead, you typically
-> want to call `ct.circle()` to create the object once in your `start` function,
-> then modify the existing circle in your [update()] function.
+#### Examples
+```
+int frameCount = 0;
+
+public void start()
+{
+	ct.println( "Program started" );
+}
+
+public void update()
+{
+	frameCount++;
+	ct.println( "Frame #" + frameCount );
+}
+```
+```
+GameObj dot;
+
+public void start()
+{
+	dot = ct.circle( 0, 50, 10 );
+}
+
+public void update()
+{
+	dot.x++;
+}
+```
+###### [Code12 Function Reference](#top) > [update()]
+
 
 Input Event Functions
 ---------------------
-The following functions, if defined in your program, will be called when
-indicated. Note that unlike all of the other functions and methods above,
-These functions are *implemented* in your program (you write the body of the
-function) and are *called* by the runtime system with appropriate.
-They are called in response to "events" happening in your application.
+Input event functions are optional functions that you can provide to 
+handle mouse/touch and keyboard input and to respond to system events.
+Like your [Main Program Functions], input event functions are *written*
+by you and *called by the Code12 system*. 
 
-Implementing any of these functions is optional and "for your information".
-They are not necessary to use other functions and features of the system.
-For example, if you don't implement any of the mouse event functions,
-you can still call functions such as `ct.clicked()` to test for mouse clicks.
+> Using input event functions is optional and not required to handle
+> mouse/touch or keyboard input. You can also use the 
+> [Mouse and Keyboard Input] functions. Using input event functions
+> is a more advanced technique that can be more flexible and more
+> efficent.
 
-> **Tip:** If your program has complex mouse or keyboard handling
-> (for example, many objects to check for clicks and many keys to test),
-> then doing your work in the event functions will be more efficient
-> than making many tests in your [update()] function.
+If defined in your program, the following functions will be called 
+by the system when the corresponding input event occurs:
+
+* [onMousePress()]
+* [onMouseDrag()]
+* [onMouseRelease()]
+* [onKeyPress()]
+* [onKeyRelease()]
+* [onCharTyped()]
+* [onResize()]
+
+###### [Code12 Function Reference](#top) > [Input Event Functions]
+
 
 ### onMousePress()
-```
-void onMousePress( GameObj obj, double x, double y )
-```
-This event is called each time a mouse click or touch is detected.
-The point (`x`, `y`) is the location of the click in display coordinates
-(relative to the top-left of the application window).
+If defined in your program, this function is called whenever the user
+clicks in the graphics screen (or touches it with a touch screen).
 
-If `obj` is not `null`, then it indicates that the click occured on
-that object. Note that `GameObj` objects must have both their
-`visible` and `clickable` fields `true` to receive clicks.
-If `obj` is null, then the click occured outside of any clickable object.
+#### Syntax
+```
+public void onMousePress( GameObj obj, double x, double y )
+{
+	// Your code goes here
+}
+```
+##### obj
+([GameObj](#java-data-types)). The [GameObj](#java-data-types) that was
+clicked, or `null` if none (if the background was clicked).
+
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the click. 
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates)
+of the click. 
+
+#### Example
+```
+public void start()
+{
+	ct.circle( 30, 50, 10 );
+	ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMousePress( GameObj obj, double x, double y )
+{
+	if (obj != null)
+		ct.logm( "Press", obj, x, y );
+	else
+		ct.logm( "Press", x, y );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onMousePress()]
+
 
 ### onMouseDrag()
-```
-void onMouseDrag( GameObj obj, double x, double y )
-```
-After a click or touch has happened, if the user's mouse or finger is still
-"down" and drags across the screen, then `onMouseDrag` will be called
-each time the position changes (you may get many calls in succession).
-The point (`x`, `y`) is the new location of the mouse/finger.
+If defined in your program, after a click or touch has happened, 
+if the user's mouse or finger is still "down" and drags across the screen, 
+then this function will be called each time the drag location changes.
 
-If `obj` is not `null`, then it indicates that the original click occured
-on that clickable object (see `onMousePress` above).
+#### Syntax
+```
+public void onMouseDrag( GameObj obj, double x, double y )
+{
+	// Your code goes here
+}
+```
+##### obj
+([GameObj](#java-data-types)). The [GameObj](#java-data-types) that the
+click that started this drag was on, or `null` if none.
 
-> Note: Once a click occurs on a clickable `GameObj`, all drag events
+> Once a click occurs on a clickable object, all drag events
 > will be sent indicating this `obj`, even if the (`x`, `y`) location
-> is no longer on the object (`GameObj` objects automatically take the
-> mouse/touch "focus" when clicked).
+> is no longer on the object.
+
+##### x
+([double](#java-data-types)). The current [x coordinate](#graphics-coordinates)
+of the drag. 
+
+##### y
+([double](#java-data-types)). The current [y coordinate](#graphics-coordinates)
+of the drag. 
+
+#### Notes
+Because the system checks frequently for changes in the mouse/touch position,
+you may get many `onMouseDrag()` events in rapid succession.
+
+#### Example
+```
+public void start()
+{
+	ct.circle( 30, 50, 10 );
+	ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMouseDrag( GameObj obj, double x, double y )
+{
+	if (obj != null)
+		ct.logm( "Drag", obj, x, y );
+	else
+		ct.logm( "Drag", x, y );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onMouseDrag()]
 
 
 ### onMouseRelease()
-```
-void onMouseRelease( GameObj obj, double x, double y )
-```
-This event is called when a mouse click or touch ends, and the mouse button
-or finger is "released". The point (`x`, `y`) is the location of the
-mouse/finger at the time of the release.
+If defined in your program, after a click or touch has happened, 
+this function will be called when the click or touch is released.
 
-If `obj` is not `null`, then it indicates that the original click occured
-on that clickable object (see `onMousePress` above).
+#### Syntax
+```
+public void onMouseRelease( GameObj obj, double x, double y )
+{
+	// Your code goes here
+}
+```
+##### obj
+([GameObj](#java-data-types)). The [GameObj](#java-data-types) that the
+click was originally on, or `null` if none.
 
-> Note: When a click occurs on a clickable `GameObj`, the release event
-> will always be sent indicating this `obj`, even if the (`x`, `y`)
-> location of the release is no longer on the object.
+> Once a click occurs on a clickable object, the release event
+> will be sent indicating this `obj`, even if the (`x`, `y`) location
+> is no longer on the object.
+
+##### x
+([double](#java-data-types)). The [x coordinate](#graphics-coordinates)
+of the mouse/touch at the time of the release. 
+
+##### y
+([double](#java-data-types)). The [y coordinate](#graphics-coordinates)
+of the mouse/touch at the time of the release.
+
+#### Example
+```
+public void start()
+{
+	ct.circle( 30, 50, 10 );
+	ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMouseRelease( GameObj obj, double x, double y )
+{
+	if (obj != null)
+		ct.logm( "Release", obj, x, y );
+	else
+		ct.logm( "Release", x, y );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onMouseRelease()]
+
 
 ### onKeyPress()
+If defined in your program, this function is called when 
+a key on the keyboard has been pressed down. 
+
+#### Syntax
 ```
-void onKeyPress( String keyName )     // key code name e.g. "a", "up"
+public void onKeyPress( String keyName )
+{
+	// Your code goes here
+}
 ```
-This event is called when a keyboard key has been pressed down.
-The event is only called once for each separate press/release,
+##### keyName
+([String](#java-data-types)). The name of the key.
+Only certain keys are supported, see [Key Names].
+
+#### Notes
+This function is only called once for each separate key press and release,
 when the key is first pressed down, reagardless of how long the key
 is held down.
 
-The `keyName` is the name of the key. See [Key Names](#key-names).
+#### Example
+```
+public void start()
+{
+	ct.println( "Press some keys" );
+}
+
+public void onKeyPress( String keyName )
+{
+	ct.logm( "Press", keyName );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onKeyPress()]
+
 
 ### onKeyRelease()
+If defined in your program, this function is called when 
+a key on the keyboard has been released after being pressed. 
+
+#### Syntax
 ```
-void onKeyRelease( String keyName )   // key code name e.g. "a", "up"
+public void onKeyRelease( String keyName )
+{
+	// Your code goes here
+}
 ```
-This event is called when the keyboard key named `keyName`
-has been released (after being pressed). See [Key Names](#key-names).
+##### keyName
+([String](#java-data-types)). The name of the key.
+Only certain keys are supported, see [Key Names].
+
+#### Example
+```
+public void start()
+{
+	ct.println( "Press some keys" );
+}
+
+public void onKeyRelease( String keyName )
+{
+	ct.logm( "Release", keyName );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onKeyRelease()]
+
 
 ### onCharTyped()
-```
-void onCharTyped( String charString )     // "a", "A", "$", etc.
-```
-This event is called when keyboard action results in a printable
-character being generated.
+If defined in your program, this function is called when 
+keyboard action results in a printable character being generated.
 
-> Unlike the key names used by `onkeyPressed` above, the `charString`
-> here is a printable character including the appropriate shift status
-> (e.g. "A" if a shifted "a" is typed, "$" or "4", "+" vs. "=", etc.).
-> Only printable characters are detected, so key sequences such as Ctrl+C
-> do not result in characters.
+#### Syntax
+```
+public void onCharTyped( String charString )
+{
+	// Your code goes here
+}
+```
+##### charString
+([String](#java-data-types)). The printable character generated, 
+for example `"a"`, `"A"`, `"$"`, `" "`, etc.
 
-> Note that some platforms may have keys that auto-repeat,
-> so you may get multiple `onCharTyped` events if a key is held down.
+#### Notes
+Unlike the key names used by [onKeyPress()], the `charString`
+here is a printable character including the appropriate shift status
+(e.g. "A" if a shifted "a" is typed, "$" or "4", "+" vs. "=", etc.).
+Only printable characters are detected, so special keys such as 
+arrow keys and key sequences such as Ctrl+C do not result in characters.
+
+Most computers have a keyboard "auto-repeat" feature, so if the user
+holds down a key, you may get the first character, then perhaps
+a 1 second delay, then repeats at maybe 8 characters per second.
+                 
+#### Example
+```
+public void start()
+{
+	ct.println( "Press some keys" );
+}
+
+public void onCharTyped( String charString )
+{
+	ct.logm( "Character", charString );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onCharTyped()]
+
 
 ### onResize()
+If defined in your program, this function is called if the application window
+is resized by the user when running in a standalone window.
+
+#### Syntax
 ```
-void onResize()
-```
-This event is called if the application window is resized by the user,
-to allow you to change any object positions or otherwise react as desired.
-The contents of your application scale automatically relative to the window
-size, so you don't need to do anything in the normal case. However, if your
-object layout depends on the window aspect ratio or the physical pixel size,
-then you can determine these as follows:
-```
-double aspectRatio = ct.getWidth() / ct.getHeight();
-int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
-int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
+public void onResize()
+{
+	// Your code goes here
+}
 ```
 
-> Some systems resize windows continuously in response to the user re-sizing
-> the window frame, so you may receive many `onResize` events in succession.
+#### Notes
+This function is *not* called when your program is running within
+the Code12 application. The Code12 application scales your application
+automatically and maintains a constant aspect ratio for your application
+if the user resizes the Code12 window or uses the pane splits.
+
+If you are using the Code12 Java runtime and your program is running
+in its own window, this function will notify you if the user resizes
+the window, to allow you to change any object positions or otherwise 
+react as desired.
+
+> Most systems resize windows continuously in response to the user dragging
+> the window frame, so you may receive many `onResize()` events in succession.
+
+Note that the contents of your application scale automatically relative 
+to the overall window size, so in many cases you don't need to do anything. 
+However, if your object layout depends on the window aspect ratio or the 
+physical pixel size of the window, then you can determine these as follows:
+
+```
+double width = ct.getWidth();
+double height = ct.getHeight();
+double aspectRatio = width / height;
+int pixelWidth = ct.round( width * ct.getPixelsPerUnit() );
+int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );
+```
+
+#### Example
+```
+public void start()
+{
+	ct.println( "Run this using the Code12 Java runtime" );
+}
+
+public void onResize()
+{
+	ct.logm( "New size", ct.getWidth(), ct.getHeight() );
+}
+```
+###### [Code12 Function Reference](#top) > [Input Event Functions] > [onResize()]
 
 
 Additional Reference Information
@@ -2491,12 +3671,12 @@ Additional Reference Information
 
 Graphics objects in Code12 are positioned on the screen by (x, y) coordinates.
 The coordinate values are not pixels, but instead are in unit values relative 
-to the size of the graphics area, which we will call the "screen". 
+to the width of the graphics area, or "screen". 
 Size values (e.g. width and height) use the same units.
 
 ##### X Coordinates, Width, and Object Scaling
 The screen area is always 100 units wide, by definition, so an x-coordinate of 50 
-is always horizontally centered in the screen. So you can think of an x-coordinate
+is always horizontally centered in the screen. You can think of an x-coordinate
 value as a percent of the window width. An x value of 0 is at the left edge, 50 is 
 in the center, and 100 is at the right edge. Similarly, a width of 50 is half as
 wide as the screen.
@@ -2535,10 +3715,12 @@ objects overlapping a screen edge are "clipped" at the edge.
 
 ##### Changing the Screen Origin to Scroll the Screen
 By default the position (0, 0) is at the upper-left corner of the screen.
-However, you can use the [ct.setScreenOrigin](#ct.setscreenorigin) function to
-change the position of the origin, which will effectively "scroll" the screen.
+However, you can use the [ct.setScreenOrigin()] function to change the position 
+of the origin, which will effectively "scroll" the screen.
 You can use this to more easily create games and other applications in which the 
 screen acts like a window into a larger world that you can move through.   
+
+###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Graphics Coordinates]
 
 
 ### Java Data Types
@@ -2562,11 +3744,12 @@ it must be enclosed in double quotes.
 Examples: `"hello"`, `"What is your name?"`, `"3"`, `"food4u*$-!)"`
 
 #### GameObj
-A `GameObj` (Game Object) is a reference to a graphical object (circle, rectangle, line, 
-text, or image) that you can create for display on the screen. To create a `GameObj`
-see [Graphic Object Creation](#graphic-object-creation). If you store a `GameObj` in
-a variable then you can also access and change the object later using 
-[GameObj Data Fields](#gameobj-data-fields) and [GameObj Methods](#gameobj-methods).
+A `GameObj` (Game Object) is a reference to a graphical object (circle, rectangle, 
+line, text, or image) that you can create for display on the screen. To create a `GameObj`,
+see [Graphics Object Creation]. If you store a `GameObj` in a variable then you can 
+also access and change the object later using the [GameObj Data Fields] and [GameObj Methods].
+
+###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Java Data Types]
 
 
 ### Color Names
@@ -2606,6 +3789,8 @@ Color Name       (red, green, blue)
 "dark yellow"    (127, 127, 0)
 
 ```
+###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Color Names]
+
 
 ### Key Names
 The following key names are supported.
@@ -2623,7 +3808,11 @@ so typing 'A' uses the "a" key, and typing '$' uses the "4" key.
 "escape"                       (esc key)
 ```
 
+###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Key Names]
+
 
 <footer>
+	Code12 Version 1.0
+
 	(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved. 
 </footer> 

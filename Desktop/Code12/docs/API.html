@@ -20,43 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Code12 Function Reference</h1>
 </header>
-<p>The Code12 API (Application Programming Interface) functions are built in to the Code12 application.</p>
-<h5 id="code12-functions">Code12 Functions</h5>
-<ul>
-<li><a href="#graphic-object-creation">Graphic Object Creation</a></li>
-<li><a href="#text-output">Text Output</a></li>
-<li><a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a></li>
-<li><a href="#screen-management">Screen Management</a></li>
-<li><a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a></li>
-<li><a href="#audio">Audio</a></li>
-<li><a href="#math-utilities">Math Utilities</a></li>
-<li><a href="#type-conversion">Type Conversion</a></li>
-<li><a href="#program-control">Program Control</a></li>
-</ul>
-<h5 id="gameobj-fields-and-methods">GameObj Fields and Methods</h5>
-<ul>
-<li><a href="#gameobj-data-fields">GameObj Data Fields</a></li>
-<li><a href="#gameobj-methods">GameObj Methods</a></li>
-</ul>
-<h5 id="math-and-string-operations">Math and String Operations</h5>
-<ul>
-<li><a href="#java-math-methods-and-fields-supported">Java Math Methods and Fields Supported</a></li>
-<li><a href="#java-string-methods-supported">Java String Methods Supported</a></li>
-</ul>
-<h5 id="input-events-and-main-program-functions">Input Events and Main Program Functions</h5>
-<ul>
-<li><a href="#main-program-functions">Main Program Functions</a></li>
-<li><a href="#input-event-functions">Input Event Functions</a></li>
-</ul>
-<h5 id="additional-reference-information">Additional Reference Information</h5>
-<ul>
-<li><a href="#graphics-coordinates">Graphics Coordinates</a></li>
-<li><a href="#java-data-types">Java Data Types</a></li>
-<li><a href="#color-names">Color Names</a></li>
-<li><a href="#key-names">Key Names</a></li>
-</ul>
-<h2 id="graphic-object-creation">Graphic Object Creation</h2>
-<p>These functions allow you to create new graphics objects for display on the screen.</p>
+<div class="summary">
+<div class="summaryColumn">
+<h5 id="graphics-object-creation"><a href="#graphics-object-creation-1">Graphics Object Creation</a></h5>
 <ul>
 <li><a href="#ct.circle">ct.circle()</a></li>
 <li><a href="#ct.rect">ct.rect()</a></li>
@@ -64,9 +30,137 @@
 <li><a href="#ct.text">ct.text()</a></li>
 <li><a href="#ct.image">ct.image()</a></li>
 </ul>
-<h6 id="code12-function-reference-graphic-object-creation"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a></h6>
+<h5 id="text-output"><a href="#text-output-1">Text Output</a></h5>
+<ul>
+<li><a href="#ct.print">ct.print()</a></li>
+<li><a href="#ct.println">ct.println()</a></li>
+<li><a href="#ct.log">ct.log()</a></li>
+<li><a href="#ct.logm">ct.logm()</a></li>
+<li><a href="#ct.setoutputfile">ct.setOutputFile()</a></li>
+</ul>
+<h5 id="alerts-and-input-dialogs"><a href="#alerts-and-input-dialogs-1">Alerts and Input Dialogs</a></h5>
+<ul>
+<li><a href="#ct.showalert">ct.showAlert()</a></li>
+<li><a href="#ct.inputint">ct.inputInt()</a></li>
+<li><a href="#ct.inputnumber">ct.inputNumber()</a></li>
+<li><a href="#ct.inputyesno">ct.inputYesNo()</a></li>
+<li><a href="#ct.inputstring">ct.inputString()</a></li>
+</ul>
+<h5 id="screen-management"><a href="#screen-management-1">Screen Management</a></h5>
+<ul>
+<li><a href="#ct.settitle">ct.setTitle()</a></li>
+<li><a href="#ct.setheight">ct.setHeight()</a></li>
+<li><a href="#ct.getwidth">ct.getWidth()</a></li>
+<li><a href="#ct.getheight">ct.getHeight()</a></li>
+<li><a href="#ct.getpixelsperunit">ct.getPixelsPerUnit()</a></li>
+<li><a href="#ct.getscreen">ct.getScreen()</a></li>
+<li><a href="#ct.setscreen">ct.setScreen()</a></li>
+<li><a href="#ct.setscreenorigin">ct.setScreenOrigin()</a></li>
+<li><a href="#ct.clearscreen">ct.clearScreen()</a></li>
+<li><a href="#ct.cleargroup">ct.clearGroup()</a></li>
+<li><a href="#ct.setbackcolor">ct.setBackColor()</a></li>
+<li><a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></li>
+<li><a href="#ct.setbackimage">ct.setBackImage()</a></li>
+</ul>
+</div>
+<div class="summaryColumn">
+<h5 id="mouse-and-keyboard-input"><a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a></h5>
+<ul>
+<li><a href="#ct.clicked">ct.clicked()</a></li>
+<li><a href="#ct.clickx">ct.clickX()</a></li>
+<li><a href="#ct.clicky">ct.clickY()</a></li>
+<li><a href="#ct.objectclicked">ct.objectClicked()</a></li>
+<li><a href="#ct.keypressed">ct.keyPressed()</a></li>
+<li><a href="#ct.chartyped">ct.charTyped()</a></li>
+</ul>
+<h5 id="audio"><a href="#audio-1">Audio</a></h5>
+<ul>
+<li><a href="#ct.loadsound">ct.loadSound()</a></li>
+<li><a href="#ct.sound">ct.sound()</a></li>
+<li><a href="#ct.setsoundvolume">ct.setSoundVolume()</a></li>
+</ul>
+<h5 id="math-utilities"><a href="#math-utilities-1">Math Utilities</a></h5>
+<ul>
+<li><a href="#ct.random">ct.random()</a></li>
+<li><a href="#ct.round">ct.round()</a></li>
+<li><a href="#ct.rounddecimal">ct.roundDecimal()</a></li>
+<li><a href="#ct.distance">ct.distance()</a></li>
+<li><a href="#ct.intdiv">ct.intDiv()</a></li>
+<li><a href="#ct.iserror">ct.isError()</a></li>
+</ul>
+<h5 id="type-conversion"><a href="#type-conversion-1">Type Conversion</a></h5>
+<ul>
+<li><a href="#ct.parseint">ct.parseInt()</a></li>
+<li><a href="#ct.parsenumber">ct.parseNumber()</a></li>
+<li><a href="#ct.canparseint">ct.canParseInt()</a></li>
+<li><a href="#ct.canparsenumber">ct.canParseNumber()</a></li>
+<li><a href="#ct.formatint">ct.formatInt()</a></li>
+<li><a href="#ct.formatdecimal">ct.formatDecimal()</a></li>
+</ul>
+<h5 id="program-control"><a href="#program-control-1">Program Control</a></h5>
+<ul>
+<li><a href="#ct.gettimer">ct.getTimer()</a></li>
+<li><a href="#ct.getversion">ct.getVersion()</a></li>
+<li><a href="#ct.pause">ct.pause()</a></li>
+<li><a href="#ct.stop">ct.stop()</a></li>
+<li><a href="#ct.restart">ct.restart()</a></li>
+</ul>
+</div>
+<div class="summaryColumn">
+<h5 id="gameobj-data-fields"><a href="#gameobj-data-fields-1">GameObj Data Fields</a></h5>
+<ul>
+<li><a href="#obj.x">obj.x</a></li>
+<li><a href="#obj.y">obj.y</a></li>
+<li><a href="#obj.visible">obj.visible</a></li>
+<li><a href="#obj.group">obj.group</a></li>
+</ul>
+<h5 id="gameobj-methods"><a href="#gameobj-methods-1">GameObj Methods</a></h5>
+<ul>
+<li><a href="#obj.gettype">obj.getType()</a></li>
+<li><a href="#obj.getwidth">obj.getWidth()</a></li>
+<li><a href="#obj.getheight">obj.getHeight()</a></li>
+<li><a href="#obj.setsize">obj.setSize()</a></li>
+<li><a href="#obj.setspeed">obj.setSpeed()</a></li>
+<li><a href="#obj.align">obj.align()</a></li>
+<li><a href="#obj.gettext">obj.getText()</a></li>
+<li><a href="#obj.settext">obj.setText()</a></li>
+<li><a href="#obj.tostring">obj.toString()</a></li>
+<li><a href="#obj.setfillcolor">obj.setFillColor()</a></li>
+<li><a href="#obj.setfillcolorrgb">obj.setFillColorRGB()</a></li>
+<li><a href="#obj.setlinecolor">obj.setLineColor()</a></li>
+<li><a href="#obj.setlinecolorrgb">obj.setLineColorRGB()</a></li>
+<li><a href="#obj.setlinewidth">obj.setLineWidth()</a></li>
+<li><a href="#obj.getlayer">obj.getLayer()</a></li>
+<li><a href="#obj.setlayer">obj.setLayer()</a></li>
+<li><a href="#obj.delete">obj.delete()</a></li>
+<li><a href="#obj.setclickable">obj.setClickable()</a></li>
+<li><a href="#obj.clicked">obj.clicked()</a></li>
+<li><a href="#obj.containspoint">obj.containsPoint()</a></li>
+<li><a href="#obj.hit">obj.hit()</a></li>
+<li><a href="#obj.objecthitingroup">obj.objectHitInGroup()</a></li>
+</ul>
+<h5 id="other-functions-supported">Other Functions Supported</h5>
+<ul>
+<li><a href="#java-math-methods">Java Math Methods</a></li>
+<li><a href="#java-string-methods">Java String Methods</a></li>
+<li><a href="#main-program-functions">Main Program Functions</a></li>
+<li><a href="#input-event-functions">Input Event Functions</a></li>
+</ul>
+</div>
+</div>
+<h6 id="code12-version-1.0">Code12 Version 1.0</h6>
+<h2 id="graphics-object-creation-1">Graphics Object Creation</h2>
+<p>These functions allow you to create a new graphics object (<a href="#java-data-types">GameObj</a>) for display on the screen.</p>
+<ul>
+<li><a href="#ct.circle">ct.circle()</a></li>
+<li><a href="#ct.rect">ct.rect()</a></li>
+<li><a href="#ct.line">ct.line()</a></li>
+<li><a href="#ct.text">ct.text()</a></li>
+<li><a href="#ct.image">ct.image()</a></li>
+</ul>
+<h6 id="code12-function-reference-graphics-object-creation"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphics-object-creation-1">Graphics Object Creation</a></h6>
 <h3 id="ct.circle">ct.circle()</h3>
-<p>Creates a new circle graphics object (GameObj).</p>
+<p>Creates a new circle graphics object (<a href="#java-data-types">GameObj</a>).</p>
 <h4 id="syntax">Syntax</h4>
 <pre><code>ct.circle( x, y, diameter );
 ct.circle( x, y, diameter, color );</code></pre>
@@ -79,15 +173,15 @@ ct.circle( x, y, diameter, color );</code></pre>
 <h5 id="color">color</h5>
 <p>(<a href="#java-data-types">String</a>, optional). A <a href="#color-names">color name</a> (for example, <code>&quot;blue&quot;</code>) for the fill color of the circle. If the <code>color</code> is not included, circle objects default to a fill color of <code>&quot;red&quot;</code>.</p>
 <h5 id="return-value"><em>Return Value</em></h5>
-<p>(<a href="#java-data-types">GameObj</a>). A reference to the circle object is returned, which can be used to access and modify the circle later (see <a href="#gameobj-data-fields">GameObj Data Fields</a> and <a href="#gameobj-methods">GameObj Methods</a>).</p>
+<p>(<a href="#java-data-types">GameObj</a>). A reference to the circle object is returned, which can be used to access and modify the circle later (see <a href="#gameobj-data-fields-1">GameObj Data Fields</a> and <a href="#gameobj-methods-1">GameObj Methods</a>).</p>
 <h4 id="examples">Examples</h4>
 <pre><code>ct.circle( 50, 30, 20 );</code></pre>
 <pre><code>ct.circle( 50, 70, 40, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj ball = ct.circle( 0, 50, 10, &quot;yellow&quot; );
 ball.xSpeed = 1;</code></pre>
-<h6 id="code12-function-reference-graphic-object-creation-ct.circle"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.circle">ct.circle()</a></h6>
+<h6 id="code12-function-reference-graphics-object-creation-ct.circle"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphics-object-creation-1">Graphics Object Creation</a> &gt; <a href="#ct.circle">ct.circle()</a></h6>
 <h3 id="ct.rect">ct.rect()</h3>
-<p>Creates a new rectangle graphics object (GameObj).</p>
+<p>Creates a new rectangle graphics object (<a href="#java-data-types">GameObj</a>).</p>
 <h4 id="syntax-1">Syntax</h4>
 <pre><code>ct.rect( x, y, width, height );
 ct.rect( x, y, width, height, color );</code></pre>
@@ -102,15 +196,15 @@ ct.rect( x, y, width, height, color );</code></pre>
 <h5 id="color-1">color</h5>
 <p>(<a href="#java-data-types">String</a>, optional). A <a href="#color-names">color name</a> (for example, <code>&quot;blue&quot;</code>) for the fill color of the rectangle. If the <code>color</code> is not included, rectangle objects default to a fill color of <code>&quot;yellow&quot;</code>.</p>
 <h5 id="return-value-1"><em>Return Value</em></h5>
-<p>(<a href="#java-data-types">GameObj</a>). A reference to the rectangle object is returned, which can be used to access and modify the rectangle later (see <a href="#gameobj-data-fields">GameObj Data Fields</a> and <a href="#gameobj-methods">GameObj Methods</a>).</p>
+<p>(<a href="#java-data-types">GameObj</a>). A reference to the rectangle object is returned, which can be used to access and modify the rectangle later (see <a href="#gameobj-data-fields-1">GameObj Data Fields</a> and <a href="#gameobj-methods-1">GameObj Methods</a>).</p>
 <h4 id="examples-1">Examples</h4>
 <pre><code>ct.rect( 50, 30, 40, 20 );</code></pre>
 <pre><code>ct.rect( 50, 70, 80, 40, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj platform = ct.rect( 0, 50, 30, 8, &quot;orange&quot; );
 platform.xSpeed = 1;</code></pre>
-<h6 id="code12-function-reference-graphic-object-creation-ct.rect"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.rect">ct.rect()</a></h6>
+<h6 id="code12-function-reference-graphics-object-creation-ct.rect"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphics-object-creation-1">Graphics Object Creation</a> &gt; <a href="#ct.rect">ct.rect()</a></h6>
 <h3 id="ct.line">ct.line()</h3>
-<p>Creates a new line graphics object (GameObj) drawn from a point (<code>x1</code>, <code>y2</code>) to a second point (<code>x2</code>, <code>y2</code>).</p>
+<p>Creates a new line graphics object (<a href="#java-data-types">GameObj</a>) drawn from a point (<code>x1</code>, <code>y2</code>) to a second point (<code>x2</code>, <code>y2</code>).</p>
 <h4 id="syntax-2">Syntax</h4>
 <pre><code>ct.line( x1, y1, x2, y2 );
 ct.line( x1, y1, x2, y2, color );</code></pre>
@@ -125,15 +219,15 @@ ct.line( x1, y1, x2, y2, color );</code></pre>
 <h5 id="color-2">color</h5>
 <p>(<a href="#java-data-types">String</a>, optional). A <a href="#color-names">color name</a> (for example, <code>&quot;blue&quot;</code>) for the color of the line. If the <code>color</code> is not included, line objects default to a color of <code>&quot;black&quot;</code>.</p>
 <h5 id="return-value-2"><em>Return Value</em></h5>
-<p>(<a href="#java-data-types">GameObj</a>). A reference to the line object is returned, which can be used to access and modify the line later (see <a href="#gameobj-data-fields">GameObj Data Fields</a> and <a href="#gameobj-methods">GameObj Methods</a>).</p>
+<p>(<a href="#java-data-types">GameObj</a>). A reference to the line object is returned, which can be used to access and modify the line later (see <a href="#gameobj-data-fields-1">GameObj Data Fields</a> and <a href="#gameobj-methods-1">GameObj Methods</a>).</p>
 <h4 id="examples-2">Examples</h4>
 <pre><code>ct.line( 10, 30, 90, 40 );</code></pre>
 <pre><code>ct.line( 10, 50, 90, 50, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj border = ct.line( 0, 75, 100, 75, &quot;red&quot; );
 border.setLineWidth( 3 );</code></pre>
-<h6 id="code12-function-reference-graphic-object-creation-ct.line"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.line">ct.line()</a></h6>
+<h6 id="code12-function-reference-graphics-object-creation-ct.line"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphics-object-creation-1">Graphics Object Creation</a> &gt; <a href="#ct.line">ct.line()</a></h6>
 <h3 id="ct.text">ct.text()</h3>
-<p>Creates a new text graphics object (GameObj), which can be used to display text on the graphics screen.</p>
+<p>Creates a new text graphics object (<a href="#java-data-types">GameObj</a>), which can be used to display text on the graphics screen.</p>
 <h4 id="syntax-3">Syntax</h4>
 <pre><code>ct.text( text, x, y, height );
 ct.text( text, x, y, height, color );</code></pre>
@@ -148,15 +242,15 @@ ct.text( text, x, y, height, color );</code></pre>
 <h5 id="color-3">color</h5>
 <p>(<a href="#java-data-types">String</a>, optional). A <a href="#color-names">color name</a> (for example, <code>&quot;blue&quot;</code>) for the color of the text. If the <code>color</code> is not included, text objects default to a text color of <code>&quot;black&quot;</code>.</p>
 <h5 id="return-value-3"><em>Return Value</em></h5>
-<p>(<a href="#java-data-types">GameObj</a>). A reference to the text object is returned, which can be used to access and modify the text object later (see <a href="#gameobj-data-fields">GameObj Data Fields</a> and <a href="#gameobj-methods">GameObj Methods</a>).</p>
+<p>(<a href="#java-data-types">GameObj</a>). A reference to the text object is returned, which can be used to access and modify the text object later (see <a href="#gameobj-data-fields-1">GameObj Data Fields</a> and <a href="#gameobj-methods-1">GameObj Methods</a>).</p>
 <h4 id="examples-3">Examples</h4>
 <pre><code>ct.text( &quot;Zombie Attack!&quot;, 50, 40, 20 );</code></pre>
 <pre><code>ct.text( &quot;Click anywhere to play&quot;, 50, 60, 5, &quot;blue&quot; );</code></pre>
 <pre><code>GameObj scoreText = ct.text( &quot;Score: 0&quot;, 100, 20, 10, &quot;green&quot; );
 scoreText.align( &quot;right&quot; );</code></pre>
-<h6 id="code12-function-reference-graphic-object-creation-ct.text"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.text">ct.text()</a></h6>
+<h6 id="code12-function-reference-graphics-object-creation-ct.text"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphics-object-creation-1">Graphics Object Creation</a> &gt; <a href="#ct.text">ct.text()</a></h6>
 <h3 id="ct.image">ct.image()</h3>
-<p>Creates a new graphics image object (GameObj) from an image file (.PNG or .JPG).</p>
+<p>Creates a new image graphics object (<a href="#java-data-types">GameObj</a>) from an image file (.PNG or .JPG).</p>
 <h4 id="syntax-4">Syntax</h4>
 <pre><code>ct.image( filename, x, y, width );</code></pre>
 <h5 id="filename">filename</h5>
@@ -174,18 +268,16 @@ scoreText.align( &quot;right&quot; );</code></pre>
 <p>If you wish to stretch or distort the image to be different from its original aspect ratio, you can do so using the <a href="#obj.setsize">obj.setSize()</a> method.</p>
 </blockquote>
 <h5 id="return-value-4"><em>Return Value</em></h5>
-<p>(<a href="#java-data-types">GameObj</a>). A reference to the image object is returned, which can be used to access and modify the image object later (see <a href="#gameobj-data-fields">GameObj Data Fields</a> and <a href="#gameobj-methods">GameObj Methods</a>).</p>
+<p>(<a href="#java-data-types">GameObj</a>). A reference to the image object is returned, which can be used to access and modify the image object later (see <a href="#gameobj-data-fields-1">GameObj Data Fields</a> and <a href="#gameobj-methods-1">GameObj Methods</a>).</p>
 <h4 id="examples-4">Examples</h4>
 <pre><code>ct.image( &quot;dragon.png&quot;, 30, 50, 10 );</code></pre>
 <pre><code>// Stretch the sky image to fill the entire screen
 GameObj sky = ct.image( &quot;sky.jpg&quot;, 50, 50, 100 );
 sky.setSize( 100, 100 );</code></pre>
-<h6 id="code12-function-reference-graphic-object-creation-ct.image"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphic-object-creation">Graphic Object Creation</a> &gt; <a href="#ct.image">ct.image()</a></h6>
-<h2 id="text-output">Text Output</h2>
+<h6 id="code12-function-reference-graphics-object-creation-ct.image"><a href="#top">Code12 Function Reference</a> &gt; <a href="#graphics-object-creation-1">Graphics Object Creation</a> &gt; <a href="#ct.image">ct.image()</a></h6>
+<h2 id="text-output-1">Text Output</h2>
 <p>These functions allow you to output text to the console area, which is below the graphics area in the Code12 application. Text in this area displays as a continuous scrolling stream of lines. You can also output to a text file on your computer.</p>
-<blockquote>
-<p>To display text on the graphics screen, use <a href="#ct.text">ct.text()</a>.</p>
-</blockquote>
+<p>Note: To display text on the graphics screen, use <a href="#ct.text">ct.text()</a>.</p>
 <ul>
 <li><a href="#ct.print">ct.print()</a></li>
 <li><a href="#ct.println">ct.println()</a></li>
@@ -193,7 +285,7 @@ sky.setSize( 100, 100 );</code></pre>
 <li><a href="#ct.logm">ct.logm()</a></li>
 <li><a href="#ct.setoutputfile">ct.setOutputFile()</a></li>
 </ul>
-<h6 id="code12-function-reference-text-output"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a></h6>
+<h6 id="code12-function-reference-text-output"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output-1">Text Output</a></h6>
 <h3 id="ct.print">ct.print()</h3>
 <p>Output text, or the text representation of any value, to the console. A newline is <em>not</em> added, so any subsequent text output will appear on the same line.</p>
 <blockquote>
@@ -214,7 +306,7 @@ ct.print( &quot;User &quot; );
 ct.print( userName )
 ct.print( &quot; has a score of &quot; );
 ct.print( score );</code></pre>
-<h6 id="code12-function-reference-text-output-ct.print"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.print">ct.print()</a></h6>
+<h6 id="code12-function-reference-text-output-ct.print"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output-1">Text Output</a> &gt; <a href="#ct.print">ct.print()</a></h6>
 <h3 id="ct.println">ct.println()</h3>
 <p>Output text, or the text representation of any value, to the console. A newline is automatically added to end the line after the value.</p>
 <blockquote>
@@ -235,7 +327,7 @@ ct.println( &quot;This is the next paragraph.&quot; );</code></pre>
 int numTrys = 3;
 
 ct.println( &quot;Your average score is &quot; + (totalScore / numTrys) );</code></pre>
-<h6 id="code12-function-reference-text-output-ct.println"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.println">ct.println()</a></h6>
+<h6 id="code12-function-reference-text-output-ct.println"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output-1">Text Output</a> &gt; <a href="#ct.println">ct.println()</a></h6>
 <h3 id="ct.log">ct.log()</h3>
 <p>Output any number of values to the console, on one line separated by commas.</p>
 <h4 id="syntax-7">Syntax</h4>
@@ -243,11 +335,7 @@ ct.println( &quot;Your average score is &quot; + (totalScore / numTrys) );</code
 <h5 id="value-value2">value, value2, …</h5>
 <p>(Any number of values, of any types). The values to output. You can pass any number of values of any type(s). The values will be output to the console on the same line, separated by commas.</p>
 <h4 id="notes">Notes</h4>
-<p>Unlike <a href="#ct.print">ct.print()</a> and <a href="#ct.println">ct.println()</a>,</p>
-<ul>
-<li>Output from <a href="#ct.log">ct.log()</a> and <a href="#ct.logm">ct.logm()</a> is colored blue in the console instead of black.</li>
-<li>String values are automatically enclosed in double quotes.</li>
-</ul>
+<p>Unlike <a href="#ct.print">ct.print()</a> and <a href="#ct.println">ct.println()</a>, output from <a href="#ct.log">ct.log()</a> and <a href="#ct.logm">ct.logm()</a> is colored blue in the console instead of black, and String values are automatically enclosed in double quotes.</p>
 <h4 id="examples-7">Examples</h4>
 <pre><code>int count = 3;
 ct.log( count );</code></pre>
@@ -257,7 +345,7 @@ int misses = 4;
 int total = hits + misses;
 
 ct.log( playerName, hits, misses, total );</code></pre>
-<h6 id="code12-function-reference-text-output-ct.log"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.log">ct.log()</a></h6>
+<h6 id="code12-function-reference-text-output-ct.log"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output-1">Text Output</a> &gt; <a href="#ct.log">ct.log()</a></h6>
 <h3 id="ct.logm">ct.logm()</h3>
 <p>Output a text message followed by any number values to the console, all on one line separated by commas.</p>
 <h4 id="syntax-8">Syntax</h4>
@@ -270,11 +358,7 @@ ct.log( playerName, hits, misses, total );</code></pre>
 <h5 id="value-value2-1">value, value2, …</h5>
 <p>(Any number of values, of any types). The values to output. You can pass any number of values of any type(s). The values will be output to the console on the same line after the <code>message</code> plus a space, separated by commas.</p>
 <h4 id="notes-1">Notes</h4>
-<p>Unlike <a href="#ct.print">ct.print()</a> and <a href="#ct.println">ct.println()</a>,</p>
-<ul>
-<li>Output from <a href="#ct.log">ct.log()</a> and <a href="#ct.logm">ct.logm()</a> is colored blue in the console instead of black.</li>
-<li>String values are automatically enclosed in double quotes.</li>
-</ul>
+<p>Unlike <a href="#ct.print">ct.print()</a> and <a href="#ct.println">ct.println()</a>, output from <a href="#ct.log">ct.log()</a> and <a href="#ct.logm">ct.logm()</a> is colored blue in the console instead of black, and String values are automatically enclosed in double quotes.</p>
 <h4 id="examples-8">Examples</h4>
 <pre><code>int count = 3;
 ct.logm( &quot;count&quot;, count );</code></pre>
@@ -283,7 +367,7 @@ int hits = 7;
 int errors = 1;
 
 ct.logm( &quot;Current stats:&quot;, runs, hits, errors );</code></pre>
-<h6 id="code12-function-reference-text-output-ct.logm"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.logm">ct.logm()</a></h6>
+<h6 id="code12-function-reference-text-output-ct.logm"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output-1">Text Output</a> &gt; <a href="#ct.logm">ct.logm()</a></h6>
 <h3 id="ct.setoutputfile">ct.setOutputFile()</h3>
 <p>If you call <code>ct.setOutputFile( filename )</code>, then any subsequent text output from <a href="#ct.print">ct.print()</a>, <a href="#ct.println">ct.println()</a>, <a href="#ct.log">ct.log()</a>, and <a href="#ct.logm">ct.logm()</a> will be written to a text file with the given filename in addition to being output to the console.</p>
 <h4 id="syntax-9">Syntax</h4>
@@ -310,8 +394,8 @@ ct.println( &quot;Difference = &quot; + (a - b) );
 ct.println( &quot;Product = &quot; + (a * b) );
 ct.println( &quot;Quotient = &quot; + (a / b) );
 ct.setOutputFilename( null );</code></pre>
-<h6 id="code12-function-reference-text-output-ct.setoutputfile"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output">Text Output</a> &gt; <a href="#ct.setoutputfile">ct.setOutputFile()</a></h6>
-<h2 id="alerts-and-input-dialogs">Alerts and Input Dialogs</h2>
+<h6 id="code12-function-reference-text-output-ct.setoutputfile"><a href="#top">Code12 Function Reference</a> &gt; <a href="#text-output-1">Text Output</a> &gt; <a href="#ct.setoutputfile">ct.setOutputFile()</a></h6>
+<h2 id="alerts-and-input-dialogs-1">Alerts and Input Dialogs</h2>
 <p>These functions allow you to display a message box for the user and to ask for input from the user.</p>
 <ul>
 <li><a href="#ct.showalert">ct.showAlert()</a></li>
@@ -320,7 +404,7 @@ ct.setOutputFilename( null );</code></pre>
 <li><a href="#ct.inputyesno">ct.inputYesNo()</a></li>
 <li><a href="#ct.inputstring">ct.inputString()</a></li>
 </ul>
-<h6 id="code12-function-reference-alerts-and-input-dialogs"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a></h6>
+<h6 id="code12-function-reference-alerts-and-input-dialogs"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs-1">Alerts and Input Dialogs</a></h6>
 <h3 id="ct.showalert">ct.showAlert()</h3>
 <p>Displays a message in a pop-up dialog box over the graphics screen. Execution of the program will pause and wait for the user to press the OK button on the dialog or press the Enter key on the keyboard.</p>
 <h4 id="syntax-10">Syntax</h4>
@@ -329,7 +413,7 @@ ct.setOutputFilename( null );</code></pre>
 <p>(<a href="#java-data-types">String</a>). The message to display. The string can contain line breaks by embedding newline (<code>\n</code>) characters in it.</p>
 <h4 id="example-1">Example</h4>
 <pre><code>ct.showAlert( &quot;Game Over!&quot; );</code></pre>
-<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.showalert"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.showalert">ct.showAlert()</a></h6>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.showalert"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs-1">Alerts and Input Dialogs</a> &gt; <a href="#ct.showalert">ct.showAlert()</a></h6>
 <h3 id="ct.inputint">ct.inputInt()</h3>
 <p>Displays a message in a pop-up dialog box that asks the user to enter a number. Execution of the program will pause and wait until the user enters a valid integer. The resulting integer value is returned.</p>
 <h4 id="syntax-11">Syntax</h4>
@@ -340,7 +424,7 @@ ct.setOutputFilename( null );</code></pre>
 <p>(<a href="#java-data-types">int</a>). The number entered by the user.</p>
 <h4 id="example-2">Example</h4>
 <pre><code>int numTargets = ct.inputInt( &quot;How many targets would you like to have?&quot; );</code></pre>
-<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputint">ct.inputInt()</a></h6>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs-1">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputint">ct.inputInt()</a></h6>
 <h3 id="ct.inputnumber">ct.inputNumber()</h3>
 <p>Displays a message in a pop-up dialog box that asks the user to enter a number. Execution of the program will pause and wait until the user enters a valid number. The resulting numeric value is returned.</p>
 <h4 id="syntax-12">Syntax</h4>
@@ -351,7 +435,7 @@ ct.setOutputFilename( null );</code></pre>
 <p>(<a href="#java-data-types">double</a>). The number entered by the user.</p>
 <h4 id="example-3">Example</h4>
 <pre><code>double tempF = ct.inputNumber( &quot;Enter the temperature in Farenheit&quot; );</code></pre>
-<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputnumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputnumber">ct.inputNumber()</a></h6>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputnumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs-1">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputnumber">ct.inputNumber()</a></h6>
 <h3 id="ct.inputyesno">ct.inputYesNo()</h3>
 <p>Displays a message in a pop-up dialog box that has two buttons labelled Yes and No. Execution of the program will pause and wait until the user presses one of the buttons.</p>
 <h4 id="syntax-13">Syntax</h4>
@@ -362,7 +446,7 @@ ct.setOutputFilename( null );</code></pre>
 <p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the user presses Yes and <code>false</code> if they press No.</p>
 <h4 id="example-4">Example</h4>
 <pre><code>boolean playAgain = ct.inputYesNo( &quot;Do you want to play again?&quot; );</code></pre>
-<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputyesno"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputyesno">ct.inputYesNo()</a></h6>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputyesno"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs-1">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputyesno">ct.inputYesNo()</a></h6>
 <h3 id="ct.inputstring">ct.inputString()</h3>
 <p>Displays a message in a popup dialog box that allows the user to enter a text string. Execution of the program will pause and wait until the user presses the Enter key to end the text input. The resulting String value is returned.</p>
 <h4 id="syntax-14">Syntax</h4>
@@ -376,8 +460,8 @@ ct.setOutputFilename( null );</code></pre>
 </blockquote>
 <h4 id="example-5">Example</h4>
 <pre><code>String name = ct.inputString( &quot;Enter your name&quot; );</code></pre>
-<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputstring"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputstring">ct.inputString()</a></h6>
-<h2 id="screen-management">Screen Management</h2>
+<h6 id="code12-function-reference-alerts-and-input-dialogs-ct.inputstring"><a href="#top">Code12 Function Reference</a> &gt; <a href="#alerts-and-input-dialogs-1">Alerts and Input Dialogs</a> &gt; <a href="#ct.inputstring">ct.inputString()</a></h6>
+<h2 id="screen-management-1">Screen Management</h2>
 <p>These functions allow you to control the size and appearance of the background of your application, and to manage multiple screens and groups of objects.</p>
 <ul>
 <li><a href="#ct.settitle">ct.setTitle()</a></li>
@@ -394,7 +478,7 @@ ct.setOutputFilename( null );</code></pre>
 <li><a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></li>
 <li><a href="#ct.setbackimage">ct.setBackImage()</a></li>
 </ul>
-<h6 id="code12-function-reference-screen-management"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a></h6>
+<h6 id="code12-function-reference-screen-management"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a></h6>
 <h3 id="ct.settitle">ct.setTitle()</h3>
 <p>Allows you to set the title of the application window.</p>
 <h4 id="syntax-15">Syntax</h4>
@@ -403,7 +487,7 @@ ct.setOutputFilename( null );</code></pre>
 <p>(<a href="#java-data-types">String</a>). The title to display at the top of the application window.</p>
 <h4 id="example-6">Example</h4>
 <pre><code>ct.setTitle( &quot;Zombie Attack&quot; );</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.settitle"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.settitle">ct.setTitle()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.settitle"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.settitle">ct.setTitle()</a></h6>
 <h3 id="ct.setheight">ct.setHeight()</h3>
 <p>Sets the height of the graphics output window in coordinate units, which effectively sets the aspect ratio of your application.</p>
 <h4 id="syntax-16">Syntax</h4>
@@ -414,7 +498,7 @@ ct.setOutputFilename( null );</code></pre>
 <pre><code>ct.setHeight( 100 );               // default square window</code></pre>
 <pre><code>ct.setHeight( 200 );               // window is twice as tall as wide</code></pre>
 <pre><code>ct.setHeight( 100.0 * 9 / 16 );    // 16:9 landscape aspect</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.setheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setheight">ct.setHeight()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.setheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.setheight">ct.setHeight()</a></h6>
 <h3 id="ct.getwidth">ct.getWidth()</h3>
 <p>This function always returns 100.0, which is the width of the application window in <a href="#graphics-coordinates">coordinate units</a> by definition.</p>
 <h4 id="syntax-17">Syntax</h4>
@@ -428,7 +512,7 @@ final double HEIGHT = ct.getHeight();
 
 // Make a rectangle that fills the entire screen
 ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.getwidth"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.getwidth">ct.getWidth()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.getwidth"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.getwidth">ct.getWidth()</a></h6>
 <h3 id="ct.getheight">ct.getHeight()</h3>
 <p>Returns the height of the the application window in <a href="#graphics-coordinates">coordinate units</a>. This is 100.0 by default, unless it is changed by <a href="#ct.setheight">ct.setHeight()</a>.</p>
 <h4 id="syntax-18">Syntax</h4>
@@ -442,7 +526,7 @@ final double HEIGHT = ct.getHeight();
 
 // Make a rectangle that fills the entire screen
 ct.rect( WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT );</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.getheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.getheight">ct.getHeight()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.getheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.getheight">ct.getHeight()</a></h6>
 <h3 id="ct.getpixelsperunit">ct.getPixelsPerUnit()</h3>
 <p>Returns the current graphics scale factor from <a href="#graphics-coordinates">coordinate units</a> to device pixels.</p>
 <h4 id="syntax-19">Syntax</h4>
@@ -462,7 +546,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 <pre><code>// Create a circle that is 10 pixels in diameter at the current scale
 double diameter = 10 / ct.getPixelsPerUnit();
 ct.circle( 50, 50, diameter );</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.getpixelsperunit"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.getpixelsperunit">ct.getPixelsPerUnit()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.getpixelsperunit"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.getpixelsperunit">ct.getPixelsPerUnit()</a></h6>
 <h3 id="ct.getscreen">ct.getScreen()</h3>
 <p>Returns the name of the current screen, which is the most recent screen set using <a href="#ct.setscreen">ct.setScreen()</a>.</p>
 <h4 id="syntax-20">Syntax</h4>
@@ -478,7 +562,7 @@ if (screenName.equals( &quot;intro&quot; ))
     if (ct.clicked())
         ct.setScreen( &quot;game&quot; );
 }</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.getscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.getscreen">ct.getScreen()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.getscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.getscreen">ct.getScreen()</a></h6>
 <h3 id="ct.setscreen">ct.setScreen()</h3>
 <p>Sets the current screen to the screen with the specified name, creating a new screen if the screen name does not exist yet.</p>
 <h4 id="syntax-21">Syntax</h4>
@@ -530,7 +614,7 @@ public void update()
     }   
 }
 </code></pre>
-<h6 id="code12-function-reference-screen-management-ct.setscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setscreen">ct.setScreen()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.setscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.setscreen">ct.setScreen()</a></h6>
 <h3 id="ct.setscreenorigin">ct.setScreenOrigin()</h3>
 <p>Offsets the entire screen horizontally and/or vertically so that the coordinate at the upper-left of the screen is a specified (<code>x</code>, <code>y</code>).</p>
 <h4 id="syntax-22">Syntax</h4>
@@ -550,7 +634,7 @@ public void update()
 <pre><code>ct.image( &quot;mountains.png&quot;, 50, 50, 300 );   // wider than screen
 ct.image( &quot;bear&quot;, 50, 70, 10 );
 ct.setScreenOrigin( 30, 0 );       // entire scene scrolls to the left</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.setscreenorigin"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setscreenorigin">ct.setScreenOrigin()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.setscreenorigin"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.setscreenorigin">ct.setScreenOrigin()</a></h6>
 <h3 id="ct.clearscreen">ct.clearScreen()</h3>
 <p>Removes and deletes all graphics (<code>GameObj</code>) objects on the current screen. The background color or image is kept, if any.</p>
 <h4 id="syntax-23">Syntax</h4>
@@ -560,7 +644,7 @@ ct.setScreenOrigin( 30, 0 );       // entire scene scrolls to the left</code></p
 ct.circle( 50, 50, 20 );
 ct.rect( 50, 70, 40, 10 );
 ct.clearScreen();     // screen is now just solid red</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.clearscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.clearscreen">ct.clearScreen()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.clearscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.clearscreen">ct.clearScreen()</a></h6>
 <h3 id="ct.cleargroup">ct.clearGroup()</h3>
 <p>Removes and deletes all graphics (<code>GameObj</code>) objects on the current screen whose <a href="#obj.group">group name</a> matches the name passed.</p>
 <h4 id="syntax-24">Syntax</h4>
@@ -583,7 +667,7 @@ GameObj coin3 = ct.image( &quot;coin.png&quot;, 90, 30, 10 );
 coin3.group = &quot;coins&quot;;
 
 ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.cleargroup"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.cleargroup">ct.clearGroup()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.cleargroup"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.cleargroup">ct.clearGroup()</a></h6>
 <h3 id="ct.setbackcolor">ct.setBackColor()</h3>
 <p>Sets the background color of the current screen to a specified <a href="#color-names">color name</a>.</p>
 <h4 id="syntax-25">Syntax</h4>
@@ -592,7 +676,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
 <p>(<a href="#java-data-types">String</a>). The <a href="#color-names">color name</a> for the background.</p>
 <h4 id="example-13">Example</h4>
 <pre><code>ct.setBackColor( &quot;light blue&quot; );</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.setbackcolor"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setbackcolor">ct.setBackColor()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.setbackcolor"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.setbackcolor">ct.setBackColor()</a></h6>
 <h3 id="ct.setbackcolorrgb">ct.setBackColorRGB()</h3>
 <p>Sets the background color of the current screen to a custom RGB color with specified <code>red</code>, <code>green</code>, and <code>blue</code> components.</p>
 <h4 id="syntax-26">Syntax</h4>
@@ -605,7 +689,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
 <p>(<a href="#java-data-types">int</a>). The blue component for the color, from 0 to 255.</p>
 <h4 id="example-14">Example</h4>
 <pre><code>ct.setBackColorRGB( 0, 60, 255 );    // greenish blue</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.setbackcolorrgb"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></h6>
+<h6 id="code12-function-reference-screen-management-ct.setbackcolorrgb"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></h6>
 <h3 id="ct.setbackimage">ct.setBackImage()</h3>
 <p>Sets the background of the current screen to an image. The background image always displays behind all graphics (<code>GameObj</code>) objects on the screen.</p>
 <h4 id="syntax-27">Syntax</h4>
@@ -619,8 +703,8 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
 <p>The image file does not need to match the aspect ratio of the screen. The background image is centered and cropped automatically to show as much of the image as possible while preserving the aspect ratio of the image.</p>
 <h4 id="example-15">Example</h4>
 <pre><code>ct.setBackImage( &quot;sky.jpg&quot; );</code></pre>
-<h6 id="code12-function-reference-screen-management-ct.setbackimage"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.setbackimage">ct.setBackImage()</a></h6>
-<h2 id="mouse-and-keyboard-input">Mouse and Keyboard Input</h2>
+<h6 id="code12-function-reference-screen-management-ct.setbackimage"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management-1">Screen Management</a> &gt; <a href="#ct.setbackimage">ct.setBackImage()</a></h6>
+<h2 id="mouse-and-keyboard-input-1">Mouse and Keyboard Input</h2>
 <p>These functions allow you to process mouse/touch input and keyboard input in your <a href="#update">update()</a> function.</p>
 <ul>
 <li><a href="#ct.clicked">ct.clicked()</a></li>
@@ -634,7 +718,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
 <blockquote>
 <p>Another more flexible way to handle mouse and keyboard input, which requires writing your own functions with parameters (syntax level 10), is to write your own <a href="#input-event-functions">Input Event Functions</a>.</p>
 </blockquote>
-<h6 id="code12-function-reference-mouse-and-keyboard-input"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a></h6>
+<h6 id="code12-function-reference-mouse-and-keyboard-input"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a></h6>
 <h3 id="ct.clicked">ct.clicked()</h3>
 <p>Returns <code>true</code> if a click (mouse button press) or touch (on touch screens) occured in the application window during the last animation frame.</p>
 <h4 id="syntax-28">Syntax</h4>
@@ -654,7 +738,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
         ct.logm( &quot;Click at&quot;, x, y );
     }
 }</code></pre>
-<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clicked"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.clicked">ct.clicked()</a></h6>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clicked"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a> &gt; <a href="#ct.clicked">ct.clicked()</a></h6>
 <h3 id="ct.clickx">ct.clickX()</h3>
 <p>Returns the <a href="#graphics-coordinates">x coordinate</a> of the last known click location in the application.</p>
 <h4 id="syntax-29">Syntax</h4>
@@ -674,7 +758,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
             ct.println( &quot;Right side&quot; );
     }
 }</code></pre>
-<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clickx"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.clickx">ct.clickX()</a></h6>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clickx"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a> &gt; <a href="#ct.clickx">ct.clickX()</a></h6>
 <h3 id="ct.clicky">ct.clickY()</h3>
 <p>Returns the <a href="#graphics-coordinates">y coordinate</a> of the last known click location in the application.</p>
 <h4 id="syntax-30">Syntax</h4>
@@ -694,7 +778,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
             ct.println( &quot;Bottom half&quot; );
     }
 }</code></pre>
-<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clicky"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.clicky">ct.clickY()</a></h6>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.clicky"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a> &gt; <a href="#ct.clicky">ct.clickY()</a></h6>
 <h3 id="ct.objectclicked">ct.objectClicked()</h3>
 <p>If a clickable graphics object (<code>GameObj</code>) was clicked during the last animation frame, then <code>ct.objectClicked()</code> returns a reference to that object, otherwise it returns <code>null</code> .</p>
 <h4 id="syntax-31">Syntax</h4>
@@ -705,7 +789,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
 <p><code>ct.objectClicked()</code> will return <code>null</code> if no object was clicked, which is the case for most animation frames in a game (they occur 60 times per second). So you must check the return value for <code>null</code> before using the <code>GameObj</code> returned. Attempting to access a field of a <code>GameObj</code> (such as <a href="#obj.x">obj.x</a>) or call a method (such as <a href="#obj.delete">obj.delete()</a>) will generate a runtime error (a “crash”) if the <code>GameObj</code> is <code>null</code>.</p>
 </blockquote>
 <h4 id="notes-8">Notes</h4>
-<p>Calling this function every time in your <a href="#update">update()</a> function will find the topmost clickable object that was clicked, whenever the user clicks on one. Any objects with the <a href="#obj.clickable">obj.clickable</a> field set to <code>false</code> will not be considered when determining which object was clicked.</p>
+<p>Calling this function every time in your <a href="#update">update()</a> function will find the topmost clickable object that was clicked, whenever the user clicks on one. Any objects with the [obj.clickable] field set to <code>false</code> will not be considered when determining which object was clicked.</p>
 <h4 id="example-19">Example</h4>
 <pre><code>public void update()
 {
@@ -714,7 +798,7 @@ ct.clearGroup( &quot;coins&quot; );    // deletes all 3 coins</code></pre>
     if (obj != null)
         obj.delete();
 }</code></pre>
-<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.objectclicked"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.objectclicked">ct.objectClicked()</a></h6>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.objectclicked"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a> &gt; <a href="#ct.objectclicked">ct.objectClicked()</a></h6>
 <h3 id="ct.keypressed">ct.keyPressed()</h3>
 <p>Returns <code>true</code> if the key with the specified <a href="#key-names">key name</a> is currently pressed (the key is down).</p>
 <h4 id="syntax-32">Syntax</h4>
@@ -743,7 +827,7 @@ public void update()
     if (ct.keyPressed( &quot;right&quot; ))
         ball.x += 0.25 
 }</code></pre>
-<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.keypressed"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.keypressed">ct.keyPressed()</a></h6>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.keypressed"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a> &gt; <a href="#ct.keypressed">ct.keyPressed()</a></h6>
 <h3 id="ct.chartyped">ct.charTyped()</h3>
 <p>Return <code>true</code> if the specified character was typed on the keyboard during the last animation frame.</p>
 <h4 id="syntax-33">Syntax</h4>
@@ -766,15 +850,15 @@ public void update()
     if (ct.charTyped( &quot; &quot; ))
         ct.println( &quot;Space bar&quot; );
 }</code></pre>
-<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.chartyped"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a> &gt; <a href="#ct.chartyped">ct.charTyped()</a></h6>
-<h2 id="audio">Audio</h2>
+<h6 id="code12-function-reference-mouse-and-keyboard-input-ct.chartyped"><a href="#top">Code12 Function Reference</a> &gt; <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a> &gt; <a href="#ct.chartyped">ct.charTyped()</a></h6>
+<h2 id="audio-1">Audio</h2>
 <p>These functions allow you to play sounds from audio files.</p>
 <ul>
 <li><a href="#ct.loadsound">ct.loadSound()</a></li>
 <li><a href="#ct.sound">ct.sound()</a></li>
 <li><a href="#ct.setsoundvolume">ct.setSoundVolume()</a></li>
 </ul>
-<h6 id="code12-function-reference-audio"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a></h6>
+<h6 id="code12-function-reference-audio"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio-1">Audio</a></h6>
 <h3 id="ct.loadsound">ct.loadSound()</h3>
 <p>Pre-loads an audio file into memory so that the first use will have no delay.</p>
 <h4 id="syntax-34">Syntax</h4>
@@ -802,7 +886,7 @@ public void update()
     if (ct.clicked())
         ct.sound( &quot;ding.wav&quot; );
 }</code></pre>
-<h6 id="code12-function-reference-audio-ct.loadsound"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.loadsound">ct.loadSound()</a></h6>
+<h6 id="code12-function-reference-audio-ct.loadsound"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio-1">Audio</a> &gt; <a href="#ct.loadsound">ct.loadSound()</a></h6>
 <h3 id="ct.sound">ct.sound()</h3>
 <p>Play a sound effect from an audio file.</p>
 <h4 id="syntax-35">Syntax</h4>
@@ -828,7 +912,7 @@ public void update()
     if (ct.clicked())
         ct.sound( &quot;ding.wav&quot; );
 }</code></pre>
-<h6 id="code12-function-reference-audio-ct.sound"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.sound">ct.sound()</a></h6>
+<h6 id="code12-function-reference-audio-ct.sound"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio-1">Audio</a> &gt; <a href="#ct.sound">ct.sound()</a></h6>
 <h3 id="ct.setsoundvolume">ct.setSoundVolume()</h3>
 <p>Sets the relative volume to use for sounds played by <a href="#ct.sound">ct.sound()</a>.</p>
 <h4 id="syntax-36">Syntax</h4>
@@ -840,8 +924,8 @@ public void update()
 <h4 id="example-23">Example</h4>
 <pre><code>ct.setSoundVolume( 0.2 );
 ct.sound( &quot;voices.mp3&quot; );</code></pre>
-<h6 id="code12-function-reference-audio-ct.setsoundvolume"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio">Audio</a> &gt; <a href="#ct.setsoundvolume">ct.setSoundVolume()</a></h6>
-<h2 id="math-utilities">Math Utilities</h2>
+<h6 id="code12-function-reference-audio-ct.setsoundvolume"><a href="#top">Code12 Function Reference</a> &gt; <a href="#audio-1">Audio</a> &gt; <a href="#ct.setsoundvolume">ct.setSoundVolume()</a></h6>
+<h2 id="math-utilities-1">Math Utilities</h2>
 <p>These functions provide a convenient way to do common calculations.</p>
 <ul>
 <li><a href="#ct.random">ct.random()</a></li>
@@ -851,8 +935,8 @@ ct.sound( &quot;voices.mp3&quot; );</code></pre>
 <li><a href="#ct.intdiv">ct.intDiv()</a></li>
 <li><a href="#ct.iserror">ct.isError()</a></li>
 </ul>
-<p>For more math operations, see <a href="#java-math-methods-and-fields-supported">Java Math Methods and Fields Supported</a>.</p>
-<h6 id="code12-function-reference-math-utilities"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a></h6>
+<p>For more math operations, see <a href="#java-math-methods">Java Math Methods</a>.</p>
+<h6 id="code12-function-reference-math-utilities"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities-1">Math Utilities</a></h6>
 <h3 id="ct.random">ct.random()</h3>
 <p>Returns a random integer within the specified range.</p>
 <h4 id="syntax-37">Syntax</h4>
@@ -872,7 +956,7 @@ else
     ct.println( &quot;tails&quot; );</code></pre>
 <pre><code>// Create a ball at a random x position
 ct.circle( ct.random( 0, 100 ), 50, 10 );</code></pre>
-<h6 id="code12-function-reference-math-utilities-ct.random"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.random">ct.random()</a></h6>
+<h6 id="code12-function-reference-math-utilities-ct.random"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities-1">Math Utilities</a> &gt; <a href="#ct.random">ct.random()</a></h6>
 <h3 id="ct.round">ct.round()</h3>
 <p>Returns a specified number rounded to the nearest integer.</p>
 <h4 id="syntax-38">Syntax</h4>
@@ -884,7 +968,7 @@ ct.circle( ct.random( 0, 100 ), 50, 10 );</code></pre>
 <h4 id="example-24">Example</h4>
 <pre><code>double x = 10.75;
 int n = ct.round( x );    // sets n to 11</code></pre>
-<h6 id="code12-function-reference-math-utilities-ct.round"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.round">ct.round()</a></h6>
+<h6 id="code12-function-reference-math-utilities-ct.round"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities-1">Math Utilities</a> &gt; <a href="#ct.round">ct.round()</a></h6>
 <h3 id="ct.rounddecimal">ct.roundDecimal()</h3>
 <p>Returns a number rounded to a specified number of decimal places.</p>
 <h4 id="syntax-39">Syntax</h4>
@@ -898,7 +982,7 @@ int n = ct.round( x );    // sets n to 11</code></pre>
 <h4 id="example-25">Example</h4>
 <pre><code>double amount = 24.3467;
 double price = ct.roundDecimal( amount, 2 );    // sets price to 24.35</code></pre>
-<h6 id="code12-function-reference-math-utilities-ct.rounddecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.rounddecimal">ct.roundDecimal()</a></h6>
+<h6 id="code12-function-reference-math-utilities-ct.rounddecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities-1">Math Utilities</a> &gt; <a href="#ct.rounddecimal">ct.roundDecimal()</a></h6>
 <h3 id="ct.distance">ct.distance()</h3>
 <p>Returns the geometric distance between two (x, y) coordinates.</p>
 <h4 id="syntax-40">Syntax</h4>
@@ -921,7 +1005,7 @@ GameObj ball2 = ct.circle( 50, 70, 10 );
 
 double dist = ct.distance( ball1.x, ball1.y, ball2.x, ball2.y );
 ct.println( &quot;The balls are &quot; + dist + &quot; units apart&quot; );</code></pre>
-<h6 id="code12-function-reference-math-utilities-ct.distance"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.distance">ct.distance()</a></h6>
+<h6 id="code12-function-reference-math-utilities-ct.distance"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities-1">Math Utilities</a> &gt; <a href="#ct.distance">ct.distance()</a></h6>
 <h3 id="ct.intdiv">ct.intDiv()</h3>
 <p>Return the result of an integer division of two integers (discard any fractional part and round the result down to the nearest integer).</p>
 <h4 id="syntax-41">Syntax</h4>
@@ -944,7 +1028,7 @@ ct.println( &quot;The balls are &quot; + dist + &quot; units apart&quot; );</cod
 </blockquote>
 <h4 id="example-27">Example</h4>
 <pre><code>int n = ct.intDiv( 3, 2 );    // sets n to 1</code></pre>
-<h6 id="code12-function-reference-math-utilities-ct.intdiv"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.intdiv">ct.intDiv()</a></h6>
+<h6 id="code12-function-reference-math-utilities-ct.intdiv"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities-1">Math Utilities</a> &gt; <a href="#ct.intdiv">ct.intDiv()</a></h6>
 <h3 id="ct.iserror">ct.isError()</h3>
 <p>Returns <code>true</code> if the value of the specified number is an error value (NaN = “Not a Number”).</p>
 <h4 id="syntax-42">Syntax</h4>
@@ -961,8 +1045,8 @@ ct.println( &quot;The balls are &quot; + dist + &quot; units apart&quot; );</cod
 error = ct.isError( 0.0 / 0.0 );
 error = ct.isError( Math.sqrt( -1 ) );
 error = ct.isError( ct.parseNumber( &quot;nope&quot; ) );</code></pre>
-<h6 id="code12-function-reference-math-utilities-ct.iserror"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.iserror">ct.isError()</a></h6>
-<h2 id="type-conversion">Type Conversion</h2>
+<h6 id="code12-function-reference-math-utilities-ct.iserror"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities-1">Math Utilities</a> &gt; <a href="#ct.iserror">ct.isError()</a></h6>
+<h2 id="type-conversion-1">Type Conversion</h2>
 <p>These functions allow you to convert text strings to numbers and vice-versa.</p>
 <ul>
 <li><a href="#ct.parseint">ct.parseInt()</a></li>
@@ -972,6 +1056,7 @@ error = ct.isError( ct.parseNumber( &quot;nope&quot; ) );</code></pre>
 <li><a href="#ct.formatint">ct.formatInt()</a></li>
 <li><a href="#ct.formatdecimal">ct.formatDecimal()</a></li>
 </ul>
+<h6 id="code12-function-reference-type-conversion"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion-1">Type Conversion</a></h6>
 <h3 id="ct.parseint">ct.parseInt()</h3>
 <p>Reads an <a href="#java-data-types">int</a> value in a <a href="#java-data-types">String</a>.</p>
 <h4 id="syntax-43">Syntax</h4>
@@ -988,7 +1073,7 @@ error = ct.isError( ct.parseNumber( &quot;nope&quot; ) );</code></pre>
 int b = ct.parseInt( &quot;  -3 &quot; );    // sets b to -3</code></pre>
 <pre><code>int c = ct.parseInt( &quot;six&quot;);       // sets c to 0
 int d = ct.parseInt( &quot;4 more&quot; );   // sets d to 0</code></pre>
-<h6 id="code12-function-reference-type-conversion-ct.parseint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.parseint">ct.parseInt()</a></h6>
+<h6 id="code12-function-reference-type-conversion-ct.parseint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion-1">Type Conversion</a> &gt; <a href="#ct.parseint">ct.parseInt()</a></h6>
 <h3 id="ct.parsenumber">ct.parseNumber()</h3>
 <p>Reads a <a href="#java-data-types">double</a> value in a <a href="#java-data-types">String</a>.</p>
 <h4 id="syntax-44">Syntax</h4>
@@ -1007,7 +1092,7 @@ int b = ct.parseNumber( &quot;  -3.02 &quot; );    // sets b to -3.02</code></pr
 double amount = ct.parseNumber( entry );    // sets amount to NaN
 if (ct.isError( amount ))
     ct.println( &quot;Invalid number format&quot; );</code></pre>
-<h6 id="code12-function-reference-type-conversion-ct.parsenumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.parsenumber">ct.parseNumber()</a></h6>
+<h6 id="code12-function-reference-type-conversion-ct.parsenumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion-1">Type Conversion</a> &gt; <a href="#ct.parsenumber">ct.parseNumber()</a></h6>
 <h3 id="ct.canparseint">ct.canParseInt()</h3>
 <p>Returns <code>true</code> if a specified <a href="#java-data-types">String</a> is a valid integer in text form.</p>
 <h4 id="syntax-45">Syntax</h4>
@@ -1028,7 +1113,7 @@ else
 {
     ct.println( &quot;Not a valid integer&quot; );
 }</code></pre>
-<h6 id="code12-function-reference-type-conversion-ct.canparseint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.canparseint">ct.canParseInt()</a></h6>
+<h6 id="code12-function-reference-type-conversion-ct.canparseint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion-1">Type Conversion</a> &gt; <a href="#ct.canparseint">ct.canParseInt()</a></h6>
 <h3 id="ct.canparsenumber">ct.canParseNumber()</h3>
 <p>Returns <code>true</code> if a specified <a href="#java-data-types">String</a> is a valid number in text form.</p>
 <h4 id="syntax-46">Syntax</h4>
@@ -1049,7 +1134,7 @@ else
 {
     ct.println( &quot;Not a valid number&quot; );
 }</code></pre>
-<h6 id="code12-function-reference-type-conversion-ct.canparsenumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.canparsenumber">ct.canParseNumber()</a></h6>
+<h6 id="code12-function-reference-type-conversion-ct.canparsenumber"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion-1">Type Conversion</a> &gt; <a href="#ct.canparsenumber">ct.canParseNumber()</a></h6>
 <h3 id="ct.formatint">ct.formatInt()</h3>
 <p>Returns a text (<a href="#java-data-types">String</a>) representation of an integer (<a href="#java-data-types">int</a>).</p>
 <h4 id="syntax-47">Syntax</h4>
@@ -1066,7 +1151,7 @@ ct.formatInt( num, numDigits );</code></pre>
 <pre><code>int score = 520;
 String text = ct.formatInt( score, 6 );   // sets text to &quot;000520&quot;
 ct.text( text, 5, 20, 10 );               // displays score on the graphics screen</code></pre>
-<h6 id="code12-function-reference-type-conversion-ct.formatint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.formatint">ct.formatInt()</a></h6>
+<h6 id="code12-function-reference-type-conversion-ct.formatint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion-1">Type Conversion</a> &gt; <a href="#ct.formatint">ct.formatInt()</a></h6>
 <h3 id="ct.formatdecimal">ct.formatDecimal()</h3>
 <p>Returns a text (<a href="#java-data-types">String</a>) representation of a number (<a href="#java-data-types">double</a>).</p>
 <h4 id="syntax-48">Syntax</h4>
@@ -1083,185 +1168,741 @@ ct.formatDecimal( number, numPlaces );</code></pre>
 String text = ct.formatDecimal( x );       // sets text to &quot;1.25&quot;</code></pre>
 <pre><code>double a = 3.14159;
 String text = ct.formatDecimal( a, 4 );    // sets text to &quot;3.1416&quot;</code></pre>
-<h6 id="code12-function-reference-type-conversion-ct.formatdecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion">Type Conversion</a> &gt; <a href="#ct.formatdecimal">ct.formatDecimal()</a></h6>
-<h2 id="program-control">Program Control</h2>
+<h6 id="code12-function-reference-type-conversion-ct.formatdecimal"><a href="#top">Code12 Function Reference</a> &gt; <a href="#type-conversion-1">Type Conversion</a> &gt; <a href="#ct.formatdecimal">ct.formatDecimal()</a></h6>
+<h2 id="program-control-1">Program Control</h2>
+<p>These functions allow you to get information about and control the execution of your program.</p>
+<ul>
+<li><a href="#ct.gettimer">ct.getTimer()</a></li>
+<li><a href="#ct.getversion">ct.getVersion()</a></li>
+<li><a href="#ct.pause">ct.pause()</a></li>
+<li><a href="#ct.stop">ct.stop()</a></li>
+<li><a href="#ct.restart">ct.restart()</a></li>
+</ul>
+<h6 id="code12-function-reference-program-control"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control-1">Program Control</a></h6>
 <h3 id="ct.gettimer">ct.getTimer()</h3>
-<pre><code>int ct.getTimer()</code></pre>
-<p>Return the number of milliseconds since the application started. Time starts at the begining of the <code>start</code> function.</p>
+<p>Return the number of milliseconds since your program started.</p>
+<h4 id="syntax-49">Syntax</h4>
+<pre><code>ct.getTimer()</code></pre>
+<h5 id="return-value-32"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The number of milliseconds since your program started.</p>
+<h4 id="examples-18">Examples</h4>
+<pre><code>public void update()
+{
+    ct.println( ct.getTimer() );
+}</code></pre>
+<pre><code>boolean timerStarted = false;
+int startTime;
+
+public void update()
+{
+    // Start a timer when the user clicks
+    if (ct.clicked())
+    {
+        ct.println( &quot;Timer started&quot; );
+        timerStarted = true;
+        startTime = ct.getTimer();
+    }
+
+    // Print a message 3 seconds after the timer started
+    if (timerStarted &amp;&amp; ct.getTimer() - startTime &gt; 3000)
+    {
+        ct.println( &quot;3 seconds have passed&quot; );
+        timerStarted = false;
+    }
+}</code></pre>
+<h6 id="code12-function-reference-program-control-ct.gettimer"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control-1">Program Control</a> &gt; <a href="#ct.gettimer">ct.getTimer()</a></h6>
 <h3 id="ct.getversion">ct.getVersion()</h3>
-<pre><code>double getVersion()</code></pre>
-<p>Return the version number of the Code12 runtime system.</p>
+<p>Returns the version number of the Code12 runtime system.</p>
+<h4 id="syntax-50">Syntax</h4>
+<pre><code>ct.getVersion()</code></pre>
+<h5 id="return-value-33"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The Code12 version number (for example 1.0).</p>
+<h4 id="examples-19">Examples</h4>
+<pre><code>if (ct.getVersion() &gt; 1.0)
+    ct.println( &quot;We have the update&quot; )</code></pre>
+<h6 id="code12-function-reference-program-control-ct.getversion"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control-1">Program Control</a> &gt; <a href="#ct.getversion">ct.getVersion()</a></h6>
 <h3 id="ct.pause">ct.pause()</h3>
-<pre><code>ct.pause()</code></pre>
-<p>Execution of the program is paused at this statement. You can then resume or stop execution using the toolbar buttons in the Code12 application.</p>
-<blockquote>
-<p>You can use <code>ct.pause</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.pause</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
-</blockquote>
+<p>Pauses execution of your program at this statement. You can then resume or stop execution using the toolbar buttons in the Code12 application.</p>
+<h4 id="syntax-51">Syntax</h4>
+<pre><code>ct.pause();</code></pre>
+<h4 id="notes-14">Notes</h4>
+<p>You can use <code>ct.pause()</code> to help you examine or debug your program while it is running. Any motion on the screen will pause so you can inspect it, and you can also check variable values in the variable watch window.</p>
+<h4 id="example-31">Example</h4>
+<pre><code>public void start()
+{
+    // Make a circle on the left
+    ct.circle( 30, 50, 20 );
+
+    // Wait for the Resume toolbar button to be pressed
+    ct.pause();
+
+    // Make a circle on the right
+    ct.circle( 70, 50, 20 );
+}</code></pre>
+<h6 id="code12-function-reference-program-control-ct.pause"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control-1">Program Control</a> &gt; <a href="#ct.pause">ct.pause()</a></h6>
 <h3 id="ct.stop">ct.stop()</h3>
-<pre><code>ct.stop()</code></pre>
-<p>Execution of the program is immediately stopped and ended at this statement. You can restart execution over from the beginning of the program using the <strong>Restart</strong> toolbar button in the Code12 application.</p>
-<blockquote>
-<p>You can use <code>ct.stop</code> to help you examine or debug your program while running your program in the Code12 application. The <code>ct.stop</code> function is not supported (ignored) when programs are running standalone outside of the Code12 application.</p>
-</blockquote>
+<p>Stops execution of your program immediately at this statement. You can restart execution over from the beginning of the program using the Restart toolbar button in the Code12 application.</p>
+<h4 id="syntax-52">Syntax</h4>
+<pre><code>ct.stop();</code></pre>
+<h4 id="notes-15">Notes</h4>
+<p>You can use <code>ct.stop()</code> to terminate your program if something unexpected happens. No more code will execute, and the values of your variables will stay as they were when <code>ct.stop()</code> was called so you can examine them in the variable watch window.</p>
+<h4 id="example-32">Example</h4>
+<pre><code>if (hero.x &lt; 0)
+    ct.stop();    // Oops, how did he get off-screen?</code></pre>
+<h6 id="code12-function-reference-program-control-ct.stop"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control-1">Program Control</a> &gt; <a href="#ct.stop">ct.stop()</a></h6>
 <h3 id="ct.restart">ct.restart()</h3>
-<pre><code>ct.restart()</code></pre>
-<p>Execution of the program is immediately stopped and restarted from the beginning of the program. Variables are re-initialized with their default/starting values, and execution starts over with your <code>start</code> function.</p>
-<blockquote>
-<p>The <code>ct.restart</code> function is not supported (ignored) when programs are running standalone under the Java runtime outside of the Code12 environment.</p>
-</blockquote>
-<h2 id="gameobj-data-fields">GameObj Data Fields</h2>
-<p><code>GameObj</code> objects are graphics objects visible on the screen. See <a href="#gameobj-creation">GameObj Creation</a> to create a <code>GameObj</code>. All <code>GameObj</code> objects have the following public data fields, which can be accessed or assigned to at any time. If assigned to, the new value takes effect at the next animation frame.</p>
+<p>Immediately stops and and then restarts your program from the beginning.</p>
+<h4 id="syntax-53">Syntax</h4>
+<pre><code>ct.restart();</code></pre>
+<h4 id="notes-16">Notes</h4>
+<p>After calling <code>ct.restart()</code>, your program immediately restarts from the beginning. Variables are re-initialized with their default/starting values, and execution starts over with your <a href="#start">start()</a> function.</p>
+<h4 id="example-33">Example</h4>
+<pre><code>if (ct.inputYesNo( &quot;Would you like to play again?&quot; ))
+    ct.restart();</code></pre>
+<h6 id="code12-function-reference-program-control-ct.restart"><a href="#top">Code12 Function Reference</a> &gt; <a href="#program-control-1">Program Control</a> &gt; <a href="#ct.restart">ct.restart()</a></h6>
+<h2 id="gameobj-data-fields-1">GameObj Data Fields</h2>
+<p>Each graphics object (<a href="#java-data-types">GameObj</a>) that you create (see <a href="#graphics-object-creation-1">Graphics Object Creation</a>) has several data variables that live inside it. These variables store information such as the position, size, and color of the object. Each <a href="#java-data-types">GameObj</a> has its own copy of these variables. You can access or change some of these data variables directly. Java refers to these object variables as <em>public data fields</em>.</p>
+<p>Each <a href="#java-data-types">GameObj</a> has public data fields named <code>x</code>, <code>y</code>, <code>visible</code>, and <code>group</code>. To access these fields, you need a variable of type <a href="#java-data-types">GameObj</a>, which you put before the data field name followed by a dot (.) character, for example <code>hero.x</code>.</p>
+<p>In the general descriptions below, the <a href="#java-data-types">GameObj</a> variable is shown as <code>obj</code>. In your program, you will replace <code>obj</code> with the name of the <a href="#java-data-types">GameObj</a> variable that you wish to access.</p>
+<ul>
+<li><a href="#obj.x">obj.x</a></li>
+<li><a href="#obj.y">obj.y</a></li>
+<li><a href="#obj.visible">obj.visible</a></li>
+<li><a href="#obj.group">obj.group</a></li>
+</ul>
+<h6 id="code12-function-reference-gameobj-data-fields"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a></h6>
 <h3 id="obj.x">obj.x</h3>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-54">Syntax</h4>
+<pre><code>obj.x</code></pre>
+<h5 id="obj">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h4 id="notes-17">Notes</h4>
+<p>You can access (“get”) or change (“set”) the <a href="#graphics-coordinates">x coordinate</a> of a <a href="#java-data-types">GameObj</a> at any time.</p>
+<h4 id="example-34">Example</h4>
+<pre><code>GameObj dot;
+
+public void start()
+{
+    dot = ct.circle( 0, 50, 10 );   
+}
+
+public void update()
+{
+    // Move dot a little to the right each animation frame
+    dot.x = dot.x + 1;
+
+    // If dot goes off-screen to the right, start over at the left
+    if (dot.x &gt; 100)
+        dot.x = 0;
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-data-fields-obj.x"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.x">obj.x</a></h6>
 <h3 id="obj.y">obj.y</h3>
-<pre><code>double x, y</code></pre>
-<p>The <code>x</code> and <code>y</code> fields specify the position of the object in the application window, in graphics coordinates. By default, graphics coordinates range from 0 to 100 in both x and y if the window is square. If the window is not square (see <code>ct.setHeight()</code>), then x coordinates still range from 0 (left edge) to 100 (right edge), but y coordinates will range from 0 (top edge) to the value returned by <code>ct.getHeight()</code> (bottom edge).</p>
-<blockquote>
-<p>By default, objects are positioned by their center, so (<code>x</code>, <code>y</code>) will be the center of the object. However, this can be modified by the <code>GameObj</code> method <code>obj.align()</code>.</p>
-</blockquote>
-<blockquote>
-<p>It is not an error to position an object outside the application window, it will simply not be visible or will clip at the window boundary.</p>
-</blockquote>
-<h3 id="obj.xspeed">obj.xSpeed</h3>
-<h3 id="obj.yspeed">obj.ySpeed</h3>
-<pre><code>double xSpeed, ySpeed</code></pre>
-<p>The <code>xSpeed</code> and <code>ySpeed</code> fields can be used to make an object move automatically at the specified speed and direction. The <code>xSpeed</code> and <code>ySpeed</code> values are added to the object’s <code>x</code> and <code>y</code> fields before each new animation frame. Animation frames happen 60 times per second, so setting <code>xSpeed</code> to 1 will make the object move 60 units per second to the right. The values for <code>xSpeed</code> and <code>ySpeed</code> can be positive or negative, and they both default to 0.</p>
-<blockquote>
-<p>You can change <code>xSpeed</code> and/or <code>ySpeed</code> at any time to change the speed or direction of an object.</p>
-</blockquote>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-55">Syntax</h4>
+<pre><code>obj.y</code></pre>
+<h5 id="obj-1">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h4 id="notes-18">Notes</h4>
+<p>You can access (“get”) or change (“set”) the <a href="#graphics-coordinates">y coordinate</a> of a <a href="#java-data-types">GameObj</a> at any time.</p>
+<h4 id="example-35">Example</h4>
+<pre><code>GameObj slab;
+
+public void start()
+{
+    slab = ct.rect( 50, 0, 40, 10 );    
+}
+
+public void update()
+{
+    // Move slab down a little each animation frame
+    slab.y = slab.y + 1;
+
+    // If slab reaches the bottom, start over at the top
+    if (slab.y &gt; ct.getHeight())
+        slab.y = 0;
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-data-fields-obj.y"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.y">obj.y</a></h6>
 <h3 id="obj.visible">obj.visible</h3>
-<pre><code>boolean visible</code></pre>
-<p>The <code>visible</code> field defaults to <code>true</code>, but you can set it to <code>false</code> to hide the object. Hidden objects are effectively disabled, and will not draw or respond to mouse/touch input.</p>
-<h3 id="obj.clickable">obj.clickable</h3>
-<pre><code>boolean clickable</code></pre>
-<p>The <code>clickable</code> field defaults to <code>true</code>, so by default all <code>GameObj</code> objects can be used to respond to click/touch input (see <a href="#ctobjectclicked">ct.objectClicked</a>, <a href="#objclicked">obj.clicked</a>, and <a href="#onmousepress">onMousePress</a>). However, if you set an object’s <code>clickable</code> field to false, then it will ignore clicks and pass them through to the object below, if any.</p>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if a <a href="#java-data-types">GameObj</a> should be displayed as normal, or <code>false</code> to hide the object and not display it.</p>
+<h4 id="syntax-56">Syntax</h4>
+<pre><code>obj.visible</code></pre>
+<h5 id="obj-2">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h4 id="notes-19">Notes</h4>
+<p>Graphics objects default to visible when created. If you set the <code>visible</code> field to <code>false</code>, the object will be hidden and disappear from the display. Hidden objects still exist (they are not deleted), and they can be brought back by setting <code>visible</code> back to <code>true</code>.</p>
 <blockquote>
-<p>If you stack two objects and want to use the bottom object to test for hits (for example a rectangle with a text label on top of it), then you can set the <code>clickable</code> field of the top object to <code>false</code>, which will cause the click to “pass through” to the object below it.</p>
+<p>In addition to not being displayed, hidden objects do not respond to mouse clicks (from <a href="#ct.objectclicked">ct.objectClicked()</a>, for example) and do not register as “hitting” other objects (see <a href="#obj.hit">obj.hit()</a>, for example]).</p>
 </blockquote>
+<h4 id="example-36">Example</h4>
+<pre><code>// Hide objects that are clicked
+GameObj target = ct.objectClicked();
+if (target != null)
+    target.visible = false;</code></pre>
+<h6 id="code12-function-reference-gameobj-data-fields-obj.visible"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.visible">obj.visible</a></h6>
 <h3 id="obj.group">obj.group</h3>
-<pre><code>String group</code></pre>
-<p>The <code>group</code> field is an optional name that you can assign to an object that will cause the function <code>ct.clearGroup()</code> to delete all objects with the matching group name. The default group name of an object is &quot;&quot; (empty string)</p>
-<h2 id="gameobj-methods">GameObj Methods</h2>
-<p>The following method functions must be called on an existing <code>GameObj</code> object (see <a href="#gameobj-creation">GameObj Creation</a>). In the syntax shown, the <code>obj</code> can be any variable of type <code>GameObj</code>.</p>
+<p>(<a href="#java-data-types">String</a>). An optional name that you can assign to a <a href="#java-data-types">GameObj</a> to associate it with other similar objects.</p>
+<h4 id="syntax-57">Syntax</h4>
+<pre><code>obj.group</code></pre>
+<h5 id="obj-3">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h4 id="notes-20">Notes</h4>
+<p>The default group name for an object is <code>&quot;&quot;</code> (empty string) when it is created. If you assign a group name, you can access and check it when you have an unknown object reference to see what kind it is.</p>
+<p>The <code>group</code> field is also used by the functions <a href="#ct.cleargroup">ct.clearGroup()</a> and <a href="#obj.objecthitingroup">obj.objectHitInGroup()</a>.</p>
+<h4 id="examples-20">Examples</h4>
+<pre><code>GameObj block;
+GameObj coin1, coin2;
+
+public void start()
+{
+    block = ct.rect( 50, 70, 20, 20 );
+
+    coin1 = ct.circle( 30, 30, 10 );
+    coin1.group = &quot;coins&quot;;
+
+    coin2 = ct.circle( 70, 30, 10 );
+    coin2.group = &quot;coins&quot;;
+}
+
+public void update()
+{
+    // Hide coins that get clicked
+    GameObj target = ct.objectClicked();
+    if (target != null &amp;&amp; target.group.equals(&quot;coins&quot;))
+        target.visible = false; 
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-data-fields-obj.group"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.group">obj.group</a></h6>
+<h2 id="gameobj-methods-1">GameObj Methods</h2>
+<p>The following method functions must be called on an existing graphics object (<a href="#java-data-types">GameObj</a>). To create a <a href="#java-data-types">GameObj</a>, see <a href="#graphics-object-creation-1">Graphics Object Creation</a>. In the syntax descriptions shown, the <code>obj</code> can be any variable of type <a href="#java-data-types">GameObj</a>. The method function will access or modify the <code>obj</code> variable you specify.</p>
+<ul>
+<li><a href="#obj.gettype">obj.getType()</a></li>
+<li><a href="#obj.getwidth">obj.getWidth()</a></li>
+<li><a href="#obj.getheight">obj.getHeight()</a></li>
+<li><a href="#obj.setsize">obj.setSize()</a></li>
+<li><a href="#obj.setspeed">obj.setSpeed()</a></li>
+<li><a href="#obj.align">obj.align()</a></li>
+<li><a href="#obj.gettext">obj.getText()</a></li>
+<li><a href="#obj.settext">obj.setText()</a></li>
+<li><a href="#obj.tostring">obj.toString()</a></li>
+<li><a href="#obj.setfillcolor">obj.setFillColor()</a></li>
+<li><a href="#obj.setfillcolorrgb">obj.setFillColorRGB()</a></li>
+<li><a href="#obj.setlinecolor">obj.setLineColor()</a></li>
+<li><a href="#obj.setlinecolorrgb">obj.setLineColorRGB()</a></li>
+<li><a href="#obj.setlinewidth">obj.setLineWidth()</a></li>
+<li><a href="#obj.getlayer">obj.getLayer()</a></li>
+<li><a href="#obj.setlayer">obj.setLayer()</a></li>
+<li><a href="#obj.delete">obj.delete()</a></li>
+<li><a href="#obj.setclickable">obj.setClickable()</a></li>
+<li><a href="#obj.clicked">obj.clicked()</a></li>
+<li><a href="#obj.containspoint">obj.containsPoint()</a></li>
+<li><a href="#obj.hit">obj.hit()</a></li>
+<li><a href="#obj.objecthitingroup">obj.objectHitInGroup()</a></li>
+</ul>
+<h6 id="code12-function-reference-gameobj-methods"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a></h6>
 <h3 id="obj.gettype">obj.getType()</h3>
-<pre><code>String obj.getType()</code></pre>
-<p>Return the type name of the <code>GameObj</code> object, which is one of: <code>&quot;circle&quot;</code>, <code>&quot;rect&quot;</code>, <code>&quot;line&quot;</code>, <code>&quot;text&quot;</code>, or <code>&quot;image&quot;</code>.</p>
-<h3 id="obj.gettext">obj.getText()</h3>
-<pre><code>String obj.getText()</code></pre>
-<p>Return the text of the object. For a <code>&quot;text&quot;</code> object, this is the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object. For an <code>&quot;image&quot;</code> object, the text defaults to the image filename, but you can change it to something else (see <code>obj.setText</code> below).</p>
+<p>Returns the type name of a <a href="#java-data-types">GameObj</a>, for example, <code>&quot;circle&quot;</code>.</p>
+<h4 id="syntax-58">Syntax</h4>
+<pre><code>obj.getType()</code></pre>
+<h5 id="obj-4">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-34"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). One of: <code>&quot;circle&quot;</code>, <code>&quot;rect&quot;</code>, <code>&quot;line&quot;</code>, <code>&quot;text&quot;</code>, or <code>&quot;image&quot;</code>.</p>
+<h4 id="example-37">Example</h4>
+<pre><code>GameObj target = ct.objectClicked();
+String type = target.getType();
+if (type.equals( &quot;circle&quot; ))
+    ct.println( &quot;You clicked a circle&quot; );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.gettype"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.gettype">obj.getType()</a></h6>
+<h3 id="obj.getwidth">obj.getWidth()</h3>
+<p>Returns the <a href="#graphics-coordinates">width</a> (horizontal size) of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-59">Syntax</h4>
+<pre><code>obj.getWidth()</code></pre>
+<h5 id="obj-5">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-35"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">width</a> of the object.</p>
+<h4 id="notes-21">Notes</h4>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the width returned is the x offset (positive or negative) from the first point to the second point, not the physical width of the line, and unrelated to the thickness of the line as set by <a href="#obj.setlinewidth">obj.setLineWidth()</a>.</p>
+<h4 id="example-38">Example</h4>
+<pre><code>GameObj title = ct.text( &quot;Zombie Attack&quot;, 50, 30, 10 );
+double titleWidth = title.getWidth();</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.getwidth"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.getwidth">obj.getWidth()</a></h6>
+<h3 id="obj.getheight">obj.getHeight()</h3>
+<p>Returns the <a href="#graphics-coordinates">height</a> (vertical size) of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-60">Syntax</h4>
+<pre><code>obj.getHeight()</code></pre>
+<h5 id="obj-6">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-36"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">height</a> of the object.</p>
+<h4 id="notes-22">Notes</h4>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the height returned is the y offset (positive or negative) from the first point to the second point, not the physical height of the line.</p>
+<h4 id="example-39">Example</h4>
+<pre><code>GameObj hero = ct.image( &quot;dragon.png&quot;, 50, 70, 10 );
+double heroHeight = hero.getHeight();</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.getheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.getheight">obj.getHeight()</a></h6>
+<h3 id="obj.setsize">obj.setSize()</h3>
+<p>Sets the size (<a href="#graphics-coordinates">width</a> and <a href="#graphics-coordinates">height</a>) of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-61">Syntax</h4>
+<pre><code>obj.setSize( width, height );</code></pre>
+<h5 id="obj-7">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="width-2">width</h5>
+<p>(<a href="#java-data-types">double</a>). The new <a href="#graphics-coordinates">width</a> for the object.</p>
+<h5 id="height-3">height</h5>
+<p>(<a href="#java-data-types">double</a>). The new <a href="#graphics-coordinates">height</a> for the object.</p>
+<h4 id="notes-23">Notes</h4>
+<p>The different types of <a href="#java-data-types">GameObj</a> objects react somewhat differently to changes in size, as follows:</p>
 <blockquote>
-<p>The <code>obj.toString()</code> method (see below) includes the object text in the description of an object.</p>
+<h5 id="circle-objects">circle Objects</h5>
+<p>Although circles are always created round (see <a href="#ct.circle">ct.circle()</a>), you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
 </blockquote>
+<blockquote>
+<h5 id="rect-objects">rect Objects</h5>
+<p>Rectangles (see <a href="#ct.rect">ct.rect()</a>) can be adjusted to any <code>width</code> and <code>height</code>.</p>
+</blockquote>
+<blockquote>
+<h5 id="line-objects">line Objects</h5>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the <code>width</code> and <code>height</code> specify offsets (positive or negative) from the first point to the second point. The <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> data fields specify the location of the first point. Calling <code>obj.setSize( width, height )</code> can be used to change the second point relative to the first point.</p>
+</blockquote>
+<blockquote>
+<h5 id="text-objects">text Objects</h5>
+<p>Text objects (see <a href="#ct.text">ct.text()</a>) ignore the <code>width</code> passed. The <code>height</code> is used to set the new height and determine the new font size for the object, and the object’s width is recalculated automatically.</p>
+</blockquote>
+<blockquote>
+<h5 id="image-objects">image Objects</h5>
+<p>Images (see <a href="#ct.image">ct.image()</a>) are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to match the specified size.</p>
+</blockquote>
+<h4 id="example-40">Example</h4>
+<pre><code>GameObj blob = ct.circle( 50, 50, 30 );
+blob.setSize( 50, 30 );      // makes an ellipse</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setsize"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setsize">obj.setSize()</a></h6>
+<h3 id="obj.setspeed">obj.setSpeed()</h3>
+<p>Sets the speed of a <a href="#java-data-types">GameObj</a> so that it moves on its own.</p>
+<h4 id="syntax-62">Syntax</h4>
+<pre><code>obj.setSpeed( xSpeed, ySpeed );</code></pre>
+<h5 id="obj-8">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="xspeed">xSpeed</h5>
+<p>(<a href="#java-data-types">double</a>). The horizontal speed for the object in <a href="#graphics-coordinates">x coordinate</a> units per animation frame.</p>
+<h5 id="yspeed">ySpeed</h5>
+<p>(<a href="#java-data-types">double</a>). The vertical speed for the object in <a href="#graphics-coordinates">y coordinate</a> units per animation frame.</p>
+<h4 id="notes-24">Notes</h4>
+<p>Before each new animation frame, the <code>xSpeed</code> and <code>ySpeed</code> are added to the <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> fields of the object, respectively. Animation frames occur 60 times per second, so an <code>xSpeed</code> of <code>1.0</code> will cause the object to move to the right at 60 units per second.</p>
+<p>The <code>xSpeed</code> and <code>ySpeed</code> can be negative, so for example, a <code>ySpeed</code> of <code>-0.5</code> will cause the object to move up at 30 units per second.</p>
+<h4 id="example-41">Example</h4>
+<pre><code>GameObj dot = ct.circle( 0, 50, 10 );
+dot.setSpeed( 0.3, 0 );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setspeed"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setspeed">obj.setSpeed()</a></h6>
+<h3 id="obj.align">obj.align()</h3>
+<p>Sets the alignment of a <a href="#java-data-types">GameObj</a>, which determines where it is located relative to its <a href="#graphics-coordinates">(x, y) coordinates</a>.</p>
+<h4 id="syntax-63">Syntax</h4>
+<pre><code>obj.align( alignment );</code></pre>
+<h5 id="obj-9">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="alignment">alignment</h5>
+<p>(<a href="#java-data-types">String</a>). One of the following strings describing the placement of an object relative to its (x, y):</p>
+<pre><code>alignment         horizontal            vertical
+--------------    -----------------     ------------------------
+&quot;top left&quot;        to the right of x     below y
+&quot;top&quot;             centered at x         below y
+&quot;top right&quot;       to the left of x      below y
+&quot;left&quot;            to the right of x     vertically centered at y
+&quot;center&quot;          centered at x         vertically centered at y
+&quot;right&quot;           to the left of x      vertically centered at y
+&quot;bottom left&quot;     to the right of x     above y
+&quot;bottom&quot;          centered at x         above y
+&quot;bottom right&quot;    to the left of x      above y</code></pre>
+<h4 id="notes-25">Notes</h4>
+<p>The default alignment is <code>&quot;center&quot;</code>, so that objects are horizontally and vertically centered around the (x, y) coordinates of the object.</p>
+<p>Line objects (see <a href="#ct.line">ct.line()</a>) ignore the alignment setting and are always drawn from the first point to the second point.</p>
+<h4 id="example-42">Example</h4>
+<pre><code>// Make the score text right-aligned in the upper right of the screen
+GameObj score = ct.text( &quot;Score: 0&quot;, 100, 0 );
+score.align( &quot;top right&quot; )</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.align"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.align">obj.align()</a></h6>
+<h3 id="obj.gettext">obj.getText()</h3>
+<p>Returns the text of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-64">Syntax</h4>
+<pre><code>obj.getText()</code></pre>
+<h5 id="obj-10">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-37"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). The text of the object. For a text object (see <a href="#ct.text">ct.text()</a>), this is the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object (see <a href="#obj.settext">obj.setText()</a>).</p>
+<h4 id="notes-26">Notes</h4>
+<p>For an image object (see <a href="#ct.image">ct.image()</a>), the text defaults to the image filename, but you can change it to something else (see <a href="#obj.settext">obj.setText()</a>).</p>
+<p>For circle, rect, and line objects, the default text is <code>null</code> (none).</p>
+<p>The <a href="#obj.tostring">obj.toString()</a> method includes the object text, if any, in the description of an object.</p>
+<h4 id="example-43">Example</h4>
+<pre><code>public void start()
+{
+    GameObj dot = ct.circle( 50, 50, 10 );
+    dot.setText( &quot;bomb&quot; );
+}
+
+public void update()
+{
+    GameObj target = ct.objectClicked();
+    String text = target.getText();
+    if (text != null &amp;&amp; text.equals( &quot;bomb&quot; ))
+        ct.println( &quot;You clicked a bomb&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.gettext"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.gettext">obj.getText()</a></h6>
 <h3 id="obj.settext">obj.setText()</h3>
-<pre><code>obj.setText( String text )</code></pre>
-<p>Set the text of an object to <code>text</code>. If the object is a text object, setting the text will cause the visible text to change. For other object types, the text is simply stored in the object (See <code>obj.getText()</code> above).</p>
+<p>Sets the text of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-65">Syntax</h4>
+<pre><code>obj.setText( text )</code></pre>
+<h5 id="obj-11">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="text-1">text</h5>
+<p>(<a href="#java-data-types">String</a>). The text to store in the object. For a text object (see <a href="#ct.text">ct.text()</a>), this becomes the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object (see <a href="#obj.gettext">obj.getText()</a>).</p>
+<h4 id="notes-27">Notes</h4>
+<p>For an image object (see <a href="#ct.image">ct.image()</a>), the text defaults to the image filename, but you can change it to something else.</p>
+<p>For circle, rect, and line objects, the default text is <code>null</code> (none).</p>
+<p>The <a href="#obj.tostring">obj.toString()</a> method includes the object text, if any, in the description of an object.</p>
+<h4 id="example-44">Example</h4>
+<pre><code>GameObj message;
+
+public void start()
+{
+    message = ct.text( &quot;Waiting for a click&quot;, 50, 50, 10 );
+}
+
+public void update()
+{
+    if (ct.clicked())
+        message.text = &quot;You clicked&quot;;
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.settext"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.settext">obj.setText()</a></h6>
 <h3 id="obj.tostring">obj.toString()</h3>
-<pre><code>String obj.toString()</code></pre>
-<p>Return a string description of the object suitable for printing for diagnostic purposes (via <code>ct.println()</code>, <code>ct.log()</code>, etc.) The string will include the type name of the object, the (<code>x</code>, <code>y</code>) coordinates rounded to the nearest integer, and the text of the object, if any. The entire string is enclosed in square brackets.</p>
-<h5 id="examples-18">Examples:</h5>
+<p>Returns a text (<a href="#java-data-types">String</a>) description of a graphics object (<a href="#java-data-types">GameObj</a>).</p>
+<h4 id="syntax-66">Syntax</h4>
+<pre><code>obj.toString()</code></pre>
+<h5 id="obj-12">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-38"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">String</a>). A description of the object. The string will include the type name of the object, the (x, y) coordinates rounded to the nearest integer, and the text of the object, if any (see <a href="#obj.settext">obj.setText()</a>). The entire string is enclosed in square brackets. Examples:</p>
 <pre><code>[circle at (70, 25)]
 [text at (50, 10) &quot;Score 3200&quot;]
 [image at (21, 83) &quot;goldfish.png&quot;]
 [image at (21, 83) &quot;hero&quot;]
 [rect at (50, 100) &quot;bottom wall&quot;]</code></pre>
-<h3 id="obj.getwidth">obj.getWidth()</h3>
-<p>Returns the width of the object. See <a href="#obj.setsize">obj.setSize()</a>.</p>
-<h3 id="obj.getheight">obj.getHeight()</h3>
-<p>Returns the height of the object. See <a href="#obj.setsize">obj.setSize()</a>.</p>
-<h3 id="obj.setsize">obj.setSize()</h3>
-<pre><code>obj.setSize( double width, double height )</code></pre>
-<p>Set the size of the object using <code>width</code> and <code>height</code>.</p>
-<p>Note that different types of objects react differently to changes in width or height, as follows:</p>
-<h5 id="circle-objects">circle Objects</h5>
-<p>Although circles are always created round, you can create an ellipse by setting different <code>width</code> and <code>height</code> values.</p>
-<h5 id="rect-objects">rect Objects</h5>
-<p>Rectangles can be any size and adjust to any <code>width</code> and <code>height</code>.</p>
-<h5 id="line-objects">line Objects</h5>
-<p>Line objects are created between two points. After creation, the <code>x</code> and <code>y</code> fields are the location of the first point, and the <code>width</code> and <code>height</code> fields specify signed offsets (can be negative) from the first point to the second point. Thus, the location of the second point is (<code>x</code> + <code>width</code>, <code>y</code> + <code>height</code>). You can change any of the <code>x</code>, <code>y</code>, <code>width</code>, or <code>height</code> fields, and the line will adjust.</p>
-<blockquote>
-<p>Note that unlike any of the other <code>GameObj</code> object types, a line may have negative values for the <code>width</code> and <code>height</code> fields. The physical width and height of the line’s bounding box can be reliably determined with<br />
-<code>Math.abs(line.width)</code> and <code>Math.abs(line.height)</code>. This does not include the thickness of the drawn line itself (see <a href="#obj.setlinewidth">obj.setLineWidth()</a>).</p>
-</blockquote>
-<h5 id="text-objects">text Objects</h5>
-<p>Text objects use a font size that is automatically determined by the object’s <code>height</code>, and the object’s <code>width</code> is calculated automatically. So, changing <code>height</code> will change the font size, and changes to the <code>width</code> field are undefined.</p>
-<blockquote>
-<p><strong>Note:</strong> When you change a text object’s <code>height</code>, the <code>width</code> will be recalculated automatically. However, the new value for <code>width</code> is not available immediately. It will be recalculated the next time the object draws (at the next animation frame).</p>
-</blockquote>
-<h5 id="image-objects">image Objects</h5>
-<p>Images are initially created with <code>height</code> calculated automatically to preserve the image’s aspect ratio given the specified <code>width</code>. However, once created, you can set any values for <code>width</code> and <code>height</code>, and the image will scale and/or stretch as necessary to fill the space.</p>
-<h3 id="obj.align">obj.align()</h3>
-<pre><code>obj.align( String alignment )</code></pre>
-<p>Set the alignment of the object to <code>alignment</code>. The alignment is a description of where where the object is positioned on screen relative to its <code>x</code> and <code>y</code> coordinates. By default, objects are positioned by their center point, so that (<code>x</code>, <code>y</code>) is at the horizontal and vertical center of the object.</p>
-<p>The following alignments are supported, which describe the location of (<code>x</code>, <code>y</code>) on the object:</p>
-<pre><code>&quot;top left&quot;
-&quot;top&quot;             or &quot;top center&quot;
-&quot;top right&quot;
-&quot;left&quot;            (vertically centered)
-&quot;center&quot;          (vertically centered)
-&quot;right&quot;           (vertically centered)
-&quot;bottom left&quot;
-&quot;bottom&quot;          or &quot;bottom center&quot;
-&quot;bottom right&quot;</code></pre>
+<h4 id="notes-28">Notes</h4>
+<p>The text output functions <a href="#ct.print">ct.print()</a>, <a href="#ct.println">ct.println()</a>, <a href="#ct.log">ct.log()</a>, and <a href="#ct.logm">ct.logm()</a> automatically call <code>obj.toString()</code> internally if you print a <a href="#java-data-types">GameObj</a> directly, so there is no need to explicitly call <code>obj.toString()</code> to print a <a href="#java-data-types">GameObj</a> description with these functions.</p>
+<h4 id="example-45">Example</h4>
+<pre><code>GameObj message;
+
+public void start()
+{
+    message = ct.text( &quot;&quot;, 50, 20, 10 );
+    ct.circle( 30, 50, 10 );
+    ct.rect( 70, 50, 10, 10 );
+}
+
+public void update()
+{
+    GameObj target = ct.objectClicked();
+    if (target != null)
+        message.text = target.toString();
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.tostring"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.tostring">obj.toString()</a></h6>
 <h3 id="obj.setfillcolor">obj.setFillColor()</h3>
-<pre><code>obj.setFillColor( String color )</code></pre>
-<p>Set the fill color of the object (text color for text objects) to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>. If <code>color</code> is <code>null</code> then the fill is removed from the object.</p>
+<p>Sets the fill color of a <a href="#java-data-types">GameObj</a> to one of the pre-defined <a href="#color-names">color names</a>.</p>
+<h4 id="syntax-67">Syntax</h4>
+<pre><code>obj.setFillColor( color );</code></pre>
+<h5 id="obj-13">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="color-5">color</h5>
+<p>(<a href="#java-data-types">String</a>). A <a href="#color-names">color name</a>, for example <code>&quot;blue&quot;</code>. If <code>color</code> is <code>null</code> then the fill is removed from the object.</p>
+<h4 id="notes-29">Notes</h4>
+<p>For a text object (see <a href="#ct.text">ct.text()</a>), the color of the text is set.</p>
+<blockquote>
+<p>If you want a solid “background color” for a text object, use <a href="#ct.rect">ct.rect()</a> to create a rectangle behind the text object.</p>
+</blockquote>
+<h4 id="example-46">Example</h4>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+dot.setFillColor( &quot;blue&quot; );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setfillcolor"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setfillcolor">obj.setFillColor()</a></h6>
 <h3 id="obj.setfillcolorrgb">obj.setFillColorRGB()</h3>
-<pre><code>obj.setFillColorRGB( int red, int green, int blue )</code></pre>
-<p>Set the fill color of the object (text color for text objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
+<p>Sets the fill color of a <a href="#java-data-types">GameObj</a> to a custom RGB color with red, green, and blue component values.</p>
+<h4 id="syntax-68">Syntax</h4>
+<pre><code>obj.setFillColorRGB( red, green, blue );</code></pre>
+<h5 id="obj-14">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="red-1">red</h5>
+<p>(<a href="#java-data-types">int</a>). The red component for the color, from 0 to 255.</p>
+<h5 id="green-1">green</h5>
+<p>(<a href="#java-data-types">int</a>). The green component for the color, from 0 to 255.</p>
+<h5 id="blue-1">blue</h5>
+<p>(<a href="#java-data-types">int</a>). The blue component for the color, from 0 to 255.</p>
+<h4 id="notes-30">Notes</h4>
+<p>For a text object (see <a href="#ct.text">ct.text()</a>), the color of the text is set.</p>
+<blockquote>
+<p>If you want a solid “background color” for a text object, use <a href="#ct.rect">ct.rect()</a> to create a rectangle behind the text object.</p>
+</blockquote>
+<h4 id="example-47">Example</h4>
+<pre><code>GameObj blob = ct.circle( 50, 50, 20 );
+blob.setFillColorRGB( 0, 60, 255 );     // greenish-blue</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setfillcolorrgb"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setfillcolorrgb">obj.setFillColorRGB()</a></h6>
 <h3 id="obj.setlinecolor">obj.setLineColor()</h3>
-<pre><code>obj.setLineColor( String color )</code></pre>
-<p>Set the line color of the object (the outline stroke color for objects other than line objects) to the pre-defined color named <code>color</code>. See <a href="#color-names">Color Names</a>. If <code>color</code> is <code>null</code> then the stroke is removed from the object.</p>
+<p>Sets the line color of a <a href="#java-data-types">GameObj</a> to one of the pre-defined <a href="#color-names">color names</a>.</p>
+<h4 id="syntax-69">Syntax</h4>
+<pre><code>obj.setLineColor( color );</code></pre>
+<h5 id="obj-15">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="color-6">color</h5>
+<p>(<a href="#java-data-types">String</a>). A <a href="#color-names">color name</a>, for example <code>&quot;blue&quot;</code>. If <code>color</code> is <code>null</code> then the outline is removed from the object.</p>
+<h4 id="notes-31">Notes</h4>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the color of the line is set. For other object types, the color of the outlined border of the object is set.</p>
+<h4 id="example-48">Example</h4>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+dot.setLineColor( &quot;green&quot; );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setlinecolor"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setlinecolor">obj.setLineColor()</a></h6>
 <h3 id="obj.setlinecolorrgb">obj.setLineColorRGB()</h3>
-<pre><code>obj.setLineColorRGB( int red, int green, int blue )</code></pre>
-<p>Set the line color of the object (the outline stroke color for objects other than line objects) to the custom RGB color with components <code>red</code>, <code>green</code>, and <code>blue</code> in the range 0-255.</p>
+<p>Sets the line color of a <a href="#java-data-types">GameObj</a> to a custom RGB color with red, green, and blue component values.</p>
+<h4 id="syntax-70">Syntax</h4>
+<pre><code>obj.setLineColorRGB( red, green, blue );</code></pre>
+<h5 id="obj-16">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="red-2">red</h5>
+<p>(<a href="#java-data-types">int</a>). The red component for the color, from 0 to 255.</p>
+<h5 id="green-2">green</h5>
+<p>(<a href="#java-data-types">int</a>). The green component for the color, from 0 to 255.</p>
+<h5 id="blue-2">blue</h5>
+<p>(<a href="#java-data-types">int</a>). The blue component for the color, from 0 to 255.</p>
+<h4 id="notes-32">Notes</h4>
+<p>For line objects (see <a href="#ct.line">ct.line()</a>), the color of the line is set. For other object types, the color of the outlined border of the object is set.</p>
+<h4 id="example-49">Example</h4>
+<pre><code>GameObj blob = ct.circle( 50, 50, 20 );
+blob.setLineColorRGB( 0, 60, 255 );     // greenish-blue outline</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setlinecolorrgb"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setlinecolorrgb">obj.setLineColorRGB()</a></h6>
 <h3 id="obj.setlinewidth">obj.setLineWidth()</h3>
-<pre><code>obj.setLineWidth( int lineWidth )</code></pre>
-<p>If an object has a line color (see <a href="#obj.setlinecolor">obj.setLineColor()</a> and <a href="#obj.setlinecolorrgb">obj.setLineColorRGB()</a>), then the object will be outlined in this color with a stroke of approximately <code>lineWidth</code> pixels. The default is 1.</p>
+<p>Sets the line width (thickness) of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-71">Syntax</h4>
+<pre><code>obj.setLineWidth( lineWidth );</code></pre>
+<h5 id="obj-17">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="linewidth">lineWidth</h5>
+<p>(<a href="#java-data-types">int</a>). The line thickness in pixels.</p>
+<h4 id="notes-33">Notes</h4>
+<p>If an object has a line color (see <a href="#obj.setlinecolor">obj.setLineColor()</a> and <a href="#obj.setlinecolorrgb">obj.setLineColorRGB()</a>), then the object will be outlined with a stroke (pen thickness) of approximately <code>lineWidth</code> pixels. The default is line width 1.</p>
 <blockquote>
-<p>Unlike normal coordinate values, <code>lineWidth</code> values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and may vary, but the overall intent is that on a screen of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution screens may use multiple pixels, and some platforms may use partial pixels for a smoother appearance (anti-aliasing).</p>
+<p>Unlike normal <a href="#graphics-coordinates">coordinate values</a>, line thickness values are measured in approximate device “pixels”, so apparent line thickness does not scale up as the window size is increased. The definition of “pixels” depends on the platform and the display, but the overall intent is that on a display of “normal” resolution (e.g. HD resolution, not 4K or Retina), a <code>lineWidth</code> of 1 will result in an appoximate 1 pixel border. High resolution displays may use multiple pixels, and some displays may use partial pixels for a smoother appearance (anti-aliasing).</p>
 </blockquote>
+<h4 id="example-50">Example</h4>
+<pre><code>GameObj frame = ct.rect( 50, 50, 60, 30 );
+frame.setLineWidth( 5 );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setlinewidth"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setlinewidth">obj.setLineWidth()</a></h6>
 <h3 id="obj.getlayer">obj.getLayer()</h3>
-<pre><code>int obj.getLayer()</code></pre>
-<p>Return the layer number for the object. See <code>obj.setLayer()</code> below.</p>
+<p>Returns the layer number for a <a href="#java-data-types">GameObj</a>. See <a href="#obj.setlayer">obj.setLayer()</a>.</p>
+<h4 id="syntax-72">Syntax</h4>
+<pre><code>obj.getLayer()</code></pre>
+<h5 id="obj-18">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-39"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">int</a>). The layer number as set by <a href="#obj.setlayer">obj.setLayer()</a>, which helps determine the stacking order of objects.</p>
+<h4 id="example-51">Example</h4>
+<pre><code>GameObj target = ct.objectClicked();
+if (target != null &amp;&amp; target.getLayer() == 0)
+    ct.println( &quot;You clicked on one of the background items&quot; );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.getlayer"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.getlayer">obj.getLayer()</a></h6>
 <h3 id="obj.setlayer">obj.setLayer()</h3>
-<pre><code>obj.setLayer( int layer )</code></pre>
-<p>Set the layer number for the object. The layer number can be used to easily control the stacking order of groups of objects. The default layer is 1, and you can set any integer value. After the background color or image, object layers are drawn from the lowest value first (in the back) to the highest values (in the front).</p>
-<p>Within a layer, objects are drawn in the order that they were created or set to that layer number. Calling <code>obj.setLayer()</code> always re-inserts an object at the top of that layer.</p>
+<p>Sets the layer number for a <a href="#java-data-types">GameObj</a>, which helps controls the stacking order of objects on the screen.</p>
+<h4 id="syntax-73">Syntax</h4>
+<pre><code>obj.setLayer( layer )</code></pre>
+<h5 id="obj-19">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="layer">layer</h5>
+<p>(<a href="#java-data-types">int</a>). The layer number to set for the object.</p>
+<h4 id="notes-34">Notes</h4>
+<p>By default, <a href="#java-data-types">GameObj</a> objects are all assigned a layer number of 1 when they are created. You can use <code>obj.setLayer()</code> to change an object’s layer number to any integer value. The layer numbers themselves have no special meaning; they are just used to order objects relative to other layer numbers.</p>
+<p>After the screen background color or image is drawn (as set by <a href="#ct.setbackcolor">ct.setBackColor()</a>, <a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a>, or <a href="#ct.setbackimage">ct.setBackImage()</a>), graphics object layers are drawn from the lowest layer number first (in the back) to the highest number (in the front).</p>
+<p>Within a layer, objects are drawn in the order that they were created or set to that layer number. Calling <code>obj.setLayer( layer )</code> always re-inserts an object at the top of <code>layer</code>, on top of any other objects with that same layer number.</p>
+<p>You can use any layer number values to help organize your screen how you want. As an example, you might assign various background object in a game to layer 0, floating objects such as score readouts and messages to layer 2, and leave the normal game objects in the default layer 1. Thus if you create new game objects during the game, they will be properly placed above the background objects but below the floating objects.</p>
+<h4 id="examples-21">Examples</h4>
+<pre><code>public void start()
+{
+    // Make some walls in the back
+    GameObj border = ct.rect( 50, 0, 100, 20 );
+    border.setLayer( 0 );
+    border = ct.rect( 50, 100, 100, 20 );
+    border.setLayer( 0 );
+    border = ct.rect( 0, 0, 20, 100 );
+    border.setLayer( 0 );
+    border = ct.rect( 100, 0, 20, 100 );
+    border.setLayer( 0 );
+
+    // Make the score readout
+    GameObj score = ct.text( &quot;Score: 0&quot;, 50, 30, 10 );
+    score.setLayer( 2 );
+}
+
+public void update()
+{
+    // Make dots whereever the user clicks
+    if (ct.clicked())
+        ct.circle( ct.clickX(), ct.clickY(), 10 );
+}</code></pre>
+<pre><code>// Move an object to the top of the layer it is currently in
+target.setLayer( target.getLayer() );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setlayer"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setlayer">obj.setLayer()</a></h6>
 <h3 id="obj.delete">obj.delete()</h3>
-<pre><code>obj.delete()</code></pre>
-<p>Remove and delete the object from the screen.</p>
+<p>Removes and deletes a <a href="#java-data-types">GameObj</a> from the screen.</p>
+<h4 id="syntax-74">Syntax</h4>
+<pre><code>obj.delete();</code></pre>
+<h5 id="obj-20">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h4 id="notes-35">Notes</h4>
+<p>The object is removed from the screen and deleted. Unlike hiding an object using the <a href="#obj.visible">obj.visible</a> field, deleting an object is permanent, and it cannot be brought back.</p>
 <blockquote>
-<p>Attempting to access the fields or methods of an object after it has been deleted may result in unpredictable behavior.</p>
+<p>Once an object has been deleted, any variables referencing that object will still exist, but accessing the fields or methods of the object is undefined and may result in unpredictable behavior.</p>
 </blockquote>
+<h4 id="example-52">Example</h4>
+<pre><code>public void update()
+{
+    // Delete any objects that get clicked
+    GameObj target = ct.objectClicked();
+    if (target != null)
+        target.delete();
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.delete"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.delete">obj.delete()</a></h6>
+<h3 id="obj.setclickable">obj.setClickable()</h3>
+<p>Specifies whether or not a <a href="#java-data-types">GameObj</a> should accept mouse/touch input.</p>
+<h4 id="syntax-75">Syntax</h4>
+<pre><code>obj.setClickable( clickable );</code></pre>
+<h5 id="obj-21">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="clickable">clickable</h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> to allow the object to accept mouse/touch input, or <code>false</code> to disable it.</p>
+<h4 id="notes-36">Notes</h4>
+<p>By default, all <a href="#java-data-types">GameObj</a> objects will detect and accept mouse/touch input (clicks), but you can disable click detection for an object by using <code>obj.setClickable( false )</code>.</p>
+<p>The functions <a href="#ct.objectclicked">ct.objectClicked()</a> and <a href="#obj.clicked">obj.clicked()</a>, and the input event functions [ct.onMousePress()], [ct.onMouseDrag()], and [ct.onMouseRelease()] can all be be used to identify if a <a href="#java-data-types">GameObj</a> was clicked and which object it was.</p>
+<p>If more than one object intersects the click location, then normally the topmost object will be considered to be the target of the click. However if an object has had click input disabled with <code>obj.setClickable( false )</code>, then the click will “pass through” to the next lower object that intersects the click location (if any), or to the background if none.</p>
+<h4 id="example-53">Example</h4>
+<pre><code>GameObj button;
+
+public void start()
+{
+    // Make a button with both text and a background rect, but let the rect
+    // handle the click detection, so we don&#39;t have to test both.
+    button = ct.rect( 50, 50, 30, 15 );
+    GameObj text = ct.text( &quot;Click me&quot;, 50, 50, 10 );
+    text.setClickable( false );   // change to true to see the difference
+}
+
+public void update()
+{
+    if (button.clicked())
+        ct.println( &quot;Button was clicked&quot;);
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.setclickable"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setclickable">obj.setClickable()</a></h6>
 <h3 id="obj.clicked">obj.clicked()</h3>
-<pre><code>boolean obj.clicked()</code></pre>
-<p>Return <code>true</code> if the object was clicked or touched during the last animation frame. Only objects with both the <code>visible</code> and <code>clickable</code> fields set to <code>true</code> will receive mouse/touch input.</p>
+<p>Returns <code>true</code> if a <a href="#java-data-types">GameObj</a> was clicked/touched during the last animation frame.</p>
+<h4 id="syntax-76">Syntax</h4>
+<pre><code>obj.clicked()</code></pre>
+<h5 id="obj-22">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="return-value-40"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if the object was clicked/touched during the last animation frame, or <code>false</code> if not.</p>
+<h4 id="notes-37">Notes</h4>
 <p>Calling this method for an object every time during your <a href="#update">update()</a> function will detect any clicks on the object.</p>
 <blockquote>
-<p>If more than one visible and clickable object intersects with the location of a click or touch, the topmost one will receive the click. Objects that are not both visible and clickable are ignored when determining the object that was clicked.</p>
+<p>Calling <code>obj.clicked()</code> in your <a href="#start">start()</a> function will have no effect, because <a href="#start">start()</a> is only called once before animation frames have begun.</p>
 </blockquote>
-<h3 id="obj.containspoint">obj.containsPoint()</h3>
-<pre><code>boolean obj.containsPoint( double x, double y )</code></pre>
-<p>Return <code>true</code> if the point (<code>x</code>, <code>y</code>) lies within the interior of the object, or on the border.</p>
-<blockquote>
-<p>Text and image objects use the rectangular bounds of the object for the test. Circles (or ellipses) use the curved shape. Lines have no interior and always return <code>false</code>.</p>
-</blockquote>
-<h3 id="obj.hit">obj.hit()</h3>
-<pre><code>boolean obj.hit( GameObj objTest )</code></pre>
-<p>Return <code>true</code> if the object currently intersects with another object <code>objTest</code>. If you call this method every time in your <a href="#update">update()</a> function, it can be used to test if/when two objects “hit” each other.</p>
-<h3 id="obj.objecthitingroup-string-group">obj.objectHitInGroup( String group )</h3>
-<pre><code>GameObj obj.objectHitInGroup( String group )</code></pre>
-<p>If the object currently intersects with another <code>GameObj</code> object on the current screen that has its <a href="#group">group</a> field equal to <code>group</code>, then return a reference to the other object, otherwise return <code>null</code>. If the specified <code>group</code> is <code>null</code> then all objects on the current screen will be considered.</p>
-<blockquote>
-<p>Note that <code>obj.objectHitInGroup()</code> will return <code>null</code> if no matching object intersects <code>obj</code>, so you must check the return value for <code>null</code> before using the <code>GameObj</code> returned.</p>
-</blockquote>
-<h2 id="java-math-methods-and-fields-supported">Java Math Methods and Fields Supported</h2>
-<p>Code12 supports the following fields and method functions from the Java <code>Math</code> class.</p>
-<pre><code>Field       Type
--------     ------
-Math.E      double
-Math.PI     double
+<p>If an object is currently hidden because <a href="#obj.visible">obj.visible</a> was set to <code>false</code>, or if the object has click input disabled (see <a href="#obj.setclickable">obj.setClickable()</a>), then <code>obj.clicked()</code> will always return <code>false</code>.</p>
+<p>If more than one visible and clickable object intersects with the location of a click or touch, the topmost one will receive the click.</p>
+<h4 id="example-54">Example</h4>
+<pre><code>GameObj dot;
 
-Function               Parameter Type(s)   Return Type
+public void start()
+{
+    dot = ct.circle( 50, 50, 10 );
+}
+
+public void update()
+{
+    if (dot.clicked())
+        ct.println( &quot;The dot was clicked&quot;);
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.clicked"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.clicked">obj.clicked()</a></h6>
+<h3 id="obj.containspoint">obj.containsPoint()</h3>
+<p>Returns <code>true</code> if a specified (x, y) location is within the interior of a <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-77">Syntax</h4>
+<pre><code>obj.containsPoint( x, y )</code></pre>
+<h5 id="obj-23">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="x-5">x</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of the point to test.</p>
+<h5 id="y-5">y</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of the point to test.</p>
+<h5 id="return-value-41"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if (<code>x</code>, <code>y</code>) is inside the object, or <code>false</code> if not.</p>
+<h4 id="notes-38">Notes</h4>
+<p>Text (<a href="#ct.text">ct.text()</a>) and image (<a href="#ct.image">ct.image()</a>) objects test the rectangular bounds of the object.</p>
+<p>Except for line objects (<a href="#ct.line">ct.line()</a>), the thickness of the border of the object (see <a href="#obj.setlinewidth">obj.setLineWidth()</a>) is not included as part of the object area.</p>
+<h4 id="example-55">Example</h4>
+<pre><code>if (hero.containsPoint( 50, 50 ))
+    ct.println( &quot;Hero is over the center of the screen&quot; );</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.containspoint"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.containspoint">obj.containsPoint()</a></h6>
+<h3 id="obj.hit">obj.hit()</h3>
+<p>Return <code>true</code> if a <a href="#java-data-types">GameObj</a> currently intersects another specified <a href="#java-data-types">GameObj</a>.</p>
+<h4 id="syntax-78">Syntax</h4>
+<pre><code>obj.hit( objTest )</code></pre>
+<h5 id="obj-24">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). A graphics object.</p>
+<h5 id="objtest">objTest</h5>
+<p>(<a href="#java-data-types">GameObj</a>). Another graphics object.</p>
+<h5 id="return-value-42"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">boolean</a>). <code>true</code> if <code>obj</code> and <code>objTest</code> are currently overlapping (or partially overlapping) on the screen.</p>
+<h4 id="notes-39">Notes</h4>
+<p>Calling this method every time in your <a href="#update">update()</a> function can be used to test if/when two objects “hit” each other.</p>
+<p>Text (<a href="#ct.text">ct.text()</a>) and image (<a href="#ct.image">ct.image()</a>) objects test the rectangular bounds of the object.</p>
+<p>Except for line objects (<a href="#ct.line">ct.line()</a>), the thickness of the border of the object (see <a href="#obj.setlinewidth">obj.setLineWidth()</a>) is not included as part of the object area.</p>
+<h4 id="example-56">Example</h4>
+<pre><code>GameObj block, dot;
+
+public void start()
+{
+    block = ct.rect( 70, 50, 10, 10 );
+    dot = ct.circle( 20, 50, 10 );
+    dot.setSpeed( 1, 0 );
+}
+
+public void update()
+{
+    if (dot.hit( block ))
+    {
+        ct.println( &quot;The dot hit the block&quot; );
+        dot.setSpeed( 0, 0 );
+    }
+}</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.hit"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.hit">obj.hit()</a></h6>
+<h3 id="obj.objecthitingroup">obj.objectHitInGroup()</h3>
+<p>Determines if a <a href="#java-data-types">GameObj</a> currently intersects another <a href="#java-data-types">GameObj</a> in the specified group.</p>
+<h4 id="syntax-79">Syntax</h4>
+<pre><code>obj.objectHitInGroup( group )</code></pre>
+<h5 id="obj-25">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
+<h5 id="group">group</h5>
+<p>(<a href="#java-data-types">String</a>). A group name for objects (see <a href="#obj.group">obj.group</a>), or <code>null</code> to consider all objects.</p>
+<h5 id="return-value-43"><em>Return Value</em></h5>
+<p>(<a href="#java-data-types">GameObj</a>). If <code>obj</code> currently intersects (overlaps or partially overlaps) another <a href="#java-data-types">GameObj</a> that has <a href="#obj.group">obj.group</a> equal to <code>group</code> (or any object if <code>group</code> is <code>null</code>), then the other <a href="#java-data-types">GameObj</a> is returned, otherwise <code>null</code> is returned.</p>
+<blockquote>
+<p>Note that <code>null</code> is returned if no intersecting object is found, so you must check the return value for <code>null</code> before using the <a href="#java-data-types">GameObj</a> returned.</p>
+</blockquote>
+<h4 id="notes-40">Notes</h4>
+<p>Calling this method every time in your <a href="#update">update()</a> function can be used to test if/when an object “hits” any other objects that you are interested in.</p>
+<p>Text (<a href="#ct.text">ct.text()</a>) and image (<a href="#ct.image">ct.image()</a>) objects test the rectangular bounds of the object.</p>
+<p>Except for line objects (<a href="#ct.line">ct.line()</a>), the thickness of the border of the object (see <a href="#obj.setlinewidth">obj.setLineWidth()</a>) is not included as part of the object area.</p>
+<h4 id="example-57">Example</h4>
+<pre><code>GameObj target = bullet.objectHitInGroup( &quot;targets&quot; );
+if (target != null)
+    target.delete();</code></pre>
+<h6 id="code12-function-reference-gameobj-methods-obj.objecthitingroup"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.objecthitingroup">obj.objectHitInGroup()</a></h6>
+<h2 id="java-math-methods">Java Math Methods</h2>
+<p>Code12 supports the following method functions and fields from the Java <code>Math</code> class.</p>
+<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html">Java Math Class</a>.</p>
+<pre><code>Function               Parameter Type(s)   Return Type
 --------------------   -----------------   -----------
 Math.abs( number )     double              double
 Math.abs( number )     int                 int
@@ -1285,10 +1926,17 @@ Math.sin( angle )      double              double
 Math.sinh( angle )     double              double
 Math.sqrt( number )    double              double
 Math.tan( angle )      double              double
-Math.tanh( angle )     double              double</code></pre>
-<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html">Java Math Class</a>.</p>
-<h2 id="java-string-methods-supported">Java String Methods Supported</h2>
+Math.tanh( angle )     double              double
+
+Field       Type
+-------     ------
+Math.E      double
+Math.PI     double
+</code></pre>
+<h6 id="code12-function-reference-java-math-methods"><a href="#top">Code12 Function Reference</a> &gt; <a href="#java-math-methods">Java Math Methods</a></h6>
+<h2 id="java-string-methods">Java String Methods</h2>
 <p>Code12 supports the following method functions from the Java <code>String</code> class. String methods must operate on a variable of type <a href="#java-data-types">String</a>, shown below as <code>str</code>.</p>
+<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">Java String Class</a>.</p>
 <pre><code>Function                      Parameter Type(s)   Return Type
 ---------------------------   -----------------   -----------
 str.compareTo( str2 )         String              int
@@ -1300,75 +1948,287 @@ str.substring( begin, end )   int, int            String
 str.toLowerCase()                                 String
 str.toUpperCase()                                 String
 str.trim()                                        String</code></pre>
-<p>For more information, see the <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">Java String Class</a>.</p>
+<h6 id="code12-function-reference-java-string-methods"><a href="#top">Code12 Function Reference</a> &gt; <a href="#java-string-methods">Java String Methods</a></h6>
 <h2 id="main-program-functions">Main Program Functions</h2>
+<p>The functions <a href="#start">start()</a> and <a href="#update">update()</a> are two functions that your program provides to contain the code for your program. Unlike other Code12 functions, you do not call the <a href="#start">start()</a> or <a href="#update">update()</a> functions. Instead, you <em>write</em> these functions by providing the function body in { brackets }, and <em>Code12 will call them</em> when appropriate.</p>
+<p>Your <a href="#start">start()</a> function is called once at the beginning of each new run of your program, and then <a href="#update">update()</a> is called before each new animation frame is drawn (60 times per second).</p>
+<p>The sequence of events for a Code12 program is:</p>
+<ol type="1">
+<li>Any class-level variables that you declare are initialized.</li>
+<li>Code in your <a href="#start">start()</a> function is executed.</li>
+<li>Code12 draws the graphics screen for the first time.</li>
+<li>The following steps are now repeated until the program is stopped:
+<ol type="a">
+<li>The system waits until the next animation frame (about 1/60th of a second).</li>
+<li>Code in your <a href="#update">update()</a> function is executed.</li>
+<li>The system redraws the graphics screen.</li>
+</ol></li>
+</ol>
+<h6 id="code12-function-reference-main-program-functions"><a href="#top">Code12 Function Reference</a> &gt; <a href="#main-program-functions">Main Program Functions</a></h6>
 <h3 id="start">start()</h3>
-<pre><code>void start()</code></pre>
-<p>The <code>start</code> function is called once at the beginning of your program. This is good place to create most of the objects for your program (except for any objects that get created as a result of an action that occurs while the application is running).</p>
+<p>Your <code>start()</code> function is executed once at the beginning of the program.</p>
+<h4 id="syntax-80">Syntax</h4>
+<pre><code>public void start()
+{
+    // Code you write here runs once at the beginning of the program
+}</code></pre>
+<h4 id="example-58">Example</h4>
+<pre><code>public void start()
+{
+    ct.rect( 50, 50, 70, 30 );
+    ct.text( &quot;Welcome to Code12!&quot;, 50, 50, 10 );
+    ct.println( &quot;This is the text output area&quot; );
+}</code></pre>
+<h6 id="code12-function-reference-start"><a href="#top">Code12 Function Reference</a> &gt; <a href="#start">start()</a></h6>
 <h3 id="update">update()</h3>
-<pre><code>void update()</code></pre>
-<p>The <code>update</code> function is called at the beginning of each animation frame. Animation frames start after the <code>start()</code> function has completed and then repeat continuously 60 times per second.</p>
+<p>Your <code>update()</code> function is executed before each animation frame is drawn (60 times per second).</p>
+<h4 id="syntax-81">Syntax</h4>
+<pre><code>public void update()
+{
+    // Code you write here runs before each animation frame is drawn
+}</code></pre>
+<h4 id="notes-41">Notes</h4>
+<p>Animation frames start after the <a href="#start">start()</a> function has completed and then repeat continuously 60 times per second.</p>
 <p>One use of animation frames is to achieve object motion and animation. For example, if you move an object 1 display unit to the right in your <a href="#update">update()</a> function, then the object will move continuously at 60 units per second.</p>
-<p>Another use of animation frames is to test repeatedly for user input, using functions such as <code>ct.clicked()</code>, <code>ct.keyPressed()</code>, and <code>ct.keyTyped()</code>, and the <code>GameObj</code> method <code>obj.clicked()</code>.</p>
-<p>You can also use animation frames to test repeatedly for object interactions that can occur when objects are moving. You can examine object fields such as <code>x</code> and <code>y</code> directly, call the <code>GameObj</code> methods <code>obj.containsPoint()</code> and <code>obj.hit()</code>, call the function <code>ct.distance()</code> or write any code you want that tests what you need to detect.</p>
-<p>Finally, note that you can call <code>ct.getTimer()</code> to detect the passage of certain amounts of time if you want.</p>
 <blockquote>
-<p>A common mistake is to create <code>GameObj</code> objects in the <a href="#update">update()</a> function in a way that causes many copies of the object to be created over and over. Note that you should <em>not</em> call functions like <code>ct.circle()</code> to “draw” a circle for each frame in an animation. Instead, you typically want to call <code>ct.circle()</code> to create the object once in your <code>start</code> function, then modify the existing circle in your <a href="#update">update()</a> function.</p>
+<p>A common mistake is to create <a href="#java-data-types">GameObj</a> objects in the <a href="#update">update()</a> function in a way that causes many copies of an object to be created over and over. Note that you should not call functions like <a href="#ct.image">ct.image()</a> to “draw” an image for each frame in an animation. Instead, you typically want to call <a href="#ct.image">ct.image()</a> to create the object once in your <a href="#start">start()</a> function then modify the existing image (e.g. change its <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a>) in your <a href="#update">update()</a> function.</p>
 </blockquote>
+<p>Another use of animation frames is to test repeatedly for user input, using functions such as <a href="#ct.clicked">ct.clicked()</a>, <a href="#ct.keypressed">ct.keyPressed()</a>, and [ct.keyTyped()], and <a href="#obj.clicked">obj.clicked()</a>.</p>
+<p>You can also use animation frames to test repeatedly for object interactions that can occur when objects are moving. You can call functions such as <a href="#obj.containspoint">obj.containsPoint()</a> and <a href="#obj.hit">obj.hit()</a>, or examine object locations using <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> and write any code you want that tests what you need to detect.</p>
+<p>Finally, note that you can call <a href="#ct.gettimer">ct.getTimer()</a> to detect the passage of certain amounts of time if you want to do something less frequently than every animation frame.</p>
+<h4 id="examples-22">Examples</h4>
+<pre><code>int frameCount = 0;
+
+public void start()
+{
+    ct.println( &quot;Program started&quot; );
+}
+
+public void update()
+{
+    frameCount++;
+    ct.println( &quot;Frame #&quot; + frameCount );
+}</code></pre>
+<pre><code>GameObj dot;
+
+public void start()
+{
+    dot = ct.circle( 0, 50, 10 );
+}
+
+public void update()
+{
+    dot.x++;
+}</code></pre>
+<h6 id="code12-function-reference-update"><a href="#top">Code12 Function Reference</a> &gt; <a href="#update">update()</a></h6>
 <h2 id="input-event-functions">Input Event Functions</h2>
-<p>The following functions, if defined in your program, will be called when indicated. Note that unlike all of the other functions and methods above, These functions are <em>implemented</em> in your program (you write the body of the function) and are <em>called</em> by the runtime system with appropriate. They are called in response to “events” happening in your application.</p>
-<p>Implementing any of these functions is optional and “for your information”. They are not necessary to use other functions and features of the system. For example, if you don’t implement any of the mouse event functions, you can still call functions such as <code>ct.clicked()</code> to test for mouse clicks.</p>
+<p>Input event functions are optional functions that you can provide to handle mouse/touch and keyboard input and to respond to system events. Like your <a href="#main-program-functions">Main Program Functions</a>, input event functions are <em>written</em> by you and <em>called by the Code12 system</em>.</p>
 <blockquote>
-<p><strong>Tip:</strong> If your program has complex mouse or keyboard handling (for example, many objects to check for clicks and many keys to test), then doing your work in the event functions will be more efficient than making many tests in your <a href="#update">update()</a> function.</p>
+<p>Using input event functions is optional and not required to handle mouse/touch or keyboard input. You can also use the <a href="#mouse-and-keyboard-input-1">Mouse and Keyboard Input</a> functions. Using input event functions is a more advanced technique that can be more flexible and more efficent.</p>
 </blockquote>
+<p>If defined in your program, the following functions will be called by the system when the corresponding input event occurs:</p>
+<ul>
+<li><a href="#onmousepress">onMousePress()</a></li>
+<li><a href="#onmousedrag">onMouseDrag()</a></li>
+<li><a href="#onmouserelease">onMouseRelease()</a></li>
+<li><a href="#onkeypress">onKeyPress()</a></li>
+<li><a href="#onkeyrelease">onKeyRelease()</a></li>
+<li><a href="#onchartyped">onCharTyped()</a></li>
+<li><a href="#onresize">onResize()</a></li>
+</ul>
+<h6 id="code12-function-reference-input-event-functions"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a></h6>
 <h3 id="onmousepress">onMousePress()</h3>
-<pre><code>void onMousePress( GameObj obj, double x, double y )</code></pre>
-<p>This event is called each time a mouse click or touch is detected. The point (<code>x</code>, <code>y</code>) is the location of the click in display coordinates (relative to the top-left of the application window).</p>
-<p>If <code>obj</code> is not <code>null</code>, then it indicates that the click occured on that object. Note that <code>GameObj</code> objects must have both their <code>visible</code> and <code>clickable</code> fields <code>true</code> to receive clicks. If <code>obj</code> is null, then the click occured outside of any clickable object.</p>
+<p>If defined in your program, this function is called whenever the user clicks in the graphics screen (or touches it with a touch screen).</p>
+<h4 id="syntax-82">Syntax</h4>
+<pre><code>public void onMousePress( GameObj obj, double x, double y )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="obj-26">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The <a href="#java-data-types">GameObj</a> that was clicked, or <code>null</code> if none (if the background was clicked).</p>
+<h5 id="x-6">x</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of the click.</p>
+<h5 id="y-6">y</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of the click.</p>
+<h4 id="example-59">Example</h4>
+<pre><code>public void start()
+{
+    ct.circle( 30, 50, 10 );
+    ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMousePress( GameObj obj, double x, double y )
+{
+    if (obj != null)
+        ct.logm( &quot;Press&quot;, obj, x, y );
+    else
+        ct.logm( &quot;Press&quot;, x, y );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onmousepress"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onmousepress">onMousePress()</a></h6>
 <h3 id="onmousedrag">onMouseDrag()</h3>
-<pre><code>void onMouseDrag( GameObj obj, double x, double y )</code></pre>
-<p>After a click or touch has happened, if the user’s mouse or finger is still “down” and drags across the screen, then <code>onMouseDrag</code> will be called each time the position changes (you may get many calls in succession). The point (<code>x</code>, <code>y</code>) is the new location of the mouse/finger.</p>
-<p>If <code>obj</code> is not <code>null</code>, then it indicates that the original click occured on that clickable object (see <code>onMousePress</code> above).</p>
+<p>If defined in your program, after a click or touch has happened, if the user’s mouse or finger is still “down” and drags across the screen, then this function will be called each time the drag location changes.</p>
+<h4 id="syntax-83">Syntax</h4>
+<pre><code>public void onMouseDrag( GameObj obj, double x, double y )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="obj-27">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The <a href="#java-data-types">GameObj</a> that the click that started this drag was on, or <code>null</code> if none.</p>
 <blockquote>
-<p>Note: Once a click occurs on a clickable <code>GameObj</code>, all drag events will be sent indicating this <code>obj</code>, even if the (<code>x</code>, <code>y</code>) location is no longer on the object (<code>GameObj</code> objects automatically take the mouse/touch “focus” when clicked).</p>
+<p>Once a click occurs on a clickable object, all drag events will be sent indicating this <code>obj</code>, even if the (<code>x</code>, <code>y</code>) location is no longer on the object.</p>
 </blockquote>
+<h5 id="x-7">x</h5>
+<p>(<a href="#java-data-types">double</a>). The current <a href="#graphics-coordinates">x coordinate</a> of the drag.</p>
+<h5 id="y-7">y</h5>
+<p>(<a href="#java-data-types">double</a>). The current <a href="#graphics-coordinates">y coordinate</a> of the drag.</p>
+<h4 id="notes-42">Notes</h4>
+<p>Because the system checks frequently for changes in the mouse/touch position, you may get many <code>onMouseDrag()</code> events in rapid succession.</p>
+<h4 id="example-60">Example</h4>
+<pre><code>public void start()
+{
+    ct.circle( 30, 50, 10 );
+    ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMouseDrag( GameObj obj, double x, double y )
+{
+    if (obj != null)
+        ct.logm( &quot;Drag&quot;, obj, x, y );
+    else
+        ct.logm( &quot;Drag&quot;, x, y );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onmousedrag"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onmousedrag">onMouseDrag()</a></h6>
 <h3 id="onmouserelease">onMouseRelease()</h3>
-<pre><code>void onMouseRelease( GameObj obj, double x, double y )</code></pre>
-<p>This event is called when a mouse click or touch ends, and the mouse button or finger is “released”. The point (<code>x</code>, <code>y</code>) is the location of the mouse/finger at the time of the release.</p>
-<p>If <code>obj</code> is not <code>null</code>, then it indicates that the original click occured on that clickable object (see <code>onMousePress</code> above).</p>
+<p>If defined in your program, after a click or touch has happened, this function will be called when the click or touch is released.</p>
+<h4 id="syntax-84">Syntax</h4>
+<pre><code>public void onMouseRelease( GameObj obj, double x, double y )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="obj-28">obj</h5>
+<p>(<a href="#java-data-types">GameObj</a>). The <a href="#java-data-types">GameObj</a> that the click was originally on, or <code>null</code> if none.</p>
 <blockquote>
-<p>Note: When a click occurs on a clickable <code>GameObj</code>, the release event will always be sent indicating this <code>obj</code>, even if the (<code>x</code>, <code>y</code>) location of the release is no longer on the object.</p>
+<p>Once a click occurs on a clickable object, the release event will be sent indicating this <code>obj</code>, even if the (<code>x</code>, <code>y</code>) location is no longer on the object.</p>
 </blockquote>
+<h5 id="x-8">x</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">x coordinate</a> of the mouse/touch at the time of the release.</p>
+<h5 id="y-8">y</h5>
+<p>(<a href="#java-data-types">double</a>). The <a href="#graphics-coordinates">y coordinate</a> of the mouse/touch at the time of the release.</p>
+<h4 id="example-61">Example</h4>
+<pre><code>public void start()
+{
+    ct.circle( 30, 50, 10 );
+    ct.rect( 70, 50, 10, 10 );
+}
+
+public void onMouseRelease( GameObj obj, double x, double y )
+{
+    if (obj != null)
+        ct.logm( &quot;Release&quot;, obj, x, y );
+    else
+        ct.logm( &quot;Release&quot;, x, y );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onmouserelease"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onmouserelease">onMouseRelease()</a></h6>
 <h3 id="onkeypress">onKeyPress()</h3>
-<pre><code>void onKeyPress( String keyName )     // key code name e.g. &quot;a&quot;, &quot;up&quot;</code></pre>
-<p>This event is called when a keyboard key has been pressed down. The event is only called once for each separate press/release, when the key is first pressed down, reagardless of how long the key is held down.</p>
-<p>The <code>keyName</code> is the name of the key. See <a href="#key-names">Key Names</a>.</p>
+<p>If defined in your program, this function is called when a key on the keyboard has been pressed down.</p>
+<h4 id="syntax-85">Syntax</h4>
+<pre><code>public void onKeyPress( String keyName )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="keyname-1">keyName</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the key. Only certain keys are supported, see <a href="#key-names">Key Names</a>.</p>
+<h4 id="notes-43">Notes</h4>
+<p>This function is only called once for each separate key press and release, when the key is first pressed down, reagardless of how long the key is held down.</p>
+<h4 id="example-62">Example</h4>
+<pre><code>public void start()
+{
+    ct.println( &quot;Press some keys&quot; );
+}
+
+public void onKeyPress( String keyName )
+{
+    ct.logm( &quot;Press&quot;, keyName );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onkeypress"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onkeypress">onKeyPress()</a></h6>
 <h3 id="onkeyrelease">onKeyRelease()</h3>
-<pre><code>void onKeyRelease( String keyName )   // key code name e.g. &quot;a&quot;, &quot;up&quot;</code></pre>
-<p>This event is called when the keyboard key named <code>keyName</code> has been released (after being pressed). See <a href="#key-names">Key Names</a>.</p>
+<p>If defined in your program, this function is called when a key on the keyboard has been released after being pressed.</p>
+<h4 id="syntax-86">Syntax</h4>
+<pre><code>public void onKeyRelease( String keyName )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="keyname-2">keyName</h5>
+<p>(<a href="#java-data-types">String</a>). The name of the key. Only certain keys are supported, see <a href="#key-names">Key Names</a>.</p>
+<h4 id="example-63">Example</h4>
+<pre><code>public void start()
+{
+    ct.println( &quot;Press some keys&quot; );
+}
+
+public void onKeyRelease( String keyName )
+{
+    ct.logm( &quot;Release&quot;, keyName );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onkeyrelease"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onkeyrelease">onKeyRelease()</a></h6>
 <h3 id="onchartyped">onCharTyped()</h3>
-<pre><code>void onCharTyped( String charString )     // &quot;a&quot;, &quot;A&quot;, &quot;$&quot;, etc.</code></pre>
-<p>This event is called when keyboard action results in a printable character being generated.</p>
-<blockquote>
-<p>Unlike the key names used by <code>onkeyPressed</code> above, the <code>charString</code> here is a printable character including the appropriate shift status (e.g. “A” if a shifted “a” is typed, “$” or “4”, “+” vs. “=”, etc.). Only printable characters are detected, so key sequences such as Ctrl+C do not result in characters.</p>
-</blockquote>
-<blockquote>
-<p>Note that some platforms may have keys that auto-repeat, so you may get multiple <code>onCharTyped</code> events if a key is held down.</p>
-</blockquote>
+<p>If defined in your program, this function is called when keyboard action results in a printable character being generated.</p>
+<h4 id="syntax-87">Syntax</h4>
+<pre><code>public void onCharTyped( String charString )
+{
+    // Your code goes here
+}</code></pre>
+<h5 id="charstring-1">charString</h5>
+<p>(<a href="#java-data-types">String</a>). The printable character generated, for example <code>&quot;a&quot;</code>, <code>&quot;A&quot;</code>, <code>&quot;$&quot;</code>, <code>&quot; &quot;</code>, etc.</p>
+<h4 id="notes-44">Notes</h4>
+<p>Unlike the key names used by <a href="#onkeypress">onKeyPress()</a>, the <code>charString</code> here is a printable character including the appropriate shift status (e.g. “A” if a shifted “a” is typed, “$” or “4”, “+” vs. “=”, etc.). Only printable characters are detected, so special keys such as arrow keys and key sequences such as Ctrl+C do not result in characters.</p>
+<p>Most computers have a keyboard “auto-repeat” feature, so if the user holds down a key, you may get the first character, then perhaps a 1 second delay, then repeats at maybe 8 characters per second.</p>
+<h4 id="example-64">Example</h4>
+<pre><code>public void start()
+{
+    ct.println( &quot;Press some keys&quot; );
+}
+
+public void onCharTyped( String charString )
+{
+    ct.logm( &quot;Character&quot;, charString );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onchartyped"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onchartyped">onCharTyped()</a></h6>
 <h3 id="onresize">onResize()</h3>
-<pre><code>void onResize()</code></pre>
-<p>This event is called if the application window is resized by the user, to allow you to change any object positions or otherwise react as desired. The contents of your application scale automatically relative to the window size, so you don’t need to do anything in the normal case. However, if your object layout depends on the window aspect ratio or the physical pixel size, then you can determine these as follows:</p>
-<pre><code>double aspectRatio = ct.getWidth() / ct.getHeight();
-int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
-int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pre>
+<p>If defined in your program, this function is called if the application window is resized by the user when running in a standalone window.</p>
+<h4 id="syntax-88">Syntax</h4>
+<pre><code>public void onResize()
+{
+    // Your code goes here
+}</code></pre>
+<h4 id="notes-45">Notes</h4>
+<p>This function is <em>not</em> called when your program is running within the Code12 application. The Code12 application scales your application automatically and maintains a constant aspect ratio for your application if the user resizes the Code12 window or uses the pane splits.</p>
+<p>If you are using the Code12 Java runtime and your program is running in its own window, this function will notify you if the user resizes the window, to allow you to change any object positions or otherwise react as desired.</p>
 <blockquote>
-<p>Some systems resize windows continuously in response to the user re-sizing the window frame, so you may receive many <code>onResize</code> events in succession.</p>
+<p>Most systems resize windows continuously in response to the user dragging the window frame, so you may receive many <code>onResize()</code> events in succession.</p>
 </blockquote>
-<h2 id="additional-reference-information-1">Additional Reference Information</h2>
+<p>Note that the contents of your application scale automatically relative to the overall window size, so in many cases you don’t need to do anything. However, if your object layout depends on the window aspect ratio or the physical pixel size of the window, then you can determine these as follows:</p>
+<pre><code>double width = ct.getWidth();
+double height = ct.getHeight();
+double aspectRatio = width / height;
+int pixelWidth = ct.round( width * ct.getPixelsPerUnit() );
+int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );</code></pre>
+<h4 id="example-65">Example</h4>
+<pre><code>public void start()
+{
+    ct.println( &quot;Run this using the Code12 Java runtime&quot; );
+}
+
+public void onResize()
+{
+    ct.logm( &quot;New size&quot;, ct.getWidth(), ct.getHeight() );
+}</code></pre>
+<h6 id="code12-function-reference-input-event-functions-onresize"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onresize">onResize()</a></h6>
+<h2 id="additional-reference-information">Additional Reference Information</h2>
 <h3 id="graphics-coordinates">Graphics Coordinates</h3>
-<p>Graphics objects in Code12 are positioned on the screen by (x, y) coordinates. The coordinate values are not pixels, but instead are in unit values relative to the size of the graphics area, which we will call the “screen”. Size values (e.g. width and height) use the same units.</p>
+<p>Graphics objects in Code12 are positioned on the screen by (x, y) coordinates. The coordinate values are not pixels, but instead are in unit values relative to the width of the graphics area, or “screen”. Size values (e.g. width and height) use the same units.</p>
 <h5 id="x-coordinates-width-and-object-scaling">X Coordinates, Width, and Object Scaling</h5>
-<p>The screen area is always 100 units wide, by definition, so an x-coordinate of 50 is always horizontally centered in the screen. So you can think of an x-coordinate value as a percent of the window width. An x value of 0 is at the left edge, 50 is in the center, and 100 is at the right edge. Similarly, a width of 50 is half as wide as the screen.</p>
+<p>The screen area is always 100 units wide, by definition, so an x-coordinate of 50 is always horizontally centered in the screen. You can think of an x-coordinate value as a percent of the window width. An x value of 0 is at the left edge, 50 is in the center, and 100 is at the right edge. Similarly, a width of 50 is half as wide as the screen.</p>
 <blockquote>
 <p>If you resize the Code12 application or use the pane splits to change the size of the graphics screen area, your graphics objects will automatically scale along with the screen, and the coordinates of the objects do not change.</p>
 </blockquote>
@@ -1383,7 +2243,8 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 <h5 id="positioning-objects-off-screen">Positioning Objects Off-screen</h5>
 <p>By default, x and y coordinates in the screen area range from 0 to 100. However, it is not an error to position objects outside of the screen bounds. For example, you could position a circle at (-10, 150), which would put it slightly off-screen to the left and quite a bit off-screen beyond the bottom. Objects outside the screen area still exist but are simply not visible, and objects overlapping a screen edge are “clipped” at the edge.</p>
 <h5 id="changing-the-screen-origin-to-scroll-the-screen">Changing the Screen Origin to Scroll the Screen</h5>
-<p>By default the position (0, 0) is at the upper-left corner of the screen. However, you can use the <a href="#ct.setscreenorigin">ct.setScreenOrigin</a> function to change the position of the origin, which will effectively “scroll” the screen. You can use this to more easily create games and other applications in which the screen acts like a window into a larger world that you can move through.</p>
+<p>By default the position (0, 0) is at the upper-left corner of the screen. However, you can use the <a href="#ct.setscreenorigin">ct.setScreenOrigin()</a> function to change the position of the origin, which will effectively “scroll” the screen. You can use this to more easily create games and other applications in which the screen acts like a window into a larger world that you can move through.</p>
+<h6 id="code12-function-reference-additional-reference-information-graphics-coordinates"><a href="#top">Code12 Function Reference</a> &gt; <a href="#additional-reference-information">Additional Reference Information</a> &gt; <a href="#graphics-coordinates">Graphics Coordinates</a></h6>
 <h3 id="java-data-types">Java Data Types</h3>
 <p>Code12 supports the standard Java data types <code>int</code>, <code>double</code>, <code>boolean</code>, and <code>String</code>, plus the <code>GameObj</code> type defined by Code12.</p>
 <h4 id="int">int</h4>
@@ -1395,7 +2256,8 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 <h4 id="string">String</h4>
 <p>A sequence of text characters. When the value of a string is given directly, it must be enclosed in double quotes. Examples: <code>&quot;hello&quot;</code>, <code>&quot;What is your name?&quot;</code>, <code>&quot;3&quot;</code>, <code>&quot;food4u*$-!)&quot;</code></p>
 <h4 id="gameobj">GameObj</h4>
-<p>A <code>GameObj</code> (Game Object) is a reference to a graphical object (circle, rectangle, line, text, or image) that you can create for display on the screen. To create a <code>GameObj</code> see <a href="#graphic-object-creation">Graphic Object Creation</a>. If you store a <code>GameObj</code> in a variable then you can also access and change the object later using <a href="#gameobj-data-fields">GameObj Data Fields</a> and <a href="#gameobj-methods">GameObj Methods</a>.</p>
+<p>A <code>GameObj</code> (Game Object) is a reference to a graphical object (circle, rectangle, line, text, or image) that you can create for display on the screen. To create a <code>GameObj</code>, see <a href="#graphics-object-creation-1">Graphics Object Creation</a>. If you store a <code>GameObj</code> in a variable then you can also access and change the object later using the <a href="#gameobj-data-fields-1">GameObj Data Fields</a> and <a href="#gameobj-methods-1">GameObj Methods</a>.</p>
+<h6 id="code12-function-reference-additional-reference-information-java-data-types"><a href="#top">Code12 Function Reference</a> &gt; <a href="#additional-reference-information">Additional Reference Information</a> &gt; <a href="#java-data-types">Java Data Types</a></h6>
 <h3 id="color-names">Color Names</h3>
 <p>The following color names are supported. If a String value used as a color is not recognized then “gray” is used.</p>
 <pre><code>Color Name       (red, green, blue)
@@ -1430,6 +2292,7 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 &quot;dark magenta&quot;   (127, 0, 127)
 &quot;dark yellow&quot;    (127, 127, 0)
 </code></pre>
+<h6 id="code12-function-reference-additional-reference-information-color-names"><a href="#top">Code12 Function Reference</a> &gt; <a href="#additional-reference-information">Additional Reference Information</a> &gt; <a href="#color-names">Color Names</a></h6>
 <h3 id="key-names">Key Names</h3>
 <p>The following key names are supported. Note that key names refer to a hardware key, not a typed character, so typing ‘A’ uses the “a” key, and typing ‘$’ uses the “4” key.</p>
 <pre><code>&quot;a&quot; to &quot;z&quot;                     (alphabet keys)
@@ -1441,7 +2304,9 @@ int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );</code></pr
 &quot;tab&quot;                          (tab key)
 &quot;backspace&quot;                    (backspace or delete left key)
 &quot;escape&quot;                       (esc key)</code></pre>
+<h6 id="code12-function-reference-additional-reference-information-key-names"><a href="#top">Code12 Function Reference</a> &gt; <a href="#additional-reference-information">Additional Reference Information</a> &gt; <a href="#key-names">Key Names</a></h6>
 <footer>
+<p>Code12 Version 1.0</p>
 (c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved.
 </footer>
 </body>
