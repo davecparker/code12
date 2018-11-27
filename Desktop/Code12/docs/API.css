@@ -1,5 +1,15 @@
 /* Style Sheet for the Code12 Reference docs */
 
+@font-face {    /* for headers */
+  font-family: 'Roboto-Bold';
+  src: url('Roboto-Bold.ttf');
+}
+
+@font-face {    /* for code */
+  font-family: 'NotoMono-Regular';
+  src: url('NotoMono-Regular.ttf');
+}
+
 body {
     margin: auto;
     padding-right: 1em;

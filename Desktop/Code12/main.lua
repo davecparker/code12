@@ -201,7 +201,7 @@ end
 -- Show the reference docs
 function app.showHelp()
 	-- TODO: Get error context if any
-	system.openURL( "http://code12.org" )
+	system.openURL( "http://www.code12.org/docs/1/API.html" )
 end
 
 -- Handle resize event for the window
