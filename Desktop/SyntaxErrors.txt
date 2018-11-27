@@ -97,3 +97,12 @@ aimport Code12.*;
       ct.setBackImage("underwater.jpg" 
       ct.setBackImage("underwater.jpg", ); 
 			double average = (GameO) "Hey";
+		else if (ct.clicked() ~= false)
+		else if (ct.clicked() ~= false)
+		else if (ct.clicked() 8 false)
+		else if (ct.clicked()  false)
+		else obj == null;
+		else obj != null;
+		else obj ~= null;
+		else blah
+		else what

@@ -612,7 +612,7 @@ local line = { t = "line",
 	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", 2,						iNode = 6, toEnd = true,
 			strErr = "Code12 requires code after an if statement to be on its own line" },
 
-	{ 8, 0, "else",			"else", 2,												iNode = 2, toEnd = true,
+	{ 8, 0, "else",			"else", stmt,											iNode = 2, toEnd = true,
 			strErr = "Code12 requires code after an else to be on its own line" },
 
 	{ 11, 0, "do",			"do", 2,												iNode = 2, toEnd = true	},
