@@ -23,7 +23,7 @@ local javaTypes = {}
 --      1            (double)
 --      false        (void)
 --      true         (boolean)
---      "null"       (null or Object)
+--      "null"       (null)
 --      "String"     (String)
 --      "GameObj"    (GameObj)
 --      { vt = vt }  (array of vt)
@@ -35,7 +35,7 @@ local mapVtToTypeName = {
 	[1]          = "double",
 	[false]      = "void",
 	[true]       = "boolean",
-	["null"]     = "Object",
+	["null"]     = "null",
 	["String"]   = "String",
 	["GameObj"]  = "GameObj",
 }
@@ -166,11 +166,12 @@ function javaTypes.canCompareVts( vt1, vt2 )
 	local t2 = type(vt2)
 	if t1 == "number" and t2 == "number" then
 		return true       -- can compare int to double
-	elseif t1 == "string" and t2 == "string" then
-		-- Objects of different types
-		return (vt1 == "null" or vt2 == "null")  -- can compare any object to null
+	elseif vt1 == "null" then
+		return t2 == "string" or t2 == "table"    -- can compare null to object or array
+	elseif vt2 == "null" then
+		return t1 == "string" or t1 == "table"    -- can compare null to object or array
 	elseif t1 == "table" and t2 == "table" then
-		return t1.vt == t2.vt    -- can compare arrays of same type
+		return vt1.vt == vt2.vt    -- can compare arrays of same type
 	end	
 	return false
 end

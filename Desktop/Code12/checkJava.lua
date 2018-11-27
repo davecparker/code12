@@ -1022,16 +1022,26 @@ end
 
 -- cast
 local function vtExprCast( node )
-	-- The only cast currently supported is (int) doubleExpr
-	assert( node.vtCast == 0 )  -- (int) enforced by parseProgram
+	-- The only casts supported are (int) and (double)
 	local vtExpr = vtSetExprNode( node.expr )
-	if vtExpr == 1 then
-		return 0   -- proper cast of double to int
-	elseif vtExpr == 0 then
-		err.setErrNode( node, "Type cast is not necessary: expression is already of type int" )
-	else
-		err.setErrNode( node, "(int) type cast can only be applied to type double" )
+	if node.vtCast == 0 then   -- (int)
+		if vtExpr == 1 then
+			return 0   -- valid cast of double to int
+		elseif vtExpr == 0 then
+			err.setErrNode( node, "Type cast is not necessary: expression is already of type int" )
+		else
+			err.setErrNode( node, "(int) type cast can only be applied to type double" )
+		end
+	elseif node.vtCast == 1 then -- (double)
+		if vtExpr == 0 then
+			return 1   -- valid cast of int to double
+		elseif vtExpr == 1 then
+			err.setErrNode( node, "Type cast is not necessary: expression is already of type double" )
+		else
+			err.setErrNode( node, "(double) type cast can only be applied to type int" )
+		end
 	end
+	err.setErrNode( node, "Type casts can only be (int) or (double)" )
 	return nil
 end
 
@@ -1191,11 +1201,11 @@ local function vtExprDivide( node )
 			if r == math.floor( r ) then
 				return 0   -- valid int result
 			end
-			err.setErrNode( node, "Integer divide has remainder. Use double or ct.intDiv()" )
+			err.setErrNode( node, "Integer divide has remainder. Use (double) or ct.intDiv()" )
 		end
 		-- The remainder can't be determined, but Code12 doesn't allow this
 		-- because chances are the programmer made a mistake.
-		err.setErrNode( node, "Integer divide may lose remainder. Use double or ct.intDiv()" )
+		err.setErrNode( node, "Integer divide may lose remainder. Use (double) or ct.intDiv()" )
 	end
 	return vt
 end
