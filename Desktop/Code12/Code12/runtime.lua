@@ -406,9 +406,10 @@ function runtime.run()
 	g.screens = {}
 	g.screen = nil
 
-	-- Get the device metrics and set the default height
+	-- Get the device metrics and set the default height and window title
 	getDeviceMetrics()
 	ct.setHeight( g.WIDTH )
+	ct.setTitle( "Code12" )
 
 	-- Make the first screen with default empty name
 	ct.setScreen("")

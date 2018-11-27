@@ -224,18 +224,19 @@ function buttons.newToolbarButton( parent, label, imageFile, onRelease, placemen
 	-- Set horizontal position of button group
 	if placement == "left" then
 		if adjacentBtn then
-			btnGroup.x = adjacentBtn.x + adjacentBtn.width + margin * 0.5
+			btnGroup.x = adjacentBtn.x + adjacentBtn.btn.width + margin * 0.5
 		else
-			btnGroup.x = margin
+			btnGroup.x = margin * 0.5
 		end
 	else
 		if adjacentBtn then
-			btnGroup.x = adjacentBtn.x - btnGroup.width - margin * 0.5
+			btnGroup.x = adjacentBtn.x - btn.width - margin * 0.5
 		else
-			btnGroup.x = app.width - margin - btnGroup.width
+			btnGroup.x = app.width - margin - btn.width
 		end
 	end
-
+	btnGroup.placement = placement
+	
 	return btnGroup
 end
 

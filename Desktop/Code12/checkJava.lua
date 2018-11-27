@@ -590,9 +590,10 @@ local function findStaticMethod( call )
 			if misName then
 				err.setErrNodeSpan( classNode, nameID, 
 						'Unknown or misspelled API function, did you mean "%s" ?', 
-						"ct." .. misName )
+						"ct." .. misName, { docLink = "#top" } )
 			else
-				err.setErrNodeSpan( classNode, nameID, "Unknown API function" )
+				err.setErrNodeSpan( classNode, nameID, "Unknown API function",
+						{ docLink = "#top" } )
 			end
 			return nil
 		elseif beforeStart then
