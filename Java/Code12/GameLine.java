@@ -61,19 +61,6 @@ public class GameLine extends GameObj
       return squaredDistance(xPoint, yPoint) <= halfW * halfW;
    }
 
-   // Update the object as necessary for a window resize from oldHeight to newHeight.
-   @Override
-   protected void updateForWindowResize(double oldHeight, double newHeight)
-   {
-      // Adjust y coordinate of both points if object has adjustY set
-      if (adjustY)
-      {
-         double adjustFactor = (newHeight / oldHeight);
-         y *= adjustFactor;
-         height *= adjustFactor;
-      }
-   }
-
    // Draw the line into the given graphics surface
    protected void draw(Graphics2D g)
    {

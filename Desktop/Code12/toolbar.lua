@@ -69,6 +69,12 @@ local function showButtons( btns )
 	end
 end
 
+-- Execute the Stop button
+local function doStop()
+	runtime.message( "Program Stopped" )
+	runtime.stop()
+end
+
 
 --- Module Functions ------------------------------------------------
 
@@ -146,7 +152,11 @@ function toolbar.update()
 	elseif runState == "waiting" then
 		showButtons{ stopBtn, gridBtn }
 	elseif runState == "paused" then
-		showButtons{ resumeBtn, stopBtn, nextFrameBtn, gridBtn }
+		if runtime.canStepOneFrame() then
+			showButtons{ resumeBtn, stopBtn, nextFrameBtn, gridBtn }
+		else
+			showButtons{ resumeBtn, stopBtn, gridBtn }
+		end
 	elseif runState == "stopped" then
 		showButtons{ restartBtn, chooseProgramBtn, optionsBtn, gridBtn }
 	elseif runState == "error" then

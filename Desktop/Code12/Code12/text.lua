@@ -2,15 +2,17 @@
 --
 -- text.lua
 --
--- Implementation of the text output APIs for the Code 12 Lua runtime.
+-- Implementation of the text output APIs for the Code12 Lua runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
-local GameObj = require("Code12.GameObjAPI")
+local GameObj = require("Code12.GameObj")
 
 
 -- File local data
@@ -49,12 +51,7 @@ end
 ---------------- Text Output API ---------------------------------------------
 
 -- API
-function ct.print(value, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.print") then
-		g.checkOnly1Param(...)
-	end
-
+function ct.print(value)
 	-- Convert value to text and print it
 	runtime.printText(textForValue(value))
 end
@@ -62,21 +59,13 @@ end
 -- API
 -- Note that ct.println() in the API must translate to ct.println("") in Lua,
 -- otherwise null will be printed.
-function ct.println(value, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.println") then
-		g.checkOnly1Param(...)
-	end
-
+function ct.println(value)
 	-- Convert value to text and print it
 	runtime.printTextLine(textForValue(value))
 end
 
 -- API
 function ct.log(value, ...)
-	-- Parameters can be any types or count, and the first value can be nil,
-	-- so there's no parameter checking we can do.
-
 	-- Treat the first value specially, so at least we can get "null" output
 	-- if the client calls with an uninitialized object.
 	-- Unfortunately, this can't work with multiple nils passed.
@@ -100,11 +89,6 @@ end
 
 -- API
 function ct.logm(message, value, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.logm") then
-		g.checkType(1, "string", message)
-	end
-
 	-- Print the message and log the values
 	ct.print(message)
 	ct.print(" ")
@@ -112,14 +96,7 @@ function ct.logm(message, value, ...)
 end
 
 -- API
-function ct.setOutputFile(filename, ...) 
-	-- Check parameters
-	if filename ~= nil then
-		if g.checkAPIParams("ct.setOutputFile") then
-			g.check1Param("string", filename, ...)
-		end
-	end
-
+function ct.setOutputFile(filename) 
 	-- Close existing output file if any
 	if g.outputFile then
 		g.outputFile:close()
@@ -134,7 +111,7 @@ function ct.setOutputFile(filename, ...)
 		end
 		g.outputFile = io.open(path, "w")
 		if g.outputFile == nil then
-			g.warning("Could not open output file", filename)
+			runtime.warning("Could not open output file", filename)
 		end
 	end
 end

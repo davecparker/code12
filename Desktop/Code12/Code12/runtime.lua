@@ -2,11 +2,13 @@
 --
 -- runtime.lua
 --
--- Implementation of the main runtime for the Code 12 Lua runtime.
+-- Implementation of the main runtime for the Code12 Lua runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
 
@@ -36,18 +38,66 @@ local runtime = {
 -- File local state
 local codeFunction       -- function for the loaded Lua user program        
 local coRoutineUser      -- coroutine running an event or nil if none
+local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
+
 
 
 ---------------- Internal Runtime Functions ------------------------------------------
+
+-- Apply xSpeed and ySpeed to all the objects in the screen
+-- and delete any that went out of bounds.
+local function applyObjectSpeeds(screen)
+	-- Objects using xSpeed and ySpeed automatically get deleted if they
+	-- go more than 100 units off-screen. 
+	local xMin = screen.originX - 100
+	local xMax = xMin + g.WIDTH + 200
+	local yMin = screen.originY - 100
+	local yMax = yMin + g.height + 200
+
+	-- Look for objects with hasSpeed set
+	local objs = screen.objs
+	for i = objs.numChildren, 1, -1 do
+		local gameObj = objs[i].code12GameObj
+		if gameObj.hasSpeed then
+			-- Apply the speed
+			local x = gameObj.x + gameObj.xSpeed
+			local y = gameObj.y + gameObj.ySpeed
+			gameObj.x = x
+			gameObj.y = y
+
+			-- Delete object if it went out of bounds
+			if x < xMin or x > xMax or y < yMin or y > yMax then
+				gameObj:removeAndDelete()
+			end
+		end
+	end
+end
+
+-- Update the display objects in group from their GameObj positions and visibility
+-- at the scale. If setSize then update the object size as well for the new scale.
+local function syncObjects(group, scale, setSize)
+	for i = 1, group.numChildren do
+		local obj = group[i]
+		local gameObj = obj.code12GameObj
+		obj.isVisible = gameObj.visible
+		obj.x = gameObj.x * scale
+		obj.y = gameObj.y * scale
+		if setSize then
+			gameObj:updateSize(gameObj.width, gameObj.height, scale)
+		end
+	end
+end
 
 -- The enterFrame listener for each frame update
 local function onNewFrame()
 	-- Call or resume the current user function if not paused (start or update)
 	local status = false
-	if g.userFn and g.runState ~= "paused" then
-		status = runtime.runEventFunction(g.userFn)
+	local runState = g.runState
+	local userFn = g.userFn
+	if userFn and runState ~= "paused" then
+		status = runtime.runEventFunction(userFn)
 		if status == nil then   -- userFn finished
-			if g.userFn == ct.userFns.start then
+			if userFn == ct.userFns.start then
 				-- User's start function finished
 				if g.outputFile then
 					g.outputFile:flush()   -- flush any print output
@@ -65,33 +115,32 @@ local function onNewFrame()
 	g.charTyped = nil
 
 	-- Update drawing objects as necessary
-    if g.screen then
-		-- Update the background object if the screen resized since last time
-		if g.window.resized then
-			g.screen.backObj:updateBackObj()
+	local screen = g.screen
+    if screen then
+		local objs = screen.objs
+
+		-- Apply speed to objects if screen has any and the program is running 
+		-- and userFn didn't yield (which interrupts the update cycle).
+		if screen.hasSpeed and runState == "running" and status ~= "yielded" then
+			applyObjectSpeeds(screen)
 		end
-		-- Update and/or sync the user drawing objects
-		local objs = g.screen.objs
-		local i = 1
-		while i <= objs.numChildren do
-			-- Check for autoDelete first
-			local gameObj = objs[i].code12GameObj
-			if gameObj:shouldAutoDelete() then
-				gameObj:removeAndDelete()
-			else
-				-- Update objects if running and userFn didn't yield
-				if g.runState == "running" and status ~= "yielded" then
-					gameObj:updateForNextFrame()
-				end
-				-- Always sync the objects so the display is correct
-				gameObj:sync()
-				i = i + 1
-			end
+
+		-- If the window resized then we need to resize all the contents
+		local scale = g.scale
+		if g.window.resized then
+			-- Background object
+			screen.backObj:updateBackObj()
+			-- Screen origin
+			objs.x = -screen.originX * scale
+			objs.y = -screen.originY * scale
+			-- Graphic objects
+			syncObjects(objs, scale, true)
+			g.window.resized = false
+		else
+			-- Just sync object positions and visibility
+			syncObjects(objs, scale)
 		end
 	end
-
-	-- We have now adapted to any window resize
-	g.window.resized = false
 end
 
 -- Global key event handler for the runtime
@@ -129,7 +178,7 @@ local function coroutineStatus(success, strErr)
 			runtime.stop()
 			return "aborted"
 		elseif strErr == "restart" then
-			-- User code requests a stop via ct.restart()
+			-- User code requests a restart via ct.restart()
 			runtime.restart()
 			return "aborted"
 		end
@@ -186,7 +235,7 @@ end
 
 -- Load the given string of Lua code as the user program and init the program.
 -- Return an error string if the program failed to load, or nil for success.
-function runtime.strErrLoadLuaCode( luaCode )
+function runtime.strErrLoadLuaCode(luaCode)
 	-- Load the code and execute the main chunk if successful
 	local strErr
 	codeFunction, strErr = loadstring( luaCode )
@@ -201,7 +250,7 @@ end
 -- passing the additional parameters given.
 -- Return the coroutine's status as "yielded", "aborted", nil if completed, or
 -- false if not run because func was nil or could not be run.
-function runtime.runEventFunction( func, ... )
+function runtime.runEventFunction(func, ...)
 	-- Is a coroutine already running?
 	if coRoutineUser then
 		if coroutine.status(coRoutineUser) == "dead" then
@@ -232,22 +281,35 @@ function runtime.blockAndYield(...)
 	end
 end
 
+-- Sync drawing objects on the current screen after possible changes
+function runtime.syncScreenObjects()
+	local screen = g.screen
+	if screen then
+		syncObjects(screen.objs, g.scale)
+	end
+end
+
+-- Run the user input (mouse or keyboard) event func if any.
+-- Return result per runtime.runEventFunction().
+function runtime.runInputEvent(func, ...)
+	if func then
+		local result = runtime.runEventFunction(func, ...)
+		runtime.syncScreenObjects()  -- in case screen redraws before next enterFrame
+		return result
+	end
+	return false
+end
+
 -- Handle a resize of the available output area
+-- TODO: max once per frame?
 function runtime.onResize()
-	-- Remember old height and get new metrics
-	local oldHeight = g.height
+	-- Get new metrics
 	getDeviceMetrics()
 
 	-- Set new logical height (sets g.height and g.scale)
 	ct.setHeight(g.WIDTH * g.window.height / g.window.width)
 
-	-- Adjust objects on the current screen as necessary
-	if oldHeight and g.screen then
-		local objs = g.screen.objs
-		for i = 1, objs.numChildren do
-			objs[i].code12GameObj:adjustForWindowResize(oldHeight, g.height)
-		end
-	end
+	-- Mark window as resized
 	g.window.resized = true
 
 	-- Send user event if necessary
@@ -277,6 +339,12 @@ function runtime.stepOneFrame()
 		onNewFrame()
 		g.runState = "paused"
 	end
+end
+
+-- Return true if the stepOneFrame operation can currently be performed.
+function runtime.canStepOneFrame()
+	-- Can step if we are between frames, not pause in user code
+	return coRoutineUser == nil
 end
 
 -- Stop a run and set the runState to endState (default "stopped")
@@ -399,6 +467,47 @@ function runtime.printTextLine(text, rgb)
 		g.outputFile:write(text)   -- echo to text file
 		g.outputFile:write("\n")
 	end
+end
+
+-- Return the current line number in the user's code or nil if unknown
+local function userLineNumber()
+	-- Look back on the stack trace to find the user's code (string)
+	-- so we can get the line number.
+	local info
+	local level = 1
+	repeat
+		info = debug.getinfo(level, "Sl")
+		level = level + 1
+	until info == nil or info.short_src == '[string "..."]'
+	if info then
+		return info.currentline
+	end
+	return nil
+end
+
+-- Print a runtime message to the console, followed by "at line #"
+-- if the user's code line number can be determined.
+function runtime.message(message)
+	local lineNum = userLineNumber()
+	if lineNum then
+		message = message .. " at line " .. lineNum
+	end
+	runtime.printTextLine(message, rgbWarningText)
+end
+
+-- Print a warning message to the console with optional quoted name
+function runtime.warning(message, name)
+	local s
+	local lineNum = userLineNumber()
+	if lineNum then
+		s = "WARNING (line " .. lineNum .. "): " .. message
+	else
+		s = "WARNING: " .. message
+	end
+	if name then
+		s = s .. " \"" .. name .. "\""
+	end
+	runtime.printTextLine(s, rgbWarningText)
 end
 
 
