@@ -39,28 +39,13 @@ local coRoutineUser      -- coroutine running an event or nil if none
 
 
 ---------------- Internal Runtime Functions ------------------------------------------
-local frameCount = 0
-local newFrameTime = 0
-local userFuncTime = 0
-local updateTime = 0
-local updateBackObjTime = 0
-local removeAndDeleteTime = 0
-local updateForNextFrameTime = 0
-local syncTime = 0
-
 -- The enterFrame listener for each frame update
 local function onNewFrame()
-	frameCount = frameCount + 1
-
-	local newFrameTimeAvg
-	local userFuncTimeAvg
-	local updateTimeAvg
-	local updateBackObjTimeAvg
-	local removeAndDeleteTimeAvg
-	local updateForNextFrameTimeAvg
-	local syncTimeAvg
-
+	---[[ time test init
+	local syncTime = 0
 	local newFrameStartTime = system.getTimer()
+	--]]
+
 	-- Call or resume the current user function if not paused (start or update)
 	local status = false
 	if g.userFn and g.runState ~= "paused" then
@@ -77,8 +62,6 @@ local function onNewFrame()
 			return
 		end
 	end
-	userFuncTime = userFuncTime  + system.getTimer() - newFrameStartTime
-	local userFuncTimeAvg = math.round(userFuncTime / frameCount * 100) / 100
 
 	-- Clear the polled input state for this frame
 	g.clicked = false
@@ -88,16 +71,13 @@ local function onNewFrame()
 	-- Update drawing objects as necessary
     if g.screen then
 		-- Update the background object if the screen resized since last time
-		local updateStartTime = system.getTimer()
 		if g.window.resized then
 			g.screen.backObj:updateBackObj()
 		end
-		updateBackObjTime = updateBackObjTime + system.getTimer() - updateStartTime
 
 		-- Update and/or sync the user drawing objects
 		local objs = g.screen.objs
 		local i = 1
-		updateStartTime = system.getTimer( )
 		while i <= objs.numChildren do
 			-- Check for autoDelete first
 			local gameObj = objs[i].code12GameObj
@@ -110,7 +90,6 @@ local function onNewFrame()
 				if g.runState == "running" and status ~= "yielded" then
 					local startTime = system.getTimer()
 					gameObj:updateForNextFrame()
-					updateForNextFrameTime = updateForNextFrameTime + system.getTimer() - startTime
 				end
 				-- Always sync the objects so the display is correct
 				local startTime = system.getTimer()
@@ -119,23 +98,23 @@ local function onNewFrame()
 				i = i + 1
 			end
 		end
-		updateTime = updateTime + system.getTimer() - updateStartTime
+
+		---[[ time test syncObjects
+		local newFrameTime = system.getTimer() - newFrameStartTime
+		TotalNewFrameTime = TotalNewFrameTime + newFrameTime
+		local newFrameTimeAvg = TotalNewFrameTime / g.frameCount
+
+		TotalSyncTime = TotalSyncTime + syncTime
+		local syncTimeAvg = TotalSyncTime / g.frameCount
+		if g.frameCount % 500 == 0 then
+			print("runtime ", g.frameCount, newFrameTimeAvg)
+			print("sync    ", g.frameCount, syncTimeAvg)
+		end
+		--]]
 	end
 
 	-- We have now adapted to any window resize
 	g.window.resized = false
-
-	newFrameTime = newFrameTime + system.getTimer() - newFrameStartTime
-
-	updateBackObjTimeAvg = math.round(updateBackObjTime / frameCount * 100) / 100
-	removeAndDeleteTimeAvg = math.round(removeAndDeleteTime / frameCount * 100) / 100
-	updateForNextFrameTimeAvg = math.round(updateForNextFrameTime / frameCount * 100) / 100
-	syncTimeAvg = math.round(syncTime / frameCount * 100) / 100
-	updateTimeAvg = math.round(updateTime / frameCount * 100) / 100
-	newFrameTimeAvg = math.round(newFrameTime / frameCount * 100) / 100
-
-	print("newFrame", newFrameTimeAvg, "updateBackObj", updateBackObjTimeAvg, "userFunc", userFuncTimeAvg, 
-			"update", updateTimeAvg, removeAndDeleteTimeAvg, updateForNextFrameTimeAvg, syncTimeAvg)
 end
 
 -- Global key event handler for the runtime
@@ -413,6 +392,16 @@ function runtime:clearProgram()
 	ct.userFns = nil
 	codeFunction = nil
 	g.runState = nil
+
+		---[[ time test reset vars
+	g.frameCount = 0
+	g.mainTime = 0
+	g.consoleTime = 0
+	g.varWatchTime = 0
+	g.runViewTime = 0
+	TotalNewFrameTime = 0
+	TotalSyncTime = 0
+	--]]
 end
 
 -- Output the given text to where console output should go
