@@ -4,7 +4,7 @@
 --
 -- Implementation of the variable watch window for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
 -- Code12 app modules
@@ -52,9 +52,16 @@ local scrollbar               -- the varWatch scrollbar
 local scrollOffset            -- starting line if scrolled back or nil if at end
 local arrayAssigned           -- true when an array has been assigned and displayData needs to be updated 
 local scrollOffsetChanged     -- true when scrollOffset has changed and displayRows needs to be updated
-local gameObjFields = { "x", "y", "width", "height", "xSpeed", "ySpeed", 
-                        "lineWidth", "visible", "clickable", "autoDelete", "group" }
-local numGameObjFields = #gameObjFields
+
+-- Names of GameObj public data fields to show
+local gameObjFields = { 
+	-- Public fields
+	"x", "y", "visible", "group", 
+	-- Additional fields
+	"width", "height", "xSpeed", "ySpeed", "text", "fillColor", "lineColor", 
+	"lineWidth", "layer", "clickable",
+}
+local numPublicGameObjFields = 4
 
 
 --- Internal Functions ---------------------------------------------------------
@@ -66,7 +73,7 @@ local function getVars()
 		local maxVarNameWidth = dropDownBtnSize + maxGameObjFieldWidth -- minimum width to ensure space for GameObj fields
 		for i = 1, #vars do
 			local var = vars[i]
-			local varNameWidth = string.len( var.nameID.str ) * charWidth
+			local varNameWidth = math.ceil( string.len( var.nameID.str ) * charWidth )
 			if maxVarNameWidth < varNameWidth then
 				maxVarNameWidth = varNameWidth
 			end
@@ -86,21 +93,35 @@ end
 
 -- Returns a string for the given String value
 local function textForStringValue( value )
-	return value
+	if value then
+		return '"' .. value .. '"'
+	end
+	return "null"
 end
 
 -- Returns a string for the given GameObj value
 local function textForGameObjValue( value )
-	if value then
-		return value:toString()
+	if value == nil then
+		return "null"
+	elseif value.deleted then
+		return "(deleted GameObj)"
 	end
-	return "null"
+	return value:toString()
 end
 
 -- Returns a string for the given GameObj value and field
 local function textForGameObjField( value, field )
 	if value then
-		return tostring(value[field])
+		local v = value[field]
+		local t = type(v)
+		if t == "nil" then
+			return "null"
+		elseif t == "string" then
+			return '"' .. v .. '"'
+		elseif t == "table" then   -- { r, g, b }
+			return "(" .. v[1] .. "," .. v[2] .. "," .. v[3] .. ")"
+		end
+		return tostring(v)
 	end
 	return "-"
 end
@@ -141,10 +162,14 @@ local function makeDisplayData()
 			iRow = iRow + 1
 			if isOpen and vt == "GameObj" then
 				-- add GameObj data fields
-				for j = 1, numGameObjFields do
+				for j = 1, #gameObjFields do
 					local gameObjField = gameObjFields[j]
 					d = { var = var, field = gameObjField }
-					d.initRowTexts = { "."..gameObjField, "" }
+					if j <= numPublicGameObjFields then
+						d.initRowTexts = { "." .. gameObjField, "" }
+					else
+						d.initRowTexts = { gameObjField, "" }
+					end
 					d.textIndents = indexOrFieldIndents
 					d.textForValue = textForGameObjField
 					displayData[iRow] = d
@@ -170,10 +195,14 @@ local function makeDisplayData()
 						iRow = iRow + 1
 						if arrayType == "GameObj" and var[j.."isOpen"] then
 							-- add GameObj fields for this open GameObj in array
-							for k = 1, numGameObjFields do
+							for k = 1, #gameObjFields do
 								local gameObjField = gameObjFields[k]
 								d = { var = var, index = j, field = gameObjField, }
-								d.initRowTexts = { "", "."..gameObjField, "" }
+								if k <= numPublicGameObjFields then
+									d.initRowTexts = { "", "." .. gameObjField, "" }
+								else
+									d.initRowTexts = { "", gameObjField, "" }
+								end
 								d.textIndents = indexAndFieldIndents
 								d.textForValue = textForGameObjField
 								displayData[iRow] = d
@@ -251,21 +280,20 @@ local function updateValues()
 			local var = d.var
 			local value = ct.userVars[var.nameID.str]
 			local textForValue = d.textForValue
-			if not index and not field then
-				-- Value of a top-level variable
-				if textForValue then
-					displayRows[i][2].text = textForValue( value )
+			if index then
+				if field then  -- Value of a GameObj field of a GameObj in an array
+					displayRows[i][3].text = textForValue( value[index], field )
+				else           -- Value of an indexed array
+					displayRows[i][2].text = textForValue( value[index] or value.default )
 				end
-			elseif not index and field then
-				-- Value of a field of a GameObj
-				displayRows[i][2].text = textForValue( value, field )
-			elseif index and not field then
-				-- Value of an indexed array
-				displayRows[i][2].text = textForValue( value[index] or value.default )
 			else
-				-- index and field
-				-- Value of a GameObj field of a GameObj in an array
-				displayRows[i][3].text = textForValue( value[index], field )
+				if field then  -- Value of a field of a GameObj
+					displayRows[i][2].text = textForValue( value, field )
+				else           -- Value of a top-level variable
+					if textForValue then
+						displayRows[i][2].text = textForValue( value )
+					end  -- TODO: else what?
+				end
 			end
 		end
 	end
@@ -340,7 +368,7 @@ function varWatch.init()
 	scrollOffset = 0
 	charWidth = app.consoleFontCharWidth
 	rowHeight = app.consoleFontHeight + 2
-	maxGameObjFieldWidth = charWidth * string.len(".autoDelete")
+	maxGameObjFieldWidth = math.ceil( charWidth * string.len("clickable") )
 	centerColWidth = dropDownBtnSize * 3 + maxGameObjFieldWidth + padding
 	Runtime:addEventListener( "enterFrame", onNewFrame )
 end
