@@ -17,12 +17,13 @@ public interface GameObjInterface
    public void setSpeed(double xSpeed, double ySpeed);
    public void align(String a);
    
-   // The fill and line
+   // Appearance
    public void setFillColor(String name);
    public void setFillColorRGB(int r, int g, int b);
    public void setLineColor(String name);
    public void setLineColorRGB(int r, int g, int b);
    public void setLineWidth(int lineWidth);
+   public void setImage(String filename);
 
    // Manipulate the object in the game's object list
    public int getLayer();

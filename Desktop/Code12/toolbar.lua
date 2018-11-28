@@ -121,7 +121,7 @@ function toolbar.create()
 
 	-- Stop button
 	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", "stop-icon.png", 
-			runtime.stop, "left", pauseBtn )
+			doStop, "left", pauseBtn )
 	toolbarBtns[#toolbarBtns + 1] = stopBtn
 
 	-- Next Frame button
