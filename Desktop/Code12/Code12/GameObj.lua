@@ -242,6 +242,17 @@ function GameObj:newText(group, text, x, y, height, colorName)
 	return gameObj
 end
 
+-- Return (path, baseDir) for an image filename
+local function pathAndBaseDirForImage(filename)
+	-- If an app context tells us the media directory then use it, else current dir.
+	local appContext = runtime.appContext
+	if appContext and appContext.mediaDir then
+		return appContext.mediaDir .. filename, appContext.mediaBaseDir
+	else
+		return filename, system.ResourceDirectory
+	end
+end
+
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
 	width = forceNotNegative(width)
@@ -251,18 +262,8 @@ function GameObj:newImage(group, filename, x, y, width)
 	end
 	local obj = nil
 	if filename ~= nil then
-		-- If an app context tells us the media directory then use it, else current dir.
-		local baseDir, path
-		local appContext = runtime.appContext
-		if appContext and appContext.mediaDir then
-			path = appContext.mediaDir .. filename
-			baseDir = appContext.mediaBaseDir
-		else
-			path = filename
-			baseDir = system.ResourceDirectory
-		end
-
 		-- Try to open the image at native resolution
+		local path, baseDir = pathAndBaseDirForImage(filename)
 		obj = display.newImage(group, path, baseDir, x * scale, y * scale)
 	end
 	if not obj then
@@ -785,6 +786,24 @@ end
 function GameObj:setLineWidth(lineWidth)
 	self.lineWidth = lineWidth
 	self:setLineColorFromColor(self.lineColor)    -- sets obj.strokeWidth
+end
+
+-- API
+function GameObj:setImage(filename)
+	-- Make sure object and filename are valid
+	if self.typeName ~= "image" then
+		runtime.warning("setImage() ignored for non-image object")
+		return
+	end
+	if filename == nil or filename == "" then
+		runtime.warning("Invalid image filename for setImage()")
+		return
+	end
+
+	-- Change the image, and set the text to the new filename
+	local path, baseDir = pathAndBaseDirForImage(filename)
+	self.obj.fill = { type = "image", filename = path, baseDir = baseDir }
+	self:setText(filename)
 end
 
 -- API

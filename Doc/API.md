@@ -103,6 +103,7 @@
 * [obj.setLineColor()]
 * [obj.setLineColorRGB()]
 * [obj.setLineWidth()]
+* [obj.setImage()]
 * [obj.getLayer()]
 * [obj.setLayer()]
 * [obj.delete()]
@@ -2259,6 +2260,7 @@ The method function will access or modify the `obj` variable you specify.
 * [obj.setLineColor()]
 * [obj.setLineColorRGB()]
 * [obj.setLineWidth()]
+* [obj.setImage()]
 * [obj.getLayer()]
 * [obj.setLayer()]
 * [obj.delete()]
@@ -2783,6 +2785,41 @@ GameObj frame = ct.rect( 50, 50, 60, 30 );
 frame.setLineWidth( 5 );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineWidth()]
+
+
+### obj.setImage()
+Changes the image of an image graphics object ([GameObj](#java-data-types)).
+
+#### Syntax
+```
+obj.setImage( filename );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object, which must be an 
+image object (see [ct.image()]).
+
+##### filename
+([String](#java-data-types)). The new image filename. See [ct.image()]
+for the filename requirements. 
+
+#### Notes
+The object's image is changed while keeping the other properties of the 
+object the same (e.g. position, size, speed). The text of the object 
+is set to the new filename (see [obj.getText()]).
+
+> Both the width and height of the object are maintained, so if the 
+> new image has a different aspect ratio than the original, then 
+> the new image may be distored to make it fit.
+
+> If the filename is invalid or is not found, the results are undefined
+> but will likely result in the object showing no image.  
+
+#### Example
+```
+if (hero.hit( bullet ))
+	hero.setImage( "hero-hurt.png" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setImage()]
 
 
 ### obj.getLayer()

@@ -142,6 +142,8 @@ return {
         ["setlinecolorrgb"] = "setLineColorRGB",
         ["setLineWidth"] = { vt = false, params = {{ name = "lineWidth", vt = 0}}, docLink = "#obj.setlinewidth" },
         ["setlinewidth"] = "setLineWidth",
+        ["setImage"] = { vt = false, params = {{ name = "filename", vt = "String"}}, docLink = "#obj.setimage" },
+        ["setimage"] = "setImage",
         ["getLayer"] = { vt = 0, params = {}, docLink = "#obj.getlayer" },
         ["getlayer"] = "getLayer",
         ["setLayer"] = { vt = false, params = {{ name = "layer", vt = 0}}, docLink = "#obj.setlayer" },

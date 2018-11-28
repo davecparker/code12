@@ -66,6 +66,7 @@ public abstract class GameObj implements GameObjInterface
    public void setLineColor(String name)              { lineColor = colorFromName(name); }
    public void setLineColorRGB(int r, int g, int b)   { lineColor = makeColor(r, g, b); }
    public void setLineWidth(int lineWidth)            { this.lineWidth = lineWidth; }
+   public void setImage(String filename)              {}   // GameImage overrides
    public int getLayer()                              { return layer; }
    public void setLayer(int layer)                    { game.setObjLayer(this, layer); }
    public void delete()                               { game.deleteObj(this); }
