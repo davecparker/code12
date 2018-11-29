@@ -43,7 +43,7 @@ local charWidth               -- character width of the font used for text objec
 local rowHeight               -- height of each row in the variable display
 local maxGameObjFieldWidth       -- maximum space needed to fix longest GameObj field in the display
 local centerColWidth          -- width of the center column of the variable display
-local showVarWatch            -- curent value of app.showVarWatch
+local showVarWatch            -- true if variable watch is active
 
 -- varWatch data
 local vars                    -- array of user program's global variables
@@ -467,8 +467,6 @@ end
 
 -- Starts a new run of the varWatch window based on the given width and height
 function varWatch.startNewRun( width, height )
-	varWatch.group.isVisible = true
-	showVarWatch = true
 	clearVarWatchTable()
 	getVars()
 	makeDisplayData()
@@ -476,10 +474,10 @@ function varWatch.startNewRun( width, height )
 	varWatch.resize( width, height )
 end
 
--- Hides the variable watch window
-function varWatch.hide()
-	varWatch.group.isVisible = false
-	showVarWatch = false
+-- Show the variable watch window if show, else hide it
+function varWatch.setVisible( show )
+	varWatch.group.isVisible = show
+	showVarWatch = show
 end
 
 -- Handles runtime event of array assigned

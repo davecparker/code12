@@ -178,7 +178,7 @@ ct.circle( 50, 70, 40, "blue" );
 ```
 ```
 GameObj ball = ct.circle( 0, 50, 10, "yellow" );
-ball.xSpeed = 1;
+ball.setSpeed( 1, 0 );
 ```
 ###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.circle()]
 
@@ -226,7 +226,7 @@ ct.rect( 50, 70, 80, 40, "blue" );
 ```
 ```
 GameObj platform = ct.rect( 0, 50, 30, 8, "orange" );
-platform.xSpeed = 1;
+platform.setSpeed( 1, 0 );
 ```
 ###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.rect()]
 
@@ -318,13 +318,13 @@ which can be used to access and modify the text object later
 
 #### Examples
 ```
-ct.text( "Zombie Attack!", 50, 40, 20 );
+ct.text( "Zombie Attack!", 50, 40, 12 );
 ```
 ```
 ct.text( "Click anywhere to play", 50, 60, 5, "blue" );
 ```
 ```
-GameObj scoreText = ct.text( "Score: 0", 100, 20, 10, "green" );
+GameObj scoreText = ct.text( "Score: 0", 100, 5, 7, "red" );
 scoreText.align( "right" );
 ```
 ###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.text()]
@@ -371,7 +371,7 @@ which can be used to access and modify the image object later
 
 #### Examples
 ```
-ct.image( "dragon.png", 30, 50, 10 );
+ct.image( "dragon.png", 50, 30, 20 );
 ```
 ```
 // Stretch the sky image to fill the entire screen
@@ -421,10 +421,10 @@ ct.print( " there!" );
 ```
 ```
 String userName = "Jennifer";
-int score = 500;
+int score = 2500;
 
 ct.print( "User " );
-ct.print( userName )
+ct.print( userName );
 ct.print( " has a score of " );
 ct.print( score );
 ```
@@ -457,10 +457,13 @@ ct.println();    // a blank line
 ct.println( "This is the next paragraph." );
 ```
 ```
-int totalScore = 250;
-int numTrys = 3;
+String userName = "Jennifer";
+int score = 2500;
 
-ct.println( "Your average score is " + (totalScore / numTrys) );
+ct.println( userName );
+ct.println( score );
+ct.println();
+ct.println( userName + " has score " + score );
 ```
 ###### [Code12 Function Reference](#top) > [Text Output] > [ct.println()]
 
@@ -570,14 +573,14 @@ output to the console only.
 double a = 7;
 double b = 2;
 
-ct.setOutputFilename( "Math Test Results.txt" );
+ct.setOutputFile( "Math Test Results.txt" );
 ct.println( "Test of simple math operations" );
 ct.log( a, b );
 ct.println( "Sum = " + (a + b) );
 ct.println( "Difference = " + (a - b) );
 ct.println( "Product = " + (a * b) );
 ct.println( "Quotient = " + (a / b) );
-ct.setOutputFilename( null );
+ct.setOutputFile( null );
 ```
 ###### [Code12 Function Reference](#top) > [Text Output] > [ct.setOutputFile()]
 
@@ -634,6 +637,7 @@ ct.inputInt( message );
 #### Example
 ```
 int numTargets = ct.inputInt( "How many targets would you like to have?" );
+ct.println( numTargets );
 ```
 ###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputInt()]
 
@@ -656,6 +660,7 @@ ct.inputNumber( message );
 #### Example
 ```
 double tempF = ct.inputNumber( "Enter the temperature in Farenheit" );
+ct.println( tempF );
 ```
 ###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputNumber()]
 
@@ -679,6 +684,7 @@ and `false` if they press No.
 #### Example
 ```
 boolean playAgain = ct.inputYesNo( "Do you want to play again?" );
+ct.println( playAgain );
 ```
 ###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputYesNo()]
 
@@ -705,6 +711,7 @@ ct.inputString( message );
 #### Example
 ```
 String name = ct.inputString( "Enter your name" );
+ct.println( name );
 ```
 ###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputString()]
 
@@ -852,6 +859,7 @@ at the current window size.
 // Determine the physical size of the game window in pixels
 int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
 int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
+ct.log( pixelWidth, pixelHeight );
 ```
 ```
 // Create a circle that is 10 pixels in diameter at the current scale

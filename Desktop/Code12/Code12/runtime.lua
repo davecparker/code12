@@ -432,7 +432,7 @@ function runtime.restart()
 end
 
 -- Stop and clear the current user program if any
-function runtime:clearProgram()
+function runtime.clearProgram()
 	runtime.stop()
 	ct.userVars = nil
 	ct.userFns = nil

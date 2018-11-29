@@ -13,6 +13,7 @@ local composer = require( "composer" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
+local source = require( "source" )
 local buttons = require( "buttons" )
 local runtime = require( "Code12.runtime" )
 local runView = require( "runView" )
@@ -41,6 +42,8 @@ local toolbarBtns         -- Array of buttons on the toolbar
 
 -- Event handler for the Choose Program button
 local function onChooseProgram()
+	runtime.clearProgram()
+	source.clear()
 	composer.gotoScene( "getFile" )
 end
 
@@ -68,12 +71,6 @@ local function showButtons( btns )
 			btn.isVisible = false
 		end
 	end
-end
-
--- Execute the Stop button
-local function doStop()
-	runtime.message( "Program Stopped" )
-	runtime.stop()
 end
 
 
@@ -121,7 +118,7 @@ function toolbar.create()
 
 	-- Stop button
 	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", "stop-icon.png", 
-			doStop, "left", pauseBtn )
+			runtime.stop, "left", pauseBtn )
 	toolbarBtns[#toolbarBtns + 1] = stopBtn
 
 	-- Next Frame button
