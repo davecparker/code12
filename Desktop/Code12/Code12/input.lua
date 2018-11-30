@@ -182,9 +182,11 @@ function g.onKey(event)
 
 	-- Process the key
 	if event.phase == "down" then
-		-- keyPress
-		keysDown[keyName] = true
-		runtime.runInputEvent(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
+		-- Send keyPress event only if not already down
+		if not keysDown[keyName] then
+			keysDown[keyName] = true
+			runtime.runInputEvent(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
+		end
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)

@@ -2590,7 +2590,8 @@ obj.setText( text )
 ([GameObj](#java-data-types)). The graphics object. 
 
 ##### text
-([String](#java-data-types)). The text to store in the object.
+([String](#java-data-types)). The text to store in the object,
+or `null` for none.
 For a text object (see [ct.text()]), this becomes the visible text.
 For other objects, this is just a string kept inside the object,
 which can be used to identity or describe the object (see [obj.getText()]).
@@ -2616,7 +2617,7 @@ public void start()
 public void update()
 {
 	if (ct.clicked())
-		message.text = "You clicked";
+		message.setText( "You clicked" );
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setText()]
@@ -2668,7 +2669,7 @@ public void update()
 {
 	GameObj target = ct.objectClicked();
 	if (target != null)
-		message.text = target.toString();
+		message.setText( target.toString() );
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.toString()]
@@ -2759,6 +2760,7 @@ For other object types, the color of the outlined border of the object is set.
 #### Example
 ```
 GameObj dot = ct.circle( 50, 50, 20 );
+dot.setLineWidth( 5 );
 dot.setLineColor( "green" );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineColor()]
@@ -2935,24 +2937,19 @@ background objects but below the floating objects.
 ```
 public void start()
 {
-	// Make some walls in the back
-	GameObj border = ct.rect( 50, 0, 100, 20 );
-	border.setLayer( 0 );
-	border = ct.rect( 50, 100, 100, 20 );
-	border.setLayer( 0 );
-	border = ct.rect( 0, 0, 20, 100 );
-	border.setLayer( 0 );
-	border = ct.rect( 100, 0, 20, 100 );
-	border.setLayer( 0 );
+	// Make a rect in the back
+	GameObj rect = ct.rect( 50, 50, 70, 20 );
+	rect.setLayer( 0 );
 
-	// Make the score readout
-	GameObj score = ct.text( "Score: 0", 50, 30, 10 );
+	// Make the score readout on top
+	GameObj score = ct.text( "Score: 0", 50, 50, 10 );
 	score.setLayer( 2 );
 }
 
 public void update()
 {
 	// Make dots whereever the user clicks
+	// at default layer 1
 	if (ct.clicked())
 		ct.circle( ct.clickX(), ct.clickY(), 10 );
 }
@@ -3043,7 +3040,7 @@ public void start()
 {
 	// Make a button with both text and a background rect, but let the rect
 	// handle the click detection, so we don't have to test both.
-	button = ct.rect( 50, 50, 30, 15 );
+	button = ct.rect( 50, 50, 60, 15 );
 	GameObj text = ct.text( "Click me", 50, 50, 10 );
 	text.setClickable( false );   // change to true to see the difference
 }
@@ -3177,17 +3174,14 @@ GameObj block, dot;
 public void start()
 {
 	block = ct.rect( 70, 50, 10, 10 );
-	dot = ct.circle( 20, 50, 10 );
-	dot.setSpeed( 1, 0 );
+	dot = ct.circle( 20, 50, 5 );
 }
 
 public void update()
 {
+	dot.x++;
 	if (dot.hit( block ))
-	{
 		ct.println( "The dot hit the block" );
-		dot.setSpeed( 0, 0 );
-	}
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.hit()]
@@ -3348,8 +3342,8 @@ public void start()
 ```
 public void start()
 {
-	ct.rect( 50, 50, 70, 30 );
-	ct.text( "Welcome to Code12!", 50, 50, 10 );
+	ct.rect( 50, 50, 80, 20 );
+	ct.text( "Welcome to Code12!", 50, 50, 8 );
 	ct.println( "This is the text output area" );
 }
 ```
@@ -3608,7 +3602,7 @@ public void onKeyPress( String keyName )
 ```
 ##### keyName
 ([String](#java-data-types)). The name of the key.
-Only certain keys are supported, see [Key Names].
+Only certain keys are supported on all platforms, see [Key Names].
 
 #### Notes
 This function is only called once for each separate key press and release,
@@ -3643,7 +3637,7 @@ public void onKeyRelease( String keyName )
 ```
 ##### keyName
 ([String](#java-data-types)). The name of the key.
-Only certain keys are supported, see [Key Names].
+Only certain keys are supported on all platforms, see [Key Names].
 
 #### Example
 ```
@@ -3714,21 +3708,12 @@ public void onResize()
 ```
 
 #### Notes
-This function is *not* called when your program is running within
-the Code12 application. The Code12 application scales your application
-automatically and maintains a constant aspect ratio for your application
-if the user resizes the Code12 window or uses the pane splits.
-
-If you are using the Code12 Java runtime and your program is running
-in its own window, this function will notify you if the user resizes
-the window, to allow you to change any object positions or otherwise 
-react as desired.
-
-> Most systems resize windows continuously in response to the user dragging
-> the window frame, so you may receive many `onResize()` events in succession.
+Most systems resize windows continuously in response to the user dragging
+the window frame, so you may receive many `onResize()` events in succession.
 
 Note that the contents of your application scale automatically relative 
-to the overall window size, so in many cases you don't need to do anything. 
+to the overall window size, so in most cases you don't need to do anything
+in response to a resize. 
 However, if your object layout depends on the window aspect ratio or the 
 physical pixel size of the window, then you can determine these as follows:
 
@@ -3744,12 +3729,17 @@ int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );
 ```
 public void start()
 {
-	ct.println( "Run this using the Code12 Java runtime" );
+	ct.println( "Resize the window" );
 }
 
 public void onResize()
 {
-	ct.logm( "New size", ct.getWidth(), ct.getHeight() );
+	double width = ct.getWidth();
+	double height = ct.getHeight();
+	int pixelWidth = ct.round( width * ct.getPixelsPerUnit() );
+	int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );
+
+	ct.log( width, height, pixelWidth, pixelHeight );
 }
 ```
 ###### [Code12 Function Reference](#top) > [Input Event Functions] > [onResize()]
@@ -3885,7 +3875,10 @@ Color Name       (red, green, blue)
 
 
 ### Key Names
-The following key names are supported.
+The following key names should be supported on all platforms
+(different operating and computers) that have these keys. 
+Support for other keys is platform-dependent.
+
 Note that key names refer to a hardware key, not a typed character,
 so typing 'A' uses the "a" key, and typing '$' uses the "4" key.
 ```

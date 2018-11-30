@@ -156,7 +156,7 @@ function toolbar.update()
 		showButtons{ helpBtn, stopBtn, gridBtn }
 	elseif runState == "paused" then
 		if runtime.canStepOneFrame() then
-			showButtons{ helpBtn, resumeBtn, stopBtn, nextFrameBtn, gridBtn }
+			showButtons{ helpBtn, optionsBtn, resumeBtn, stopBtn, nextFrameBtn, gridBtn }
 		else
 			showButtons{ helpBtn, resumeBtn, stopBtn, gridBtn }
 		end
