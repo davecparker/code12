@@ -2215,10 +2215,20 @@ back by setting `visible` back to `true`.
 
 #### Example
 ```
-// Hide objects that are clicked
-GameObj target = ct.objectClicked();
-if (target != null)
-	target.visible = false;
+public void start()
+{
+	ct.circle( 50, 30, 10 );
+	ct.rect( 30, 70, 30, 10 );
+	ct.text( "Hey", 70, 50, 10 );
+}
+
+public void update()
+{
+	// Hide objects that get clicked
+	GameObj obj = ct.objectClicked();
+	if (obj != null)
+		obj.visible = false;
+}
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.visible]
 
@@ -2253,16 +2263,16 @@ public void start()
 {
 	block = ct.rect( 50, 70, 20, 20 );
 
-	coin1 = ct.circle( 30, 30, 10 );
+	coin1 = ct.circle( 30, 30, 10, "orange" );
 	coin1.group = "coins";
 
-	coin2 = ct.circle( 70, 30, 10 );
+	coin2 = ct.circle( 70, 30, 10, "orange" );
 	coin2.group = "coins";
 }
 
 public void update()
 {
-	// Hide coins that get clicked
+	// Hide (only) coins that get clicked
 	GameObj target = ct.objectClicked();
 	if (target != null && target.group.equals("coins"))
 		target.visible = false;	
@@ -2973,12 +2983,19 @@ deleting an object is permanent, and it cannot be brought back.
 
 #### Example
 ```
+public void start()
+{
+	ct.circle( 50, 30, 10 );
+	ct.rect( 30, 70, 30, 10 );
+	ct.text( "Hey", 70, 50, 10 );
+}
+
 public void update()
 {
-	// Delete any objects that get clicked
-	GameObj target = ct.objectClicked();
-	if (target != null)
-		target.delete();
+	// Delete objects that get clicked
+	GameObj obj = ct.objectClicked();
+	if (obj != null)
+		obj.delete();
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.delete()]

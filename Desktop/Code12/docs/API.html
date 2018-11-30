@@ -1373,10 +1373,20 @@ public void update()
 <p>In addition to not being displayed, hidden objects do not respond to mouse clicks (from <a href="#ct.objectclicked">ct.objectClicked()</a>, for example) and do not register as “hitting” other objects (see <a href="#obj.hit">obj.hit()</a>, for example]).</p>
 </blockquote>
 <h4 id="example-37">Example</h4>
-<pre><code>// Hide objects that are clicked
-GameObj target = ct.objectClicked();
-if (target != null)
-    target.visible = false;</code></pre>
+<pre><code>public void start()
+{
+    ct.circle( 50, 30, 10 );
+    ct.rect( 30, 70, 30, 10 );
+    ct.text( &quot;Hey&quot;, 70, 50, 10 );
+}
+
+public void update()
+{
+    // Hide objects that get clicked
+    GameObj obj = ct.objectClicked();
+    if (obj != null)
+        obj.visible = false;
+}</code></pre>
 <h6 id="code12-function-reference-gameobj-data-fields-obj.visible"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-data-fields-1">GameObj Data Fields</a> &gt; <a href="#obj.visible">obj.visible</a></h6>
 <h3 id="obj.group">obj.group</h3>
 <p>(<a href="#java-data-types">String</a>). An optional name that you can assign to a <a href="#java-data-types">GameObj</a> to associate it with other similar objects.</p>
@@ -1395,16 +1405,16 @@ public void start()
 {
     block = ct.rect( 50, 70, 20, 20 );
 
-    coin1 = ct.circle( 30, 30, 10 );
+    coin1 = ct.circle( 30, 30, 10, &quot;orange&quot; );
     coin1.group = &quot;coins&quot;;
 
-    coin2 = ct.circle( 70, 30, 10 );
+    coin2 = ct.circle( 70, 30, 10, &quot;orange&quot; );
     coin2.group = &quot;coins&quot;;
 }
 
 public void update()
 {
-    // Hide coins that get clicked
+    // Hide (only) coins that get clicked
     GameObj target = ct.objectClicked();
     if (target != null &amp;&amp; target.group.equals(&quot;coins&quot;))
         target.visible = false; 
@@ -1818,12 +1828,19 @@ target.setLayer( target.getLayer() );</code></pre>
 <p>Once an object has been deleted, any variables referencing that object will still exist, but accessing the fields or methods of the object is undefined and may result in unpredictable behavior.</p>
 </blockquote>
 <h4 id="example-54">Example</h4>
-<pre><code>public void update()
+<pre><code>public void start()
 {
-    // Delete any objects that get clicked
-    GameObj target = ct.objectClicked();
-    if (target != null)
-        target.delete();
+    ct.circle( 50, 30, 10 );
+    ct.rect( 30, 70, 30, 10 );
+    ct.text( &quot;Hey&quot;, 70, 50, 10 );
+}
+
+public void update()
+{
+    // Delete objects that get clicked
+    GameObj obj = ct.objectClicked();
+    if (obj != null)
+        obj.delete();
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.delete"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.delete">obj.delete()</a></h6>
 <h3 id="obj.setclickable">obj.setClickable()</h3>
