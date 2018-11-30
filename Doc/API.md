@@ -2332,10 +2332,9 @@ obj.getType()
 
 #### Example
 ```
-GameObj target = ct.objectClicked();
-String type = target.getType();
-if (type.equals( "circle" ))
-	ct.println( "You clicked a circle" );
+GameObj dot = ct.circle( 50, 50, 10 );
+String type = dot.getType();
+ct.log( type );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getType()]
 
@@ -2364,6 +2363,7 @@ of the line as set by [obj.setLineWidth()].
 ```
 GameObj title = ct.text( "Zombie Attack", 50, 30, 10 );
 double titleWidth = title.getWidth();
+ct.log( titleWidth );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getWidth()]
 
@@ -2389,8 +2389,9 @@ not the physical height of the line.
 
 #### Example
 ```
-GameObj hero = ct.image( "dragon.png", 50, 70, 10 );
+GameObj hero = ct.image( "hero.png", 50, 50, 10 );
 double heroHeight = hero.getHeight();
+ct.log( heroHeight );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getHeight()]
 
@@ -2480,8 +2481,8 @@ of `-0.5` will cause the object to move up at 30 units per second.
 
 #### Example
 ```
-GameObj dot = ct.circle( 0, 50, 10 );
-dot.setSpeed( 0.3, 0 );
+GameObj dot = ct.circle( 0, 70, 10 );
+dot.setSpeed( 0.3, -0.1 );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSpeed()]
 
@@ -2526,8 +2527,8 @@ always drawn from the first point to the second point.
 #### Example
 ```
 // Make the score text right-aligned in the upper right of the screen
-GameObj score = ct.text( "Score: 0", 100, 0 );
-score.align( "top right" )
+GameObj score = ct.text( "Score: 0", 100, 0, 8 );
+score.align( "top right" );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.align()]
 
@@ -2561,16 +2562,18 @@ in the description of an object.
 ```
 public void start()
 {
-	GameObj dot = ct.circle( 50, 50, 10 );
-	dot.setText( "bomb" );
+	GameObj circle1 = ct.circle( 30, 50, 10, "orange" );
+	circle1.setText( "coin" );
+
+	GameObj circle2 = ct.circle( 70, 50, 10, "black" );
+	circle2.setText( "bomb" );
 }
 
 public void update()
 {
 	GameObj target = ct.objectClicked();
-	String text = target.getText();
-	if (text != null && text.equals( "bomb" ))
-		ct.println( "You clicked a bomb" );
+	if (target != null)
+		ct.log( target.getText() );
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getText()]
