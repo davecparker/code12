@@ -3875,8 +3875,8 @@ Color Name       (red, green, blue)
 
 
 ### Key Names
-The following key names should be supported on all platforms
-(different operating and computers) that have these keys. 
+The following key names are supported on all platforms
+(different operating systems and computers) that have these keys. 
 Support for other keys is platform-dependent.
 
 Note that key names refer to a hardware key, not a typed character,
