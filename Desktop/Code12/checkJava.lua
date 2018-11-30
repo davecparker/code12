@@ -174,29 +174,27 @@ local function findMisspelledName( nameStr, nameTable )
 	if #matches == 1 then --If there is only one keyword that is the same length as nameStr return it
 		return matches[1] 
 	else --If there are more than one keyword the same length and distance from nameStr check for first/last character matching
-		local temp = {}
-
 		for i = 1, #matches do
+			local temp = {}
 			local bonusMatch = 0
 
-			local tempStr = matches[i] 
+			local tempStr = matches[i] --One point for first character matches
 
 			
 			if string.sub(tempStr, 1, 1) == string.sub(nameStr, 1, 1) then
-				bonusMatch =  bonusMatch + 1 --One point for first character matches
+				bonusMatch =  bonusMatch + 1
 			end
 
 			if string.sub(tempStr, -1, -1) == string.sub(nameStr, -1, -1) then
-				bonusMatch =  bonusMatch + 1 --One point for last character matches
+				bonusMatch =  bonusMatch + 1
 			end
 
-			if bonusMatch == 2 then --If a keyword has a first and last character match with nameStr return it
+			if bonusMatch == 2 then--If a keyword has a first and last character match with nameStr return it
 				return matches[i]
 			else
 				table.insert( temp, matches[i] )
 			end
 		end
-
 		matches = temp
 	end
 
