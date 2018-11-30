@@ -78,7 +78,8 @@ end
 
 -- Make the toolbar UI
 function toolbar.create()
-	local pauseBtnWidth = 80
+	local restartBtnWidth = 75
+	local resumeBtnWidth = 80
 	toolbarGroup = g.makeGroup()
 	toolbarBtns = {}
 
@@ -101,29 +102,29 @@ function toolbar.create()
 			onChooseProgram, "right", optionsBtn )
 	toolbarBtns[#toolbarBtns + 1] = chooseProgramBtn 
 
+	-- Stop button
+	stopBtn = buttons.newToolbarButton( toolbarGroup, " Stop", "stop-icon.png", 
+			runtime.stop, "left", nil, restartBtnWidth )
+	toolbarBtns[#toolbarBtns + 1] = stopBtn
+
+	-- Restart button
+	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", "resume-icon.png", 
+			app.processUserFile, "left", nil, restartBtnWidth )
+	toolbarBtns[#toolbarBtns + 1] = restartBtn
+
 	-- Pause button
 	pauseBtn = buttons.newToolbarButton( toolbarGroup, "Pause", "pause-icon.png", 
-			runtime.pause, "left", nil, pauseBtnWidth )
+			runtime.pause, "left", restartBtn, resumeBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = pauseBtn
 
 	-- Resume button
 	resumeBtn = buttons.newToolbarButton( toolbarGroup, "Resume", "resume-icon.png", 
-			runtime.resume, "left", nil, pauseBtnWidth )
+			runtime.resume, "left", restartBtn, resumeBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = resumeBtn
 	
-	-- Restart button
-	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", "resume-icon.png", 
-			app.processUserFile, "left", nil, pauseBtnWidth )
-	toolbarBtns[#toolbarBtns + 1] = restartBtn
-
-	-- Stop button
-	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", "stop-icon.png", 
-			runtime.stop, "left", pauseBtn )
-	toolbarBtns[#toolbarBtns + 1] = stopBtn
-
 	-- Next Frame button
 	nextFrameBtn = buttons.newToolbarButton( toolbarGroup, "Next Frame", "next-frame-icon.png", 
-			runtime.stepOneFrame, "left", stopBtn )
+			runtime.stepOneFrame, "left", resumeBtn )
 	toolbarBtns[#toolbarBtns + 1] = nextFrameBtn
 
 	-- Toggle Grid button
