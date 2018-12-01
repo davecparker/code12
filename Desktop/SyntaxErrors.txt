@@ -106,3 +106,6 @@ aimport Code12.*;
 		else obj ~= null;
 		else blah
 		else what
+		ct.logm( "Current stats:", runs, hits, errors );	}
+		ct.println( playAgain );;
+public void start

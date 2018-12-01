@@ -13,6 +13,7 @@ local composer = require( "composer" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
+local source = require( "source" )
 local buttons = require( "buttons" )
 local runtime = require( "Code12.runtime" )
 local runView = require( "runView" )
@@ -41,6 +42,8 @@ local toolbarBtns         -- Array of buttons on the toolbar
 
 -- Event handler for the Choose Program button
 local function onChooseProgram()
+	runtime.clearProgram()
+	source.clear()
 	composer.gotoScene( "getFile" )
 end
 
@@ -70,18 +73,13 @@ local function showButtons( btns )
 	end
 end
 
--- Execute the Stop button
-local function doStop()
-	runtime.message( "Program Stopped" )
-	runtime.stop()
-end
-
 
 --- Module Functions ------------------------------------------------
 
 -- Make the toolbar UI
 function toolbar.create()
-	local pauseBtnWidth = 80
+	local restartBtnWidth = 75
+	local resumeBtnWidth = 80
 	toolbarGroup = g.makeGroup()
 	toolbarBtns = {}
 
@@ -104,29 +102,29 @@ function toolbar.create()
 			onChooseProgram, "right", optionsBtn )
 	toolbarBtns[#toolbarBtns + 1] = chooseProgramBtn 
 
+	-- Stop button
+	stopBtn = buttons.newToolbarButton( toolbarGroup, " Stop", "stop-icon.png", 
+			runtime.stop, "left", nil, restartBtnWidth )
+	toolbarBtns[#toolbarBtns + 1] = stopBtn
+
+	-- Restart button
+	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", "resume-icon.png", 
+			app.processUserFile, "left", nil, restartBtnWidth )
+	toolbarBtns[#toolbarBtns + 1] = restartBtn
+
 	-- Pause button
 	pauseBtn = buttons.newToolbarButton( toolbarGroup, "Pause", "pause-icon.png", 
-			runtime.pause, "left", nil, pauseBtnWidth )
+			runtime.pause, "left", restartBtn, resumeBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = pauseBtn
 
 	-- Resume button
 	resumeBtn = buttons.newToolbarButton( toolbarGroup, "Resume", "resume-icon.png", 
-			runtime.resume, "left", nil, pauseBtnWidth )
+			runtime.resume, "left", restartBtn, resumeBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = resumeBtn
 	
-	-- Restart button
-	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", "resume-icon.png", 
-			app.processUserFile, "left", nil, pauseBtnWidth )
-	toolbarBtns[#toolbarBtns + 1] = restartBtn
-
-	-- Stop button
-	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", "stop-icon.png", 
-			doStop, "left", pauseBtn )
-	toolbarBtns[#toolbarBtns + 1] = stopBtn
-
 	-- Next Frame button
 	nextFrameBtn = buttons.newToolbarButton( toolbarGroup, "Next Frame", "next-frame-icon.png", 
-			runtime.stepOneFrame, "left", stopBtn )
+			runtime.stepOneFrame, "left", resumeBtn )
 	toolbarBtns[#toolbarBtns + 1] = nextFrameBtn
 
 	-- Toggle Grid button
@@ -158,7 +156,7 @@ function toolbar.update()
 		showButtons{ helpBtn, stopBtn, gridBtn }
 	elseif runState == "paused" then
 		if runtime.canStepOneFrame() then
-			showButtons{ helpBtn, resumeBtn, stopBtn, nextFrameBtn, gridBtn }
+			showButtons{ helpBtn, optionsBtn, resumeBtn, stopBtn, nextFrameBtn, gridBtn }
 		else
 			showButtons{ helpBtn, resumeBtn, stopBtn, gridBtn }
 		end

@@ -274,12 +274,12 @@ local function callCode( call )
 		-- String methods
 		if methodName == "equals" then
 			-- Lua can compare strings directly with ==
-			return "(" .. varIndexCode( lValue ) 
+			return "(" .. lValueCode( lValue ) 
 					.. " == " .. exprCode( exprs[1] ) .. ")"
 		end
 		-- Map to corresponding global Lua function, passing the object.  
 		parts = { luaFnFromJavaStringMethod[methodName], "(", 
-				varIndexCode( lValue ) }
+				lValueCode( lValue ) }
 		if numExprs > 0 then
 			parts[#parts + 1] = ", "
 		end

@@ -56,11 +56,21 @@ local source =  {
 
 -- Purge the parse cache
 function source.purgeParseCache()
-	source.lineCacheForStrLine = {}
-	source.lines = {}
 	source.numLines = 0
 	source.syntaxLevel = nil
+	source.lines = {}
+	source.lineCacheForStrLine = {}
 end
+
+-- Clear the source contents
+function source.clear()
+	source.path = nil
+	source.timeModLast = 0
+	source.updated = false
+	source.timeLoaded = 0
+	source.strLines = nil
+	source.purgeParseCache()
+end	
 
 -- If path then set source.path to it, otherwise use the existing source.path.
 -- Read the source and store all of its source lines in source.strLines.

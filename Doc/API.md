@@ -178,7 +178,7 @@ ct.circle( 50, 70, 40, "blue" );
 ```
 ```
 GameObj ball = ct.circle( 0, 50, 10, "yellow" );
-ball.xSpeed = 1;
+ball.setSpeed( 1, 0 );
 ```
 ###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.circle()]
 
@@ -226,7 +226,7 @@ ct.rect( 50, 70, 80, 40, "blue" );
 ```
 ```
 GameObj platform = ct.rect( 0, 50, 30, 8, "orange" );
-platform.xSpeed = 1;
+platform.setSpeed( 1, 0 );
 ```
 ###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.rect()]
 
@@ -318,13 +318,13 @@ which can be used to access and modify the text object later
 
 #### Examples
 ```
-ct.text( "Zombie Attack!", 50, 40, 20 );
+ct.text( "Zombie Attack!", 50, 40, 12 );
 ```
 ```
 ct.text( "Click anywhere to play", 50, 60, 5, "blue" );
 ```
 ```
-GameObj scoreText = ct.text( "Score: 0", 100, 20, 10, "green" );
+GameObj scoreText = ct.text( "Score: 0", 100, 5, 7, "red" );
 scoreText.align( "right" );
 ```
 ###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.text()]
@@ -371,7 +371,7 @@ which can be used to access and modify the image object later
 
 #### Examples
 ```
-ct.image( "dragon.png", 30, 50, 10 );
+ct.image( "dragon.png", 50, 30, 20 );
 ```
 ```
 // Stretch the sky image to fill the entire screen
@@ -421,10 +421,10 @@ ct.print( " there!" );
 ```
 ```
 String userName = "Jennifer";
-int score = 500;
+int score = 2500;
 
 ct.print( "User " );
-ct.print( userName )
+ct.print( userName );
 ct.print( " has a score of " );
 ct.print( score );
 ```
@@ -457,10 +457,13 @@ ct.println();    // a blank line
 ct.println( "This is the next paragraph." );
 ```
 ```
-int totalScore = 250;
-int numTrys = 3;
+String userName = "Jennifer";
+int score = 2500;
 
-ct.println( "Your average score is " + (totalScore / numTrys) );
+ct.println( userName );
+ct.println( score );
+ct.println();
+ct.println( userName + " has score " + score );
 ```
 ###### [Code12 Function Reference](#top) > [Text Output] > [ct.println()]
 
@@ -570,14 +573,14 @@ output to the console only.
 double a = 7;
 double b = 2;
 
-ct.setOutputFilename( "Math Test Results.txt" );
+ct.setOutputFile( "Math Test Results.txt" );
 ct.println( "Test of simple math operations" );
 ct.log( a, b );
 ct.println( "Sum = " + (a + b) );
 ct.println( "Difference = " + (a - b) );
 ct.println( "Product = " + (a * b) );
 ct.println( "Quotient = " + (a / b) );
-ct.setOutputFilename( null );
+ct.setOutputFile( null );
 ```
 ###### [Code12 Function Reference](#top) > [Text Output] > [ct.setOutputFile()]
 
@@ -634,6 +637,7 @@ ct.inputInt( message );
 #### Example
 ```
 int numTargets = ct.inputInt( "How many targets would you like to have?" );
+ct.println( numTargets );
 ```
 ###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputInt()]
 
@@ -656,6 +660,7 @@ ct.inputNumber( message );
 #### Example
 ```
 double tempF = ct.inputNumber( "Enter the temperature in Farenheit" );
+ct.println( tempF );
 ```
 ###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputNumber()]
 
@@ -679,6 +684,7 @@ and `false` if they press No.
 #### Example
 ```
 boolean playAgain = ct.inputYesNo( "Do you want to play again?" );
+ct.println( playAgain );
 ```
 ###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputYesNo()]
 
@@ -705,6 +711,7 @@ ct.inputString( message );
 #### Example
 ```
 String name = ct.inputString( "Enter your name" );
+ct.println( name );
 ```
 ###### [Code12 Function Reference](#top) > [Alerts and Input Dialogs] > [ct.inputString()]
 
@@ -852,6 +859,7 @@ at the current window size.
 // Determine the physical size of the game window in pixels
 int pixelWidth = ct.round( ct.getWidth() * ct.getPixelsPerUnit() );
 int pixelHeight = ct.round( ct.getHeight() * ct.getPixelsPerUnit() );
+ct.log( pixelWidth, pixelHeight );
 ```
 ```
 // Create a circle that is 10 pixels in diameter at the current scale
@@ -918,7 +926,7 @@ if (numLives == 0)
 {
 	ct.setScreen( "end" );
 	ct.setBackColor( "light blue" );
-	ct.text( "Game Over", 50, 50, 20 );
+	ct.text( "Game Over", 50, 50, 15 );
 }
 ```
 ```
@@ -933,7 +941,7 @@ public void start()
 
 	// Make the game screen
 	ct.setScreen( "game" );
-	ct.backImage( "city.jpg" );
+	ct.setBackImage( "city.jpg" );
 	ct.image( "hero.png", 50, 50, 10 );
 	// etc.
 
@@ -1001,9 +1009,9 @@ to the left and no longer be visible.
 
 #### Example
 ```
-ct.image( "mountains.png", 50, 50, 300 );   // wider than screen
-ct.image( "bear", 50, 70, 10 );
-ct.setScreenOrigin( 30, 0 );       // entire scene scrolls to the left
+ct.image( "city.jpg", 50, 50, 250 );   // wider than screen
+ct.image( "hero.png", 50, 70, 10 );
+ct.setScreenOrigin( 25, 0 );       // entire scene scrolls to the left
 ```
 ###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setScreenOrigin()]
 
@@ -1018,7 +1026,7 @@ ct.clearScreen();
 ```
 #### Example
 ```
-ct.setBackColor( "red" )
+ct.setBackColor( "gray" );
 ct.circle( 50, 50, 20 );
 ct.rect( 50, 70, 40, 10 );
 ct.clearScreen();     // screen is now just solid red
@@ -1095,7 +1103,7 @@ ct.setBackColorRGB( red, green, blue );
 
 #### Example
 ```
-ct.setBackColorRGB( 0, 60, 255 );    // greenish blue
+ct.setBackColorRGB( 210, 180, 140 );    // tan
 ```
 ###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setBackColorRGB()]
 
@@ -1276,6 +1284,13 @@ will not be considered when determining which object was clicked.
 
 #### Example
 ```
+public void start()
+{
+	ct.circle( 50, 30, 10 );
+	ct.rect( 30, 70, 30, 10 );
+	ct.text( "Hey", 70, 50, 10 );
+}
+
 public void update()
 {
 	// Delete objects that get clicked
@@ -1330,7 +1345,7 @@ public void update()
 {
 	// Move ball to the right when right arrow is held down
 	if (ct.keyPressed( "right" ))
-		ball.x += 0.25 
+		ball.x += 0.25; 
 }
 ```
 ###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input] > [ct.keyPressed()]
@@ -1371,13 +1386,21 @@ per second.
 
 #### Example
 ```
+public void start()
+{
+	ct.println( "Looking for 4, $, and space" );
+}
+
 public void update()
 {
-	if (ct.charTyped( "w" ))
-		ct.println( "w was typed" );
+	if (ct.charTyped( "4" ))
+		ct.println( "4 was typed" );
 	
+	if (ct.charTyped( "$" ))
+		ct.println( "$ was typed" );
+
 	if (ct.charTyped( " " ))
-		ct.println( "Space bar" );
+		ct.println( "space was typed" );
 }
 ```
 ###### [Code12 Function Reference](#top) > [Mouse and Keyboard Input] > [ct.charTyped()]
@@ -1430,15 +1453,15 @@ sound format.
 
 #### Example
 ```
-public void start
+public void start()
 {
-	ct.loadSound( "ding.wav" );
+	ct.loadSound( "pop.wav" );
 }
 
 public void update()
 {
 	if (ct.clicked())
-		ct.sound( "ding.wav" );
+		ct.sound( "pop.wav" );
 }
 ```
 ###### [Code12 Function Reference](#top) > [Audio] > [ct.loadSound()]
@@ -1472,10 +1495,10 @@ the first time a sound is played.
 
 #### Examples
 ```
-ct.sound( "ding.wav" );
+ct.sound( "pop.wav" );
 ```
 ```
-public void start
+public void start()
 {
 	ct.sound( "music.mp3" );
 }
@@ -1483,7 +1506,7 @@ public void start
 public void update()
 {
 	if (ct.clicked())
-		ct.sound( "ding.wav" );
+		ct.sound( "pop.wav" );
 }
 ```
 ###### [Code12 Function Reference](#top) > [Audio] > [ct.sound()]
@@ -1506,7 +1529,7 @@ then sounds are attenuated relative to the volume they were recorded at.
 #### Example
 ```
 ct.setSoundVolume( 0.2 );
-ct.sound( "voices.mp3" );
+ct.sound( "music.mp3" );
 ```
 ###### [Code12 Function Reference](#top) > [Audio] > [ct.setSoundVolume()]
 
@@ -1546,6 +1569,7 @@ ct.random( min, max )
 #### Examples
 ```
 int diceRoll = ct.random( 1, 6 );
+ct.log( diceRoll );
 ```
 ```
 // Flip a coin
@@ -1577,7 +1601,8 @@ ct.round( number )
 #### Example
 ```
 double x = 10.75;
-int n = ct.round( x );    // sets n to 11
+int n = ct.round( x );
+ct.log( n );
 ```
 ###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.round()]
 
@@ -1601,7 +1626,8 @@ ct.roundDecimal( number, numPlaces )
 #### Example
 ```
 double amount = 24.3467;
-double price = ct.roundDecimal( amount, 2 );    // sets price to 24.35
+double price = ct.roundDecimal( amount, 2 );
+ct.log( price );
 ```
 ###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.roundDecimal()]
 
@@ -1673,6 +1699,7 @@ to the nearest integer.
 #### Example
 ```
 int n = ct.intDiv( 3, 2 );    // sets n to 1
+ct.log( n );
 ```
 ###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.intDiv()]
 
@@ -1698,12 +1725,11 @@ in an error or invalid number. See the examples below.
 
 #### Example
 ```
-boolean error;
-
-// These all set error to true
-error = ct.isError( 0.0 / 0.0 );
-error = ct.isError( Math.sqrt( -1 ) );
-error = ct.isError( ct.parseNumber( "nope" ) );
+// One of these is not considered a NaN error...
+ct.log( ct.isError( 0.0 / 0.0 ) );                  // undefined
+ct.log( ct.isError( Math.sqrt( -1 ) ) );            // imaginary
+ct.log( ct.isError( 0.0 / 2.0 ) );                  // infinity
+ct.log( ct.isError( ct.parseNumber( "nope" ) ) );   // error
 ```
 ###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.isError()]
 
@@ -1739,14 +1765,14 @@ then the integer value is returned, otherwise 0 is returned.
 > Since 0 is also a valid integer, it is a good idea to
 > test the string with [ct.canParseInt()] first.
 
-#### Examples
+#### Example
 ```
 int a = ct.parseInt( "546" );      // sets a to 546
 int b = ct.parseInt( "  -3 " );    // sets b to -3
-```
-```
 int c = ct.parseInt( "six");       // sets c to 0
 int d = ct.parseInt( "4 more" );   // sets d to 0
+
+ct.log( a, b, c, d);
 ```
 ###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.parseInt()]
 
@@ -1770,14 +1796,13 @@ is returned.
 
 #### Examples
 ```
-int a = ct.parseNumber( "5" );           // sets a to 5.0
-int b = ct.parseNumber( "  -3.02 " );    // sets b to -3.02
-```
-```
-String entry = "$24.99";
-double amount = ct.parseNumber( entry );    // sets amount to NaN
-if (ct.isError( amount ))
-	ct.println( "Invalid number format" );
+double a = ct.parseNumber( "5" );           // sets a to 5.0
+double b = ct.parseNumber( "  -3.02 " );    // sets b to -3.02
+double c = ct.parseNumber( "$24.99" );      // sets c to NaN
+
+ct.log( a, b, c );
+if (ct.isError( c ))
+	ct.println( "Got an invalid number" );
 ```
 ###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.parseNumber()]
 
@@ -1799,7 +1824,7 @@ otherwise `false`.
 
 #### Example
 ```
-String entry = "13";
+String entry = ct.inputString( "Enter something" );
 
 if (ct.canParseInt( entry ))
 {
@@ -1831,7 +1856,7 @@ otherwise `false`.
 
 #### Example
 ```
-String entry = "-0.99";
+String entry = ct.inputString( "Enter something" );
 
 if (ct.canParseNumber( entry ))
 {
@@ -1867,12 +1892,13 @@ returned will have at least this many characters, adding leading zeros as necess
 
 #### Examples
 ```
-String text = ct.formatInt( 32 );         // sets text to "32"
+String text = ct.formatInt( 32 );    // sets text to "32"
+ct.log( text );
 ```
 ```
 int score = 520;
 String text = ct.formatInt( score, 6 );   // sets text to "000520"
-ct.text( text, 5, 20, 10 );               // displays score on the graphics screen
+ct.text( text, 50, 5, 10 );               // displays score on the graphics screen
 ```
 ###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.formatInt()]
 
@@ -1900,11 +1926,13 @@ adding extra zeros as necessary.
 #### Examples
 ```
 double x = 1.250;
-String text = ct.formatDecimal( x );       // sets text to "1.25"
+String text = ct.formatDecimal( x );    // sets text to "1.25"
+ct.log( text );
 ```
 ```
 double a = 3.14159;
 String text = ct.formatDecimal( a, 4 );    // sets text to "3.1416"
+ct.log( text );
 ```
 ###### [Code12 Function Reference](#top) > [Type Conversion] > [ct.formatDecimal()]
 
@@ -1944,6 +1972,11 @@ public void update()
 boolean timerStarted = false;
 int startTime;
 
+public void start()
+{
+	ct.text( "Click to start timer", 50, 50, 5 );
+}
+
 public void update()
 {
 	// Start a timer when the user clicks
@@ -1978,7 +2011,7 @@ ct.getVersion()
 #### Examples
 ```
 if (ct.getVersion() > 1.0)
-	ct.println( "We have the update" )
+	ct.println( "We have the update" );
 ```
 ###### [Code12 Function Reference](#top) > [Program Control] > [ct.getVersion()]
 
@@ -2182,10 +2215,20 @@ back by setting `visible` back to `true`.
 
 #### Example
 ```
-// Hide objects that are clicked
-GameObj target = ct.objectClicked();
-if (target != null)
-	target.visible = false;
+public void start()
+{
+	ct.circle( 50, 30, 10 );
+	ct.rect( 30, 70, 30, 10 );
+	ct.text( "Hey", 70, 50, 10 );
+}
+
+public void update()
+{
+	// Hide objects that get clicked
+	GameObj obj = ct.objectClicked();
+	if (obj != null)
+		obj.visible = false;
+}
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.visible]
 
@@ -2220,16 +2263,16 @@ public void start()
 {
 	block = ct.rect( 50, 70, 20, 20 );
 
-	coin1 = ct.circle( 30, 30, 10 );
+	coin1 = ct.circle( 30, 30, 10, "orange" );
 	coin1.group = "coins";
 
-	coin2 = ct.circle( 70, 30, 10 );
+	coin2 = ct.circle( 70, 30, 10, "orange" );
 	coin2.group = "coins";
 }
 
 public void update()
 {
-	// Hide coins that get clicked
+	// Hide (only) coins that get clicked
 	GameObj target = ct.objectClicked();
 	if (target != null && target.group.equals("coins"))
 		target.visible = false;	
@@ -2289,10 +2332,9 @@ obj.getType()
 
 #### Example
 ```
-GameObj target = ct.objectClicked();
-String type = target.getType();
-if (type.equals( "circle" ))
-	ct.println( "You clicked a circle" );
+GameObj dot = ct.circle( 50, 50, 10 );
+String type = dot.getType();
+ct.log( type );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getType()]
 
@@ -2321,6 +2363,7 @@ of the line as set by [obj.setLineWidth()].
 ```
 GameObj title = ct.text( "Zombie Attack", 50, 30, 10 );
 double titleWidth = title.getWidth();
+ct.log( titleWidth );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getWidth()]
 
@@ -2346,8 +2389,9 @@ not the physical height of the line.
 
 #### Example
 ```
-GameObj hero = ct.image( "dragon.png", 50, 70, 10 );
+GameObj hero = ct.image( "hero.png", 50, 50, 10 );
 double heroHeight = hero.getHeight();
+ct.log( heroHeight );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getHeight()]
 
@@ -2437,8 +2481,8 @@ of `-0.5` will cause the object to move up at 30 units per second.
 
 #### Example
 ```
-GameObj dot = ct.circle( 0, 50, 10 );
-dot.setSpeed( 0.3, 0 );
+GameObj dot = ct.circle( 0, 70, 10 );
+dot.setSpeed( 0.3, -0.1 );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSpeed()]
 
@@ -2483,8 +2527,8 @@ always drawn from the first point to the second point.
 #### Example
 ```
 // Make the score text right-aligned in the upper right of the screen
-GameObj score = ct.text( "Score: 0", 100, 0 );
-score.align( "top right" )
+GameObj score = ct.text( "Score: 0", 100, 0, 8 );
+score.align( "top right" );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.align()]
 
@@ -2518,16 +2562,18 @@ in the description of an object.
 ```
 public void start()
 {
-	GameObj dot = ct.circle( 50, 50, 10 );
-	dot.setText( "bomb" );
+	GameObj circle1 = ct.circle( 30, 50, 10, "orange" );
+	circle1.setText( "coin" );
+
+	GameObj circle2 = ct.circle( 70, 50, 10, "black" );
+	circle2.setText( "bomb" );
 }
 
 public void update()
 {
 	GameObj target = ct.objectClicked();
-	String text = target.getText();
-	if (text != null && text.equals( "bomb" ))
-		ct.println( "You clicked a bomb" );
+	if (target != null)
+		ct.log( target.getText() );
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getText()]
@@ -2544,7 +2590,8 @@ obj.setText( text )
 ([GameObj](#java-data-types)). The graphics object. 
 
 ##### text
-([String](#java-data-types)). The text to store in the object.
+([String](#java-data-types)). The text to store in the object,
+or `null` for none.
 For a text object (see [ct.text()]), this becomes the visible text.
 For other objects, this is just a string kept inside the object,
 which can be used to identity or describe the object (see [obj.getText()]).
@@ -2570,7 +2617,7 @@ public void start()
 public void update()
 {
 	if (ct.clicked())
-		message.text = "You clicked";
+		message.setText( "You clicked" );
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setText()]
@@ -2622,7 +2669,7 @@ public void update()
 {
 	GameObj target = ct.objectClicked();
 	if (target != null)
-		message.text = target.toString();
+		message.setText( target.toString() );
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.toString()]
@@ -2686,7 +2733,7 @@ For a text object (see [ct.text()]), the color of the text is set.
 #### Example
 ```
 GameObj blob = ct.circle( 50, 50, 20 );
-blob.setFillColorRGB( 0, 60, 255 );     // greenish-blue
+blob.setFillColorRGB( 210, 180, 140 );     // tan
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setFillColorRGB()]
 
@@ -2713,6 +2760,7 @@ For other object types, the color of the outlined border of the object is set.
 #### Example
 ```
 GameObj dot = ct.circle( 50, 50, 20 );
+dot.setLineWidth( 5 );
 dot.setLineColor( "green" );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineColor()]
@@ -2745,7 +2793,8 @@ For other object types, the color of the outlined border of the object is set.
 #### Example
 ```
 GameObj blob = ct.circle( 50, 50, 20 );
-blob.setLineColorRGB( 0, 60, 255 );     // greenish-blue outline
+blob.setLineWidth( 5 );
+blob.setLineColorRGB( 210, 180, 140 );     // tan outline
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLineColorRGB()]
 
@@ -2888,24 +2937,19 @@ background objects but below the floating objects.
 ```
 public void start()
 {
-	// Make some walls in the back
-	GameObj border = ct.rect( 50, 0, 100, 20 );
-	border.setLayer( 0 );
-	border = ct.rect( 50, 100, 100, 20 );
-	border.setLayer( 0 );
-	border = ct.rect( 0, 0, 20, 100 );
-	border.setLayer( 0 );
-	border = ct.rect( 100, 0, 20, 100 );
-	border.setLayer( 0 );
+	// Make a rect in the back
+	GameObj rect = ct.rect( 50, 50, 70, 20 );
+	rect.setLayer( 0 );
 
-	// Make the score readout
-	GameObj score = ct.text( "Score: 0", 50, 30, 10 );
+	// Make the score readout on top
+	GameObj score = ct.text( "Score: 0", 50, 50, 10 );
 	score.setLayer( 2 );
 }
 
 public void update()
 {
 	// Make dots whereever the user clicks
+	// at default layer 1
 	if (ct.clicked())
 		ct.circle( ct.clickX(), ct.clickY(), 10 );
 }
@@ -2939,12 +2983,19 @@ deleting an object is permanent, and it cannot be brought back.
 
 #### Example
 ```
+public void start()
+{
+	ct.circle( 50, 30, 10 );
+	ct.rect( 30, 70, 30, 10 );
+	ct.text( "Hey", 70, 50, 10 );
+}
+
 public void update()
 {
-	// Delete any objects that get clicked
-	GameObj target = ct.objectClicked();
-	if (target != null)
-		target.delete();
+	// Delete objects that get clicked
+	GameObj obj = ct.objectClicked();
+	if (obj != null)
+		obj.delete();
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.delete()]
@@ -2989,7 +3040,7 @@ public void start()
 {
 	// Make a button with both text and a background rect, but let the rect
 	// handle the click detection, so we don't have to test both.
-	button = ct.rect( 50, 50, 30, 15 );
+	button = ct.rect( 50, 50, 60, 15 );
 	GameObj text = ct.text( "Click me", 50, 50, 10 );
 	text.setClickable( false );   // change to true to see the difference
 }
@@ -3123,17 +3174,14 @@ GameObj block, dot;
 public void start()
 {
 	block = ct.rect( 70, 50, 10, 10 );
-	dot = ct.circle( 20, 50, 10 );
-	dot.setSpeed( 1, 0 );
+	dot = ct.circle( 20, 50, 5 );
 }
 
 public void update()
 {
+	dot.x++;
 	if (dot.hit( block ))
-	{
 		ct.println( "The dot hit the block" );
-		dot.setSpeed( 0, 0 );
-	}
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.hit()]
@@ -3294,8 +3342,8 @@ public void start()
 ```
 public void start()
 {
-	ct.rect( 50, 50, 70, 30 );
-	ct.text( "Welcome to Code12!", 50, 50, 10 );
+	ct.rect( 50, 50, 80, 20 );
+	ct.text( "Welcome to Code12!", 50, 50, 8 );
 	ct.println( "This is the text output area" );
 }
 ```
@@ -3554,7 +3602,7 @@ public void onKeyPress( String keyName )
 ```
 ##### keyName
 ([String](#java-data-types)). The name of the key.
-Only certain keys are supported, see [Key Names].
+Only certain keys are supported on all platforms, see [Key Names].
 
 #### Notes
 This function is only called once for each separate key press and release,
@@ -3589,7 +3637,7 @@ public void onKeyRelease( String keyName )
 ```
 ##### keyName
 ([String](#java-data-types)). The name of the key.
-Only certain keys are supported, see [Key Names].
+Only certain keys are supported on all platforms, see [Key Names].
 
 #### Example
 ```
@@ -3660,21 +3708,12 @@ public void onResize()
 ```
 
 #### Notes
-This function is *not* called when your program is running within
-the Code12 application. The Code12 application scales your application
-automatically and maintains a constant aspect ratio for your application
-if the user resizes the Code12 window or uses the pane splits.
-
-If you are using the Code12 Java runtime and your program is running
-in its own window, this function will notify you if the user resizes
-the window, to allow you to change any object positions or otherwise 
-react as desired.
-
-> Most systems resize windows continuously in response to the user dragging
-> the window frame, so you may receive many `onResize()` events in succession.
+Most systems resize windows continuously in response to the user dragging
+the window frame, so you may receive many `onResize()` events in succession.
 
 Note that the contents of your application scale automatically relative 
-to the overall window size, so in many cases you don't need to do anything. 
+to the overall window size, so in most cases you don't need to do anything
+in response to a resize. 
 However, if your object layout depends on the window aspect ratio or the 
 physical pixel size of the window, then you can determine these as follows:
 
@@ -3690,12 +3729,17 @@ int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );
 ```
 public void start()
 {
-	ct.println( "Run this using the Code12 Java runtime" );
+	ct.println( "Resize the window" );
 }
 
 public void onResize()
 {
-	ct.logm( "New size", ct.getWidth(), ct.getHeight() );
+	double width = ct.getWidth();
+	double height = ct.getHeight();
+	int pixelWidth = ct.round( width * ct.getPixelsPerUnit() );
+	int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );
+
+	ct.log( width, height, pixelWidth, pixelHeight );
 }
 ```
 ###### [Code12 Function Reference](#top) > [Input Event Functions] > [onResize()]
@@ -3808,11 +3852,12 @@ Color Name       (red, green, blue)
 "orange"         (255, 127, 0)
 "pink"           (255, 192, 203)
 "purple"         (64, 0, 127)
+"brown"          (130, 70, 30)
 
 "light gray"     (191, 191, 191)
 "light red"      (255, 127, 127)
 "light green"    (127, 255, 127)
-"light blue"     (127, 127, 255)
+"light blue"     (170, 225, 255)
 "light cyan"     (127, 255, 255)
 "light magenta"  (255, 127, 255)
 "light yellow"   (255, 255, 127)
@@ -3823,14 +3868,17 @@ Color Name       (red, green, blue)
 "dark blue"      (0, 0, 127)
 "dark cyan"      (0, 127, 127)
 "dark magenta"   (127, 0, 127)
-"dark yellow"    (127, 127, 0)
+"dark yellow"    (220, 190, 0)
 
 ```
 ###### [Code12 Function Reference](#top) > [Additional Reference Information] > [Color Names]
 
 
 ### Key Names
-The following key names are supported.
+The following key names are supported on all platforms
+(different operating systems and computers) that have these keys. 
+Support for other keys is platform-dependent.
+
 Note that key names refer to a hardware key, not a typed character,
 so typing 'A' uses the "a" key, and typing '$' uses the "4" key.
 ```

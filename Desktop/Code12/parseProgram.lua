@@ -332,7 +332,7 @@ local function getVar( p, nodes, structs, isGlobal )
 end	
 
 -- Make and return an lValue structure from the parse node parts.
--- The index and field can be nil 
+-- The index and field can be nil, and field can be an ID or a "field". 
 local function makeLValueFromNodes( varID, index, field )
 	local indexExpr = nil
 	local lastToken = nil
@@ -342,7 +342,11 @@ local function makeLValueFromNodes( varID, index, field )
 	end
 	local fieldID = nil
 	if field then
-		fieldID = field.nodes[2]
+		if field.tt == "ID" then
+			fieldID = field
+		elseif field.p == "field" then
+			fieldID = field.nodes[2]
+		end
 		lastToken = nil   -- don't need this anymore
 	end
 	return { s = "lValue", varID = varID, 

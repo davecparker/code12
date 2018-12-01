@@ -96,7 +96,7 @@ local function writeNewProgramSkeleton( path )
 {
 	public void start()
 	{
-		// Start your code here
+		// Your code goes here
 	}
 }
 ]]
@@ -104,16 +104,16 @@ local function writeNewProgramSkeleton( path )
 			skeleton = skeleton ..
 [[
 {
-	// Declare your class-level variables here
+	// Declare class-level variables here
 
 	public void start()
 	{
-		// Your code here runs once at the start of running the program
+		// Your program starts here
 	}
 
 	public void update()
 	{
-		// Your code here runs once per new frame after start()
+		// Code here runs before each animation frame
 	}
 }
 ]]
@@ -131,7 +131,7 @@ local function newProgram()
 	local className, ext
 	while true do -- breaks internally when valid program name is entered
 		programName = env.strFromInputBoxDialog( "New Program", 
-				"Enter a name for your new program, then press OK to choose where to save it",
+				"Enter a name for your new program, then press OK to choose where to save it.",
 				programName )
 		if not programName then
 			-- User clicked "Cancel" in new program dialog
@@ -142,7 +142,7 @@ local function newProgram()
 		className, ext = env.basenameAndExtFromFilename( programName )
 		if not isValidClassName( className ) then
 			env.showErrAlert( "Invalid Program Name", 
-					"Program names must start with a capital letter, then contain only letters and digits (no spaces)" )
+					"Program names must start with a capital letter, then contain only letters and digits (no spaces)." )
 		elseif ext and ext ~= "java" then
 			env.showErrAlert( "Invalid Program Name", "Java programs must have an extension of .java" )
 		else
