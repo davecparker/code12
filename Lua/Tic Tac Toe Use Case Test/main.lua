@@ -1,12 +1,12 @@
 package.path = package.path .. [[;../../Desktop/Code12/?.lua;C:\Users\lando\Documents\code12\Desktop\Code12\?.lua]]
 local ct, this, _fn = require('Code12.ct').getTables()
 
-board = {{nil, nil, nil},
-              {nil, nil, nil},
-              {nil, nil, nil}}
-results = nil
-isPlayerTurn = true
-time = 0
+local board = {{nil, nil, nil},
+               {nil, nil, nil},
+               {nil, nil, nil}}
+local results = nil
+local isPlayerTurn = true
+local time = 0
 
 function _fn.start()
     ct.line(10, ct.getHeight() / 3, ct.getWidth() - 10, ct.getHeight() / 3, "light blue")

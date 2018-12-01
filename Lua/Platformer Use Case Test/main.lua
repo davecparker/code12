@@ -1,10 +1,10 @@
 package.path = package.path .. [[;../../Desktop/Code12/?.lua;C:\Users\lando\Documents\code12\Desktop\Code12\?.lua]]
 local ct, this, _fn = require('Code12.ct').getTables()
 
-player = nil
-time = nil
-steps = {}
-isOnStep = nil
+local player = nil
+local time = nil
+local steps = {}
+local isOnStep = nil
 
 function _fn.start()
     ct.setBackColor("dark gray")

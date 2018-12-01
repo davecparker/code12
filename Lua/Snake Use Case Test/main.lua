@@ -1,11 +1,11 @@
 package.path = package.path .. [[;../../Desktop/Code12/?.lua;C:\Users\lando\Documents\code12\Desktop\Code12\?.lua]]
 local ct, this, _fn = require('Code12.ct').getTables()
 
-snake = nil
-food = nil
-prevCharTyped = "w"
-charTyped = "a"
-time = nil
+local snake = nil
+local food = nil
+local prevCharTyped = "w"
+local charTyped = "a"
+local time = nil
 
 function _fn.start()
     ct.setBackColor("dark gray")

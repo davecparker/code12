@@ -1,38 +1,175 @@
 package.path = package.path .. [[;../../Desktop/Code12/?.lua;C:\Users\lando\Documents\code12\Desktop\Code12\?.lua]]
 local ct, this, _fn = require('Code12.ct').getTables()
 
-board = {{}, {}, {}, {}, {}, {}, {}, {}}
-pieces, oppPieces = {}, {}
-isPlayerTurn = nil
-tileLength = 12
+local board = {{}, {}, {}, {}, {}, {}, {}, {}}
+local pieces = {{}, {}}
+local isPlayerTurn
+local pCaptured, oCaptured = 0, 0
+local tileLength = 12
+local moveCount = 0
+local time
 
--- Piece Methods -------------------------------------------------------------
+-- Piece ---------------------------------------------------------------------
 
 function newPiece(t, i, j, c)
-    local p = {
+    return {
         t = t,
         i = i,
         j = j,
+        c = c,
+        isWhite = c == 'w',
         gameObj = getGameImage(t, i, j, c),
         possibleMoves = {},
         move = move,
+        capture = capture,
         delete = delete,
+        sudoMove = sudoMove,
+        undoMove = undoMove,
+        isAllyAt = isAllyAt,
+        isEnemyAt = isEnemyAt,
+        isPossibleMove = isPossibleMove,
     }
-    return p
 end
 
--- TODO: add variable indicating direction pawns are heading
+function move(obj, i, j)
+    moveCount = moveCount + 1
+    colorBoard()
+    colorMove(obj.i, obj.j, i, j)
+    ct.logm(log(obj.i, obj.j, i, j), obj, getPieceAt(i, j))
+    ct.sound("chess sound.wav")
+
+    if obj:isEnemyAt(i, j) then
+        getPieceAt(i, j):capture()
+    end
+    obj.i, obj.j = i, j
+    obj.gameObj.x, obj.gameObj.y = getCoords(i, j)
+    updateAllPossibleMoves()
+end
+
+function capture(obj)
+    local gameObj = obj.gameObj
+    gameObj:setSize(3, 3)
+    if isPlayerPiece(obj) then
+        pCaptured = pCaptured + 1
+        gameObj.x, gameObj.y = 3 * pCaptured, 3
+    else
+        oCaptured = oCaptured + 1
+        gameObj.x, gameObj.y = 3 * oCaptured, 105
+    end
+    obj:delete()
+end
+
+function delete(obj)
+    local m, n = getPieceIndex(obj)
+    for n = n, #pieces[m] do
+        pieces[m][n] = pieces[m][n + 1]
+    end
+end
+
+function sudoMove(obj, i, j)
+    if obj:isEnemyAt(i, j) then
+        local p = getPieceAt(i, j)
+        p.ni, p.nj = p.i, p.j
+        p.i, p.j = -1, -1
+    end
+    obj.ni, obj.nj = obj.i, obj.j
+    obj.i, obj.j = i, j
+    updateAllPossibleMoves()
+end
+
+function undoMove(obj)
+    obj.i, obj.j = obj.ni, obj.nj
+    obj.ni, obj.nj = nil, nil
+    if obj:isEnemyAt(-1, -1) then
+        local p = getPieceAt(-1, -1)
+        p.i, p.j = p.ni, p.nj
+        p.ni, p.nj = nil, nil
+    end
+    updateAllPossibleMoves()
+end
+
+function isAllyAt(obj, i, j)
+    local piece = getPieceAt(i, j)
+    if piece then
+        return obj.isWhite == piece.isWhite
+    end
+end
+
+function isEnemyAt(obj, i, j)
+    local piece = getPieceAt(i, j)
+    if piece then
+        return obj.isWhite ~= piece.isWhite
+    end
+end
+
+function isPossibleMove(obj, i, j)
+    for k, v in ipairs(obj.possibleMoves) do
+        if v[1] == i and v[2] == j then
+            return true
+        end
+    end
+end
+
+-- Pawn Piece ----------------------------------------------------------------
+
 function newPawn(i, j, c)
     local p = newPiece("pawn", i, j, c)
     p.dir = -1
-    if c == "b" then
-        p.dir = 1
-    end
     p.isFirstMove = true
-    p.hasReachedEnd = false
+    p.move = movePawn
     p.updatePossibleMoves = updatePossibleMovesPawn
+    p.promotion = promotion
+    if i == 2 then
+        p.dir = 1
+        p.promotion = oppPromotion
+    end
     return p
 end
+
+function movePawn(obj, i, j)
+    obj.isFirstMove = nil
+    move(obj, i, j)
+    if obj.i == 1 or obj.i == 8 then
+        obj:promotion()
+        --TODO: log promotion
+        --NOTE: obj parameter is of type pawn at this point
+    end
+end
+
+function updatePossibleMovesPawn(obj)
+    -- normal move
+    local i = obj.i + obj.dir
+    if not getPieceAt(i, obj.j) then
+        obj.possibleMoves[1] = {i, obj.j}
+        --double move
+        if obj.isFirstMove and not getPieceAt(i + obj.dir, obj.j) then
+            obj.possibleMoves[2] = {i + obj.dir, obj.j}
+        end
+    end
+    -- diagonal capture
+    for n, dj in ipairs{-1, 1} do
+        if isInRange(i, obj.j + dj) and obj:isEnemyAt(i, obj.j + dj)  then
+            obj.possibleMoves[#obj.possibleMoves + 1] = {i, obj.j + dj}
+        end
+    end
+end
+
+function promotion(obj)
+    local m, n = getPieceIndex(obj)
+    local promotedPiece = promotionPrompt()
+    obj.gameObj:delete()
+    pieces[m][n] = promotedPiece(obj.i, obj.j, obj.c)
+    pieces[m][n]:updatePossibleMoves()
+end
+
+function oppPromotion(obj)
+    obj.gameObj:delete()
+    local m, n = getPieceIndex(obj)
+    local promotedPieces = {newQueen, newBishop, newRook, newKnight}
+    pieces[m][n] = promotedPieces[ct.random(1, 4)](obj.i, obj.j, obj.c)
+end
+
+-- Rook Piece ----------------------------------------------------------------
 
 function newRook(i, j, c)
     local r = newPiece("rook", i, j, c)
@@ -40,11 +177,42 @@ function newRook(i, j, c)
     return r
 end
 
+function updatePossibleMovesRook(obj)
+    -- down, up, right, left
+    for n, s in ipairs{{1, 0}, {-1, 0}, {0, -1}, {0, 1}} do
+        for k = 1, #board - 1 do
+            local i, j = obj.i + s[1] * k, obj.j + s[2] * k
+            if not isInRange(i, j) or obj:isAllyAt(i, j) then
+                break
+            end
+            obj.possibleMoves[#obj.possibleMoves + 1] = {i, j}
+            if obj:isEnemyAt(i, j) then
+                break
+            end
+        end
+    end
+end
+
+-- Knight Piece --------------------------------------------------------------
+
 function newKnight(i, j, c)
     local k = newPiece("knight", i, j, c)
     k.updatePossibleMoves = updatePossibleMovesKnight
     return k
 end
+
+function updatePossibleMovesKnight(obj)
+    for m, di in ipairs{-2, -1, 1, 2} do
+        for n, dj in ipairs{-2, -1, 1, 2} do
+            local i, j = obj.i + di, obj.j + dj
+            if math.abs(di) ~= math.abs(dj) and isInRange(i, j) and not obj:isAllyAt(i, j) then
+               obj.possibleMoves[#obj.possibleMoves + 1] = {i, j}
+            end
+        end
+    end
+end
+
+-- Bishop Piece --------------------------------------------------------------
 
 function newBishop(i, j, c)
     local b = newPiece("bishop", i, j, c)
@@ -52,11 +220,36 @@ function newBishop(i, j, c)
     return b
 end
 
+function updatePossibleMovesBishop(obj)
+    -- down right, down left, up left, up right
+    for n, s in ipairs{{1, 1}, {1, -1}, {-1, -1}, {-1, 1}} do
+        for k = 1, #board - 1 do
+            local i, j = obj.i + s[1] * k, obj.j + s[2] * k
+            if not isInRange(i, j) or obj:isAllyAt(i, j) then
+                break
+            end
+            obj.possibleMoves[#obj.possibleMoves + 1] = {i, j}
+            if obj:isEnemyAt(i, j) then
+                break
+            end
+        end
+    end
+end
+
+-- Queen Piece ---------------------------------------------------------------
+
 function newQueen(i, j, c)
     local q = newPiece("queen", i, j, c)
     q.updatePossibleMoves = updatePossibleMovesQueen
     return q
 end
+
+function updatePossibleMovesQueen(obj)
+    updatePossibleMovesRook(obj)
+    updatePossibleMovesBishop(obj)
+end
+
+-- King Piece ----------------------------------------------------------------
 
 function newKing(i, j, c)
     local k = newPiece("king", i, j, c)
@@ -64,200 +257,320 @@ function newKing(i, j, c)
     return k
 end
 
-function move(obj, i, j)
-    obj.i, obj.j = i, j
-    obj.gameObj.x, obj.gameObj.y = getCoords(i, j)
-    --ct.logm("message", self)
-    obj:updatePossibleMoves()
-end
-
---TODO: implement en passant and promotion -> (make sure to toggle hasReachedEnd)
-function updatePossibleMovesPawn(obj)
-    --normal move
-    obj.possibleMoves = {}
-    if not isPieceAt(obj.i + obj.dir, obj.j) then
-        obj.possibleMoves[1] = {obj.i + obj.dir, obj.j}
-        --double move
-        if not isPieceAt(obj.i + obj.dir * 2, obj.j) and obj.isFirstMove then
-            obj.possibleMoves[2] = {obj.i + obj.dir * 2, obj.j}
-            obj.isFirstMove = false
-        end
-    end
-    --diagonal capture left
-    if obj.j - 1 >= 1 and isEnemyAt(obj.i + obj.dir, obj.j - 1) then
-        obj.possibleMoves[#obj.possibleMoves + 1] = {obj.i + obj.dir, obj.j - 1}
-    end
-    --diagonal capture right
-    if obj.j + 1 <= 8 and isEnemyAt(obj.i + obj.dir, obj.j + 1) then
-        obj.possibleMoves[#obj.possibleMoves + 1] = {obj.i + obj.dir, obj.j + 1}
-    end
-end
-
---TODO: implement castling, but prevent queen from doing so
-function updatePossibleMovesRook(obj)
-    obj.possibleMoves = {}
-    --up, down
-    for i, s in ipairs{-1, 1} do
-        for k = 1, #board - 1 do
-            local i = obj.i + s * k
-            --ct.print(i .. " ")
-            if not isInRange(i, obj.j) or isAllyAt(i, obj.j) then
-                --ct.print(i .. " ")
-                break
-            end
-            obj.possibleMoves[#obj.possibleMoves + 1] = {i, obj.j}
-            if isEnemyAt(i, obj.j) then
-                break
-            end
-        end
-    end
-    --right, left
-    for i, s in ipairs{-1, 1} do
-        for k = 1, #board - 1 do
-            local j = obj.j + s * k
-            if not isInRange(obj.i, j) and isAllyAt(obj.i, j) then
-                break
-            end
-            obj.possibleMoves[#obj.possibleMoves + 1] = {obj.i, j}
-            if isEnemyAt(obj.i, j) then
-                break
-            end
-        end
-    end
-end
-
-function updatePossibleMovesKnight(obj)
-    obj.possibleMoves = {}
-    for m, di in ipairs{-2, -1, 1, 2} do
-        for n, dj in ipairs{-2, -1, 1, 2} do
-            local i, j = obj.i + di, obj.j + dj
-            if math.abs(di) ~= math.abs(dj) and isInRange(i, j) and (isEnemyAt(i, j) or not isPieceAt(i, j)) then
-               obj.possibleMoves[#obj.possibleMoves + 1] = {i, j}
-            end
-        end
-    end
-end
-
-function updatePossibleMovesBishop(obj)
-    obj.possibleMoves = {}
-    -- down left, down right, up right, up left
-    for m, v in ipairs{{1, 1}, {1, -1}, {-1, -1}, {-1, 1}} do
-        for k = 1, #board - 1 do
-            local i, j = obj.i + v[1] * k, obj.j + v[2] * k
-            if i <= 1 and i >= 8 and j <= 1 and j >= 8 or isAllyAt(i, j) then
-                break
-            end
-            obj.possibleMoves[#obj.possibleMoves + 1] = {i, j}
-            if isEnemyAt(i, j) then
-                break
-            end
-        end
-    end
-end
-
--- TODO: create independent function
-function updatePossibleMovesQueen(obj)
-    updatePossibleMovesRook(obj)
-    updatePossibleMovesBishop(obj)
-end
-
 function updatePossibleMovesKing(obj)
-    obj.possibleMoves = {}
     for i = obj.i - 1, obj.i + 1 do
         for j = obj.j - 1, obj.j + 1 do
-            if isInRange(i, j) and not isAllyAt(i, j) then
+            if isInRange(i, j) and not obj:isAllyAt(i, j) then
                 obj.possibleMoves[#obj.possibleMoves + 1] = {i, j}
             end
         end
     end
 end
 
-function delete(obj)
-end
-
 -- Main Functions ------------------------------------------------------------
 
 function _fn.start()
-    startGame()
-
-    --TODO bug: print() does not work without println()
+    ct.setBackColor("dark gray")
+    createBoard()
+    local c = colorPrompt()
+    setupPieces(c)
+    updateAllPossibleMoves()
+    --TODO: setOutputFile cannot open file
+    ct.setOutputFile("log.pgn")
+    ct.println("Algebraic Notation Records")
+    ct.println("\tFor more information visit: https://en.wikipedia.org/wiki/Algebraic_notation_(chess)")
+    ct.setSoundVolume(0.5)
+    ct.loadSound("chess sound.wav")
+    isPlayerTurn = c == 'w'
+    time = ct.getTimer()
 end
 
 function _fn.update()
-    for i, v in ipairs(pieces) do
-        pieces[i]:updatePossibleMoves()
+    if not getOppKing() or isOppInCheckMate() then
+        --TODO: log player winning
+    elseif not getPlayerKing() or isPlayerInCheckMate() then
+        --TODO: log opponent winning
+    elseif isDraw() then
+        --TODO: log draw
+    end
+
+    if not isPlayerTurn and #pieces[2] > 0 and ct.getTimer() - time > 500 then
+        opponentMove()
+        isPlayerTurn = true
     end
 end
 
-function onMouseDrag(obj, x, y)
-    obj.x, obj.y = x, y
-end
-
-function _fn.onMouseRelease(obj, x, y)
-    local k = getPieceIndex(obj)
-    local i, j = getBoardIndex(x, y)
-    if k then
-        for m, v in ipairs(pieces[k].possibleMoves) do
-            --ct.println("(" .. v[1] .. " " .. v[2] .. ") ")
-            if v[1] == i and v[2] == j then
-                pieces[k]:move(i, j)
-                break
-            end
-            --pieces[k].gameObj.x, pieces[k].gameObj.y = getCoords(pieces[k].i, pieces[k].j)
+function _fn.onMouseDrag(gameObj, x, y)
+    local piece = getPieceFromGameObj(gameObj)
+    if isPlayerTurn and isPlayerPiece(piece) then
+        colorBoard()
+        gameObj:setLayer(2)
+        gameObj:setSize(3, 3)
+        gameObj.x, gameObj.y = x, y
+        local i, j = getBoardIndex(x, y)
+        if piece:isPossibleMove(i, j) and piece:isEnemyAt(i, j) then
+            board[i][j]:setFillColor("light red")
+        elseif piece:isPossibleMove(i, j) then
+            board[i][j]:setFillColor("light blue")
         end
     end
 end
 
-function startGame()
-    createBoard()
-    pieces = setupPieces(7, 8, "w")
-    oppPieces = setupPieces(2, 1, "b")
+function _fn.onMouseRelease(gameObj, x, y)
+    local piece = getPieceFromGameObj(gameObj)
+    local i, j = getBoardIndex(x, y)
+    if isPlayerTurn and isPlayerPiece(piece) and piece:isPossibleMove(i, j) then
+        colorTile(i, j)
+        gameObj:setLayer(1)
+        gameObj:setSize(8, 9)
+        piece:move(i, j)
+        isPlayerTurn = false
+        time = ct.getTimer()
+    elseif isPlayerPiece(piece) then
+        gameObj:setLayer(1)
+        gameObj:setSize(8, 9)
+        x, y = getCoords(piece.i, piece.j)
+        gameObj.x, gameObj.y = x, y
+    end
 end
 
+--TODO: create labels for tiles
 function createBoard()
     for i = 1, #board do
         for j = 1, #board do
             local x, y = getCoords(i, j)
-            local color = "dark gray"
-            if i % 2 == j % 2 then
-                color = "white"
-            end
-            board[i][j] = ct.rect(x, y, tileLength, tileLength, color)
+            board[i][j] = ct.rect(x, y, tileLength, tileLength)
+            board[i][j].lineWidth = 0
+        end
+    end
+    colorBoard()
+end
+
+function setupPieces(pColor)
+    local oColor = 'b'
+    if pColor == 'b' then
+        oColor = 'w'
+    end
+    local player = {7, 8, pColor}
+    local opponent = {2, 1, oColor}
+    for m, v in ipairs{player, opponent} do
+        for n, piece in ipairs{newRook, newKnight, newBishop, newQueen, newKing, newBishop, newKnight, newRook} do
+            pieces[m][n] = newPawn(v[1], n, v[3])
+            pieces[m][n + #board] = piece(v[2], n, v[3])
         end
     end
 end
 
-function setupPieces(p, k, c)
-    local newPieces = {}
-    for i, f in ipairs{newRook, newKnight, newBishop, newQueen, newKing, newBishop, newKnight, newRook} do
-        newPieces[i] = newPawn(p, i, c)
-        newPieces[i + #board] = f(k, i, c)
+function opponentMove()
+    local rpiece
+    while true do
+        rpiece = pieces[2][ct.random(1, #pieces[2])]
+        rpiece.possibleMoves = {}
+        rpiece:updatePossibleMoves()
+        if #rpiece.possibleMoves > 0 then
+            break
+        end
     end
-    return newPieces
+    local v = rpiece.possibleMoves[ct.random(1, #rpiece.possibleMoves)]
+    rpiece:move(v[1], v[2])
+end
+
+function isInCheck(k)
+    local king = getKing(k)
+    local m = math.abs(k - 2) + 1
+    for n = 1, #pieces[m] do
+        if pieces[m][n]:isPossibleMove(king.i, king.j) then
+            return true
+        end
+    end
+end
+
+function isInCheckMate(m)
+    if not isInCheck(m) then
+        return false
+    end
+    for n = 1, #pieces[m] do
+        for i = 1, #pieces[m][n].possibleMoves do
+            local pm = pieces[m][n].possibleMoves[i]
+            pieces[m][n]:sudoMove(pm[1], pm[2])
+            local flag = not isInCheck(m)
+            pieces[m][n]:undoMove()
+            if flag then
+                return false
+            end
+        end
+    end
+    return true
+end
+
+function isDraw()
+end
+
+function colorMove(i1, j1, i2, j2)
+    board[i1][j1]:setFillColor("light blue")
+    if getPieceAt(i2, j2) then
+        board[i2][j2]:setFillColor("light red")
+    else
+        board[i2][j2]:setFillColor("light blue")
+    end
+end
+
+function colorBoard()
+    for i = 1, #board do
+        for j = 1, #board[i] do
+            colorTile(i, j)
+        end
+    end
+end
+
+function colorTile(i, j)
+    if i % 2 == j % 2 then
+        board[i][j]:setFillColorRGB(220, 220, 220)
+    else
+        board[i][j]:setFillColorRGB(100, 127, 127)
+    end
+end
+
+function log(i1, j1, i2, j2)
+    local piece = getPieceAt(i1, j1)
+    local t, ch = piece.t, ''
+    local files = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}
+    local file1, rank1 = files[j1], math.abs(i1 - 8) + 1
+    local file2, rank2 = files[j2], math.abs(i2 - 8) + 1
+    --TODO: change algorithm of logging check
+    -- if getPlayerKing() and getOppKing() then
+    --     local k = 2
+    --     if isPlayerPiece(piece) then
+    --         k = 1
+    --     end
+    --     piece:sudoMove(i2, j2)
+    --     if isInCheckMate(k) then
+    --         ch = '#'
+    --     elseif isInCheck(k) then
+    --         ch = '+'
+    --     end
+    --     piece:undoMove()
+    -- end
+    if t == "pawn" then
+        t = ''
+    elseif t == "knight" then
+        t = 'N'
+    else
+        t = t:sub(1, 1):upper()
+    end
+    if getPieceAt(i2, j2) then
+        return moveCount .. ". " .. t .. file1 .. rank1 .. 'x' .. file2 .. rank2 .. ch
+    end
+    return moveCount .. ". " .. t .. file1 .. rank1 .. file2 .. rank2 .. ch
+end
+
+function colorPrompt()
+    local message = "What piece color would you like to play as?\n\tBlack or White"
+    local values = {
+        {"black", 'b'},
+        {"white", 'w'},
+    }
+    return prompt(message, values)
+end
+
+function promotionPrompt()
+    local input = ct.inputYesNo("Would you like to promote your pawn to a queen?")
+    if input then
+        return newQueen
+    end
+    local message = "Please enter a piece you wish to promote your pawn to:\n\tQueen, Bishop, Rook, or Knight"
+    local values = {
+        {"queen",  newQueen},
+        {"bishop", newBishop},
+        {"rook",   newRook},
+        {"knight", newKnight},
+    }
+    return prompt(message, values)
 end
 
 -- Helper Functions ----------------------------------------------------------
 
-function getPieceIndex(obj)
-    ct.println(obj)
-    for k = 1, #pieces do
-        if obj == pieces[k].gameObj then
-            return k
+function prompt(message, values)
+    while true do
+        input = ct.inputString(message):lower()
+        for m in pairs(values) do
+            if input == values[m][1] or input == values[m][1]:sub(1, 1) then
+                return values[m][2]
+            end
         end
     end
 end
 
-function getGameImage(t, i, j, c)
-    local x, y = getCoords(i, j)
-    return ct.image(c .. "_" .. t .. ".png", x, y, 8)
+function updateAllPossibleMoves()
+    for m = 1, #pieces do
+        for n = 1, #pieces[m] do
+            ct.println(pieces[m][n])
+            pieces[m][n].possibleMoves = {}
+            pieces[m][n]:updatePossibleMoves()
+        end
+    end
 end
 
-function isInRange(i, j)
-    return i >= 1 and i <= #board and j >= 1 and j <= #board
+function isPlayerInCheck()
+    return isInCheck(1)
 end
 
-function getCoords(i, j)
-    return tileLength * j - 4, tileLength * i
+function isOppInCheck()
+    return isInCheck(2)
+end
+
+function isPlayerInCheckMate()
+    return isInCheckMate(1)
+end
+
+function isOppInCheckMate()
+    return isInCheckMate(2)
+end
+
+function getPlayerKing()
+    return getKing(1)
+end
+
+function getOppKing()
+    return getKing(2)
+end
+
+function getKing(m)
+    for n = 1, #pieces[m] do
+        if pieces[m][n].t == "king" then
+            return pieces[m][n]
+        end
+    end
+end
+
+function getPieceAt(i, j)
+    for m = 1, #pieces do
+        for n = 1, #pieces[m] do
+            if pieces[m][n].i == i and pieces[m][n].j == j then
+                return pieces[m][n]
+            end
+        end
+    end
+end
+
+function getPieceFromGameObj(gameObj)
+    for m = 1, #pieces do
+        for n = 1, #pieces[m] do
+            if gameObj == pieces[m][n].gameObj then
+                return pieces[m][n]
+            end
+        end
+    end
+end
+
+function getPieceIndex(obj)
+    for m = 1, #pieces do
+        for n = 1, #pieces[m] do
+            if obj == pieces[m][n] then
+                return m, n
+            end
+        end
+    end
 end
 
 function getBoardIndex(x, y)
@@ -276,24 +589,24 @@ function getBoardIndex(x, y)
     return i, j
 end
 
-function isPieceAt(i, j)
-    return isAllyAt(i, j) or isEnemyAt(i, j)
+function getGameImage(t, i, j, c)
+    local x, y = getCoords(i, j)
+    local image = ct.image(c .. "_" .. t .. ".png", x, y, 8)
+    image:setSize(8, 9)
+    return image
 end
 
-function isAllyAt(i, j)
-    for k = 1, #pieces do
-        if pieces[k].i == i and pieces[k].j == j then
-            return true
-        end
-    end
+function getCoords(i, j)
+    return tileLength * j - 4, tileLength * i
 end
 
-function isEnemyAt(i, j)
-    for k = 1, #oppPieces do
-        if oppPieces[k].i == i and oppPieces[k].j == j then
-            return true
-        end
-    end
+function isPlayerPiece(obj)
+    local m, n = getPieceIndex(obj)
+    return m == 1
+end
+
+function isInRange(i, j)
+    return i >= 1 and i <= #board and j >= 1 and j <= #board
 end
 
 require('Code12.api')
