@@ -1457,10 +1457,9 @@ public void update()
 <h5 id="return-value-34"><em>Return Value</em></h5>
 <p>(<a href="#java-data-types">String</a>). One of: <code>&quot;circle&quot;</code>, <code>&quot;rect&quot;</code>, <code>&quot;line&quot;</code>, <code>&quot;text&quot;</code>, or <code>&quot;image&quot;</code>.</p>
 <h4 id="example-38">Example</h4>
-<pre><code>GameObj target = ct.objectClicked();
-String type = target.getType();
-if (type.equals( &quot;circle&quot; ))
-    ct.println( &quot;You clicked a circle&quot; );</code></pre>
+<pre><code>GameObj dot = ct.circle( 50, 50, 10 );
+String type = dot.getType();
+ct.log( type );</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.gettype"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.gettype">obj.getType()</a></h6>
 <h3 id="obj.getwidth">obj.getWidth()</h3>
 <p>Returns the <a href="#graphics-coordinates">width</a> (horizontal size) of a <a href="#java-data-types">GameObj</a>.</p>
@@ -1474,7 +1473,8 @@ if (type.equals( &quot;circle&quot; ))
 <p>For line objects (see <a href="#ct.line">ct.line()</a>), the width returned is the x offset (positive or negative) from the first point to the second point, not the physical width of the line, and unrelated to the thickness of the line as set by <a href="#obj.setlinewidth">obj.setLineWidth()</a>.</p>
 <h4 id="example-39">Example</h4>
 <pre><code>GameObj title = ct.text( &quot;Zombie Attack&quot;, 50, 30, 10 );
-double titleWidth = title.getWidth();</code></pre>
+double titleWidth = title.getWidth();
+ct.log( titleWidth );</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.getwidth"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.getwidth">obj.getWidth()</a></h6>
 <h3 id="obj.getheight">obj.getHeight()</h3>
 <p>Returns the <a href="#graphics-coordinates">height</a> (vertical size) of a <a href="#java-data-types">GameObj</a>.</p>
@@ -1487,8 +1487,9 @@ double titleWidth = title.getWidth();</code></pre>
 <h4 id="notes-22">Notes</h4>
 <p>For line objects (see <a href="#ct.line">ct.line()</a>), the height returned is the y offset (positive or negative) from the first point to the second point, not the physical height of the line.</p>
 <h4 id="example-40">Example</h4>
-<pre><code>GameObj hero = ct.image( &quot;dragon.png&quot;, 50, 70, 10 );
-double heroHeight = hero.getHeight();</code></pre>
+<pre><code>GameObj hero = ct.image( &quot;hero.png&quot;, 50, 50, 10 );
+double heroHeight = hero.getHeight();
+ct.log( heroHeight );</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.getheight"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.getheight">obj.getHeight()</a></h6>
 <h3 id="obj.setsize">obj.setSize()</h3>
 <p>Sets the size (<a href="#graphics-coordinates">width</a> and <a href="#graphics-coordinates">height</a>) of a <a href="#java-data-types">GameObj</a>.</p>
@@ -1540,8 +1541,8 @@ blob.setSize( 50, 30 );      // makes an ellipse</code></pre>
 <p>Before each new animation frame, the <code>xSpeed</code> and <code>ySpeed</code> are added to the <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> fields of the object, respectively. Animation frames occur 60 times per second, so an <code>xSpeed</code> of <code>1.0</code> will cause the object to move to the right at 60 units per second.</p>
 <p>The <code>xSpeed</code> and <code>ySpeed</code> can be negative, so for example, a <code>ySpeed</code> of <code>-0.5</code> will cause the object to move up at 30 units per second.</p>
 <h4 id="example-42">Example</h4>
-<pre><code>GameObj dot = ct.circle( 0, 50, 10 );
-dot.setSpeed( 0.3, 0 );</code></pre>
+<pre><code>GameObj dot = ct.circle( 0, 70, 10 );
+dot.setSpeed( 0.3, -0.1 );</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.setspeed"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setspeed">obj.setSpeed()</a></h6>
 <h3 id="obj.align">obj.align()</h3>
 <p>Sets the alignment of a <a href="#java-data-types">GameObj</a>, which determines where it is located relative to its <a href="#graphics-coordinates">(x, y) coordinates</a>.</p>
@@ -1567,8 +1568,8 @@ dot.setSpeed( 0.3, 0 );</code></pre>
 <p>Line objects (see <a href="#ct.line">ct.line()</a>) ignore the alignment setting and are always drawn from the first point to the second point.</p>
 <h4 id="example-43">Example</h4>
 <pre><code>// Make the score text right-aligned in the upper right of the screen
-GameObj score = ct.text( &quot;Score: 0&quot;, 100, 0 );
-score.align( &quot;top right&quot; )</code></pre>
+GameObj score = ct.text( &quot;Score: 0&quot;, 100, 0, 8 );
+score.align( &quot;top right&quot; );</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.align"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.align">obj.align()</a></h6>
 <h3 id="obj.gettext">obj.getText()</h3>
 <p>Returns the text of a <a href="#java-data-types">GameObj</a>.</p>
@@ -1585,16 +1586,18 @@ score.align( &quot;top right&quot; )</code></pre>
 <h4 id="example-44">Example</h4>
 <pre><code>public void start()
 {
-    GameObj dot = ct.circle( 50, 50, 10 );
-    dot.setText( &quot;bomb&quot; );
+    GameObj circle1 = ct.circle( 30, 50, 10, &quot;orange&quot; );
+    circle1.setText( &quot;coin&quot; );
+
+    GameObj circle2 = ct.circle( 70, 50, 10, &quot;black&quot; );
+    circle2.setText( &quot;bomb&quot; );
 }
 
 public void update()
 {
     GameObj target = ct.objectClicked();
-    String text = target.getText();
-    if (text != null &amp;&amp; text.equals( &quot;bomb&quot; ))
-        ct.println( &quot;You clicked a bomb&quot; );
+    if (target != null)
+        ct.log( target.getText() );
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.gettext"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.gettext">obj.getText()</a></h6>
 <h3 id="obj.settext">obj.setText()</h3>
@@ -1604,7 +1607,7 @@ public void update()
 <h5 id="obj-11">obj</h5>
 <p>(<a href="#java-data-types">GameObj</a>). The graphics object.</p>
 <h5 id="text-1">text</h5>
-<p>(<a href="#java-data-types">String</a>). The text to store in the object. For a text object (see <a href="#ct.text">ct.text()</a>), this becomes the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object (see <a href="#obj.gettext">obj.getText()</a>).</p>
+<p>(<a href="#java-data-types">String</a>). The text to store in the object, or <code>null</code> for none. For a text object (see <a href="#ct.text">ct.text()</a>), this becomes the visible text. For other objects, this is just a string kept inside the object, which can be used to identity or describe the object (see <a href="#obj.gettext">obj.getText()</a>).</p>
 <h4 id="notes-27">Notes</h4>
 <p>For an image object (see <a href="#ct.image">ct.image()</a>), the text defaults to the image filename, but you can change it to something else.</p>
 <p>For circle, rect, and line objects, the default text is <code>null</code> (none).</p>
@@ -1620,7 +1623,7 @@ public void start()
 public void update()
 {
     if (ct.clicked())
-        message.text = &quot;You clicked&quot;;
+        message.setText( &quot;You clicked&quot; );
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.settext"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.settext">obj.setText()</a></h6>
 <h3 id="obj.tostring">obj.toString()</h3>
@@ -1652,7 +1655,7 @@ public void update()
 {
     GameObj target = ct.objectClicked();
     if (target != null)
-        message.text = target.toString();
+        message.setText( target.toString() );
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.tostring"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.tostring">obj.toString()</a></h6>
 <h3 id="obj.setfillcolor">obj.setFillColor()</h3>
@@ -1705,6 +1708,7 @@ blob.setFillColorRGB( 210, 180, 140 );     // tan</code></pre>
 <p>For line objects (see <a href="#ct.line">ct.line()</a>), the color of the line is set. For other object types, the color of the outlined border of the object is set.</p>
 <h4 id="example-49">Example</h4>
 <pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+dot.setLineWidth( 5 );
 dot.setLineColor( &quot;green&quot; );</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.setlinecolor"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.setlinecolor">obj.setLineColor()</a></h6>
 <h3 id="obj.setlinecolorrgb">obj.setLineColorRGB()</h3>
@@ -1792,24 +1796,19 @@ if (target != null &amp;&amp; target.getLayer() == 0)
 <h4 id="examples-20">Examples</h4>
 <pre><code>public void start()
 {
-    // Make some walls in the back
-    GameObj border = ct.rect( 50, 0, 100, 20 );
-    border.setLayer( 0 );
-    border = ct.rect( 50, 100, 100, 20 );
-    border.setLayer( 0 );
-    border = ct.rect( 0, 0, 20, 100 );
-    border.setLayer( 0 );
-    border = ct.rect( 100, 0, 20, 100 );
-    border.setLayer( 0 );
+    // Make a rect in the back
+    GameObj rect = ct.rect( 50, 50, 70, 20 );
+    rect.setLayer( 0 );
 
-    // Make the score readout
-    GameObj score = ct.text( &quot;Score: 0&quot;, 50, 30, 10 );
+    // Make the score readout on top
+    GameObj score = ct.text( &quot;Score: 0&quot;, 50, 50, 10 );
     score.setLayer( 2 );
 }
 
 public void update()
 {
     // Make dots whereever the user clicks
+    // at default layer 1
     if (ct.clicked())
         ct.circle( ct.clickX(), ct.clickY(), 10 );
 }</code></pre>
@@ -1862,7 +1861,7 @@ public void start()
 {
     // Make a button with both text and a background rect, but let the rect
     // handle the click detection, so we don&#39;t have to test both.
-    button = ct.rect( 50, 50, 30, 15 );
+    button = ct.rect( 50, 50, 60, 15 );
     GameObj text = ct.text( &quot;Click me&quot;, 50, 50, 10 );
     text.setClickable( false );   // change to true to see the difference
 }
@@ -1941,17 +1940,14 @@ public void update()
 public void start()
 {
     block = ct.rect( 70, 50, 10, 10 );
-    dot = ct.circle( 20, 50, 10 );
-    dot.setSpeed( 1, 0 );
+    dot = ct.circle( 20, 50, 5 );
 }
 
 public void update()
 {
+    dot.x++;
     if (dot.hit( block ))
-    {
         ct.println( &quot;The dot hit the block&quot; );
-        dot.setSpeed( 0, 0 );
-    }
 }</code></pre>
 <h6 id="code12-function-reference-gameobj-methods-obj.hit"><a href="#top">Code12 Function Reference</a> &gt; <a href="#gameobj-methods-1">GameObj Methods</a> &gt; <a href="#obj.hit">obj.hit()</a></h6>
 <h3 id="obj.objecthitingroup">obj.objectHitInGroup()</h3>
@@ -2052,8 +2048,8 @@ str.trim()                                        String</code></pre>
 <h4 id="example-60">Example</h4>
 <pre><code>public void start()
 {
-    ct.rect( 50, 50, 70, 30 );
-    ct.text( &quot;Welcome to Code12!&quot;, 50, 50, 10 );
+    ct.rect( 50, 50, 80, 20 );
+    ct.text( &quot;Welcome to Code12!&quot;, 50, 50, 8 );
     ct.println( &quot;This is the text output area&quot; );
 }</code></pre>
 <h6 id="code12-function-reference-start"><a href="#top">Code12 Function Reference</a> &gt; <a href="#start">start()</a></h6>
@@ -2214,7 +2210,7 @@ public void onMouseRelease( GameObj obj, double x, double y )
     // Your code goes here
 }</code></pre>
 <h5 id="keyname-1">keyName</h5>
-<p>(<a href="#java-data-types">String</a>). The name of the key. Only certain keys are supported, see <a href="#key-names">Key Names</a>.</p>
+<p>(<a href="#java-data-types">String</a>). The name of the key. Only certain keys are supported on all platforms, see <a href="#key-names">Key Names</a>.</p>
 <h4 id="notes-44">Notes</h4>
 <p>This function is only called once for each separate key press and release, when the key is first pressed down, reagardless of how long the key is held down.</p>
 <h4 id="example-64">Example</h4>
@@ -2236,7 +2232,7 @@ public void onKeyPress( String keyName )
     // Your code goes here
 }</code></pre>
 <h5 id="keyname-2">keyName</h5>
-<p>(<a href="#java-data-types">String</a>). The name of the key. Only certain keys are supported, see <a href="#key-names">Key Names</a>.</p>
+<p>(<a href="#java-data-types">String</a>). The name of the key. Only certain keys are supported on all platforms, see <a href="#key-names">Key Names</a>.</p>
 <h4 id="example-65">Example</h4>
 <pre><code>public void start()
 {
@@ -2279,12 +2275,8 @@ public void onCharTyped( String charString )
     // Your code goes here
 }</code></pre>
 <h4 id="notes-46">Notes</h4>
-<p>This function is <em>not</em> called when your program is running within the Code12 application. The Code12 application scales your application automatically and maintains a constant aspect ratio for your application if the user resizes the Code12 window or uses the pane splits.</p>
-<p>If you are using the Code12 Java runtime and your program is running in its own window, this function will notify you if the user resizes the window, to allow you to change any object positions or otherwise react as desired.</p>
-<blockquote>
 <p>Most systems resize windows continuously in response to the user dragging the window frame, so you may receive many <code>onResize()</code> events in succession.</p>
-</blockquote>
-<p>Note that the contents of your application scale automatically relative to the overall window size, so in many cases you don’t need to do anything. However, if your object layout depends on the window aspect ratio or the physical pixel size of the window, then you can determine these as follows:</p>
+<p>Note that the contents of your application scale automatically relative to the overall window size, so in most cases you don’t need to do anything in response to a resize. However, if your object layout depends on the window aspect ratio or the physical pixel size of the window, then you can determine these as follows:</p>
 <pre><code>double width = ct.getWidth();
 double height = ct.getHeight();
 double aspectRatio = width / height;
@@ -2293,12 +2285,17 @@ int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );</code></pre>
 <h4 id="example-67">Example</h4>
 <pre><code>public void start()
 {
-    ct.println( &quot;Run this using the Code12 Java runtime&quot; );
+    ct.println( &quot;Resize the window&quot; );
 }
 
 public void onResize()
 {
-    ct.logm( &quot;New size&quot;, ct.getWidth(), ct.getHeight() );
+    double width = ct.getWidth();
+    double height = ct.getHeight();
+    int pixelWidth = ct.round( width * ct.getPixelsPerUnit() );
+    int pixelHeight = ct.round( height * ct.getPixelsPerUnit() );
+
+    ct.log( width, height, pixelWidth, pixelHeight );
 }</code></pre>
 <h6 id="code12-function-reference-input-event-functions-onresize"><a href="#top">Code12 Function Reference</a> &gt; <a href="#input-event-functions">Input Event Functions</a> &gt; <a href="#onresize">onResize()</a></h6>
 <h2 id="additional-reference-information">Additional Reference Information</h2>
@@ -2372,7 +2369,8 @@ public void onResize()
 </code></pre>
 <h6 id="code12-function-reference-additional-reference-information-color-names"><a href="#top">Code12 Function Reference</a> &gt; <a href="#additional-reference-information">Additional Reference Information</a> &gt; <a href="#color-names">Color Names</a></h6>
 <h3 id="key-names">Key Names</h3>
-<p>The following key names are supported. Note that key names refer to a hardware key, not a typed character, so typing ‘A’ uses the “a” key, and typing ‘$’ uses the “4” key.</p>
+<p>The following key names are supported on all platforms (different operating systems and computers) that have these keys. Support for other keys is platform-dependent.</p>
+<p>Note that key names refer to a hardware key, not a typed character, so typing ‘A’ uses the “a” key, and typing ‘$’ uses the “4” key.</p>
 <pre><code>&quot;a&quot; to &quot;z&quot;                     (alphabet keys)
 &quot;0&quot; to &quot;9&quot;                     (top row number keys)
 &quot;numPad0&quot; to &quot;numPad9&quot;         (number pad digit keys)
