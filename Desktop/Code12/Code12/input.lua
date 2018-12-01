@@ -2,14 +2,17 @@
 --
 -- input.lua
 --
--- Implementation of the touch and key input handling for the Code 12 Lua runtime.
+-- Implementation of the touch and key input handling for the Code12 Lua runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 ----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
+local GameObj = require("Code12.GameObj")
 
 
 ---------------- Touch Tracking ----------------------------------------------
@@ -34,28 +37,25 @@ local function clickEvent(event, gameObj)
 
 	-- Get logical click location 
 	local xP, yP = g.mainGroup:contentToLocal(event.x, event.y)
-	local x = xP / g.scale + g.screen.originX
-	local y = yP / g.scale + g.screen.originY
+	local xOrigin = g.screen.originX
+	local yOrigin = g.screen.originY
+	local x = xP / g.scale + xOrigin
+	local y = yP / g.scale + yOrigin
 
 	if phase == "began" then
 		-- Ignore click if not in the game area
-		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
+		if x < xOrigin or x > g.WIDTH + xOrigin 
+				or y < yOrigin or y > g.height + yOrigin then
 			return false
 		end
 
-		-- If gameObj is nil, check if a line was clicked
+		-- If gameObj is nil then check if a line was clicked
+		-- because Corona doesn't sent touch events to lines.
 		focusObj = event.target
 		if gameObj == nil then
-			local objs = g.screen.objs
-			for i = 1, objs.numChildren do
-				local gObj = objs[i].code12GameObj
-				if gObj.clickable and gObj._code12.typeName == "line" then
-					if gObj:lineContainsPoint(x, y) then
-						gameObj = gObj
-						focusObj = objs[i]
-						break
-					end
-				end
+			gameObj = GameObj.hitTestLines(x, y)
+			if gameObj then
+				focusObj = gameObj.obj
 			end
 		end
 
@@ -74,26 +74,15 @@ local function clickEvent(event, gameObj)
 		g.setFocusObj(focusObj)
 
 		-- Call client event
-		runtime.runEventFunction(ct.userFns.onMousePress, gameObj, x, y)
+		runtime.runInputEvent(ct.userFns.onMousePress, gameObj, x, y)
 	elseif event.target ~= focusObj then
 		return false    -- click did not begin on this object
 	elseif phase == "moved" then
-		-- Ignore this drag point if not in the game area
-		if x < 0 or x > g.WIDTH or y < 0 or y > g.height then
-			return false
-		end
-
-		-- Set last drag location
-		g.clickX = x
-		g.clickY = y
-
-		-- Call client event
-		runtime.runEventFunction(ct.userFns.onMouseDrag, gameObj, x, y)
+		-- Call client move event
+		runtime.runInputEvent(ct.userFns.onMouseDrag, gameObj, x, y)
 	else  -- (ended or cancelled)
-		-- Call client event, forcing the final point inside the game area
-		x = g.pinValue(x, 0, g.WIDTH)
-		y = g.pinValue(y, 0, g.height)
-		runtime.runEventFunction(ct.userFns.onMouseRelease, gameObj, x, y)
+		-- Call client release event
+		runtime.runInputEvent(ct.userFns.onMouseRelease, gameObj, x, y)
 	end
 	return true
 end
@@ -195,95 +184,53 @@ function g.onKey(event)
 	if event.phase == "down" then
 		-- keyPress
 		keysDown[keyName] = true
-		runtime.runEventFunction(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
+		runtime.runInputEvent(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)
 		if ch then
 			g.charTyped = ch    -- remember for ct.charTyped()
-			runtime.runEventFunction(ct.userFns.onCharTyped, ch)
+			runtime.runInputEvent(ct.userFns.onCharTyped, ch)
 		end
 		return true    -- Always? Means client has to handle all keys
 	elseif event.phase == "up" then
 		-- keyRelease
 		keysDown[keyName] = nil
-		runtime.runEventFunction(ct.userFns.onKeyRelease, keyName)
+		runtime.runInputEvent(ct.userFns.onKeyRelease, keyName)
 	end
 	return false
 end
 
 
----------------- Mouse and Keyboard API --------------------------------------
+---------------- Mouse and Keyboard Input API -------------------------
 
 -- API
-function ct.clicked(...)
-	-- Check params
-	if g.checkAPIParams("ct.clicked") then
-		g.checkNoParams(...)
-	end
-
-	-- Return polled clicked state
+function ct.clicked()
 	return g.clicked
 end
 
 -- API
-function ct.clickX(...)
-	-- Check params
-	if g.checkAPIParams("ct.clickX") then
-		g.checkNoParams(...)
-	end
-
-	-- Return last click x
+function ct.clickX()
 	return g.clickX
 end
 
 -- API
-function ct.clickY(...)
-	-- Check params
-	if g.checkAPIParams("ct.clickY") then
-		g.checkNoParams(...)
-	end
-
-	-- Return last click y
+function ct.clickY()
 	return g.clickY
 end
 
 -- API
-function ct.objectClicked(...)
-	-- Check params
-	if g.checkAPIParams("ct.objectClicked") then
-		g.checkNoParams(...)
-	end
-
-	-- Return clicked object if any
+function ct.objectClicked()
 	return g.gameObjClicked
 end
 
 -- API
-function ct.keyPressed(keyName, ...)
-	-- Check parameters
-	if keyName == nil then
-		return false
-	end
-	if g.checkAPIParams("ct.keyPressed") then
-		g.check1Param("string", keyName, ...)
-	end
-
-	-- Return true if this key is currently pressed, false if not
+function ct.keyPressed(keyName)
 	return keysDown[keyName] ~= nil
 end
 
 -- API
-function ct.charTyped(ch, ...)
-	-- Check parameters
-	if ch == nil  then
-		return false
-	end
-	if g.checkAPIParams("ct.charTyped") then
-		g.check1Param("string", ch, ...)
-	end
-
-	-- Return true if this char was typed during this frame
-	return g.charTyped == ch
+function ct.charTyped(ch)
+	return ch and g.charTyped == ch
 end
 

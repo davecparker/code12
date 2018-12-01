@@ -306,8 +306,12 @@ end
 
 -- Return the Lua code string for a type cast
 local function castCode( expr )
-	-- The only supported type cast is (int) doubleExpr
-	return "ct.toInt(" .. exprCode( expr.expr ) .. ")"
+	-- The only supported type casts are ((int) double) and ((double) int)
+	if expr.vtCast == 0 then  -- (int)
+		return "ct.toInt(" .. exprCode( expr.expr ) .. ")"
+	else
+		return exprCode( expr.expr )
+	end
 end
 
 -- Return the Lua code string for a parens expr

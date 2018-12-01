@@ -79,11 +79,9 @@ class UserCode extends Code12Program
 		bigBall = ct.circle(x, 80, 40);
 		// bigBall.setFillColorRGB(400, 127, -50);
 		bigBall.setFillColor(null);
-		bigBall.clickable = true;
 
 		// Add a fish
 		fish = ct.image("goldfish.png", 50, 50, 15);
-		fish.clickable = true;
 		String filename = null;
 		// ct.image(filename, 50, 20, 15);
 
@@ -124,8 +122,7 @@ class UserCode extends Code12Program
 		{
 			double localX = 1.1 + 5;
 			bigBall.x--;
-			bigBall.width /= factor;
-			bigBall.height *= /* WTF? */ (1 / factor);
+			bigBall.setSize( bigBall.getWidth() / factor, bigBall.getHeight() / factor);
 			speed = -speed;
 		}
 		else if (bigBall.x < 0)
@@ -154,7 +151,9 @@ class UserCode extends Code12Program
 		// Check for fish click
 		if (fish.clicked())
 		{
-			if (!ct.inputYesNo("Continue?"))
+			if (ct.inputYesNo("Continue?"))
+				fish.setImage("goldfish right.png");
+			else
 				ct.restart();
 		}
 	}
@@ -182,7 +181,7 @@ class UserCode extends Code12Program
 	{
 		if (obj != null)
 		{
-			obj.xSpeed = .1;
+			obj.setSpeed( .1, 0 );
 			ct.println( obj.toString() + " was clicked" );
 		}
 		else

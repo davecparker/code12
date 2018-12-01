@@ -18,12 +18,7 @@
 import Code12.*;
 
 class ScreenManagementTest extends Code12Program
-{
-   public static void main(String[] args)
-   { 
-      Code12.run(new ScreenManagementTest()); 
-   }
-   
+{ 
    boolean paused; // if true a call to update() does nothing
    GameObj displayText; // ct.text() obj for displaying variable values and function 
                         // return values
@@ -38,31 +33,31 @@ class ScreenManagementTest extends Code12Program
    int pngBackgroundTotal; // how many png backgrounds there are in the program folder
    int jpgBackgroundTotal; // how many jpg backgrounds there are in the program folder
    String[] colorNames = { "black", 
-							      "white", 
-							      "red", 
-							      "green", 
-							      "blue", 
-							      "cyan", 
-							      "magenta", 
-							      "yellow", 
-							      "gray", 
-							      "orange", 
-							      "pink", 
-							      "purple", 
-							      "light gray", 
-							      "light red", 
-							      "light green", 
-							      "light blue", 
-							      "light cyan", 
-							      "light magenta",
-							      "light yellow",
-							      "dark gray",
-							      "dark red",
-							      "dark green",
-							      "dark blue",
-							      "dark cyan",
-							      "dark magenta",
-							      "dark yellow" };
+                           "white", 
+                           "red", 
+                           "green", 
+                           "blue", 
+                           "cyan", 
+                           "magenta", 
+                           "yellow", 
+                           "gray", 
+                           "orange", 
+                           "pink", 
+                           "purple", 
+                           "light gray", 
+                           "light red", 
+                           "light green", 
+                           "light blue", 
+                           "light cyan", 
+                           "light magenta",
+                           "light yellow",
+                           "dark gray",
+                           "dark red",
+                           "dark green",
+                           "dark blue",
+                           "dark cyan",
+                           "dark magenta",
+                           "dark yellow" };
 
    public void start()
    {  
@@ -246,10 +241,18 @@ class ScreenManagementTest extends Code12Program
    {
       double pixelsPerUnit = ct.getPixelsPerUnit();
       double size = cornerBoxPixels / pixelsPerUnit;
-      cornerBox.setSize( size, size );
-      cornerBox.x = ct.getWidth();
-      cornerBox.y = ct.getHeight();
-      
-      displayText.height = displayTextPixels / pixelsPerUnit ;
+      if ( cornerBox != null )
+      {
+         cornerBox.setSize( size, size );
+         cornerBox.x = ct.getWidth();
+         cornerBox.y = ct.getHeight();
+      }
+      if ( displayText != null )
+         displayText.height = displayTextPixels / pixelsPerUnit ;
+   }
+
+   public static void main(String[] args)
+   {
+      Code12.run(new ScreenManagementTest()); 
    }
 }

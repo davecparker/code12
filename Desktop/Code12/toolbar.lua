@@ -15,6 +15,7 @@ local g = require( "Code12.globals" )
 local app = require( "app" )
 local buttons = require( "buttons" )
 local runtime = require( "Code12.runtime" )
+local runView = require( "runView" )
 
 
 -- The toolbar module
@@ -31,6 +32,8 @@ local stopBtn             -- Stop button
 local pauseBtn            -- Pause button
 local resumeBtn           -- Resume button
 local nextFrameBtn        -- Next Frame button
+local helpBtn             -- Help button
+local gridBtn             -- Toggle grid button
 local toolbarBtns         -- Array of buttons on the toolbar
 
 
@@ -46,17 +49,31 @@ local function onOptions()
 	composer.gotoScene( "optionsView" )
 end
 
--- Show the toolbar buttons in given array btns and hide any other buttons
+-- Show the toolbar buttons in given array btns and hide any other buttons.
+-- The btns should be ordered as right-aligned buttons right to left,
+-- then left-aligned buttons left to right.
 local function showButtons( btns )
-	for i = 1, #toolbarBtns do
-		toolbarBtns[i].isVisible = false
-		for j = 1, #btns do
-			if toolbarBtns[i] == btns[j] then
-				toolbarBtns[i].isVisible = true
-				break
-			end
+	-- Show requested buttons only, place right-aligned buttons, 
+	-- and hide left-aligned buttons as necessary if not enough room.
+	for _, btn in ipairs(toolbarBtns) do
+		btn.isVisible = false
+	end
+	local xMax = app.width - app.margin / 2
+	for _, btn in ipairs(btns) do
+		btn.isVisible = true
+		if btn.placement == "right" then
+			btn.x = xMax - btn.btn.width
+			xMax = btn.x - app.margin / 2
+		elseif btn.x + btn.btn.width > xMax then
+			btn.isVisible = false
 		end
 	end
+end
+
+-- Execute the Stop button
+local function doStop()
+	runtime.message( "Program Stopped" )
+	runtime.stop()
 end
 
 
@@ -72,33 +89,50 @@ function toolbar.create()
 	bgRect = g.uiItem( display.newRect( toolbarGroup, 0, 0, app.width, app.dyToolbar ),
 							app.toolbarShade, app.borderShade )
 
+	-- Help button
+	helpBtn = buttons.newToolbarButton( toolbarGroup, "Help", "help-icon.png", 
+			app.showHelp, "right" )
+	toolbarBtns[#toolbarBtns + 1] = helpBtn
+
 	-- Options button
-	optionsBtn = buttons.newToolbarButton( toolbarGroup, "Options", onOptions, "right" )
+	optionsBtn = buttons.newToolbarButton( toolbarGroup, "Options", "options-icon.png", 
+			onOptions, "right", helpBtn )
 	toolbarBtns[#toolbarBtns + 1] = optionsBtn
 
 	-- Choose Program Button
-	chooseProgramBtn = buttons.newToolbarButton( toolbarGroup, "Choose Program", onChooseProgram, "right", optionsBtn )
-	toolbarBtns[#toolbarBtns + 1] = chooseProgramBtn
+	chooseProgramBtn = buttons.newToolbarButton( toolbarGroup, "Choose Program", "choose-program-icon.png", 
+			onChooseProgram, "right", optionsBtn )
+	toolbarBtns[#toolbarBtns + 1] = chooseProgramBtn 
 
 	-- Pause button
-	pauseBtn = buttons.newToolbarButton( toolbarGroup, "Pause", runtime.pause, "left", nil, pauseBtnWidth )
+	pauseBtn = buttons.newToolbarButton( toolbarGroup, "Pause", "pause-icon.png", 
+			runtime.pause, "left", nil, pauseBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = pauseBtn
 
 	-- Resume button
-	resumeBtn = buttons.newToolbarButton( toolbarGroup, "Resume", runtime.resume, "left", nil, pauseBtnWidth )
+	resumeBtn = buttons.newToolbarButton( toolbarGroup, "Resume", "resume-icon.png", 
+			runtime.resume, "left", nil, pauseBtnWidth )
 	toolbarBtns[#toolbarBtns + 1] = resumeBtn
 	
+	-- Restart button
+	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", "resume-icon.png", 
+			app.processUserFile, "left", nil, pauseBtnWidth )
+	toolbarBtns[#toolbarBtns + 1] = restartBtn
+
 	-- Stop button
-	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", runtime.stop, "left", pauseBtn )
+	stopBtn = buttons.newToolbarButton( toolbarGroup, "Stop", "stop-icon.png", 
+			doStop, "left", pauseBtn )
 	toolbarBtns[#toolbarBtns + 1] = stopBtn
 
 	-- Next Frame button
-	nextFrameBtn = buttons.newToolbarButton( toolbarGroup, "Next Frame", runtime.stepOneFrame, "left", stopBtn )
+	nextFrameBtn = buttons.newToolbarButton( toolbarGroup, "Next Frame", "next-frame-icon.png", 
+			runtime.stepOneFrame, "left", stopBtn )
 	toolbarBtns[#toolbarBtns + 1] = nextFrameBtn
 
-	-- Restart button
-	restartBtn = buttons.newToolbarButton( toolbarGroup, "Restart", app.processUserFile, "left", nil, pauseBtnWidth )
-	toolbarBtns[#toolbarBtns + 1] = restartBtn
+	-- Toggle Grid button
+	gridBtn = buttons.newToolbarButton( toolbarGroup, "Grid", "grid-icon.png", 
+			runView.toggleGrid, "left", nextFrameBtn )
+	toolbarBtns[#toolbarBtns + 1] = gridBtn
 
 	-- Set the initial visibility of the toolbar buttons
 	toolbar.update()
@@ -107,8 +141,7 @@ end
 -- Resize the toolbar
 function toolbar.resize()
 	bgRect.width = app.width
-	optionsBtn.x = app.width - app.margin - optionsBtn.width
-	chooseProgramBtn.x = optionsBtn.x - chooseProgramBtn.width - app.margin
+	toolbar.update()
 end
 
 -- Show/hide the toolbar
@@ -119,18 +152,22 @@ end
 -- Update the buttons visible on the toolbar based on the run state
 function toolbar.update()
 	local runState = g.runState
-	if runState == nil then
-		showButtons{ optionsBtn }
-	elseif runState == "running" then
-		showButtons{ stopBtn, pauseBtn }
+	if runState == "running" then
+		showButtons{ helpBtn, stopBtn, pauseBtn, gridBtn }
 	elseif runState == "waiting" then
-		showButtons{ stopBtn }
+		showButtons{ helpBtn, stopBtn, gridBtn }
 	elseif runState == "paused" then
-		showButtons{ resumeBtn, stopBtn, nextFrameBtn }
+		if runtime.canStepOneFrame() then
+			showButtons{ helpBtn, resumeBtn, stopBtn, nextFrameBtn, gridBtn }
+		else
+			showButtons{ helpBtn, resumeBtn, stopBtn, gridBtn }
+		end
 	elseif runState == "stopped" then
-		showButtons{ restartBtn, chooseProgramBtn, optionsBtn }
+		showButtons{ helpBtn, optionsBtn, chooseProgramBtn, restartBtn, gridBtn }
 	elseif runState == "error" then
-		showButtons{ chooseProgramBtn, optionsBtn }
+		showButtons{ helpBtn, optionsBtn, chooseProgramBtn, }
+	else
+		showButtons{ helpBtn, optionsBtn }
 	end
 end
 

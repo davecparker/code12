@@ -51,6 +51,7 @@ local app =  {
 	openFilesInEditor = true,    -- when true, opened programs will also open in text editor
 	customEditors = {},          -- table of custom editors, e.g. { name = "Atom", path = "C:\...\atom.exe" }
 	showVarWatch = true,         -- when true, show the variable watch window
+	gridOn = false,              -- when true, the coordinate gridlines are visible over the program output
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
@@ -139,28 +140,26 @@ function app.startWithCapital( str )
 	return string.upper( string.sub( str, 1, 1 ) ) .. (string.sub( str, 2 ) or "")
 end
 
-
+-- Return the Levenshtein distance of two strings (number of chars different)
 function app.partialMatchString( str1, str2 )
-	-- Computes levenshtein distance of two strings and returns it
 	str1 = string.lower(str1)
-    str2 = string.lower(str2)
-    local len1, len2 = #str1, #str2
-    local char1, char2, distance = {}, {}, {}
-    str1:gsub('.', function (c) table.insert(char1, c) end)
-    str2:gsub('.', function (c) table.insert(char2, c) end)
-    for i = 0, len1 do distance[i] = {} end
-    for i = 0, len1 do distance[i][0] = i end
-    for i = 0, len2 do distance[0][i] = i end
-    for i = 1, len1 do
-        for j = 1, len2 do
-            distance[i][j] = math.min( 
-            	distance[i-1][j  ] + 1, 
-            	distance[i  ][j-1] + 1,
-            	distance[i-1][j-1] + (char1[i] == char2[j] and 0 or 1)
-            	)
-        end
-    end
-    return distance[len1][len2]
+	str2 = string.lower(str2)
+	local len1, len2 = #str1, #str2
+	local char1, char2, distance = {}, {}, {}
+	str1:gsub('.', function (c) table.insert(char1, c) end)
+	str2:gsub('.', function (c) table.insert(char2, c) end)
+	for i = 0, len1 do distance[i] = {} end
+	for i = 0, len1 do distance[i][0] = i end
+	for i = 0, len2 do distance[0][i] = i end
+	for i = 1, len1 do
+		for j = 1, len2 do
+			distance[i][j] = math.min( 
+				distance[i-1][j  ] + 1, 
+				distance[i  ][j-1] + 1,
+				distance[i-1][j-1] + (char1[i] == char2[j] and 0 or 1) )
+		end
+	end
+	return distance[len1][len2]
 end
 
 -- Add given path to the end of app.recentSourceFilePaths and remove any other

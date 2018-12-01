@@ -7,6 +7,9 @@
 -- (c)Copyright 2018 by David C. Parker
 -----------------------------------------------------------------------------------------
 
+-- Command line launch arguments
+local launchArgs = ...
+
 -- Corona modules
 local composer = require( "composer" )
 local json = require( "json" )
@@ -70,6 +73,7 @@ local function runLuaCode( luaCode )
 	end
 end
 
+--[[
 -- Write a Lua source code output file to save the generated code.
 -- Put it next to the Java source file.
 local function writeLuaCode( codeStr )
@@ -121,6 +125,7 @@ local function writeLuaCode( codeStr )
 	--print( "--- Lua Code: ---\n" ); 
 	--print( codeStr )
 end
+--]]
 
 -- Process the source (parse then run or show error), which has already been read. 
 function app.processUserFile()
@@ -156,7 +161,7 @@ function app.processUserFile()
 			local codeStr = codeGenJava.getLuaCode( programTree )
 			print( string.format( "\nFile processed in %.3f ms\n", 
 						system.getTimer() - startTime ) )
-			writeLuaCode( codeStr )
+			-- writeLuaCode( codeStr )    TODO: Put this in options screen
 			runLuaCode( codeStr )
 			return
 		end
@@ -193,6 +198,12 @@ local function checkUserFile()
 	end
 end
 
+-- Show the reference docs
+function app.showHelp()
+	-- TODO: Get error context if any
+	system.openURL( "http://www.code12.org/docs/1/API.html" )
+end
+
 -- Handle resize event for the window
 local function onResizeWindow()
 	app.getWindowSize()
@@ -224,6 +235,20 @@ function app.saveSettings()
 	if file then
 		file:write( json.encode( userSettings ) )
 		io.close( file )
+	end
+end
+
+-- Update app.sourseFile and add path to app.recentSourceFilePaths
+-- and save user settings
+function app.updateSourceFile( path )
+	if path then
+		source.path = path
+		source.timeLoaded = 0
+		source.timeModLast = 0
+		source.updated = false
+		source.numLines = 0
+		app.addRecentSourceFilePath( path )
+		app.saveSettings()
 	end
 end
 
@@ -330,11 +355,21 @@ function app.setEditorPath()
 	end
 end
 
+-- Update the user source file and open the file in non-system default editor
+local function updateAndOpenSourceFile( path )
+	app.updateSourceFile( path )
+	if app.openFilesInEditor and app.editorPath then
+		env.openFileInEditor( path )
+	end
+end
+
 -- Handle system events for the app
 local function onSystemEvent( event )
 	-- Save the user settings if the user switches out of or quits the app
 	if event.type == "applicationSuspend" or event.type == "applicationExit" then
 		app.saveSettings()
+	elseif event.type == "applicationOpen" then
+		updateAndOpenSourceFile( event.url )
 	end
 end
 
@@ -381,7 +416,14 @@ local function initApp()
 	timer.performWithDelay( 250, checkUserFile, 0 )       -- 4x/sec
 	timer.performWithDelay( 10, checkUserFile, 0 )        -- first check soon
 	timer.performWithDelay( 10000, statusBar.update, 0 )  -- every 10 sec
-	composer.gotoScene( "getFile" )
+	
+	-- Handle launch with arguments
+	if launchArgs then
+		updateAndOpenSourceFile( launchArgs.args[1] )
+		composer.gotoScene( "runView" )
+	else
+		composer.gotoScene( "getFile" )
+	end
 end
 
 

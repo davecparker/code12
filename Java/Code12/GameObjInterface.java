@@ -10,16 +10,20 @@ public interface GameObjInterface
    public void setText(String text);
    public String toString();
    
-   // The object size and alignment
+   // Object positioning
+   public double getWidth();
+   public double getHeight();
    public void setSize(double width, double height);
+   public void setSpeed(double xSpeed, double ySpeed);
    public void align(String a);
-   public void align(String a, boolean adjustY);
    
-   // The object colors
+   // Appearance
    public void setFillColor(String name);
    public void setFillColorRGB(int r, int g, int b);
    public void setLineColor(String name);
    public void setLineColorRGB(int r, int g, int b);
+   public void setLineWidth(int lineWidth);
+   public void setImage(String filename);
 
    // Manipulate the object in the game's object list
    public int getLayer();
@@ -27,6 +31,7 @@ public interface GameObjInterface
    public void delete();
    
    // Polled input
+   public void setClickable(boolean clickable);
    public boolean clicked();
    
    // Geometry

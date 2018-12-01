@@ -22,10 +22,19 @@ public class GameImage extends GameObj
       super(game, x, y, 10, 10);  // real size set below, stub in case of failure
       type = "image";
       
+      // Set image and default to full pixel size of image initially
+      setImageFilename(filename, false);
+
       // Default to no extra fill and no frame
       setFillColor(null);         // fill color is currently ignored actually
       setLineColor(null);
       
+   }
+
+   // Set the image given the filename. If keepSize then keep the existing
+   // width and height, otherwise set size to the full pixel size of the image.
+   public void setImageFilename(String filename, boolean keepSize)
+   {
       // If the file can't be found, warn the user
       text = filename;     // Store filename in text field by default
       found = false;
@@ -37,12 +46,17 @@ public class GameImage extends GameObj
             game.logError("Cannot find image file", filename);
          else
          {           
-            // Try to load the raw image and set the initial size as full pixel size
+            // Load the raw image
             found = true; 
             ImageIcon icon = new ImageIcon(path);  // loads asynchronously unfortunately
-            width = icon.getIconWidth() / game.scaleLToP;
-            height = icon.getIconHeight() / game.scaleLToP;
             rawImage = icon.getImage();  // blank image until loaded or if not found
+            
+            // Set the initial size as full pixel size if not keepSize
+            if (!keepSize)
+            {
+               width = icon.getIconWidth() / game.scaleLToP;
+               height = icon.getIconHeight() / game.scaleLToP;
+            }
          }
       }
       
@@ -50,6 +64,13 @@ public class GameImage extends GameObj
       scaledImage = null;
       widthPImg = 0;
       heightPImg = 0;  
+   }
+
+   // Change the image to filename
+   @Override
+   public void setImage(String filename)
+   {
+      setImageFilename(filename, true);
    }
    
    // Return true if the image was found

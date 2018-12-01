@@ -77,26 +77,60 @@ function env.dirAndFilenameOfPath( path )
 			(string.sub( path, iChar + 1 ) or "")
 end
 
+-- Return the basename and extension of the given filename
+function env.basenameAndExtFromFilename( filename )
+	-- Find the last "." if any
+	local iChar = string.len( filename )
+	while iChar > 0 do
+		if string.byte( filename, iChar ) == string.byte( "." ) then
+			break
+		end
+		iChar = iChar - 1
+	end
+	if iChar <= 0 then
+		return filename -- simple filename with no extension
+	end
+
+	-- Split the filename and return the parts
+	return string.sub( filename, 1, iChar - 1 ), string.sub( filename, iChar + 1 )
+end
+
 -- Return the file modification time for a file 
 function env.fileModTimeFromPath( path )
 	return lfs.attributes( path, "modification" )
 end
 
--- Run the Open File dialog with the given title, filterPatterns, and filterDescription.
--- Parameters filterPatterns and filterDescription are optional and ignored in Mac environments.
+-- Return the path to the user's Documents folder with a folder seperator at the end
+function env.documentsPath()
+	if env.isWindows then
+		local userProfile = os.getenv( "USERPROFILE" )
+		return userProfile .. [[\Documents\]]
+	else
+		local home = os.getenv( "HOME" )
+		return home .. [[/Documents/]]
+	end
+end
+
+-- Run the Open File dialog with the given title, and optional 
+-- filterPatterns, filterDescription and defaultPath.
 -- Return the string pathname chosen or nil if cancelled.
-function env.pathFromOpenFileDialog( title, filterPatterns, filterDescription )
+function env.pathFromOpenFileDialog( title, filterPatterns, filterDescription, defaultPath )
 	if not env.isWindows then
 		filterPatterns = nil
 		filterDescription = nil
 	end
 	local result = fileDialogs.openFileDialog{
 		title = title,
+		default_path_and_file = defaultPath,
 		filter_patterns = filterPatterns,
 		filter_description = filterDescription,
 		allow_multiple_selects = false,
 	}
 	if type(result) == "string" then
+		-- fileDialogs.openFileDialog leaves a trailing / in some cases, so remove it
+		if string.sub( result, -1, -1 ) == chDirSeperator then
+			result = string.sub( result, 1, -2 )
+		end
 		return result
 	end
 	return nil
@@ -115,29 +149,41 @@ function env.pathFromSaveFileDialog( title, defaultPathAndFile )
 	return nil
 end
 
+-- Return true if the given path can be opened for reading, false otherwise
+function env.canRead( path )
+	local file = io.open( path, "r" )
+	if file then
+		io.close( file )
+		return true
+	end
+	return false
+end
+
 -- Open the given source file using app.editorPath if it is valid 
 -- or the system default editor if it is not
 function env.openFileInEditor( path )
 	if path then
+		-- Check that editorPath is valid
 		local editorPath = app.editorPath
-		if editorPath then
-			-- Check that editorPath is valid
-			local file = io.open( editorPath, "r" )
-			if file then
-				io.close( file )
-			else
-				editorPath = nil
-				app.editorPath = editorPath
-			end
+		if editorPath and not env.canRead( editorPath ) then
+			editorPath = nil
+			app.editorPath = editorPath
 		end
+
+		-- Open using editorPath or system default
 		if env.isWindows then
 			if editorPath then
-				os.execute( [[""]] .. editorPath .. [[" "]] .. path .. [[""]] )
+				os.execute( 'start "" "' .. editorPath .. '" "' .. path .. '"' )
 			else
 				os.execute( 'start "" "' .. path .. '"' )
 			end
 		else
-			os.execute( 'open -a "Sublime Text.app" "' .. path .. '"' )
+			if editorPath then
+				local _, filename = env.dirAndFilenameOfPath( editorPath )
+				os.execute( 'open -a "' .. filename .. '" "' .. path .. '"' )
+			else
+				os.execute( 'open "' .. path .. '"' )
+			end
 		end
 	end
 end
@@ -173,7 +219,10 @@ function env.findInstalledEditors()
 			{ name = "Notepad++", path = [[C:\Program Files\Notepad++\notepad++.exe]] },
 			{ name = "Notepad++", path = [[C:\Program Files (x86)\Notepad++\notepad++.exe]] },
 	}
-	local macEditors = {}
+	local macEditors = {
+			{ name = "Sublime Text", path = [[/Applications/Sublime Text.app]] },		
+			{ name = "Atom", path = [[/Applications/Atom.app]] },		
+	}
 	local editors
 	if env.isWindows then
 		editors = winEditors
@@ -198,27 +247,18 @@ function env.findInstalledEditors()
 	end
 end
 
--- Run the Input Box dialog with the given title and message.
+-- Run the Input Box dialog with the given title, message, and optional default text.
 -- Return the string inputed or nil if cancelled.
-function env.strFromInputBoxDialog( title, message )
+function env.strFromInputBoxDialog( title, message, default )
 	local result = fileDialogs.inputBox{
 		title = title,
 		message = message,
+		default_input = default,
 	}
 	if type(result) == "string" then
 		return result
 	end
 	return nil
-end
-
--- Return true if the given path can be opened for reading, false otherwise
-function env.canRead( path )
-	local file = io.open( path, "r" )
-	if file then
-		io.close( file )
-		return true
-	end
-	return false
 end
 
 

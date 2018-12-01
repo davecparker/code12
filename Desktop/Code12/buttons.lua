@@ -4,7 +4,7 @@
 --
 -- The buttons module for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
 -- Corona modules
@@ -175,7 +175,7 @@ end
 
 -- Return a display group containing a new button and its icon for the toolbar.
 -- Placement can be "left" or "right" to place the button on that side of the toolbar.
-function buttons.newToolbarButton( parent, label, onRelease, placement, adjacentBtn, width )
+function buttons.newToolbarButton( parent, label, imageFile, onRelease, placement, adjacentBtn, width )
 	local iconSize = 15
 	local padding = 10
 	-- Make button display group
@@ -184,7 +184,7 @@ function buttons.newToolbarButton( parent, label, onRelease, placement, adjacent
 	btnGroup.anchorX = 0
 	btnGroup.y = app.dyToolbar / 2
 	-- Make button icon
-	local icon = display.newImageRect( parent, "images/" .. label .. ".png", iconSize, iconSize )
+	local icon = display.newImageRect( parent, "images/" .. imageFile, iconSize, iconSize )
 	icon.anchorX = 0
 	icon.x = padding / 2
 	icon:setFillColor( unpack( labelColor ) )
@@ -224,18 +224,19 @@ function buttons.newToolbarButton( parent, label, onRelease, placement, adjacent
 	-- Set horizontal position of button group
 	if placement == "left" then
 		if adjacentBtn then
-			btnGroup.x = adjacentBtn.x + adjacentBtn.width + margin * 0.5
+			btnGroup.x = adjacentBtn.x + adjacentBtn.btn.width + margin * 0.5
 		else
-			btnGroup.x = margin
+			btnGroup.x = margin * 0.5
 		end
 	else
 		if adjacentBtn then
-			btnGroup.x = adjacentBtn.x - btnGroup.width - margin * 0.5
+			btnGroup.x = adjacentBtn.x - btn.width - margin * 0.5
 		else
-			btnGroup.x = app.width - margin - btnGroup.width
+			btnGroup.x = app.width - margin - btn.width
 		end
 	end
-
+	btnGroup.placement = placement
+	
 	return btnGroup
 end
 

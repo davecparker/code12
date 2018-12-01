@@ -132,13 +132,13 @@ local function findMisspelledName( nameStr, nameTable )
     local matches = {} --Array of keywords of 4 or less Levenshtein distance from the string the user entered (nameStr)
     local matchesDist = {} --Coresponding distances for keywords in matches
 
-    for entryStr, entry in pairs( nameTable ) do
-    	if type(entry) == "table" then
-    		local match = app.partialMatchString( nameStr, entryStr )
-    		if match <= bestMatch then--Tests if the keyword is closer to entryStr
-    			table.insert(matches, entryStr) --Inserts the keyword to match array
-    			table.insert(matchesDist, match) --Inserts the coresponding distance to the match distance array
-    			bestMatch = match
+	for entryStr, entry in pairs( nameTable ) do
+		if type(entry) == "table" then
+			local match = app.partialMatchString( nameStr, entryStr )
+			if match <= bestMatch then--Tests if the keyword is closer to entryStr
+				table.insert(matches, entryStr) --Inserts the keyword to match array
+				table.insert(matchesDist, match) --Inserts the coresponding distance to the match distance array
+				bestMatch = match
 			end
 		end
 	end
@@ -149,7 +149,9 @@ local function findMisspelledName( nameStr, nameTable )
 
 	if #matches == 1 then --If there is only one good match return it
 		return matches[1]
-	else --If there is more than one keyword in matches filter out all that are not the closest or tied for closest to nameStr 
+	else 
+		-- If there is more than one keyword in matches, filter out all that are not 
+		-- the closest or tied for closest to nameStr 
 		local temp = {} 
 		for i = 1,#matches do
 			if matchesDist[i] <= bestMatch then
@@ -173,9 +175,11 @@ local function findMisspelledName( nameStr, nameTable )
 
 	if #matches == 1 then --If there is only one keyword that is the same length as nameStr return it
 		return matches[1] 
-	else --If there are more than one keyword the same length and distance from nameStr check for first/last character matching
+	else 
+		-- If there are more than one keyword the same length and distance from nameStr, 
+		-- check for first/last character matching
+		local temp = {}
 		for i = 1, #matches do
-			local temp = {}
 			local bonusMatch = 0
 
 			local tempStr = matches[i] --One point for first character matches
@@ -586,9 +590,10 @@ local function findStaticMethod( call )
 			if misName then
 				err.setErrNodeSpan( classNode, nameID, 
 						'Unknown or misspelled API function, did you mean "%s" ?', 
-						"ct." .. misName )
+						"ct." .. misName, { docLink = "#top" } )
 			else
-				err.setErrNodeSpan( classNode, nameID, "Unknown API function" )
+				err.setErrNodeSpan( classNode, nameID, "Unknown API function",
+						{ docLink = "#top" } )
 			end
 			return nil
 		elseif beforeStart then
@@ -1017,16 +1022,26 @@ end
 
 -- cast
 local function vtExprCast( node )
-	-- The only cast currently supported is (int) doubleExpr
-	assert( node.vtCast == 0 )  -- (int) enforced by parseProgram
+	-- The only casts supported are (int) and (double)
 	local vtExpr = vtSetExprNode( node.expr )
-	if vtExpr == 1 then
-		return 0   -- proper cast of double to int
-	elseif vtExpr == 0 then
-		err.setErrNode( node, "Type cast is not necessary: expression is already of type int" )
-	else
-		err.setErrNode( node, "(int) type cast can only be applied to type double" )
+	if node.vtCast == 0 then   -- (int)
+		if vtExpr == 1 then
+			return 0   -- valid cast of double to int
+		elseif vtExpr == 0 then
+			err.setErrNode( node, "Type cast is not necessary: expression is already of type int" )
+		else
+			err.setErrNode( node, "(int) type cast can only be applied to type double" )
+		end
+	elseif node.vtCast == 1 then -- (double)
+		if vtExpr == 0 then
+			return 1   -- valid cast of int to double
+		elseif vtExpr == 1 then
+			err.setErrNode( node, "Type cast is not necessary: expression is already of type double" )
+		else
+			err.setErrNode( node, "(double) type cast can only be applied to type int" )
+		end
 	end
+	err.setErrNode( node, "Type casts can only be (int) or (double)" )
 	return nil
 end
 
@@ -1186,11 +1201,11 @@ local function vtExprDivide( node )
 			if r == math.floor( r ) then
 				return 0   -- valid int result
 			end
-			err.setErrNode( node, "Integer divide has remainder. Use double or ct.intDiv()" )
+			err.setErrNode( node, "Integer divide has remainder. Use (double) or ct.intDiv()" )
 		end
 		-- The remainder can't be determined, but Code12 doesn't allow this
 		-- because chances are the programmer made a mistake.
-		err.setErrNode( node, "Integer divide may lose remainder. Use double or ct.intDiv()" )
+		err.setErrNode( node, "Integer divide may lose remainder. Use (double) or ct.intDiv()" )
 	end
 	return vt
 end

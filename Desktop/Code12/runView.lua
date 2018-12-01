@@ -27,6 +27,8 @@ local runView = composer.newScene()
 
 -- UI metrics
 local dxyPaneSplit = 10
+local gridLabelsFontSize = 11
+local gridLineShade = 0.6
 
 -- Display objects and groups
 local outputGroup              -- display group for program output area
@@ -34,11 +36,18 @@ local rightBar                 -- clipping bar to the right of the output area
 local paneSplitConsole         -- pane split between output and console
 local paneSplitRight           -- pane split between output and varWatch window
 local lowerGroup               -- display area below the pane split
+local gridLinesGroup           -- display group for grid lines
+local gridXLabels              -- array of text objs to label the vertical grid lines
+local gridYLabels              -- array of text objs to label the horizontal grid lines
+local gridGroup                -- display group for gridLinesGroup, gridXLabels and gridYLabels
 
 -- UI state
 local paneDragOffset           -- when dragging the pane split
 local outputRatio              -- fraction of app height taken by output area
 local showVarWatchLast         -- last known value of app.showVarWatch
+local layoutNeeded             -- true when the layout has changed
+local screenOriginX            -- value of g.screen.originX
+local screenOriginY            -- value of g.screen.originY
 
 
 --- Internal Functions ------------------------------------------------
@@ -59,6 +68,105 @@ end
 -- Return the available width and height for the variable watch window
 local function varWatchWidthAndHeight()
 	return app.width - rightBar.x, app.outputHeight - 1
+end
+
+-- Return a new text object at x, y which has been inserted into the gridGroup and has
+-- fill color set to gridLineShade
+local function newGridLabel( text, x, y )
+	local label = display.newText( gridGroup, text, x, y, native.systemFont, gridLabelsFontSize )
+	label:setFillColor( gridLineShade )
+	return label
+end
+
+-- Return an new line from x1, y1 to x2, y2 which has been inserted into the gridGroup and has
+-- stroke color set to grideLineShade
+local function newGridLine( x1, y1, x2, y2 )
+	local line = display.newLine( gridLinesGroup, x1, y1, x2, y2 )
+	line:setStrokeColor( gridLineShade )
+	return line
+end
+
+-- Make the coordinate grideLines
+local function makeGrid()
+	local width = app.outputWidth
+	local height = app.outputHeight
+	local scale = g.scale
+	local screen = g.screen
+	-- Remove existing grid lines
+	if gridLinesGroup then
+		gridLinesGroup:removeSelf()
+		gridLinesGroup = nil
+	end
+	-- Make grid lines group
+	gridLinesGroup = g.makeGroup( gridGroup )
+	gridGroup:toFront()
+	-- Calculate x-value for first vertical grid line and label
+	screenOriginX = screen.originX
+	local xLine = math.floor( screenOriginX / 10 ) * 10 + 10
+	local x = (xLine - screenOriginX) * scale
+	-- Make vertical grid lines and labels
+	local numLabels = #gridXLabels
+	local label
+	local n = 0 -- number of labels updated/created 
+	while x < width do
+		n = n + 1
+		if n <= numLabels then
+			-- Move existing label into new position and update its text
+			label = gridXLabels[n]
+			label.text = xLine
+			label.x = x
+			label.isVisible = true
+		else
+			-- Make new label
+			label = newGridLabel( xLine, x, 0 )
+			label.anchorY = 0
+			numLabels = numLabels + 1
+			gridXLabels[numLabels] = label
+		end
+		-- Make new gridline
+		newGridLine( x, label.height + 1, x, height )
+		-- Update loop variables
+		xLine = xLine + 10
+		x = (xLine - screenOriginX) * scale
+	end
+	-- Hide any extra labels
+	while n < numLabels do
+		n = n + 1
+		gridXLabels[n].isVisible = false
+	end
+	-- Calculate y-value for first horizontal grid line
+	screenOriginY = screen.originY
+	local yLine = math.floor( screenOriginY / 10 ) * 10 + 10
+	local y = (yLine - screenOriginY) * scale
+	-- Make horizontal grideLines and labels
+	numLabels = #gridYLabels
+	n = 0
+	while y < height do
+		n = n + 1
+		if n <= numLabels then
+			-- Move existing label into new position and update its text
+			label = gridYLabels[n]
+			label.text = yLine
+			label.y = y
+			label.isVisible = true
+		else
+			-- Make new label
+			label = newGridLabel( yLine, 0, y )
+			label.anchorX = 0
+			numLabels = numLabels + 1
+			gridYLabels[numLabels] = label
+		end
+		-- Make new grid line
+		newGridLine( label.width + 1, y, width, y )
+		-- Update loop variables
+		yLine = yLine + 10
+		y = (yLine - screenOriginY) * scale
+	end
+	-- Hide any extra labels
+	while n < numLabels do
+		n = n + 1
+		gridYLabels[n].isVisible = false
+	end
 end
 
 -- Position the display panes
@@ -89,13 +197,18 @@ local function layoutPanes()
 	lowerGroup.y = paneSplitConsole.y + dxyPaneSplit + 1
 	local consoleHeight = app.height - lowerGroup.y - app.dyStatusBar
 	console.resize( app.width, consoleHeight )
+
+	-- Remake the coordinate grideLines if they are on
+	if app.gridOn then
+		makeGrid()
+	end
 end
 
 -- Runtime callback to set the output pixel size being used
 local function setOutputSize( widthP, heightP )
 	app.outputWidth = math.floor( widthP )
 	app.outputHeight = math.floor( heightP )
-	layoutPanes()
+	layoutNeeded = true
 end
 
 -- Resize the output area using width and height as the available space,
@@ -179,6 +292,20 @@ local function showRuntimeError( lineNum, message )
 	composer.gotoScene( "errView" )
 end
 
+-- Handle new frame events by calling layoutPanes if needed
+local function onNewFrame()
+	-- Update layout of panes if needed
+	if layoutNeeded then
+		layoutPanes()
+		layoutNeeded = false
+	end
+	-- Update grid labels if needed
+	local screen = g.screen
+	if app.gridOn and (screenOriginX ~= screen.originX or screenOriginY ~= screen.originY) then
+		makeGrid()
+	end
+end
+
 
 --- Scene Methods ------------------------------------------------
 
@@ -191,6 +318,9 @@ function runView:create()
 
 	-- Make the display items
 	outputGroup = g.makeGroup( sceneGroup, 0, app.dyToolbar )
+	gridGroup = g.makeGroup( outputGroup )
+	gridXLabels = {}
+	gridYLabels = {}
 	rightBar = g.uiItem( display.newRect( sceneGroup, 0, outputGroup.y, 0, 0 ), 
 						app.extraShade, app.borderShade )
 	paneSplitRight = g.uiItem( display.newRect( sceneGroup, 0, rightBar.y, 
@@ -219,6 +349,7 @@ function runView:create()
 
 	-- Install window resize handler
 	Runtime:addEventListener( "resize", self )
+	Runtime:addEventListener( "enterFrame", onNewFrame )
 end
 
 -- Prepare to show the runView scene
@@ -259,6 +390,18 @@ function runView:resize()
 	-- trying to keep the outputRatio about the same.
 	app.getWindowSize()
 	resizeOutputArea( nil, maxOutputHeight() * outputRatio )
+end
+
+-- Toggle the coordinate grideLines on/off
+function runView.toggleGrid()
+	local gridOn = app.gridOn
+	if gridOn then
+		gridGroup.isVisible = false
+	else
+		makeGrid()
+		gridGroup.isVisible = true
+	end
+	app.gridOn = not gridOn
 end
 
 

@@ -84,3 +84,25 @@ imort Code12.*;
 			int len = gObjArr.length
 aimport Code12.*;
 		frameRateDisplay.
+		ct.circle(ct.random(0, 100), ct.random(0, 100), 5;)
+	int numObjects 0;
+		int time = ct.getTimer()
+   public final String[] LEVEL1 =  
+        "111111111111111111111111111111"
+     ArrayList<GameObj> platforms = new ArrayList<GameObj>();
+     ArrayList<GameObj> coins = new ArrayList<GameObj>();
+     ArrayList<GameObj> enemies = new ArrayList<GameObj>();
+      Iterator<GameObj> it = coins.iterator();
+         player = ct.image("player_forwards.png", platforms.get(0).x, platforms.get(0).y, 5);
+      ct.setBackImage("underwater.jpg" 
+      ct.setBackImage("underwater.jpg", ); 
+			double average = (GameO) "Hey";
+		else if (ct.clicked() ~= false)
+		else if (ct.clicked() ~= false)
+		else if (ct.clicked() 8 false)
+		else if (ct.clicked()  false)
+		else obj == null;
+		else obj != null;
+		else obj ~= null;
+		else blah
+		else what

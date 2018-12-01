@@ -153,7 +153,7 @@ public class Paint extends Code12Program
       // then draw a line between those coordinates and the current 
 
       // user can only draw on canvas(null space), not on other game objects
-      if ( ct.clickX() > palette.width + 2 )
+      if ( x > palette.width + 2 )
       {
          brush = ct.line( lastX, lastY, x, y ,currentColor);
          brush.lineWidth = ct.toInt(size);

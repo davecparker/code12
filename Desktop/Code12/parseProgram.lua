@@ -394,14 +394,9 @@ local function makeCall( nodes )
 end
 
 -- Make and return a cast structure given the parse tree nodes. 
--- The only supported type cast is currently (int). 
--- In other cases, set the error state.
 local function makeCast( nodes )
-	local typeNode = nodes[2]
-	if typeNode.str ~= "int" then
-		err.setErrNode( typeNode, "The only type cast supported by Code12 is (int)" )
-	end
-	return { s = "cast", vtCast = 0, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
+	local vt = javaTypes.vtFromType( nodes[2] )
+	return { s = "cast", vtCast = vt, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
 end
 
 -- Get the single controlled stmt or block of controlled stmts for an 
@@ -1102,7 +1097,7 @@ function parseProgram.parseLines( syntaxLevel )
 				-- We can cache this parse for possible reuse if it was successful
 				-- and not involved in a multi-line parse or block comment
 				if tree and not tree.isError and lineRec.errRec == nil
-						and lineRec.iLineStart == nil and iLineCommentStart == nil
+						and lineRec.iLineStart == lineRec.iLine and iLineCommentStart == nil
 						and not lineRec.openComment then
 					source.lineCacheForStrLine[strLine] = lineRec  -- cache it
 				end

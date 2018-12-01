@@ -2,37 +2,29 @@
 --
 -- screens.lua
 --
--- Implementation of the screen management APIs for the Code 12 Lua runtime.
+-- Implementation of the screen management APIs for the Code12 Lua runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
 local ct = require("Code12.ct")
 local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
-local GameObj = require("Code12.GameObjAPI")
+local GameObj = require("Code12.GameObj")
 
 
 ---------------- Screen Management API ---------------------------------------
 
 -- API
-function ct.setTitle(title, ...)
-	-- Check parameters
-	title = title or "Code12"
-	if g.checkAPIParams("ct.setTitle") then
-		g.check1Param("string", title, ...)
-	end
-
-	-- The window title only affects macOS and Windows
-	native.setProperty("windowTitleText", title)
+function ct.setTitle(title)
+	native.setProperty("windowTitleText", title or "Code12")
 end
 
 -- API
-function ct.setHeight(height, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.setHeight") then
-		g.check1Param("number", height, ...)
-	end
+function ct.setHeight(height)
+	-- Pin height to a reasonable range
 	height = g.pinValue(height, 1, 10000)
 
 	-- Are we embedded in an external app window?
@@ -82,60 +74,33 @@ function ct.setHeight(height, ...)
 end
 
 -- API
-function ct.getWidth(...)
-	-- Check parameters
-	if g.checkAPIParams("ct.getWidth") then
-		g.checkNoParams(...)
-	end
-
-	-- Return logical width
+function ct.getWidth()
 	return g.WIDTH
 end
 
 -- API
-function ct.getHeight(...)
-	-- Check parameters
-	if g.checkAPIParams("ct.getHeight") then
-		g.checkNoParams(...)
-	end
-
-	-- Return logical height
+function ct.getHeight()
 	return g.height
 end
 
 -- API
-function ct.getPixelsPerUnit(...)
-	-- Check parameters
-	if g.checkAPIParams("ct.getPixelsPerUnit") then
-		g.checkNoParams(...)
-	end
-
-	-- Return logical to pixel scale factor
+function ct.getPixelsPerUnit()
 	return g.scale
 end
 
 -- API
-function ct.getScreen(...)
-	-- Check parameters
-	if g.checkAPIParams("ct.getScreen") then
-		g.checkNoParams(...)
-	end
-
-	-- Return name of current screen
+function ct.getScreen()
 	return g.screen.name
 end
 
 -- API
-function ct.setScreen(name, ...)
-	-- Check parameters
+function ct.setScreen(name)
+	-- Make nil name same as empty string
 	name = name or ""
-	if g.checkAPIParams("ct.setScreen") then
-		g.check1Param("string", name, ...)
-	end
 
 	-- Hide old screen if any
 	if g.screen then
-		g.screen.group.isVisible = false;
+		g.screen.group.isVisible = false
 	end
 
 	-- Does this screen name already exist?
@@ -149,9 +114,11 @@ function ct.setScreen(name, ...)
 			name = name,
 			group = display.newGroup(),
 			objs = display.newGroup(),   -- layer above background obj
-			backObj = nil,    -- background object, set below
 			originX = 0,
 			originY = 0,
+			-- backObj = nil,      -- background object, set below
+			-- hasSpeed = nil,     -- true if any objs use xSpeed/ySpeed
+			-- objsWarning = nil,  -- true when we have given an object count warning
 		}
 		g.mainGroup:insert(screen.group)
 		screen.group:insert(screen.objs)
@@ -159,26 +126,17 @@ function ct.setScreen(name, ...)
 		g.screen = screen
 
 		-- Add default white background
-		ct.setBackColor("white")
+		ct.setBackColor("white")    -- sets backObj
 	end
 
-	-- Show new screen
-	screen.group.isVisible = true;
-
-	-- Update the screen's background object if any
-	if screen.backObj then
-		screen.backObj:updateBackObj()
-	end
+	-- Show new screen and make sure it does a full resize at next update
+	screen.group.isVisible = true
+	g.window.resized = true
 end
 
 -- API
-function ct.setScreenOrigin(x, y, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.setScreenOrigin") then
-		g.checkTypes({"number", "number"}, x, y, ...)
-	end
-
-	-- Save the origin in the screen
+function ct.setScreenOrigin(x, y)
+	-- Save the origin in the current screen
 	local screen = g.screen
 	screen.originX = x
 	screen.originY = y	
@@ -190,12 +148,7 @@ function ct.setScreenOrigin(x, y, ...)
 end
 
 -- API
-function ct.clearScreen(...)
-	-- Check parameters
-	if g.checkAPIParams("ct.clearScreen") then
-		g.checkNoParams(...)
-	end
-
+function ct.clearScreen()
 	-- Delete all objects in the screen group, from top down
 	local screenGroup = g.screen.objs
 	for i = screenGroup.numChildren, 1, -1 do
@@ -204,14 +157,9 @@ function ct.clearScreen(...)
 end
 
 -- API
-function ct.clearGroup(group, ...)
-	-- Check parameters
-	group = group or ""
-	if g.checkAPIParams("ct.clearGroup") then
-		g.check1Param("string", group, ...)
-	end
-
+function ct.clearGroup(group)
 	-- Delete objects with matching group name, from top down
+	group = group or ""
 	local screenGroup = g.screen.objs
 	for i = screenGroup.numChildren, 1, -1 do
 		local gameObj = screenGroup[i].code12GameObj
@@ -222,7 +170,7 @@ function ct.clearGroup(group, ...)
 end
 
 -- API
-function ct.setBackColor(colorName, ...)
+function ct.setBackColor(colorName)
 	-- Delete previous background object if any
 	local backObj = g.screen.backObj
 	if backObj then
@@ -230,18 +178,15 @@ function ct.setBackColor(colorName, ...)
 		g.screen.backObj = nil
 	end
 
-	-- Check parameters
+	-- Calling with nil just removes the background
 	if colorName == nil then
 		return
-	end
-	if g.checkAPIParams("ct.setBackColor") then
-		g.check1Param("string", colorName, ...)
 	end
 
 	-- Make a rect big enough to cover the screen without needing to scale it
 	backObj = GameObj:newRect(g.screen.group, 0, 0, 100000, 100000, colorName)
 	backObj.updateBackObj = function () end
-	local obj = backObj._code12.obj
+	local obj = backObj.obj
 	obj:removeEventListener("touch", g.onTouchGameObj)
 	obj:addEventListener("touch", g.onTouchBackObj)
 
@@ -251,11 +196,8 @@ function ct.setBackColor(colorName, ...)
 end
 
 -- API
-function ct.setBackColorRGB(red, green, blue, ...)
-	-- Check parameters
-	if g.checkAPIParams("ct.setBackColorRGB") then
-		g.checkTypes({"number", "number", "number"}, red, green, blue, ...)
-	end
+function ct.setBackColorRGB(red, green, blue)
+	-- Pin color components to the allowed range
 	red = g.pinValue(red, 0, 255)
 	green = g.pinValue(green, 0, 255)
 	blue = g.pinValue(blue, 0, 255)
@@ -266,7 +208,7 @@ function ct.setBackColorRGB(red, green, blue, ...)
 end
 
 -- API
-function ct.setBackImage(filename, ...)
+function ct.setBackImage(filename)
 	-- Delete previous background object if any
 	local backObj = g.screen.backObj
 	if backObj then
@@ -274,24 +216,21 @@ function ct.setBackImage(filename, ...)
 		g.screen.backObj = nil
 	end
 
-	-- Check parameters
+	-- Calling with nil or empty filename just removes the background
 	if filename == nil or filename == "" then
 		return
-	end
-	if g.checkAPIParams("ct.setBackImage") then
-		g.check1Param("string", filename, ...)
 	end
 
 	-- Make an image object with temporary position and size for now
 	backObj = GameObj:newImage(g.screen.group, filename, 0, 0, g.WIDTH)
-	local img = backObj._code12.obj
+	local img = backObj.obj
 	img:removeEventListener("touch", g.onTouchGameObj)
 	img:addEventListener("touch", g.onTouchBackObj)
 
 	-- Install special update method to position and crop properly
 	backObj.updateBackObj = 
 			function (gameObj)
-				local obj = gameObj._code12.obj
+				local obj = gameObj.obj
 				local scale = g.scale
 
 				-- Center it in the window
