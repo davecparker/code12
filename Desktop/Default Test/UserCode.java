@@ -14,17 +14,19 @@ class UserCode extends Code12Program
 	int frameCount = 0;
 	String function = "Testing";
 
-   public static void main(String[] args)
-   { 
-      Code12.run(new UserCode()); 
-   }
+	public static void main(String[] args)
+	{ 
+		Code12.run(new UserCode()); 
+	}
    
 	public void start()
 	{
 		// int oops = count;
 		// double nope = ball.x;
 		// ct.circle(50, 50, LIMIT);
-		double x = (10 + 50 * 5 + (45 / 3 * 2)) / 5.0;
+		double x = (10 + 50 * 5    ///
+			+ (45 / 3 * 2))        ///  
+			/ 5.0;
 		int xInt = ct.toInt( x );
 		String name = "Dave" + " " + "Parker";
 		boolean done, end;
@@ -72,15 +74,14 @@ class UserCode extends Code12Program
 
 		// Draw some circles
 		ball = ct.circle(x + 6, 15, 5);
+		ball.setFillColor("blue");
 		ct.circle(ct.intDiv(xInt, 2) + 10, 40, 5);
 		bigBall = ct.circle(x, 80, 40);
 		// bigBall.setFillColorRGB(400, 127, -50);
 		bigBall.setFillColor(null);
-		bigBall.clickable = true;
 
 		// Add a fish
 		fish = ct.image("goldfish.png", 50, 50, 15);
-		fish.clickable = true;
 		String filename = null;
 		// ct.image(filename, 50, 20, 15);
 
@@ -121,8 +122,7 @@ class UserCode extends Code12Program
 		{
 			double localX = 1.1 + 5;
 			bigBall.x--;
-			bigBall.width /= factor;
-			bigBall.height *= /* WTF? */ (1 / factor);
+			bigBall.setSize( bigBall.getWidth() / factor, bigBall.getHeight() / factor);
 			speed = -speed;
 		}
 		else if (bigBall.x < 0)
@@ -150,7 +150,12 @@ class UserCode extends Code12Program
 
 		// Check for fish click
 		if (fish.clicked())
-			ct.inputYesNo("Continue?");
+		{
+			if (ct.inputYesNo("Continue?"))
+				fish.setImage("goldfish right.png");
+			else
+				ct.restart();
+		}
 	}
 
 	// Move the ball
@@ -176,11 +181,11 @@ class UserCode extends Code12Program
 	{
 		if (obj != null)
 		{
-			obj.xSpeed = .1;
+			obj.setSpeed( .1, 0 );
 			ct.println( obj.toString() + " was clicked" );
 		}
 		else
-			ct.println( "Mouse was pressed at (" + x + ", " + y + ")" );
+			ct.logm( "onMousePress", x, y );
 	}
 
 	void loopAndArrayTest()

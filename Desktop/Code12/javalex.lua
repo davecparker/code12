@@ -140,15 +140,11 @@ local correctCaseForLowercaseName = {
 } 
 
 -- State for the lexer used by token scanning functions
-local source    		   -- the source string
-local chars     		   -- array of ASCII codes for the source string
-local lineNumber           -- the line number for the source string
+local lineRecord           -- the line record for the line being scanned
+local sourceStr    		   -- the source code string for the line being scanned
+local chars     		   -- array of ASCII codes for sourceStr
+local lineNumber           -- the line number for sourceStr
 local iChar     		   -- index to current char in chars
-local iLineBlockComment    -- line number for start of block comment (/* */) or nil if none
-local commentForLine       -- array of end-of-line comments indexed by line number
-local indentLevelForLine   -- array of indent levels indexed by line number
-local prevIndentStr        -- previous (non blank/comment) line of code's indent string
-local prevLineNumber       -- previous (non blank/comment) line of code's line number
 
 
 ----- Token scanning functions ------------------------------------------------
@@ -329,22 +325,28 @@ local function starToken()
 end
 
 -- Read through a block comment (/*  */), disallowing nesting per Java.
--- If the comment is closed on this line then set iLineBlockComment = nil.
--- Return false if an error is encountered, else true.
+-- Update the comment state in lineRecord as appropriate.
 local function skipBlockComment()
-	assert( iLineBlockComment )
+	assert( lineRecord.iLineCommentStart )
 	while true do
 		local ch = chars[iChar]
 		if ch == 42 and chars[iChar + 1] == 47 then  -- */
+			-- Comment closed
 			iChar = iChar + 2
-			iLineBlockComment = nil   -- comment closed
+			if lineRecord.iLineCommentStart == lineNumber then
+				-- Comment open and closed on this line, so no worries
+				lineRecord.iLineCommentStart = nil
+			end
 			return
 		elseif ch == 47 and chars[iChar + 1] == 42 then  -- /*
-			err.setErrLineNumAndRefLineNum( lineNumber, iLineBlockComment, 
+			-- Apparent attempt at a nested block comment
+			err.setErrLineNumAndRefLineNum( lineNumber, lineRecord.iLineCommentStart, 
 					"Java does not allow nesting comments within comments using /* */" )
 			iChar = iChar + 2   -- pass the 2nd /* and keep going per Java
 		elseif ch == nil then
-			return    -- unclosed comment continues to next line
+			-- Line ends with unclosed comment
+			lineRecord.openComment = true
+			return false
 		else
 			iChar = iChar + 1
 		end
@@ -359,13 +361,13 @@ local function slashToken()
 	local charNext = chars[iChar]
 	if charNext == 47 then   --  /
 		-- Comment to end of line
-		local str = string.sub( source, iChar + 1 )
+		local str = string.sub( sourceStr, iChar + 1 )
 		iChar = #chars + 1
 		return "COMMENT", str
 	elseif charNext == 42 then  -- *
 		-- Start of block comment
 		iChar = iChar + 1
-		iLineBlockComment = lineNumber
+		lineRecord.iLineCommentStart = lineNumber
 		skipBlockComment()
 		return "COMMENT"
 	elseif charNext == 61 then   --  =
@@ -426,7 +428,7 @@ local function stringLiteralToken()
 		iChar = iChar + 1
 		charNext = chars[iChar]
 	end
-	local str = string.sub(source, iCharStart, iChar)
+	local str = string.sub(sourceStr, iCharStart, iChar)
 	iChar = iChar + 1
 	return "STR", str
 end
@@ -477,7 +479,7 @@ local function numericLiteralToken( startsWithDot )
 		setTokenErr( iCharStart, iChar - 1, "This is not a valid number or name" )
 		return nil
 	end
-	local str = string.sub(source, iCharStart, iChar - 1)
+	local str = string.sub(sourceStr, iCharStart, iChar - 1)
 	if isNUM then
 		return "NUM", str
 	end
@@ -494,46 +496,14 @@ local function dotToken()
 	return "."
 end
 
--- Determine and store the indentation level of source and check for consistent use of tabs and spaces
-local function checkIndentation( tokens )
-	if #tokens == 0 then
-		-- set indent for this line to 0
-		indentLevelForLine[lineNumber] = 0
-	else
-		-- determine indent
-		local indLvl = tokens[1].iChar - 1
-		-- store indent level
-		indentLevelForLine[lineNumber] = indLvl
-		local indentStr = string.sub( source, 1, indLvl )
-		-- check inconsistent indent
-		if prevIndentStr then
-			local prevIndLvl = indentLevelForLine[prevLineNumber]
-			if indLvl == prevIndLvl and indentStr ~= prevIndentStr
-					or indLvl > prevIndLvl and string.sub( indentStr, 1, prevIndLvl ) ~= prevIndentStr
-					or indLvl < prevIndLvl and string.sub( prevIndentStr, 1, indLvl ) ~= indentStr then
-				err.setErr( { iLine = lineNumber }, { iLine = prevLineNumber }, 
-						"Mix of tabs and spaces used for indentation is not consistent with the previous line of code" )
-			end
-		end
-		-- save prev indent
-		prevIndentStr = indentStr
-		prevLineNumber = lineNumber
-	end
-end
-
 
 ----- Module functions -------------------------------------------------------
 
--- Init the state of the lexer for a program
-function javalex.initProgram()
-	iLineBlockComment = nil
-	commentForLine = {}
-	indentLevelForLine = {}
-	prevIndentStr = nil
-	prevLineNumber = nil
-end
-
--- Return an array of tokens for the given source string and line number. 
+-- Return an array of tokens for the given source line record
+-- and set the lexical analysis fields in the lineRec. 
+-- If iLineCommentStart then the line starts inside an open comment started there.
+-- Return nil and set the error state if a token is malformed or illegal.
+--
 -- Each token is a table with 4 fields named, for example: 
 --     { tt = "ID", str = "foo", iLine = 10, iChar = 23 }
 -- where iChar is the index of the start of the token in sourceStr, 
@@ -549,19 +519,20 @@ end
 --     "NULL": the null literal (str is "null")
 --     "COMMENT": a comment (str is comment text if to end of line, else nil)
 --     "END": the end of the source string (str is empty string)
--- Return nil and set the error state if a token is malformed or illegal.
-function javalex.getTokens( sourceStr, lineNum )
-	-- Make array of ASCII codes for the source string
-	source = sourceStr
-	lineNumber = lineNum
-	chars = { string.byte(source, 1, string.len(source)) }   -- supposedly faster than a loop
+function javalex.getTokens( lineRec, iLineCommentStart )
+	-- Init scanner state for this line
+	lineRecord = lineRec
+	sourceStr = lineRec.str
+	chars = { string.byte( sourceStr, 1, string.len( sourceStr ) ) }
+	lineNumber = lineRec.iLine
 	iChar = 1
 
 	-- Init array of tokens to return
 	local tokens = {}
 
 	-- Are we inside a block comment that started on a previous line?
-	if iLineBlockComment then
+	if iLineCommentStart then
+		lineRec.iLineCommentStart = iLineCommentStart
 		skipBlockComment()
 	end
 
@@ -583,7 +554,7 @@ function javalex.getTokens( sourceStr, lineNum )
 				charType = charTypes[chars[iChar]]
 			until type(charType) ~= "boolean"    -- ID char
 			local iCharEnd = iChar - 1
-			local str = string.sub( source, iCharStart, iCharEnd )
+			local str = string.sub( sourceStr, iCharStart, iCharEnd )
 			local tt = ttForKnownName[str]
 			if tt == nil then
 				-- Not a known word, so user-defined ID
@@ -601,7 +572,7 @@ function javalex.getTokens( sourceStr, lineNum )
 				return nil
 			end
 			tokens[#tokens + 1] = { tt = tt, str = str, 
-					iLine = lineNum, iChar = iCharStart }
+					iLine = lineNumber, iChar = iCharStart }
 		elseif charType == false then   -- numeric 0-9
 			-- Number constant
 			local tt, str = numericLiteralToken()
@@ -609,30 +580,40 @@ function javalex.getTokens( sourceStr, lineNum )
 				return nil
 			end
 			tokens[#tokens + 1] = { tt = tt, str = str, 
-					iLine = lineNum, iChar = iCharStart }
-		elseif charType == nil then
-			-- End of source string
-			checkIndentation( tokens )
+					iLine = lineNumber, iChar = iCharStart }
+		elseif charType == nil then  -- end of source string
+			-- Set lexical fields in lineRec
+			if #tokens == 0 then
+				lineRec.hasCode = false
+				lineRec.indentLevel = 0
+				lineRec.indentStr = ""
+			else
+				lineRec.hasCode = true
+				local indentLevel = tokens[1].iChar - 1
+				lineRec.indentLevel = indentLevel
+				lineRec.indentStr = string.sub( sourceStr, 1, indentLevel )
+			end
+			-- Add sentinal token and return tokens
 			tokens[#tokens + 1] = { tt = "END", str = " ", 
-					iLine = lineNum, iChar = iCharStart }
-			return tokens 
+					iLine = lineNumber, iChar = iCharStart }
+			return tokens
 		elseif type(charType) == "function" then
 			-- Possible multi-char token, char or string literal, or comment
 			local tt, str = charType()   -- tt, (tt, str) or (nil, errRecord)
 			if tt == nil then 
 				return nil   -- token error (e.g. unclosed string literal)
 			elseif tt == "COMMENT" then
-				-- Remember text for end-of-line comments (discard block comments)
-				commentForLine[lineNum] = str
+				-- Store text for end-of-line comments (discard block comments)
+				lineRec.commentStr = str
 			else
 				tokens[#tokens + 1] = { tt = tt, str = str or tt, 
-						iLine = lineNum, iChar = iCharStart }
+						iLine = lineNumber, iChar = iCharStart }
 			end
 		else
 			-- Single char token
 			iChar = iChar + 1
 			tokens[#tokens + 1] = { tt = charType, str = charType, 
-					iLine = lineNum, iChar = iCharStart }
+					iLine = lineNumber, iChar = iCharStart }
 		end 
 	until false   -- returns internally when end of string is found
 end
@@ -668,30 +649,13 @@ function javalex.knownName( nameStr )
 	return tt, strCorrectCase, usage
 end 
 
--- Return the comment string at the end of the given line number or nil if none
-function javalex.commentForLine( lineNum )
-	return commentForLine[lineNum]
-end
-
--- Return the indent level of the given line number in number of spaces,
--- assuming a tab stop of 8 spaces
-function javalex.indentLevelForLine( lineNum )
-	return indentLevelForLine[lineNum]
-end
-
--- If the parsing state is inside an unclosed block comment then return the 
--- line number where the comment started, otherwise return nil.
-function javalex.iLineStartOfUnclosedBlockComment()
-	return iLineBlockComment
-end
-
 
 ----- Initialization ---------------------------------------------------------
 
 -- Init the charTypes array
 local function initCharTypes()
 	-- Init array to all invalid chars to start with (and ensure contiguous array)
-	for ch = 0, 127 do
+	for ch = 0, 255 do
 		charTypes[ch] = invalidCharToken
 	end
 

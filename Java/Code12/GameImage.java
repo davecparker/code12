@@ -9,9 +9,10 @@ import javax.swing.ImageIcon;
 public class GameImage extends GameObj
 {
    // Private instance data
+   private boolean found;                 // true if image file was found 
    private Image rawImage;                // unscaled image as loaded from file
    private Image scaledImage;             // cached scaled image as last drawn or null
-   private double widthPImg, heightPImg;  // pixel size of scaledImage 
+   private double widthPImg, heightPImg;  // pixel size of scaledImage
    
    
    // Construct an image from the filename at the given location
@@ -21,33 +22,61 @@ public class GameImage extends GameObj
       super(game, x, y, 10, 10);  // real size set below, stub in case of failure
       type = "image";
       
+      // Set image and default to full pixel size of image initially
+      setImageFilename(filename, false);
+
       // Default to no extra fill and no frame
       setFillColor(null);         // fill color is currently ignored actually
       setLineColor(null);
       
+   }
+
+   // Set the image given the filename. If keepSize then keep the existing
+   // width and height, otherwise set size to the full pixel size of the image.
+   public void setImageFilename(String filename, boolean keepSize)
+   {
       // If the file can't be found, warn the user
       text = filename;     // Store filename in text field by default
-      if (filename == null)
-         rawImage = null;
-      else
+      found = false;
+      rawImage = null;
+      if (filename != null)
       {
          String path = filename;
          if (!(new File(path)).isFile())
-         {
             game.logError("Cannot find image file", filename);
-         }
+         else
+         {           
+            // Load the raw image
+            found = true; 
+            ImageIcon icon = new ImageIcon(path);  // loads asynchronously unfortunately
+            rawImage = icon.getImage();  // blank image until loaded or if not found
             
-         // Try to load the raw image and set the initial size as full pixel size
-         ImageIcon icon = new ImageIcon(path);  // loads asynchronously unfortunately 
-         width = icon.getIconWidth() / game.scaleLToP;
-         height = icon.getIconHeight() / game.scaleLToP;
-         rawImage = icon.getImage();  // blank image until loaded or if not found
+            // Set the initial size as full pixel size if not keepSize
+            if (!keepSize)
+            {
+               width = icon.getIconWidth() / game.scaleLToP;
+               height = icon.getIconHeight() / game.scaleLToP;
+            }
+         }
       }
       
       // No cached scaled image yet (will lazy init when drawn)
       scaledImage = null;
       widthPImg = 0;
       heightPImg = 0;  
+   }
+
+   // Change the image to filename
+   @Override
+   public void setImage(String filename)
+   {
+      setImageFilename(filename, true);
+   }
+   
+   // Return true if the image was found
+   public boolean imageFound()
+   {
+      return found;
    }
    
    // Draw the image into the given graphics surface

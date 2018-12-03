@@ -2,22 +2,26 @@
 --
 -- globals.lua
 --
--- The global state and utility functions for the Code 12 Lua Runtime.
+-- The global state and utility functions for the Code12 Lua Runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
+
+
+-- Ask Corona what platform we are running on
+local platform = system.getInfo("platform")
 
 
 -- The global state table
 local g = {
 	-- The runtime version number
-	version = 0.5,
+	version = 1.0,
 
 	-- Platform info
-	platform = nil,        -- e.g. "android", "macos"
-	isMac = false,         -- true if MacOS
-	isMobile = false,      -- true if iOS or Android
-	isSimulator = false,   -- true if running on Corona Simulator
+	platform = platform,
+	isMac = (platform == "macos"),
+	isMobile = (platform == "android" or platform == "ios"),
+	isSimulator = (system.getInfo("environment") == "simulator"),	
 
 	-- Device pixel metrics, set at init time and when the window resizes
 	device = {
@@ -39,8 +43,11 @@ local g = {
 
 	-- Display data structures 
 	mainGroup = nil,    -- main outer Corona display group
-	screens = {},       -- Table of screens indexed by: name = { name = n, group = g }
+	screens = nil,      -- Table of screens indexed by: name = { name = n, group = g }
 	screen = nil,       -- current screen in screens table
+
+	-- UI state shared by the app and the user program
+	focusObj = nil,        -- object with the touch focus or nil if none
 
 	-- Text output state
 	outputFile = nil,      -- file handle for text output or nil for none
@@ -52,12 +59,10 @@ local g = {
 	clickY = 0,            -- Last click x location 
 	charTyped = nil,       -- char typed during this update frame (string), nil if none
 
-	-- Run state
-	startTime = nil,       -- System time in ms when start function began, or nil before
-	focusObj = nil,        -- object with the touch focus or nil if none
-	modalDialog = false,   -- true if a modal dialog is showing
-	blocked = false,       -- true if user code is blocked on user input
-	stopped = false,       -- true if run was stopped or failed
+	-- The run state
+	runState = nil,    -- "running", "waiting", "paused", "stopped", "error", or nil
+	userFn = nil,      -- Current user function to execute (start, update, or nil) 
+	startTime = nil,   -- System time in ms when start function began, or nil before
 }
 
 
@@ -110,18 +115,10 @@ function g.uiBlack(obj)
 	return g.uiItem(obj, 0)
 end
 
-
----------------- Runtime State Functions--------------------------------------
-
 -- Set the touch focus to the given object or nil to release
 function g.setFocusObj(obj)
 	display.getCurrentStage():setFocus(obj)
 	g.focusObj = obj
-end
-
--- Return the object with the touch focus or nil if none
-function g.getFocusObj()
-	return g.focusObj
 end
 
 

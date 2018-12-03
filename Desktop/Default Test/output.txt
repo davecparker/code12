@@ -10,3 +10,8 @@ And another:
 
 Here's an unitialized GameObj: null
 Done
+Hello Dave
+Line 1
+Line 2
+Line 3
+Line 4

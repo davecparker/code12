@@ -2,14 +2,18 @@
 --
 -- dialogs.lua
 --
--- Implementation of the alert and input dialog APIs for the Code 12 Lua runtime.
+-- Implementation of the alert and input dialog APIs for the Code12 Lua runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
-local g = require("Code12.globals")
-require("Code12.runtime")
 
+-- Runtime support modules
+local ct = require("Code12.ct")
+local g = require("Code12.globals")
+local runtime = require("Code12.runtime")
+
+-- Corona modules
 local widget = require("widget")
 
 
@@ -140,7 +144,7 @@ local function onTouchDragBar(event)
 		g.setFocusObj(dragBar)
 		dragOffsetX = event.x - dialogGroup.x
 		dragOffsetY = event.y - dialogGroup.y
-	elseif g.getFocusObj() == dragBar and phase ~= "cancelled" then
+	elseif g.focusObj == dragBar and phase ~= "cancelled" then
 		-- Move dialog then make sure it's fully visible in the app window
 		local xMax = display.actualContentWidth - dialogFrame.width
 		local yMax = display.actualContentHeight - dialogFrame.height
@@ -244,15 +248,17 @@ local function inputValue(message, valueType)
 	-- Init the input state, then block and yield until the dialog finishes
 	inputType = valueType
 	g.setFocusObj(nil)   -- a GameObj may have focus if it was just clicked on
-	g.modalDialog = true
+	g.runState = "waiting"
 	while dialogGroup do
-		if g.blockAndYield() == "abort" then
+		if runtime.blockAndYield() == "abort" then
 			endDialog()
-			g.modalDialog = false
-			error("aborted");
+			g.runState = "stopped"
+			error("aborted")   -- caught by the runtime
 		end
 	end
-	g.modalDialog = false
+	if g.runState == "waiting" then
+		g.runState = "running"
+	end
 
 	-- Return the result
 	return inputResult
@@ -262,62 +268,27 @@ end
 ---------------- Alert and Input Dialog APIs ---------------------------------
 
 -- API
-function ct.showAlert(message, ...)
-	-- Check parameters
-	message = message or ""
-	if g.checkAPIParams("ct.inputInt") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Show an alert
-	inputValue(message, nil)
+function ct.showAlert(message)
+	inputValue(message or "Alert", nil)
 end
 
 -- API
-function ct.inputInt(message, ...)
-	-- Check parameters
-	message = message or "Enter an integer"
-	if g.checkAPIParams("ct.inputInt") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Input the value from a dialog
-	return inputValue(message, "int")
+function ct.inputInt(message)
+	return inputValue(message or "Enter an integer", "int")
 end
 
 -- API
-function ct.inputNumber(message, ...)
-	-- Check parameters
-	message = message or "Enter a number"
-	if g.checkAPIParams("ct.inputNumber") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Input the value from a dialog
-	return inputValue(message, "double")
+function ct.inputNumber(message)
+	return inputValue(message or "Enter a number", "double")
 end
 
 -- API
-function ct.inputYesNo(message, ...)
-	-- Check parameters
-	message = message or "Press Yes or No"
-	if g.checkAPIParams("ct.inputYesNo") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Input the value from a dialog
-	return inputValue(message, "boolean")
+function ct.inputYesNo(message)
+	return inputValue(message or "Press Yes or No", "boolean")
 end
 
 -- API
-function ct.inputString(message, ...)
-	-- Check parameters
-	message = message or "Enter a text string"
-	if g.checkAPIParams("ct.inputString") then
-		g.check1Param("string", message, ...)
-	end
-
-	-- Input the value from a dialog
-	return inputValue(message, "string")
+function ct.inputString(message)
+	return inputValue(message or "Enter a text string", "string")
 end
 

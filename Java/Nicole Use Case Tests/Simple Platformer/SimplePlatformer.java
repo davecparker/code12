@@ -90,9 +90,14 @@ public class SimplePlatformer extends Code12Program
 
       // Using ct.setScreenOrigin to adjust viewpoint of the "world"
 
+<<<<<<< HEAD
       // Moving the origin to the left
        //if ( playerRight.x < 100 || playerLeft.x  < 100 )
          //ct.setScreenOrigin(-100,0);
+=======
+      if ( playerRight.x < 100 || playerLeft.x  < 100 )
+         ct.setScreenOrigin(0,0);
+>>>>>>> master
 
       // Moving the origin to the right
       if ( playerRight.x > 100 || playerLeft.x > 100 )
@@ -229,7 +234,7 @@ public class SimplePlatformer extends Code12Program
             }
          }
       }
-
+      return "";
    }
 
    public void startJump()
@@ -262,7 +267,7 @@ public class SimplePlatformer extends Code12Program
 
    public void onKeyRelease( String keyName )
    {
-       if ( keyName.equals("left") )
+      if ( keyName.equals("left") )
       {
          playerRight.xSpeed = 0;
          playerLeft.xSpeed = 0;

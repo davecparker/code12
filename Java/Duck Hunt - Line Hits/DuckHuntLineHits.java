@@ -7,14 +7,10 @@ import Code12.*;
 
 public class DuckHuntLineHits extends Code12Program
 {
-	public static void main( String[] args )
-	{
-		Code12.run( new DuckHuntLineHits() );
-	}
-
 	GameObj gun; // Gun at bottom of window that fires bullets
 	GameObj ducksHitDisplay; // Text display for percent of ducks hit
 	GameObj accuracyDisplay; // Text display for percent of shots on target
+	GameObj frameRateDisplay;// Text display for animation frame rate
 	double yMax; // Maximum y-coordinate of the game window
 	int maxSizeBullets; // Maximum bullets array size
 	int maxSizeDucks; // Maximum ducks array size
@@ -31,7 +27,8 @@ public class DuckHuntLineHits extends Code12Program
 	GameObj leftWall, topWall; // Lines to test line hits
 	boolean paused; // For starting/stopping new duck creation
 	boolean turboMode; // For a crazy number of ducks;
-	int frameCount = 0;
+	int frameCount;
+	int startTime;
 
 	public void start()
 	{
@@ -60,13 +57,17 @@ public class DuckHuntLineHits extends Code12Program
 		accuracyDisplay = ct.text( "Shot Accuracy: ", 100, yMax, scoreHeight, scoreColor );
 		accuracyDisplay.align( "bottom right", true );
 
+		// Make frameRateDisplay
+		frameRateDisplay = ct.text( "FrameRate: ", 0, 0, scoreHeight, scoreColor );
+		frameRateDisplay.align( "top left" );
+
 		// Make gun
 		gun = ct.image( "gun.png", 50, yMax - scoreHeight, 8 );
 		gun.align( "bottom", true );
 
 		// Initialize arrays
-		maxSizeDucks = 5000;
-		maxSizeBullets = 100;
+		maxSizeDucks = 20;
+		maxSizeBullets = 5;
 		bulletsArr = new GameObj[maxSizeBullets];
 		ducksArr = new GameObj[maxSizeDucks];
 		duckYStartsArr = new double[maxSizeDucks];
@@ -82,24 +83,38 @@ public class DuckHuntLineHits extends Code12Program
 		// Start the game unpaused and with turbo mode off
 		paused = false;
 		turboMode = false;
+
+		// Initialize the frame count and timer for frameRateDisplay
+		frameCount = 1;
+		startTime = ct.getTimer();
+
 	}
 
 	public void update()
 	{
 		frameCount++;
+		if ( frameCount % 10 == 0 )
+		{
+			int endTime = ct.getTimer();
+			int frameRate = ct.round( 10000.0 / (endTime - startTime) );
+			frameRateDisplay.setText( "FrameRate: " + frameRate);
+			startTime = endTime;
+		}
 
 		// Make ducks at random times and positions
-		if (!paused && frameCount % 180 == 1)
+		int randMax = 50;
+		if ( turboMode )
+			randMax = 10;
+		if (!paused && ct.random(1, randMax) == 1)
 		{
-			int numberOfDucks = 1;
+			double duckSpeed = -0.5;
 			if (turboMode)
-				numberOfDucks = 100;
-			for (int i = 1; i <= numberOfDucks; i++)
 			{
-				double x = 95;
-				double y = ct.random( 10, ct.toInt(yMax / 2) );
-				GameObj duck = createDuck( x, y, -0.1);
+				duckSpeed = -0.75;
 			}
+			double x = 105;
+			double y = ct.random( 10, ct.toInt(yMax / 2) );
+			GameObj duck = createDuck( x, y, duckSpeed);
 		}
 
 		// If a duck goes off screen, delete it
@@ -153,12 +168,18 @@ public class DuckHuntLineHits extends Code12Program
 		}
 
 		// Update ducksHitDisplay
-		int percent = ct.round( 100.0 * ducksHit / (ducksHit + ducksMissed) );
-		ducksHitDisplay.setText( "Ducks hit: " + percent + "%" );
+		if ( ducksHit + ducksMissed > 0 )
+		{
+			int percent = ct.round( 100.0 * ducksHit / (ducksHit + ducksMissed) );
+			ducksHitDisplay.setText( "Ducks hit: " + percent + "%" );
+		}
 
 		// Update accuracyDisplay
-		percent = ct.round( 100.0 * ducksHit / (ducksHit + bulletsMissed) );
-		accuracyDisplay.setText( "Shot Accuracy: " + percent + "%" );
+		if ( ducksHit + bulletsMissed > 0 )
+		{
+			int percent = ct.round( 100.0 * ducksHit / (ducksHit + bulletsMissed) );
+			accuracyDisplay.setText( "Shot Accuracy: " + percent + "%" );
+		}
 	}
 
 	// Makes a bullet at position xStart, yStart that will then
@@ -183,11 +204,11 @@ public class DuckHuntLineHits extends Code12Program
 	// Deletes a bullet
 	void deleteBullet( int index )
 	{
-		GameObj bullet = bulletsArr[index];
-		bullet.delete();
+		bulletsArr[index].delete();
 		for( int i = index; i < bulletsCount - 1; i++ )
 			bulletsArr[i] = bulletsArr[i + 1];
 		bulletsCount--;
+		bulletsArr[bulletsCount] = null;
 	}
 
 	// Makes a duck to the right of the window at y-coordinate yStart
@@ -211,14 +232,14 @@ public class DuckHuntLineHits extends Code12Program
 	// Deletes a duck
 	void deleteDuck( int index )
 	{
-		GameObj duck = ducksArr[index];
-		duck.delete();
+		ducksArr[index].delete();
 		for( int i = index; i <  ducksCount - 1; i++ )
 		{
 			ducksArr[i] = ducksArr[i + 1];
 			duckYStartsArr[i] = duckYStartsArr[i + 1];
 		}
 		ducksCount--;
+		ducksArr[ducksCount] = null;
 	}
 
 	// Makes a dead duck at duck's position
@@ -264,5 +285,10 @@ public class DuckHuntLineHits extends Code12Program
 			else
 				ct.println( "turboMode off" );
 		}
+	}
+
+	public static void main( String[] args )
+	{
+		Code12.run( new DuckHuntLineHits() );
 	}
 }

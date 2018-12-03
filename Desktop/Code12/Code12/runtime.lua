@@ -2,60 +2,111 @@
 --
 -- runtime.lua
 --
--- Implementation of the main runtime object (ct) for the Code 12 Lua runtime.
+-- Implementation of the main runtime for the Code12 Lua runtime.
 --
--- (c)Copyright 2018 by David C. Parker
+-- (c)Copyright 2018 by Code12. All Rights Reserved.
 -----------------------------------------------------------------------------------------
 
+
+-- Runtime support modules
+local ct = require("Code12.ct")
 local g = require("Code12.globals")
 
 
--- The global "ct" table is the main Code 12 global runtime object, 
--- where the "global" APIs live. If we are running in the context of the
--- Code12 Desktop App, then ct has already been created by the app and
--- should contain fields as follows:
---     ct = {
---         _appContext = {
---             sourceDir = string,       -- dir where user code is (absolute)
---             sourceFilename = string,  -- user code filename (in sourceDir)
---             mediaBaseDir = (const),   -- Corona baseDir to use for media files  
---             mediaDir = string,        -- media dir relative to mediaBaseDir
---             outputGroup = group,      -- display group where output should go
---             widthP = number,          -- pixel width of output area
---             heightP = number,         -- pixel height of output area
---             setClipSize = function,   -- called by runtime to specify output size
---             print = function,         -- called by runtime for console output
---             println = function,       -- called by runtime for console output
---             inputString = function,   -- called by runtime for console input
---             runtimeErr = function,    -- called by runtime on runtime error
---         },
---         ct.checkParams = true,        -- true to check API params at runtime
---     }
--- If running standalone (e.g. for a Corona SDK build), then ct starts out nil
--- and we create it here, with no _appContext field.
-local appContext
-if ct then
-	appContext = ct._appContext
-else
-	-- Standalone
-	ct = {
-		checkParams = true,
-	}
-	appContext= nil
-end
+-- The runtime module and data
+local runtime = {
+	-- The appContext table is set by main.lua when running the Code12 app,
+	-- or left nil when running a generated Lua app standalone.
+	-- appContext = {
+	--     sourceDir = string,       -- dir where user code is (absolute)
+	--     sourceFilename = string,  -- user code filename (in sourceDir)
+	--     mediaBaseDir = (const),   -- Corona baseDir to use for media files  
+	--     mediaDir = string,        -- media dir relative to mediaBaseDir
+	--     outputGroup = group,      -- display group where output should go
+	--     widthP = number,          -- pixel width of output area
+	--     heightP = number,         -- pixel height of output area
+	--     setClipSize = function,   -- called by runtime to specify output size
+	--     clearConsole = function,  -- called by runtime to clear console output
+	--     print = function,         -- called by runtime for console output
+	--     println = function,       -- called by runtime for console output
+	--     runtimeErr = function,    -- called by runtime on runtime error
+	--     arrayAssigned = function, -- called by runtime when an array var is assigned
+	-- },
+}
+
 
 -- File local state
-local coRoutineUser = nil    -- coroutine running an event or nil if none
+local codeFunction       -- function for the loaded Lua user program        
+local coRoutineUser      -- coroutine running an event or nil if none
+local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
 
 
----------------- Runtime Functions ------------------------------------------
 
--- The enterFrame listener for each frame update after the first
+---------------- Internal Runtime Functions ------------------------------------------
+
+-- Apply xSpeed and ySpeed to all the objects in the screen
+-- and delete any that went out of bounds.
+local function applyObjectSpeeds(screen)
+	-- Objects using xSpeed and ySpeed automatically get deleted if they
+	-- go more than 100 units off-screen. 
+	local xMin = screen.originX - 100
+	local xMax = xMin + g.WIDTH + 200
+	local yMin = screen.originY - 100
+	local yMax = yMin + g.height + 200
+
+	-- Look for objects with hasSpeed set
+	local objs = screen.objs
+	for i = objs.numChildren, 1, -1 do
+		local gameObj = objs[i].code12GameObj
+		if gameObj.hasSpeed then
+			-- Apply the speed
+			local x = gameObj.x + gameObj.xSpeed
+			local y = gameObj.y + gameObj.ySpeed
+			gameObj.x = x
+			gameObj.y = y
+
+			-- Delete object if it went out of bounds
+			if x < xMin or x > xMax or y < yMin or y > yMax then
+				gameObj:removeAndDelete()
+			end
+		end
+	end
+end
+
+-- Update the display objects in group from their GameObj positions and visibility
+-- at the scale. If setSize then update the object size as well for the new scale.
+local function syncObjects(group, scale, setSize)
+	for i = 1, group.numChildren do
+		local obj = group[i]
+		local gameObj = obj.code12GameObj
+		obj.isVisible = gameObj.visible
+		obj.x = gameObj.x * scale
+		obj.y = gameObj.y * scale
+		if setSize then
+			gameObj:updateSize(gameObj.width, gameObj.height, scale)
+		end
+	end
+end
+
+-- The enterFrame listener for each frame update
 local function onNewFrame()
-	-- Call or resume the client's update function if any
-	local yielded = g.eventFunctionYielded(_fn.update)
-	if g.stopped then
-		return
+	-- Call or resume the current user function if not paused (start or update)
+	local status = false
+	local runState = g.runState
+	local userFn = g.userFn
+	if userFn and runState ~= "paused" then
+		status = runtime.runEventFunction(userFn)
+		if status == nil then   -- userFn finished
+			if userFn == ct.userFns.start then
+				-- User's start function finished
+				if g.outputFile then
+					g.outputFile:flush()   -- flush any print output
+				end
+				g.userFn = ct.userFns.update  -- now start calling update if defined
+			end
+		elseif status == "aborted" then
+			return
+		end
 	end
 
 	-- Clear the polled input state for this frame
@@ -63,97 +114,243 @@ local function onNewFrame()
 	g.gameObjClicked = nil
 	g.charTyped = nil
 
-	-- Update the background object if the screen resized since last time
-	if g.window.resized then
-		g.screen.backObj:updateBackObj()
-	end
+	-- Update drawing objects as necessary
+	local screen = g.screen
+    if screen then
+		local objs = screen.objs
 
-	-- Update and sync the drawing objects as necessary.
-    -- Note that objects may be deleted during the loop. 
-	local objs = g.screen.objs
-	local i = 1
-	while i <= objs.numChildren do
-		-- Check for autoDelete first
-		local gameObj = objs[i].code12GameObj
-		if gameObj:shouldAutoDelete() then
-			gameObj:removeAndDelete()
+		-- Apply speed to objects if screen has any and the program is running 
+		-- and userFn didn't yield (which interrupts the update cycle).
+		if screen.hasSpeed and runState == "running" and status ~= "yielded" then
+			applyObjectSpeeds(screen)
+		end
+
+		-- If the window resized then we need to resize all the contents
+		local scale = g.scale
+		if g.window.resized then
+			-- Background object
+			screen.backObj:updateBackObj()
+			-- Screen origin
+			objs.x = -screen.originX * scale
+			objs.y = -screen.originY * scale
+			-- Graphic objects
+			syncObjects(objs, scale, true)
+			g.window.resized = false
 		else
-			if not yielded then
-				gameObj:update()
-			end
-			gameObj:sync()
-			i = i + 1
+			-- Just sync object positions and visibility
+			syncObjects(objs, scale)
 		end
 	end
-
-	-- We have now adapted to any window resize
-	g.window.resized = false
 end
 
--- The enterFrame listener for the first update only
-local function onFirstFrame()
-	-- Call or resume the client's start method if any
-	local yielded = g.eventFunctionYielded(_fn.start)
-	if g.stopped then
-		return
+-- Global key event handler for the runtime
+local function onKey(event)
+	if g.runState == "running" then
+		return g.onKey(event)
 	end
-
-	-- Flush the output file if any, to make sure at least 
-	-- output done in start() gets written, in case we abort later.
-	if g.outputFile then
-		g.outputFile:flush()
-	end
-
-	-- Sync the drawing objects for the draw
-	local objs = g.screen.objs
-	for i = 1, objs.numChildren do
-		objs[i].code12GameObj:sync()
-	end
-
-	-- If start() finished then switch to the normal frame update 
-	-- handler for subsequent frames
-	if not yielded then
-		Runtime:removeEventListener("enterFrame", onFirstFrame)
-		Runtime:addEventListener("enterFrame", onNewFrame)
-	end
+	return false
 end
 
 -- Get the device/output metrics in native units
 local function getDeviceMetrics()
 	-- If running with an appContext then get the metrics from the app.
 	-- Otherwise get the physical device metrics for a standalone run.
-	if appContext then
-		g.device.width = appContext.widthP
-		g.device.height = appContext.heightP
+	if runtime.appContext then
+		g.device.width = runtime.appContext.widthP
+		g.device.height = runtime.appContext.heightP
 	else
 		g.device.width = display.actualContentWidth
 		g.device.height = display.actualContentHeight
 	end
 end
 
--- Handle a window resize for a standalone resizeable app
-function g.onResize()
-	local oldHeight = g.height    -- remember old height if any
-	getDeviceMetrics()            -- get new device metrics
+-- Handle the result of the two return values from a coroutine.resume call,
+-- check the status of the coroutine to adjust the running state,
+-- and return the status as "yielded", "aborted", nil if completed.
+local function coroutineStatus(success, strErr)
+	if success then
+		if coroutine.status(coRoutineUser) == "dead" then
+			-- The user code finished
+			coRoutineUser = nil
+			return nil
+		elseif strErr == "stop" then
+			-- User code requests a stop via ct.stop()
+			runtime.stop()
+			return "aborted"
+		elseif strErr == "restart" then
+			-- User code requests a restart via ct.restart()
+			runtime.restart()
+			return "aborted"
+		end
+		-- The user code yielded (e.g. input dialog, or ct.pause())
+		return "yielded"
+	end
+
+	-- Runtime error
+	local strLineNum, strMessage = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
+	if strLineNum then
+		-- Runtime error in user code, report to the appContext if any 
+		coRoutineUser = nil
+		runtime.stop()
+		print("\n*** Runtime Error: " .. strErr)
+		local lineNum = tonumber( strLineNum ) 
+		if lineNum and runtime.appContext and runtime.appContext.runtimeErr then
+			-- Recognize Lua's equivalent of a null pointer exception
+			if string.find( strErr, "attempt to index" ) 
+					and string.find( strErr, "a nil value") then
+				strMessage = "object is null, cannot access fields or methods"
+			end
+			runtime.appContext.runtimeErr(lineNum, strMessage)
+			return "aborted"
+		end
+		-- For standalone runs, let app abort below but improve the message
+		strErr = "Line " .. strLineNum .. ": " .. strMessage
+	end
+
+	-- Looks like a runtime error in Code12. Report the full message in an alert.
+	-- TODO: For production, report "unknown runtime error" or something.
+	native.showAlert( "Runtime Error", strErr, { "OK" } )
+	return "aborted"
+end
+
+-- Init the user program data state and run the codeFunction main chunk
+-- to init the class-level variables and define the user functions.
+local function initUserProgram()
+	if codeFunction then
+		ct.userVars = {}
+		ct.userFns = {}
+		codeFunction()
+	end
+end
+
+-- Init the runtime
+local function initRuntime()
+	-- Install the global event listeners
+	Runtime:addEventListener("enterFrame", onNewFrame)
+	Runtime:addEventListener("key", onKey)
+end
+
+
+---------------- Module Functions ------------------------------------------
+
+-- Load the given string of Lua code as the user program and init the program.
+-- Return an error string if the program failed to load, or nil for success.
+function runtime.strErrLoadLuaCode(luaCode)
+	-- Load the code and execute the main chunk if successful
+	local strErr
+	codeFunction, strErr = loadstring( luaCode )
+	if codeFunction then
+		initUserProgram()
+	end
+	return strErr
+end
+
+-- If a user event function coroutine is already running then resume it, 
+-- otherwise start a coroutine to run the given function if not nil, 
+-- passing the additional parameters given.
+-- Return the coroutine's status as "yielded", "aborted", nil if completed, or
+-- false if not run because func was nil or could not be run.
+function runtime.runEventFunction(func, ...)
+	-- Is a coroutine already running?
+	if coRoutineUser then
+		if coroutine.status(coRoutineUser) == "dead" then
+			coRoutineUser = nil
+		else
+			local success, strErr = coroutine.resume(coRoutineUser)
+			return coroutineStatus(success, strErr)
+		end
+	end
+
+	-- Is there a valid function to start?
+	if type(func) == "function" then
+		coRoutineUser = coroutine.create(func)
+		if coRoutineUser then
+			-- Start the user function, passing its parameters
+			local success, strErr = coroutine.resume(coRoutineUser, ...)
+			return coroutineStatus(success, strErr)
+		end
+	end
+	return false
+end
+
+-- Block and yield the user's code then return any message from the
+-- main thread, in particular it might be "abort".
+function runtime.blockAndYield(...)
+	if coRoutineUser then
+		return coroutine.yield(...)
+	end
+end
+
+-- Sync drawing objects on the current screen after possible changes
+function runtime.syncScreenObjects()
+	local screen = g.screen
+	if screen then
+		syncObjects(screen.objs, g.scale)
+	end
+end
+
+-- Run the user input (mouse or keyboard) event func if any.
+-- Return result per runtime.runEventFunction().
+function runtime.runInputEvent(func, ...)
+	if func then
+		local result = runtime.runEventFunction(func, ...)
+		runtime.syncScreenObjects()  -- in case screen redraws before next enterFrame
+		return result
+	end
+	return false
+end
+
+-- Handle a resize of the available output area
+-- TODO: max once per frame?
+function runtime.onResize()
+	-- Get new metrics
+	getDeviceMetrics()
 
 	-- Set new logical height (sets g.height and g.scale)
 	ct.setHeight(g.WIDTH * g.window.height / g.window.width)
 
-	-- Adjust objects on the current screen as necessary
-	if oldHeight and g.screen then
-		local objs = g.screen.objs
-		for i = 1, objs.numChildren do
-			objs[i].code12GameObj:adjustForWindowResize(oldHeight, g.height)
-		end
-	end
+	-- Mark window as resized
 	g.window.resized = true
 
 	-- Send user event if necessary
-	g.eventFunctionYielded(_fn.onResize)
+	if g.runState == "running" then
+		runtime.runEventFunction(ct.userFns.onResize)
+	end
 end
 
--- Stop a run
-function g.stopRun()
+-- Pause a run
+function runtime.pause()
+	if g.runState == "running" then
+		audio.pause()
+		g.runState = "paused"
+	end
+end
+
+-- Resume a paused run
+function runtime.resume()
+	if g.runState == "paused" then
+		audio.resume()
+		g.runState = "running"
+	end
+end
+
+-- When the run state is paused, advance one frame then pause again.
+function runtime.stepOneFrame()
+	if g.runState == "paused" then
+		g.runState = "running"
+		onNewFrame()
+		g.runState = "paused"
+	end
+end
+
+-- Return true if the stepOneFrame operation can currently be performed.
+function runtime.canStepOneFrame()
+	-- Can step if we are between frames, not pause in user code
+	return coRoutineUser == nil
+end
+
+-- Stop a run and set the runState to endState (default "stopped")
+function runtime.stop( endState )
 	-- Abort the user coRoutine if necessary
 	if coRoutineUser then
 		if coroutine.status(coRoutineUser) ~= "dead" then
@@ -162,21 +359,8 @@ function g.stopRun()
 		coRoutineUser = nil
 	end
 
-	-- Remove the event listeners (only some may be installed)
-	Runtime:removeEventListener("enterFrame", onFirstFrame)
-	Runtime:removeEventListener("enterFrame", onNewFrame)
-	Runtime:removeEventListener("key", g.onKey)
-	Runtime:removeEventListener("resize", g.onResize)
-
-	-- Destroy the main display group, screens, and display objects
-	if g.mainGroup then
-		g.mainGroup:removeSelf()  -- deletes contained screen and object groups
-		g.mainGroup = nil
-	end
-	g.screens = {}
-	g.screen = nil
-
-	-- Close output file if any
+	-- Stop any audio and close output file if any
+	audio.stop()
 	if g.outputFile then
 		g.outputFile:close()
 		g.outputFile = nil
@@ -189,139 +373,151 @@ function g.stopRun()
 	g.clickY = 0
 	g.charTyped = nil
 
-	-- Set game state for a stopped run
+	-- Set the run state and restart if requested
+	g.runState = endState or "stopped"
+	g.userFn = nil
 	g.startTime = nil
-	g.modalDialog = false
-	g.stopped = true
-	g.blocked = false
 end	
 
--- Handle the result of the two return values from a coroutine.resume call,
--- and check the status of the coroutine to adjust the running state,
--- and return true if the coroutine yielded or false if it completed.
-local function coroutineYielded(success, strErr)
-	if success then
-		if coroutine.status(coRoutineUser) == "dead" then
-			-- The user code finished
-			coRoutineUser = nil
-			g.blocked = false
-			return false
-		end
-		-- The user code blocked and yielded
-		g.blocked = true
-		return true
-	else
-		-- Runtime error
-		g.stopRun()
-		print("\n*** Runtime Error: " .. strErr)
-		-- Did the error occur in user code or Code12?
-		local strLineNum, strMessage = string.match( strErr, "%[string[^:]+:(%d+):(.*)" )
-		if strLineNum then
-			-- Error was in user code, report to the appContext if any 
-			local lineNum = tonumber( strLineNum ) 
-			if lineNum and appContext.runtimeErr then
-				-- Recognize Lua's equivalent of a null pointer exception
-				if string.find( strErr, "attempt to index" ) 
-						and string.find( strErr, "a nil value") then
-					strMessage = "object is null, cannot access fields or methods"
-				end
-				appContext.runtimeErr(lineNum, strMessage)
-				return
-			end
-			strErr = "Line " .. strLineNum .. ": " .. strMessage  -- for standalone runs
-		end
-		-- Looks like a runtime error in Code12. Report the full message in an alert.
-		-- TODO: For production, report "unknown runtime error" or something.
-		native.showAlert( "Runtime Error", strErr, { "OK" } )
-		return false
-	end
-end
-
--- If a user event function coroutine is already running then give it another 
--- time slice and return true if it yielded again or false it if completed. 
--- If no coroutine is already running, then start a coroutine to run the
--- given function (if not nil), passing the additional parameters given, 
--- and return true if the coroutine yielded or false if it completed.
-function g.eventFunctionYielded( func, ... )
-	-- Is a coroutine already running?
-	if coRoutineUser then
-		local success, strErr = coroutine.resume(coRoutineUser)
-		return coroutineYielded(success, strErr)
-	end
-
-	-- Is there a valid function to start?
-	if type(func) == "function" then
-		coRoutineUser = coroutine.create(func)
-		if coRoutineUser then
-			-- Start the user function, passing its parameters
-			local success, strErr = coroutine.resume(coRoutineUser, ...)
-			return coroutineYielded(success, strErr)
-		end
-	end
-	return false
-end
-
--- Block and yield the user's code, then return any message from the
--- main thread, in particular it might be "abort".
-function g.blockAndYield()
-	if coRoutineUser then
-		return coroutine.yield()
-	end
-end
-
--- Init for a new run of the user program after the user's code has been loaded
-function g.initRun()
+-- Start a new run of the user program after the user's code has been loaded
+function runtime.run()
 	-- Stop any existing run in case it wasn't ended explicitly
-	g.stopRun()
+	runtime.stop()
 
 	-- Create a main outer display group so that we can rotate and place it 
 	-- to change orientation (portrait to landscape). Also, the origin of this group
 	-- corrects for Corona's origin possibly not being at the device upper left.
+	if g.mainGroup then
+		g.mainGroup:removeSelf()  -- delete old contained screen and object groups
+	end
 	g.mainGroup = display.newGroup()
-	g.mainGroup.finalize = function () g.mainGroup = nil end   -- in case parent kills it
+	g.mainGroup.finalize =        -- in case parent group kills it
+			function () 
+				g.mainGroup = nil 
+			end
 
-	-- If in an app context then put the main display group inside the app's output group,
-	-- otherwise prepare to use the entire device screen.
-	if appContext then
-		appContext.outputGroup:insert( g.mainGroup )
+	-- If in an app context then put the main display group inside the app's output group
+	-- and clear the console, otherwise prepare to use the entire device screen.
+	if runtime.appContext then
+		runtime.appContext.outputGroup:insert( g.mainGroup )
+		runtime.appContext.clearConsole()
 	else
 		display.setStatusBar(display.HiddenStatusBar)   -- hide device status bar
 	end
 
-	-- Get the device metrics and set the default height
+	-- Create empty screens array (destroy any existing ones)
+	g.screens = {}
+	g.screen = nil
+
+	-- Get the device metrics and set the default height and window title
 	getDeviceMetrics()
 	ct.setHeight( g.WIDTH )
+	ct.setTitle( "Code12" )
 
 	-- Make the first screen with default empty name
 	ct.setScreen("")
 
-	-- Install the event listeners
-	Runtime:addEventListener("enterFrame", onFirstFrame)  -- will call user's start()
-	Runtime:addEventListener("key", g.onKey)
-	if appContext == nil and not g.isMobile then
-		Runtime:addEventListener("resize", g.onResize)  -- for standalone window resize
-	end
-
 	-- Start the game and the game timer
-	g.stopped = false
+	g.runState = "running"
+	g.userFn = ct.userFns.start
 	g.startTime = system.getTimer()
+	-- Now onNewFrame called by enterFrame listener will start the action
 end
 
-
----------------- Special Runtime Init Function -------------------------------
-
--- Init the Code12 runtime system.
--- If running standalone then also start the run, otherwise wait for app to start it.
-function ct.initRuntime()
-	-- Get platform and determine if we are on a desktop vs. mobile device
-	g.platform = system.getInfo("platform")
-	g.isMac = (g.platform == "macos")
-	g.isMobile = (g.platform == "android" or g.platform == "ios")
-	g.isSimulator = (system.getInfo("environment") == "simulator")	
-
-	-- Start the run if running standalone
-	if not appContext then
-		g.initRun()
+-- Restart the current user program if any
+function runtime.restart()
+	if codeFunction then
+		-- Stop current run, re-init program data state, then start again
+		runtime.stop()
+		initUserProgram()
+		runtime.run()
 	end
 end
+
+-- Stop and clear the current user program if any
+function runtime.clearProgram()
+	runtime.stop()
+	ct.userVars = nil
+	ct.userFns = nil
+	codeFunction = nil
+	g.runState = nil
+end
+
+-- Output the given text to where console output should go
+function runtime.printText(text)
+	if runtime.appContext then
+		runtime.appContext.print(text)     -- Code12 app console
+	elseif g.isSimulator then
+		io.write(text)             -- Corona simulator console
+		io.flush()
+	end
+	if g.outputFile then
+		g.outputFile:write(text)   -- echo to text file
+	end
+end
+
+-- Output the given text plus a newline to where console output should go.
+-- if rgb is included then it is an array {r, g, b} (each 0-1) for the 
+-- color to assign to the line if possible.
+function runtime.printTextLine(text, rgb)
+	if runtime.appContext then
+		runtime.appContext.println(text, rgb)   -- Code12 app console
+	elseif g.isSimulator then
+		io.write(text)             -- Corona simulator console
+		io.write("\n")
+		io.flush()
+	end
+	if g.outputFile then
+		g.outputFile:write(text)   -- echo to text file
+		g.outputFile:write("\n")
+	end
+end
+
+-- Return the current line number in the user's code or nil if unknown
+local function userLineNumber()
+	-- Look back on the stack trace to find the user's code (string)
+	-- so we can get the line number.
+	local info
+	local level = 1
+	repeat
+		info = debug.getinfo(level, "Sl")
+		level = level + 1
+	until info == nil or info.short_src == '[string "..."]'
+	if info then
+		return info.currentline
+	end
+	return nil
+end
+
+-- Print a runtime message to the console, followed by "at line #"
+-- if the user's code line number can be determined.
+function runtime.message(message)
+	local lineNum = userLineNumber()
+	if lineNum then
+		message = message .. " at line " .. lineNum
+	end
+	runtime.printTextLine(message, rgbWarningText)
+end
+
+-- Print a warning message to the console with optional quoted name
+function runtime.warning(message, name)
+	local s
+	local lineNum = userLineNumber()
+	if lineNum then
+		s = "WARNING (line " .. lineNum .. "): " .. message
+	else
+		s = "WARNING: " .. message
+	end
+	if name then
+		s = s .. " \"" .. name .. "\""
+	end
+	runtime.printTextLine(s, rgbWarningText)
+end
+
+
+----------------------------------------------------------------------------
+
+-- Init and return the runtime module
+initRuntime()
+return runtime
 

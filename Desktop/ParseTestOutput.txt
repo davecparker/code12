@@ -5128,9 +5128,9 @@ line (end)
 527. 
 
 528. ////////////////////////////////////////////////////////////////////
+*** Beginning of Expected Errors Section ***
 
-529. ERRORS
-************** Beginning of Expected Errors Section **************
+529. // ERRORS
 
 530. 
 
@@ -5140,6 +5140,10 @@ line (end)
 *** Line 532 chars 1-2: Close of comment without matching opening /*
 
 533. int i; /* /* */ // nested block comments
+line (varDecl)
+    TYPE (int)
+    idList (list)
+        ID (i)
 *** Line 533: Java does not allow nesting comments within comments using /* */
 *** Reference Line 533
 
@@ -5221,7 +5225,14 @@ line (end)
 *** Line 559 chars 8-14: Unsupported reserved word "finally"
 
 560. boolean foo(int for);
-*** Line 560 chars 17-19: Syntax Error: "for" was unexpected here
+line (func)
+    retType (type)
+        TYPE (boolean)
+    ID (foo)
+    paramList (list)
+        param (type)
+            TYPE (int)
+*** Line 560 chars 13-15: Parameters in a function definition should be a type followed by a name
 
 561. for(int do = 0; do < 10; do++)
 *** Line 561 chars 9-10: Syntax Error: "do" was unexpected here
@@ -5316,25 +5327,29 @@ line (end)
 *** Line 591 char 9: Syntax Error: expected "("
 
 592. x = 10          // missing ; in stmt
+line (stmt)
+    stmt (assign)
+        ID (x)
+        INT (10)
 *** Line 592 char 37: Statement should end with a semicolon (;)
 
 593. int x = 10		// missing ; in varInit
-*** Line 593 char 36: Syntax Error: expected ";"
+*** Line 593 char 36: Syntax Error: expected a semicolon
 
 594. int x 			// missing ; in varDecl
 *** Line 594 char 33: Syntax Error: end of line was unexpected here
 
 595. final int x = 10 // missing ; in constInit
-*** Line 595 char 43: Syntax Error: expected ";"
+*** Line 595 char 43: Syntax Error: expected a semicolon
 
 596. foo(x, );       // missing expr in exprList
-*** Line 596 char 6: Missing list item or extra comma
+*** Line 596 char 8: Syntax Error: ")" was unexpected here
 
 597. f00()++;		// ++ applied to non-lvalue
-*** Line 597 chars 6-7: Syntax Error: expected ";"
+*** Line 597 chars 6-7: Syntax Error: expected a semicolon
 
 598. --x.foo();		// -- applied to non-lvalue
-*** Line 598 char 8: Syntax Error: expected ";"
+*** Line 598 char 8: Syntax Error: expected a semicolon
 
 599. x = / b;		// missing expr before binary op
 *** Line 599 char 5: Syntax Error: "/" was unexpected here
@@ -5384,13 +5399,13 @@ line (end)
 *** Line 612 char 3: Syntax Error: "+" was unexpected here
 
 613. x = 1,000;      // commas in numbers
-*** Line 613 char 6: Syntax Error: expected ";"
+*** Line 613 char 6: Syntax Error: expected a semicolon
 
 614. x = 1.23.45;    // too many decimal points
-*** Line 614 chars 9-11: Syntax Error: expected ";"
+*** Line 614 chars 9-11: Syntax Error: expected a semicolon
 
 615. x = 3.14e1.0;   // exponential notation with decimal point in exponent
-*** Line 615 chars 11-12: Syntax Error: expected ";"
+*** Line 615 chars 11-12: Syntax Error: expected a semicolon
 
 616. x = 3.14e;      // Invalid exponential notation
 *** Line 616 chars 5-10: Invalid exponential notation
@@ -5418,15 +5433,24 @@ line (end)
 
 624. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
+*** Line 625 char 29: Statement should end with a semicolon (;)
 
 625. y)              // missing ;
-*** Line 625 char 29: Statement should end with a semicolon (;)
+line (stmt)
+    stmt (call)
+        callHead (user)
+            ID (foo)
+        exprList (list)
+            expr (lValue)
+                ID (x)
+            expr (lValue)
+                ID (y)
 
 626. x = (a + b + c / 3; 	// missing closing parenthesis
 *** Line 626 char 19: Syntax Error: expected ")"
 
 627. x = foo(y, bar(z, w); 	// missing closing parenthesis w/ nested parentheses
-*** Line 627 char 21: Syntax Error: ";" was unexpected here
+*** Line 627 char 21: Syntax Error: a semicolon was unexpected here
 
 628. x = a + b + c ) / 3; 	// missing openning parenthesis
 *** Line 628 char 15: Syntax Error: ")" was unexpected here
@@ -5435,9 +5459,29 @@ line (end)
 *** Line 629 char 52: Syntax Error: expected ")"
 
 630. if ( i == 1 ); 	// if statment ended by ;
+line (if)
+    expr (==)
+        expr (lValue)
+            ID (i)
+        INT (1)
 *** Line 630 char 14: if statement should not end with a semicolon
 
 631. for ( i=0; i<n; i++); 	// for() followed directly by ;
+line (for)
+    forControl (three)
+        forInit (stmt)
+            stmt (assign)
+                ID (i)
+                INT (0)
+        forExpr (expr)
+            expr (<)
+                expr (lValue)
+                    ID (i)
+                expr (lValue)
+                    ID (n)
+        forNext (stmt)
+            stmt (postInc)
+                ID (i)
 *** Line 631 char 21: for loop header should not end with a semicolon
 
 632. x + 1 = x; 		// confusing left hand side an right hand side of assignment
@@ -5453,18 +5497,49 @@ line (end)
 *** Line 635 chars 8-9: Invalid operator. Did you mean <= ?
 
 636. elseif( x > 2 ) // elseif instead of else if
+line (stmt)
+    stmt (call)
+        callHead (user)
+            ID (elseif)
+        exprList (list)
+            expr (>)
+                expr (lValue)
+                    ID (x)
+                INT (2)
 *** Line 636 char 45: Statement should end with a semicolon (;)
 
 637. for(int i=0, i<n, i++) 	// commas in place of semicolons
+line (for)
+    forControl (three)
+        forInit (var)
+            TYPE (int)
+            ID (i)
+            INT (0)
+        ID (i)
+        ID (n)
+        ID (i)
 *** Line 637 char 12: for loop parts should be separated by semicolons (;)
 Comma not supported
 
 638. for(int i=0; i<n, i++) 	// comma in place of semicolon
+line (for)
+    forControl (three)
+        forInit (var)
+            TYPE (int)
+            ID (i)
+            INT (0)
+        forExpr (expr)
+            expr (<)
+                expr (lValue)
+                    ID (i)
+                expr (lValue)
+                    ID (n)
+        ID (i)
 *** Line 638 char 17: for loop parts should be separated by semicolons (;)
 Comma not supported
 
 639. for(int i=0: i<n: i++) 	// colons in place of semicolons
-*** Line 639 char 12: Syntax Error: expected ";"
+*** Line 639 char 12: Syntax Error: expected a semicolon
 
 640. for{int i=0; i<n; i++} 	// {} in place of ()
 *** Line 640 char 4: Syntax Error: expected "("
@@ -5476,7 +5551,7 @@ Comma not supported
 *** Line 642 char 8: Syntax Error: ":" was unexpected here
 
 643. for( int x; arr ) 		// using ; instead of :
-*** Line 643 char 11: Syntax Error: ";" was unexpected here
+*** Line 643 char 11: Syntax Error: a semicolon was unexpected here
 
 644. for( int[] x : arr )
 *** Line 644 char 9: Syntax Error: "[" was unexpected here
@@ -5488,7 +5563,15 @@ Comma not supported
 *** Line 646 char 10: Syntax Error: ":" was unexpected here
 
 647. double foo(x, y, z) 	// missing variable types for arguments in function definition
-*** Line 647 char 12: Syntax Error: a name was unexpected here
+line (func)
+    retType (type)
+        TYPE (double)
+    ID (foo)
+    paramList (list)
+        param (expr)
+            expr (lValue)
+                ID (x)
+*** Line 647 char 12: Parameters in a function definition should be a type followed by a name
 
 648. double foo[i]()			// index on function identifier
 *** Line 648 char 11: Syntax Error: "[" was unexpected here
@@ -5503,6 +5586,20 @@ Comma not supported
 *** Line 651 chars 5-7: Syntax Error: a type was unexpected here
 
 652. boolean foo(int x, double y, GameObj z); // semicolon after function declaration
+line (func)
+    retType (type)
+        TYPE (boolean)
+    ID (foo)
+    paramList (list)
+        param (var)
+            TYPE (int)
+            ID (x)
+        param (var)
+            TYPE (double)
+            ID (y)
+        param (var)
+            TYPE (GameObj)
+            ID (z)
 *** Line 652 char 40: function header should not end with a semicolon
 
 653. String s = 'Hello'; 	// '' in place of "" for strings
@@ -5515,10 +5612,19 @@ Comma not supported
 *** Line 655 chars 34-35: Unclosed string literal
 
 656. ct.println("He said "Hello""); 	// not escaping double quotes in a string literal
-*** Line 656 char 26: Function parameter values must be separated by commas
+line (stmt)
+    stmt (call)
+        callHead (ct)
+            ID (println)
+        exprList1 (list)
+            STR ("He said ")
+        expr (lValue)
+            ID (Hello)
+        STR ("")
+*** Line 656 char 21: Function parameter values must be separated by commas
 
 657. newObj() = oldObj; 				// assigning to a function value
-*** Line 657 char 10: Syntax Error: expected ";"
+*** Line 657 char 10: Syntax Error: expected a semicolon
 
 658. f = void foo()					// mixing assignment and function declaration
 *** Line 658 chars 5-8: Syntax Error: "void" was unexpected here
@@ -5542,10 +5648,22 @@ Comma not supported
 665. // --------------------------------------------------------------------------------
 
 666. int x = 1, y = 2, z = 3;      // declaring and initializing multiple variables
+line (varInit)
+    TYPE (int)
+    ID (x)
+    INT (1)
+    ID (y)
+    INT (2)
+    ID (z)
+    INT (3)
 *** Line 666 chars 1-79: Code12 requires each variable initialization to be on its own line
 
 667. import java.io.PrintWriter;   // import other than Code12.*
-*** Line 667 chars 1-6: Syntax Error: "import" was unexpected here
+line (import)
+    ID (java)
+    ID (io)
+    ID (PrintWriter)
+*** Line 667 chars 1-60: Code12 does not support importing other classes
 
 668. protected int secretVar;        // protected access
 *** Line 668 chars 1-9: Unsupported reserved word "protected"
@@ -5560,7 +5678,11 @@ Comma not supported
 *** Line 671 char 11: char type not supported, use double quotes
 
 672. while(foo) { 	// opening { in control structure not on it's own line
-*** Line 672 char 12: In Code12, each { to start a new block must be on its own line
+line (while)
+    expr (lValue)
+        ID (foo)
+    whileEnd (while)
+*** Line 672 char 12: In Code12, each {  to start a new block must be on its own line
 
 673. i++; } 			// closing } not on it's own line
 *** Line 673 char 6: Syntax Error: expected end of line
@@ -5573,13 +5695,32 @@ Comma not supported
 *** Line 675 chars 12-54: Syntax Error: a string was unexpected here
 
 676. x = a; y = b; 	// more than one statement on a single line
+line (stmt)
+    stmt (assign)
+        ID (x)
+        expr (lValue)
+            ID (a)
+    ID (y)
+    ID (b)
 *** Line 676 chars 1-59: Code12 requires each statement to be on its own line
 
 677. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
+line (if)
+    expr (==)
+        expr (lValue)
+            ID (x)
+        INT (0)
+    ID (println)
+    STR ("x is zero")
 *** Line 677 chars 13-36: Code12 requires code after an if statement to be on its own line
 
 678. double getVariable() { return variable; } // {} must start and end on their own lines
-*** Line 678 char 22: In Code12, each { to start a new block must be on its own line
+line (func)
+    retType (type)
+        TYPE (double)
+    ID (getVariable)
+    ID (variable)
+*** Line 678 char 22: In Code12, each {  to start a new block must be on its own line
 
 679. switch (choice)
 *** Line 679 chars 1-6: Unsupported reserved word "switch"
@@ -5594,15 +5735,24 @@ Comma not supported
 *** Line 682 char 14: Syntax Error: expected "("
 
 683. input.toLowerCase().equals("quit"); // indexing after function call
-*** Line 683 char 20: Syntax Error: expected ";"
+*** Line 683 char 20: Syntax Error: expected a semicolon
 
 684. newBullet().ySpeed = 0;
-*** Line 684 char 12: Syntax Error: expected ";"
+*** Line 684 char 12: Syntax Error: expected a semicolon
 
 685. final int N; 	// constant declaration without initialization
 *** Line 685 char 12: Syntax Error: expected "="
 
 686. for (int i = 0, int j = 0; ; ) // Comma in forInit, forNext
+line (for)
+    forControl (three)
+        forInit (var)
+            TYPE (int)
+            ID (i)
+            INT (0)
+        TYPE (int)
+        ID (j)
+        INT (0)
 *** Line 686 char 15: for loop parts should be separated by semicolons (;)
 Comma not supported
 
@@ -5706,7 +5856,7 @@ Comma not supported
 *** Line 719 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-719 lines processed in 95 ms
+719 lines processed in 97 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)

@@ -14,10 +14,13 @@ local composer = require( "composer" )
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local app = require( "app" )
+local source = require( "source" )
 local err = require( "err" )
 
--- The runView module and scene
+
+-- The errView module and scene
 local errView = composer.newScene()
+
 
 -- UI metrics
 local dxChar = app.consoleFontCharWidth
@@ -88,7 +91,7 @@ local function makeCodeGroup( numSourceLines )
 							dxChar * 6, dyLine, true )
 	cg.sourceRect = makeHilightRect( cg.highlightGroup, 0, y, dxChar * 4, dyLine )
 
-	-- Make the lines numbers
+	-- Make the line numbers
 	cg.lineNumGroup = g.makeGroup( cg, 0, margin )
 	for i = 1, numSourceLines do
 		local t = display.newText{
@@ -162,7 +165,7 @@ local function makeErrDisplay( sceneGroup )
 	end
 
 	-- Make the error text
-	errText = g.uiBlack( display.newText{
+	errText = g.uiItem( display.newText{
 		parent = errGroup,
 		text = "", 
 		x = margin * 2, 
@@ -173,6 +176,7 @@ local function makeErrDisplay( sceneGroup )
 		fontSize = app.consoleFontSize + 2,
 		align = "left",
 	} )
+	errText:setFillColor( 0.9, 0, 0.1 )   -- slightly darkened red
 
 	-- Position the docs toolbar
 	-- Can't use errText.height: doesn't work when it wraps :(
@@ -191,25 +195,24 @@ local function setHighlightRectFromLoc( r, loc )
 	r.x = -dxExtra   -- default for whole and multi-line cases
 	r.height = app.consoleFontHeight  -- default for single line cases
 	local iLine = loc.iLine
-	local sourceLines = app.sourceFile.strLines
 	local numCols = 0
 	if loc.iLineEnd and loc.iLineEnd > iLine then
 		-- Multi-line. Make a rectangle bounding all the lines.
 		r.height = 0
 		for i = iLine, loc.iLineEnd do
-			local _, cols = app.iCharToICol( sourceLines[i] or "", 1 )
+			local _, cols = app.iCharToICol( source.lines[i].str, 1 )
 			numCols = math.max( numCols, cols )
 			r.height = r.height + app.consoleFontHeight
 		end
 	elseif loc.iCharStart then
 		-- Partial line
 		local iColStart, iColEnd = app.iCharToICol(
-				sourceLines[iLine] or "", loc.iCharStart, loc.iCharEnd )
+				source.lines[iLine].str, loc.iCharStart, loc.iCharEnd )
 		r.x = (iColStart - 1) * dxChar - dxExtra
 		numCols = iColEnd - iColStart + 1
 	else
 		-- Whole line
-		local _, cols = app.iCharToICol( sourceLines[iLine] or "", 1 )
+		local _, cols = app.iCharToICol( source.lines[iLine].str, 1 )
 		numCols = cols
 	end
 	r.width = math.max( numCols, 1 ) * dxChar + dxExtra * 2
@@ -226,14 +229,14 @@ local function loadCodeGroup( cg, loc, refLoc )
 	local lineNumFirst = iLine - before
 	local lineNumLast = lineNumFirst + numLines
 	local lineNum = lineNumFirst
-	local sourceLines = app.sourceFile.strLines
 	for i = 1, numLines do 
-		if lineNum < 1 or lineNum > #sourceLines + 1 then
+		if lineNum < 1 or lineNum > source.numLines + 1 then
 			cg.lineNumGroup[i].text = ""
+			cg.sourceGroup[i].text = ""
 		else
 			cg.lineNumGroup[i].text = tostring( lineNum )
+			cg.sourceGroup[i].text = app.detabLine( source.lines[lineNum].str )
 		end
-		cg.sourceGroup[i].text = app.detabLine( sourceLines[lineNum] or "" )
 		lineNum = lineNum + 1
 	end
 
@@ -255,34 +258,6 @@ local function loadCodeGroup( cg, loc, refLoc )
 	else
 		refRect.isVisible = false
 	end
-end
-
--- Show the error state
-local function showError()
-	-- Set the error text
-	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
-	errText.text = errRec.strErr
-
-	-- Show the error index and count if multi
-	if app.oneErrOnly or #errLineNumbers < 2 then
-		errCountText.text = ""
-	else
-		errCountText.text = iError .. " of " .. #errLineNumbers
-	end
-
-	-- Are we using two code groups or just one?
-	if refCodeGroup then
-		loadCodeGroup( mainCodeGroup, errRec.loc )
-		loadCodeGroup( refCodeGroup, errRec.refLoc )
-	else
-		loadCodeGroup( mainCodeGroup, errRec.loc, errRec.refLoc )
-	end
-end
-
--- Display or re-display the current error
-local function displayError( sceneGroup )
-	makeErrDisplay( sceneGroup )
-	showError()
 end
 
 -- Enable or disable the given toolbar button
@@ -309,18 +284,59 @@ local function updateToolbar()
 	end
 end
 
--- Show the docs if show else hide them, and update the toolbar
+-- Show the docs if show else hide them, and update the toolbar.
 local function showDocs( show )
 	if show then
 		docsWebView.isVisible = true
-
-		-- TODO: Link to specific section if possible
-		docsWebView:request( "API.html", system.ResourceDirectory )
+		local url = "docs/API.html"
+		if errRec.docLink then
+			url = url .. errRec.docLink
+		end
+		docsWebView:request( url, system.ResourceDirectory )
 	else
 		docsWebView:stop()
 		docsWebView.isVisible = false
 	end
 	updateToolbar()
+end
+
+-- Show the error state
+local function showError()
+	-- Set the error text
+	print( string.format( "Line %d: %s", errRec.loc.iLine, errRec.strErr ) )
+	local text = errRec.strErr
+	if errRec.strNote then
+		if text == "" then
+			text = errRec.strNote
+		else
+			text = text .. "\n(" .. errRec.strNote .. ")"
+		end
+	end
+	errText.text = text
+
+	-- Show the error index and count if multi
+	if app.oneErrOnly or #errLineNumbers < 2 then
+		errCountText.text = ""
+	else
+		errCountText.text = iError .. " of " .. #errLineNumbers
+	end
+
+	-- Are we using two code groups or just one?
+	if refCodeGroup then
+		loadCodeGroup( mainCodeGroup, errRec.loc )
+		loadCodeGroup( refCodeGroup, errRec.refLoc )
+	else
+		loadCodeGroup( mainCodeGroup, errRec.loc, errRec.refLoc )
+	end
+
+	-- Show documentation link if any
+	showDocs( errRec.docLink ~= nil )
+end
+
+-- Display or re-display the current error
+local function displayError( sceneGroup )
+	makeErrDisplay( sceneGroup )
+	showError()
 end
 
 -- Make the toolbar for the docs view
@@ -391,7 +407,6 @@ local function onKeyEvent( event )
 		if keyName == "pageUp" then
 			iErrorNew = iError - 1
 		elseif keyName == "pageDown" then
-			print("pageDown")
 			iErrorNew = iError + 1
 		elseif keyName == "home" then
 			iErrorNew = 1

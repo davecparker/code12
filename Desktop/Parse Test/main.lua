@@ -8,10 +8,10 @@
 -----------------------------------------------------------------------------------------
 
 
--- The parsing module
 package.path = package.path .. ';../Code12/?.lua'
-local javalex = require( "javalex" )
+local source = require( "source" )
 local parseJava = require( "parseJava" )
+local parseProgram = require( "parseProgram" )
 local err = require( "err" )
 
 
@@ -19,12 +19,6 @@ local err = require( "err" )
 local javaFilename = "TestCode.java"
 local treeFilename = "../ParseTestOutput.txt"   -- in parent so Corona won't trigger re-run
 local outFile
-
--- The user source file
-local sourceFile = {
-	path = nil,              -- full pathname to the file
-	strLines = {},           -- array of source code lines when read
-}
 
 -- Text objects in the app window
 local textObjs = {}
@@ -50,27 +44,6 @@ local function outputAndDisplay( msg )
 	end
 end
 
--- Read the sourceFile and store all of its source lines.
--- Return true if success.
-local function readSourceFile()
-	local file = io.open( sourceFile.path, "r" )
-	if file then
-		sourceFile.strLines = {}   -- delete previous contents if any
-		local lineNum = 1
-		repeat
-			local s = file:read( "*l" )  -- read a line
-			if s == nil then 
-				break  -- end of file
-			end
-			sourceFile.strLines[lineNum] = s
-			lineNum = lineNum + 1
-		until false -- breaks internally
-		io.close( file )
-		return true
-	end
-	return false
-end
-
 -- Trim whitespace from a string (http://lua-users.org/wiki/StringTrim)
 local function trim1(s)
 	return (s:gsub("^%s*(.-)%s*$", "%1"))
@@ -80,8 +53,7 @@ end
 -- Parse the test file and write the parse tree to the output
 local function parseTestCode()
 	-- Read the input file
-	sourceFile.path = javaFilename    -- name is relative to project folder
-	if not readSourceFile() then
+	if not source.readFile( javaFilename ) then
 		error( "Cannot open input file " .. javaFilename )
 	end
 
@@ -91,9 +63,11 @@ local function parseTestCode()
 		error( "Cannot open output file " .. treeFilename )
 	end
 
-	-- Init error state for bulk error mode
+	-- Init error state for bulk error mode and parse the source
+	local startTime = system.getTimer()
 	err.initProgram()
 	err.bulkTestMode = true
+	parseProgram.parseLines( 12 )   -- max syntax level 12
 
 	-- Parse input and write output
 	output( "======= Test Started ==========================================" )
@@ -101,65 +75,52 @@ local function parseTestCode()
 	local numUnexpectedErrors = 0
 	local numExpectedErrors = 0
 	local numUncaughtErrors = 0
-	local startTime = system.getTimer()
-	parseJava.initProgram()
-	local lineNum = 1
-	local startTokens = nil
-	while lineNum <= #sourceFile.strLines do
-		local strCode = sourceFile.strLines[lineNum]
+	for lineNum = 1, #source.strLines do
+		local lineRec = source.lines[lineNum]
+		local strCode = lineRec.str
+
+		-- Check for the indicator for the expected errors section
+		if strCode == "// ERRORS" then
+			errorSection = true
+			output( "*** Beginning of Expected Errors Section ***" )
+		end
 
 		-- Output source for this line
 		outFile:write( "\n" .. lineNum .. ". " .. trim1( strCode ) .. "\n" )
 
-		-- Check for the indicator for the expected errors section
-		if strCode == "ERRORS" then
-			errorSection = true
-			output( "************** Beginning of Expected Errors Section **************" )
-		else
-			-- Parse this line
-			local tree, tokens = parseJava.parseLine( strCode, lineNum, startTokens ) -- TODO: Set and change syntax level?
-			if tree == false then
-				-- This line is unfinished, carry the tokens forward to the next line
-				startTokens = tokens
-				outFile:write( "-- Incomplete line carried forward\n" )
-			else
-				startTokens = nil
-				local errRec = err.errRecForLine( lineNum )
-				if errRec then
-					-- This line has an error on it, output it.
-					output( err.getErrString( errRec ) or "*** Missing error state!" )
+		-- Print the parse tree for this line, if any
+		local tree = lineRec.parseTree
+		if tree == false then
+			output( "-- Incomplete line carried forward" )
+		elseif tree and tree.p ~= "blank" then
+			parseJava.printParseTree( tree, 0, outFile )
+		end
 
-					-- Count the error
-					if errorSection then
-						numExpectedErrors = numExpectedErrors + 1
-					else
-						numUnexpectedErrors = numUnexpectedErrors + 1
-					end
-				else
-					-- Successful parse. 
-					-- Did we expect an error on this line?
-					if errorSection then
-						-- Ignore blank lines
-						if tree.p ~= "blank" and tree.p ~= "comment" then
-							numUncaughtErrors = numUncaughtErrors + 1
-							outFile:write( "*** Uncaught Error "..numUncaughtErrors.."\n" )
-						end
-					end
-					if tree.p ~= "blank" then
-						-- Output parse tree to output file only
-						parseJava.printParseTree( tree, 0, outFile )
-					end
-				end
+		-- Does this line have an error?
+		local errRec = lineRec.errRec
+		if errRec then
+			-- This line has an error on it. Output it and count the error
+			output( err.getErrString( errRec ) or "**** Missing error state!" )
+			if errorSection then
+				numExpectedErrors = numExpectedErrors + 1
+			else
+				numUnexpectedErrors = numUnexpectedErrors + 1
+			end
+		else
+			-- No error on this line. Did we expect one?
+			if errorSection and tree and tree.p ~= "blank" and tree.p ~= "comment" 
+					and lineRec.iLineStart == lineNum then
+				numUncaughtErrors = numUncaughtErrors + 1
+				outFile:write( "**** Uncaught Error " .. numUncaughtErrors .. "\n" )
 			end
 		end
-		lineNum = lineNum + 1
 	end
 	local endTime = math.round( system.getTimer() - startTime )  -- to nearest ms
 	output( "======= Test Complete =========================================" )
 	output( "" )
 
 	-- Output and display results
-	outputAndDisplay( string.format( "%d lines processed in %d ms", lineNum - 1, endTime ) )
+	outputAndDisplay( string.format( "%d lines processed in %d ms", #source.strLines, endTime ) )
 	outputAndDisplay( "" )
 	outputAndDisplay( string.format( "%d unexpected errors", numUnexpectedErrors ) )
 	outputAndDisplay( string.format( "%d uncaught errors (%d expected errors)", 

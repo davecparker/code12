@@ -1,62 +1,62 @@
 import Code12.*;
 
-class level10 extends Code12Program
+class Level8 extends Code12Program
 {
    //Global variables
-      boolean startPhase = true;
-      boolean mainPhase = false;
-      boolean endPhase = false;
-      int updates = 0;
-      double screenHeight;
-      double screenWidth;
-      //Player character
-      GameObj ghostBird;
-      GameObj bird;
-      String flap = "downflap";
-      String filename;
-      final int BIRDHIEGHT = 8;
-      double birdX;
-      double birdY;
-      boolean movingUp = true;
-      //Score
-      GameObj scoreObj;
-      double scoreX;
-      double scoreY; 
-      int score;
-      int scoreHeight = 5;
-      int highScore = 0;
-      String scoreImgFile = "0.png";
-      //Background
-      GameObj back1;
-      GameObj back2;
-      //Ground
-      GameObj ground1;
-      GameObj ground2;
-      GameObj ground3;
-      //Pipes
-      GameObj goal1;
-      GameObj goal2;
-      int randY;
-      boolean hit1 = false;
-      boolean hit2 = false;
-      int goalY;
-      GameObj pipeUp1;
-      GameObj pipeDown1;
-      GameObj pipeUp2;
-      GameObj pipeDown2;
-      //End Screen
-      double endY;
-      GameObj gameOverImg;
-      GameObj endScoreText;
-      GameObj endScoreImg;
-      GameObj endBestText;
-      GameObj endBestImg;
-      GameObj restartText;
-      GameObj restartBox;
+   boolean startPhase = true;
+   boolean mainPhase = false;
+   boolean endPhase = false;
+   int updates = 0;
+   double screenHeight;
+   double screenWidth;
+   //Player character
+   GameObj ghostBird;
+   GameObj bird;
+   String flap = "downflap";
+   String filename;
+   final int BIRDHIEGHT = 8;
+   double birdX;
+   double birdY;
+   boolean movingUp = true;
+   //Score
+   GameObj scoreObj;
+   double scoreX;
+   double scoreY; 
+   int score;
+   int scoreHeight = 5;
+   int highScore = 0;
+   String scoreImgFile = "0.png";
+   //Backgroundcv  ;
+   GameObj back1;
+   GameObj back2;
+   //Ground
+   GameObj ground1;
+   GameObj ground2;
+   GameObj ground3;
+   //Pipes
+   GameObj goal1;
+   GameObj goal2;
+   int randY;
+   boolean hit1 = false;
+   boolean hit2 = false;
+   int goalY;
+   GameObj pipeUp1;
+   GameObj pipeDown1;
+   GameObj pipeUp2;
+   GameObj pipeDown2;
+   //End Screen
+   double endY;
+   GameObj gameOverImg;
+   GameObj endScoreText;
+   GameObj endScoreImg;
+   GameObj endBestText;
+   GameObj endBestImg;
+   GameObj restartText;
+   GameObj restartBox;
 
    public static void main(String[] args)
    { 
-      Code12.run( new level10() ); 
+      Code12.run( new level8() ); 
    }
    
    public void start()
@@ -160,7 +160,7 @@ class level10 extends Code12Program
          //Handles keypress input
          if( ct.clicked() || ct.charTyped(" ") )
          {
-            ghostBird.y -= 4.5;
+            ghostBird.y -= 3.5;
             ghostBird.ySpeed = -1;
          } 
 
@@ -332,7 +332,7 @@ class level10 extends Code12Program
       }  
       if( endPhase )
       {
-         if( restartBox.clicked() ) //Restarts the game
+         if( restartBox.clicked() || ct.charTyped(" ") ) //Restarts the game
          {            
             //Sets Phase flags
             mainPhase = true;

@@ -1,7 +1,7 @@
 package Code12;  // (c)Copyright 2018 by David C. Parker 
 
 
-// These are the methods that you can call on a Game object.
+// These are the methods that you can call on the ct object.
 public interface GameInterface
 {
    // Text Output
@@ -67,6 +67,9 @@ public interface GameInterface
    public double distance(double x1, double y1, double x2, double y2);
    public int getTimer();
    public double getVersion();
+   public void pause();    // not supported (ignored) by the Code12 Java runtime
+   public void stop();     // not supported (ignored) by the Code12 Java runtime
+   public void restart();  // not supported (ignored) by the Code12 Java runtime
 
    // Type Conversion
    public int toInt(double d);

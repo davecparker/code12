@@ -1,0 +1,206 @@
+// Code 12 API Summary
+//====================
+
+class CT
+{
+	// Graphic Object Creation
+	//------------------------
+	GameObj circle( double x, double y, double diameter )
+	GameObj circle( double x, double y, double diameter, String color )
+	GameObj rect( double x, double y, double width, double height )
+	GameObj rect( double x, double y, double width, double height, String color )
+	GameObj line( double x1, double y1, double x2, double y2 )
+	GameObj line( double x1, double y1, double x2, double y2, String color )
+	GameObj text( String s, double x, double y, double height )
+	GameObj text( String s, double x, double y, double height, String color )
+	GameObj image( String filename, double x, double y, double width )
+
+	// Text Output
+	//------------
+	void print( Object value )       // any type, no newline added
+	void println( Object value )     // any type (param required), newline at end
+	void println( )                  // just a newline
+	void log( Object values )        // values delimited and strings quoted
+	void logm( String message, Object values)    // log with unquoted message
+	void setOutputFile( String filename )        // where to echo print and log output 
+
+	// Alerts and Input Dialogs
+	//-------------------------
+	void showAlert( String message ) 
+	int inputInt( String message )
+	double inputNumber( String message )
+	boolean inputYesNo( String message )
+	String inputString( String message )
+
+	// Screen Management
+	//------------------
+	void setTitle( String title )
+	void setHeight( double height )   // on mobile just determines landscape vs. portrait
+	double getWidth( )                // always 100.0
+	double getHeight( )               // default 100.0
+	double getPixelsPerUnit()         // scale factor to convert coordinate units to pixels
+	String getScreen( )
+	void setScreen( String name )
+	void setScreenOrigin( double x, double y )
+	void clearScreen( )
+	void clearGroup( String group )
+	void setBackColor( String color )
+	void setBackColorRGB( int red, int green, int blue )
+	void setBackImage( String filename )
+
+	// Mouse and Keyboard Input
+	//-------------------------
+	boolean clicked( )
+	double clickX( )
+	double clickY( )
+	GameObj objectClicked( )
+	boolean keyPressed( String keyName )
+	boolean charTyped( String charString )
+
+	// Audio
+	//------
+	boolean loadSound( String filename )
+	void sound( String filename )
+	void setSoundVolume( double volume )
+
+	// Math Utilities
+	//---------------
+	int random( int min, int max )
+	int round( double number )
+	double roundDecimal( double number, int numPlaces )
+	double distance( double x1, double y1, double x2, double y2 )
+	int intDiv( int numerator, int denominator )
+	boolean isError( double number )
+
+	// Type Conversion
+	//----------------
+	int toInt( double number )             // (deprecated) truncates
+	int parseInt( String str )             // 0 if failure
+	double parseNumber( String str )       // NaN if failure
+	boolean canParseInt( String str )
+	boolean canParseNumber( String str )
+	String formatInt( int number )
+	String formatInt( int number, int numDigits )    // uses leading 0's
+	String formatDecimal( double number )
+	String formatDecimal( double number, int numPlaces )
+
+	// Program Control
+	//----------------
+	int getTimer( )
+	double getVersion( )
+	void pause( )
+	void stop( )
+	void restart( )
+}
+
+class GameObj
+{
+	// GameObj Data Fields
+	//--------------------
+	double x;
+	double y;
+	boolean visible;          // default true
+	String group;             // default ""
+
+	// GameObj Methods
+	// ---------------
+	String getType( )                                  // "circle", "image", etc.
+	double getWidth( )
+	double getHeight( )
+	void setSize( double width, double height )
+	void setSpeed( double xSpeed, double ySpeed )      // at 60 fps
+	void align( String alignment )                     // "top left", "top", "center", etc.
+	String getText( )
+	void setText( String text )                        // included in print output
+	String toString( )                                 // "[type at (x, y) "text"]"
+	void setFillColor( String color )                  // "red", "white", etc. or null
+	void setFillColorRGB( int red, int green, int blue )
+	void setLineColor( String color )
+	void setLineColorRGB( int red, int green, int blue )
+	void setLineWidth( int lineWidth );                // in pixels
+	void setImage( String filename );                  // only for image objects
+	int getLayer( )
+	void setLayer( int layer )                         // objects default to layer 1
+	void delete( )
+	void setClickable( boolean clickable )             // default true
+	boolean clicked( )
+	boolean containsPoint( double x, double y )
+	boolean hit( GameObj objTest )
+	GameObj objectHitInGroup( String group )
+}
+
+class MATH
+{
+	// Java Math Fields Supported
+	//---------------------------
+	double  E;
+	double  PI;
+
+	// Java Math Methods Supported
+	//----------------------------
+	double  abs( double number )
+	int     abs( int number )
+	double  acos( double number )
+	double  asin( double number )
+	double  atan( double number )
+	double  atan2( double y, double x)
+	double  ceil( double number )
+	double  cos( double angle )
+	double  cosh( double angle )
+	double  exp( double number )
+	double  floor( double number )
+	double  log( double number )
+	double  log10( double number )
+	double  max( double number1, double number2 )
+	int     max( int number1, int number2 )
+	double  min( double number1, double number2 )
+	int     min( int number1, int number2 )
+	double  pow( double number, double exponent )
+	double  sin( double angle )
+	double  sinh( double angle )
+	double  sqrt( double number )
+	double  tan( double angle )
+	double  tanh( double angle )
+}
+
+class String
+{
+	// Java String Methods Supported
+	//------------------------------
+	int      compareTo( String str2 )
+	boolean  equals( String str2 )
+	int      indexOf( String strFind )
+	int      length()
+	String   substring( int beginIndex )
+	String   substring( int beginIndex, int endIndex )
+	String   toLowerCase()
+	String   toUpperCase()
+	String   trim()
+}
+
+class PrintStream
+{
+	// Special support for System.out.print() and System.out.println()
+	//----------------------------------------------------------------
+	void print( Object value )
+	void println( Object value )
+}
+
+class Code12Program
+{
+	// Main Program Functions
+	//-----------------------
+	void start( )
+	void update( )
+	void main( String[] args )         // for Java runtime only
+
+	// Input Event Functions
+	//----------------------
+	void onMousePress( GameObj obj, double x, double y ) 
+	void onMouseDrag( GameObj obj, double x, double y ) 
+	void onMouseRelease( GameObj obj, double x, double y )
+	void onKeyPress( String keyName )        // key code name e.g. "a", "up"
+	void onKeyRelease( String keyName )      // key code name e.g. "a", "up"
+	void onCharTyped( String charString )        // "a", "A", "$", etc.
+	void onResize( ) 
+}
