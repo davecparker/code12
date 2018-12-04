@@ -106,3 +106,79 @@ aimport Code12.*;
 		else obj ~= null;
 		else blah
 		else what
+	int i = +5;
+   int i = +5;
+	classLevelInt = 5++;
+	classLevelInt = classLevelInt++;
+		ct.print(++classLevelInt);
+		ct.print(++classLevelInt);
+		ct.print(++classLevelInt);
+		ct.print(++classLevelInt);
+		ct.println(++classLevelInt);
+		ct.println(++i);
+		ct.println(++i);
+		ct.println(++i);
+		ct.println(++i);
+		i = Math.round(i++);
+		i = Math.round(++i);
+		ct.println(++i);
+		classLevelInt<<;
+		2 << 11;
+		ct.println(2 ~ 1);
+		ct.println(~2);
+		ct.println(~2);
+		ct.println(~2);
+		ct.println(~2);
+		ct.println(~2);
+		ct.println(~2);
+		ct.println(~2);
+		ct.println(~2);
+		classLevelInt = 2 ^ 1);
+		"Use == to compare for equality (= is for assignment)"
+		i = Math.round(i++);
+		i = Math.round(++i);
+		ct.println(++i);
+		1 + 1 = 2;
+		GameObj rect = ct.rect(50, 50, )
+		1 + 1 = 2;
+		1 + 1 = 2;
+		for (;;s == 1)
+		for (;;i==1)
+		for (;;i<1)
+		i = Math.round(i++);
+		i = Math.round(++i);
+		ct.println(++i);
+		i = Math.round(i++);
+		i = Math.round(++i);
+		ct.println(++i);
+		b = 
+		if ()
+		else if ()
+		while ()
+		while ();
+		b = ;
+		if ()
+		else if ()
+		while ()
+		while ();
+		if ()
+		else if ()
+		while ()
+		while ();
+		else if ()
+		while ()
+		while ();
+		while ()
+		while ();
+		while ();
+		while ();
+		if ()
+		else if ()
+		while ()
+		while ();
+		if ()
+		else if ()
+		while ();
+		while ();
+		if ()
+		else if ()

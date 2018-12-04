@@ -1,0 +1,15 @@
+======= Test Started ==========================================
+======= Test Complete =========================================
+
+Semantic Error Test:
+
+    237 lines processed
+    11 ms Parse time
+    1 ms Semantic check time
+    0 ms Code Generation time
+    13 ms Total time
+
+0 unexpected errors
+0 uncaught errors (75 expected errors)
+
+SUCCESS
