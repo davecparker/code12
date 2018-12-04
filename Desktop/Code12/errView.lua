@@ -270,34 +270,32 @@ local function enableBtn( btn, enable )
 end
 
 -- Update the docs toolbar
-local function updateToolbar()
+local function updateDocsToolbar()
 	if docsWebView.isVisible then
 		moreInfoBtn:setLabel( "Close" )
+		moreInfoBtn.isVisible = true
 		backBtn.isVisible = true
 		forwardBtn.isVisible = true
 		enableBtn( backBtn, docsWebView.canGoBack )
 		enableBtn( forwardBtn, docsWebView.canGoForward )
 	else
-		moreInfoBtn:setLabel( "More Info." )
+		moreInfoBtn:setLabel( "More Info" )
+		moreInfoBtn.isVisible = (errRec ~= nil and errRec.docLink ~= nil)
 		backBtn.isVisible = false
 		forwardBtn.isVisible = false
 	end
 end
 
--- Show the docs if show else hide them, and update the toolbar.
-local function showDocs( show )
-	if show then
+-- If docLink then show this link in the docsWebView, else hide the docsWebView.
+local function showDocs( docLink )
+	if docLink then
 		docsWebView.isVisible = true
-		local url = "docs/API.html"
-		if errRec.docLink then
-			url = url .. errRec.docLink
-		end
-		docsWebView:request( url, system.ResourceDirectory )
+		docsWebView:request( "docs/" .. docLink, system.ResourceDirectory )
 	else
 		docsWebView:stop()
 		docsWebView.isVisible = false
 	end
-	updateToolbar()
+	updateDocsToolbar()
 end
 
 -- Show the error state
@@ -330,7 +328,7 @@ local function showError()
 	end
 
 	-- Show documentation link if any
-	showDocs( errRec.docLink ~= nil )
+	showDocs( errRec.docLink )
 end
 
 -- Display or re-display the current error
@@ -358,12 +356,17 @@ local function makeDocsToolbar( parent )
 	moreInfoBtn = widget.newButton{
 		x = app.width - margin, 
 		y = yCenter,
-		label = "More Info.",
+		label = "More Info",
 		labelAlign = "right",
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI,
 		onRelease = function ()
-						showDocs( not docsWebView.isVisible )  -- toggle visibility
+						-- Toggle docs view
+						if docsWebView.isVisible then
+							showDocs( nil )
+						else
+							showDocs( errRec.docLink )
+						end
 					end
 	}
 	docsToolbarGroup:insert( moreInfoBtn )
@@ -378,7 +381,7 @@ local function makeDocsToolbar( parent )
 	backBtn:addEventListener( "tap", 
 		function() 
 			docsWebView:back()
-			updateToolbar()
+			updateDocsToolbar()
 		end )
 	forwardBtn = display.newImageRect( docsToolbarGroup, "images/back.png", size, size )
 	forwardBtn.rotation = 180
@@ -388,11 +391,11 @@ local function makeDocsToolbar( parent )
 	forwardBtn:addEventListener( "tap", 
 		function() 
 			docsWebView:forward()
-			updateToolbar()
+			updateDocsToolbar()
 		end )
 
 	-- Set the initial state
-	updateToolbar()
+	updateDocsToolbar()
 end
 
 -- Handle key events in the view
@@ -441,7 +444,7 @@ function errView:create()
 	docsWebView.isVisible = false
 	docsWebView:addEventListener( "urlRequest",
 		function ()
-			timer.performWithDelay( 100, updateToolbar )
+			timer.performWithDelay( 100, updateDocsToolbar )
 		end )
 
 	-- Make the toolbar for the docs view
@@ -476,7 +479,7 @@ function errView:hide( event )
 	if event.phase == "will" then
 		Runtime:removeEventListener( "key", onKeyEvent )
 	elseif event.phase == "did" then
-		showDocs( false )
+		showDocs( nil )
 	end
 end
 

@@ -590,11 +590,11 @@ local function findStaticMethod( call )
 			if misName then
 				err.setErrNodeSpan( classNode, nameID, 
 						'Unknown or misspelled API function, did you mean "%s" ?', 
-						"ct." .. misName, { docLink = "#top" } )
+						"ct." .. misName )
 			else
-				err.setErrNodeSpan( classNode, nameID, "Unknown API function",
-						{ docLink = "#top" } )
+				err.setErrNodeSpan( classNode, nameID, "Unknown API function" )
 			end
+			err.addDocLink( "API.html" )
 			return nil
 		elseif beforeStart then
 			err.setErrNode( call, "Code12 API functions cannot be called before start()" )
@@ -701,13 +701,13 @@ local function vtCheckCall( call )
 	local min = method.min or numParams
 	if numExprs < min then
 		err.setErrNodeAndRef( call, refFunc, "%s requires %d parameter%s", 
-				app.startWithCapital( fnName ), min, (min ~= 1 and "s") or "",
-				{ docLink = method.docLink } )
+				app.startWithCapital( fnName ), min, (min ~= 1 and "s") or "" )
+		err.addDocLink( method.docLink )
 		return nil
 	elseif not method.variadic and numExprs > numParams then
 		err.setErrNodeAndRef( call, refFunc, 
-				"Too many parameters passed to %s", fnName, 
-				{ docLink = method.docLink }  )
+				"Too many parameters passed to %s", fnName ) 
+		err.addDocLink( method.docLink )
 		return nil
 	end
 
@@ -740,8 +740,8 @@ local function vtCheckCall( call )
 					"Parameter #%d (%s) of %s expects type %s, but %s was passed",
 					i, method.params[i].name, fnName,
 					javaTypes.typeNameFromVt( vtNeeded ), 
-					javaTypes.typeNameFromVt( vtPassed ),
-					{ docLink = method.docLink } )
+					javaTypes.typeNameFromVt( vtPassed ) )
+			err.addDocLink( method.docLink )
 			return nil
 		end
 	end
@@ -1274,8 +1274,8 @@ local function vtExprCall( node )
 	if vt == false then
 		local method, fnName = methodAndDisplayNameFromCall( node )
 		err.setErrNode( node, 
-				"%s does not return a value", app.startWithCapital( fnName ), 
-				{ docLink = method.docLink } )
+				"%s does not return a value", app.startWithCapital( fnName ) ) 
+		err.addDocLink( method.docLink )
 	end
 	return vt
 end

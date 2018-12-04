@@ -171,6 +171,7 @@ local function possibleExpectedToken( ttExpected )
 				err.setErrNode( token, "Syntax Error: %s was unexpected here",
 						tokenDescription( token ) )
 			end
+			err.addDocLink( "Java.html#java-syntax-examples" )
 		end
 	end
 end
@@ -206,6 +207,7 @@ local function invalidTypeName( node )
 	else
 		err.setErrNode( node, "Expected a type name here" )
 	end
+	err.addDocLink( "Java.html#java-data-types" )
 end
 
 
@@ -258,6 +260,7 @@ local function parseOpExpr( leftSide, minPrecedence )
 		if rightSide == nil then
 			err.setErrNodeAndRef( tokens[iToken], op,
 					"Expected expression after %s operator", op.str )
+			err.addDocLink( "Java.html#expressions" )
 			return nil
 		end
 		-- Check for another op after this op's expr and compare precedence
@@ -696,6 +699,7 @@ function parseGrammar( grammar )
 					else
 						err.setErrNode( nodes[iNode], strErr )
 					end
+					err.addDocLink( "Java.html#java-syntax-examples" )
 				end
 
 				-- Return the parse tree
@@ -885,6 +889,7 @@ local function parseCurrentLine( level )
 		-- Make a generic syntax error to use if a more specific error was not already set
 		local lastToken = tokens[#tokens - 1]  -- not counting the END
 		err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
+		err.addDocLink( "Java.html#java-syntax-examples" )
 	end
 	err.addNoteToErrAtLineNum( lineNumber, strNote )
 
@@ -964,6 +969,7 @@ function parseJava.isInvalidID( nameNode, usage, existing )
 	else
 		err.setErrNode( nameNode, 'Names are case-sensitive, known name is "%s"', strCorrectCase )
 	end
+	err.addDocLink( "Java.html" )
 	return true
 end
 
