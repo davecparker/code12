@@ -216,6 +216,24 @@ local function settingsFilePath()
 	return system.pathForFile( "userSettings.txt", system.DocumentsDirectory )
 end
 
+-- Return the path name for the developer settings file
+local function devSettingsFilePath()
+	return system.pathForFile( "devSettings.txt", system.DocumentsDirectory )
+end
+
+-- Return a table from given file path to JSON encoded data or nil in case of an error
+local function tableFromPathToJSONFile( filePath )
+	local file = io.open( filePath, "r" )
+	if file then
+		local str = file:read( "*a" )	-- Read entire file as a string (JSON encoded)
+		io.close( file )
+		if str then
+			local t = json.decode( str )
+			return t
+		end
+	end
+	return nil
+end
 -- Save the user settings
 function app.saveSettings()
 	-- Update the userSettings
@@ -224,7 +242,6 @@ function app.saveSettings()
 	userSettings.tabWidth = app.tabWidth
 	userSettings.editorPath = app.editorPath
 	userSettings.useDefaultEditor = app.useDefaultEditor
-	userSettings.oneErrOnly = app.oneErrOnly
 	userSettings.recentSourceFilePaths = app.recentSourceFilePaths
 	userSettings.openFilesInEditor = app.openFilesInEditor
 	userSettings.customEditors = app.customEditors
@@ -260,75 +277,72 @@ local function loadSettings()
 	end
 
 	-- Read the settings file
-	local file = io.open( settingsFilePath(), "r" )
-	if file then
-		local str = file:read( "*a" )	-- Read entire file as a string (JSON encoded)
-		io.close( file )
-		if str then
-			local t = json.decode( str )
-			if t then
-				-- Use the saved syntaxLevel if valid
-				local level = t.syntaxLevel
-				if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
-					userSettings.syntaxLevel = level
-					app.syntaxLevel = userSettings.syntaxLevel
-				end
+	local t = tableFromPathToJSONFile( settingsFilePath() )
+	if t then
+		-- Use the saved syntaxLevel if valid
+		local level = t.syntaxLevel
+		if type(level) == "number" and level >= 1 and level <= app.numSyntaxLevels then 
+			userSettings.syntaxLevel = level
+			app.syntaxLevel = userSettings.syntaxLevel
+		end
 
-				-- Use the saved tabWidth if valid
-				local tabWidth = t.tabWidth
-				if type(tabWidth) == "number" and tabWidth >=2 and tabWidth <= 8 then
-					app.tabWidth = tabWidth
-				end
+		-- Use the saved tabWidth if valid
+		local tabWidth = t.tabWidth
+		if type(tabWidth) == "number" and tabWidth >=2 and tabWidth <= 8 then
+			app.tabWidth = tabWidth
+		end
 
-				-- Use the saved editorPath if valid
-				if type(t.editorPath) == "string" then
-					file = io.open( t.editorPath, "r" )
-					if file then
-						io.close( file )
-						app.editorPath = t.editorPath
-					end
-				end
+		-- Use the saved editorPath if valid
+		if type(t.editorPath) == "string" then
+			local file = io.open( t.editorPath, "r" )
+			if file then
+				io.close( file )
+				app.editorPath = t.editorPath
+			end
+		end
 
-				-- Use the saved useDefaultEditor value
-				if type(t.useDefaultEditor) == "boolean" then
-					app.useDefaultEditor = t.useDefaultEditor
-				end
+		-- Use the saved useDefaultEditor value
+		if type(t.useDefaultEditor) == "boolean" then
+			app.useDefaultEditor = t.useDefaultEditor
+		end
 
-				-- Use the saved oneErrOnly value
-				if type(t.oneErrOnly) == "boolean" then
-					app.oneErrOnly = t.oneErrOnly
-				end
+		-- Use the saved recentSourceFilePaths
+		if type(t.recentSourceFilePaths) == "table" then
+			app.recentSourceFilePaths = t.recentSourceFilePaths
+		end
 
-				-- Use the saved recentSourceFilePaths
-				if type(t.recentSourceFilePaths) == "table" then
-					app.recentSourceFilePaths = t.recentSourceFilePaths
-				end
+		-- Used the saved openFilesInEditor value
+		if type(t.openFilesInEditor) == "boolean" then
+			app.openFilesInEditor = t.openFilesInEditor
+		end
 
-				-- Used the saved openFilesInEditor value
-				if type(t.openFilesInEditor) == "boolean" then
-					app.openFilesInEditor = t.openFilesInEditor
-				end
-
-				-- Use the saved customEditors
-				local customEditors = t.customEditors
-				if type(customEditors) == "table" then
-					app.customEditors = {}
-					for i = 1, #customEditors do
-						local customEditor = customEditors[i]
-						if type(customEditor) == "table" and 
-								type(customEditor.name) == "string" and 
-								type(customEditor.path) == "string" then
-							app.customEditors[#app.customEditors + 1] = customEditor
-						end
-					end
-				end
-
-				-- Use the saved showVarWatch
-				local showVarWatch = t.showVarWatch
-				if type(showVarWatch) == "boolean" then
-					app.showVarWatch = showVarWatch
+		-- Use the saved customEditors
+		local customEditors = t.customEditors
+		if type(customEditors) == "table" then
+			app.customEditors = {}
+			for i = 1, #customEditors do
+				local customEditor = customEditors[i]
+				if type(customEditor) == "table" and 
+						type(customEditor.name) == "string" and 
+						type(customEditor.path) == "string" then
+					app.customEditors[#app.customEditors + 1] = customEditor
 				end
 			end
+		end
+
+		-- Use the saved showVarWatch
+		local showVarWatch = t.showVarWatch
+		if type(showVarWatch) == "boolean" then
+			app.showVarWatch = showVarWatch
+		end
+	end
+
+	-- Read the developer settings file
+	t = tableFromPathToJSONFile( devSettingsFilePath() )
+	if t then
+		-- Use the saved oneErrOnly value
+		if type(t.oneErrOnly) == "boolean" then
+			app.oneErrOnly = t.oneErrOnly
 		end
 	end
 end
