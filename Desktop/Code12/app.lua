@@ -22,6 +22,9 @@ local app =  {
 	consoleFontSize = 14,
 	fontSizeUI = 12,
 
+	-- Web folders
+	webHelpDir = "http://www.code12.org/docs/1/",
+
 	-- UI metrics
 	margin = 10,                 -- generic margin to leave between many UI items
 	dyToolbar = 40,              -- toolbar height
@@ -178,6 +181,12 @@ function app.addRecentSourceFilePath( path )
 		table.remove( recentPaths )
 	end
 end
+
+-- Show the reference docs in a new browser window
+function app.showHelp()
+	system.openURL( app.webHelpDir .. "API.html" )   -- TODO: use starting index page
+end
+
 
 ------------------------------------------------------------------------------
 return app

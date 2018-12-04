@@ -16,11 +16,14 @@ local g = require( "Code12.globals" )
 local app = require( "app" )
 local source = require( "source" )
 local err = require( "err" )
+local env = require( "env" )
 
 
 -- The errView module and scene
 local errView = composer.newScene()
 
+-- Options
+local localHelp = true         -- true to use local copy of help docs, not web
 
 -- UI metrics
 local dxChar = app.consoleFontCharWidth
@@ -168,7 +171,7 @@ local function makeErrDisplay( sceneGroup )
 	errText = g.uiItem( display.newText{
 		parent = errGroup,
 		text = "", 
-		x = margin * 2, 
+		x = margin, 
 		y = y + margin,
 		width = app.width - margin * 4,
 		height = 0,
@@ -290,7 +293,11 @@ end
 local function showDocs( docLink )
 	if docLink then
 		docsWebView.isVisible = true
-		docsWebView:request( "docs/" .. docLink, system.ResourceDirectory )
+		if localHelp then
+			docsWebView:request( "docs/" .. docLink, system.ResourceDirectory )
+		else
+			docsWebView:request( app.webHelpDir .. docLink )
+		end
 	else
 		docsWebView:stop()
 		docsWebView.isVisible = false
@@ -427,6 +434,21 @@ local function onKeyEvent( event )
 	return false
 end
 
+-- Listener function for the docs native web view
+local function webViewListener( event )
+	-- If failed trying to load from web over http, then try local copy.
+	if event.errorCode then
+		if event.url and string.sub( event.url, 1, 4 ) == "http" then
+			print( "Web load failed, trying local copy" )
+			local dir, link = env.dirAndFilenameOfPath( event.url, "/" )
+			docsWebView:request( "docs/" .. link, system.ResourceDirectory )
+		end
+	else
+		-- Update Back and Forward buttons after link is fully resolved
+		timer.performWithDelay( 100, updateDocsToolbar )
+	end
+end
+
 
 --- Scene Methods ------------------------------------------------
 
@@ -442,10 +464,7 @@ function errView:create()
 	docsWebView.anchorX = 0
 	docsWebView.anchorY = 0
 	docsWebView.isVisible = false
-	docsWebView:addEventListener( "urlRequest",
-		function ()
-			timer.performWithDelay( 100, updateDocsToolbar )
-		end )
+	docsWebView:addEventListener( "urlRequest", webViewListener )
 
 	-- Make the toolbar for the docs view
 	makeDocsToolbar( sceneGroup )
