@@ -630,11 +630,12 @@ local colors = {
     ["orange"] =         {255, 127, 0},
     ["pink"] =           {255, 192, 203},
     ["purple"] =         {64, 0, 127},
+    ["brown"] =          {130, 70, 30},
          
     ["light gray"] =     {191, 191, 191},
     ["light red"] =      {255, 127, 127},
     ["light green"] =    {127, 255, 127},
-    ["light blue"] =     {127, 127, 255},
+    ["light blue"] =     {170, 225, 255},
     ["light cyan"] =     {127, 255, 255},
     ["light magenta"] =  {255, 127, 255},
     ["light yellow"] =   {255, 255, 127},
@@ -645,7 +646,7 @@ local colors = {
     ["dark blue"] =      {0, 0, 127},
     ["dark cyan"] =      {0, 127, 127},
     ["dark magenta"] =   {127, 0, 127},
-    ["dark yellow"] =    {127, 127, 0},
+    ["dark yellow"] =    {220, 190, 0},
 }
 
 -- Return the color (3-array) for the given color name, or gray if name not known.

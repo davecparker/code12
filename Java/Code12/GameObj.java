@@ -205,11 +205,12 @@ public abstract class GameObj implements GameObjInterface
          case "orange":        return new Color(255, 127, 0);
          case "pink":          return new Color(255, 192, 203);
          case "purple":        return new Color(64, 0, 127);
+         case "brown":         return new Color(130, 70, 30);
 
          case "light gray":    return new Color(191, 191, 191);
          case "light red":     return new Color(255, 127, 127);
          case "light green":   return new Color(127, 255, 127);
-         case "light blue":    return new Color(127, 127, 255);
+         case "light blue":    return new Color(170, 225, 255);
          case "light cyan":    return new Color(127, 255, 255);
          case "light magenta": return new Color(255, 127, 255);
          case "light yellow":  return new Color(255, 255, 127);
@@ -220,7 +221,7 @@ public abstract class GameObj implements GameObjInterface
          case "dark blue":     return new Color(0, 0, 127);
          case "dark cyan":     return new Color(0, 127, 127);
          case "dark magenta":  return new Color(127, 0, 127);
-         case "dark yellow":   return new Color(127, 127, 0);
+         case "dark yellow":   return new Color(220, 190, 0);
       }
       return new Color(127, 127, 127);   // Gray for color name not found
    }

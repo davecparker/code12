@@ -117,7 +117,10 @@ local function updateConsole()
 
 		-- Add the incomplete line if any
 		if hasIncompleteLine and iText <= numDisplayLines then
-			textObjs[iText].text = table.concat( currentLineStrings )
+			local textObj = textObjs[iText]
+			textObj.text = table.concat( currentLineStrings )
+			local rgb = rgbTextDefault
+			textObj:setFillColor( rgb[1], rgb[2], rgb[3] )
 			iText = iText + 1
 		end
 	end
