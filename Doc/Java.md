@@ -1,11 +1,11 @@
 % Java Language Help
 
 ##### [Java Language Constructs](#java-syntax-examples)
-* [Procedure Calls]
+* [Function Calls]
 * [Comments]
 * [Variables]
 * [Expressions]
-* [Function Calls]
+* [Function Return Values]
 * [Object Data Fields]
 * [Object Method Calls]
 * [If-else]
@@ -27,11 +27,11 @@ Java Syntax Examples
 These sections contain examples of Java language syntax for 
 the 12 core programming constructs supported by Code12.
 
-1. [Procedure Calls]
+1. [Function Calls]
 2. [Comments]
 3. [Variables]
 4. [Expressions]
-5. [Function Calls]
+5. [Function Return Values]
 6. [Object Data Fields]
 7. [Object Method Calls]
 8. [If-else]
@@ -43,8 +43,8 @@ the 12 core programming constructs supported by Code12.
 ###### [Java Language Help](#top) > [Java Syntax Examples]
 
 
-### Procedure Calls
-A procedure call is a named command for your program to execute, followed by 
+### Function Calls
+A function call is a named command for your program to execute, followed by 
 a list of input values for the command to use.
 
 #### Examples
@@ -65,7 +65,7 @@ ct.text( "Game Over", 50, 50, 10 );
 ```
 
 #### Notes
-A procedure call is the most common programming construct. 
+A function call is the most common programming construct. 
 It is essentially a command for the program to do something.
 The command has a name (for example `ct.circle`) 
 followed by a list of input values in parentheses, and at the
@@ -79,13 +79,12 @@ you need to give a list of 3 numbers to the command.
 For `ct.circle`, these are the x-coordinate, y-coordinate,
 and diameter of the circle. 
 
-##### Java Terminology
-Most programmers refer to procedure calls as "function calls",
-and Java programmers will often refer to them as "method calls".
-Here will we usually refer to them as "function calls".
+> ##### Java Terminology
+> Java programmers will often refer to function calls as 
+> "method calls".
 
-The input values to a function call are called "parameters" or
-"arguments". Here we will usually refer to them as "parameters".
+> The input values to a function call are called "parameters" or
+> "arguments".
 
 ##### Parameters
 Each command (function) requires different input values (parameters). 
@@ -123,7 +122,7 @@ called the "Java Class Library", but Code12 only supports a
 handful of functions from this library when programs are run
 within the Code12 application.
 
-###### [Java Language Help](#top) > [Procedure Calls]
+###### [Java Language Help](#top) > [Function Calls]
 
 
 ### Comments

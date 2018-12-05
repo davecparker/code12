@@ -440,7 +440,7 @@ local function webViewListener( event )
 	if event.errorCode then
 		if event.url and string.sub( event.url, 1, 4 ) == "http" then
 			print( "Web load failed, trying local copy" )
-			local dir, link = env.dirAndFilenameOfPath( event.url, "/" )
+			local _, link = env.dirAndFilenameOfPath( event.url, "/" )
 			docsWebView:request( "docs/" .. link, system.ResourceDirectory )
 		end
 	else

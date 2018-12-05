@@ -23,7 +23,7 @@ local parseJava = {}
 
 -- Language feature names introduced at each syntax level
 local syntaxFeatures = {
-	"procedure calls",
+	"function calls",
 	"comments",
 	"variables",
 	"expressions",
@@ -374,7 +374,7 @@ local callHead = { t = "callHead",
 		strErr = invalidVarName },
 }
 
--- A return type for a procedure/function definition
+-- A return type for a function definition
 local retType = { t = "retType",
 	{ 1, 12, "void",			"void"						},
 	{ 12, 12, "array",			"TYPE", "[", "]"			},
