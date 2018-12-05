@@ -126,6 +126,60 @@ within the Code12 application.
 
 
 ### Comments
+Comments are a way for programmers to leave notes to themselves or
+other programmers in the code. They are ignored when the program executes.
+
+#### Examples
+```
+// This is a comment
+```
+```
+// Draw a circle in the center of the screen
+ct.circle( 50, 50, 20 );
+```
+```
+// Draw 3 circles
+ct.circle( 30, 50, 10 );    // left side
+ct.circle( 50, 50, 10 );    // center
+ct.circle( 70, 50, 10 );    // right side
+```
+```
+// The statement below has been "commented out" (disabled)
+// ct.circle( 50, 50, 10);
+```
+```
+/*
+   This is a block comment.
+   It can go on for several lines.
+   If the block comment contains any Java code,
+   the code will all be ignored.
+
+   ct.rect( 50, 50, 70, 70 );
+   ct.circle( 50, 50, 20 );
+
+   The above code is ignored.
+*/
+```
+
+#### Notes
+Comments help make your program more readable (to humans) by
+explaining what is going on and giving other information that
+might be useful to you or another programmer reading your code.
+Comments are totally ignored by Java when your program is
+being executed.
+
+Besides leaving helpful notes, another use of comments is to
+temporarily disable some code without deleting it
+(because you might want to add it back later, for example).
+
+There are two different ways to make a comment in Java. 
+The most common way is use to `//`, which causes all text
+after it until the end of the line to be treated as a comment.
+
+If you want to make a long comment that spans several lines,
+you can also use a block comment, which begins with `/*` and 
+ends with `*/` at any point in your code after the start 
+of the comment.
 
 ###### [Java Language Help](#top) > [Comments]
 

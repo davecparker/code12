@@ -1132,6 +1132,7 @@ function parseProgram.parseLines( syntaxLevel )
 	-- Check for unclosed block comment
 	if iLineCommentStart then
 		err.setErrLineNum( iLineCommentStart, "Comment started with /* was not closed with */" )
+		err.addDocLink( "Java.html#comments" )
 	end
 
 	-- Print cache stats

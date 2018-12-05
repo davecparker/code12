@@ -88,6 +88,33 @@
 <p>The Java programming language is often used with a large library called the “Java Class Library”, but Code12 only supports a handful of functions from this library when programs are run within the Code12 application.</p>
 <h6 id="java-language-help-function-calls"><a href="#top">Java Language Help</a> &gt; <a href="#function-calls-1">Function Calls</a></h6>
 <h3 id="comments">Comments</h3>
+<p>Comments are a way for programmers to leave notes to themselves or other programmers in the code. They are ignored when the program executes.</p>
+<h4 id="examples-1">Examples</h4>
+<pre><code>// This is a comment</code></pre>
+<pre><code>// Draw a circle in the center of the screen
+ct.circle( 50, 50, 20 );</code></pre>
+<pre><code>// Draw 3 circles
+ct.circle( 30, 50, 10 );    // left side
+ct.circle( 50, 50, 10 );    // center
+ct.circle( 70, 50, 10 );    // right side</code></pre>
+<pre><code>// The statement below has been &quot;commented out&quot; (disabled)
+// ct.circle( 50, 50, 10);</code></pre>
+<pre><code>/*
+   This is a block comment.
+   It can go on for several lines.
+   If the block comment contains any Java code,
+   the code will all be ignored.
+
+   ct.rect( 50, 50, 70, 70 );
+   ct.circle( 50, 50, 20 );
+
+   The above code is ignored.
+*/</code></pre>
+<h4 id="notes-1">Notes</h4>
+<p>Comments help make your program more readable (to humans) by explaining what is going on and giving other information that might be useful to you or another programmer reading your code. Comments are totally ignored by Java when your program is being executed.</p>
+<p>Besides leaving helpful notes, another use of comments is to temporarily disable some code without deleting it (because you might want to add it back later, for example).</p>
+<p>There are two different ways to make a comment in Java. The most common way is use to <code>//</code>, which causes all text after it until the end of the line to be treated as a comment.</p>
+<p>If you want to make a long comment that spans several lines, you can also use a block comment, which begins with <code>/*</code> and ends with <code>*/</code> at any point in your code after the start of the comment.</p>
 <h6 id="java-language-help-comments"><a href="#top">Java Language Help</a> &gt; <a href="#comments">Comments</a></h6>
 <h3 id="variables">Variables</h3>
 <h6 id="java-language-help-variables"><a href="#top">Java Language Help</a> &gt; <a href="#variables">Variables</a></h6>
