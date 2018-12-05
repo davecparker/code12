@@ -1,243 +1,406 @@
-    program CheckJavaErrorTestCode { #funcs = 3, #vars = 5 }
+    program CheckJavaErrorTestCode { #funcs = 4, #vars = 5 }
         funcs:
   9.        func voidMethod { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 11, #stmts = 0, iLineBegin = 10 }
- 13.        func testMethod { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 230, #stmts = 84, iLineBegin = 14 }
+ 13.        func noErrorsMethod { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 18, #stmts = 3, iLineBegin = 14 }
                     stmts:
- 15.                    var i { vt = int, initExpr = 1 }
- 16.                    var d { vt = double, initExpr = 1.2 }
- 17.                    var b { vt = boolean, initExpr = false }
- 18.                    var s { vt = String, initExpr = "" }
- 19.                    var rect { vt = GameObj }
+ 15.                    var intArrayInitWithExpressions { vt = array of int }
+                            initExpr: arrayInit { #exprs = 3 }
+                                exprs:
+                                    (+) { right = 2, left = 1 }
+                                    (+) { right = 50 }
+                                        left: (*) { right = 4, left = 3 }
+                                    (+) { right = 3 }
+                                        left: parens
+                                            expr: (-) { right = 890, left = 67 }
+ 16.                    var gObjArrayInitWithCTCalls { vt = array of GameObj }
+                            initExpr: arrayInit { #exprs = 2 }
+                                exprs:
+                                    call rect { #exprs = 4, class = ct }
+                                        exprs:
+ 16.                                        (50)
+ 16.                                        (50)
+ 16.                                        (10)
+ 16.                                        (10)
+                                    call text { #exprs = 4, class = ct }
+                                        exprs:
+ 16.                                        ("text")
+ 16.                                        (50)
+ 16.                                        (50)
+ 16.                                        (10)
+ 17.                    var dblArrayInitWithExpressionsAndIntPromotion { vt = array of double }
+                            initExpr: arrayInit { #exprs = 2 }
+                                exprs:
+                                    (+) { right = 2, left = 1 }
+                                    (/) { right = 2 }
+                                        left: (*) { right = 7, left = 3.4 }
+ 20.        func testErrorsMethod { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 313, #stmts = 108, iLineBegin = 21 }
+                    stmts:
+ 22.                    var intVar { vt = int, initExpr = 1 }
+ 23.                    var doubleVar { vt = double, initExpr = 1.2 }
+ 24.                    var booleanVar { vt = boolean, initExpr = false }
+ 25.                    var stringVar { vt = String, initExpr = "" }
+ 26.                    var rect { vt = GameObj }
                             initExpr: call rect { #exprs = 4, class = ct }
                                 exprs:
- 19.                                (50)
- 19.                                (50)
- 19.                                (10)
- 19.                                (10)
- 20.                    var circle { vt = GameObj }
+ 26.                                (50)
+ 26.                                (50)
+ 26.                                (10)
+ 26.                                (10)
+ 27.                    var circle { vt = GameObj }
                             initExpr: call circle { #exprs = 3, class = ct }
                                 exprs:
- 20.                                (50)
- 20.                                (50)
- 20.                                (10)
- 21.                    var text { vt = GameObj }
+ 27.                                (50)
+ 27.                                (50)
+ 27.                                (10)
+ 28.                    var text { vt = GameObj }
                             initExpr: call text { #exprs = 4, class = ct }
                                 exprs:
- 21.                                ("text")
- 21.                                (50)
- 21.                                (50)
- 21.                                (10)
- 22.                    var intArr { vt = array of int }
+ 28.                                ("text")
+ 28.                                (50)
+ 28.                                (50)
+ 28.                                (10)
+ 29.                    var image { vt = GameObj }
+                            initExpr: call image { #exprs = 4, class = ct }
+                                exprs:
+ 29.                                ("bogusFileName.png")
+ 29.                                (50)
+ 29.                                (50)
+ 29.                                (10)
+ 30.                    var intArr { vt = array of int }
                             initExpr: newArray { vtElement = 0, lengthExpr = 10 }
- 23.                    var dblArr { vt = array of double }
+ 31.                    var dblArr { vt = array of double }
                             initExpr: newArray { vtElement = 1, lengthExpr = 10 }
- 24.                    var boolArr { vt = array of boolean }
+ 32.                    var boolArr { vt = array of boolean }
                             initExpr: newArray { vtElement = true, lengthExpr = 10 }
- 25.                    var strArr { vt = array of String }
+ 33.                    var strArr { vt = array of String }
                             initExpr: newArray { vtElement = "String", lengthExpr = 10 }
- 26.                    var objArr { vt = array of GameObj }
+ 34.                    var objArr { vt = array of GameObj }
                             initExpr: newArray { vtElement = "GameObj", lengthExpr = 10 }
- 33.                    call println { #exprs = 1, class = ct }
+ 37.                    assign (=)
+                            lValue: lValue { varID = circle, fieldID = x }
+                            expr: cast { vtCast = 0 }
+                                expr: parens
+                                    expr: (+) { right = 314 }
+                                        left: lValue { varID = intVar }
+ 39.                    assign (=)
+                            lValue: lValue { varID = objArr }
+                            expr: newArray { vtElement = "GameObj" }
+                                lengthExpr: (*) { left = 2 }
+                                    right: cast { vtCast = 0 }
+                                        expr: lValue { varID = objArr }
+ 41.                    assign (=)
+                            lValue: lValue { varID = doubleVar }
+                            expr: cast { vtCast = 1 }
+                                expr: parens
+                                    expr: (*) { right = 2.3, left = 10 }
+ 43.                    assign (=)
+                            lValue: lValue { varID = rect, fieldID = group }
+                            expr: cast { vtCast = "String" }
+                                expr: lValue { varID = circle, fieldID = group }
+ 45.                    assign (=)
+                            lValue: lValue { varID = doubleVar }
+                            expr: staticField { fieldID = P, class = Math }
+ 49.                    assign (=)
+                            lValue: lValue { varID = rect, fieldID = x }
+                            expr: unaryOp (neg)
+                                expr: lValue { varID = rect }
+ 51.                    assign (=)
+                            lValue: lValue { varID = stringVar }
+                            expr: unaryOp (neg)
+                                expr: lValue { varID = stringVar }
+ 55.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
+                            expr: unaryOp (not)
+                                expr: lValue { varID = intVar }
+ 59.                    assign (=)
+                            lValue: lValue { varID = objArr }
+                            expr: newArray { vtElement = "GameObj", lengthExpr = "ten" }
+ 61.                    assign (=)
+                            lValue: lValue { varID = strArr }
+                            expr: newArray { vtElement = "String" }
+                                lengthExpr: (+)
+                                    right: lValue { varID = doubleVar }
+                                    left: lValue { varID = intVar }
+ 63.                    assign (=)
+                            lValue: lValue { varID = boolArr }
+                            expr: newArray { vtElement = true }
+                                lengthExpr: (+)
+                                    right: lValue { varID = doubleVar }
+                                    left: lValue { varID = intVar }
+ 65.                    assign (=)
+                            lValue: lValue { varID = dblArr }
+                            expr: newArray { vtElement = 1 }
+                                lengthExpr: lValue { varID = doubleVar }
+ 67.                    assign (=)
+                            lValue: lValue { varID = intArr }
+                            expr: newArray { vtElement = 0, lengthExpr = 10.0 }
+ 91.                    var arrInit9 { vt = array of String }
+                            initExpr: arrayInit { #exprs = 1 }
+                                exprs:
+                                    newArray { vtElement = "String" }
+                                        lengthExpr: lValue { varID = intVar }
+ 93.                    var arrInit8 { vt = array of GameObj }
+                            initExpr: arrayInit { #exprs = 3 }
+                                exprs:
+                                    lValue { varID = rect }
+                                    lValue { varID = intArr }
+                                    lValue { varID = text }
+ 95.                    var arrInit7 { vt = array of GameObj }
+                            initExpr: arrayInit { #exprs = 3 }
+                                exprs:
+                                    lValue { varID = rect }
+                                    lValue { varID = image }
+                                    lValue { varID = objArr }
+ 99.                    var arrInit6 { vt = array of GameObj }
+                            initExpr: arrayInit { #exprs = 3 }
+                                exprs:
+                                    call rect { #exprs = 4, class = ct }
+                                        exprs:
+ 99.                                        (50)
+ 99.                                        (50)
+ 99.                                        (10)
+ 99.                                        (10)
+                                    lValue { varID = text }
+ 99.                                (0)
+101.                    var arrInit5 { vt = array of GameObj }
+                            initExpr: arrayInit { #exprs = 2 }
+                                exprs:
+101.                                ("circle")
+                                    lValue { varID = circle }
+103.                    var arrInit4 { vt = array of String }
+                            initExpr: arrayInit { #exprs = 3 }
+                                exprs:
+                                    (+) { right = 1 }
+                                        left: lValue { varID = stringVar }
+                                    lValue { varID = intVar }
+                                    (+) { right = 2 }
+                                        left: lValue { varID = intVar }
+105.                    var arrInit3 { vt = array of boolean }
+                            initExpr: arrayInit { #exprs = 3 }
+                                exprs:
+105.                                (false)
+                                    lValue { varID = booleanVar }
+105.                                (null)
+107.                    var arrInit2 { vt = array of double }
+                            initExpr: arrayInit { #exprs = 2 }
+                                exprs:
+                                    lValue { varID = circle }
+107.                                (0.5)
+109.                    var arrInit1 { vt = array of int }
+                            initExpr: arrayInit { #exprs = 2 }
+                                exprs:
+109.                                (1)
+109.                                ("1")
+114.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = s }
+                                    right: lValue { varID = stringVar }
                                     left: lValue { varID = objArr }
- 35.                    call println { #exprs = 1, class = ct }
+116.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = s }
+                                    right: lValue { varID = stringVar }
                                     left: lValue { varID = strArr }
- 37.                    call println { #exprs = 1, class = ct }
+118.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = s }
+                                    right: lValue { varID = stringVar }
                                     left: lValue { varID = boolArr }
- 39.                    call println { #exprs = 1, class = ct }
+120.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = dblArr }
-                                    left: lValue { varID = s }
- 41.                    call println { #exprs = 1, class = ct }
+                                    left: lValue { varID = stringVar }
+122.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intArr }
-                                    left: lValue { varID = s }
- 45.                    call println { #exprs = 1, class = ct }
+                                    left: lValue { varID = stringVar }
+126.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = d }
+                                    right: lValue { varID = doubleVar }
                                     left: lValue { varID = intArr }
- 47.                    call println { #exprs = 1, class = ct }
+128.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = d }
+                                    right: lValue { varID = doubleVar }
                                     left: lValue { varID = rect }
- 49.                    call println { #exprs = 1, class = ct }
+130.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = d }
-                                    left: lValue { varID = b }
- 51.                    call println { #exprs = 1, class = ct }
+                                    right: lValue { varID = doubleVar }
+                                    left: lValue { varID = booleanVar }
+132.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = i }
+                                    right: lValue { varID = intVar }
                                     left: lValue { varID = intArr }
- 53.                    call println { #exprs = 1, class = ct }
+134.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = i }
+                                    right: lValue { varID = intVar }
                                     left: lValue { varID = rect }
- 55.                    call println { #exprs = 1, class = ct }
+136.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = b }
- 57.                    call println { #exprs = 1, class = ct }
+                                    right: lValue { varID = intVar }
+                                    left: lValue { varID = booleanVar }
+138.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intArr }
-                                    left: lValue { varID = d }
- 59.                    call println { #exprs = 1, class = ct }
+                                    left: lValue { varID = doubleVar }
+140.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = rect }
-                                    left: lValue { varID = d }
- 61.                    call println { #exprs = 1, class = ct }
+                                    left: lValue { varID = doubleVar }
+142.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = b }
-                                    left: lValue { varID = d }
- 63.                    call println { #exprs = 1, class = ct }
+                                    right: lValue { varID = booleanVar }
+                                    left: lValue { varID = doubleVar }
+144.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intArr }
-                                    left: lValue { varID = i }
- 65.                    call println { #exprs = 1, class = ct }
+                                    left: lValue { varID = intVar }
+146.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = rect }
-                                    left: lValue { varID = i }
- 67.                    call println { #exprs = 1, class = ct }
+                                    left: lValue { varID = intVar }
+148.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
-                                    right: lValue { varID = b }
-                                    left: lValue { varID = i }
- 69.                    assign (=)
-                            lValue: lValue { varID = d }
+                                    right: lValue { varID = booleanVar }
+                                    left: lValue { varID = intVar }
+150.                    assign (=)
+                            lValue: lValue { varID = doubleVar }
                             expr: (/) { left = 1 }
                                 right: parens
                                     expr: (+) { right = 1 }
                                         left: (+)
                                             right: lValue { varID = intArr }
-                                            left: lValue { varID = b }
- 71.                    assign (=)
-                            lValue: lValue { varID = s }
+                                            left: lValue { varID = booleanVar }
+152.                    assign (=)
+                            lValue: lValue { varID = stringVar }
                             expr: (+)
                                 right: lValue { varID = rect }
-                                left: lValue { varID = b }
- 73.                    assign (=)
-                            lValue: lValue { varID = i }
+                                left: lValue { varID = booleanVar }
+154.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (+)
                                 right: (/) { right = 2 }
-                                    left: lValue { varID = d }
-                                left: lValue { varID = b }
- 75.                    assign (=)
-                            lValue: lValue { varID = i }
+                                    left: lValue { varID = doubleVar }
+                                left: lValue { varID = booleanVar }
+156.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (-) { right = 1 }
                                 left: (+)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = b }
- 77.                    assign (=)
-                            lValue: lValue { varID = b }
+                                    right: lValue { varID = intVar }
+                                    left: lValue { varID = booleanVar }
+158.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: (+)
-                                right: lValue { varID = b }
-                                left: lValue { varID = b }
- 79.                    assign (=)
+                                right: lValue { varID = booleanVar }
+                                left: lValue { varID = booleanVar }
+160.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = x }
                             expr: (+)
                                 right: lValue { varID = text }
                                 left: lValue { varID = circle }
- 81.                    assign (=)
+162.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = width }
                             expr: (+) { left = 2 }
                                 right: lValue { varID = rect }
- 83.                    call println { #exprs = 1, class = ct }
+164.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+) { right = false }
                                     left: lValue { varID = rect, fieldID = x }
- 87.                    assign (=)
-                            lValue: lValue { varID = d }
+168.                    assign (=)
+                            lValue: lValue { varID = doubleVar }
                             expr: (-) { right = ".txt" }
-                                left: lValue { varID = s }
- 89.                    assign (=)
-                            lValue: lValue { varID = i }
+                                left: lValue { varID = stringVar }
+170.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (%)
                                 right: lValue { varID = text }
                                 left: lValue { varID = rect, fieldID = group }
- 91.                    assign (=)
-                            lValue: lValue { varID = d }
+172.                    assign (=)
+                            lValue: lValue { varID = doubleVar }
                             expr: (/) { right = 10 }
                                 left: lValue { varID = circle }
- 93.                    assign (=)
+174.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = width }
                             expr: (*) { right = 2 }
                                 left: lValue { varID = rect }
- 95.                    assign (=)
+176.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = x }
                             expr: (-) { left = 100 }
                                 right: lValue { varID = rect }
- 99.                    assign (=)
-                            lValue: lValue { varID = b }
+180.                    var intArrayInitWithExpressions { vt = array of int }
+                            initExpr: arrayInit { #exprs = 2 }
+                                exprs:
+                                    (+) { left = 1 }
+                                        right: (/) { right = 1, left = 2 }
+                                    (/) { right = 2 }
+                                        left: parens
+                                            expr: (+) { right = 1, left = 3 }
+182.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: (==) { right = 1 }
                                 left: (/)
-                                    right: lValue { varID = i }
-                                    left: lValue { varID = i }
-101.                    assign (=)
-                            lValue: lValue { varID = d }
+                                    right: lValue { varID = intVar }
+                                    left: lValue { varID = intVar }
+184.                    assign (=)
+                            lValue: lValue { varID = doubleVar }
                             expr: (/) { right = 3 }
                                 left: unaryOp (neg) { expr = 10 }
-103.                    assign (=)
-                            lValue: lValue { varID = d }
+186.                    assign (=)
+                            lValue: lValue { varID = doubleVar }
                             expr: (/) { left = 10 }
                                 right: unaryOp (neg) { expr = 3 }
-105.                    assign (=)
-                            lValue: lValue { varID = i }
+188.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (/) { right = 5, left = 123 }
-107.                    assign (=)
-                            lValue: lValue { varID = i }
+190.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (/) { right = 3 }
                                 left: parens
                                     expr: (+) { right = 2, left = 1 }
-109.                    assign (=)
-                            lValue: lValue { varID = i }
+192.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (/) { left = 1 }
                                 right: parens
                                     expr: (+) { right = 3, left = 2 }
-111.                    assign (=)
+194.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = x }
                             expr: (/) { right = 1 }
-                                left: lValue { varID = i }
-113.                    call println { #exprs = 1, class = ct }
+                                left: lValue { varID = intVar }
+196.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+) { left = 1 }
                                     right: (/)
-                                        right: lValue { varID = i }
-                                        left: lValue { varID = i }
-115.                    assign (=)
-                            lValue: lValue { varID = d }
+                                        right: lValue { varID = intVar }
+                                        left: lValue { varID = intVar }
+198.                    assign (=)
+                            lValue: lValue { varID = doubleVar }
                             expr: (/) { left = 2 }
-                                right: lValue { varID = i }
-117.                    assign (=)
-                            lValue: lValue { varID = i }
+                                right: lValue { varID = intVar }
+200.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (/) { right = 2 }
-                                left: lValue { varID = i }
-121.                    assign (=)
+                                left: lValue { varID = intVar }
+204.                    assign (=)
                             lValue: lValue { varID = circle }
                             expr: (||) { right = false }
-                                left: lValue { varID = i }
-123.                    if
+                                left: lValue { varID = intVar }
+206.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
@@ -245,105 +408,105 @@
                                             left: lValue { varID = rect }
                                         block: block { #stmts = 1 }
                                             stmts:
-127.                                            call voidMethod
+210.                                            call voidMethod
                             expr: (&&) { left = true }
-                                right: lValue { varID = d }
+                                right: lValue { varID = doubleVar }
                             block: block { #stmts = 1 }
                                 stmts:
-124.                                call voidMethod
-129.                    while
+207.                                call voidMethod
+212.                    while
                             expr: (&&)
-                                right: lValue { varID = b }
-                                left: lValue { varID = i }
+                                right: lValue { varID = booleanVar }
+                                left: lValue { varID = intVar }
                             block: block { #stmts = 1 }
                                 stmts:
-130.                                break
-131.                    doWhile { iLineWhile = 134 }
+213.                                break
+214.                    doWhile { iLineWhile = 217 }
                             expr: (||)
-                                right: lValue { varID = s }
-                                left: lValue { varID = d }
+                                right: lValue { varID = stringVar }
+                                left: lValue { varID = doubleVar }
                             block: block { #stmts = 1 }
                                 stmts:
-132.                                break
-138.                    assign (=)
-                            lValue: lValue { varID = b }
+215.                                break
+221.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: (<)
                                 right: lValue { varID = rect }
                                 left: lValue { varID = circle }
-140.                    if
+223.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         expr: (<=) { right = 10, left = "level" }
                                         block: block { #stmts = 1 }
                                             stmts:
-144.                                            call voidMethod
+227.                                            call voidMethod
                             expr: (>) { right = false, left = 1 }
                             block: block { #stmts = 1 }
                                 stmts:
-141.                                call voidMethod
-146.                    while
+224.                                call voidMethod
+229.                    while
                             expr: (>=)
                                 right: lValue { varID = rect, fieldID = visible }
                                 left: (+) { right = 1, left = 1 }
                             block: block { #stmts = 1 }
                                 stmts:
-147.                                break
-148.                    doWhile { iLineWhile = 151 }
+230.                                break
+231.                    doWhile { iLineWhile = 234 }
                             expr: (<) { left = 3.14 }
                                 right: lValue { varID = text }
                             block: block { #stmts = 1 }
                                 stmts:
-149.                                break
-155.                    if
+232.                                break
+238.                    if
                             expr: (!=) { left = "" }
-                                right: lValue { varID = s }
+                                right: lValue { varID = stringVar }
                             block: block { #stmts = 1 }
                                 stmts:
-156.                                call voidMethod
-158.                    call println { #exprs = 1, class = ct }
+239.                                call voidMethod
+241.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (==) { right = "circles" }
                                     left: lValue { varID = circle, fieldID = group }
-168.                    assign (=)
-                            lValue: lValue { varID = b }
+251.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: (==)
                                 right: lValue { varID = rect }
-                                left: lValue { varID = b }
-170.                    assign (=)
-                            lValue: lValue { varID = b }
+                                left: lValue { varID = booleanVar }
+253.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: (!=) { right = true }
                                 left: lValue { varID = rect }
-172.                    assign (=)
-                            lValue: lValue { varID = b }
+255.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: (==) { left = "3.14" }
                                 right: staticField { fieldID = PI, class = Math }
-174.                    for
+257.                    for
                             expr: (!=)
-                                right: lValue { varID = s }
-                                left: lValue { varID = i }
+                                right: lValue { varID = stringVar }
+                                left: lValue { varID = intVar }
                             block: block { #stmts = 1 }
                                 stmts:
-175.                                call voidMethod
-177.                    assign (=)
-                            lValue: lValue { varID = b }
+258.                                call voidMethod
+260.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: (==) { right = true }
-                                left: lValue { varID = s }
-179.                    assign (=)
-                            lValue: lValue { varID = b }
+                                left: lValue { varID = stringVar }
+262.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: (!=) { right = false, left = "false" }
-180.                    doWhile { iLineWhile = 183 }
+263.                    doWhile { iLineWhile = 266 }
                             expr: (==) { right = false, left = 1 }
                             block: block { #stmts = 1 }
                                 stmts:
-181.                                call voidMethod
-185.                    while
+264.                                call voidMethod
+268.                    while
                             expr: (!=) { right = 0 }
-                                left: lValue { varID = b }
+                                left: lValue { varID = booleanVar }
                             block: block { #stmts = 1 }
                                 stmts:
-186.                                call voidMethod
-188.                    if
+269.                                call voidMethod
+271.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
@@ -351,73 +514,73 @@
                                             right: lValue { varID = circle }
                                         block: block { #stmts = 1 }
                                             stmts:
-192.                                            call voidMethod
+275.                                            call voidMethod
                             expr: (==) { right = 1 }
                                 left: lValue { varID = rect }
                             block: block { #stmts = 1 }
                                 stmts:
-189.                                call voidMethod
-196.                    call println { #exprs = 1, class = ct }
+272.                                call voidMethod
+279.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (=)
                                     right: lValue { varID = rect }
                                     left: lValue { varID = circle }
-198.                    while
+281.                    while
                             expr: (=) { right = false }
-                                left: lValue { varID = b }
+                                left: lValue { varID = booleanVar }
                             block: block { #stmts = 1 }
                                 stmts:
-199.                                assign (=) { expr = true }
-                                        lValue: lValue { varID = b }
-201.                    if
+282.                                assign (=) { expr = true }
+                                        lValue: lValue { varID = booleanVar }
+284.                    if
                             expr: (=) { right = 100 }
                                 left: lValue { varID = rect, fieldID = x }
                             block: block { #stmts = 1 }
                                 stmts:
-202.                                call setSpeed { #exprs = 2 }
+285.                                call setSpeed { #exprs = 2 }
                                         lValue: lValue { varID = rect }
                                         exprs:
                                             unaryOp (neg) { expr = 1 }
-202.                                        (0)
-204.                    assign (=)
-                            lValue: lValue { varID = b }
+285.                                        (0)
+287.                    assign (=)
+                            lValue: lValue { varID = booleanVar }
                             expr: parens
                                 expr: (=) { right = 2 }
                                     left: (+) { right = 1, left = 1 }
-206.                    if
+289.                    if
                             expr: (=) { right = 1 }
-                                left: lValue { varID = i }
+                                left: lValue { varID = intVar }
                             block: block { #stmts = 1 }
                                 stmts:
-207.                                call println { #exprs = 1, class = ct }
+290.                                call println { #exprs = 1, class = ct }
                                         exprs:
-207.                                        ("oops")
-211.                    call println { #exprs = 1, class = ct }
+290.                                        ("oops")
+294.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 call voidMethod
-213.                    assign (=)
-                            lValue: lValue { varID = i }
+296.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: call println { class = ct }
-219.                    assign (=)
-                            lValue: lValue { varID = i }
+302.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (|) { right = 1, left = 2 }
-221.                    assign (=)
-                            lValue: lValue { varID = i }
+304.                    assign (=)
+                            lValue: lValue { varID = intVar }
                             expr: (^) { right = 1, left = 2 }
-223.                    call println { #exprs = 1, class = ct }
+306.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (&) { right = 1, left = 2 }
-225.                    call println { #exprs = 1, class = ct }
+308.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (>>>) { right = 1, left = 2 }
-227.                    call println { #exprs = 1, class = ct }
+310.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (>>) { right = 1, left = 2 }
-229.                    call println { #exprs = 1, class = ct }
+312.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (<<) { right = 1, left = 2 }
-234.        func start { #paramVars = 0, isPublic = true, vt = void }
-                block: block { iLineEnd = 236, #stmts = 0, iLineBegin = 235 }
+317.        func start { #paramVars = 0, isPublic = true, vt = void }
+                block: block { iLineEnd = 319, #stmts = 0, iLineBegin = 318 }
         vars:
   3.        var classLevelInt { vt = int, isGlobal = true, initExpr = 0 }
   4.        var classLevelDouble { vt = double, isGlobal = true, initExpr = 0 }

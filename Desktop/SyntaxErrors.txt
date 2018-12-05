@@ -109,3 +109,6 @@ aimport Code12.*;
 		ct.logm( "Current stats:", runs, hits, errors );	}
 		ct.println( playAgain );;
 public void start
+	int a = {};
+	int a[] = {};
+		b = not 1;
