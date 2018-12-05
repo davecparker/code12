@@ -59,37 +59,37 @@ class DrawingProgram extends Code12Program
       
       // Make circle icon
       circle = ct.rect( boxSize / 2, yBoxes, boxSize, boxSize, "white" );
-      circle.clickable = true;
       iconImage = ct.circle( circle.x, circle.y, boxSize * 0.75, "white" );
+      iconImage.setClickable( false );
       circle.setLayer( 2 );
       iconImage.setLayer( 2 );
       
       // Make ellipse icon
       ellipse = ct.rect( circle.x + boxSize, yBoxes, boxSize, boxSize, "white" );
-      ellipse.clickable = true;
       iconImage = ct.circle( ellipse.x, ellipse.y, boxSize * 0.75, "white" );
-      iconImage.height *= 0.7;
+      iconImage.setClickable( false );
+      iconImage.setSize( iconImage.getWidth(), iconImage.getHeight() * 0.7 );
       ellipse.setLayer( 2 );
       iconImage.setLayer( 2 );
       
       // Make rectangle icon
       rectangle = ct.rect( ellipse.x + boxSize, yBoxes, boxSize, boxSize, "white" );
-      rectangle.clickable = true;
       iconImage = ct.rect( rectangle.x, rectangle.y, boxSize * 0.7, boxSize * 0.7, "white" );
+      iconImage.setClickable( false );
       rectangle.setLayer( 2 );
       iconImage.setLayer( 2 );
       
       // Make line icon
       line = ct.rect( rectangle.x + boxSize, yBoxes, boxSize, boxSize, "white" );
-      line.clickable = true;
       iconImage = ct.line( line.x - boxSize * 0.35, line.y + boxSize * 0.35, line.x + boxSize * 0.35, line.y - boxSize * 0.35 );
+      iconImage.setClickable( false );
       line.setLayer( 2 );
       iconImage.setLayer( 2 );
       
       // Make arrow icon for selecting objects
       selectBox = ct.rect( line.x + boxSize * 2, yBoxes, boxSize, boxSize, "white" );
-      selectBox.clickable = true;
       iconImage = ct.image( "arrow.png", selectBox.x, selectBox.y, boxSize );
+      iconImage.setClickable( false );
       
       // Make color boxes
       purple = ct.rect( 100 - boxSize / 2, yBoxes, boxSize, boxSize, "purple" );
@@ -117,45 +117,32 @@ class DrawingProgram extends Code12Program
       orange.setLayer( 2 );
       pink.setLayer( 2 );
       purple.setLayer( 2 );
-      
-      black.clickable = true;
-      white.clickable = true;
-      red.clickable = true;
-      green.clickable = true;
-      blue.clickable = true;
-      cyan.clickable = true;
-      magenta.clickable = true;
-      yellow.clickable = true;
-      gray.clickable = true;
-      orange.clickable = true;
-      pink.clickable = true;
-      purple.clickable = true;
-      
-      black.setText("black");
-      white.setText("white");
-      red.setText("red");
-      green.setText("green");
-      blue.setText("blue");
-      cyan.setText("cyan");
-      magenta.setText("magenta");
-      yellow.setText("yellow");
-      gray.setText("gray");
-      orange.setText("orange");
-      pink.setText("pink");
-      purple.setText("purple");
+           
+      black.setText( "black" );
+      white.setText( "white" );
+      red.setText( "red" );
+      green.setText( "green" );
+      blue.setText( "blue" );
+      cyan.setText( "cyan" );
+      magenta.setText( "magenta" );
+      yellow.setText( "yellow" );
+      gray.setText( "gray" );
+      orange.setText( "orange" );
+      pink.setText( "pink" );
+      purple.setText( "purple" );
       
       // Set xMinColors 
       xMinColors = white.x - boxSize / 2;
       
       // Set selected shape
       selectedShapeBox = circle;
-      selectedShapeBox.lineWidth = 3;
+      selectedShapeBox.setLineWidth( 3 );
       selectBoxOn = false;
       
       // Set selected color
       selectedColor = "white";
       selectedColorSwatch = white;
-      selectedColorSwatch.lineWidth = 3;
+      selectedColorSwatch.setLineWidth( 3 );
    }
 
    public void update()
@@ -180,7 +167,6 @@ class DrawingProgram extends Code12Program
                newObj = ct.line( x, y, x, y );
                newObj.setLineColor( selectedColor );
             }
-            newObj.clickable = true;
             if ( selectedShapeBox != line )
             {
                newObj.setFillColor( selectedColor );
@@ -200,18 +186,18 @@ class DrawingProgram extends Code12Program
          if ( x >= xMinColors )
          {
             // obj is a color swatch
-            selectedColorSwatch.lineWidth = 1;
+            selectedColorSwatch.setLineWidth( 1 );
             selectedColorSwatch = obj;
-            selectedColorSwatch.lineWidth = 3;
+            selectedColorSwatch.setLineWidth( 3 );
             selectedColorSwatch.setLayer( 2 );
             selectedColor = selectedColorSwatch.getText();
          }
          else
          {
             // obj is a shape selector or the select box
-            selectedShapeBox.lineWidth = 1;
+            selectedShapeBox.setLineWidth( 1 );
             selectedShapeBox = obj;
-            selectedShapeBox.lineWidth = 3;
+            selectedShapeBox.setLineWidth( 3 );
                         
             if ( obj == selectBox )
                selectBoxOn = true;
@@ -230,20 +216,17 @@ class DrawingProgram extends Code12Program
             if ( selectedShapeBox == circle )
             {
                double newDiameter = 2 * ct.distance( newObj.x, newObj.y, x, y );
-               newObj.width = newDiameter;
-               newObj.height = newDiameter;
+               newObj.setSize( newDiameter, newDiameter );
             }
             else if ( selectedShapeBox == ellipse || selectedShapeBox == rectangle )
             {
                double newWidth = 2 * ct.distance( newObj.x, 0, x, 0 );
                double newHeight = 2 * ct.distance( 0, newObj.y, 0, y );
-               newObj.width = newWidth;
-               newObj.height = newHeight;
+               newObj.setSize( newWidth, newHeight );
             }
             else if ( selectedShapeBox == line )
             {
-               newObj.width = x - newObj.x;
-               newObj.height = y - newObj.y;
+               newObj.setSize( x - newObj.x, y - newObj.y );
             }
             newObj.group = "drawing";
          }
@@ -260,7 +243,7 @@ class DrawingProgram extends Code12Program
    {
       if ( keyName.equals( "backspace" ) )
       {
-         ct.println("backspace key pressed");
+         ct.println( "backspace key pressed" );
          if ( selectedObj != null )
             selectedObj.delete();
       }
@@ -268,8 +251,8 @@ class DrawingProgram extends Code12Program
          ct.clearGroup( "drawing" );
    }
    
-   public static void main(String[] args)
+   public static void main( String[] args )
    { 
-      Code12.run(new DrawingProgram()); 
+      Code12.run( new DrawingProgram() ); 
    }
 }
