@@ -102,8 +102,8 @@ class DrawingProgram extends Code12Program
       blue = ct.rect( cyan.x - boxSize, yBoxes, boxSize, boxSize, "blue" );
       green = ct.rect( blue.x - boxSize, yBoxes, boxSize, boxSize, "green" );
       red = ct.rect( green.x - boxSize, yBoxes, boxSize, boxSize, "red" );
-      black = ct.rect( red.x - boxSize, yBoxes, boxSize, boxSize, "black" );
-      white = ct.rect( black.x - boxSize, yBoxes, boxSize, boxSize, "white" );
+      white = ct.rect( red.x - boxSize, yBoxes, boxSize, boxSize, "white" );
+      black = ct.rect( white.x - boxSize, yBoxes, boxSize, boxSize, "black" );
       
       black.setLayer( 2 );
       white.setLayer( 2 );
@@ -132,7 +132,7 @@ class DrawingProgram extends Code12Program
       purple.setText( "purple" );
       
       // Set xMinColors 
-      xMinColors = white.x - boxSize / 2;
+      xMinColors = black.x - boxSize / 2;
       
       // Set selected shape
       selectedShapeBox = circle;
@@ -140,9 +140,12 @@ class DrawingProgram extends Code12Program
       selectBoxOn = false;
       
       // Set selected color
-      selectedColor = "white";
-      selectedColorSwatch = white;
+      selectedColor = "black";
+      selectedColorSwatch = black;
       selectedColorSwatch.setLineWidth( 3 );
+
+      ct.println( "Backspace: delete selected object" );
+      ct.println( "c: clear the canvas" );
    }
 
    public void update()
@@ -226,7 +229,19 @@ class DrawingProgram extends Code12Program
             }
             else if ( selectedShapeBox == line )
             {
-               newObj.setSize( x - newObj.x, y - newObj.y );
+               double dx = x - newObj.x;
+               double dy = y - newObj.y;
+               if ( dx > 0 && dy > 0 )
+               {
+                  newObj.setSize( dx, dy );
+               }
+               else
+               {
+                  double x1 = newObj.x;
+                  double y1 = newObj.y;
+                  newObj.delete();
+                  newObj = ct.line( x1, y1, x1 + dx, y1 + dy, selectedColor );
+               }
             }
             newObj.group = "drawing";
          }
@@ -243,12 +258,15 @@ class DrawingProgram extends Code12Program
    {
       if ( keyName.equals( "backspace" ) )
       {
-         ct.println( "backspace key pressed" );
+         // Delete selected drawing object
          if ( selectedObj != null )
             selectedObj.delete();
       }
       else if ( keyName.equals( "c" ) )
+      {
+         // Clear the canvas
          ct.clearGroup( "drawing" );
+      }
    }
    
    public static void main( String[] args )
