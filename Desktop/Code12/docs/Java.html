@@ -65,10 +65,13 @@
 <pre><code>ct.circle( 50, 70, 20, &quot;green&quot; );</code></pre>
 <pre><code>ct.setBackColor( &quot;light blue&quot; );</code></pre>
 <pre><code>ct.text( &quot;Game Over&quot;, 50, 50, 10 );</code></pre>
+<pre><code>ct.circle( 45, 45, 20, &quot;yellow&quot; );
+ct.circle( 55, 55, 20, &quot;blue&quot; );</code></pre>
 <h4 id="notes">Notes</h4>
 <p>A function call is the most common programming construct. It is essentially a command for the program to do something. The command has a name (for example <code>ct.circle</code>) followed by a list of input values in parentheses, and at the very end is a semicolon. The input values provide additional details that the command needs to do its work. For example, in the call:</p>
 <pre><code>ct.circle( 50, 30, 20 );</code></pre>
 <p>you need to give a list of 3 numbers to the command. For <code>ct.circle</code>, these are the x-coordinate, y-coordinate, and diameter of the circle.</p>
+<p>If you make a sequence of function calls, they are executed one at a time in the order they are listed in your program.</p>
 <blockquote>
 <h5 id="java-terminology">Java Terminology</h5>
 <p>Java programmers will often refer to function calls as “method calls”.</p>
@@ -117,6 +120,97 @@ ct.circle( 70, 50, 10 );    // right side</code></pre>
 <p>If you want to make a long comment that spans several lines, you can also use a block comment, which begins with <code>/*</code> and ends with <code>*/</code> at any point in your code after the start of the comment.</p>
 <h6 id="java-language-help-comments"><a href="#top">Java Language Help</a> &gt; <a href="#comments">Comments</a></h6>
 <h3 id="variables">Variables</h3>
+<p>A variable is a name for a location in memory that can store a value (such as a number). The value of the variable can be changed during a program, but only the most recent value is remembered. Using a variable name in a program causes the value to be substituted.</p>
+<h4 id="examples-2">Examples</h4>
+<pre><code>int x = 30;
+ct.circle( x, 50, 20 );</code></pre>
+<pre><code>int xPosition = 30;
+double yPosition = 25.5;
+int size = 10;
+String dotColor = &quot;yellow&quot;;
+
+ct.circle( xPosition, yPosition, size, dotColor );
+
+xPosition = 70;
+
+ct.rect( xPosition, yPosition, size, size, dotColor );</code></pre>
+<h4 id="notes-2">Notes</h4>
+<p>Variables can have different types, corresponding to the type of value that they can store. Code12 supports 5 different types of variables: <code>int</code>, <code>double</code>, <code>boolean</code>, <code>String</code>, and <code>GameObj</code> (see <a href="#java-data-types">Java Data Types</a>).</p>
+<p>The first time a new variable is introduced in your program, you must “declare” the variable by specifying its type. The type is followed by the name of the variable, which you can choose, then a equals sign (“=”) and the starting value for the variable. For example:</p>
+<pre><code>int xPosition = 30;</code></pre>
+<p>Finally, like most Java statements, the entire statement must be followed by a semicolon.</p>
+<h5 id="variable-names">Variable names</h5>
+<p>You can choose the names for your variables, and unlike in mathematics, they can be multiple characters (a word). Variable names must start with a letter, and by convention in Java, it should be a lowercase letter (a-z). After the first letter, you can use any sequence of letters, digits (0-9), and the underscore (“_”) character. Examples:</p>
+<pre><code>int x = 30;
+int x2 = 70;
+int count = 1;
+double middle = 2.5;
+boolean done = false;
+String name = &quot;Fred&quot;;
+String gR8_name_dude = &quot;Bill&quot;;</code></pre>
+<p>Variable names cannot contain spaces, but using a convention called “camel case”, you can create a readable multi-word name without underscores by capitalizing the first letter of each word except the first, for example:</p>
+<pre><code>int enemyCount = 50;
+double averageScore = 85.72;
+boolean bonusMode = true;
+String playerName = &quot;Sue&quot;;
+int youCanGetReallyLongButEventuallyItGetsAnnoyingToType = 100;</code></pre>
+<p>Some names are not allowed as variables because they mean something special in the Java language, for example <code>double</code>, <code>public</code>, <code>class</code>, <code>if</code>, <code>for</code>, and <code>do</code>. If you try to use an invalid variable name, you will get a syntax error.</p>
+<h5 id="variable-declaration-initialization-and-assignment">Variable Declaration, Initialization, and Assignment</h5>
+<p>In the example:</p>
+<pre><code>int xPosition = 30;</code></pre>
+<p>the variable <code>xPosition</code> is being <em>declared</em> (introduced as a new variable with the specified type) and also <em>initialized</em> (being given its starting value).</p>
+<p>If you want to change the value of a variable later, you can use an <em>assignment</em> statement, for example:</p>
+<pre><code>xPosition = 70;</code></pre>
+<p>This changes the value of <code>xPosition</code> to 70 and the previous value of 30 is overwritten and lost. Note that you do not specify the type of the variable when it is being assigned, only when it is declared.</p>
+<p>It is also possible to declare a variable without initializing it, such as:</p>
+<pre><code>int xPosition;</code></pre>
+<p>However, you will need to assign a value to it before using it for the first time anywhere else in your program, for example:</p>
+<pre><code>int xPosition;
+xPosition = 30;
+ct.circle( xPosition, 50, 20 );</code></pre>
+<p>If you are only declaring variables and not initializing them, it is also possible to declare more than one at a time, as long as they have the same type, for example:</p>
+<pre><code>int xPosition, yPosition;
+String playerOneName, playerTwoName;</code></pre>
+<h5 id="class-level-variables-vs.local-variables">Class-Level Variables vs. Local Variables</h5>
+<p>Code in Java programs is grouped into blocks that are surrounded by curly brackets. A variable is only defined inside the block that you declare it in, starting just after the declaration and ending at the end of the block. For example:</p>
+<pre><code>class MyProgram
+{
+    public void start()
+    {
+        int yPosition = 50;
+        ct.circle( 30, yPosition, 20 );
+        ct.circle( 70, yPosition, 20 );
+    }
+
+    public void update()
+    {
+        // yPosition cannot be used here
+    }
+}</code></pre>
+<p>Here the variable <code>yPosition</code> is declared in the <code>start</code> block, so it can be used there in the two <code>ct.circle</code> function calls after the declaration. However, it cannot be used in the <code>update</code> block.</p>
+<p>If you want to use a variable in any block in your program, you can declare it in the <code>class</code> block but before the <code>start</code> block. For example:</p>
+<pre><code>class MyProgram
+{
+    int size = 20;
+
+    public void start()
+    {       
+        int yPosition = 50;
+        ct.circle( 30, yPosition, size );
+        ct.circle( 70, yPosition, size );
+    }
+
+    public void update()
+    {
+        // size can be used here, but not yPosition
+    }
+}</code></pre>
+<p>This works because variables are defined in the block they are defined in as well as any nested blocks inside it.</p>
+<p>A variable that is defined at the start of the <code>class</code> block is called a <em>class-level variable</em> and can be used anywhere in your program. A variable declared in any block other than the class block (such as <code>yPosition</code> above) is called a <em>local variable</em> because it can only be used locally in the block with the declaration.</p>
+<p>Note that the memory storage location for a class-level variable lasts for the entire run of your program and is therefore “permanent”, whereas the memory for a local variable is disposed of as soon as the block it is declared in ends. Local variables are therefore also “temporary” variables in practice.</p>
+<blockquote>
+<p>Only class-level (permanent) variables are displayed in the variable watch window in the Code12 application, because all local variables come and go very quickly in practice.</p>
+</blockquote>
 <h6 id="java-language-help-variables"><a href="#top">Java Language Help</a> &gt; <a href="#variables">Variables</a></h6>
 <h3 id="expressions">Expressions</h3>
 <h6 id="java-language-help-expressions"><a href="#top">Java Language Help</a> &gt; <a href="#expressions">Expressions</a></h6>

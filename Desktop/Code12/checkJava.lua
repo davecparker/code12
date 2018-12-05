@@ -67,6 +67,9 @@ local function checkLowerCaseStart( nameNode, usage )
 	if chFirst < 97 or chFirst > 122 then    -- a to z
 		err.setErrNode( nameNode, 
 				"By convention, %s names should start with a lower-case letter", usage )
+		if usage == "variable" then
+			err.addDocLink( "Java.html#variables" )
+		end
 	end
 end
 
@@ -221,11 +224,13 @@ local function defineVar( var )
 	if varFound then
 		err.setErrNodeAndRef( var, varFound, 
 				"Variable %s was already defined", varName )
+		err.addDocLink( "Java.html#variables" )
 		return false
 	elseif varCorrectCase then
 		err.setErrNodeAndRef( var, varCorrectCase, 
 				"Variable %s differs only by upper/lower case from existing variable %s", 
 				varName, nameCorrectCase )
+		err.addDocLink( "Java.html#variables" )
 		return false
 	end
 
@@ -280,6 +285,7 @@ local function getVariable( varNode, isVarAssign )
 		else
 			err.setErrNode( varNode, "Undefined variable %s", varNode.str )
 		end
+		err.addDocLink( "Java.html#variables" )
 		return nil
 	end
 	if isVarAssign then
@@ -287,6 +293,7 @@ local function getVariable( varNode, isVarAssign )
 	elseif not varFound.assigned then
 		err.setErrNode( varNode,  
 			"Variable %s must be assigned before it is used", varNode.str )
+		err.addDocLink( "Java.html#variables" )
 	end
 	return varFound
 end
