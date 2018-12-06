@@ -63,10 +63,10 @@
 <pre><code>ct.println( &quot;Hello World!&quot; );</code></pre>
 <pre><code>ct.circle( 50, 30, 20 );</code></pre>
 <pre><code>ct.circle( 50, 70, 20, &quot;green&quot; );</code></pre>
-<pre><code>ct.setBackColor( &quot;light blue&quot; );</code></pre>
+<pre><code>ct.setBackColor( &quot;dark gray&quot; );</code></pre>
 <pre><code>ct.text( &quot;Game Over&quot;, 50, 50, 10 );</code></pre>
-<pre><code>ct.circle( 45, 45, 20, &quot;yellow&quot; );
-ct.circle( 55, 55, 20, &quot;blue&quot; );</code></pre>
+<pre><code>ct.rect( 45, 45, 20, 20, &quot;pink&quot; );
+ct.circle( 55, 55, 20, &quot;light blue&quot; );</code></pre>
 <h4 id="notes">Notes</h4>
 <p>A function call is the most common programming construct. It is essentially a command for the program to do something. The command has a name (for example <code>ct.circle</code>) followed by a list of input values in parentheses, and at the very end is a semicolon. The input values provide additional details that the command needs to do its work. For example, in the call:</p>
 <pre><code>ct.circle( 50, 30, 20 );</code></pre>
@@ -87,7 +87,7 @@ ct.circle( 55, 55, 20, &quot;blue&quot; );</code></pre>
 <pre><code>ct.circle( 50, 70, 20, &quot;green&quot; );</code></pre>
 <p>If you do not specify an optional parameter, the function will use a default value. In the case of <code>ct.circle</code>, if you don’t specify the color, it defaults to the color <code>&quot;red&quot;</code>.</p>
 <h5 id="functions-supported">Functions Supported</h5>
-<p>What functions you have to choose from in your program depends on what “libraries” your system provides or that you have installed. Code12 has its own library of functions build-in, and most of these functions start with the prefix <code>ct.</code> (for “Code Twelve”).</p>
+<p>What functions you have to choose from in your program depends on what “libraries” your system provides or that you have installed. Code12 has its own library of functions build-in, and most of these functions start with the prefix <code>ct.</code> (for “Code Twelve”). For a complete list, see the <a href="API.html">Code12 Function Reference</a>.</p>
 <p>The Java programming language is often used with a large library called the “Java Class Library”, but Code12 only supports a handful of functions from this library when programs are run within the Code12 application.</p>
 <h6 id="java-language-help-function-calls"><a href="#top">Java Language Help</a> &gt; <a href="#function-calls">Function Calls</a></h6>
 <h3 id="comments">Comments</h3>
@@ -114,7 +114,7 @@ ct.circle( 70, 50, 10 );    // right side</code></pre>
    The above code is ignored.
 */</code></pre>
 <h4 id="notes-1">Notes</h4>
-<p>Comments help make your program more readable (to humans) by explaining what is going on and giving other information that might be useful to you or another programmer reading your code. Comments are totally ignored by Java when your program is being executed.</p>
+<p>Comments help make your program more readable (to humans) by explaining what is going on and giving other information that might be useful to you or another programmer reading your code. Comments are ignored by Java when your program is being executed.</p>
 <p>Besides leaving helpful notes, another use of comments is to temporarily disable some code without deleting it (because you might want to add it back later, for example).</p>
 <p>There are two different ways to make a comment in Java. The most common way is use to <code>//</code>, which causes all text after it until the end of the line to be treated as a comment.</p>
 <p>If you want to make a long comment that spans several lines, you can also use a block comment, which begins with <code>/*</code> and ends with <code>*/</code> at any point in your code after the start of the comment.</p>
@@ -140,7 +140,7 @@ ct.rect( xPosition, yPosition, size, size, dotColor );</code></pre>
 <pre><code>int xPosition = 30;</code></pre>
 <p>Finally, like most Java statements, the entire statement must be followed by a semicolon.</p>
 <h5 id="variable-names">Variable names</h5>
-<p>You can choose the names for your variables, and unlike in mathematics, they can be multiple characters (a word). Variable names must start with a letter, and by convention in Java, it should be a lowercase letter (a-z). After the first letter, you can use any sequence of letters, digits (0-9), and the underscore (“_”) character. Examples:</p>
+<p>You can choose the names for your variables, and unlike in mathematics, they can be multiple characters (e.g. a word). Variable names must start with a letter, and by convention in Java, it should be a lowercase letter (a-z). After the first letter, you can use any sequence of letters, digits (0-9), and the underscore (“_”) character. Examples:</p>
 <pre><code>int x = 30;
 int x2 = 70;
 int count = 1;
@@ -172,7 +172,7 @@ ct.circle( xPosition, 50, 20 );</code></pre>
 <pre><code>int xPosition, yPosition;
 String playerOneName, playerTwoName;</code></pre>
 <h5 id="class-level-variables-vs.local-variables">Class-Level Variables vs. Local Variables</h5>
-<p>Code in Java programs is grouped into blocks that are surrounded by curly brackets. A variable is only defined inside the block that you declare it in, starting just after the declaration and ending at the end of the block. For example:</p>
+<p>Code in Java programs is grouped into blocks that are surrounded by curly brackets <code>{</code> and <code>}</code>. A variable is only defined inside the block that you declare it in, starting just after the declaration and ending at the end of the block. For example:</p>
 <pre><code>class MyProgram
 {
     public void start()
@@ -240,8 +240,8 @@ ct.circle( 9, 9, 9 );</code></pre>
 int yCenter = 50;
 int yLevel = yCenter - 20;
 ct.circle( xCenter + 10, yLevel, 15 );</code></pre>
-<p>Here the value used to initialize <code>yLevel</code> is the expression <code>yCenter - 20</code>, which will be calculated as 30, and first input value for the function call is the expression <code>xCenter + 10</code>, which results in the value 60.</p>
-<p>When you use expressions for input values to a function call, the variables and expressions are all evaluated and calculated “on the spot” before the function is called, using the current values of any variables. Then the resulting values are sent to the function, so when the <code>ct.circle()</code> function above is called, the call above ends up being equivalent to:</p>
+<p>Here the value used to initialize <code>yLevel</code> is the expression <code>yCenter - 20</code>, which will be calculated as 30, and first parameter for the function call is the expression <code>xCenter + 10</code>, which results in the value 60.</p>
+<p>When you use expressions for parameters to a function call, the variables and expressions are all evaluated and calculated “on the spot” before the function is called, using the current values of any variables. Then the resulting values are sent to the function, so when the <code>ct.circle()</code> function above is called, the call above ends up being equivalent to:</p>
 <pre><code>ct.circle( 60, 30, 15 );</code></pre>
 <h5 id="numeric-operators">Numeric Operators</h5>
 <p>The numeric operators suppported are:</p>
@@ -312,9 +312,9 @@ ct.log( message );     // &quot;Player Sue has score 500&quot;</code></pre>
 <h3 id="java-data-types">Java Data Types</h3>
 <p>Code12 supports the standard Java data types <code>int</code>, <code>double</code>, <code>boolean</code>, and <code>String</code>, plus the <code>GameObj</code> type defined by Code12.</p>
 <h4 id="int">int</h4>
-<p>A number with an integer value. Examples: <code>3</code>, <code>125</code>, <code>0</code>, <code>-1</code>, <code>43500</code>, <code>-1200</code>.</p>
+<p>A number with an integer value. Examples: <code>3</code>, <code>125</code>, <code>0</code>, <code>-1</code>, <code>43500</code>, <code>-1203</code>.</p>
 <h4 id="double">double</h4>
-<p>A number which can include optional decimal places. Examples: <code>3.14</code>, <code>5</code>, <code>-67.456</code>, <code>0</code>, <code>154.003</code>, <code>-0.0001</code></p>
+<p>A number which can include optional decimal places. Examples: <code>3.14</code>, <code>5.0</code>, <code>-67.456</code>, <code>0.0</code>, <code>154.003</code>, <code>-0.0001</code></p>
 <h4 id="boolean">boolean</h4>
 <p>A logical (truth) value that can only be <code>true</code> or <code>false</code>.</p>
 <h4 id="string">String</h4>

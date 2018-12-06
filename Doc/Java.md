@@ -58,14 +58,14 @@ ct.circle( 50, 30, 20 );
 ct.circle( 50, 70, 20, "green" );
 ```
 ```
-ct.setBackColor( "light blue" );
+ct.setBackColor( "dark gray" );
 ```
 ```
 ct.text( "Game Over", 50, 50, 10 );
 ```
 ```
-ct.circle( 45, 45, 20, "yellow" );
-ct.circle( 55, 55, 20, "blue" );
+ct.rect( 45, 45, 20, 20, "pink" );
+ct.circle( 55, 55, 20, "light blue" );
 ```
 #### Notes
 A function call is the most common programming construct. 
@@ -122,6 +122,7 @@ What functions you have to choose from in your program depends on
 what "libraries" your system provides or that you have installed.
 Code12 has its own library of functions build-in, and most
 of these functions start with the prefix `ct.` (for "Code Twelve").
+For a complete list, see the [Code12 Function Reference](API.html).
 
 The Java programming language is often used with a large library
 called the "Java Class Library", but Code12 only supports a
@@ -170,8 +171,7 @@ ct.circle( 70, 50, 10 );    // right side
 Comments help make your program more readable (to humans) by
 explaining what is going on and giving other information that
 might be useful to you or another programmer reading your code.
-Comments are totally ignored by Java when your program is
-being executed.
+Comments are ignored by Java when your program is being executed.
 
 Besides leaving helpful notes, another use of comments is to
 temporarily disable some code without deleting it
@@ -231,7 +231,7 @@ be followed by a semicolon.
 
 ##### Variable names
 You can choose the names for your variables, and unlike in
-mathematics, they can be multiple characters (a word).
+mathematics, they can be multiple characters (e.g. a word).
 Variable names must start with a letter, and by convention
 in Java, it should be a lowercase letter (a-z). After the
 first letter, you can use any sequence of letters, digits (0-9),
@@ -300,8 +300,8 @@ int xPosition, yPosition;
 String playerOneName, playerTwoName;
 ```
 ##### Class-Level Variables vs. Local Variables
-Code in Java programs is grouped into blocks that are 
-surrounded by curly brackets. A variable is only defined
+Code in Java programs is grouped into blocks that are surrounded
+by curly brackets `{` and `}`. A variable is only defined
 inside the block that you declare it in, starting just after
 the declaration and ending at the end of the block.
 For example:
@@ -358,7 +358,7 @@ a *local variable* because it can only be used locally in
 the block with the declaration.
 
 Note that the memory storage location for a class-level variable 
-lasts for the entire run of your program and is therefore 
+in Code12 lasts for the entire run of your program and is therefore 
 "permanent", whereas the memory for a local variable is disposed
 of as soon as the block it is declared in ends. Local variables
 are therefore also "temporary" variables in practice.
@@ -417,11 +417,11 @@ int yLevel = yCenter - 20;
 ct.circle( xCenter + 10, yLevel, 15 );
 ```
 Here the value used to initialize `yLevel` is the expression
-`yCenter - 20`, which will be calculated as 30, and first input value 
+`yCenter - 20`, which will be calculated as 30, and first parameter 
 for the function call is the expression `xCenter + 10`, which results 
 in the value 60. 
 
-When you use expressions for input values to a function call, 
+When you use expressions for parameters to a function call, 
 the variables and expressions are all evaluated and calculated
 "on the spot" before the function is called, using the current 
 values of any variables. Then the resulting values are
