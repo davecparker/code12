@@ -923,9 +923,15 @@ local function getMembers( programTree )
 			err.setErrNode( tree, "Code12 does not support additional class definitions" )
 			getBlock()
 		else
-			-- Unexpected line in the class block
-			err.overrideErrLineParseTree( tree, 
-					"Statement must be inside a function body -- mismatched { } brackets?" )
+			-- Unexpected line in the class block.
+			-- Does it look like name = expr; (missing type in class-level var decl)?
+			if p == "stmt" and nodes[1].p == "assign" and nodes[1].nodes[1].tt == "ID" then
+				err.overrideErrLineParseTree( tree, "Initialization of a variable must include a type" )
+				err.addDocLink( "Java.html#variables" )
+			else
+				err.overrideErrLineParseTree( tree, 
+						"Statement must be inside a function body -- mismatched { } brackets?" )
+			end
 		end
 
 		-- Check indentation of members
@@ -1132,6 +1138,7 @@ function parseProgram.parseLines( syntaxLevel )
 	-- Check for unclosed block comment
 	if iLineCommentStart then
 		err.setErrLineNum( iLineCommentStart, "Comment started with /* was not closed with */" )
+		err.addDocLink( "Java.html#comments" )
 	end
 
 	-- Print cache stats

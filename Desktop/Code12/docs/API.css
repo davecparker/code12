@@ -72,10 +72,11 @@ h1.title {
 }
 
 h2 {    /* API groups */
-    background-color: #eeeeff;
-    border: 1px solid black;
     font-size: 200%;
     line-height: 110%;
+    margin-top: 0.5em;
+    background-color: #eeeeff;
+    border: 1px solid black;
     padding: 0.2em;
 }
 
@@ -132,10 +133,17 @@ h6 {   /* Contents back links and end of topic */
 ul {
     list-style: none;
     padding-left: 2em;
-
 }
 
 ul a { 
+    text-decoration: none;
+}
+
+ol {
+    padding-left: 4em;
+}
+
+ol a { 
     text-decoration: none;
 }
 

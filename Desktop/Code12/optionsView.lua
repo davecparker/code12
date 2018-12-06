@@ -303,11 +303,11 @@ function optionsView:create()
 
 	-- Syntax level picker
 	local syntaxLevels = {
-		"1. Procedure Calls",
+		"1. Function Calls",
 		"2. Comments",
 		"3. Variables",
 		"4. Expressions",
-		"5. Function Calls",
+		"5. Function Return Values",
 		"6. Object Data Fields",
 		"7. Object Method Calls",
 		"8. If-else",

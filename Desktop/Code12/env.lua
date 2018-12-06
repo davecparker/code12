@@ -58,12 +58,14 @@ function env.relativePath( fromDir, destDir )
 end
 
 -- Split a file pathname into dir and filename parts.
--- Return (dir, filename). The dir includes the last / or \.
-function env.dirAndFilenameOfPath( path )
+-- Return (dir, filename). The dir includes the last dirSeperator, 
+-- which defaults to / or \ depending on the platform if not included.
+function env.dirAndFilenameOfPath( path, dirSeperator )
 	-- Find the last dir seperator if any
+	local byteSep = (dirSeperator and string.byte( dirSeperator )) or byteDirSeperator
 	local iChar = string.len( path )
 	while iChar > 0 do
-		if string.byte( path, iChar ) == byteDirSeperator then
+		if string.byte( path, iChar ) == byteSep then
 			break
 		end
 		iChar = iChar - 1
