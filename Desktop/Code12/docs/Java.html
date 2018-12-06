@@ -22,11 +22,11 @@
 </header>
 <h5 id="java-language-constructs"><a href="#java-syntax-examples">Java Language Constructs</a></h5>
 <ul>
-<li><a href="#function-calls-1">Function Calls</a></li>
+<li><a href="#function-calls">Function Calls</a></li>
 <li><a href="#comments">Comments</a></li>
 <li><a href="#variables">Variables</a></li>
 <li><a href="#expressions">Expressions</a></li>
-<li>[Function Return Values]</li>
+<li><a href="#function-return-values">Function Return Values</a></li>
 <li><a href="#object-data-fields">Object Data Fields</a></li>
 <li><a href="#object-method-calls">Object Method Calls</a></li>
 <li><a href="#if-else">If-else</a></li>
@@ -43,11 +43,11 @@
 <h2 id="java-syntax-examples">Java Syntax Examples</h2>
 <p>These sections contain examples of Java language syntax for the 12 core programming constructs supported by Code12.</p>
 <ol type="1">
-<li><a href="#function-calls-1">Function Calls</a></li>
+<li><a href="#function-calls">Function Calls</a></li>
 <li><a href="#comments">Comments</a></li>
 <li><a href="#variables">Variables</a></li>
 <li><a href="#expressions">Expressions</a></li>
-<li>[Function Return Values]</li>
+<li><a href="#function-return-values">Function Return Values</a></li>
 <li><a href="#object-data-fields">Object Data Fields</a></li>
 <li><a href="#object-method-calls">Object Method Calls</a></li>
 <li><a href="#if-else">If-else</a></li>
@@ -89,7 +89,7 @@ ct.circle( 55, 55, 20, &quot;blue&quot; );</code></pre>
 <h5 id="functions-supported">Functions Supported</h5>
 <p>What functions you have to choose from in your program depends on what “libraries” your system provides or that you have installed. Code12 has its own library of functions build-in, and most of these functions start with the prefix <code>ct.</code> (for “Code Twelve”).</p>
 <p>The Java programming language is often used with a large library called the “Java Class Library”, but Code12 only supports a handful of functions from this library when programs are run within the Code12 application.</p>
-<h6 id="java-language-help-function-calls"><a href="#top">Java Language Help</a> &gt; <a href="#function-calls-1">Function Calls</a></h6>
+<h6 id="java-language-help-function-calls"><a href="#top">Java Language Help</a> &gt; <a href="#function-calls">Function Calls</a></h6>
 <h3 id="comments">Comments</h3>
 <p>Comments are a way for programmers to leave notes to themselves or other programmers in the code. They are ignored when the program executes.</p>
 <h4 id="examples-1">Examples</h4>
@@ -213,9 +213,88 @@ String playerOneName, playerTwoName;</code></pre>
 </blockquote>
 <h6 id="java-language-help-variables"><a href="#top">Java Language Help</a> &gt; <a href="#variables">Variables</a></h6>
 <h3 id="expressions">Expressions</h3>
+<p>An expression is a combination of numbers (or values of other types), variables, and <em>operators</em> such as <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code>, which causes the computer to do the calculations and get a resulting value.</p>
+<h4 id="examples-3">Examples</h4>
+<pre><code>int xCenter = 50;
+int x = xCenter + 10;    // assigns resulting value 60 to x
+ct.log( x );</code></pre>
+<pre><code>double a = 3;
+double b = 2;
+double sum = a + b;           // sets sum to 5
+double difference = a - b;    // sets diff to 1
+double product = a * b;       // sets product to 6
+double quotient = a / b;      // sets quotient to 1.5
+ct.log( sum, difference, product, quotient );</code></pre>
+<pre><code>int hits = 5;
+int misses = 9;
+int bonus = 200;
+double score = (hits * 50 - misses) / ((hits + misses) * 0.1) + bonus;
+ct.log( score );</code></pre>
+<h4 id="notes-3">Notes</h4>
+<p>In most places where a numeric value is expected in a Java program, such as where the number 9 appears in these examples:</p>
+<pre><code>int variable = 9;
+variable = 9;
+ct.circle( 9, 9, 9 );</code></pre>
+<p>instead of using a simple number or variable, you can also use an <em>expression</em>, which is a combination of numbers and variables combined with basic math operations such as <code>+</code> and <code>-</code>. For example,</p>
+<pre><code>int xCenter = 50;
+int yCenter = 50;
+int yLevel = yCenter - 20;
+ct.circle( xCenter + 10, yLevel, 15 );</code></pre>
+<p>Here the value used to initialize <code>yLevel</code> is the expression <code>yCenter - 20</code>, which will be calculated as 30, and first input value for the function call is the expression <code>xCenter + 10</code>, which results in the value 60.</p>
+<p>When you use expressions for input values to a function call, the variables and expressions are all evaluated and calculated “on the spot” before the function is called, using the current values of any variables. Then the resulting values are sent to the function, so when the <code>ct.circle()</code> function above is called, the call above ends up being equivalent to:</p>
+<pre><code>ct.circle( 60, 30, 15 );</code></pre>
+<h5 id="numeric-operators">Numeric Operators</h5>
+<p>The numeric operators suppported are:</p>
+<pre><code>Expression      Calculation
+----------      -----------
+a + b           Addition
+a - b           Subtraction
+-a              Negate (change sign)
+a * b           Multiplication
+a / b           Division
+a % b           Mod (remainder)</code></pre>
+<p>The expression <code>a % b</code> operator calculates the remainder of (a / b) after the integer part of the quotient is subtracted. For example, <code>7 % 3</code> is 1, because (7 / 3) is 2 remainder 1.</p>
+<h5 id="order-of-operations-and-parentheses">Order of Operations and Parentheses</h5>
+<p>In an expression with multiple operators, such as:</p>
+<pre><code>int result = 3 + 2 * 5;     // result gets 13</code></pre>
+<p>The calculations are done in the same order as the rules of algebra, which is not always left-to-right. Here, <code>2 * 5</code> will be calculated first (because multiplication has “higher precedence” over addition), then the 3 is added, so the result is 13, not 30.</p>
+<p>If you want to override the normal order of operations, you can use parentheses in your expression, such as:</p>
+<pre><code>int newResult = (3 + 2) * 5;    // result gets 30</code></pre>
+<blockquote>
+<p>It is easy to make a mistake with assumptions about the order of operations. Good programmers are generous with their use of parentheses to reduce mistakes and to make their code easier to understand.</p>
+</blockquote>
+<h5 id="int-vs.double-and-integer-division">int vs. double and Integer Division</h5>
+<p>The numeric operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and <code>%</code>) can be used on values of either type <a href="#java-data-types">int</a> or <a href="#java-data-types">double</a>, and the result will be type <code>int</code> if both sides are <code>int</code>, or <code>double</code> if either side is a <code>double</code>. This produces the results you would probably expect, except in the case of using <code>/</code> to divide two <code>int</code> values. What if the result is not an integer?</p>
+<pre><code>int i = 3 / 2;       // What do you think this does?  
+double d = 3 / 2;    // How about this?</code></pre>
+<p>You might think that since 3/2 = 1.5, storing the result in an integer (<code>i</code>) will force the computer to round the result to 2, whereas storing the result in a double (<code>d</code>) will store 1.5. Unfortunately, neither of these is what Java will do…</p>
+<p>Java treats <code>/</code> operating on two <code>int</code> values as “integer division”, which is defined as discarding any fractional part of the result and “truncating” the result to an integer (always rounding towards zero), so here <code>3 / 2</code> is 1. This happens even if the result is being stored in a <code>double</code>. So, the results for both <code>i</code> and <code>d</code> above would be 1.</p>
+<p>Normally Java would just produce the result of 1 for both <code>i</code> and <code>d</code> above without warning. Because this situation is a common source of errors (especially for beginning programmers), Code12 considers the above statements to be errors, and you must code them differently. There are three choices to rewrite it:</p>
+<pre><code>// Make sure at least one side is a double
+double d = 3.0 / 2;       // 1.5</code></pre>
+<pre><code>// Use a &quot;type cast&quot; to convert one side to double
+int left = 3;
+int right = 2;
+double d = (double) left / right;     // 1.5</code></pre>
+<pre><code>// Use ct.intDiv() if you really want integer division
+int i = ct.intDiv( 3, 2 );         // 1</code></pre>
+<h5 id="using-for-string-concatenation">Using + for String Concatenation</h5>
+<p>In addition to using the <code>+</code> operator to add two numeric values, you can also use it to combine two <a href="#java-data-types">String</a> (text) values. The result is a new longer string with the second string appended to the end of the first string. This is called “concatenation”. For example:</p>
+<pre><code>String firstName = &quot;John&quot;;
+String lastName = &quot;Smith&quot;;
+String fullName = firstName + &quot; &quot; + lastName;   // &quot;John Smith&quot;
+ct.log( firstName, lastName, fullName );</code></pre>
+<p>Java also allows you to concatenate numbers with strings, in which case the number is automatically converted to text (a string) and then the text is concatenated. For example:</p>
+<pre><code>String name = &quot;Sue&quot;;
+int score = 500;
+String message = &quot;Player &quot; + name + &quot; has score &quot; + score;
+ct.log( message );     // &quot;Player Sue has score 500&quot;</code></pre>
+<p>Note the use of spaces in the examples above. String concatenation does not add them automatically, so <code>&quot;John&quot; + &quot;Smith&quot;</code> would be <code>&quot;JohnSmith&quot;</code>.</p>
+<h5 id="operands-with-boolean-results">Operands with boolean Results</h5>
+<p>There are several other operands that produce <a href="#java-data-types">boolean</a> values. These are mostly used in conjunction with <a href="#if-else">if-else</a> statements (syntax level 8) so they are explained in that section.</p>
 <h6 id="java-language-help-expressions"><a href="#top">Java Language Help</a> &gt; <a href="#expressions">Expressions</a></h6>
-<h3 id="function-calls-1">Function Calls</h3>
-<h6 id="java-language-help-function-calls-1"><a href="#top">Java Language Help</a> &gt; <a href="#function-calls-1">Function Calls</a></h6>
+<h3 id="function-return-values">Function Return Values</h3>
+<h6 id="java-language-help-function-return-values"><a href="#top">Java Language Help</a> &gt; <a href="#function-return-values">Function Return Values</a></h6>
 <h3 id="object-data-fields">Object Data Fields</h3>
 <h6 id="java-language-help-object-data-fields"><a href="#top">Java Language Help</a> &gt; <a href="#object-data-fields">Object Data Fields</a></h6>
 <h3 id="object-method-calls">Object Method Calls</h3>

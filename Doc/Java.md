@@ -166,7 +166,6 @@ ct.circle( 70, 50, 10 );    // right side
    The above code is ignored.
 */
 ```
-
 #### Notes
 Comments help make your program more readable (to humans) by
 explaining what is going on and giving other information that
@@ -213,7 +212,6 @@ xPosition = 70;
 
 ct.rect( xPosition, yPosition, size, size, dotColor );
 ```
-
 #### Notes
 Variables can have different types, corresponding to the type 
 of value that they can store. Code12 supports 5 different
@@ -301,7 +299,6 @@ as long as they have the same type, for example:
 int xPosition, yPosition;
 String playerOneName, playerTwoName;
 ```
-
 ##### Class-Level Variables vs. Local Variables
 Code in Java programs is grouped into blocks that are 
 surrounded by curly brackets. A variable is only defined
@@ -370,18 +367,192 @@ are therefore also "temporary" variables in practice.
 > variable watch window in the Code12 application, because all
 > local variables come and go very quickly in practice. 
 
-
 ###### [Java Language Help](#top) > [Variables]
 
 
 ### Expressions
+An expression is a combination of numbers (or values of 
+other types), variables, and *operators* such as `+`, `-`,
+`*`, and `/`, which causes the computer to do the calculations
+and get a resulting value.
+
+#### Examples
+```
+int xCenter = 50;
+int x = xCenter + 10;    // assigns resulting value 60 to x
+ct.log( x );
+```
+```
+double a = 3;
+double b = 2;
+double sum = a + b;           // sets sum to 5
+double difference = a - b;    // sets diff to 1
+double product = a * b;       // sets product to 6
+double quotient = a / b;      // sets quotient to 1.5
+ct.log( sum, difference, product, quotient );
+```
+```
+int hits = 5;
+int misses = 9;
+int bonus = 200;
+double score = (hits * 50 - misses) / ((hits + misses) * 0.1) + bonus;
+ct.log( score );
+```
+#### Notes
+In most places where a numeric value is expected in a Java program,
+such as where the number 9 appears in these examples:
+```
+int variable = 9;
+variable = 9;
+ct.circle( 9, 9, 9 );
+```
+instead of using a simple number or variable, you can also use 
+an *expression*, which is a combination of numbers and variables 
+combined with basic math operations such as `+` and `-`. 
+For example,
+```
+int xCenter = 50;
+int yCenter = 50;
+int yLevel = yCenter - 20;
+ct.circle( xCenter + 10, yLevel, 15 );
+```
+Here the value used to initialize `yLevel` is the expression
+`yCenter - 20`, which will be calculated as 30, and first input value 
+for the function call is the expression `xCenter + 10`, which results 
+in the value 60. 
+
+When you use expressions for input values to a function call, 
+the variables and expressions are all evaluated and calculated
+"on the spot" before the function is called, using the current 
+values of any variables. Then the resulting values are
+sent to the function, so when the `ct.circle()` function 
+above is called, the call above ends up being equivalent to:
+```
+ct.circle( 60, 30, 15 );
+```
+##### Numeric Operators
+The numeric operators suppported are:
+```
+Expression      Calculation
+----------      -----------
+a + b           Addition
+a - b           Subtraction
+-a              Negate (change sign)
+a * b           Multiplication
+a / b           Division
+a % b           Mod (remainder)
+```
+The expression `a % b` operator calculates the remainder of
+(a / b) after the integer part of the quotient is subtracted.
+For example, `7 % 3` is 1, because (7 / 3) is 2 remainder 1.
+
+##### Order of Operations and Parentheses
+In an expression with multiple operators, such as:
+```
+int result = 3 + 2 * 5;     // result gets 13
+```
+The calculations are done in the same order as the rules
+of algebra, which is not always left-to-right. 
+Here, `2 * 5` will be calculated first (because multiplication
+has "higher precedence" over addition), then the 3
+is added, so the result is 13, not 30.
+
+If you want to override the normal order of operations,
+you can use parentheses in your expression, such as:
+```
+int newResult = (3 + 2) * 5;    // result gets 30
+```
+> It is easy to make a mistake with assumptions about
+> the order of operations. Good programmers are 
+> generous with their use of parentheses to reduce
+> mistakes and to make their code easier to understand. 
+
+##### int vs. double and Integer Division
+The numeric operators (`+`, `-`, `*`, `/`, and `%`) can 
+be used on values of either type [int](#java-data-types) 
+or [double](#java-data-types), and the result will be 
+type `int` if both sides are `int`, or `double` if 
+either side is a `double`. This produces the results 
+you would probably expect, except in the case of using
+`/` to divide two `int` values. What if the result is
+not an integer?
+```
+int i = 3 / 2;       // What do you think this does?  
+double d = 3 / 2;    // How about this?
+```
+You might think that since 3/2 = 1.5, storing the result 
+in an integer (`i`) will force the computer to round 
+the result to 2, whereas storing the result
+in a double (`d`) will store 1.5. Unfortunately,
+neither of these is what Java will do...
+
+Java treats `/` operating on two `int` values as 
+"integer division", which is defined as discarding any
+fractional part of the result and "truncating"
+the result to an integer (always rounding towards zero), 
+so here `3 / 2` is 1. This happens even if the result 
+is being stored in a `double`. So, the results for both 
+`i` and `d` above would be 1. 
+
+Normally Java would just produce the result of 1 for both
+`i` and `d` above without warning. Because this situation 
+is a common source of errors (especially for beginning 
+programmers), Code12 considers the above statements to be
+errors, and you must code them differently. There are three
+choices to rewrite it:
+```
+// Make sure at least one side is a double
+double d = 3.0 / 2;       // 1.5
+```
+```
+// Use a "type cast" to convert one side to double
+int left = 3;
+int right = 2;
+double d = (double) left / right;     // 1.5
+```
+```
+// Use ct.intDiv() if you really want integer division
+int i = ct.intDiv( 3, 2 );         // 1
+```
+##### Using + for String Concatenation 
+In addition to using the `+` operator to add two numeric
+values, you can also use it to combine two
+[String](#java-data-types) (text) values. The result
+is a new longer string with the second string appended to
+the end of the first string. This is called "concatenation".
+For example:
+```
+String firstName = "John";
+String lastName = "Smith";
+String fullName = firstName + " " + lastName;   // "John Smith"
+ct.log( firstName, lastName, fullName );
+```
+Java also allows you to concatenate numbers with strings,
+in which case the number is automatically converted to
+text (a string) and then the text is concatenated.
+For example:
+```
+String name = "Sue";
+int score = 500;
+String message = "Player " + name + " has score " + score;
+ct.log( message );     // "Player Sue has score 500"
+```
+Note the use of spaces in the examples above. String concatenation
+does not add them automatically, so `"John" + "Smith"` would be
+`"JohnSmith"`.
+
+##### Operands with boolean Results
+There are several other operands that produce 
+[boolean](#java-data-types) values. These are mostly used
+in conjunction with [if-else] statements (syntax level 8)
+so they are explained in that section.
 
 ###### [Java Language Help](#top) > [Expressions]
 
 
-### Function Calls
+### Function Return Values
 
-###### [Java Language Help](#top) > [Function Calls]
+###### [Java Language Help](#top) > [Function Return Values]
 
 
 ### Object Data Fields
@@ -426,11 +597,11 @@ plus the `GameObj` type defined by Code12.
 
 #### int
 A number with an integer value. 
-Examples: `3`, `125`, `0`, `-1`, `43500`, `-1200`.
+Examples: `3`, `125`, `0`, `-1`, `43500`, `-1203`.
 
 #### double
 A number which can include optional decimal places. 
-Examples: `3.14`, `5`, `-67.456`, `0`, `154.003`, `-0.0001`
+Examples: `3.14`, `5.0`, `-67.456`, `0.0`, `154.003`, `-0.0001`
 
 #### boolean
 A logical (truth) value that can only be `true` or `false`.

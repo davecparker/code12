@@ -3810,11 +3810,11 @@ plus the `GameObj` type defined by Code12.
 
 #### int
 A number with an integer value. 
-Examples: `3`, `125`, `0`, `-1`, `43500`, `-1200`.
+Examples: `3`, `125`, `0`, `-1`, `43500`, `-1203`.
 
 #### double
 A number which can include optional decimal places. 
-Examples: `3.14`, `5`, `-67.456`, `0`, `154.003`, `-0.0001`
+Examples: `3.14`, `5.0`, `-67.456`, `0.0`, `154.003`, `-0.0001`
 
 #### boolean
 A logical (truth) value that can only be `true` or `false`.

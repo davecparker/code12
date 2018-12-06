@@ -113,3 +113,5 @@ public void start
 		ct.rect(35,  ,  50, 28, "blue");
 	String 
 	String textColor = "black"
+		ct.text( "In Code We Trust", xField, flagTop + fieldHeight - textSize * 0.3
+				textSize, textColor );

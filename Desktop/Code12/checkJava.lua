@@ -1209,10 +1209,12 @@ local function vtExprDivide( node )
 				return 0   -- valid int result
 			end
 			err.setErrNode( node, "Integer divide has remainder. Use (double) or ct.intDiv()" )
+			err.addDocLink( "Java.html#expressions" )
 		end
 		-- The remainder can't be determined, but Code12 doesn't allow this
 		-- because chances are the programmer made a mistake.
 		err.setErrNode( node, "Integer divide may lose remainder. Use (double) or ct.intDiv()" )
+		err.addDocLink( "Java.html#expressions" )
 	end
 	return vt
 end
