@@ -1102,7 +1102,7 @@ end
 -- arrayInit
 local function vtExprArrayInit( node )
 	local exprs = node.exprs
-	if #exprs == 0 then
+	if not exprs then
 		err.setErrNode( node, "Array initializer cannot be empty" )
 		return nil
 	end
