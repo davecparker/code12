@@ -112,3 +112,4 @@ public void start
 	int a = {};
 	int a[] = {};
 		b = not 1;
+		ct.println(~2);

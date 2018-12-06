@@ -15,9 +15,296 @@ class CheckJavaErrorTestCode
 		int[] intArrayInitWithExpressions = { 1 + 2, 3 * 4 + 50, (67 - 890) + 3 };
 		GameObj[] gObjArrayInitWithCTCalls = { ct.rect(50, 50, 10, 10), ct.text("text", 50, 50, 10) };
 		double[] dblArrayInitWithExpressionsAndIntPromotion = { 1 + 2, 3.4 * 7 / 2 };
+		// int[] arrEmptyInit = { };
 	}
 
-	void testErrorsMethod()
+	int funcMissingReturn10()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			if (boolVar1)
+				ct.println();
+			else if (boolVar2)
+				return r;
+			else
+				return r;
+		// ERROR "Function is missing a return statement"
+	}
+	int funcMissingReturn9()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			if (boolVar2)
+				return r;
+			else
+				ct.println();
+		// ERROR "Function is missing a return statement"
+	}
+	int funcMissingReturn8()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			if (boolVar2)
+				return r;
+			else
+				return r;
+		// ERROR "Function is missing a return statement"
+	}
+	int funcMissingReturn7()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = true;
+		if (boolVar1)
+			ct.println();
+		else if (boolVar2)
+			ct.println();
+		else
+			return r;
+		// ERROR "Function is missing a return statement"
+	}
+	int funcMissingReturn6()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = true;
+		if (boolVar1)
+			ct.println();
+		else if (boolVar2)
+			return r;
+		else
+			ct.println();
+		// ERROR "Function is missing a return statement"
+	}
+	int funcMissingReturn5()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = true;
+		if (boolVar1)
+			return r;
+		else if (boolVar2)
+			ct.println();
+		else
+			ct.println();
+		// RROR "Function is missing a return statement"
+	}
+	int funcMissingReturn4()
+	{
+		boolean boolVar = false;
+		if (boolVar)
+			ct.println();
+		else
+			ct.println();
+		// ERROR "Function is missing a return statement"
+	}
+	int funcMissingReturn2()
+	{
+		int r = 0;
+		boolean boolVar = false;
+		if (boolVar)
+			return r;
+		// ERROR "Function is missing a return statement"
+	}
+	int funcMissingReturn1()
+	{
+		// ERROR "Function is missing a return statement"
+	}
+	int funcPathMissingReturn4WithBrackets()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+		{
+			return r;
+		}
+		else if (boolVar2)
+		{
+			ct.println();
+			// RROR "path is missing a return statement"
+		}
+	}
+	int funcPathMissingReturn3WithBrackets()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+		{
+			ct.println();
+			// ERROR "path is missing a return statement"
+		}
+		else if (boolVar2)
+		{
+			return r;
+		}
+	}
+	int funcPathMissingReturn2WithBrackets()
+	{
+		int r = 0;
+		boolean boolVar = false;
+		if (boolVar)
+		{
+			return r;
+		}
+		else
+		{
+			ct.println();
+			// ERROR "path is missing a return statement"
+		}
+	}
+	int funcPathMissingReturn1WithBrackets()
+	{
+		int r = 0;
+		boolean boolVar = false;
+		if (boolVar)
+		{
+			ct.println();
+			// ERROR "path is missing a return statement"
+		}
+		else
+		{
+			return r;
+		}
+	}
+	int funcPathMissingReturn10()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			if (boolVar1)
+				return r;
+			else if (boolVar2)
+				return r;
+			else
+				// ERROR "path is missing a return statement"
+				ct.println();
+		else
+			return r;
+	}
+	int funcPathMissingReturn9()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			if (boolVar1)
+				return r;
+			else if (boolVar2)
+				// ERROR "path is missing a return statement"
+				ct.println();
+			else
+				return r;
+		else
+			return r;
+	}
+	int funcPathMissingReturn8()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			if (boolVar1)
+				// ERROR "path is missing a return statement"
+				ct.println();
+			else if (boolVar2)
+				return r;
+			else
+				return r;
+		else
+			return r;
+	}
+	int funcPathMissingReturn7()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			// ERROR "path is missing a return statement"
+			ct.println();
+		else if (boolVar2)
+			return r;
+		else
+			return r;
+	}
+	int funcPathMissingReturn6()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			return r;
+		else if (boolVar2)
+			// ERROR "path is missing a return statement"
+			ct.println();
+		else
+			return r;
+	}
+	int funcPathMissingReturn5()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			return r;
+		else if (boolVar2)
+			return r;
+		else
+			// ERROR "path is missing a return statement"
+			ct.println();
+	}
+	int funcPathMissingReturn4()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			return r;
+		else if (boolVar2)
+			// RROR "path is missing a return statement"
+			ct.println();
+	}
+	int funcPathMissingReturn3()
+	{
+		int r = 0;
+		boolean boolVar1 = false;
+		boolean boolVar2 = false;
+		if (boolVar1)
+			// ERROR "path is missing a return statement"
+			ct.println();
+		else if (boolVar2)
+			return r;
+	}
+	int funcPathMissingReturn2()
+	{
+		int r = 0;
+		boolean boolVar = false;
+		if (boolVar)
+			return r;
+		else
+			// ERROR "path is missing a return statement"
+			ct.println();
+	}
+	int funcPathMissingReturn1()
+	{
+		int r = 0;
+		boolean boolVar = false;
+		if (boolVar)
+			// ERROR "path is missing a return statement"
+			ct.println();
+		else
+			return r;
+	}
+
+	void testErrors1()
 	{
 		int intVar = 1;
 		double doubleVar = 1.2;
@@ -34,8 +321,10 @@ class CheckJavaErrorTestCode
 		GameObj[] objArr = new GameObj[10];
 
 		// ERROR "already of type int"
+		circle.x = (int) intVar + 314;
+		// ERROR "already of type int"
 		circle.x = (int) (intVar + 314);
-		// ERROR "(int) type cast can only be applied"
+		// ERROR "(int) type cast can only be applied to type double"
 		objArr = new GameObj[2 * (int) objArr];
 		// ERROR "already of type double"
 		doubleVar = (double) (10 * 2.3);
@@ -66,25 +355,22 @@ class CheckJavaErrorTestCode
 		// ERROR "count must be an integer"
 		intArr = new int[10.0];
 
+		/* Tested fine in Code12 runtime but cause runtime error for automated error test */
 		// // "Code12 does not support making objects with new"
-		// // ERRO "making objects with new"
+		// // RROR "making objects with new"
 		// circle.group = new String();
-		// // ERRO "making objects with new"
+		// // RROR "making objects with new"
 		// rect.setText( new String() );
-		// // ERRO "making objects with new"
+		// // RROR "making objects with new"
 		// String[] newStringArr2 = { stringVar, new String() };
-		// // ERRO "making objects with new"
+		// // RROR "making objects with new"
 		// String[] newStringArr = { new String() };
-		// // ERRO "making objects with new"
+		// // RROR "making objects with new"
 		// String newString = new String();
-		// // ERRO "making objects with new"
+		// // RROR "making objects with new"
 		// intVar = new Integer(1);
-		// // ERRO "making objects with new"
+		// // RROR "making objects with new"
 		// rect = new GameObj();
-
-		// "Array initializer cannot be empty"
-		// ERRO "cannot be empty"
-		// int[] arrInit10 = { };
 
 		// "Code12 does not support arrays of arrays"
 		// ERROR "arrays of arrays"
@@ -233,14 +519,16 @@ class CheckJavaErrorTestCode
 		// ERROR "Inequality operator"
 		while (3.14 < text);
 
-		// if syntaxLevel >= 7: "Use str1.equals( str2 ) to compare two String values"
+		// if syntaxLevel >= 7: 
+		// "Use str1.equals( str2 ) to compare two String values"
 		// ERROR "compare two String values"
 		if ("" != stringVar)
 			voidMethod();
 		// ERROR "compare two String values"
 		ct.println(circle.group == "circles");
 
-		// if syntaxLevel < 7: "Strings cannot be compared with ==. You must use the equals method, which requires level 7"
+		// if syntaxLevel < 7: 
+		// "Strings cannot be compared with ==. You must use the equals method, which requires level 7"
 		// RROR "cannot be compared with"
 		// ct.println(circle.group != "");
 		// RROR "cannot be compared with"
