@@ -100,10 +100,21 @@ system, this is the [Code12 Function Reference](API.html).
 You must list the parameters in the order they are expected
 by the function.
 
-The most common parameter values are numbers and text (although
-there are other types as well). Text values are called "strings" 
+Parameters can have different types (e.g. number vs. text),
+and each parameter you supply must be the correct type or 
+you will get an error. See [Java Data Types] for examples.
+
+Text values are called "strings" (type [String](#java-data-types)) 
 and are enclosed in `"double quotes"` when you are specifying 
-the text directly.
+the text directly. 
+
+There are two types of numbers: [int](#java-data-types) 
+and [double](#java-data-types), depending on whether the number 
+is allowed to have decimal places or not.
+You are allowed to use an `int` where a `double` is required
+and it will convert automatically, but you cannot use a
+`double` where an `int` is required, because precision would
+be lost. 
 
 ##### Optional Parameters
 Some functions have parameters that are optional, meaning you can 
@@ -551,8 +562,112 @@ so they are explained in that section.
 
 
 ### Function Return Values
+Functions that are defined to have a *Return Value* will produce
+a "result" value, which can then be used by the calling code. 
+The call to the function acts like a value that can be used anywhere
+a value or an [expression](#expressions) is expected.
 
+#### Examples
+```
+// Roll a 6-sided die 
+int roll = ct.random( 1, 6 );
+ct.log( roll );
+```
+```
+// Ask the user to enter their name
+String name = ct.inputString( "Enter your name" );
+ct.log( name );
+```
+```
+// Round a number to two decimal places
+double number = 24.947823;
+double result = ct.roundDecimal( number, 2 );
+ct.log( number, result );
+```
+```
+// Make a circle at a random location
+ct.circle( ct.random( 0, 100 ), ct.random( 0, 100 ), 10 );
+```
+```
+// Compute sin(a) + cos(a)
+double a = 1.2;
+ct.log( Math.sin( a ) + Math.cos( a ) );
+```
+#### Notes
+Some functions that you can call with a [function call](#function-calls)
+are designed to calculate or produce a resulting value that they can give 
+("return") to the calling code. Not all functions return a value.
+You can look up the description of a function in the 
+[Code12 Function Reference](API.html) to see if it has a *Return Value*.
+
+For example, the function [ct.random()](API.html#ct.random) calculates
+a random integer within the range of the two numbers given in its parameters. 
+For example:
+```
+int roll = ct.random( 1, 6 );
+```
+This code calls the `ct.random()` function and then captures and stores 
+the return value in the variable `roll`. The code `ct.random( 1, 6 )` then
+acts like the resulting value to the rest of the code. Note that the
+rest of the code takes the same form as:
+```
+int roll = 3;
+```
+so here the value being assigned to the variable (`3`) can be replaced with 
+the function call `ct.random( 1, 6 )`, which calculates a value to use.
+
+##### Function Calls in Expressions
+You can also use function calls in an [expression](#expressions), anywhere
+a value of the function's return value type can be used. For example:
+```
+// Roll two dice and get the total
+int totalRoll = ct.random( 1, 6 ) + ct.random( 1, 6 );
+```
+Here the `ct.random()` function is called twice (calculating a potentially
+different result each time), and the values are "returned" to the calling code,
+which otherwise takes the same form as:
+```
+// Pretend to roll two dice and get the total
+int totalRoll = 3 + 5;
+```
+Note carefully the placement of the semicolons in the above examples.
+A function call itself does *not* have a semicolon after it, but
+the entire statement it is used in (e.g. a variable initialization or
+assignment) might need one at the very end.
+
+##### Function Calls in Parameters
+Since a function call can be used anywhere a value of the resulting
+type can be used, you can also use them as parameters to other
+function calls. For example:
+```
+// Draw a circle at a random location on the screen
+ct.circle( ct.random( 0, 100 ), ct.random( 0, 100 ), 20 );
+```
+In this case, we have function calls "within" a function call, 
+and the parentheses end up being nested. At first this may appear 
+confusing, but just remember that you can think of a function call 
+as being replaced by its return value, and also that logically the 
+whole statement will be executed from the inside out (like a 
+complex Math expression with parentheses would be). So the two
+`ct.random()` function calls will happen first, then the outer
+call to `ct.circle()` will happen, taking the same form as, for example:
+```
+ct.circle( 67, 32, 20 );
+```
+##### Java Math Functions 
+In addition to the functions that Code12 provides (which start with
+`ct.`), Java provides several functions to do standard Math calculations 
+that start with `Math.` (note that the "M" is capitalized). See 
+[Java Math Functions](API.html#java-math-functions). For example:
+```
+// Try the Pythagorean Theorem
+double a = 3;
+double b = 4;
+double c = Math.sqrt( Math.pow( a, 2 ) + Math.pow( b, 2 ) );
+ct.log( a, b, c );
+```
 ###### [Java Language Help](#top) > [Function Return Values]
+
 
 
 ### Object Data Fields
