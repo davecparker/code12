@@ -113,3 +113,19 @@ public void start
 	int a[] = {};
 		b = not 1;
 		ct.println(~2);
+		if (GameObj != null)
+		if (GameObj != null)
+		if (GameObj != null)
+		ct.println(break);
+		ERROR "requires a return value"
+	invoidt funcWrongReturnValueType6()
+		for (int i : {1, 2})
+		for (int i : new Double[10])
+		while ( )
+      ct.println(++d);
+      ct.println(d++);
+		intVar %= Math.PI;
+		intVar %= 10;
+		i %= 10;
+      i %= 10;
+		double minOf3 = Math.min(1, 2, 3)
