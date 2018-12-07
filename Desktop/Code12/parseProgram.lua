@@ -371,7 +371,7 @@ local function makeCall( nodes )
 	local callHead = nodes[1]
 	local ns = callHead.nodes
 	local p = callHead.p
-	if p == "ct" or p == "Math" then
+	if p == "ct" or p == "Math" or p == "unknown" then
 		class = ns[1]
 		nameID = ns[3]
 	elseif p == "System" then
