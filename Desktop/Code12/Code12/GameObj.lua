@@ -45,6 +45,8 @@ end
  
 -- Update the size for a rectangular object
 local function updateSizeRect(gameObj, width, height, scale)
+	width = forceNotNegative(width)
+	height = forceNotNegative(height)
 	gameObj.width = width
 	gameObj.height = height
 	local obj = gameObj.obj
@@ -54,6 +56,8 @@ end
 
 -- Update the size for a circle object
 local function updateSizeCircle(gameObj, width, height, scale)
+	width = forceNotNegative(width)
+	height = forceNotNegative(height)
 	gameObj.width = width
 	gameObj.height = height
 	local obj = gameObj.obj
@@ -69,6 +73,7 @@ end
 
 -- Update the size for a text object (width is ignored)
 local function updateSizeText(gameObj, _, height, scale)
+	height = forceNotNegative(height)
 	local prevHeight = gameObj.height
 	gameObj.height = height
 	-- Determine and set new font size
@@ -97,6 +102,9 @@ local function updateSizeLine(gameObj, width, height, scale)
 			gameObj:setObj(newObj)
 			group:insert(i, newObj)   -- insert at same z-order as old line
 			gameObj:setLineColorFromColor(gameObj.lineColor)  -- sets color and stroke width
+			if gameObj.clickable then
+				newObj:addEventListener("touch", g.onTouchGameObj)
+			end
 			-- Remove old line
 			obj:removeSelf()
 			break
@@ -724,7 +732,7 @@ end
 
 -- API
 function GameObj:setSize(width, height)
-	self:updateSize(forceNotNegative(width), forceNotNegative(height), g.scale)
+	self:updateSize(width, height, g.scale)
 end
 
 -- API
