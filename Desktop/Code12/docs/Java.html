@@ -81,7 +81,9 @@ ct.circle( 55, 55, 20, &quot;light blue&quot; );</code></pre>
 </blockquote>
 <h5 id="parameters">Parameters</h5>
 <p>Each command (function) requires different input values (parameters). To determine what parameters a function needs, you can look it up in the reference documentation. For the Code12 system, this is the <a href="API.html">Code12 Function Reference</a>. You must list the parameters in the order they are expected by the function.</p>
-<p>The most common parameter values are numbers and text (although there are other types as well). Text values are called “strings” and are enclosed in <code>&quot;double quotes&quot;</code> when you are specifying the text directly.</p>
+<p>Parameters can have different types (e.g. number vs. text), and each parameter you supply must be the correct type or you will get an error. See <a href="#java-data-types">Java Data Types</a> for examples.</p>
+<p>Text values are called “strings” (type <a href="#java-data-types">String</a>) and are enclosed in <code>&quot;double quotes&quot;</code> when you are specifying the text directly.</p>
+<p>There are two types of numbers: <a href="#java-data-types">int</a> and <a href="#java-data-types">double</a>, depending on whether the number is allowed to have decimal places or not. You are allowed to use an <code>int</code> where a <code>double</code> is required and it will convert automatically, but you cannot use a <code>double</code> where an <code>int</code> is required, because precision would be lost.</p>
 <h5 id="optional-parameters">Optional Parameters</h5>
 <p>Some functions have parameters that are optional, meaning you can choose to specify them or not. For example, the <code>ct.circle</code> function has an optional 4th parameter, which is a color name for the circle, as in:</p>
 <pre><code>ct.circle( 50, 70, 20, &quot;green&quot; );</code></pre>
@@ -207,7 +209,7 @@ String playerOneName, playerTwoName;</code></pre>
 }</code></pre>
 <p>This works because variables are defined in the block they are defined in as well as any nested blocks inside it.</p>
 <p>A variable that is defined at the start of the <code>class</code> block is called a <em>class-level variable</em> and can be used anywhere in your program. A variable declared in any block other than the class block (such as <code>yPosition</code> above) is called a <em>local variable</em> because it can only be used locally in the block with the declaration.</p>
-<p>Note that the memory storage location for a class-level variable lasts for the entire run of your program and is therefore “permanent”, whereas the memory for a local variable is disposed of as soon as the block it is declared in ends. Local variables are therefore also “temporary” variables in practice.</p>
+<p>Note that the memory storage location for a class-level variable in Code12 lasts for the entire run of your program and is therefore “permanent”, whereas the memory for a local variable is disposed of as soon as the block it is declared in ends. Local variables are therefore also “temporary” variables in practice.</p>
 <blockquote>
 <p>Only class-level (permanent) variables are displayed in the variable watch window in the Code12 application, because all local variables come and go very quickly in practice.</p>
 </blockquote>
@@ -294,6 +296,51 @@ ct.log( message );     // &quot;Player Sue has score 500&quot;</code></pre>
 <p>There are several other operands that produce <a href="#java-data-types">boolean</a> values. These are mostly used in conjunction with <a href="#if-else">if-else</a> statements (syntax level 8) so they are explained in that section.</p>
 <h6 id="java-language-help-expressions"><a href="#top">Java Language Help</a> &gt; <a href="#expressions">Expressions</a></h6>
 <h3 id="function-return-values">Function Return Values</h3>
+<p>Functions that are defined to have a <em>Return Value</em> will produce a “result” value, which can then be used by the calling code. The call to the function acts like a value that can be used anywhere a value or an <a href="#expressions">expression</a> is expected.</p>
+<h4 id="examples-4">Examples</h4>
+<pre><code>// Roll a 6-sided die 
+int roll = ct.random( 1, 6 );
+ct.log( roll );</code></pre>
+<pre><code>// Ask the user to enter their name
+String name = ct.inputString( &quot;Enter your name&quot; );
+ct.log( name );</code></pre>
+<pre><code>// Round a number to two decimal places
+double number = 24.947823;
+double result = ct.roundDecimal( number, 2 );
+ct.log( number, result );</code></pre>
+<pre><code>// Make a circle at a random location
+ct.circle( ct.random( 0, 100 ), ct.random( 0, 100 ), 10 );</code></pre>
+<pre><code>// Compute sin(a) + cos(a)
+double a = 1.2;
+ct.log( Math.sin( a ) + Math.cos( a ) );</code></pre>
+<h4 id="notes-4">Notes</h4>
+<p>Some functions that you can call with a <a href="#function-calls">function call</a> are designed to calculate or produce a resulting value that they can give (“return”) to the calling code. Not all functions return a value. You can look up the description of a function in the <a href="API.html">Code12 Function Reference</a> to see if it has a <em>Return Value</em>.</p>
+<p>For example, the function <a href="API.html#ct.random">ct.random()</a> calculates a random integer within the range of the two numbers given in its parameters. For example:</p>
+<pre><code>int roll = ct.random( 1, 6 );</code></pre>
+<p>This code calls the <code>ct.random()</code> function and then captures and stores the return value in the variable <code>roll</code>. The code <code>ct.random( 1, 6 )</code> then acts like the resulting value to the rest of the code. Note that the rest of the code takes the same form as:</p>
+<pre><code>int roll = 3;</code></pre>
+<p>so here the value being assigned to the variable (<code>3</code>) can be replaced with the function call <code>ct.random( 1, 6 )</code>, which calculates a value to use.</p>
+<h5 id="function-calls-in-expressions">Function Calls in Expressions</h5>
+<p>You can also use function calls in an <a href="#expressions">expression</a>, anywhere a value of the function’s return value type can be used. For example:</p>
+<pre><code>// Roll two dice and get the total
+int totalRoll = ct.random( 1, 6 ) + ct.random( 1, 6 );</code></pre>
+<p>Here the <code>ct.random()</code> function is called twice (calculating a potentially different result each time), and the values are “returned” to the calling code, which otherwise takes the same form as:</p>
+<pre><code>// Pretend to roll two dice and get the total
+int totalRoll = 3 + 5;</code></pre>
+<p>Note carefully the placement of the semicolons in the above examples. A function call itself does <em>not</em> have a semicolon after it, but the entire statement it is used in (e.g. a variable initialization or assignment) might need one at the very end.</p>
+<h5 id="function-calls-in-parameters">Function Calls in Parameters</h5>
+<p>Since a function call can be used anywhere a value of the resulting type can be used, you can also use them as parameters to other function calls. For example:</p>
+<pre><code>// Draw a circle at a random location on the screen
+ct.circle( ct.random( 0, 100 ), ct.random( 0, 100 ), 20 );</code></pre>
+<p>In this case, we have function calls “within” a function call, and the parentheses end up being nested. At first this may appear confusing, but just remember that you can think of a function call as being replaced by its return value, and also that logically the whole statement will be executed from the inside out (like a complex Math expression with parentheses would be). So the two <code>ct.random()</code> function calls will happen first, then the outer call to <code>ct.circle()</code> will happen, taking the same form as, for example:</p>
+<pre><code>ct.circle( 67, 32, 20 );</code></pre>
+<h5 id="java-math-functions">Java Math Functions</h5>
+<p>In addition to the functions that Code12 provides (which start with <code>ct.</code>), Java provides several functions to do standard Math calculations that start with <code>Math.</code> (note that the “M” is capitalized). See <a href="API.html#java-math-functions">Java Math Functions</a>. For example:</p>
+<pre><code>// Try the Pythagorean Theorem
+double a = 3;
+double b = 4;
+double c = Math.sqrt( Math.pow( a, 2 ) + Math.pow( b, 2 ) );
+ct.log( a, b, c );</code></pre>
 <h6 id="java-language-help-function-return-values"><a href="#top">Java Language Help</a> &gt; <a href="#function-return-values">Function Return Values</a></h6>
 <h3 id="object-data-fields">Object Data Fields</h3>
 <h6 id="java-language-help-object-data-fields"><a href="#top">Java Language Help</a> &gt; <a href="#object-data-fields">Object Data Fields</a></h6>
