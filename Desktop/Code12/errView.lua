@@ -16,11 +16,14 @@ local g = require( "Code12.globals" )
 local app = require( "app" )
 local source = require( "source" )
 local err = require( "err" )
+local env = require( "env" )
 
 
 -- The errView module and scene
 local errView = composer.newScene()
 
+-- Options
+local localHelp = true         -- true to use local copy of help docs, not web
 
 -- UI metrics
 local dxChar = app.consoleFontCharWidth
@@ -168,7 +171,7 @@ local function makeErrDisplay( sceneGroup )
 	errText = g.uiItem( display.newText{
 		parent = errGroup,
 		text = "", 
-		x = margin * 2, 
+		x = margin, 
 		y = y + margin,
 		width = app.width - margin * 4,
 		height = 0,
@@ -270,34 +273,36 @@ local function enableBtn( btn, enable )
 end
 
 -- Update the docs toolbar
-local function updateToolbar()
+local function updateDocsToolbar()
 	if docsWebView.isVisible then
 		moreInfoBtn:setLabel( "Close" )
+		moreInfoBtn.isVisible = true
 		backBtn.isVisible = true
 		forwardBtn.isVisible = true
 		enableBtn( backBtn, docsWebView.canGoBack )
 		enableBtn( forwardBtn, docsWebView.canGoForward )
 	else
-		moreInfoBtn:setLabel( "More Info." )
+		moreInfoBtn:setLabel( "More Info" )
+		moreInfoBtn.isVisible = (errRec ~= nil and errRec.docLink ~= nil)
 		backBtn.isVisible = false
 		forwardBtn.isVisible = false
 	end
 end
 
--- Show the docs if show else hide them, and update the toolbar.
-local function showDocs( show )
-	if show then
+-- If docLink then show this link in the docsWebView, else hide the docsWebView.
+local function showDocs( docLink )
+	if docLink then
 		docsWebView.isVisible = true
-		local url = "docs/API.html"
-		if errRec.docLink then
-			url = url .. errRec.docLink
+		if localHelp then
+			docsWebView:request( "docs/" .. docLink, system.ResourceDirectory )
+		else
+			docsWebView:request( app.webHelpDir .. docLink )
 		end
-		docsWebView:request( url, system.ResourceDirectory )
 	else
 		docsWebView:stop()
 		docsWebView.isVisible = false
 	end
-	updateToolbar()
+	updateDocsToolbar()
 end
 
 -- Show the error state
@@ -330,7 +335,7 @@ local function showError()
 	end
 
 	-- Show documentation link if any
-	showDocs( errRec.docLink ~= nil )
+	showDocs( errRec.docLink )
 end
 
 -- Display or re-display the current error
@@ -358,12 +363,17 @@ local function makeDocsToolbar( parent )
 	moreInfoBtn = widget.newButton{
 		x = app.width - margin, 
 		y = yCenter,
-		label = "More Info.",
+		label = "More Info",
 		labelAlign = "right",
 		font = native.systemFontBold,
 		fontSize = app.fontSizeUI,
 		onRelease = function ()
-						showDocs( not docsWebView.isVisible )  -- toggle visibility
+						-- Toggle docs view
+						if docsWebView.isVisible then
+							showDocs( nil )
+						else
+							showDocs( errRec.docLink )
+						end
 					end
 	}
 	docsToolbarGroup:insert( moreInfoBtn )
@@ -378,7 +388,7 @@ local function makeDocsToolbar( parent )
 	backBtn:addEventListener( "tap", 
 		function() 
 			docsWebView:back()
-			updateToolbar()
+			updateDocsToolbar()
 		end )
 	forwardBtn = display.newImageRect( docsToolbarGroup, "images/back.png", size, size )
 	forwardBtn.rotation = 180
@@ -388,11 +398,11 @@ local function makeDocsToolbar( parent )
 	forwardBtn:addEventListener( "tap", 
 		function() 
 			docsWebView:forward()
-			updateToolbar()
+			updateDocsToolbar()
 		end )
 
 	-- Set the initial state
-	updateToolbar()
+	updateDocsToolbar()
 end
 
 -- Handle key events in the view
@@ -424,6 +434,21 @@ local function onKeyEvent( event )
 	return false
 end
 
+-- Listener function for the docs native web view
+local function webViewListener( event )
+	-- If failed trying to load from web over http, then try local copy.
+	if event.errorCode then
+		if event.url and string.sub( event.url, 1, 4 ) == "http" then
+			print( "Web load failed, trying local copy" )
+			local _, link = env.dirAndFilenameOfPath( event.url, "/" )
+			docsWebView:request( "docs/" .. link, system.ResourceDirectory )
+		end
+	else
+		-- Update Back and Forward buttons after link is fully resolved
+		timer.performWithDelay( 100, updateDocsToolbar )
+	end
+end
+
 
 --- Scene Methods ------------------------------------------------
 
@@ -439,10 +464,7 @@ function errView:create()
 	docsWebView.anchorX = 0
 	docsWebView.anchorY = 0
 	docsWebView.isVisible = false
-	docsWebView:addEventListener( "urlRequest",
-		function ()
-			timer.performWithDelay( 100, updateToolbar )
-		end )
+	docsWebView:addEventListener( "urlRequest", webViewListener )
 
 	-- Make the toolbar for the docs view
 	makeDocsToolbar( sceneGroup )
@@ -476,7 +498,7 @@ function errView:hide( event )
 	if event.phase == "will" then
 		Runtime:removeEventListener( "key", onKeyEvent )
 	elseif event.phase == "did" then
-		showDocs( false )
+		showDocs( nil )
 	end
 end
 

@@ -850,7 +850,7 @@ int underIndentedInstanceVar;
 		// ERROR "Undefined variable"
 		for (x = 0; x < 1; x++) 
 			voidFunc();
-		// ERROR "Undefined function foo"
+		// ERROR "Undefined function"
 		foo();
 		// ERROR "already defined"
 		int j = 3;
@@ -867,7 +867,7 @@ int underIndentedInstanceVar;
 		integer n = 100;
 		// ERROR "Unknown type name"
 		bool gameOver = false;
-		// ERROR "Unknown API function"
+		// ERROR "Unknown function"
 		GameObj r = ct.rectangle(0,0,10,10);
 		// ERROR "Unknown field"
 		objVar.isVisible = false;
@@ -1150,11 +1150,11 @@ int underIndentedInstanceVar;
 		// ERROR "Variable objArr was already defined"
 		GameObj[] objArr = new GameObj[10];
 
-		// ERROR "Calling event functions directly is not allowed"
+		// ERROR "Calling main program or event functions"
 		update();
-		// ERROR "Calling event functions directly is not allowed"
+		// ERROR "Calling main program or event functions"
 		start();
-		// ERROR "Calling event functions directly is not allowed"
+		// ERROR "Calling main program or event functions"
 		onMousePress(0,0);
 
 		// ERROR "Code12 function name is"
@@ -1189,9 +1189,9 @@ int underIndentedInstanceVar;
 		// ERROR "Method call on invalid type (boolean)"
 		boolVar.foo();
 
-		// ERROR "misspelled API function"
+		// ERROR "misspelled function"
 		ct.prnitln();
-		// ERROR "Unknown API function"
+		// ERROR "Unknown function"
 		ct.circ(0,0,10);
 
 		// ERROR "Unknown method"

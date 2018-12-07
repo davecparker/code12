@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Java Language Help</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="API.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Java Language Help</h1>
+</header>
+<h5 id="java-language-constructs"><a href="#java-syntax-examples">Java Language Constructs</a></h5>
+<ul>
+<li><a href="#function-calls">Function Calls</a></li>
+<li><a href="#comments">Comments</a></li>
+<li><a href="#variables">Variables</a></li>
+<li><a href="#expressions">Expressions</a></li>
+<li><a href="#function-return-values">Function Return Values</a></li>
+<li><a href="#object-data-fields">Object Data Fields</a></li>
+<li><a href="#object-method-calls">Object Method Calls</a></li>
+<li><a href="#if-else">If-else</a></li>
+<li><a href="#function-definitions">Function Definitions</a></li>
+<li><a href="#parameters-1">Parameters</a></li>
+<li><a href="#loops">Loops</a></li>
+<li><a href="#arrays">Arrays</a></li>
+</ul>
+<h5 id="java-language-elements">Java Language Elements</h5>
+<ul>
+<li><a href="#java-data-types">Java Data Types</a></li>
+</ul>
+<h6 id="code12-version-1.0">Code12 Version 1.0</h6>
+<h2 id="java-syntax-examples">Java Syntax Examples</h2>
+<p>These sections contain examples of Java language syntax for the 12 core programming constructs supported by Code12.</p>
+<ol type="1">
+<li><a href="#function-calls">Function Calls</a></li>
+<li><a href="#comments">Comments</a></li>
+<li><a href="#variables">Variables</a></li>
+<li><a href="#expressions">Expressions</a></li>
+<li><a href="#function-return-values">Function Return Values</a></li>
+<li><a href="#object-data-fields">Object Data Fields</a></li>
+<li><a href="#object-method-calls">Object Method Calls</a></li>
+<li><a href="#if-else">If-else</a></li>
+<li><a href="#function-definitions">Function Definitions</a></li>
+<li><a href="#parameters-1">Parameters</a></li>
+<li><a href="#loops">Loops</a></li>
+<li><a href="#arrays">Arrays</a></li>
+</ol>
+<h6 id="java-language-help-java-syntax-examples"><a href="#top">Java Language Help</a> &gt; <a href="#java-syntax-examples">Java Syntax Examples</a></h6>
+<h3 id="function-calls">Function Calls</h3>
+<p>A function call is a named command for your program to execute, followed by a list of input values for the command to use.</p>
+<h4 id="examples">Examples</h4>
+<pre><code>ct.println( &quot;Hello World!&quot; );</code></pre>
+<pre><code>ct.circle( 50, 30, 20 );</code></pre>
+<pre><code>ct.circle( 50, 70, 20, &quot;green&quot; );</code></pre>
+<pre><code>ct.setBackColor( &quot;dark gray&quot; );</code></pre>
+<pre><code>ct.text( &quot;Game Over&quot;, 50, 50, 10 );</code></pre>
+<pre><code>ct.rect( 45, 45, 20, 20, &quot;pink&quot; );
+ct.circle( 55, 55, 20, &quot;light blue&quot; );</code></pre>
+<h4 id="notes">Notes</h4>
+<p>A function call is the most common programming construct. It is essentially a command for the program to do something. The command has a name (for example <code>ct.circle</code>) followed by a list of input values in parentheses, and at the very end is a semicolon. The input values provide additional details that the command needs to do its work. For example, in the call:</p>
+<pre><code>ct.circle( 50, 30, 20 );</code></pre>
+<p>you need to give a list of 3 numbers to the command. For <code>ct.circle</code>, these are the x-coordinate, y-coordinate, and diameter of the circle.</p>
+<p>If you make a sequence of function calls, they are executed one at a time in the order they are listed in your program.</p>
+<blockquote>
+<h5 id="java-terminology">Java Terminology</h5>
+<p>Java programmers will often refer to function calls as “method calls”.</p>
+</blockquote>
+<blockquote>
+<p>The input values to a function call are called “parameters” or “arguments”.</p>
+</blockquote>
+<h5 id="parameters">Parameters</h5>
+<p>Each command (function) requires different input values (parameters). To determine what parameters a function needs, you can look it up in the reference documentation. For the Code12 system, this is the <a href="API.html">Code12 Function Reference</a>. You must list the parameters in the order they are expected by the function.</p>
+<p>Parameters can have different types (e.g. number vs. text), and each parameter you supply must be the correct type or you will get an error. See <a href="#java-data-types">Java Data Types</a> for examples.</p>
+<p>Text values are called “strings” (type <a href="#java-data-types">String</a>) and are enclosed in <code>&quot;double quotes&quot;</code> when you are specifying the text directly.</p>
+<p>There are two types of numbers: <a href="#java-data-types">int</a> and <a href="#java-data-types">double</a>, depending on whether the number is allowed to have decimal places or not. You are allowed to use an <code>int</code> where a <code>double</code> is required and it will convert automatically, but you cannot use a <code>double</code> where an <code>int</code> is required, because precision would be lost.</p>
+<h5 id="optional-parameters">Optional Parameters</h5>
+<p>Some functions have parameters that are optional, meaning you can choose to specify them or not. For example, the <code>ct.circle</code> function has an optional 4th parameter, which is a color name for the circle, as in:</p>
+<pre><code>ct.circle( 50, 70, 20, &quot;green&quot; );</code></pre>
+<p>If you do not specify an optional parameter, the function will use a default value. In the case of <code>ct.circle</code>, if you don’t specify the color, it defaults to the color <code>&quot;red&quot;</code>.</p>
+<h5 id="functions-supported">Functions Supported</h5>
+<p>What functions you have to choose from in your program depends on what “libraries” your system provides or that you have installed. Code12 has its own library of functions build-in, and most of these functions start with the prefix <code>ct.</code> (for “Code Twelve”). For a complete list, see the <a href="API.html">Code12 Function Reference</a>.</p>
+<p>The Java programming language is often used with a large library called the “Java Class Library”, but Code12 only supports a handful of functions from this library when programs are run within the Code12 application.</p>
+<h6 id="java-language-help-function-calls"><a href="#top">Java Language Help</a> &gt; <a href="#function-calls">Function Calls</a></h6>
+<h3 id="comments">Comments</h3>
+<p>Comments are a way for programmers to leave notes to themselves or other programmers in the code. They are ignored when the program executes.</p>
+<h4 id="examples-1">Examples</h4>
+<pre><code>// This is a comment</code></pre>
+<pre><code>// Draw a circle in the center of the screen
+ct.circle( 50, 50, 20 );</code></pre>
+<pre><code>// Draw 3 circles
+ct.circle( 30, 50, 10 );    // left side
+ct.circle( 50, 50, 10 );    // center
+ct.circle( 70, 50, 10 );    // right side</code></pre>
+<pre><code>// The statement below has been &quot;commented out&quot; (disabled)
+// ct.circle( 50, 50, 10);</code></pre>
+<pre><code>/*
+   This is a block comment.
+   It can go on for several lines.
+   If the block comment contains any Java code,
+   the code will all be ignored.
+
+   ct.rect( 50, 50, 70, 70 );
+   ct.circle( 50, 50, 20 );
+
+   The above code is ignored.
+*/</code></pre>
+<h4 id="notes-1">Notes</h4>
+<p>Comments help make your program more readable (to humans) by explaining what is going on and giving other information that might be useful to you or another programmer reading your code. Comments are ignored by Java when your program is being executed.</p>
+<p>Besides leaving helpful notes, another use of comments is to temporarily disable some code without deleting it (because you might want to add it back later, for example).</p>
+<p>There are two different ways to make a comment in Java. The most common way is use to <code>//</code>, which causes all text after it until the end of the line to be treated as a comment.</p>
+<p>If you want to make a long comment that spans several lines, you can also use a block comment, which begins with <code>/*</code> and ends with <code>*/</code> at any point in your code after the start of the comment.</p>
+<h6 id="java-language-help-comments"><a href="#top">Java Language Help</a> &gt; <a href="#comments">Comments</a></h6>
+<h3 id="variables">Variables</h3>
+<p>A variable is a name for a location in memory that can store a value (such as a number). The value of the variable can be changed during a program, but only the most recent value is remembered. Using a variable name in a program causes the value to be substituted.</p>
+<h4 id="examples-2">Examples</h4>
+<pre><code>int x = 30;
+ct.circle( x, 50, 20 );</code></pre>
+<pre><code>int xPosition = 30;
+double yPosition = 25.5;
+int size = 10;
+String dotColor = &quot;yellow&quot;;
+
+ct.circle( xPosition, yPosition, size, dotColor );
+
+xPosition = 70;
+
+ct.rect( xPosition, yPosition, size, size, dotColor );</code></pre>
+<h4 id="notes-2">Notes</h4>
+<p>Variables can have different types, corresponding to the type of value that they can store. Code12 supports 5 different types of variables: <code>int</code>, <code>double</code>, <code>boolean</code>, <code>String</code>, and <code>GameObj</code> (see <a href="#java-data-types">Java Data Types</a>).</p>
+<p>The first time a new variable is introduced in your program, you must “declare” the variable by specifying its type. The type is followed by the name of the variable, which you can choose, then a equals sign (“=”) and the starting value for the variable. For example:</p>
+<pre><code>int xPosition = 30;</code></pre>
+<p>Finally, like most Java statements, the entire statement must be followed by a semicolon.</p>
+<h5 id="variable-names">Variable names</h5>
+<p>You can choose the names for your variables, and unlike in mathematics, they can be multiple characters (e.g. a word). Variable names must start with a letter, and by convention in Java, it should be a lowercase letter (a-z). After the first letter, you can use any sequence of letters, digits (0-9), and the underscore (“_”) character. Examples:</p>
+<pre><code>int x = 30;
+int x2 = 70;
+int count = 1;
+double middle = 2.5;
+boolean done = false;
+String name = &quot;Fred&quot;;
+String gR8_name_dude = &quot;Bill&quot;;</code></pre>
+<p>Variable names cannot contain spaces, but using a convention called “camel case”, you can create a readable multi-word name without underscores by capitalizing the first letter of each word except the first, for example:</p>
+<pre><code>int enemyCount = 50;
+double averageScore = 85.72;
+boolean bonusMode = true;
+String playerName = &quot;Sue&quot;;
+int youCanGetReallyLongButEventuallyItGetsAnnoyingToType = 100;</code></pre>
+<p>Some names are not allowed as variables because they mean something special in the Java language, for example <code>double</code>, <code>public</code>, <code>class</code>, <code>if</code>, <code>for</code>, and <code>do</code>. If you try to use an invalid variable name, you will get a syntax error.</p>
+<h5 id="variable-declaration-initialization-and-assignment">Variable Declaration, Initialization, and Assignment</h5>
+<p>In the example:</p>
+<pre><code>int xPosition = 30;</code></pre>
+<p>the variable <code>xPosition</code> is being <em>declared</em> (introduced as a new variable with the specified type) and also <em>initialized</em> (being given its starting value).</p>
+<p>If you want to change the value of a variable later, you can use an <em>assignment</em> statement, for example:</p>
+<pre><code>xPosition = 70;</code></pre>
+<p>This changes the value of <code>xPosition</code> to 70 and the previous value of 30 is overwritten and lost. Note that you do not specify the type of the variable when it is being assigned, only when it is declared.</p>
+<p>It is also possible to declare a variable without initializing it, such as:</p>
+<pre><code>int xPosition;</code></pre>
+<p>However, you will need to assign a value to it before using it for the first time anywhere else in your program, for example:</p>
+<pre><code>int xPosition;
+xPosition = 30;
+ct.circle( xPosition, 50, 20 );</code></pre>
+<p>If you are only declaring variables and not initializing them, it is also possible to declare more than one at a time, as long as they have the same type, for example:</p>
+<pre><code>int xPosition, yPosition;
+String playerOneName, playerTwoName;</code></pre>
+<h5 id="class-level-variables-vs.local-variables">Class-Level Variables vs. Local Variables</h5>
+<p>Code in Java programs is grouped into blocks that are surrounded by curly brackets <code>{</code> and <code>}</code>. A variable is only defined inside the block that you declare it in, starting just after the declaration and ending at the end of the block. For example:</p>
+<pre><code>class MyProgram
+{
+    public void start()
+    {
+        int yPosition = 50;
+        ct.circle( 30, yPosition, 20 );
+        ct.circle( 70, yPosition, 20 );
+    }
+
+    public void update()
+    {
+        // yPosition cannot be used here
+    }
+}</code></pre>
+<p>Here the variable <code>yPosition</code> is declared in the <code>start</code> block, so it can be used there in the two <code>ct.circle</code> function calls after the declaration. However, it cannot be used in the <code>update</code> block.</p>
+<p>If you want to use a variable in any block in your program, you can declare it in the <code>class</code> block but before the <code>start</code> block. For example:</p>
+<pre><code>class MyProgram
+{
+    int size = 20;
+
+    public void start()
+    {       
+        int yPosition = 50;
+        ct.circle( 30, yPosition, size );
+        ct.circle( 70, yPosition, size );
+    }
+
+    public void update()
+    {
+        // size can be used here, but not yPosition
+    }
+}</code></pre>
+<p>This works because variables are defined in the block they are defined in as well as any nested blocks inside it.</p>
+<p>A variable that is defined at the start of the <code>class</code> block is called a <em>class-level variable</em> and can be used anywhere in your program. A variable declared in any block other than the class block (such as <code>yPosition</code> above) is called a <em>local variable</em> because it can only be used locally in the block with the declaration.</p>
+<p>Note that the memory storage location for a class-level variable in Code12 lasts for the entire run of your program and is therefore “permanent”, whereas the memory for a local variable is disposed of as soon as the block it is declared in ends. Local variables are therefore also “temporary” variables in practice.</p>
+<blockquote>
+<p>Only class-level (permanent) variables are displayed in the variable watch window in the Code12 application, because all local variables come and go very quickly in practice.</p>
+</blockquote>
+<h6 id="java-language-help-variables"><a href="#top">Java Language Help</a> &gt; <a href="#variables">Variables</a></h6>
+<h3 id="expressions">Expressions</h3>
+<p>An expression is a combination of numbers (or values of other types), variables, and <em>operators</em> such as <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code>, which causes the computer to do the calculations and get a resulting value.</p>
+<h4 id="examples-3">Examples</h4>
+<pre><code>int xCenter = 50;
+int x = xCenter + 10;    // assigns resulting value 60 to x
+ct.log( x );</code></pre>
+<pre><code>double a = 3;
+double b = 2;
+double sum = a + b;           // sets sum to 5
+double difference = a - b;    // sets diff to 1
+double product = a * b;       // sets product to 6
+double quotient = a / b;      // sets quotient to 1.5
+ct.log( sum, difference, product, quotient );</code></pre>
+<pre><code>int hits = 5;
+int misses = 9;
+int bonus = 200;
+double score = (hits * 50 - misses) / ((hits + misses) * 0.1) + bonus;
+ct.log( score );</code></pre>
+<h4 id="notes-3">Notes</h4>
+<p>In most places where a numeric value is expected in a Java program, such as where the number 9 appears in these examples:</p>
+<pre><code>int variable = 9;
+variable = 9;
+ct.circle( 9, 9, 9 );</code></pre>
+<p>instead of using a simple number or variable, you can also use an <em>expression</em>, which is a combination of numbers and variables combined with basic math operations such as <code>+</code> and <code>-</code>. For example,</p>
+<pre><code>int xCenter = 50;
+int yCenter = 50;
+int yLevel = yCenter - 20;
+ct.circle( xCenter + 10, yLevel, 15 );</code></pre>
+<p>Here the value used to initialize <code>yLevel</code> is the expression <code>yCenter - 20</code>, which will be calculated as 30, and first parameter for the function call is the expression <code>xCenter + 10</code>, which results in the value 60.</p>
+<p>When you use expressions for parameters to a function call, the variables and expressions are all evaluated and calculated “on the spot” before the function is called, using the current values of any variables. Then the resulting values are sent to the function, so when the <code>ct.circle()</code> function above is called, the call above ends up being equivalent to:</p>
+<pre><code>ct.circle( 60, 30, 15 );</code></pre>
+<h5 id="numeric-operators">Numeric Operators</h5>
+<p>The numeric operators suppported are:</p>
+<pre><code>Expression      Calculation
+----------      -----------
+a + b           Addition
+a - b           Subtraction
+-a              Negate (change sign)
+a * b           Multiplication
+a / b           Division
+a % b           Mod (remainder)</code></pre>
+<p>The expression <code>a % b</code> operator calculates the remainder of (a / b) after the integer part of the quotient is subtracted. For example, <code>7 % 3</code> is 1, because (7 / 3) is 2 remainder 1.</p>
+<h5 id="order-of-operations-and-parentheses">Order of Operations and Parentheses</h5>
+<p>In an expression with multiple operators, such as:</p>
+<pre><code>int result = 3 + 2 * 5;     // result gets 13</code></pre>
+<p>The calculations are done in the same order as the rules of algebra, which is not always left-to-right. Here, <code>2 * 5</code> will be calculated first (because multiplication has “higher precedence” over addition), then the 3 is added, so the result is 13, not 30.</p>
+<p>If you want to override the normal order of operations, you can use parentheses in your expression, such as:</p>
+<pre><code>int newResult = (3 + 2) * 5;    // result gets 30</code></pre>
+<blockquote>
+<p>It is easy to make a mistake with assumptions about the order of operations. Good programmers are generous with their use of parentheses to reduce mistakes and to make their code easier to understand.</p>
+</blockquote>
+<h5 id="int-vs.double-and-integer-division">int vs. double and Integer Division</h5>
+<p>The numeric operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and <code>%</code>) can be used on values of either type <a href="#java-data-types">int</a> or <a href="#java-data-types">double</a>, and the result will be type <code>int</code> if both sides are <code>int</code>, or <code>double</code> if either side is a <code>double</code>. This produces the results you would probably expect, except in the case of using <code>/</code> to divide two <code>int</code> values. What if the result is not an integer?</p>
+<pre><code>int i = 3 / 2;       // What do you think this does?  
+double d = 3 / 2;    // How about this?</code></pre>
+<p>You might think that since 3/2 = 1.5, storing the result in an integer (<code>i</code>) will force the computer to round the result to 2, whereas storing the result in a double (<code>d</code>) will store 1.5. Unfortunately, neither of these is what Java will do…</p>
+<p>Java treats <code>/</code> operating on two <code>int</code> values as “integer division”, which is defined as discarding any fractional part of the result and “truncating” the result to an integer (always rounding towards zero), so here <code>3 / 2</code> is 1. This happens even if the result is being stored in a <code>double</code>. So, the results for both <code>i</code> and <code>d</code> above would be 1.</p>
+<p>Normally Java would just produce the result of 1 for both <code>i</code> and <code>d</code> above without warning. Because this situation is a common source of errors (especially for beginning programmers), Code12 considers the above statements to be errors, and you must code them differently. There are three choices to rewrite it:</p>
+<pre><code>// Make sure at least one side is a double
+double d = 3.0 / 2;       // 1.5</code></pre>
+<pre><code>// Use a &quot;type cast&quot; to convert one side to double
+int left = 3;
+int right = 2;
+double d = (double) left / right;     // 1.5</code></pre>
+<pre><code>// Use ct.intDiv() if you really want integer division
+int i = ct.intDiv( 3, 2 );         // 1</code></pre>
+<h5 id="using-for-string-concatenation">Using + for String Concatenation</h5>
+<p>In addition to using the <code>+</code> operator to add two numeric values, you can also use it to combine two <a href="#java-data-types">String</a> (text) values. The result is a new longer string with the second string appended to the end of the first string. This is called “concatenation”. For example:</p>
+<pre><code>String firstName = &quot;John&quot;;
+String lastName = &quot;Smith&quot;;
+String fullName = firstName + &quot; &quot; + lastName;   // &quot;John Smith&quot;
+ct.log( firstName, lastName, fullName );</code></pre>
+<p>Java also allows you to concatenate numbers with strings, in which case the number is automatically converted to text (a string) and then the text is concatenated. For example:</p>
+<pre><code>String name = &quot;Sue&quot;;
+int score = 500;
+String message = &quot;Player &quot; + name + &quot; has score &quot; + score;
+ct.log( message );     // &quot;Player Sue has score 500&quot;</code></pre>
+<p>Note the use of spaces in the examples above. String concatenation does not add them automatically, so <code>&quot;John&quot; + &quot;Smith&quot;</code> would be <code>&quot;JohnSmith&quot;</code>.</p>
+<h5 id="operands-with-boolean-results">Operands with boolean Results</h5>
+<p>There are several other operands that produce <a href="#java-data-types">boolean</a> values. These are mostly used in conjunction with <a href="#if-else">if-else</a> statements (syntax level 8) so they are explained in that section.</p>
+<h6 id="java-language-help-expressions"><a href="#top">Java Language Help</a> &gt; <a href="#expressions">Expressions</a></h6>
+<h3 id="function-return-values">Function Return Values</h3>
+<p>Functions that are defined to have a <em>Return Value</em> will produce a “result” value, which can then be used by the calling code. The call to the function acts like a value that can be used anywhere a value or an <a href="#expressions">expression</a> is expected.</p>
+<h4 id="examples-4">Examples</h4>
+<pre><code>// Roll a 6-sided die 
+int roll = ct.random( 1, 6 );
+ct.log( roll );</code></pre>
+<pre><code>// Ask the user to enter their name
+String name = ct.inputString( &quot;Enter your name&quot; );
+ct.log( name );</code></pre>
+<pre><code>// Round a number to two decimal places
+double number = 24.947823;
+double result = ct.roundDecimal( number, 2 );
+ct.log( number, result );</code></pre>
+<pre><code>// Make a circle at a random location
+ct.circle( ct.random( 0, 100 ), ct.random( 0, 100 ), 10 );</code></pre>
+<pre><code>// Compute sin(a) + cos(a)
+double a = 1.2;
+ct.log( Math.sin( a ) + Math.cos( a ) );</code></pre>
+<h4 id="notes-4">Notes</h4>
+<p>Some functions that you can call with a <a href="#function-calls">function call</a> are designed to calculate or produce a resulting value that they can give (“return”) to the calling code. Not all functions return a value. You can look up the description of a function in the <a href="API.html">Code12 Function Reference</a> to see if it has a <em>Return Value</em>.</p>
+<p>For example, the function <a href="API.html#ct.random">ct.random()</a> calculates a random integer within the range of the two numbers given in its parameters. For example:</p>
+<pre><code>int roll = ct.random( 1, 6 );</code></pre>
+<p>This code calls the <code>ct.random()</code> function and then captures and stores the return value in the variable <code>roll</code>. The code <code>ct.random( 1, 6 )</code> then acts like the resulting value to the rest of the code. Note that the rest of the code takes the same form as:</p>
+<pre><code>int roll = 3;</code></pre>
+<p>so here the value being assigned to the variable (<code>3</code>) can be replaced with the function call <code>ct.random( 1, 6 )</code>, which calculates a value to use.</p>
+<h5 id="function-calls-in-expressions">Function Calls in Expressions</h5>
+<p>You can also use function calls in an <a href="#expressions">expression</a>, anywhere a value of the function’s return value type can be used. For example:</p>
+<pre><code>// Roll two dice and get the total
+int totalRoll = ct.random( 1, 6 ) + ct.random( 1, 6 );</code></pre>
+<p>Here the <code>ct.random()</code> function is called twice (calculating a potentially different result each time), and the values are “returned” to the calling code, which otherwise takes the same form as:</p>
+<pre><code>// Pretend to roll two dice and get the total
+int totalRoll = 3 + 5;</code></pre>
+<p>Note carefully the placement of the semicolons in the above examples. A function call itself does <em>not</em> have a semicolon after it, but the entire statement it is used in (e.g. a variable initialization or assignment) might need one at the very end.</p>
+<h5 id="function-calls-in-parameters">Function Calls in Parameters</h5>
+<p>Since a function call can be used anywhere a value of the resulting type can be used, you can also use them as parameters to other function calls. For example:</p>
+<pre><code>// Draw a circle at a random location on the screen
+ct.circle( ct.random( 0, 100 ), ct.random( 0, 100 ), 20 );</code></pre>
+<p>In this case, we have function calls “within” a function call, and the parentheses end up being nested. At first this may appear confusing, but just remember that you can think of a function call as being replaced by its return value, and also that logically the whole statement will be executed from the inside out (like a complex Math expression with parentheses would be). So the two <code>ct.random()</code> function calls will happen first, then the outer call to <code>ct.circle()</code> will happen, taking the same form as, for example:</p>
+<pre><code>ct.circle( 67, 32, 20 );</code></pre>
+<h5 id="java-math-functions">Java Math Functions</h5>
+<p>In addition to the functions that Code12 provides (which start with <code>ct.</code>), Java provides several functions to do standard Math calculations that start with <code>Math.</code> (note that the “M” is capitalized). See <a href="API.html#java-math-functions">Java Math Functions</a>. For example:</p>
+<pre><code>// Try the Pythagorean Theorem
+double a = 3;
+double b = 4;
+double c = Math.sqrt( Math.pow( a, 2 ) + Math.pow( b, 2 ) );
+ct.log( a, b, c );</code></pre>
+<h6 id="java-language-help-function-return-values"><a href="#top">Java Language Help</a> &gt; <a href="#function-return-values">Function Return Values</a></h6>
+<h3 id="object-data-fields">Object Data Fields</h3>
+<h6 id="java-language-help-object-data-fields"><a href="#top">Java Language Help</a> &gt; <a href="#object-data-fields">Object Data Fields</a></h6>
+<h3 id="object-method-calls">Object Method Calls</h3>
+<h6 id="java-language-help-object-method-calls"><a href="#top">Java Language Help</a> &gt; <a href="#object-method-calls">Object Method Calls</a></h6>
+<h3 id="if-else">If-else</h3>
+<h6 id="java-language-help-if-else"><a href="#top">Java Language Help</a> &gt; <a href="#if-else">If-else</a></h6>
+<h3 id="function-definitions">Function Definitions</h3>
+<h6 id="java-language-help-function-definitions"><a href="#top">Java Language Help</a> &gt; <a href="#function-definitions">Function Definitions</a></h6>
+<h3 id="parameters-1">Parameters</h3>
+<h6 id="java-language-help-parameters"><a href="#top">Java Language Help</a> &gt; <a href="#parameters-1">Parameters</a></h6>
+<h3 id="loops">Loops</h3>
+<h6 id="java-language-help-loops"><a href="#top">Java Language Help</a> &gt; <a href="#loops">Loops</a></h6>
+<h3 id="arrays">Arrays</h3>
+<h6 id="java-language-help-arrays"><a href="#top">Java Language Help</a> &gt; <a href="#arrays">Arrays</a></h6>
+<h3 id="java-data-types">Java Data Types</h3>
+<p>Code12 supports the standard Java data types <code>int</code>, <code>double</code>, <code>boolean</code>, and <code>String</code>, plus the <code>GameObj</code> type defined by Code12.</p>
+<h4 id="int">int</h4>
+<p>A number with an integer value. Examples: <code>3</code>, <code>125</code>, <code>0</code>, <code>-1</code>, <code>43500</code>, <code>-1203</code>.</p>
+<h4 id="double">double</h4>
+<p>A number which can include optional decimal places. Examples: <code>3.14</code>, <code>5.0</code>, <code>-67.456</code>, <code>0.0</code>, <code>154.003</code>, <code>-0.0001</code></p>
+<h4 id="boolean">boolean</h4>
+<p>A logical (truth) value that can only be <code>true</code> or <code>false</code>.</p>
+<h4 id="string">String</h4>
+<p>A sequence of text characters. When the value of a string is given directly, it must be enclosed in double quotes. Examples: <code>&quot;hello&quot;</code>, <code>&quot;What is your name?&quot;</code>, <code>&quot;3&quot;</code>, <code>&quot;food4u*$-!)&quot;</code></p>
+<h4 id="gameobj">GameObj</h4>
+<p>A <code>GameObj</code> (Game Object) is a reference to a graphical object (circle, rectangle, line, text, or image) that you can create for display on the screen. To create a <code>GameObj</code>, see [Graphics Object Creation]. If you store a <code>GameObj</code> in a variable then you can also access and change the object later using the [GameObj Data Fields] and [GameObj Methods].</p>
+<h6 id="java-language-help-java-data-types"><a href="#top">Java Language Help</a> &gt; <a href="#java-data-types">Java Data Types</a></h6>
+<footer>
+<p>Code12 Version 1.0</p>
+(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved.
+</footer>
+</body>
+</html>

@@ -117,8 +117,8 @@ class GameObj
 	void setFillColorRGB( int red, int green, int blue )
 	void setLineColor( String color )
 	void setLineColorRGB( int red, int green, int blue )
-	void setLineWidth( int lineWidth );                // in pixels
-	void setImage( String filename );                  // only for image objects
+	void setLineWidth( int lineWidth )                 // in pixels
+	void setImage( String filename )                   // only for image objects
 	int getLayer( )
 	void setLayer( int layer )                         // objects default to layer 1
 	void delete( )

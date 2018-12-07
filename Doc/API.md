@@ -114,7 +114,7 @@
 * [obj.objectHitInGroup()]
 
 ##### Other Functions Supported
-* [Java Math Methods]
+* [Java Math Functions]
 * [Java String Methods]
 * [Main Program Functions]
 * [Input Event Functions]
@@ -1545,7 +1545,7 @@ These functions provide a convenient way to do common calculations.
 * [ct.intDiv()]
 * [ct.isError()]
 
-For more math operations, see [Java Math Methods].
+For more math operations, see [Java Math Functions].
 
 ###### [Code12 Function Reference](#top) > [Math Utilities]
 
@@ -3233,9 +3233,9 @@ if (target != null)
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.objectHitInGroup()]
 
 
-Java Math Methods
------------------
-Code12 supports the following method functions and fields from the Java `Math` class.
+Java Math Functions
+-------------------
+Code12 supports the following functions and fields from the Java `Math` class.
 
 For more information, see the 
 [Java Math Class](https://docs.oracle.com/javase/8/docs/api/java/lang/Math.html).
@@ -3274,7 +3274,7 @@ Math.PI     double
 
 ```
 
-###### [Code12 Function Reference](#top) > [Java Math Methods]
+###### [Code12 Function Reference](#top) > [Java Math Functions]
 
 
 Java String Methods
@@ -3810,11 +3810,11 @@ plus the `GameObj` type defined by Code12.
 
 #### int
 A number with an integer value. 
-Examples: `3`, `125`, `0`, `-1`, `43500`, `-1200`.
+Examples: `3`, `125`, `0`, `-1`, `43500`, `-1203`.
 
 #### double
 A number which can include optional decimal places. 
-Examples: `3.14`, `5`, `-67.456`, `0`, `154.003`, `-0.0001`
+Examples: `3.14`, `5.0`, `-67.456`, `0.0`, `154.003`, `-0.0001`
 
 #### boolean
 A logical (truth) value that can only be `true` or `false`.

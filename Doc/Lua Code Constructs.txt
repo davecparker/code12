@@ -7,8 +7,8 @@ Java-to-Lua conversion of the Code12 desktop app. Each of the 12 Code12
 coding concepts is shown with an example in Java and the equivalent in Lua.
 
 
-1. Procedure Calls
-==================
+1. Function Calls
+=================
 The syntax is very similar. Semicolons at the end are optional in Lua,
 and normally not used unless you are putting multiple statements on a line. 
 
@@ -107,8 +107,8 @@ x = (start + 3) * size - 1
 name = firstName .. " " .. lastName
 
 
-5. Function Calls
-=================
+5. Function Return Values
+=========================
 For the subset we are using, there are no real syntax differences for functions 
 that return a value. You can ignore the value, assign it to a variable, or use 
 it in an expression.

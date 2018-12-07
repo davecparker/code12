@@ -129,3 +129,9 @@ public void start
 		i %= 10;
       i %= 10;
 		double minOf3 = Math.min(1, 2, 3)
+		ct.rect(50, 64, 80, 4, "white");	}
+		ct.rect(35,  ,  50, 28, "blue");
+	String 
+	String textColor = "black"
+		ct.text( "In Code We Trust", xField, flagTop + fieldHeight - textSize * 0.3
+				textSize, textColor );

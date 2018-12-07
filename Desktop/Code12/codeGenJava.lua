@@ -358,6 +358,11 @@ local function arrayInitCode( expr )
 	return table.concat( codeStrs )
 end
 
+-- "new Class" is not allowed outside main, which doesn't generate code
+local function newClassCode( expr )
+	return ""
+end
+
 -- Functions to generate code for the various expr types
 local fnGenerateExpr = {
 	["call"]         = callExprCode,
@@ -369,7 +374,7 @@ local fnGenerateExpr = {
 	["binOp"]        = binOpCode,
 	["newArray"]     = newArrayCode,
 	["arrayInit"]    = arrayInitCode,
-	-- "new" is not allowed outside main, which doesn't generate code
+	["new"]          = newClassCode,
 }
 
 -- Return the Lua code for the given expr
