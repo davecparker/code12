@@ -6,11 +6,13 @@ class CheckJavaErrorTestCode
 	String classLevelString = "";
 	GameObj classLevelGameObj;
 	int[] classLevelIntArr = new int[10];
+	GameObj classLevelUnassignedVar;
 	// RROR "API functions cannot be called before start()"
 	// GameObj ctCallBeforeStart = ct.rect(0, 0, 10, 10);
 
 	void voidMethod()
 	{
+		int voidMethodVar;
 		return;
 	}
 	void voidMethodWithParams(int p1, double p2, boolean p3, String p4, GameObj p5)
@@ -72,6 +74,77 @@ class CheckJavaErrorTestCode
 			return returnValue;
 		}
 	}
+	void testErrors3()
+	{
+		boolean boolVar = false;
+		if (boolVar)
+		{
+			int prevBlockVar;
+		}
+		// ERROR "Undefined variable (previous variable"
+		prevBlockVar = 2e2;
+		// ERROR "Undefined variable (previous variable"
+		ct.println(voidMethodVar + 1);
+		// ERROR "Undefined variable (previous similar variable"
+		prevBlockvar = 1.1;
+		// ERROR "must be declared with a type before being assigned"
+		undeclaredVar = 0;
+		// ERROR "Undefined variable"
+		classLevelGameObj.setText(undeclaredVar);
+		// ERROR "must be assigned before it is used"
+		ct.print(classLevelUnassignedVar);
+		int unassignedVar;
+		// ERROR "must be assigned before it is used"
+		ct.print(unassignedVar);
+	}
+	// ERROR "Return type" (for Code12 events)
+	public boolean onMousePress( GameObj obj, double x, double y )
+	{
+		return classLevelBoolean;
+	}
+	// ERROR "Wrong number of parameters" (for Code12 events)
+	public void onMouseDrag( GameObj obj, double x, double y, double z )
+	{
+	}
+	// ERROR "Wrong type for parameter 3"
+	public void onMouseRelease( GameObj obj, double x, int y )
+	{
+	}
+	// ERROR "function must be declared starting with" public
+	void onKeyPress( String keyName )
+	{
+	}
+	// ERROR "function must be declared starting with" public
+	private void onKeyRelease( String keyName )
+	{
+	}
+	// ? "The main function must be declared as" public static
+	public void main(String[] args)
+	{
+	}
+	// ERROR "function should not be declared static"
+	public static void onCharTyped( String charString )
+	{
+	}
+	public void onResize()
+	{
+	}
+	// ERROR "function was already defined"
+	public void onResize()
+	{
+	}
+	void existingUserFunction()
+	{
+	}
+	// ERROR "already defined"
+	void existingUserFunction()
+	{
+	}
+	// ERROR "differs only by upper/lower case from existing function"
+	void existingUserfunction()
+	{
+	}
+	// --- end defineMethod() tests
 	void testErrors2()
 	{
 		int intVar = 0;
@@ -87,8 +160,36 @@ class CheckJavaErrorTestCode
 		boolean[] boolArr = new boolean[10];
 		String[] strArr = new String[10];
 		GameObj[] objArr = new GameObj[10];
-
-
+		// ERROR "double cannot be assigned to an int"
+		intVar = dblVar;
+		// ERROR "double cannot be assigned to a String"
+		strVar = dblVar;
+		// ERROR "Integer value cannot be assigned to a String"
+		strVar = intVar;
+		// ERROR "String cannot be assigned to a double"
+		dblVar = strVar;
+		// ERROR "String cannot be assigned to an int"
+		intVar = strVar;
+		// ERROR "cannot be assigned to type"
+		dblVar = rect;
+		// ERROR "can only be applied to an array"
+		rect[0].x = dblVar;
+		// ERROR "can only be applied to an array"
+		intVar[0]++;
+		// ERROR "index must be an integer"
+		strArr[intVar * 1.0] = strVar;
+		// ERROR "index must be an integer"
+		objArr[dblVar] = rect;
+		// ERROR "Arrays can only access" .length field
+		intArr = new int[intArr.foo * 2];
+		// ERROR "no data fields"
+		ct.print(intVar.x);
+		// ERROR "function as a variable"
+		rect.setText = strVar;
+		// ERROR "Unknown field"
+		dblVar = rect.foo;
+		// ERROR "Unknown field"
+		rect.foo = 0;
 		// ERROR "Calling event functions"
 		onMousePress( rect, rect.x, rect.y );
 		// ERROR "Undefined function, the Code12 function name is"
@@ -114,7 +215,7 @@ class CheckJavaErrorTestCode
 		// ERROR "Unknown or misspelled method"
 		rect.getWidht(dblVar);
 		// ERROR "Unknown or misspelled method"
-		strVar.equality(classLevelString);
+		strVar.equal(classLevelString);
 		// ERROR "Unknown method"
 		rect.foo();		
 		// ERROR "Unknown method"
@@ -1068,10 +1169,5 @@ class CheckJavaErrorTestCode
 	// RROR "A Code12 program must define"
 	public void start()
 	{
-	}
-
-	public void main(String[] args)
-	{
-
 	}
 }

@@ -26,7 +26,6 @@ local outFile
 
 -- Misc state
 local syntaxLevel = 12       -- test at max syntax level
-local codeGenOn = false      -- true to turn on Lua code generation
 
 -- Error data
 local numUnexpectedErrors = 0
@@ -173,13 +172,11 @@ local function checkTestCode()
 	local semCheckTime = system.getTimer() - startTime
 
 	-- Do Code Generation
-	if codeGenOn then
-		startTime = system.getTimer()
-		if programTree then
-			codeGenJava.getLuaCode( programTree )
-		end
-		local codeGenTime = system.getTimer() - startTime
+	startTime = system.getTimer()
+	if programTree then
+		codeGenJava.getLuaCode( programTree )
 	end
+	local codeGenTime = system.getTimer() - startTime
 
 	-- Check the results
 	checkErrorResults()
@@ -192,10 +189,8 @@ local function checkTestCode()
 	outputAndDisplay( string.format( "    %d lines processed", source.numLines ) )
 	outputAndDisplay( string.format( "    %d ms Parse time", parseTime ) )
 	outputAndDisplay( string.format( "    %d ms Semantic check time", semCheckTime ) )
-	if codeGenOn then
-		outputAndDisplay( string.format( "    %d ms Code Generation time", codeGenTime ) )
-		outputAndDisplay( string.format( "    %d ms Total time",  parseTime + semCheckTime + codeGenTime) )
-	end
+	outputAndDisplay( string.format( "    %d ms Code Generation time", codeGenTime ) )
+	outputAndDisplay( string.format( "    %d ms Total time",  parseTime + semCheckTime + codeGenTime ) )
 	outputAndDisplay( "" )
 	outputAndDisplay( string.format( "%d unexpected errors", numUnexpectedErrors ) )
 	outputAndDisplay( string.format( "%d uncaught errors (%d expected errors)", 

@@ -278,7 +278,7 @@ local function callCode( call )
 					.. " == " .. exprCode( exprs[1] ) .. ")"
 		end
 		-- Map to corresponding global Lua function, passing the object.  
-		parts = { luaFnFromJavaStringMethod[methodName], "(", 
+		parts = { luaFnFromJavaStringMethod[methodName] or "", "(", 
 				lValueCode( lValue ) }
 		if numExprs > 0 then
 			parts[#parts + 1] = ", "
