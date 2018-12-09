@@ -67,7 +67,7 @@ local function applyObjectSpeeds(screen)
 
 			-- Delete object if it went out of bounds
 			if x < xMin or x > xMax or y < yMin or y > yMax then
-				gameObj:removeAndDelete()
+				gameObj:removeAndDelete( true )
 			end
 		end
 	end

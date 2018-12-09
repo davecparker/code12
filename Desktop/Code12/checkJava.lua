@@ -612,10 +612,26 @@ local function findStaticMethod( call )
 			if misName then
 				err.setErrNodeSpan( classNode, nameID, 
 						'Unknown or misspelled function, did you mean "ct.%s" ?', misName )
+				err.addDocLink( "API.html" )
 			else
-				err.setErrNodeSpan( classNode, nameID, "Unknown function" )
+				-- Did they use ct.objMethod instead of obj.objMethod?
+				method = lookupID( nameID, apiTables["GameObj"].methods )
+				if method then
+					if syntaxLevel < 7 then
+						err.setErrNodeSpan( classNode, nameID,
+								'GameObj methods must be called on a GameObj variable, not "ct."'
+								.. '\n(Use of object method calls requires syntax level 7)' )
+						err.addDocLink( "Java.html#object-method-calls" )
+					else
+						err.setErrNodeSpan( classNode, nameID,
+								'GameObj methods must be called on a GameObj variable, not "ct."' )
+						err.addDocLink( method.docLink )
+					end
+				else
+					err.setErrNodeSpan( classNode, nameID, "Unknown function" )
+					err.addDocLink( "API.html" )
+				end
 			end
-			err.addDocLink( "API.html" )
 			return nil
 		elseif beforeStart then
 			err.setErrNode( call, "Code12 API functions cannot be called before start()" )
