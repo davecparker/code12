@@ -358,8 +358,8 @@ local function arrayInitCode( expr )
 	return table.concat( codeStrs )
 end
 
--- "new Class" is not allowed outside main, which doesn't generate code
-local function newClassCode( expr )
+-- "new Class()" is not allowed outside main, which doesn't generate code
+local function newClassCode()
 	return ""
 end
 

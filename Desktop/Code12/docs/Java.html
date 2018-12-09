@@ -129,13 +129,13 @@ ct.circle( x, 50, 20 );</code></pre>
 <pre><code>int xPosition = 30;
 double yPosition = 25.5;
 int size = 10;
-String dotColor = &quot;yellow&quot;;
+String color = &quot;yellow&quot;;
 
-ct.circle( xPosition, yPosition, size, dotColor );
+ct.circle( xPosition, yPosition, size, color );
 
 xPosition = 70;
 
-ct.rect( xPosition, yPosition, size, size, dotColor );</code></pre>
+ct.rect( xPosition, yPosition, size, size, color );</code></pre>
 <h4 id="notes-2">Notes</h4>
 <p>Variables can have different types, corresponding to the type of value that they can store. Code12 supports 5 different types of variables: <code>int</code>, <code>double</code>, <code>boolean</code>, <code>String</code>, and <code>GameObj</code> (see <a href="#java-data-types">Java Data Types</a>).</p>
 <p>The first time a new variable is introduced in your program, you must “declare” the variable by specifying its type. The type is followed by the name of the variable, which you can choose, then a equals sign (“=”) and the starting value for the variable. For example:</p>
@@ -259,12 +259,37 @@ a % b           Mod (remainder)</code></pre>
 <h5 id="order-of-operations-and-parentheses">Order of Operations and Parentheses</h5>
 <p>In an expression with multiple operators, such as:</p>
 <pre><code>int result = 3 + 2 * 5;     // result gets 13</code></pre>
-<p>The calculations are done in the same order as the rules of algebra, which is not always left-to-right. Here, <code>2 * 5</code> will be calculated first (because multiplication has “higher precedence” over addition), then the 3 is added, so the result is 13, not 30.</p>
+<p>The calculations are done in the same order as the rules of algebra, which is not always left-to-right. Here, <code>2 * 5</code> will be calculated first (because multiplication has “higher precedence” over addition), then the 3 is added, so the result is 13, not 25.</p>
 <p>If you want to override the normal order of operations, you can use parentheses in your expression, such as:</p>
-<pre><code>int newResult = (3 + 2) * 5;    // result gets 30</code></pre>
+<pre><code>int newResult = (3 + 2) * 5;    // result gets 25</code></pre>
 <blockquote>
 <p>It is easy to make a mistake with assumptions about the order of operations. Good programmers are generous with their use of parentheses to reduce mistakes and to make their code easier to understand.</p>
 </blockquote>
+<h5 id="changing-a-variable-value">Changing a Variable Value</h5>
+<p>In the following code:</p>
+<pre><code>int score = 500;
+int bonus = 100;
+int total = score + bonus;</code></pre>
+<p>The <code>total</code> is introduced as a new variable that will be assigned the value 600. Instead of introducing a new variable, it is also possible to change the value of the existing <code>score</code> variable:</p>
+<pre><code>int score = 500;
+int bonus = 100;
+score = score + bonus;</code></pre>
+<p>Here <code>score</code> is initialized to 500, but then it is assigned a new value using the expression <code>score + bonus</code>, which is calculated as 600, so <code>score</code> then gets assigned the new value of 600 (overwriting the previous value of 500).</p>
+<p>If you try to look at the statement <code>score = score + bonus;</code> like an equation in algebra, it doesn’t make much sense (bonus must be 0? But we said it was 100…). However, this makes perfect sense in Java (and other computer languages). It is important to understand that assignment statements are <em>not equations</em>. They are <em>instructions</em> to calculate and store a new value for a variable. Here <code>score = score + bonus;</code> increases the value of the score by the bonus. This kind of code is very common in programming.</p>
+<h5 id="assignment-shortcuts">Assignment Shortcuts</h5>
+<p>Statements like <code>score = score + bonus;</code> above are common enough that Java has a shortcut for it:</p>
+<pre><code>score += bonus;       // score = score + bonus;</code></pre>
+<p>Further, increasing a variable by 1 is even more common (when counting things, for example), so Java has an even shorter shortcut for that:</p>
+<pre><code>score++;             // score = score + 1</code></pre>
+<p>Here are examples of the Java assignment shortcut statements supported by Code12:</p>
+<pre><code>Shortcut      Equivalent
+--------      ----------
+a += b;       a = a + b;
+a -= b;       a = a - b;
+a *= b;       a = a * b;
+a /= b;       a = a / b;
+a++;          a = a + 1;
+a--;          a = a - 1;</code></pre>
 <h5 id="int-vs.double-and-integer-division">int vs. double and Integer Division</h5>
 <p>The numeric operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, and <code>%</code>) can be used on values of either type <a href="#java-data-types">int</a> or <a href="#java-data-types">double</a>, and the result will be type <code>int</code> if both sides are <code>int</code>, or <code>double</code> if either side is a <code>double</code>. This produces the results you would probably expect, except in the case of using <code>/</code> to divide two <code>int</code> values. What if the result is not an integer?</p>
 <pre><code>int i = 3 / 2;       // What do you think this does?  
@@ -293,7 +318,7 @@ String message = &quot;Player &quot; + name + &quot; has score &quot; + score;
 ct.log( message );     // &quot;Player Sue has score 500&quot;</code></pre>
 <p>Note the use of spaces in the examples above. String concatenation does not add them automatically, so <code>&quot;John&quot; + &quot;Smith&quot;</code> would be <code>&quot;JohnSmith&quot;</code>.</p>
 <h5 id="operands-with-boolean-results">Operands with boolean Results</h5>
-<p>There are several other operands that produce <a href="#java-data-types">boolean</a> values. These are mostly used in conjunction with <a href="#if-else">if-else</a> statements (syntax level 8) so they are explained in that section.</p>
+<p>There are several other operands that produce <a href="#java-data-types">boolean</a> values. These are mostly used in conjunction with <a href="#if-else">if-else</a> statements (syntax level 8), so they are explained in that section.</p>
 <h6 id="java-language-help-expressions"><a href="#top">Java Language Help</a> &gt; <a href="#expressions">Expressions</a></h6>
 <h3 id="function-return-values">Function Return Values</h3>
 <p>Functions that are defined to have a <em>Return Value</em> will produce a “result” value, which can then be used by the calling code. The call to the function acts like a value that can be used anywhere a value or an <a href="#expressions">expression</a> is expected.</p>
@@ -305,9 +330,9 @@ ct.log( roll );</code></pre>
 String name = ct.inputString( &quot;Enter your name&quot; );
 ct.log( name );</code></pre>
 <pre><code>// Round a number to two decimal places
-double number = 24.947823;
-double result = ct.roundDecimal( number, 2 );
-ct.log( number, result );</code></pre>
+double amount = 24.947823;
+double result = ct.roundDecimal( amount, 2 );
+ct.log( amount, result );</code></pre>
 <pre><code>// Make a circle at a random location
 ct.circle( ct.random( 0, 100 ), ct.random( 0, 100 ), 10 );</code></pre>
 <pre><code>// Compute sin(a) + cos(a)
@@ -343,6 +368,63 @@ double c = Math.sqrt( Math.pow( a, 2 ) + Math.pow( b, 2 ) );
 ct.log( a, b, c );</code></pre>
 <h6 id="java-language-help-function-return-values"><a href="#top">Java Language Help</a> &gt; <a href="#function-return-values">Function Return Values</a></h6>
 <h3 id="object-data-fields">Object Data Fields</h3>
+<p>The <a href="API.html#graphics-object-creation">Graphics Object Creation</a> functions in Code12 <a href="#function-return-values">return a value</a> of type <a href="#java-data-types">GameObj</a>, which allows you to manipulate the graphics object created. First you must capture the return value of the function in a variable of type <code>GameObj</code>, such as:</p>
+<pre><code>GameObj dot = ct.circle( 50, 30, 20 );</code></pre>
+<p>A variable of type <a href="#java-data-types">GameObj</a> acts like a container that has several sub-variables inside of it, which all apply to that graphics object. These sub-variables are called <em>data fields</em>. Some of these data fields can be accessed directly using a dot (.) after the <code>GameObj</code> variable name followed by the name of the sub-variable. For example, <code>hero.x</code> is the x-coordinate of a <code>GameObj</code> variable named <code>hero</code>.</p>
+<h5 id="examples-5">Examples</h5>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
+dot.x = 100;             // move to right edge of screen</code></pre>
+<pre><code>GameObj square = ct.rect( 7, 7, 10, 10 );
+double y = ct.inputNumber( &quot;Enter y-coordinate to move square to&quot; );
+square.y = y;</code></pre>
+<pre><code>GameObj dot;
+
+public void start()
+{
+    dot = ct.circle( 0, 50, 10 );   
+}
+
+public void update()
+{
+    // Move dot a little to the right each animation frame
+    dot.x = dot.x + 1;
+}</code></pre>
+<pre><code>GameObj greenDot = ct.circle( 30, 50, 20, &quot;green&quot; );
+GameObj redDot = ct.circle( 70, 50, 20, &quot;red&quot; );
+redDot.visible = false;</code></pre>
+<pre><code>GameObj penny = ct.circle( 30, 10, 6, &quot;orange&quot; );
+penny.group = &quot;coins&quot;;
+
+GameObj dime = ct.circle( 50, 10, 6, &quot;light gray&quot; );
+dime.group = &quot;coins&quot;;
+
+GameObj bill = ct.rect( 75, 10, 20, 10, &quot;dark green&quot; );
+bill.group = &quot;bills&quot;;
+
+ct.showAlert( &quot;Click OK to delete the coins&quot; );
+ct.clearGroup( &quot;coins&quot; );</code></pre>
+<h4 id="notes-5">Notes</h4>
+<p>The Java data types <a href="#java-data-types">int</a>, <a href="#java-data-types">double</a>, and <a href="#java-data-types">boolean</a> are called “primitive” data types, because they only take a single number to store (the boolean values <code>true</code> and <code>false</code> are represented by the numbers 1 and 0 internally). The <a href="#java-data-types">GameObj</a> type, however, is a complex data type that requires several numbers internally to store. This is an example of an “Object” data type in Java.</p>
+<p>Each <code>GameObj</code> variable contains several data fields inside it. These fields store the object’s current position, size, speed, color, and more. Because you can have many <code>GameObj</code> objects in your program, each one has its own memory locations for each of these fields, so, for example, <code>hero.x</code> may be 32 while <code>enemy.x</code> might be 75.</p>
+<h5 id="getting-and-setting-data-fields">Getting and Setting Data Fields</h5>
+<p>An object data field allows you to either “get” its current value, as in:</p>
+<pre><code>GameObj dot = ct.circle( 50, 30, 20 );   // circle at (50, 30)
+double xPosition = dot.x;       // sets xPosition to 50</code></pre>
+<p>or you can also “set” (change) a field value, as is:</p>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
+dot.x = 100;             // move to right edge of screen</code></pre>
+<p>In this statement:</p>
+<pre><code>dot.x = dot.x + 1;</code></pre>
+<p>The code first “gets” the current value of the <code>x</code> field of <code>dot</code> then changes (“sets”) it to be 1 greater.</p>
+<h5 id="gameobj-public-data-fields">GameObj Public Data Fields</h5>
+<p>Only some of the data fields inside a <code>GameObj</code> can be accessed directly. Java refers to these as “public data fields”. These are:</p>
+<pre><code>Field       Type        Use
+-------     -------     -------------------------
+x           double      The object&#39;s x-coordinate
+y           double      The object&#39;s y-coordinate
+visible     boolean     false to hide the object
+group       String      optional group name</code></pre>
+<p>For more information, see <a href="API.html#gameobj-data-fields">GameObj Data Fields</a>.</p>
 <h6 id="java-language-help-object-data-fields"><a href="#top">Java Language Help</a> &gt; <a href="#object-data-fields">Object Data Fields</a></h6>
 <h3 id="object-method-calls">Object Method Calls</h3>
 <h6 id="java-language-help-object-method-calls"><a href="#top">Java Language Help</a> &gt; <a href="#object-method-calls">Object Method Calls</a></h6>

@@ -926,7 +926,9 @@ local function getMembers( programTree )
 			-- Unexpected line in the class block.
 			-- Does it look like name = expr; (missing type in class-level var decl)?
 			if p == "stmt" and nodes[1].p == "assign" and nodes[1].nodes[1].tt == "ID" then
-				err.overrideErrLineParseTree( tree, "Initialization of a variable must include a type" )
+				err.overrideErrLineParseTree( tree, 
+						"Initialization of a variable must include a type,\n"
+						.. "assignments must be inside a function body, e.g. start()" )
 				err.addDocLink( "Java.html#variables" )
 			else
 				err.overrideErrLineParseTree( tree, 

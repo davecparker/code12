@@ -215,13 +215,13 @@ ct.circle( x, 50, 20 );
 int xPosition = 30;
 double yPosition = 25.5;
 int size = 10;
-String dotColor = "yellow";
+String color = "yellow";
 
-ct.circle( xPosition, yPosition, size, dotColor );
+ct.circle( xPosition, yPosition, size, color );
 
 xPosition = 70;
 
-ct.rect( xPosition, yPosition, size, size, dotColor );
+ct.rect( xPosition, yPosition, size, size, color );
 ```
 #### Notes
 Variables can have different types, corresponding to the type 
@@ -466,17 +466,73 @@ The calculations are done in the same order as the rules
 of algebra, which is not always left-to-right. 
 Here, `2 * 5` will be calculated first (because multiplication
 has "higher precedence" over addition), then the 3
-is added, so the result is 13, not 30.
+is added, so the result is 13, not 25.
 
 If you want to override the normal order of operations,
 you can use parentheses in your expression, such as:
 ```
-int newResult = (3 + 2) * 5;    // result gets 30
+int newResult = (3 + 2) * 5;    // result gets 25
 ```
 > It is easy to make a mistake with assumptions about
 > the order of operations. Good programmers are 
 > generous with their use of parentheses to reduce
-> mistakes and to make their code easier to understand. 
+> mistakes and to make their code easier to understand.
+
+##### Changing a Variable Value
+In the following code:
+```
+int score = 500;
+int bonus = 100;
+int total = score + bonus;
+```
+The `total` is introduced as a new variable that will be
+assigned the value 600. Instead of introducing a new 
+variable, it is also possible to change the value of 
+the existing `score` variable:
+```
+int score = 500;
+int bonus = 100;
+score = score + bonus;
+```
+Here `score` is initialized to 500, but then it is assigned 
+a new value using the expression `score + bonus`, which 
+is calculated as 600, so `score` then gets assigned the
+new value of 600 (overwriting the previous value of 500).
+
+If you try to look at the statement `score = score + bonus;`
+like an equation in algebra, it doesn't make much sense (bonus 
+must be 0? But we said it was 100...). However, this makes perfect
+sense in Java (and other computer languages). It is important 
+to understand that assignment statements are *not equations*. 
+They are *instructions* to calculate and store a new value for a 
+variable. Here `score = score + bonus;` increases the value 
+of the score by the bonus. This kind of code is very common
+in programming.
+
+##### Assignment Shortcuts
+Statements like `score = score + bonus;` above are common 
+enough that Java has a shortcut for it:
+```
+score += bonus;       // score = score + bonus;
+```
+Further, increasing a variable by 1 is even more common
+(when counting things, for example), so Java has an
+even shorter shortcut for that:
+```
+score++;             // score = score + 1
+```
+Here are examples of the Java assignment shortcut statements
+supported by Code12:
+```
+Shortcut      Equivalent
+--------      ----------
+a += b;       a = a + b;
+a -= b;       a = a - b;
+a *= b;       a = a * b;
+a /= b;       a = a / b;
+a++;          a = a + 1;
+a--;          a = a - 1;
+```
 
 ##### int vs. double and Integer Division
 The numeric operators (`+`, `-`, `*`, `/`, and `%`) can 
@@ -555,7 +611,7 @@ does not add them automatically, so `"John" + "Smith"` would be
 ##### Operands with boolean Results
 There are several other operands that produce 
 [boolean](#java-data-types) values. These are mostly used
-in conjunction with [if-else] statements (syntax level 8)
+in conjunction with [if-else] statements (syntax level 8),
 so they are explained in that section.
 
 ###### [Java Language Help](#top) > [Expressions]
@@ -580,9 +636,9 @@ ct.log( name );
 ```
 ```
 // Round a number to two decimal places
-double number = 24.947823;
-double result = ct.roundDecimal( number, 2 );
-ct.log( number, result );
+double amount = 24.947823;
+double result = ct.roundDecimal( amount, 2 );
+ct.log( amount, result );
 ```
 ```
 // Make a circle at a random location
@@ -669,8 +725,111 @@ ct.log( a, b, c );
 ###### [Java Language Help](#top) > [Function Return Values]
 
 
-
 ### Object Data Fields
+The [Graphics Object Creation](API.html#graphics-object-creation)
+functions in Code12 [return a value](#function-return-values) 
+of type [GameObj](#java-data-types), which allows you to manipulate 
+the graphics object created. First you must capture the return 
+value of the function in a variable of type `GameObj`, such as:
+```
+GameObj dot = ct.circle( 50, 30, 20 );
+```
+A variable of type [GameObj](#java-data-types) acts like a container
+that has several sub-variables inside of it, which all apply to that 
+graphics object. These sub-variables are called *data fields*.
+Some of these data fields can be accessed directly using a dot (.) 
+after the `GameObj` variable name followed by the name of the sub-variable. 
+For example, `hero.x` is the x-coordinate of a `GameObj` variable named `hero`.
+
+##### Examples
+```
+GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
+dot.x = 100;             // move to right edge of screen
+```
+```
+GameObj square = ct.rect( 7, 7, 10, 10 );
+double y = ct.inputNumber( "Enter y-coordinate to move square to" );
+square.y = y;
+```
+```
+GameObj dot;
+
+public void start()
+{
+	dot = ct.circle( 0, 50, 10 );	
+}
+
+public void update()
+{
+	// Move dot a little to the right each animation frame
+	dot.x = dot.x + 1;
+}
+```
+```
+GameObj greenDot = ct.circle( 30, 50, 20, "green" );
+GameObj redDot = ct.circle( 70, 50, 20, "red" );
+redDot.visible = false;
+```
+```
+GameObj penny = ct.circle( 30, 10, 6, "orange" );
+penny.group = "coins";
+
+GameObj dime = ct.circle( 50, 10, 6, "light gray" );
+dime.group = "coins";
+
+GameObj bill = ct.rect( 75, 10, 20, 10, "dark green" );
+bill.group = "bills";
+
+ct.showAlert( "Click OK to delete the coins" );
+ct.clearGroup( "coins" );
+```
+#### Notes
+The Java data types [int](#java-data-types), [double](#java-data-types),
+and [boolean](#java-data-types) are called "primitive" data types,
+because they only take a single number to store (the boolean 
+values `true` and `false` are represented by the numbers 1 and 0
+internally). The [GameObj](#java-data-types) type, however, is a 
+complex data type that requires several numbers internally to store.
+This is an example of an "Object" data type in Java.
+
+Each `GameObj` variable contains several data fields inside it.
+These fields store the object's current position, size, speed,
+color, and more. Because you can have many `GameObj` objects in your 
+program, each one has its own memory locations for each of these
+fields, so, for example, `hero.x` may be 32 while `enemy.x` 
+might be 75.
+
+##### Getting and Setting Data Fields
+An object data field allows you to either "get" its current value,
+as in:
+```
+GameObj dot = ct.circle( 50, 30, 20 );   // circle at (50, 30)
+double xPosition = dot.x;       // sets xPosition to 50
+```
+or you can also "set" (change) a field value, as is:
+```
+GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
+dot.x = 100;             // move to right edge of screen
+```
+In this statement:
+```
+dot.x = dot.x + 1;
+```
+The code first "gets" the current value of the `x` field of `dot`
+then changes ("sets") it to be 1 greater. 
+
+##### GameObj Public Data Fields
+Only some of the data fields inside a `GameObj` can be accessed
+directly. Java refers to these as "public data fields". These are:
+```
+Field       Type        Use
+-------     -------     -------------------------
+x           double      The object's x-coordinate
+y           double      The object's y-coordinate
+visible     boolean     false to hide the object
+group       String      optional group name
+```
+For more information, see [GameObj Data Fields](API.html#gameobj-data-fields).
 
 ###### [Java Language Help](#top) > [Object Data Fields]
 
