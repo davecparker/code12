@@ -741,7 +741,7 @@ Some of these data fields can be accessed directly using a dot (.)
 after the `GameObj` variable name followed by the name of the sub-variable. 
 For example, `hero.x` is the x-coordinate of a `GameObj` variable named `hero`.
 
-##### Examples
+#### Examples
 ```
 GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
 dot.x = 100;             // move to right edge of screen
@@ -835,6 +835,160 @@ For more information, see [GameObj Data Fields](API.html#gameobj-data-fields).
 
 
 ### Object Method Calls
+Code12 has several special functions that are designed 
+for use on graphics objects. When a Java function is designed to
+operate on a specific object (instead of your application as a whole), 
+it is often provided as an "*object method*", which uses a slightly
+different syntax than a normal function call.
+
+#### Example
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+ball.setFillColor( "blue" );
+```
+The call to `ball.setFillColor()` above is an object method call.
+Unlike [function calls](#function-calls) that apply to your application 
+as a whole (which start with `ct.` in Code12), object methods 
+for graphics objects are called by specifying a variable of type
+[GameObj](#java-data-types) (here `ball`) to the left of the dot (.) 
+instead of `ct`. The `GameObj` variable refers to the particular 
+graphics object in your program that you want to operate on.
+
+The function [ct.circle()](API.html#ct.circle) creates a new circle
+object and also [returns a value](#function-return-values) 
+of type `GameObj` so that you can make a variable such as `ball`
+that will refer to the object that was created and then call object
+methods on it afterwards.
+
+#### More Examples
+```
+GameObj top = ct.circle( 50, 35, 10 );
+GameObj middle = ct.circle( 50, 50, 10 );
+GameObj bottom = ct.circle( 50, 65, 10 );
+
+top.setFillColor( "red" );
+middle.setFillColor( "yellow" );
+bottom.setFillColor( "green" );
+```
+```
+GameObj block = ct.rect( 10, 10, 10, 10 );
+block.setSize( 20, 5 );
+block.setSpeed( 0.5, 0.25 );
+block.setFillColorRGB( 200, 100, 50 );
+block.setLineColor( "gray" );
+block.setLineWidth( 3 );
+```
+```
+GameObj text = ct.text( "This will be underlined", 50, 30, 8 );
+double width = text.getWidth();
+double height = text.getHeight();
+double yBottom = text.y + height / 2;
+GameObj underline = ct.line( text.x - width / 2, yBottom,
+                             text.x + width / 2, yBottom );
+underline.setLineWidth( 2 );
+```
+```
+String str = "Code12";
+int numChars = str.length();
+String strLower = str.toLowerCase();
+ct.println( strLower.substring( 0, numChars - 2 ) );
+```
+#### Notes
+You can think of a [GameObj](#java-data-types) as a container
+for several sub-variables ("data fields"), all of which apply
+to a specific graphics object on the screen. You can also think
+of a variable of type `GameObj` as a reference to (like a name for) 
+the graphics object itself.
+
+In addition to the [GameObj public data fields](API.html#gameobj-data-fields),
+each `GameObj` also internally has data fields that are used to 
+store the object's size, speed, colors, and more. These fields are
+not accessible directly, but the 
+[GameObj method functions](API.html#gameobj-methods) can
+be used to access or change these properties of the object.
+There are also some method functions that perform special actions
+or tests on the object.
+
+Calling a `GameObj` method function applies only to the particular 
+`GameObj` that the method is called on, not any other `GameObj`
+objects in your program. 
+
+##### Getting and Setting Properties of an Object
+Some method functions modify the object that they are called on,
+for example:
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+ball.setFillColor( "blue" );
+```
+This is often called "setting a property" of an object.
+
+Other method functions are designed to just return information 
+about the object, for example:
+```
+GameObj message = ct.text( "Hello There", 50, 50, 10 );
+double width = message.getWidth();
+```
+This is often called "getting a property" of an object.
+Method functions that "get" properties will always have
+a [return value](#function-return-values).
+
+##### Methods vs. Functions
+A call to an object method function has a variable name before 
+the dot instead of `ct`. For example:
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+
+ct.setBackColor( "yellow" );    // normal function call
+ball.setFillColor( "blue" );    // method function call
+```
+> Strictly speaking, all function calls in Java are actually 
+> considered method calls in Object-Oriented terminology.
+> The "ct" in a Code12 function call is actually a variable 
+> that is provided to you by the system that refers to your 
+> program as a whole. So a call such as `ct.setBackColor()`
+> is really a call to the `setBackColor()` method on the 
+> `ct` object.
+
+So, calling a method function on a `GameObj` requires that you have
+a variable of type `GameObj` in your program to refer to the object
+with. In the following code:
+```
+ct.circle( 30, 50, 20 );
+GameObj block = ct.rect( 70, 50, 20, 30 );
+
+block.setSpeed( 0, 1 );
+```
+the circle is created and drawn on the screen, but the 
+[return value](#function-return-values) of `ct.circle()`
+is ignored and not assigned to a variable. This means
+there is no way to call a method function on it. 
+The rectangle, however, is assigned to the variable
+`block`, which can then be used to call method functions.
+
+##### GameObj and String Methods
+A Code12 program can call method functions on two different 
+types of data objects: [GameObj](#java-data-types) and 
+[String](#java-data-types). See the 
+[GameObj method functions](API.html#gameobj-methods) for
+the method functions supported for `GameObj` objects.
+
+Variables of type [String](#java-data-types) are technically 
+also "objects" in Java, and there are various method functions 
+designed to operate on strings.
+See [Java String Methods](API.html#java-string-methods) 
+for the methods supported by Code12.
+
+> All of the Java String methods either return information about
+> the string or create and return a new String. It is not possible 
+> to modify a String in Java.
+
+Note that `GameObj` methods can only be called on a variable
+of type `GameObj`, and `String` methods must be called on a
+variable of type `String`.
+
+The Java data types [int](#java-data-types), [double](#java-data-types),
+and [boolean](#java-data-types) are "primitive types" and do
+not support method calls.
 
 ###### [Java Language Help](#top) > [Object Method Calls]
 
