@@ -58,6 +58,8 @@ local g = {
 	clickX = 0,            -- Last click x location 
 	clickY = 0,            -- Last click x location 
 	charTyped = nil,       -- char typed during this update frame (string), nil if none
+	xDialog = nil,         -- x coord (physical, left) for input dialog placement
+	yDialog = nil,         -- y coord (physical, top) for input dialog placement
 
 	-- The run state
 	runState = nil,    -- "running", "waiting", "paused", "stopped", "error", or nil
