@@ -135,3 +135,6 @@ public void start
 	String textColor = "black"
 		ct.text( "In Code We Trust", xField, flagTop + fieldHeight - textSize * 0.3
 				textSize, textColor );
+		ct.println(~2);
+		boolean boolVar = rect.getText().equals("");
+		Boolean boolVar = rect.getText().equals("");

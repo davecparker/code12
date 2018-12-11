@@ -7,9 +7,27 @@ class CheckJavaErrorTestCode
 	GameObj classLevelGameObj;
 	int[] classLevelIntArr = new int[10];
 	GameObj classLevelUnassignedVar;
-	// RROR "API functions cannot be called before start()"
-	// GameObj ctCallBeforeStart = ct.rect(0, 0, 10, 10);
+	// ERROR "API functions cannot be called before start()"
+	GameObj varFromCtCallBeforeStart = ct.rect(0, 0, 10, 10);
+	// ERROR "User-defined functions cannot be called before start()"
+	GameObj intVarFromUserMethod = intMethod();
 
+	void syntaxLevelDependentTests()
+	{
+		String strVar = "";
+		GameObj gameObjVar = ct.circle(0, 0, 1);
+		// if syntaxLevel is 7-12: 
+		// ERROR "Use str1.equals( str2 ) to compare two String values"
+		if ("" != strVar)
+			voidMethod();
+		// ERROR "Use str1.equals( str2 ) to compare two String values"
+		ct.println(gameObjVar.group == "circles");
+	}
+
+	int intMethod()
+	{
+		return 0;
+	}
 	void voidMethod()
 	{
 		int voidMethodVar;
@@ -18,9 +36,7 @@ class CheckJavaErrorTestCode
 	void voidMethodWithParams(int p1, double p2, boolean p3, String p4, GameObj p5)
 	{
 	}
-	// void variadicMethod(int... args)
-	// {
-	// }
+
 	GameObj noErrorsMethod()
 	{
 		System.out.println("Hello world");
@@ -30,9 +46,7 @@ class CheckJavaErrorTestCode
 		int[] intArrayInitWithExpressions = { 1 + 2, 3 * 4 + 50, (67 - 890) + 3 };
 		GameObj[] gObjArrayInitWithCTCalls = { ct.rect(50, 50, 10, 10), ct.text("text", 50, 50, 10) };
 		double[] dblArrayInitWithExpressionsAndIntPromotion = { 1 + 2, 3.4 * 7 / 2 };
-		// ? int[] arrEmptyInit = { };
-		// ? if (classLevelGameObj.getText().equals(classLevelString))
-		// 	voidMethod();
+
 		for (;boolVar;)
 		{
 			ct.println();
@@ -74,9 +88,48 @@ class CheckJavaErrorTestCode
 			return returnValue;
 		}
 	}
+	// void syntaxLevelDependentTests()
+	// ERROR "parameter names should start with a lower-case letter"
+	public void onMousePress( GameObj obj, double x, double Yvalue )
+	{
+	}
+	// ERROR "parameter names should start with a lower-case letter"
+	void parameterStartsWithCapitalMethod( double doubleParam, int IntParam, boolean boolParam )
+	{
+		int userFunc1Var = 1;
+	}
+	// ERROR "function names should start with a lower-case letter"
+	void StartsWithCapitalLetterMethod()
+	{
+	}
 	void testErrors3()
 	{
+		int intVar = 0;
 		boolean boolVar = false;
+		// ERROR "variable names should start with a lower-case letter"
+		int Starts_with_capital_letter_var;
+		// ERROR "variable names should start with a lower-case letter"
+		double StartsWithCapitalLetterVarWithAssignment = 3.14;
+		// ERROR "variable names should start with a lower-case letter"
+		GameObj[] GameObjArrVar = new GameObj[10];
+		// ERROR "Names are case-sensitive, known name is"
+		double dblVar = intvar + 1;
+		// ERROR "Names are case-sensitive, known name is"
+		ct.println(boolvar);
+		// ERROR "Names are case-sensitive, known name is"
+		voidmethod();
+		// ERROR "Names are case-sensitive, known name is"
+		ct.PrintLn();
+		// ERROR "already defined"
+		int classLevelGameObj;
+		// ERROR "already defined"
+		int intVar;
+		// ERROR "already defined"
+		boolean boolVar;
+		// ERROR "differs only by upper/lower case from existing variable"
+		GameObj classlevelInt;
+		// ERROR "differs only by upper/lower case from existing variable"
+		boolean boolvar = true;
 		if (boolVar)
 		{
 			int prevBlockVar;
@@ -118,10 +171,7 @@ class CheckJavaErrorTestCode
 	private void onKeyRelease( String keyName )
 	{
 	}
-	// ? "The main function must be declared as" public static
-	public void main(String[] args)
-	{
-	}
+
 	// ERROR "function should not be declared static"
 	public static void onCharTyped( String charString )
 	{
@@ -144,7 +194,6 @@ class CheckJavaErrorTestCode
 	void existingUserfunction()
 	{
 	}
-	// --- end defineMethod() tests
 	void testErrors2()
 	{
 		int intVar = 0;
@@ -190,22 +239,20 @@ class CheckJavaErrorTestCode
 		dblVar = rect.foo;
 		// ERROR "Unknown field"
 		rect.foo = 0;
-		// ERROR "Calling event functions"
+		// ERROR "Calling main program or event functions directly is not allowed"
 		onMousePress( rect, rect.x, rect.y );
-		// ERROR "Undefined function, the Code12 function name is"
+		// ERROR "Unknown function, the Code12 function name is"
 		GameObj line = line(50, 50, 10, 10);
-		// ERROR "Undefined function, the Code12 function name is"
+		// ERROR "Unknown function, the Code12 function name is"
 		println();
 		// ERROR "Undefined function"
 		undefinedFunc();
-		// ERROR "Unknown or misspelled API function"
+		// ERROR "Unknown or misspelled function"
 		rect = ct.rec(0, 0, 1, 1);
-		// ERROR "Unknown or misspelled API function"
+		// ERROR "Unknown or misspelled function"
 		ct.printLine();
-		// ERROR "Unknown API function"
+		// ERROR "Unknown function"
 		ct.foo();
-		// ? "supported System functions are"
-		// System.outprintln("");
 		// ERROR "supported System functions are"
 		System.foo.bar();
 		// ERROR "supported System functions are"
@@ -646,19 +693,7 @@ class CheckJavaErrorTestCode
 			ct.println();
 		// ERROR "Function is missing a return statement"
 	}
-	int funcMissingReturn5()
-	{
-		int r = 0;
-		boolean boolVar1 = false;
-		boolean boolVar2 = true;
-		if (boolVar1)
-			return r;
-		else if (boolVar2)
-			ct.println();
-		else
-			ct.println();
-		// ? "Function is missing a return statement"
-	}
+
 	int funcMissingReturn4()
 	{
 		boolean boolVar = false;
@@ -679,21 +714,6 @@ class CheckJavaErrorTestCode
 	int funcMissingReturn1()
 	{
 		// ERROR "Function is missing a return statement"
-	}
-	int funcPathMissingReturn4Brackets()
-	{
-		int r = 0;
-		boolean boolVar1 = false;
-		boolean boolVar2 = false;
-		if (boolVar1)
-		{
-			return r;
-		}
-		else if (boolVar2)
-		{
-			ct.println();
-			// ? "path is missing a return statement"
-		}
 	}
 	int funcPathMissingReturn3Brackets()
 	{
@@ -825,17 +845,6 @@ class CheckJavaErrorTestCode
 			// ERROR "path is missing a return statement"
 			ct.println();
 	}
-	int funcPathMissingReturn4()
-	{
-		int r = 0;
-		boolean boolVar1 = false;
-		boolean boolVar2 = false;
-		if (boolVar1)
-			return r;
-		else if (boolVar2)
-			// ? "path is missing a return statement"
-			ct.println();
-	}
 	int funcPathMissingReturn3()
 	{
 		int r = 0;
@@ -918,23 +927,21 @@ class CheckJavaErrorTestCode
 		dblArr = new double[dblVar];
 		// ERROR "count must be an integer"
 		intArr = new int[10.0];
-
-		/* Tested fine in Code12 runtime but cause runtime error for automated error test */
-		// // "Code12 does not support making objects with new"
-		// // RROR "making objects with new"
-		// circle.group = new String();
-		// // RROR "making objects with new"
-		// rect.setText( new String() );
-		// // RROR "making objects with new"
-		// String[] newStringArr2 = { strVar, new String() };
-		// // RROR "making objects with new"
-		// String[] newStringArr = { new String() };
-		// // RROR "making objects with new"
-		// String newString = new String();
-		// // RROR "making objects with new"
-		// intVar = new Integer(1);
-		// // RROR "making objects with new"
-		// rect = new GameObj();
+		// "Code12 does not support making objects with new"
+		// ERROR "objects with new"
+		circle.group = new String();
+		// ERROR "objects with new"
+		rect.setText( new String() );
+		// ERROR "objects with new"
+		String[] newStringArr2 = { strVar, new String() };
+		// ERROR "objects with new"
+		String[] newStringArr = { new String() };
+		// ERROR "objects with new"
+		String newString = new String();
+		// ERROR "objects with new"
+		intVar = new Integer(1);
+		// ERROR "objects with new"
+		rect = new GameObj();
 
 		// "Code12 does not support arrays of arrays"
 		// ERROR "arrays of arrays"
@@ -1083,21 +1090,6 @@ class CheckJavaErrorTestCode
 		// ERROR "Inequality operator"
 		while (3.14 < text);
 
-		// if syntaxLevel >= 7: 
-		// "Use str1.equals( str2 ) to compare two String values"
-		// ERROR "compare two String values"
-		if ("" != strVar)
-			voidMethod();
-		// ERROR "compare two String values"
-		ct.println(circle.group == "circles");
-
-		// if syntaxLevel < 7: 
-		// "Strings cannot be compared with ==. You must use the equals method, which requires level 7"
-		// RROR "cannot be compared with"
-		// ct.println(circle.group != "");
-		// RROR "cannot be compared with"
-		// ct.println(strVar == "");
-
 		// "Cannot compare %strVar to %strVar"
 		// ERROR "Cannot compare"
 		boolVar = boolVar == rect;
@@ -1147,9 +1139,6 @@ class CheckJavaErrorTestCode
 		// ERROR "does not return a value"
 		intVar = ct.println();
 
-		// "The %strVar operator is not supported by Code12 "
-		// ? "operator is not supported"
-		// ct.println(~2);
 		// ERROR "operator is not supported"
 		intVar = 2 | 1;
 		// ERROR "operator is not supported"
@@ -1164,9 +1153,6 @@ class CheckJavaErrorTestCode
 		ct.println(2 << 1);
 	}
 
-	// 'A Code12 program must define a "start" function'
-	/* Comment out start() to get next error */
-	// RROR "A Code12 program must define"
 	public void start()
 	{
 	}
