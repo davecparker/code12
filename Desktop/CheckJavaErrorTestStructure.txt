@@ -1,4 +1,4 @@
-    program CheckJavaErrorTestCode { #funcs = 74, #vars = 9 }
+    program CheckJavaErrorTestCode { #funcs = 71, #vars = 9 }
         funcs:
  15.        func syntaxLevelDependentTests { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 25, #stmts = 4, iLineBegin = 16 }
@@ -37,23 +37,23 @@
  36.                var p4 { vt = String, isGlobal = false }
  36.                var p5 { vt = GameObj, isGlobal = false }
                 block: block { iLineEnd = 38, #stmts = 0, iLineBegin = 37 }
- 42.        func noErrorsMethod { #paramVars = 0, vt = GameObj }
-                block: block { iLineEnd = 94, #stmts = 12, iLineBegin = 43 }
+ 40.        func noErrorsMethod { #paramVars = 0, vt = GameObj }
+                block: block { iLineEnd = 90, #stmts = 12, iLineBegin = 41 }
                     stmts:
- 44.                    call println { lValue = out, #exprs = 1, class = System }
+ 42.                    call println { lValue = out, #exprs = 1, class = System }
                             exprs:
- 44.                            ("Hello world")
- 45.                    assign (=)
+ 42.                            ("Hello world")
+ 43.                    assign (=)
                             lValue: lValue { varID = classLevelGameObj }
                             expr: call rect { #exprs = 4, class = ct }
                                 exprs:
- 45.                                (0)
- 45.                                (0)
- 45.                                (10)
- 45.                                (10)
- 46.                    var returnValue { vt = GameObj, initExpr = null }
- 47.                    var boolVar { vt = boolean, initExpr = false }
- 48.                    var intArrayInitWithExpressions { vt = array of int }
+ 43.                                (0)
+ 43.                                (0)
+ 43.                                (10)
+ 43.                                (10)
+ 44.                    var returnValue { vt = GameObj, initExpr = null }
+ 45.                    var boolVar { vt = boolean, initExpr = false }
+ 46.                    var intArrayInitWithExpressions { vt = array of int }
                             initExpr: arrayInit { #exprs = 3 }
                                 exprs:
                                     (+) { right = 2, left = 1 }
@@ -62,381 +62,381 @@
                                     (+) { right = 3 }
                                         left: parens
                                             expr: (-) { right = 890, left = 67 }
- 49.                    var gObjArrayInitWithCTCalls { vt = array of GameObj }
+ 47.                    var gObjArrayInitWithCTCalls { vt = array of GameObj }
                             initExpr: arrayInit { #exprs = 2 }
                                 exprs:
                                     call rect { #exprs = 4, class = ct }
                                         exprs:
- 49.                                        (50)
- 49.                                        (50)
- 49.                                        (10)
- 49.                                        (10)
+ 47.                                        (50)
+ 47.                                        (50)
+ 47.                                        (10)
+ 47.                                        (10)
                                     call text { #exprs = 4, class = ct }
                                         exprs:
- 49.                                        ("text")
- 49.                                        (50)
- 49.                                        (50)
- 49.                                        (10)
- 50.                    var dblArrayInitWithExpressionsAndIntPromotion { vt = array of double }
+ 47.                                        ("text")
+ 47.                                        (50)
+ 47.                                        (50)
+ 47.                                        (10)
+ 48.                    var dblArrayInitWithExpressionsAndIntPromotion { vt = array of double }
                             initExpr: arrayInit { #exprs = 2 }
                                 exprs:
                                     (+) { right = 2, left = 1 }
                                     (/) { right = 2 }
                                         left: (*) { right = 7, left = 3.4 }
- 54.                    for
+ 50.                    for
                             expr: lValue { varID = boolVar }
-                            block: block { iLineEnd = 62, #stmts = 3, iLineBegin = 55 }
+                            block: block { iLineEnd = 58, #stmts = 3, iLineBegin = 51 }
                                 stmts:
- 56.                                call println { class = ct }
- 57.                                if
+ 52.                                call println { class = ct }
+ 53.                                if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
- 60.                                            break
+ 56.                                            break
                                         expr: lValue { varID = boolVar }
                                         block: block { #stmts = 1 }
                                             stmts:
- 58.                                            call println { class = ct }
- 61.                                call println { class = ct }
- 63.                    while
+ 54.                                            call println { class = ct }
+ 57.                                call println { class = ct }
+ 59.                    while
                             expr: lValue { varID = boolVar }
-                            block: block { iLineEnd = 68, #stmts = 2, iLineBegin = 64 }
+                            block: block { iLineEnd = 64, #stmts = 2, iLineBegin = 60 }
                                 stmts:
- 65.                                if
+ 61.                                if
                                         expr: lValue { varID = boolVar }
                                         block: block { #stmts = 1 }
                                             stmts:
- 66.                                            break
+ 62.                                            break
+ 63.                                call println { class = ct }
+ 65.                    doWhile { iLineWhile = 71 }
+                            expr: lValue { varID = boolVar }
+                            block: block { iLineEnd = 70, #stmts = 2, iLineBegin = 66 }
+                                stmts:
  67.                                call println { class = ct }
- 69.                    doWhile { iLineWhile = 75 }
-                            expr: lValue { varID = boolVar }
-                            block: block { iLineEnd = 74, #stmts = 2, iLineBegin = 70 }
-                                stmts:
- 71.                                call println { class = ct }
- 72.                                if
+ 68.                                if
                                         expr: lValue { varID = boolVar }
                                         block: block { #stmts = 1 }
                                             stmts:
- 73.                                            break
- 77.                    for
+ 69.                                            break
+ 73.                    for
                             expr: lValue { varID = boolVar }
-                            block: block { iLineEnd = 81, #stmts = 1, iLineBegin = 78 }
+                            block: block { iLineEnd = 77, #stmts = 1, iLineBegin = 74 }
                                 stmts:
- 79.                                if
+ 75.                                if
                                         expr: lValue { varID = boolVar }
                                         block: block { #stmts = 1 }
                                             stmts:
- 80.                                            return
+ 76.                                            return
                                                     expr: lValue { varID = returnValue }
- 82.                    if
+ 78.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
-                                        elseBlock: block { iLineEnd = 93, #stmts = 1, iLineBegin = 91 }
-                                            stmts:
- 92.                                            return
-                                                    expr: lValue { varID = returnValue }
-                                        expr: lValue { varID = boolVar }
-                                        block: block { iLineEnd = 89, #stmts = 1, iLineBegin = 87 }
+                                        elseBlock: block { iLineEnd = 89, #stmts = 1, iLineBegin = 87 }
                                             stmts:
  88.                                            return
                                                     expr: lValue { varID = returnValue }
+                                        expr: lValue { varID = boolVar }
+                                        block: block { iLineEnd = 85, #stmts = 1, iLineBegin = 83 }
+                                            stmts:
+ 84.                                            return
+                                                    expr: lValue { varID = returnValue }
                             expr: lValue { varID = classLevelBoolean }
-                            block: block { iLineEnd = 85, #stmts = 1, iLineBegin = 83 }
+                            block: block { iLineEnd = 81, #stmts = 1, iLineBegin = 79 }
                                 stmts:
- 84.                                return
+ 80.                                return
                                         expr: lValue { varID = returnValue }
- 97.        func onMousePress { #paramVars = 3, isPublic = true, vt = void }
+ 93.        func onMousePress { #paramVars = 3, isPublic = true, vt = void }
                 paramVars:
- 97.                var obj { vt = GameObj, isGlobal = false }
- 97.                var x { vt = double, isGlobal = false }
- 97.                var Yvalue { vt = double, isGlobal = false }
-                block: block { iLineEnd = 99, #stmts = 0, iLineBegin = 98 }
-101.        func parameterStartsWithCapitalMethod { #paramVars = 3, vt = void }
+ 93.                var obj { vt = GameObj, isGlobal = false }
+ 93.                var x { vt = double, isGlobal = false }
+ 93.                var Yvalue { vt = double, isGlobal = false }
+                block: block { iLineEnd = 95, #stmts = 0, iLineBegin = 94 }
+ 97.        func parameterStartsWithCapitalMethod { #paramVars = 3, vt = void }
                 paramVars:
-101.                var doubleParam { vt = double, isGlobal = false }
-101.                var IntParam { vt = int, isGlobal = false }
-101.                var boolParam { vt = boolean, isGlobal = false }
-                block: block { iLineEnd = 104, #stmts = 1, iLineBegin = 102 }
+ 97.                var doubleParam { vt = double, isGlobal = false }
+ 97.                var IntParam { vt = int, isGlobal = false }
+ 97.                var boolParam { vt = boolean, isGlobal = false }
+                block: block { iLineEnd = 100, #stmts = 1, iLineBegin = 98 }
                     stmts:
-103.                    var userFunc1Var { vt = int, initExpr = 1 }
-106.        func StartsWithCapitalLetterMethod { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 108, #stmts = 0, iLineBegin = 107 }
-109.        func testErrors3 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 156, #stmts = 23, iLineBegin = 110 }
+ 99.                    var userFunc1Var { vt = int, initExpr = 1 }
+102.        func StartsWithCapitalLetterMethod { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 104, #stmts = 0, iLineBegin = 103 }
+105.        func testErrors3 { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 152, #stmts = 23, iLineBegin = 106 }
                     stmts:
-111.                    var intVar { vt = int, initExpr = 0 }
-112.                    var boolVar { vt = boolean, initExpr = false }
-114.                    var Starts_with_capital_letter_var { vt = int }
-116.                    var StartsWithCapitalLetterVarWithAssignment { vt = double, initExpr = 3.14 }
-118.                    var GameObjArrVar { vt = array of GameObj }
+107.                    var intVar { vt = int, initExpr = 0 }
+108.                    var boolVar { vt = boolean, initExpr = false }
+110.                    var Starts_with_capital_letter_var { vt = int }
+112.                    var StartsWithCapitalLetterVarWithAssignment { vt = double, initExpr = 3.14 }
+114.                    var GameObjArrVar { vt = array of GameObj }
                             initExpr: newArray { vtElement = "GameObj", lengthExpr = 10 }
-120.                    var dblVar { vt = double }
+116.                    var dblVar { vt = double }
                             initExpr: (+) { right = 1 }
                                 left: lValue { varID = intvar }
-122.                    call println { #exprs = 1, class = ct }
+118.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 lValue { varID = boolvar }
-124.                    call voidmethod
-126.                    call PrintLn { class = ct }
-128.                    var classLevelGameObj { vt = int }
-130.                    var intVar { vt = int }
-132.                    var boolVar { vt = boolean }
-134.                    var classlevelInt { vt = GameObj }
-136.                    var boolvar { vt = boolean, initExpr = true }
-137.                    if
+120.                    call voidmethod
+122.                    call PrintLn { class = ct }
+124.                    var classLevelGameObj { vt = int }
+126.                    var intVar { vt = int }
+128.                    var boolVar { vt = boolean }
+130.                    var classlevelInt { vt = GameObj }
+132.                    var boolvar { vt = boolean, initExpr = true }
+133.                    if
                             expr: lValue { varID = boolVar }
-                            block: block { iLineEnd = 140, #stmts = 1, iLineBegin = 138 }
+                            block: block { iLineEnd = 136, #stmts = 1, iLineBegin = 134 }
                                 stmts:
-139.                                var prevBlockVar { vt = int }
-142.                    assign (=) { expr = 2e2 }
+135.                                var prevBlockVar { vt = int }
+138.                    assign (=) { expr = 2e2 }
                             lValue: lValue { varID = prevBlockVar }
-144.                    call println { #exprs = 1, class = ct }
+140.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+) { right = 1 }
                                     left: lValue { varID = voidMethodVar }
-146.                    assign (=) { expr = 1.1 }
+142.                    assign (=) { expr = 1.1 }
                             lValue: lValue { varID = prevBlockvar }
-148.                    assign (=) { expr = 0 }
+144.                    assign (=) { expr = 0 }
                             lValue: lValue { varID = undeclaredVar }
-150.                    call setText { #exprs = 1 }
+146.                    call setText { #exprs = 1 }
                             lValue: lValue { varID = classLevelGameObj }
                             exprs:
                                 lValue { varID = undeclaredVar }
-152.                    call print { #exprs = 1, class = ct }
+148.                    call print { #exprs = 1, class = ct }
                             exprs:
                                 lValue { varID = classLevelUnassignedVar }
-153.                    var unassignedVar { vt = int }
-155.                    call print { #exprs = 1, class = ct }
+149.                    var unassignedVar { vt = int }
+151.                    call print { #exprs = 1, class = ct }
                             exprs:
                                 lValue { varID = unassignedVar }
-158.        func onMousePress { #paramVars = 3, isPublic = true, vt = boolean }
+154.        func onMousePress { #paramVars = 3, isPublic = true, vt = boolean }
                 paramVars:
-158.                var obj { vt = GameObj, isGlobal = false }
-158.                var x { vt = double, isGlobal = false }
-158.                var y { vt = double, isGlobal = false }
-                block: block { iLineEnd = 161, #stmts = 1, iLineBegin = 159 }
+154.                var obj { vt = GameObj, isGlobal = false }
+154.                var x { vt = double, isGlobal = false }
+154.                var y { vt = double, isGlobal = false }
+                block: block { iLineEnd = 157, #stmts = 1, iLineBegin = 155 }
                     stmts:
-160.                    return
+156.                    return
                             expr: lValue { varID = classLevelBoolean }
-163.        func onMouseDrag { #paramVars = 4, isPublic = true, vt = void }
+159.        func onMouseDrag { #paramVars = 4, isPublic = true, vt = void }
+                paramVars:
+159.                var obj { vt = GameObj, isGlobal = false }
+159.                var x { vt = double, isGlobal = false }
+159.                var y { vt = double, isGlobal = false }
+159.                var z { vt = double, isGlobal = false }
+                block: block { iLineEnd = 161, #stmts = 0, iLineBegin = 160 }
+163.        func onMouseRelease { #paramVars = 3, isPublic = true, vt = void }
                 paramVars:
 163.                var obj { vt = GameObj, isGlobal = false }
 163.                var x { vt = double, isGlobal = false }
-163.                var y { vt = double, isGlobal = false }
-163.                var z { vt = double, isGlobal = false }
+163.                var y { vt = int, isGlobal = false }
                 block: block { iLineEnd = 165, #stmts = 0, iLineBegin = 164 }
-167.        func onMouseRelease { #paramVars = 3, isPublic = true, vt = void }
+167.        func onKeyPress { #paramVars = 1, vt = void }
                 paramVars:
-167.                var obj { vt = GameObj, isGlobal = false }
-167.                var x { vt = double, isGlobal = false }
-167.                var y { vt = int, isGlobal = false }
+167.                var keyName { vt = String, isGlobal = false }
                 block: block { iLineEnd = 169, #stmts = 0, iLineBegin = 168 }
-171.        func onKeyPress { #paramVars = 1, vt = void }
+171.        func onKeyRelease { #paramVars = 1, vt = void }
                 paramVars:
 171.                var keyName { vt = String, isGlobal = false }
                 block: block { iLineEnd = 173, #stmts = 0, iLineBegin = 172 }
-175.        func onKeyRelease { #paramVars = 1, vt = void }
+176.        func onCharTyped { isStatic = true, vt = void, #paramVars = 1, isPublic = true }
                 paramVars:
-175.                var keyName { vt = String, isGlobal = false }
-                block: block { iLineEnd = 177, #stmts = 0, iLineBegin = 176 }
-183.        func onCharTyped { isStatic = true, vt = void, #paramVars = 1, isPublic = true }
-                paramVars:
-183.                var charString { vt = String, isGlobal = false }
+176.                var charString { vt = String, isGlobal = false }
+                block: block { iLineEnd = 178, #stmts = 0, iLineBegin = 177 }
+179.        func onResize { #paramVars = 0, isPublic = true, vt = void }
+                block: block { iLineEnd = 181, #stmts = 0, iLineBegin = 180 }
+183.        func onResize { #paramVars = 0, isPublic = true, vt = void }
                 block: block { iLineEnd = 185, #stmts = 0, iLineBegin = 184 }
-186.        func onResize { #paramVars = 0, isPublic = true, vt = void }
+186.        func existingUserFunction { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 188, #stmts = 0, iLineBegin = 187 }
-190.        func onResize { #paramVars = 0, isPublic = true, vt = void }
+190.        func existingUserFunction { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 192, #stmts = 0, iLineBegin = 191 }
-193.        func existingUserFunction { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 195, #stmts = 0, iLineBegin = 194 }
-197.        func existingUserFunction { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 199, #stmts = 0, iLineBegin = 198 }
-201.        func existingUserfunction { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 203, #stmts = 0, iLineBegin = 202 }
-204.        func testErrors2 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 370, #stmts = 79, iLineBegin = 205 }
+194.        func existingUserfunction { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 196, #stmts = 0, iLineBegin = 195 }
+197.        func testErrors2 { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 361, #stmts = 79, iLineBegin = 198 }
                     stmts:
-206.                    var intVar { vt = int, initExpr = 0 }
-207.                    var dblVar { vt = double, initExpr = 0 }
-208.                    var boolVar { vt = boolean, initExpr = false }
-209.                    var strVar { vt = String, initExpr = "" }
-210.                    var rect { vt = GameObj }
+199.                    var intVar { vt = int, initExpr = 0 }
+200.                    var dblVar { vt = double, initExpr = 0 }
+201.                    var boolVar { vt = boolean, initExpr = false }
+202.                    var strVar { vt = String, initExpr = "" }
+203.                    var rect { vt = GameObj }
                             initExpr: call rect { #exprs = 4, class = ct }
                                 exprs:
-210.                                (50)
-210.                                (50)
-210.                                (10)
-210.                                (10)
-211.                    var circle { vt = GameObj }
+203.                                (50)
+203.                                (50)
+203.                                (10)
+203.                                (10)
+204.                    var circle { vt = GameObj }
                             initExpr: call circle { #exprs = 3, class = ct }
                                 exprs:
-211.                                (50)
-211.                                (50)
-211.                                (10)
-212.                    var text { vt = GameObj }
+204.                                (50)
+204.                                (50)
+204.                                (10)
+205.                    var text { vt = GameObj }
                             initExpr: call text { #exprs = 4, class = ct }
                                 exprs:
-212.                                ("text")
-212.                                (50)
-212.                                (50)
-212.                                (10)
-213.                    var image { vt = GameObj }
+205.                                ("text")
+205.                                (50)
+205.                                (50)
+205.                                (10)
+206.                    var image { vt = GameObj }
                             initExpr: call image { #exprs = 4, class = ct }
                                 exprs:
-213.                                ("bogusFileName.png")
-213.                                (50)
-213.                                (50)
-213.                                (10)
-214.                    var intArr { vt = array of int }
+206.                                ("bogusFileName.png")
+206.                                (50)
+206.                                (50)
+206.                                (10)
+207.                    var intArr { vt = array of int }
                             initExpr: newArray { vtElement = 0, lengthExpr = 10 }
-215.                    var dblArr { vt = array of double }
+208.                    var dblArr { vt = array of double }
                             initExpr: newArray { vtElement = 1, lengthExpr = 10 }
-216.                    var boolArr { vt = array of boolean }
+209.                    var boolArr { vt = array of boolean }
                             initExpr: newArray { vtElement = true, lengthExpr = 10 }
-217.                    var strArr { vt = array of String }
+210.                    var strArr { vt = array of String }
                             initExpr: newArray { vtElement = "String", lengthExpr = 10 }
-218.                    var objArr { vt = array of GameObj }
+211.                    var objArr { vt = array of GameObj }
                             initExpr: newArray { vtElement = "GameObj", lengthExpr = 10 }
-220.                    assign (=)
+213.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: lValue { varID = dblVar }
-222.                    assign (=)
+215.                    assign (=)
                             lValue: lValue { varID = strVar }
                             expr: lValue { varID = dblVar }
-224.                    assign (=)
+217.                    assign (=)
                             lValue: lValue { varID = strVar }
                             expr: lValue { varID = intVar }
-226.                    assign (=)
+219.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: lValue { varID = strVar }
-228.                    assign (=)
+221.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: lValue { varID = strVar }
-230.                    assign (=)
+223.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: lValue { varID = rect }
-232.                    assign (=)
+225.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = x, indexExpr = 0 }
                             expr: lValue { varID = dblVar }
-234.                    assign (++)
+227.                    assign (++)
                             lValue: lValue { varID = intVar, indexExpr = 0 }
-236.                    assign (=)
+229.                    assign (=)
                             lValue: lValue { varID = strArr }
                                 indexExpr: (*) { right = 1.0 }
                                     left: lValue { varID = intVar }
                             expr: lValue { varID = strVar }
-238.                    assign (=)
+231.                    assign (=)
                             lValue: lValue { varID = objArr }
                                 indexExpr: lValue { varID = dblVar }
                             expr: lValue { varID = rect }
-240.                    assign (=)
+233.                    assign (=)
                             lValue: lValue { varID = intArr }
                             expr: newArray { vtElement = 0 }
                                 lengthExpr: (*) { right = 2 }
                                     left: lValue { varID = intArr, fieldID = foo }
-242.                    call print { #exprs = 1, class = ct }
+235.                    call print { #exprs = 1, class = ct }
                             exprs:
                                 lValue { varID = intVar, fieldID = x }
-244.                    assign (=)
+237.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = setText }
                             expr: lValue { varID = strVar }
-246.                    assign (=)
+239.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: lValue { varID = rect, fieldID = foo }
-248.                    assign (=) { expr = 0 }
+241.                    assign (=) { expr = 0 }
                             lValue: lValue { varID = rect, fieldID = foo }
-250.                    call onMousePress { #exprs = 3 }
+243.                    call onMousePress { #exprs = 3 }
                             exprs:
                                 lValue { varID = rect }
                                 lValue { varID = rect, fieldID = x }
                                 lValue { varID = rect, fieldID = y }
-252.                    var line { vt = GameObj }
+245.                    var line { vt = GameObj }
                             initExpr: call line { #exprs = 4 }
                                 exprs:
-252.                                (50)
-252.                                (50)
-252.                                (10)
-252.                                (10)
-254.                    call println
-256.                    call undefinedFunc
-258.                    assign (=)
+245.                                (50)
+245.                                (50)
+245.                                (10)
+245.                                (10)
+247.                    call println
+249.                    call undefinedFunc
+251.                    assign (=)
                             lValue: lValue { varID = rect }
                             expr: call rec { #exprs = 4, class = ct }
                                 exprs:
-258.                                (0)
-258.                                (0)
-258.                                (1)
-258.                                (1)
-260.                    call printLine { class = ct }
-262.                    call foo { class = ct }
-266.                    call bar { lValue = foo, class = System }
-268.                    call println { lValue = err, #exprs = 1, class = System }
+251.                                (0)
+251.                                (0)
+251.                                (1)
+251.                                (1)
+253.                    call printLine { class = ct }
+255.                    call foo { class = ct }
+257.                    call bar { lValue = foo, class = System }
+259.                    call println { lValue = err, #exprs = 1, class = System }
                             exprs:
-268.                            ("File opening failed:")
-270.                    var stdev { vt = double }
+259.                            ("File opening failed:")
+261.                    var stdev { vt = double }
                             initExpr: call foo { #exprs = 1, class = Math }
                                 exprs:
                                     lValue { varID = doubleVar }
-272.                    call getWidht { #exprs = 1 }
+263.                    call getWidht { #exprs = 1 }
                             lValue: lValue { varID = rect }
                             exprs:
                                 lValue { varID = dblVar }
-274.                    call equal { #exprs = 1 }
+265.                    call equal { #exprs = 1 }
                             lValue: lValue { varID = strVar }
                             exprs:
                                 lValue { varID = classLevelString }
-276.                    call foo
+267.                    call foo
                             lValue: lValue { varID = rect }
-278.                    call concat { #exprs = 1 }
+269.                    call concat { #exprs = 1 }
                             lValue: lValue { varID = rect, fieldID = group }
                             exprs:
                                 call getText
                                     lValue: lValue { varID = text }
-280.                    call setSize { #exprs = 2 }
+271.                    call setSize { #exprs = 2 }
                             lValue: lValue { varID = classLevelString }
                             exprs:
                                 lValue { varID = intVar }
                                 lValue { varID = dblVar }
-282.                    call size
+273.                    call size
                             lValue: lValue { varID = strVar }
-284.                    call delete
+275.                    call delete
                             lValue: lValue { varID = objArr }
-286.                    call delete
+277.                    call delete
                             lValue: lValue { varID = intVar }
-288.                    call print { class = ct }
-290.                    if
+279.                    call print { class = ct }
+281.                    if
                             expr: (<) { right = 0 }
                                 left: call min { #exprs = 1, class = Math }
                                     exprs:
-290.                                    (1)
+281.                                    (1)
                             block: block { #stmts = 1 }
                                 stmts:
-291.                                call voidMethod
-293.                    call voidMethodWithParams
-295.                    if
+282.                                call voidMethod
+284.                    call voidMethodWithParams
+286.                    if
                             expr: (<) { right = 0 }
                                 left: call min { #exprs = 3, class = Math }
                                     exprs:
-295.                                    (1)
-295.                                    (2)
-295.                                    (3)
+286.                                    (1)
+286.                                    (2)
+286.                                    (3)
                             block: block { #stmts = 1 }
                                 stmts:
-296.                                call voidMethod
-298.                    var minOf3 { vt = double }
+287.                                call voidMethod
+289.                    var minOf3 { vt = double }
                             initExpr: call min { #exprs = 3, class = Math }
                                 exprs:
-298.                                (1)
-298.                                (2)
-298.                                (3)
-300.                    call voidMethod { #exprs = 1 }
+289.                                (1)
+289.                                (2)
+289.                                (3)
+291.                    call voidMethod { #exprs = 1 }
                             exprs:
-300.                            (1)
-302.                    call println { #exprs = 2, class = ct }
+291.                            (1)
+293.                    call println { #exprs = 2, class = ct }
                             exprs:
-302.                            ("hello")
-302.                            ("world")
-304.                    call println { #exprs = 1, class = ct }
+293.                            ("hello")
+293.                            ("world")
+295.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 call distance { #exprs = 4, class = ct }
                                     exprs:
@@ -446,168 +446,180 @@
                                         lValue { varID = rect, fieldID = y }
                                         lValue { varID = circle }
                                         lValue { varID = circle, fieldID = y }
-306.                    assign (=)
+297.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: call max { #exprs = 2, class = Math }
                                 exprs:
                                     lValue { varID = intVar }
                                     lValue { varID = strVar }
-307.                    call voidMethodWithParams { #exprs = 5 }
+298.                    call voidMethodWithParams { #exprs = 5 }
                             exprs:
                                 lValue { varID = intVar }
                                 lValue { varID = intVar }
                                 lValue { varID = boolVar }
                                 lValue { varID = strVar }
                                 lValue { varID = rect }
-309.                    call voidMethodWithParams { #exprs = 5 }
+300.                    call voidMethodWithParams { #exprs = 5 }
                             exprs:
                                 lValue { varID = intVar }
                                 lValue { varID = dblVar }
                                 lValue { varID = boolVar }
                                 lValue { varID = strVar }
                                 lValue { varID = intVar }
-311.                    call voidMethodWithParams { #exprs = 5 }
+302.                    call voidMethodWithParams { #exprs = 5 }
                             exprs:
                                 lValue { varID = intVar }
                                 lValue { varID = dblVar }
                                 lValue { varID = strVar }
                                 lValue { varID = strVar }
                                 lValue { varID = rect }
-313.                    call voidMethodWithParams { #exprs = 5 }
+304.                    call voidMethodWithParams { #exprs = 5 }
                             exprs:
                                 lValue { varID = intVar }
                                 lValue { varID = boolVar }
                                 lValue { varID = boolVar }
                                 lValue { varID = strVar }
                                 lValue { varID = rect }
-315.                    call voidMethodWithParams { #exprs = 5 }
+306.                    call voidMethodWithParams { #exprs = 5 }
                             exprs:
                                 lValue { varID = dblVar }
                                 lValue { varID = dblVar }
                                 lValue { varID = boolVar }
                                 lValue { varID = strVar }
                                 lValue { varID = rect }
-317.                    for
+308.                    for
                             expr: lValue { varID = intVar }
                             block: block { #stmts = 1 }
                                 stmts:
-318.                                call println { class = ct }
-319.                    doWhile { iLineWhile = 322 }
+309.                                call println { class = ct }
+310.                    doWhile { iLineWhile = 313 }
                             expr: (+) { right = "" }
                                 left: parens
                                     expr: (==) { right = 2e0 }
                                         left: (+) { right = 1.0, left = 1 }
                             block: block { #stmts = 1 }
                                 stmts:
-320.                                call println { class = ct }
-324.                    while
+311.                                call println { class = ct }
+315.                    while
                             expr: (+) { right = "" }
                                 left: lValue { varID = boolVar }
                             block: block { #stmts = 1 }
                                 stmts:
-326.                                assign (+=) { expr = 1 }
+317.                                assign (+=) { expr = 1 }
                                         lValue: lValue { varID = rect, fieldID = group }
-328.                    assign (+=) { expr = false }
+319.                    assign (+=) { expr = false }
                             lValue: lValue { varID = boolVar }
-330.                    assign (*=)
+321.                    assign (*=)
                             lValue: lValue { varID = dblVar }
                             expr: lValue { varID = rect }
-332.                    assign (+=)
+323.                    assign (+=)
                             lValue: lValue { varID = dblVar }
                             expr: (+) { right = "" }
                                 left: lValue { varID = boolVar }
-334.                    assign (+=)
+325.                    assign (+=)
                             lValue: lValue { varID = intVar }
                             expr: lValue { varID = boolVar }
-336.                    assign (/=)
+327.                    assign (/=)
                             lValue: lValue { varID = intVar }
                             expr: (*)
                                 right: lValue { varID = rect, fieldID = x }
                                 left: lValue { varID = classLevelInt }
-338.                    assign (*=) { expr = 1e0 }
+329.                    assign (*=) { expr = 1e0 }
                             lValue: lValue { varID = intVar }
-340.                    assign (-=)
+331.                    assign (-=)
                             lValue: lValue { varID = classLevelInt }
                             expr: lValue { varID = classLevelDouble }
-342.                    assign (+=) { expr = 1.0 }
+333.                    assign (+=) { expr = 1.0 }
                             lValue: lValue { varID = intVar }
-344.                    if
+335.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         expr: lValue { varID = intVar }
                                         block: block { #stmts = 1 }
                                             stmts:
-348.                                            call println { class = ct }
+339.                                            call println { class = ct }
                             expr: lValue { varID = dblVar }
                             block: block { #stmts = 1 }
                                 stmts:
-345.                                call println { class = ct }
-350.                    if { expr = 0 }
+336.                                call println { class = ct }
+341.                    if { expr = 0 }
                             block: block { #stmts = 1 }
                                 stmts:
-351.                                call println { class = ct }
-353.                    forArray { expr = null }
-353.                        var: var x { vt = int, isGlobal = false }
+342.                                call println { class = ct }
+344.                    forArray { expr = null }
+344.                        var: var x { vt = int, isGlobal = false }
+                            block: block { #stmts = 1 }
+                                stmts:
+345.                                break
+347.                    forArray
+347.                        var: var x { vt = int, isGlobal = false }
+                            expr: lValue { varID = image }
+                            block: block { #stmts = 1 }
+                                stmts:
+348.                                break
+350.                    forArray
+350.                        var: var x { vt = int, isGlobal = false }
+                            expr: lValue { varID = intVar }
+                            block: block { #stmts = 1 }
+                                stmts:
+351.                                break
+353.                    forArray
+353.                        var: var x { vt = GameObj, isGlobal = false }
+                            expr: lValue { varID = classLevelIntArr }
                             block: block { #stmts = 1 }
                                 stmts:
 354.                                break
 356.                    forArray
-356.                        var: var x { vt = int, isGlobal = false }
-                            expr: lValue { varID = image }
+356.                        var: var x { vt = boolean, isGlobal = false }
+                            expr: newArray { vtElement = "String", lengthExpr = 10 }
                             block: block { #stmts = 1 }
                                 stmts:
 357.                                break
 359.                    forArray
 359.                        var: var x { vt = int, isGlobal = false }
-                            expr: lValue { varID = intVar }
-                            block: block { #stmts = 1 }
-                                stmts:
-360.                                break
-362.                    forArray
-362.                        var: var x { vt = GameObj, isGlobal = false }
-                            expr: lValue { varID = classLevelIntArr }
-                            block: block { #stmts = 1 }
-                                stmts:
-363.                                break
-365.                    forArray
-365.                        var: var x { vt = boolean, isGlobal = false }
-                            expr: newArray { vtElement = "String", lengthExpr = 10 }
-                            block: block { #stmts = 1 }
-                                stmts:
-366.                                break
-368.                    forArray
-368.                        var: var x { vt = int, isGlobal = false }
                             expr: lValue { varID = dblArr }
                             block: block { #stmts = 1 }
                                 stmts:
-369.                                break
-371.        func voidFuncReturnsValue6 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 380, #stmts = 3, iLineBegin = 372 }
+360.                                break
+362.        func voidFuncReturnsValue6 { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 371, #stmts = 3, iLineBegin = 363 }
                     stmts:
-373.                    var r { vt = GameObj }
+364.                    var r { vt = GameObj }
                             initExpr: call circle { #exprs = 3, class = ct }
                                 exprs:
-373.                                (0)
-373.                                (0)
-373.                                (1)
-374.                    while
+364.                                (0)
+364.                                (0)
+364.                                (1)
+365.                    while
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
                                 stmts:
-375.                                if
+366.                                if
                                         expr: lValue { varID = classLevelBoolean }
                                         block: block { #stmts = 1 }
                                             stmts:
-377.                                            return
+368.                                            return
                                                     expr: lValue { varID = r }
+370.                    return
+                            expr: lValue { varID = r }
+372.        func voidFuncReturnsValue5 { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 380, #stmts = 3, iLineBegin = 373 }
+                    stmts:
+374.                    var r { vt = GameObj, initExpr = null }
+375.                    for
+                            expr: lValue { varID = classLevelBoolean }
+                            block: block { #stmts = 1 }
+                                stmts:
+377.                                return
+                                        expr: lValue { varID = r }
 379.                    return
                             expr: lValue { varID = r }
-381.        func voidFuncReturnsValue5 { #paramVars = 0, vt = void }
+381.        func voidFuncReturnsValue4 { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 389, #stmts = 3, iLineBegin = 382 }
                     stmts:
-383.                    var r { vt = GameObj, initExpr = null }
-384.                    for
+383.                    var r { vt = String, initExpr = null }
+384.                    if
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
                                 stmts:
@@ -615,10 +627,10 @@
                                         expr: lValue { varID = r }
 388.                    return
                             expr: lValue { varID = r }
-390.        func voidFuncReturnsValue4 { #paramVars = 0, vt = void }
+390.        func voidFuncReturnsValue3 { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 398, #stmts = 3, iLineBegin = 391 }
                     stmts:
-392.                    var r { vt = String, initExpr = null }
+392.                    var r { vt = String, initExpr = "" }
 393.                    if
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
@@ -627,10 +639,10 @@
                                         expr: lValue { varID = r }
 397.                    return
                             expr: lValue { varID = r }
-399.        func voidFuncReturnsValue3 { #paramVars = 0, vt = void }
+399.        func voidFuncReturnsValue2 { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 407, #stmts = 3, iLineBegin = 400 }
                     stmts:
-401.                    var r { vt = String, initExpr = "" }
+401.                    var r { vt = boolean, initExpr = false }
 402.                    if
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
@@ -639,56 +651,56 @@
                                         expr: lValue { varID = r }
 406.                    return
                             expr: lValue { varID = r }
-408.        func voidFuncReturnsValue2 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 416, #stmts = 3, iLineBegin = 409 }
+408.        func voidFuncReturnsValue1 { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 413, #stmts = 2, iLineBegin = 409 }
                     stmts:
-410.                    var r { vt = boolean, initExpr = false }
-411.                    if
-                            expr: lValue { varID = classLevelBoolean }
-                            block: block { #stmts = 1 }
-                                stmts:
-413.                                return
-                                        expr: lValue { varID = r }
-415.                    return
+410.                    var r { vt = double, initExpr = 0 }
+412.                    return
                             expr: lValue { varID = r }
-417.        func voidFuncReturnsValue1 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 422, #stmts = 2, iLineBegin = 418 }
+414.        func funcWrongReturnValueType7 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 418, #stmts = 1, iLineBegin = 415 }
                     stmts:
-419.                    var r { vt = double, initExpr = 0 }
-421.                    return
-                            expr: lValue { varID = r }
-423.        func funcWrongReturnValueType7 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 427, #stmts = 1, iLineBegin = 424 }
-                    stmts:
-426.                    return
+417.                    return
                             expr: (*) { right = 1.0 }
                                 left: lValue { varID = classLevelInt }
-428.        func funcWrongReturnValueType6 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 437, #stmts = 3, iLineBegin = 429 }
+419.        func funcWrongReturnValueType6 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 428, #stmts = 3, iLineBegin = 420 }
                     stmts:
-430.                    var r { vt = GameObj }
+421.                    var r { vt = GameObj }
                             initExpr: call circle { #exprs = 3, class = ct }
                                 exprs:
-430.                                (0)
-430.                                (0)
-430.                                (1)
-431.                    while
+421.                                (0)
+421.                                (0)
+421.                                (1)
+422.                    while
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
                                 stmts:
-432.                                if
+423.                                if
                                         expr: lValue { varID = classLevelBoolean }
                                         block: block { #stmts = 1 }
                                             stmts:
-434.                                            return
+425.                                            return
                                                     expr: lValue { varID = r }
+427.                    return
+                            expr: lValue { varID = r }
+429.        func funcWrongReturnValueType5 { #paramVars = 0, vt = String }
+                block: block { iLineEnd = 437, #stmts = 3, iLineBegin = 430 }
+                    stmts:
+431.                    var r { vt = GameObj, initExpr = null }
+432.                    for
+                            expr: lValue { varID = classLevelBoolean }
+                            block: block { #stmts = 1 }
+                                stmts:
+434.                                return
+                                        expr: lValue { varID = r }
 436.                    return
                             expr: lValue { varID = r }
-438.        func funcWrongReturnValueType5 { #paramVars = 0, vt = String }
+438.        func funcWrongReturnValueType4 { #paramVars = 0, vt = GameObj }
                 block: block { iLineEnd = 446, #stmts = 3, iLineBegin = 439 }
                     stmts:
-440.                    var r { vt = GameObj, initExpr = null }
-441.                    for
+440.                    var r { vt = String, initExpr = null }
+441.                    if
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
                                 stmts:
@@ -696,10 +708,10 @@
                                         expr: lValue { varID = r }
 445.                    return
                             expr: lValue { varID = r }
-447.        func funcWrongReturnValueType4 { #paramVars = 0, vt = GameObj }
+447.        func funcWrongReturnValueType3 { #paramVars = 0, vt = boolean }
                 block: block { iLineEnd = 455, #stmts = 3, iLineBegin = 448 }
                     stmts:
-449.                    var r { vt = String, initExpr = null }
+449.                    var r { vt = String, initExpr = "" }
 450.                    if
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
@@ -708,10 +720,10 @@
                                         expr: lValue { varID = r }
 454.                    return
                             expr: lValue { varID = r }
-456.        func funcWrongReturnValueType3 { #paramVars = 0, vt = boolean }
+456.        func funcWrongReturnValueType2 { #paramVars = 0, vt = double }
                 block: block { iLineEnd = 464, #stmts = 3, iLineBegin = 457 }
                     stmts:
-458.                    var r { vt = String, initExpr = "" }
+458.                    var r { vt = boolean, initExpr = false }
 459.                    if
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
@@ -720,52 +732,50 @@
                                         expr: lValue { varID = r }
 463.                    return
                             expr: lValue { varID = r }
-465.        func funcWrongReturnValueType2 { #paramVars = 0, vt = double }
-                block: block { iLineEnd = 473, #stmts = 3, iLineBegin = 466 }
+465.        func funcWrongReturnValueType1 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 470, #stmts = 2, iLineBegin = 466 }
                     stmts:
-467.                    var r { vt = boolean, initExpr = false }
-468.                    if
+467.                    var r { vt = double, initExpr = 0 }
+469.                    return
+                            expr: lValue { varID = r }
+471.        func funcNoReturnValue6 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 479, #stmts = 3, iLineBegin = 472 }
+                    stmts:
+473.                    var r { vt = int, initExpr = 0 }
+474.                    while
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
                                 stmts:
-470.                                return
-                                        expr: lValue { varID = r }
-472.                    return
-                            expr: lValue { varID = r }
-474.        func funcWrongReturnValueType1 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 479, #stmts = 2, iLineBegin = 475 }
-                    stmts:
-476.                    var r { vt = double, initExpr = 0 }
-478.                    return
-                            expr: lValue { varID = r }
-480.        func funcNoReturnValue6 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 488, #stmts = 3, iLineBegin = 481 }
-                    stmts:
-482.                    var r { vt = int, initExpr = 0 }
-483.                    while
-                            expr: lValue { varID = classLevelBoolean }
-                            block: block { #stmts = 1 }
-                                stmts:
-484.                                if
+475.                                if
                                         expr: lValue { varID = classLevelBoolean }
                                         block: block { #stmts = 1 }
                                             stmts:
-486.                                            return
-487.                    return
+477.                                            return
+478.                    return
                             expr: lValue { varID = r }
-489.        func funcNoReturnValue5 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 496, #stmts = 3, iLineBegin = 490 }
+480.        func funcNoReturnValue5 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 487, #stmts = 3, iLineBegin = 481 }
                     stmts:
-491.                    var r { vt = int, initExpr = 0 }
-492.                    for
+482.                    var r { vt = int, initExpr = 0 }
+483.                    for
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
                                 stmts:
-494.                                return
-495.                    return
+485.                                return
+486.                    return
                             expr: lValue { varID = r }
-497.        func funcNoReturnValue4 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 505, #stmts = 3, iLineBegin = 498 }
+488.        func funcNoReturnValue4 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 496, #stmts = 3, iLineBegin = 489 }
+                    stmts:
+490.                    var r { vt = int, initExpr = 0 }
+491.                    if
+                            expr: lValue { varID = classLevelBoolean }
+                            block: block { #stmts = 1 }
+                                stmts:
+493.                                return
+495.                    return
+497.        func funcNoReturnValue3 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 504, #stmts = 3, iLineBegin = 498 }
                     stmts:
 499.                    var r { vt = int, initExpr = 0 }
 500.                    if
@@ -773,776 +783,706 @@
                             block: block { #stmts = 1 }
                                 stmts:
 502.                                return
-504.                    return
-506.        func funcNoReturnValue3 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 513, #stmts = 3, iLineBegin = 507 }
-                    stmts:
-508.                    var r { vt = int, initExpr = 0 }
-509.                    if
-                            expr: lValue { varID = classLevelBoolean }
-                            block: block { #stmts = 1 }
-                                stmts:
-511.                                return
-512.                    return
+503.                    return
                             expr: lValue { varID = r }
-514.        func funcNoReturnValue2 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 521, #stmts = 3, iLineBegin = 515 }
+505.        func funcNoReturnValue2 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 512, #stmts = 3, iLineBegin = 506 }
                     stmts:
-516.                    var r { vt = int, initExpr = 0 }
-517.                    if
+507.                    var r { vt = int, initExpr = 0 }
+508.                    if
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
                                 stmts:
-518.                                return
+509.                                return
                                         expr: lValue { varID = r }
-520.                    return
-522.        func funcNoReturnValue1 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 526, #stmts = 1, iLineBegin = 523 }
+511.                    return
+513.        func funcNoReturnValue1 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 517, #stmts = 1, iLineBegin = 514 }
                     stmts:
-525.                    return
-527.        func funcBreakStmtErrors { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 542, #stmts = 2, iLineBegin = 528 }
+516.                    return
+518.        func funcBreakStmtErrors { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 533, #stmts = 2, iLineBegin = 519 }
                     stmts:
-529.                    if
+520.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
-539.                                            break
+530.                                            break
                                         expr: lValue { varID = classLevelBoolean }
                                         block: block { #stmts = 1 }
                                             stmts:
-536.                                            break
+527.                                            break
                             expr: lValue { varID = classLevelBoolean }
-                            block: block { iLineEnd = 533, #stmts = 1, iLineBegin = 530 }
+                            block: block { iLineEnd = 524, #stmts = 1, iLineBegin = 521 }
                                 stmts:
-532.                                break
-541.                    break
-543.        func funcUnreachableStmt8 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 560, #stmts = 3, iLineBegin = 544 }
+523.                                break
+532.                    break
+534.        func funcUnreachableStmt8 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 551, #stmts = 3, iLineBegin = 535 }
                     stmts:
-545.                    var r { vt = int, initExpr = 0 }
-546.                    if
+536.                    var r { vt = int, initExpr = 0 }
+537.                    if
                             expr: lValue { varID = classLevelBoolean }
-                            block: block { iLineEnd = 558, #stmts = 1, iLineBegin = 547 }
+                            block: block { iLineEnd = 549, #stmts = 1, iLineBegin = 538 }
                                 stmts:
-548.                                if
+539.                                if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
                                                 if
                                                     expr: (==) { right = 3 }
                                                         left: (+) { right = 1, left = 1 }
-                                                    block: block { iLineEnd = 557, #stmts = 2, iLineBegin = 553 }
+                                                    block: block { iLineEnd = 548, #stmts = 2, iLineBegin = 544 }
                                                         stmts:
-554.                                                        return
+545.                                                        return
                                                                 expr: lValue { varID = r }
-556.                                                        call println { class = ct }
+547.                                                        call println { class = ct }
                                         expr: lValue { varID = classLevelBoolean }
-                                        block: block { iLineEnd = 551, #stmts = 1, iLineBegin = 549 }
+                                        block: block { iLineEnd = 542, #stmts = 1, iLineBegin = 540 }
                                             stmts:
-550.                                            call println { class = ct }
-559.                    return
+541.                                            call println { class = ct }
+550.                    return
                             expr: lValue { varID = r }
-561.        func funcUnreachableStmt7 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 571, #stmts = 3, iLineBegin = 562 }
+552.        func funcUnreachableStmt7 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 562, #stmts = 3, iLineBegin = 553 }
                     stmts:
-563.                    var r { vt = int, initExpr = 0 }
-564.                    while
+554.                    var r { vt = int, initExpr = 0 }
+555.                    while
                             expr: lValue { varID = classLevelBoolean }
-                            block: block { iLineEnd = 569, #stmts = 2, iLineBegin = 565 }
+                            block: block { iLineEnd = 560, #stmts = 2, iLineBegin = 556 }
                                 stmts:
-566.                                return
+557.                                return
                                         expr: lValue { varID = r }
-568.                                call println { class = ct }
-570.                    return
+559.                                call println { class = ct }
+561.                    return
                             expr: lValue { varID = r }
-572.        func funcUnreachableStmt6 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 586, #stmts = 3, iLineBegin = 573 }
+563.        func funcUnreachableStmt6 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 577, #stmts = 3, iLineBegin = 564 }
                     stmts:
-574.                    var r { vt = int, initExpr = 0 }
-575.                    if
+565.                    var r { vt = int, initExpr = 0 }
+566.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         expr: (==) { right = 3 }
                                             left: (+) { right = 1, left = 1 }
-                                        block: block { iLineEnd = 584, #stmts = 2, iLineBegin = 580 }
+                                        block: block { iLineEnd = 575, #stmts = 2, iLineBegin = 571 }
                                             stmts:
-581.                                            return
+572.                                            return
                                                     expr: lValue { varID = r }
-583.                                            call println { class = ct }
+574.                                            call println { class = ct }
                             expr: lValue { varID = classLevelBoolean }
-                            block: block { iLineEnd = 578, #stmts = 1, iLineBegin = 576 }
+                            block: block { iLineEnd = 569, #stmts = 1, iLineBegin = 567 }
                                 stmts:
-577.                                call println { class = ct }
-585.                    return
+568.                                call println { class = ct }
+576.                    return
                             expr: lValue { varID = r }
-587.        func funcUnreachableStmt5 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 601, #stmts = 3, iLineBegin = 588 }
+578.        func funcUnreachableStmt5 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 592, #stmts = 3, iLineBegin = 579 }
                     stmts:
-589.                    var r { vt = int, initExpr = 0 }
-590.                    if
-                            elseBlock: block { iLineEnd = 599, #stmts = 2, iLineBegin = 595 }
+580.                    var r { vt = int, initExpr = 0 }
+581.                    if
+                            elseBlock: block { iLineEnd = 590, #stmts = 2, iLineBegin = 586 }
                                 stmts:
-596.                                return
+587.                                return
                                         expr: lValue { varID = r }
-598.                                call println { class = ct }
+589.                                call println { class = ct }
                             expr: lValue { varID = classLevelBoolean }
-                            block: block { iLineEnd = 593, #stmts = 1, iLineBegin = 591 }
+                            block: block { iLineEnd = 584, #stmts = 1, iLineBegin = 582 }
                                 stmts:
-592.                                call println { class = ct }
-600.                    return
+583.                                call println { class = ct }
+591.                    return
                             expr: lValue { varID = r }
-602.        func funcUnreachableStmt4 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 613, #stmts = 3, iLineBegin = 603 }
+593.        func funcUnreachableStmt4 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 604, #stmts = 3, iLineBegin = 594 }
                     stmts:
-604.                    var r { vt = int, initExpr = 0 }
-605.                    if
+595.                    var r { vt = int, initExpr = 0 }
+596.                    if
                             expr: lValue { varID = classLevelBoolean }
-                            block: block { iLineEnd = 611, #stmts = 2, iLineBegin = 606 }
+                            block: block { iLineEnd = 602, #stmts = 2, iLineBegin = 597 }
                                 stmts:
-607.                                return
+598.                                return
                                         expr: lValue { varID = r }
-609.                                if
+600.                                if
                                         expr: (==) { right = 2 }
                                             left: (+) { right = 1, left = 1 }
                                         block: block { #stmts = 1 }
                                             stmts:
-610.                                            call println { class = ct }
-612.                    return
+601.                                            call println { class = ct }
+603.                    return
                             expr: lValue { varID = r }
-614.        func funcUnreachableStmt3 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 623, #stmts = 5, iLineBegin = 615 }
+605.        func funcUnreachableStmt3 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 614, #stmts = 5, iLineBegin = 606 }
                     stmts:
-616.                    var r { vt = int, initExpr = 0 }
-617.                    return
+607.                    var r { vt = int, initExpr = 0 }
+608.                    return
                             expr: lValue { varID = r }
-619.                    for
+610.                    for
                             expr: lValue { varID = classLevelBoolean }
                             block: block { #stmts = 1 }
                                 stmts:
-620.                                break
-621.                    call println { class = ct }
-622.                    return
+611.                                break
+612.                    call println { class = ct }
+613.                    return
                             expr: lValue { varID = r }
-624.        func funcUnreachableStmt2 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 633, #stmts = 5, iLineBegin = 625 }
+615.        func funcUnreachableStmt2 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 624, #stmts = 5, iLineBegin = 616 }
                     stmts:
-626.                    var r { vt = int, initExpr = 0 }
+617.                    var r { vt = int, initExpr = 0 }
+618.                    return
+                            expr: lValue { varID = r }
+620.                    if
+                            expr: lValue { varID = classLevelBoolean }
+                            block: block { #stmts = 1 }
+                                stmts:
+621.                                call println { class = ct }
+622.                    call println { class = ct }
+623.                    return
+                            expr: lValue { varID = r }
+625.        func funcUnreachableStmt1 { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 631, #stmts = 3, iLineBegin = 626 }
+                    stmts:
 627.                    return
-                            expr: lValue { varID = r }
-629.                    if
-                            expr: lValue { varID = classLevelBoolean }
-                            block: block { #stmts = 1 }
-                                stmts:
-630.                                call println { class = ct }
-631.                    call println { class = ct }
-632.                    return
-                            expr: lValue { varID = r }
-634.        func funcUnreachableStmt1 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 640, #stmts = 3, iLineBegin = 635 }
+629.                    call println { class = ct }
+630.                    call println { class = ct }
+632.        func funcMissingReturn10 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 645, #stmts = 4, iLineBegin = 633 }
                     stmts:
-636.                    return
-638.                    call println { class = ct }
-639.                    call println { class = ct }
-641.        func funcMissingReturn10 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 654, #stmts = 4, iLineBegin = 642 }
-                    stmts:
-643.                    var r { vt = int, initExpr = 0 }
-644.                    var boolVar1 { vt = boolean, initExpr = false }
-645.                    var boolVar2 { vt = boolean, initExpr = false }
-646.                    if
+634.                    var r { vt = int, initExpr = 0 }
+635.                    var boolVar1 { vt = boolean, initExpr = false }
+636.                    var boolVar2 { vt = boolean, initExpr = false }
+637.                    if
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-647.                                if
+638.                                if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
                                                 if
                                                     elseBlock: block { #stmts = 1 }
                                                         stmts:
-652.                                                        return
+643.                                                        return
                                                                 expr: lValue { varID = r }
                                                     expr: lValue { varID = boolVar2 }
                                                     block: block { #stmts = 1 }
                                                         stmts:
-650.                                                        return
+641.                                                        return
                                                                 expr: lValue { varID = r }
                                         expr: lValue { varID = boolVar1 }
                                         block: block { #stmts = 1 }
                                             stmts:
-648.                                            call println { class = ct }
-655.        func funcMissingReturn9 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 666, #stmts = 4, iLineBegin = 656 }
+639.                                            call println { class = ct }
+646.        func funcMissingReturn9 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 657, #stmts = 4, iLineBegin = 647 }
                     stmts:
-657.                    var r { vt = int, initExpr = 0 }
-658.                    var boolVar1 { vt = boolean, initExpr = false }
-659.                    var boolVar2 { vt = boolean, initExpr = false }
-660.                    if
+648.                    var r { vt = int, initExpr = 0 }
+649.                    var boolVar1 { vt = boolean, initExpr = false }
+650.                    var boolVar2 { vt = boolean, initExpr = false }
+651.                    if
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-661.                                if
+652.                                if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
-664.                                            call println { class = ct }
+655.                                            call println { class = ct }
                                         expr: lValue { varID = boolVar2 }
                                         block: block { #stmts = 1 }
                                             stmts:
-662.                                            return
+653.                                            return
                                                     expr: lValue { varID = r }
-667.        func funcMissingReturn8 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 678, #stmts = 4, iLineBegin = 668 }
+658.        func funcMissingReturn8 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 669, #stmts = 4, iLineBegin = 659 }
                     stmts:
-669.                    var r { vt = int, initExpr = 0 }
-670.                    var boolVar1 { vt = boolean, initExpr = false }
-671.                    var boolVar2 { vt = boolean, initExpr = false }
-672.                    if
+660.                    var r { vt = int, initExpr = 0 }
+661.                    var boolVar1 { vt = boolean, initExpr = false }
+662.                    var boolVar2 { vt = boolean, initExpr = false }
+663.                    if
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-673.                                if
+664.                                if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
-676.                                            return
+667.                                            return
                                                     expr: lValue { varID = r }
                                         expr: lValue { varID = boolVar2 }
                                         block: block { #stmts = 1 }
                                             stmts:
-674.                                            return
+665.                                            return
                                                     expr: lValue { varID = r }
-679.        func funcMissingReturn7 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 691, #stmts = 4, iLineBegin = 680 }
+670.        func funcMissingReturn7 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 682, #stmts = 4, iLineBegin = 671 }
                     stmts:
-681.                    var r { vt = int, initExpr = 0 }
-682.                    var boolVar1 { vt = boolean, initExpr = false }
-683.                    var boolVar2 { vt = boolean, initExpr = true }
-684.                    if
+672.                    var r { vt = int, initExpr = 0 }
+673.                    var boolVar1 { vt = boolean, initExpr = false }
+674.                    var boolVar2 { vt = boolean, initExpr = true }
+675.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
-689.                                            return
+680.                                            return
                                                     expr: lValue { varID = r }
                                         expr: lValue { varID = boolVar2 }
                                         block: block { #stmts = 1 }
                                             stmts:
-687.                                            call println { class = ct }
+678.                                            call println { class = ct }
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-685.                                call println { class = ct }
-692.        func funcMissingReturn6 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 704, #stmts = 4, iLineBegin = 693 }
+676.                                call println { class = ct }
+683.        func funcMissingReturn6 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 695, #stmts = 4, iLineBegin = 684 }
                     stmts:
-694.                    var r { vt = int, initExpr = 0 }
-695.                    var boolVar1 { vt = boolean, initExpr = false }
-696.                    var boolVar2 { vt = boolean, initExpr = true }
-697.                    if
+685.                    var r { vt = int, initExpr = 0 }
+686.                    var boolVar1 { vt = boolean, initExpr = false }
+687.                    var boolVar2 { vt = boolean, initExpr = true }
+688.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
-702.                                            call println { class = ct }
+693.                                            call println { class = ct }
                                         expr: lValue { varID = boolVar2 }
                                         block: block { #stmts = 1 }
                                             stmts:
-700.                                            return
+691.                                            return
                                                     expr: lValue { varID = r }
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-698.                                call println { class = ct }
-705.        func funcMissingReturn5 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 717, #stmts = 4, iLineBegin = 706 }
+689.                                call println { class = ct }
+697.        func funcMissingReturn4 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 705, #stmts = 2, iLineBegin = 698 }
                     stmts:
-707.                    var r { vt = int, initExpr = 0 }
-708.                    var boolVar1 { vt = boolean, initExpr = false }
-709.                    var boolVar2 { vt = boolean, initExpr = true }
+699.                    var boolVar { vt = boolean, initExpr = false }
+700.                    if
+                            elseBlock: block { #stmts = 1 }
+                                stmts:
+703.                                call println { class = ct }
+                            expr: lValue { varID = boolVar }
+                            block: block { #stmts = 1 }
+                                stmts:
+701.                                call println { class = ct }
+706.        func funcMissingReturn2 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 713, #stmts = 3, iLineBegin = 707 }
+                    stmts:
+708.                    var r { vt = int, initExpr = 0 }
+709.                    var boolVar { vt = boolean, initExpr = false }
 710.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-                                    if
-                                        elseBlock: block { #stmts = 1 }
-                                            stmts:
-715.                                            call println { class = ct }
-                                        expr: lValue { varID = boolVar2 }
-                                        block: block { #stmts = 1 }
-                                            stmts:
-713.                                            call println { class = ct }
-                            expr: lValue { varID = boolVar1 }
+                            expr: lValue { varID = boolVar }
                             block: block { #stmts = 1 }
                                 stmts:
 711.                                return
                                         expr: lValue { varID = r }
-718.        func funcMissingReturn4 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 726, #stmts = 2, iLineBegin = 719 }
+714.        func funcMissingReturn1 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 717, #stmts = 0, iLineBegin = 715 }
+718.        func funcPathMissingReturn3Brackets { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 732, #stmts = 4, iLineBegin = 719 }
                     stmts:
-720.                    var boolVar { vt = boolean, initExpr = false }
-721.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-724.                                call println { class = ct }
-                            expr: lValue { varID = boolVar }
-                            block: block { #stmts = 1 }
-                                stmts:
-722.                                call println { class = ct }
-727.        func funcMissingReturn2 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 734, #stmts = 3, iLineBegin = 728 }
-                    stmts:
-729.                    var r { vt = int, initExpr = 0 }
-730.                    var boolVar { vt = boolean, initExpr = false }
-731.                    if
-                            expr: lValue { varID = boolVar }
-                            block: block { #stmts = 1 }
-                                stmts:
-732.                                return
-                                        expr: lValue { varID = r }
-735.        func funcMissingReturn1 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 738, #stmts = 0, iLineBegin = 736 }
-739.        func funcPathMissingReturn4Brackets { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 753, #stmts = 4, iLineBegin = 740 }
-                    stmts:
-741.                    var r { vt = int, initExpr = 0 }
-742.                    var boolVar1 { vt = boolean, initExpr = false }
-743.                    var boolVar2 { vt = boolean, initExpr = false }
-744.                    if
+720.                    var r { vt = int, initExpr = 0 }
+721.                    var boolVar1 { vt = boolean, initExpr = false }
+722.                    var boolVar2 { vt = boolean, initExpr = false }
+723.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         expr: lValue { varID = boolVar2 }
-                                        block: block { iLineEnd = 752, #stmts = 1, iLineBegin = 749 }
+                                        block: block { iLineEnd = 731, #stmts = 1, iLineBegin = 729 }
                                             stmts:
-750.                                            call println { class = ct }
-                            expr: lValue { varID = boolVar1 }
-                            block: block { iLineEnd = 747, #stmts = 1, iLineBegin = 745 }
-                                stmts:
-746.                                return
-                                        expr: lValue { varID = r }
-754.        func funcPathMissingReturn3Brackets { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 768, #stmts = 4, iLineBegin = 755 }
-                    stmts:
-756.                    var r { vt = int, initExpr = 0 }
-757.                    var boolVar1 { vt = boolean, initExpr = false }
-758.                    var boolVar2 { vt = boolean, initExpr = false }
-759.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-                                    if
-                                        expr: lValue { varID = boolVar2 }
-                                        block: block { iLineEnd = 767, #stmts = 1, iLineBegin = 765 }
-                                            stmts:
-766.                                            return
+730.                                            return
                                                     expr: lValue { varID = r }
                             expr: lValue { varID = boolVar1 }
-                            block: block { iLineEnd = 763, #stmts = 1, iLineBegin = 760 }
+                            block: block { iLineEnd = 727, #stmts = 1, iLineBegin = 724 }
                                 stmts:
-761.                                call println { class = ct }
-769.        func funcPathMissingReturn2Brackets { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 782, #stmts = 3, iLineBegin = 770 }
+725.                                call println { class = ct }
+733.        func funcPathMissingReturn2Brackets { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 746, #stmts = 3, iLineBegin = 734 }
                     stmts:
-771.                    var r { vt = int, initExpr = 0 }
-772.                    var boolVar { vt = boolean, initExpr = false }
-773.                    if
-                            elseBlock: block { iLineEnd = 781, #stmts = 1, iLineBegin = 778 }
+735.                    var r { vt = int, initExpr = 0 }
+736.                    var boolVar { vt = boolean, initExpr = false }
+737.                    if
+                            elseBlock: block { iLineEnd = 745, #stmts = 1, iLineBegin = 742 }
                                 stmts:
-779.                                call println { class = ct }
+743.                                call println { class = ct }
                             expr: lValue { varID = boolVar }
-                            block: block { iLineEnd = 776, #stmts = 1, iLineBegin = 774 }
+                            block: block { iLineEnd = 740, #stmts = 1, iLineBegin = 738 }
+                                stmts:
+739.                                return
+                                        expr: lValue { varID = r }
+747.        func funcPathMissingReturn1Brackets { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 760, #stmts = 3, iLineBegin = 748 }
+                    stmts:
+749.                    var r { vt = int, initExpr = 0 }
+750.                    var boolVar { vt = boolean, initExpr = false }
+751.                    if
+                            elseBlock: block { iLineEnd = 759, #stmts = 1, iLineBegin = 757 }
+                                stmts:
+758.                                return
+                                        expr: lValue { varID = r }
+                            expr: lValue { varID = boolVar }
+                            block: block { iLineEnd = 755, #stmts = 1, iLineBegin = 752 }
+                                stmts:
+753.                                call println { class = ct }
+761.        func funcPathMissingReturn10 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 776, #stmts = 4, iLineBegin = 762 }
+                    stmts:
+763.                    var r { vt = int, initExpr = 0 }
+764.                    var boolVar1 { vt = boolean, initExpr = false }
+765.                    var boolVar2 { vt = boolean, initExpr = false }
+766.                    if
+                            elseBlock: block { #stmts = 1 }
                                 stmts:
 775.                                return
                                         expr: lValue { varID = r }
-783.        func funcPathMissingReturn1Brackets { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 796, #stmts = 3, iLineBegin = 784 }
-                    stmts:
-785.                    var r { vt = int, initExpr = 0 }
-786.                    var boolVar { vt = boolean, initExpr = false }
-787.                    if
-                            elseBlock: block { iLineEnd = 795, #stmts = 1, iLineBegin = 793 }
-                                stmts:
-794.                                return
-                                        expr: lValue { varID = r }
-                            expr: lValue { varID = boolVar }
-                            block: block { iLineEnd = 791, #stmts = 1, iLineBegin = 788 }
-                                stmts:
-789.                                call println { class = ct }
-797.        func funcPathMissingReturn10 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 812, #stmts = 4, iLineBegin = 798 }
-                    stmts:
-799.                    var r { vt = int, initExpr = 0 }
-800.                    var boolVar1 { vt = boolean, initExpr = false }
-801.                    var boolVar2 { vt = boolean, initExpr = false }
-802.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-811.                                return
-                                        expr: lValue { varID = r }
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-803.                                if
+767.                                if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
                                                 if
                                                     elseBlock: block { #stmts = 1 }
                                                         stmts:
-809.                                                        call println { class = ct }
+773.                                                        call println { class = ct }
                                                     expr: lValue { varID = boolVar2 }
                                                     block: block { #stmts = 1 }
                                                         stmts:
-806.                                                        return
+770.                                                        return
                                                                 expr: lValue { varID = r }
                                         expr: lValue { varID = boolVar1 }
                                         block: block { #stmts = 1 }
                                             stmts:
-804.                                            return
+768.                                            return
                                                     expr: lValue { varID = r }
-813.        func funcPathMissingReturn9 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 828, #stmts = 4, iLineBegin = 814 }
+777.        func funcPathMissingReturn9 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 792, #stmts = 4, iLineBegin = 778 }
                     stmts:
-815.                    var r { vt = int, initExpr = 0 }
-816.                    var boolVar1 { vt = boolean, initExpr = false }
-817.                    var boolVar2 { vt = boolean, initExpr = false }
-818.                    if
+779.                    var r { vt = int, initExpr = 0 }
+780.                    var boolVar1 { vt = boolean, initExpr = false }
+781.                    var boolVar2 { vt = boolean, initExpr = false }
+782.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
-827.                                return
+791.                                return
                                         expr: lValue { varID = r }
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-819.                                if
+783.                                if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
                                                 if
                                                     elseBlock: block { #stmts = 1 }
                                                         stmts:
-825.                                                        return
+789.                                                        return
                                                                 expr: lValue { varID = r }
                                                     expr: lValue { varID = boolVar2 }
                                                     block: block { #stmts = 1 }
                                                         stmts:
-823.                                                        call println { class = ct }
+787.                                                        call println { class = ct }
                                         expr: lValue { varID = boolVar1 }
                                         block: block { #stmts = 1 }
+                                            stmts:
+784.                                            return
+                                                    expr: lValue { varID = r }
+793.        func funcPathMissingReturn8 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 808, #stmts = 4, iLineBegin = 794 }
+                    stmts:
+795.                    var r { vt = int, initExpr = 0 }
+796.                    var boolVar1 { vt = boolean, initExpr = false }
+797.                    var boolVar2 { vt = boolean, initExpr = false }
+798.                    if
+                            elseBlock: block { #stmts = 1 }
+                                stmts:
+807.                                return
+                                        expr: lValue { varID = r }
+                            expr: lValue { varID = boolVar1 }
+                            block: block { #stmts = 1 }
+                                stmts:
+799.                                if
+                                        elseBlock: block { #stmts = 1 }
+                                            stmts:
+                                                if
+                                                    elseBlock: block { #stmts = 1 }
+                                                        stmts:
+805.                                                        return
+                                                                expr: lValue { varID = r }
+                                                    expr: lValue { varID = boolVar2 }
+                                                    block: block { #stmts = 1 }
+                                                        stmts:
+803.                                                        return
+                                                                expr: lValue { varID = r }
+                                        expr: lValue { varID = boolVar1 }
+                                        block: block { #stmts = 1 }
+                                            stmts:
+801.                                            call println { class = ct }
+809.        func funcPathMissingReturn7 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 821, #stmts = 4, iLineBegin = 810 }
+                    stmts:
+811.                    var r { vt = int, initExpr = 0 }
+812.                    var boolVar1 { vt = boolean, initExpr = false }
+813.                    var boolVar2 { vt = boolean, initExpr = false }
+814.                    if
+                            elseBlock: block { #stmts = 1 }
+                                stmts:
+                                    if
+                                        elseBlock: block { #stmts = 1 }
                                             stmts:
 820.                                            return
                                                     expr: lValue { varID = r }
-829.        func funcPathMissingReturn8 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 844, #stmts = 4, iLineBegin = 830 }
-                    stmts:
-831.                    var r { vt = int, initExpr = 0 }
-832.                    var boolVar1 { vt = boolean, initExpr = false }
-833.                    var boolVar2 { vt = boolean, initExpr = false }
-834.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-843.                                return
-                                        expr: lValue { varID = r }
+                                        expr: lValue { varID = boolVar2 }
+                                        block: block { #stmts = 1 }
+                                            stmts:
+818.                                            return
+                                                    expr: lValue { varID = r }
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-835.                                if
-                                        elseBlock: block { #stmts = 1 }
-                                            stmts:
-                                                if
-                                                    elseBlock: block { #stmts = 1 }
-                                                        stmts:
-841.                                                        return
-                                                                expr: lValue { varID = r }
-                                                    expr: lValue { varID = boolVar2 }
-                                                    block: block { #stmts = 1 }
-                                                        stmts:
-839.                                                        return
-                                                                expr: lValue { varID = r }
-                                        expr: lValue { varID = boolVar1 }
-                                        block: block { #stmts = 1 }
-                                            stmts:
-837.                                            call println { class = ct }
-845.        func funcPathMissingReturn7 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 857, #stmts = 4, iLineBegin = 846 }
+816.                                call println { class = ct }
+822.        func funcPathMissingReturn6 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 834, #stmts = 4, iLineBegin = 823 }
                     stmts:
-847.                    var r { vt = int, initExpr = 0 }
-848.                    var boolVar1 { vt = boolean, initExpr = false }
-849.                    var boolVar2 { vt = boolean, initExpr = false }
-850.                    if
+824.                    var r { vt = int, initExpr = 0 }
+825.                    var boolVar1 { vt = boolean, initExpr = false }
+826.                    var boolVar2 { vt = boolean, initExpr = false }
+827.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         elseBlock: block { #stmts = 1 }
                                             stmts:
-856.                                            return
+833.                                            return
                                                     expr: lValue { varID = r }
                                         expr: lValue { varID = boolVar2 }
                                         block: block { #stmts = 1 }
                                             stmts:
-854.                                            return
+831.                                            call println { class = ct }
+                            expr: lValue { varID = boolVar1 }
+                            block: block { #stmts = 1 }
+                                stmts:
+828.                                return
+                                        expr: lValue { varID = r }
+835.        func funcPathMissingReturn5 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 847, #stmts = 4, iLineBegin = 836 }
+                    stmts:
+837.                    var r { vt = int, initExpr = 0 }
+838.                    var boolVar1 { vt = boolean, initExpr = false }
+839.                    var boolVar2 { vt = boolean, initExpr = false }
+840.                    if
+                            elseBlock: block { #stmts = 1 }
+                                stmts:
+                                    if
+                                        elseBlock: block { #stmts = 1 }
+                                            stmts:
+846.                                            call println { class = ct }
+                                        expr: lValue { varID = boolVar2 }
+                                        block: block { #stmts = 1 }
+                                            stmts:
+843.                                            return
                                                     expr: lValue { varID = r }
                             expr: lValue { varID = boolVar1 }
                             block: block { #stmts = 1 }
                                 stmts:
-852.                                call println { class = ct }
-858.        func funcPathMissingReturn6 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 870, #stmts = 4, iLineBegin = 859 }
+841.                                return
+                                        expr: lValue { varID = r }
+848.        func funcPathMissingReturn3 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 858, #stmts = 4, iLineBegin = 849 }
                     stmts:
-860.                    var r { vt = int, initExpr = 0 }
-861.                    var boolVar1 { vt = boolean, initExpr = false }
-862.                    var boolVar2 { vt = boolean, initExpr = false }
+850.                    var r { vt = int, initExpr = 0 }
+851.                    var boolVar1 { vt = boolean, initExpr = false }
+852.                    var boolVar2 { vt = boolean, initExpr = false }
+853.                    if
+                            elseBlock: block { #stmts = 1 }
+                                stmts:
+                                    if
+                                        expr: lValue { varID = boolVar2 }
+                                        block: block { #stmts = 1 }
+                                            stmts:
+857.                                            return
+                                                    expr: lValue { varID = r }
+                            expr: lValue { varID = boolVar1 }
+                            block: block { #stmts = 1 }
+                                stmts:
+855.                                call println { class = ct }
+859.        func funcPathMissingReturn2 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 868, #stmts = 3, iLineBegin = 860 }
+                    stmts:
+861.                    var r { vt = int, initExpr = 0 }
+862.                    var boolVar { vt = boolean, initExpr = false }
 863.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
-                                    if
-                                        elseBlock: block { #stmts = 1 }
-                                            stmts:
-869.                                            return
-                                                    expr: lValue { varID = r }
-                                        expr: lValue { varID = boolVar2 }
-                                        block: block { #stmts = 1 }
-                                            stmts:
-867.                                            call println { class = ct }
-                            expr: lValue { varID = boolVar1 }
+867.                                call println { class = ct }
+                            expr: lValue { varID = boolVar }
                             block: block { #stmts = 1 }
                                 stmts:
 864.                                return
                                         expr: lValue { varID = r }
-871.        func funcPathMissingReturn5 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 883, #stmts = 4, iLineBegin = 872 }
+869.        func funcPathMissingReturn1 { #paramVars = 0, vt = int }
+                block: block { iLineEnd = 878, #stmts = 3, iLineBegin = 870 }
                     stmts:
-873.                    var r { vt = int, initExpr = 0 }
-874.                    var boolVar1 { vt = boolean, initExpr = false }
-875.                    var boolVar2 { vt = boolean, initExpr = false }
-876.                    if
+871.                    var r { vt = int, initExpr = 0 }
+872.                    var boolVar { vt = boolean, initExpr = false }
+873.                    if
                             elseBlock: block { #stmts = 1 }
-                                stmts:
-                                    if
-                                        elseBlock: block { #stmts = 1 }
-                                            stmts:
-882.                                            call println { class = ct }
-                                        expr: lValue { varID = boolVar2 }
-                                        block: block { #stmts = 1 }
-                                            stmts:
-879.                                            return
-                                                    expr: lValue { varID = r }
-                            expr: lValue { varID = boolVar1 }
-                            block: block { #stmts = 1 }
                                 stmts:
 877.                                return
                                         expr: lValue { varID = r }
-884.        func funcPathMissingReturn4 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 894, #stmts = 4, iLineBegin = 885 }
-                    stmts:
-886.                    var r { vt = int, initExpr = 0 }
-887.                    var boolVar1 { vt = boolean, initExpr = false }
-888.                    var boolVar2 { vt = boolean, initExpr = false }
-889.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-                                    if
-                                        expr: lValue { varID = boolVar2 }
-                                        block: block { #stmts = 1 }
-                                            stmts:
-893.                                            call println { class = ct }
-                            expr: lValue { varID = boolVar1 }
-                            block: block { #stmts = 1 }
-                                stmts:
-890.                                return
-                                        expr: lValue { varID = r }
-895.        func funcPathMissingReturn3 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 905, #stmts = 4, iLineBegin = 896 }
-                    stmts:
-897.                    var r { vt = int, initExpr = 0 }
-898.                    var boolVar1 { vt = boolean, initExpr = false }
-899.                    var boolVar2 { vt = boolean, initExpr = false }
-900.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-                                    if
-                                        expr: lValue { varID = boolVar2 }
-                                        block: block { #stmts = 1 }
-                                            stmts:
-904.                                            return
-                                                    expr: lValue { varID = r }
-                            expr: lValue { varID = boolVar1 }
-                            block: block { #stmts = 1 }
-                                stmts:
-902.                                call println { class = ct }
-906.        func funcPathMissingReturn2 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 915, #stmts = 3, iLineBegin = 907 }
-                    stmts:
-908.                    var r { vt = int, initExpr = 0 }
-909.                    var boolVar { vt = boolean, initExpr = false }
-910.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-914.                                call println { class = ct }
                             expr: lValue { varID = boolVar }
                             block: block { #stmts = 1 }
                                 stmts:
-911.                                return
-                                        expr: lValue { varID = r }
-916.        func funcPathMissingReturn1 { #paramVars = 0, vt = int }
-                block: block { iLineEnd = 925, #stmts = 3, iLineBegin = 917 }
+875.                                call println { class = ct }
+880.        func testErrors1 { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 1154, #stmts = 108, iLineBegin = 881 }
                     stmts:
-918.                    var r { vt = int, initExpr = 0 }
-919.                    var boolVar { vt = boolean, initExpr = false }
-920.                    if
-                            elseBlock: block { #stmts = 1 }
-                                stmts:
-924.                                return
-                                        expr: lValue { varID = r }
-                            expr: lValue { varID = boolVar }
-                            block: block { #stmts = 1 }
-                                stmts:
-922.                                call println { class = ct }
-927.        func testErrors1 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 1204, #stmts = 108, iLineBegin = 928 }
-                    stmts:
-929.                    var intVar { vt = int, initExpr = 1 }
-930.                    var dblVar { vt = double, initExpr = 1.2 }
-931.                    var boolVar { vt = boolean, initExpr = false }
-932.                    var strVar { vt = String, initExpr = "" }
-933.                    var rect { vt = GameObj }
+882.                    var intVar { vt = int, initExpr = 1 }
+883.                    var dblVar { vt = double, initExpr = 1.2 }
+884.                    var boolVar { vt = boolean, initExpr = false }
+885.                    var strVar { vt = String, initExpr = "" }
+886.                    var rect { vt = GameObj }
                             initExpr: call rect { #exprs = 4, class = ct }
                                 exprs:
-933.                                (50)
-933.                                (50)
-933.                                (10)
-933.                                (10)
-934.                    var circle { vt = GameObj }
+886.                                (50)
+886.                                (50)
+886.                                (10)
+886.                                (10)
+887.                    var circle { vt = GameObj }
                             initExpr: call circle { #exprs = 3, class = ct }
                                 exprs:
-934.                                (50)
-934.                                (50)
-934.                                (10)
-935.                    var text { vt = GameObj }
+887.                                (50)
+887.                                (50)
+887.                                (10)
+888.                    var text { vt = GameObj }
                             initExpr: call text { #exprs = 4, class = ct }
                                 exprs:
-935.                                ("text")
-935.                                (50)
-935.                                (50)
-935.                                (10)
-936.                    var image { vt = GameObj }
+888.                                ("text")
+888.                                (50)
+888.                                (50)
+888.                                (10)
+889.                    var image { vt = GameObj }
                             initExpr: call image { #exprs = 4, class = ct }
                                 exprs:
-936.                                ("bogusFileName.png")
-936.                                (50)
-936.                                (50)
-936.                                (10)
-937.                    var intArr { vt = array of int }
+889.                                ("bogusFileName.png")
+889.                                (50)
+889.                                (50)
+889.                                (10)
+890.                    var intArr { vt = array of int }
                             initExpr: newArray { vtElement = 0, lengthExpr = 10 }
-938.                    var dblArr { vt = array of double }
+891.                    var dblArr { vt = array of double }
                             initExpr: newArray { vtElement = 1, lengthExpr = 10 }
-939.                    var boolArr { vt = array of boolean }
+892.                    var boolArr { vt = array of boolean }
                             initExpr: newArray { vtElement = true, lengthExpr = 10 }
-940.                    var strArr { vt = array of String }
+893.                    var strArr { vt = array of String }
                             initExpr: newArray { vtElement = "String", lengthExpr = 10 }
-941.                    var objArr { vt = array of GameObj }
+894.                    var objArr { vt = array of GameObj }
                             initExpr: newArray { vtElement = "GameObj", lengthExpr = 10 }
-944.                    assign (=)
+897.                    assign (=)
                             lValue: lValue { varID = circle, fieldID = x }
                             expr: (+) { right = 314 }
                                 left: cast { vtCast = 0 }
                                     expr: lValue { varID = intVar }
-946.                    assign (=)
+899.                    assign (=)
                             lValue: lValue { varID = circle, fieldID = x }
                             expr: cast { vtCast = 0 }
                                 expr: parens
                                     expr: (+) { right = 314 }
                                         left: lValue { varID = intVar }
-948.                    assign (=)
+901.                    assign (=)
                             lValue: lValue { varID = objArr }
                             expr: newArray { vtElement = "GameObj" }
                                 lengthExpr: (*) { left = 2 }
                                     right: cast { vtCast = 0 }
                                         expr: lValue { varID = objArr }
-950.                    assign (=)
+903.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: cast { vtCast = 1 }
                                 expr: parens
                                     expr: (*) { right = 2.3, left = 10 }
-952.                    assign (=)
+905.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = group }
                             expr: cast { vtCast = "String" }
                                 expr: lValue { varID = circle, fieldID = group }
-954.                    assign (=)
+907.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: staticField { fieldID = P, class = Math }
-958.                    assign (=)
+911.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = x }
                             expr: unaryOp (neg)
                                 expr: lValue { varID = rect }
-960.                    assign (=)
+913.                    assign (=)
                             lValue: lValue { varID = strVar }
                             expr: unaryOp (neg)
                                 expr: lValue { varID = strVar }
-964.                    assign (=)
+917.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: unaryOp (not)
                                 expr: lValue { varID = intVar }
-968.                    assign (=)
+921.                    assign (=)
                             lValue: lValue { varID = objArr }
                             expr: newArray { vtElement = "GameObj", lengthExpr = "ten" }
-970.                    assign (=)
+923.                    assign (=)
                             lValue: lValue { varID = strArr }
                             expr: newArray { vtElement = "String" }
                                 lengthExpr: (+)
                                     right: lValue { varID = dblVar }
                                     left: lValue { varID = intVar }
-972.                    assign (=)
+925.                    assign (=)
                             lValue: lValue { varID = boolArr }
                             expr: newArray { vtElement = true }
                                 lengthExpr: (+)
                                     right: lValue { varID = dblVar }
                                     left: lValue { varID = intVar }
-974.                    assign (=)
+927.                    assign (=)
                             lValue: lValue { varID = dblArr }
                             expr: newArray { vtElement = 1 }
                                 lengthExpr: lValue { varID = dblVar }
-976.                    assign (=)
+929.                    assign (=)
                             lValue: lValue { varID = intArr }
                             expr: newArray { vtElement = 0, lengthExpr = 10.0 }
-989.                    assign (=)
+942.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: new Integer { #exprs = 1 }
                                 exprs:
-989.                                (1)
-995.                    var arrInit9 { vt = array of String }
+942.                                (1)
+948.                    var arrInit9 { vt = array of String }
                             initExpr: arrayInit { #exprs = 1 }
                                 exprs:
                                     newArray { vtElement = "String" }
                                         lengthExpr: lValue { varID = intVar }
-997.                    var arrInit8 { vt = array of GameObj }
+950.                    var arrInit8 { vt = array of GameObj }
                             initExpr: arrayInit { #exprs = 3 }
                                 exprs:
                                     lValue { varID = rect }
                                     lValue { varID = intArr }
                                     lValue { varID = text }
-999.                    var arrInit7 { vt = array of GameObj }
+952.                    var arrInit7 { vt = array of GameObj }
                             initExpr: arrayInit { #exprs = 3 }
                                 exprs:
                                     lValue { varID = rect }
                                     lValue { varID = image }
                                     lValue { varID = objArr }
-1003.                    var arrInit6 { vt = array of GameObj }
+956.                    var arrInit6 { vt = array of GameObj }
                             initExpr: arrayInit { #exprs = 3 }
                                 exprs:
                                     call rect { #exprs = 4, class = ct }
                                         exprs:
-1003.                                        (50)
-1003.                                        (50)
-1003.                                        (10)
-1003.                                        (10)
+956.                                        (50)
+956.                                        (50)
+956.                                        (10)
+956.                                        (10)
                                     lValue { varID = text }
-1003.                                (0)
-1005.                    var arrInit5 { vt = array of GameObj }
+956.                                (0)
+958.                    var arrInit5 { vt = array of GameObj }
                             initExpr: arrayInit { #exprs = 2 }
                                 exprs:
-1005.                                ("circle")
+958.                                ("circle")
                                     lValue { varID = circle }
-1007.                    var arrInit4 { vt = array of String }
+960.                    var arrInit4 { vt = array of String }
                             initExpr: arrayInit { #exprs = 3 }
                                 exprs:
                                     (+) { right = 1 }
@@ -1550,108 +1490,108 @@
                                     lValue { varID = intVar }
                                     (+) { right = 2 }
                                         left: lValue { varID = intVar }
-1009.                    var arrInit3 { vt = array of boolean }
+962.                    var arrInit3 { vt = array of boolean }
                             initExpr: arrayInit { #exprs = 3 }
                                 exprs:
-1009.                                (false)
+962.                                (false)
                                     lValue { varID = boolVar }
-1009.                                (null)
-1011.                    var arrInit2 { vt = array of double }
+962.                                (null)
+964.                    var arrInit2 { vt = array of double }
                             initExpr: arrayInit { #exprs = 2 }
                                 exprs:
                                     lValue { varID = circle }
-1011.                                (0.5)
-1013.                    var arrInit1 { vt = array of int }
+964.                                (0.5)
+966.                    var arrInit1 { vt = array of int }
                             initExpr: arrayInit { #exprs = 2 }
                                 exprs:
-1013.                                (1)
-1013.                                ("1")
-1018.                    call println { #exprs = 1, class = ct }
+966.                                (1)
+966.                                ("1")
+971.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = strVar }
                                     left: lValue { varID = objArr }
-1020.                    call println { #exprs = 1, class = ct }
+973.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = strVar }
                                     left: lValue { varID = strArr }
-1022.                    call println { #exprs = 1, class = ct }
+975.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = strVar }
                                     left: lValue { varID = boolArr }
-1024.                    call println { #exprs = 1, class = ct }
+977.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = dblArr }
                                     left: lValue { varID = strVar }
-1026.                    call println { #exprs = 1, class = ct }
+979.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intArr }
                                     left: lValue { varID = strVar }
-1030.                    call println { #exprs = 1, class = ct }
+983.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = dblVar }
                                     left: lValue { varID = intArr }
-1032.                    call println { #exprs = 1, class = ct }
+985.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = dblVar }
                                     left: lValue { varID = rect }
-1034.                    call println { #exprs = 1, class = ct }
+987.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = dblVar }
                                     left: lValue { varID = boolVar }
-1036.                    call println { #exprs = 1, class = ct }
+989.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intVar }
                                     left: lValue { varID = intArr }
-1038.                    call println { #exprs = 1, class = ct }
+991.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intVar }
                                     left: lValue { varID = rect }
-1040.                    call println { #exprs = 1, class = ct }
+993.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intVar }
                                     left: lValue { varID = boolVar }
-1042.                    call println { #exprs = 1, class = ct }
+995.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intArr }
                                     left: lValue { varID = dblVar }
-1044.                    call println { #exprs = 1, class = ct }
+997.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = rect }
                                     left: lValue { varID = dblVar }
-1046.                    call println { #exprs = 1, class = ct }
+999.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = boolVar }
                                     left: lValue { varID = dblVar }
-1048.                    call println { #exprs = 1, class = ct }
+1001.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = intArr }
                                     left: lValue { varID = intVar }
-1050.                    call println { #exprs = 1, class = ct }
+1003.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = rect }
                                     left: lValue { varID = intVar }
-1052.                    call println { #exprs = 1, class = ct }
+1005.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+)
                                     right: lValue { varID = boolVar }
                                     left: lValue { varID = intVar }
-1054.                    assign (=)
+1007.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: (/) { left = 1 }
                                 right: parens
@@ -1659,63 +1599,63 @@
                                         left: (+)
                                             right: lValue { varID = intArr }
                                             left: lValue { varID = boolVar }
-1056.                    assign (=)
+1009.                    assign (=)
                             lValue: lValue { varID = strVar }
                             expr: (+)
                                 right: lValue { varID = rect }
                                 left: lValue { varID = boolVar }
-1058.                    assign (=)
+1011.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (+)
                                 right: (/) { right = 2 }
                                     left: lValue { varID = dblVar }
                                 left: lValue { varID = boolVar }
-1060.                    assign (=)
+1013.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (-) { right = 1 }
                                 left: (+)
                                     right: lValue { varID = intVar }
                                     left: lValue { varID = boolVar }
-1062.                    assign (=)
+1015.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: (+)
                                 right: lValue { varID = boolVar }
                                 left: lValue { varID = boolVar }
-1064.                    assign (=)
+1017.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = x }
                             expr: (+)
                                 right: lValue { varID = text }
                                 left: lValue { varID = circle }
-1066.                    assign (=)
+1019.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = width }
                             expr: (+) { left = 2 }
                                 right: lValue { varID = rect }
-1068.                    call println { #exprs = 1, class = ct }
+1021.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+) { right = false }
                                     left: lValue { varID = rect, fieldID = x }
-1072.                    assign (=)
+1025.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: (-) { right = ".txt" }
                                 left: lValue { varID = strVar }
-1074.                    assign (=)
+1027.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (%)
                                 right: lValue { varID = text }
                                 left: lValue { varID = rect, fieldID = group }
-1076.                    assign (=)
+1029.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: (/) { right = 10 }
                                 left: lValue { varID = circle }
-1078.                    assign (=)
+1031.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = width }
                             expr: (*) { right = 2 }
                                 left: lValue { varID = rect }
-1080.                    assign (=)
+1033.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = x }
                             expr: (-) { left = 100 }
                                 right: lValue { varID = rect }
-1084.                    var intArrayInitWithExpressions { vt = array of int }
+1037.                    var intArrayInitWithExpressions { vt = array of int }
                             initExpr: arrayInit { #exprs = 2 }
                                 exprs:
                                     (+) { left = 1 }
@@ -1723,56 +1663,56 @@
                                     (/) { right = 2 }
                                         left: parens
                                             expr: (+) { right = 1, left = 3 }
-1086.                    assign (=)
+1039.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: (==) { right = 1 }
                                 left: (/)
                                     right: lValue { varID = intVar }
                                     left: lValue { varID = intVar }
-1088.                    assign (=)
+1041.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: (/) { right = 3 }
                                 left: unaryOp (neg) { expr = 10 }
-1090.                    assign (=)
+1043.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: (/) { left = 10 }
                                 right: unaryOp (neg) { expr = 3 }
-1092.                    assign (=)
+1045.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (/) { right = 5, left = 123 }
-1094.                    assign (=)
+1047.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (/) { right = 3 }
                                 left: parens
                                     expr: (+) { right = 2, left = 1 }
-1096.                    assign (=)
+1049.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (/) { left = 1 }
                                 right: parens
                                     expr: (+) { right = 3, left = 2 }
-1098.                    assign (=)
+1051.                    assign (=)
                             lValue: lValue { varID = rect, fieldID = x }
                             expr: (/) { right = 1 }
                                 left: lValue { varID = intVar }
-1100.                    call println { #exprs = 1, class = ct }
+1053.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (+) { left = 1 }
                                     right: (/)
                                         right: lValue { varID = intVar }
                                         left: lValue { varID = intVar }
-1102.                    assign (=)
+1055.                    assign (=)
                             lValue: lValue { varID = dblVar }
                             expr: (/) { left = 2 }
                                 right: lValue { varID = intVar }
-1104.                    assign (=)
+1057.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (/) { right = 2 }
                                 left: lValue { varID = intVar }
-1108.                    assign (=)
+1061.                    assign (=)
                             lValue: lValue { varID = circle }
                             expr: (||) { right = false }
                                 left: lValue { varID = intVar }
-1110.                    if
+1063.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
@@ -1780,95 +1720,95 @@
                                             left: lValue { varID = rect }
                                         block: block { #stmts = 1 }
                                             stmts:
-1114.                                            call voidMethod
+1067.                                            call voidMethod
                             expr: (&&) { left = true }
                                 right: lValue { varID = dblVar }
                             block: block { #stmts = 1 }
                                 stmts:
-1111.                                call voidMethod
-1116.                    while
+1064.                                call voidMethod
+1069.                    while
                             expr: (&&)
                                 right: lValue { varID = boolVar }
                                 left: lValue { varID = intVar }
                             block: block { #stmts = 1 }
                                 stmts:
-1117.                                break
-1118.                    doWhile { iLineWhile = 1121 }
+1070.                                break
+1071.                    doWhile { iLineWhile = 1074 }
                             expr: (||)
                                 right: lValue { varID = strVar }
                                 left: lValue { varID = dblVar }
                             block: block { #stmts = 1 }
                                 stmts:
-1119.                                break
-1125.                    assign (=)
+1072.                                break
+1078.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: (<)
                                 right: lValue { varID = rect }
                                 left: lValue { varID = circle }
-1127.                    if
+1080.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
                                         expr: (<=) { right = 10, left = "level" }
                                         block: block { #stmts = 1 }
                                             stmts:
-1131.                                            call voidMethod
+1084.                                            call voidMethod
                             expr: (>) { right = false, left = 1 }
                             block: block { #stmts = 1 }
                                 stmts:
-1128.                                call voidMethod
-1133.                    while
+1081.                                call voidMethod
+1086.                    while
                             expr: (>=)
                                 right: lValue { varID = rect, fieldID = visible }
                                 left: (+) { right = 1, left = 1 }
                             block: block { #stmts = 1 }
                                 stmts:
-1134.                                break
-1135.                    doWhile { iLineWhile = 1138 }
+1087.                                break
+1088.                    doWhile { iLineWhile = 1091 }
                             expr: (<) { left = 3.14 }
                                 right: lValue { varID = text }
                             block: block { #stmts = 1 }
                                 stmts:
-1136.                                break
-1142.                    assign (=)
+1089.                                break
+1095.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: (==)
                                 right: lValue { varID = rect }
                                 left: lValue { varID = boolVar }
-1144.                    assign (=)
+1097.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: (!=) { right = true }
                                 left: lValue { varID = rect }
-1146.                    assign (=)
+1099.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: (==) { left = "3.14" }
                                 right: staticField { fieldID = PI, class = Math }
-1148.                    for
+1101.                    for
                             expr: (!=)
                                 right: lValue { varID = strVar }
                                 left: lValue { varID = intVar }
                             block: block { #stmts = 1 }
                                 stmts:
-1149.                                call voidMethod
-1151.                    assign (=)
+1102.                                call voidMethod
+1104.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: (==) { right = true }
                                 left: lValue { varID = strVar }
-1153.                    assign (=)
+1106.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: (!=) { right = false, left = "false" }
-1154.                    doWhile { iLineWhile = 1157 }
+1107.                    doWhile { iLineWhile = 1110 }
                             expr: (==) { right = false, left = 1 }
                             block: block { #stmts = 1 }
                                 stmts:
-1155.                                call voidMethod
-1159.                    while
+1108.                                call voidMethod
+1112.                    while
                             expr: (!=) { right = 0 }
                                 left: lValue { varID = boolVar }
                             block: block { #stmts = 1 }
                                 stmts:
-1160.                                call voidMethod
-1162.                    if
+1113.                                call voidMethod
+1115.                    if
                             elseBlock: block { #stmts = 1 }
                                 stmts:
                                     if
@@ -1876,73 +1816,73 @@
                                             right: lValue { varID = circle }
                                         block: block { #stmts = 1 }
                                             stmts:
-1166.                                            call voidMethod
+1119.                                            call voidMethod
                             expr: (==) { right = 1 }
                                 left: lValue { varID = rect }
                             block: block { #stmts = 1 }
                                 stmts:
-1163.                                call voidMethod
-1170.                    call println { #exprs = 1, class = ct }
+1116.                                call voidMethod
+1123.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (=)
                                     right: lValue { varID = rect }
                                     left: lValue { varID = circle }
-1172.                    while
+1125.                    while
                             expr: (=) { right = false }
                                 left: lValue { varID = boolVar }
                             block: block { #stmts = 1 }
                                 stmts:
-1173.                                assign (=) { expr = true }
+1126.                                assign (=) { expr = true }
                                         lValue: lValue { varID = boolVar }
-1175.                    if
+1128.                    if
                             expr: (=) { right = 100 }
                                 left: lValue { varID = rect, fieldID = x }
                             block: block { #stmts = 1 }
                                 stmts:
-1176.                                call setSpeed { #exprs = 2 }
+1129.                                call setSpeed { #exprs = 2 }
                                         lValue: lValue { varID = rect }
                                         exprs:
                                             unaryOp (neg) { expr = 1 }
-1176.                                        (0)
-1178.                    assign (=)
+1129.                                        (0)
+1131.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: parens
                                 expr: (=) { right = 2 }
                                     left: (+) { right = 1, left = 1 }
-1180.                    if
+1133.                    if
                             expr: (=) { right = 1 }
                                 left: lValue { varID = intVar }
                             block: block { #stmts = 1 }
                                 stmts:
-1181.                                call println { #exprs = 1, class = ct }
+1134.                                call println { #exprs = 1, class = ct }
                                         exprs:
-1181.                                        ("oops")
-1185.                    call println { #exprs = 1, class = ct }
+1134.                                        ("oops")
+1138.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 call voidMethod
-1187.                    assign (=)
+1140.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: call println { class = ct }
-1193.                    assign (=)
+1143.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (|) { right = 1, left = 2 }
-1195.                    assign (=)
+1145.                    assign (=)
                             lValue: lValue { varID = intVar }
                             expr: (^) { right = 1, left = 2 }
-1197.                    call println { #exprs = 1, class = ct }
+1147.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (&) { right = 1, left = 2 }
-1199.                    call println { #exprs = 1, class = ct }
+1149.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (>>>) { right = 1, left = 2 }
-1201.                    call println { #exprs = 1, class = ct }
+1151.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (>>) { right = 1, left = 2 }
-1203.                    call println { #exprs = 1, class = ct }
+1153.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (<<) { right = 1, left = 2 }
-1209.        func start { #paramVars = 0, isPublic = true, vt = void }
-                block: block { iLineEnd = 1211, #stmts = 0, iLineBegin = 1210 }
+1156.        func start { #paramVars = 0, isPublic = true, vt = void }
+                block: block { iLineEnd = 1158, #stmts = 0, iLineBegin = 1157 }
         vars:
   3.        var classLevelInt { vt = int, isGlobal = true, initExpr = 0 }
   4.        var classLevelDouble { vt = double, isGlobal = true, initExpr = 0 }
