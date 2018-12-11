@@ -1,11 +1,13 @@
 import Code12.*;
 
-class TestProgram extends Code12Program
+class Level6Tests extends Code12Program
 {
 	public void start()
 	{
 		String strVar = "";
 		GameObj gameObjVar = ct.circle(0, 0, 1);
+		
+		// if syntaxLevel < 7:
 		// ERROR "Strings cannot be compared with =="
 		ct.println(gameObjVar.group != "");
 		// ERROR "Strings cannot be compared with =="
@@ -27,6 +29,4 @@ class TestProgram extends Code12Program
 	public void update()
 	{
 	}
-
-
 }
