@@ -176,7 +176,7 @@ end
 -- Return a display group containing a new button and its icon for the toolbar.
 -- Placement can be "left" or "right" to place the button on that side of the toolbar.
 function buttons.newToolbarButton( parent, label, imageFile, onRelease, placement, adjacentBtn, width )
-	local iconSize = 15
+	local iconSize = 16
 	local padding = 10
 	-- Make button display group
 	local btnGroup = display.newGroup()
