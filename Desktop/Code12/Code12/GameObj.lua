@@ -142,6 +142,7 @@ function GameObj:new(typeName, x, y, width, height)
 		-- obj = nil,            -- the Corona display object
 		-- hasSpeed = nil,       -- true if xSpeed or ySpeed was set
 		-- deleted = nil,        -- if true then obj is a dummy obj
+		-- autoDeleted = nil,    -- true if object was auto deleted
 	}
 
 	-- Assign default methods
@@ -175,19 +176,25 @@ function GameObj:setObj(obj)
 end
 
 -- Remove a GameObj and delete the display object.
+-- If autoDelete then the runtime is auto-deleting it, else an explicit delete.
 -- The GameObj will be subject to garbage collection when outstanding refs to it are gone.
-function GameObj:removeAndDelete()
+function GameObj:removeAndDelete( autoDelete )
 	if self.deleted then  -- This object was already deleted
-		runtime.warning("Attempt to delete an object that was already deleted")
+		if not (autoDelete or self.autoDeleted) then
+			runtime.warning("Attempt to delete an object that was already deleted")
+		end
 		return
 	end
 	local obj = self.obj
 	obj.code12GameObj = nil    -- remove display object's reference to the GameObj
 	obj:removeSelf()	       -- remove and destroy the display object
 	self.obj = GameObj.dummyObj    -- dummy display object to help client avoid crashes
-	self.deleted = true
 	self.visible = false       -- to reduce impact of any stale references
 	self.clickable = false
+	self.deleted = true
+	if autoDelete then
+		self.autoDeleted = true
+	end
 end
 
 -- Circle constructor
@@ -879,10 +886,10 @@ function GameObj:hit(gameObj)
 	-- Make sure object is valid and visible first
 	if gameObj == nil then
 		return false
-	elseif gameObj.deleted then
+	elseif gameObj.deleted and not gameObj.autoDeleted then
 		runtime.warning("Attempt to test for hit with a deleted object")
 		return false
-	elseif self.deleted then
+	elseif self.deleted and not self.autoDeleted then
 		runtime.warning("Attempt to call hit method on a deleted object")
 		return false
 	elseif not gameObj.visible then

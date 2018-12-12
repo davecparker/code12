@@ -67,7 +67,7 @@ local function applyObjectSpeeds(screen)
 
 			-- Delete object if it went out of bounds
 			if x < xMin or x > xMax or y < yMin or y > yMax then
-				gameObj:removeAndDelete()
+				gameObj:removeAndDelete( true )
 			end
 		end
 	end
@@ -372,6 +372,8 @@ function runtime.stop( endState )
 	g.clickX = 0
 	g.clickY = 0
 	g.charTyped = nil
+	g.xDialog = nil
+	g.yDialog = nil
 
 	-- Set the run state and restart if requested
 	g.runState = endState or "stopped"

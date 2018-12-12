@@ -3,28 +3,28 @@
 <div class="summary">
 <div class="summaryColumn">
 
-##### [Graphics Object Creation]
+##### [Graphics Object Creation] {#toc-graphics-object-creation}
 * [ct.circle()]
 * [ct.rect()]
 * [ct.line()]
 * [ct.text()]
 * [ct.image()]
 
-##### [Text Output]
+##### [Text Output] {#toc-text-output}
 * [ct.print()]
 * [ct.println()]
 * [ct.log()]
 * [ct.logm()]
 * [ct.setOutputFile()]
 
-##### [Alerts and Input Dialogs]
+##### [Alerts and Input Dialogs] {#toc-alerts-and-input-dialogs}
 * [ct.showAlert()]
 * [ct.inputInt()]
 * [ct.inputNumber()]
 * [ct.inputYesNo()]
 * [ct.inputString()]
 
-##### [Screen Management]
+##### [Screen Management] {#toc-screen-management}
 * [ct.setTitle()]
 * [ct.setHeight()]
 * [ct.getWidth()]
@@ -42,7 +42,7 @@
 </div>
 <div class="summaryColumn">
 
-##### [Mouse and Keyboard Input]
+##### [Mouse and Keyboard Input] {#toc-mouse-and-keyboard-input}
 * [ct.clicked()]
 * [ct.clickX()]
 * [ct.clickY()]
@@ -50,12 +50,12 @@
 * [ct.keyPressed()]
 * [ct.charTyped()]
 
-##### [Audio]
+##### [Audio] {#toc-audio}
 * [ct.loadSound()]
 * [ct.sound()]
 * [ct.setSoundVolume()]
 
-##### [Math Utilities]
+##### [Math Utilities] {#toc-math-utilities}
 * [ct.random()]
 * [ct.round()]
 * [ct.roundDecimal()]
@@ -63,7 +63,7 @@
 * [ct.intDiv()]
 * [ct.isError()]
 
-##### [Type Conversion]
+##### [Type Conversion] {#toc-type-conversion}
 * [ct.parseInt()]
 * [ct.parseNumber()]
 * [ct.canParseInt()]
@@ -71,7 +71,7 @@
 * [ct.formatInt()]
 * [ct.formatDecimal()]
 
-##### [Program Control]
+##### [Program Control] {#toc-program-control}
 * [ct.getTimer()]
 * [ct.getVersion()]
 * [ct.pause()]
@@ -82,13 +82,13 @@
 </div>
 <div class="summaryColumn">
 
-##### [GameObj Data Fields]
+##### [GameObj Data Fields] {#toc-gameobj-data-fields}
 * [obj.x]
 * [obj.y]
 * [obj.visible]
 * [obj.group]
 
-##### [GameObj Methods]	
+##### [GameObj Methods]	{#toc-gameobj-methods}
 * [obj.getType()]
 * [obj.getWidth()]
 * [obj.getHeight()]
@@ -113,7 +113,7 @@
 * [obj.hit()]
 * [obj.objectHitInGroup()]
 
-##### Other Functions Supported
+##### Other Functions Supported {#toc-other-functions-supported}
 * [Java Math Functions]
 * [Java String Methods]
 * [Main Program Functions]
@@ -2865,6 +2865,9 @@ is set to the new filename (see [obj.getText()]).
 
 #### Example
 ```
+GameObj hero = ct.image( "hero.png", 50, 50, 10 );
+GameObj bullet = ct.rect( 50, 70, 1, 10 );
+
 if (hero.hit( bullet ))
 	hero.setImage( "hero-hurt.png" );
 ```
@@ -3133,6 +3136,8 @@ object (see [obj.setLineWidth()]) is not included as part of the object area.
 
 #### Example
 ```
+GameObj hero = ct.image( "hero.png", 45, 45, 10 );
+
 if (hero.containsPoint( 50, 50 ))
 	ct.println( "Hero is over the center of the screen" );
 ```
@@ -3226,9 +3231,26 @@ object (see [obj.setLineWidth()]) is not included as part of the object area.
 
 #### Example
 ```
-GameObj target = bullet.objectHitInGroup( "targets" );
-if (target != null)
-	target.delete();
+GameObj bullet;
+
+public void start()
+{
+	GameObj c = ct.circle( 30, 20, 10 );
+	c.group = "targets";
+	c = ct.circle( 70, 20, 10 );
+	c.group = "targets";
+
+	bullet = ct.rect( 70, 100, 1, 10 );
+	bullet.setSpeed( 0, -1 );
+
+}
+
+public void update()
+{
+	GameObj target = bullet.objectHitInGroup( "targets" );
+	if (target != null)
+		target.delete();
+}
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.objectHitInGroup()]
 
