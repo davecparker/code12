@@ -880,8 +880,8 @@ local function parseCurrentLine( level )
 	tryLineParseAtLevel( level )
 	if findError.iTokenMax then
 		-- Tracking found and reported an error
-		print( string.format( '\nSyntax error at token %d "%s"', 
-				findError.iTokenMax, tokens[findError.iTokenMax].str ) )
+		print( string.format( '\nLine %s: Syntax error at token %d "%s"', 
+				lineNumber, findError.iTokenMax, tokens[findError.iTokenMax].str ) )
 		for _, parse in ipairs( findError.parses ) do
 			print( string.format( "    %s expected %s", 
 					parse.stmtPattern, parse.ttExpected ) )

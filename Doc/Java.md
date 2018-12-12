@@ -215,13 +215,13 @@ ct.circle( x, 50, 20 );
 int xPosition = 30;
 double yPosition = 25.5;
 int size = 10;
-String dotColor = "yellow";
+String color = "yellow";
 
-ct.circle( xPosition, yPosition, size, dotColor );
+ct.circle( xPosition, yPosition, size, color );
 
 xPosition = 70;
 
-ct.rect( xPosition, yPosition, size, size, dotColor );
+ct.rect( xPosition, yPosition, size, size, color );
 ```
 #### Notes
 Variables can have different types, corresponding to the type 
@@ -466,17 +466,73 @@ The calculations are done in the same order as the rules
 of algebra, which is not always left-to-right. 
 Here, `2 * 5` will be calculated first (because multiplication
 has "higher precedence" over addition), then the 3
-is added, so the result is 13, not 30.
+is added, so the result is 13, not 25.
 
 If you want to override the normal order of operations,
 you can use parentheses in your expression, such as:
 ```
-int newResult = (3 + 2) * 5;    // result gets 30
+int newResult = (3 + 2) * 5;    // result gets 25
 ```
 > It is easy to make a mistake with assumptions about
 > the order of operations. Good programmers are 
 > generous with their use of parentheses to reduce
-> mistakes and to make their code easier to understand. 
+> mistakes and to make their code easier to understand.
+
+##### Changing a Variable Value
+In the following code:
+```
+int score = 500;
+int bonus = 100;
+int total = score + bonus;
+```
+The `total` is introduced as a new variable that will be
+assigned the value 600. Instead of introducing a new 
+variable, it is also possible to change the value of 
+the existing `score` variable:
+```
+int score = 500;
+int bonus = 100;
+score = score + bonus;
+```
+Here `score` is initialized to 500, but then it is assigned 
+a new value using the expression `score + bonus`, which 
+is calculated as 600, so `score` then gets assigned the
+new value of 600 (overwriting the previous value of 500).
+
+If you try to look at the statement `score = score + bonus;`
+like an equation in algebra, it doesn't make much sense (bonus 
+must be 0? But we said it was 100...). However, this makes perfect
+sense in Java (and other computer languages). It is important 
+to understand that assignment statements are *not equations*. 
+They are *instructions* to calculate and store a new value for a 
+variable. Here `score = score + bonus;` increases the value 
+of the score by the bonus. This kind of code is very common
+in programming.
+
+##### Assignment Shortcuts
+Statements like `score = score + bonus;` above are common 
+enough that Java has a shortcut for it:
+```
+score += bonus;       // score = score + bonus;
+```
+Further, increasing a variable by 1 is even more common
+(when counting things, for example), so Java has an
+even shorter shortcut for that:
+```
+score++;             // score = score + 1
+```
+Here are examples of the Java assignment shortcut statements
+supported by Code12:
+```
+Shortcut      Equivalent
+--------      ----------
+a += b;       a = a + b;
+a -= b;       a = a - b;
+a *= b;       a = a * b;
+a /= b;       a = a / b;
+a++;          a = a + 1;
+a--;          a = a - 1;
+```
 
 ##### int vs. double and Integer Division
 The numeric operators (`+`, `-`, `*`, `/`, and `%`) can 
@@ -555,7 +611,7 @@ does not add them automatically, so `"John" + "Smith"` would be
 ##### Operands with boolean Results
 There are several other operands that produce 
 [boolean](#java-data-types) values. These are mostly used
-in conjunction with [if-else] statements (syntax level 8)
+in conjunction with [if-else] statements (syntax level 8),
 so they are explained in that section.
 
 ###### [Java Language Help](#top) > [Expressions]
@@ -580,9 +636,9 @@ ct.log( name );
 ```
 ```
 // Round a number to two decimal places
-double number = 24.947823;
-double result = ct.roundDecimal( number, 2 );
-ct.log( number, result );
+double amount = 24.947823;
+double result = ct.roundDecimal( amount, 2 );
+ct.log( amount, result );
 ```
 ```
 // Make a circle at a random location
@@ -669,13 +725,270 @@ ct.log( a, b, c );
 ###### [Java Language Help](#top) > [Function Return Values]
 
 
-
 ### Object Data Fields
+The [Graphics Object Creation](API.html#graphics-object-creation)
+functions in Code12 [return a value](#function-return-values) 
+of type [GameObj](#java-data-types), which allows you to manipulate 
+the graphics object created. First you must capture the return 
+value of the function in a variable of type `GameObj`, such as:
+```
+GameObj dot = ct.circle( 50, 30, 20 );
+```
+A variable of type [GameObj](#java-data-types) acts like a container
+that has several sub-variables inside of it, which all apply to that 
+graphics object. These sub-variables are called *data fields*.
+Some of these data fields can be accessed directly using a dot (.) 
+after the `GameObj` variable name followed by the name of the sub-variable. 
+For example, `hero.x` is the x-coordinate of a `GameObj` variable named `hero`.
+
+#### Examples
+```
+GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
+dot.x = 100;             // move to right edge of screen
+```
+```
+GameObj square = ct.rect( 7, 7, 10, 10 );
+double y = ct.inputNumber( "Enter y-coordinate to move square to" );
+square.y = y;
+```
+```
+GameObj dot;
+
+public void start()
+{
+	dot = ct.circle( 0, 50, 10 );	
+}
+
+public void update()
+{
+	// Move dot a little to the right each animation frame
+	dot.x = dot.x + 1;
+}
+```
+```
+GameObj greenDot = ct.circle( 30, 50, 20, "green" );
+GameObj redDot = ct.circle( 70, 50, 20, "red" );
+redDot.visible = false;
+```
+```
+GameObj penny = ct.circle( 30, 10, 6, "orange" );
+penny.group = "coins";
+
+GameObj dime = ct.circle( 50, 10, 6, "light gray" );
+dime.group = "coins";
+
+GameObj bill = ct.rect( 75, 10, 20, 10, "dark green" );
+bill.group = "bills";
+
+ct.showAlert( "Click OK to delete the coins" );
+ct.clearGroup( "coins" );
+```
+#### Notes
+The Java data types [int](#java-data-types), [double](#java-data-types),
+and [boolean](#java-data-types) are called "primitive" data types,
+because they only take a single number to store (the boolean 
+values `true` and `false` are represented by the numbers 1 and 0
+internally). The [GameObj](#java-data-types) type, however, is a 
+complex data type that requires several numbers internally to store.
+This is an example of an "Object" data type in Java.
+
+Each `GameObj` variable contains several data fields inside it.
+These fields store the object's current position, size, speed,
+color, and more. Because you can have many `GameObj` objects in your 
+program, each one has its own memory locations for each of these
+fields, so, for example, `hero.x` may be 32 while `enemy.x` 
+might be 75.
+
+##### Getting and Setting Data Fields
+An object data field allows you to either "get" its current value,
+as in:
+```
+GameObj dot = ct.circle( 50, 30, 20 );   // circle at (50, 30)
+double xPosition = dot.x;       // sets xPosition to 50
+```
+or you can also "set" (change) a field value, as is:
+```
+GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
+dot.x = 100;             // move to right edge of screen
+```
+In this statement:
+```
+dot.x = dot.x + 1;
+```
+The code first "gets" the current value of the `x` field of `dot`
+then changes ("sets") it to be 1 greater. 
+
+##### GameObj Public Data Fields
+Only some of the data fields inside a `GameObj` can be accessed
+directly. Java refers to these as "public data fields". These are:
+```
+Field       Type        Use
+-------     -------     -------------------------
+x           double      The object's x-coordinate
+y           double      The object's y-coordinate
+visible     boolean     false to hide the object
+group       String      optional group name
+```
+For more information, see [GameObj Data Fields](API.html#gameobj-data-fields).
 
 ###### [Java Language Help](#top) > [Object Data Fields]
 
 
 ### Object Method Calls
+Code12 has several special functions that are designed 
+for use on graphics objects. When a Java function is designed to
+operate on a specific object (instead of your application as a whole), 
+it is often provided as an "*object method*", which uses a slightly
+different syntax than a normal function call.
+
+#### Example
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+ball.setFillColor( "blue" );
+```
+The call to `ball.setFillColor()` above is an object method call.
+Unlike [function calls](#function-calls) that apply to your application 
+as a whole (which start with `ct.` in Code12), object methods 
+for graphics objects are called by specifying a variable of type
+[GameObj](#java-data-types) (here `ball`) to the left of the dot (.) 
+instead of `ct`. The `GameObj` variable refers to the particular 
+graphics object in your program that you want to operate on.
+
+The function [ct.circle()](API.html#ct.circle) creates a new circle
+object and also [returns a value](#function-return-values) 
+of type `GameObj` so that you can make a variable such as `ball`
+that will refer to the object that was created and then call object
+methods on it afterwards.
+
+#### More Examples
+```
+GameObj top = ct.circle( 50, 35, 10 );
+GameObj middle = ct.circle( 50, 50, 10 );
+GameObj bottom = ct.circle( 50, 65, 10 );
+
+top.setFillColor( "red" );
+middle.setFillColor( "yellow" );
+bottom.setFillColor( "green" );
+```
+```
+GameObj block = ct.rect( 10, 10, 10, 10 );
+block.setSize( 20, 5 );
+block.setSpeed( 0.5, 0.25 );
+block.setFillColorRGB( 200, 100, 50 );
+block.setLineColor( "gray" );
+block.setLineWidth( 3 );
+```
+```
+GameObj text = ct.text( "This will be underlined", 50, 30, 8 );
+double width = text.getWidth();
+double height = text.getHeight();
+double yBottom = text.y + height / 2;
+GameObj underline = ct.line( text.x - width / 2, yBottom,
+                             text.x + width / 2, yBottom );
+underline.setLineWidth( 2 );
+```
+```
+String str = "Code12";
+int numChars = str.length();
+String strLower = str.toLowerCase();
+ct.println( strLower.substring( 0, numChars - 2 ) );
+```
+#### Notes
+You can think of a [GameObj](#java-data-types) as a container
+for several sub-variables ("data fields"), all of which apply
+to a specific graphics object on the screen. You can also think
+of a variable of type `GameObj` as a reference to (like a name for) 
+the graphics object itself.
+
+In addition to the [GameObj public data fields](API.html#gameobj-data-fields),
+each `GameObj` also internally has data fields that are used to 
+store the object's size, speed, colors, and more. These fields are
+not accessible directly, but the 
+[GameObj method functions](API.html#gameobj-methods) can
+be used to access or change these properties of the object.
+There are also some method functions that perform special actions
+or tests on the object.
+
+Calling a `GameObj` method function applies only to the particular 
+`GameObj` that the method is called on, not any other `GameObj`
+objects in your program. 
+
+##### Getting and Setting Properties of an Object
+Some method functions modify the object that they are called on,
+for example:
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+ball.setFillColor( "blue" );
+```
+This is often called "setting a property" of an object.
+
+Other method functions are designed to just return information 
+about the object, for example:
+```
+GameObj message = ct.text( "Hello There", 50, 50, 10 );
+double width = message.getWidth();
+```
+This is often called "getting a property" of an object.
+Method functions that "get" properties will always have
+a [return value](#function-return-values).
+
+##### Methods vs. Functions
+A call to an object method function has a variable name before 
+the dot instead of `ct`. For example:
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+
+ct.setBackColor( "yellow" );    // normal function call
+ball.setFillColor( "blue" );    // method function call
+```
+> Strictly speaking, all function calls in Java are actually 
+> considered method calls in Object-Oriented terminology.
+> The "ct" in a Code12 function call is actually a variable 
+> that is provided to you by the system that refers to your 
+> program as a whole. So a call such as `ct.setBackColor()`
+> is really a call to the `setBackColor()` method on the 
+> `ct` object.
+
+So, calling a method function on a `GameObj` requires that you have
+a variable of type `GameObj` in your program to refer to the object
+with. In the following code:
+```
+ct.circle( 30, 50, 20 );
+GameObj block = ct.rect( 70, 50, 20, 30 );
+
+block.setSpeed( 0, 1 );
+```
+the circle is created and drawn on the screen, but the 
+[return value](#function-return-values) of `ct.circle()`
+is ignored and not assigned to a variable. This means
+there is no way to call a method function on it. 
+The rectangle, however, is assigned to the variable
+`block`, which can then be used to call method functions.
+
+##### GameObj and String Methods
+A Code12 program can call method functions on two different 
+types of data objects: [GameObj](#java-data-types) and 
+[String](#java-data-types). See the 
+[GameObj method functions](API.html#gameobj-methods) for
+the method functions supported for `GameObj` objects.
+
+Variables of type [String](#java-data-types) are technically 
+also "objects" in Java, and there are various method functions 
+designed to operate on strings.
+See [Java String Methods](API.html#java-string-methods) 
+for the methods supported by Code12.
+
+> All of the Java String methods either return information about
+> the string or create and return a new String. It is not possible 
+> to modify a String in Java.
+
+Note that `GameObj` methods can only be called on a variable
+of type `GameObj`, and `String` methods must be called on a
+variable of type `String`.
+
+The Java data types [int](#java-data-types), [double](#java-data-types),
+and [boolean](#java-data-types) are "primitive types" and do
+not support method calls.
 
 ###### [Java Language Help](#top) > [Object Method Calls]
 
