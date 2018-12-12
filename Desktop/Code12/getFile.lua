@@ -384,7 +384,7 @@ local function makeUIGroup( sceneGroup )
 		labelsFont = native.systemFontBold,
 		labelsFontSize = medFontSize,
 		style = "checkbox",
-		switchSize = medFontSize,
+		switchSize = 16,
 		x = leftMargin,
 		y = recentProgramsGroup.y + recentProgramsGroup.height + extraMargin + margin,
 		onPress = onAlsoOpenInEditor,

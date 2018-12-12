@@ -24,10 +24,14 @@ local optionsView = composer.newScene()
 
 
 -- UI Metrics
-local margin = app.margin -- Space between most UI elements
-local topMargin = margin  -- Top margin of the scene
-local switchSize = 20     -- Size of radio buttons, checkboxes, and fillboxes
-local fontSize = 20       -- Font size of switch headers and labels
+local sectionMargin = 15                    -- Space between sections
+local topMargin = app.margin                -- Top margin of the scene
+local titleFontSize = 30                    -- Font size for the title
+local optionsFont = app.optionsFont         -- Font for switch labels
+local optionsFontBold = app.optionsFontBold -- Font for title and switch headers
+local fontSize = app.optionsFontSize        -- Font size of switch headers and labels
+local switchSize = 16                       -- Size of radio buttons, checkboxes, and fillboxes
+local btnOutlineMargin = 4                  -- Outline margin for buttons
 
 -- Display objects and groups
 local title               -- Title text
@@ -111,16 +115,16 @@ local function makeEditorPicker( parent )
 	end
 	editorPicker = buttons.newSettingPicker{
 		parent = parent,
-		header = "Text Editor:",
-		headerFont = native.systemFontBold,
+		header = "Text Editor",
+		headerFont = optionsFontBold,
 		headerFontSize = fontSize,
 		labels = editorNames,
-		labelsFont = native.systemFont,
+		labelsFont = optionsFont,
 		labelsFontSize = fontSize,
 		style = "radio",
 		switchSize = switchSize,
 		x = 0,
-		y = varWatchPicker.y + varWatchPicker.height + margin,
+		y = math.round( varWatchPicker.y + varWatchPicker.height + sectionMargin ),
 		onPress = 
 			function ( event )
 				app.editorPath = env.installedEditors[event.target.value].path
@@ -129,15 +133,36 @@ local function makeEditorPicker( parent )
 	}
 end
 
+local function makeOpenInEditorBtn( filename )
+	if openInEditorBtn then
+		openInEditorBtn:removeSelf()
+		openInEditorBtn = nil
+	end
+	openInEditorBtn = buttons.newOptionButton{
+		parent = optionsGroup,
+		x = 0,
+		y = addEditorBtn.y + addEditorBtn.height + app.margin,
+		label = "Open " .. filename .. " in Editor",
+		font = optionsFont,
+		fontSize = fontSize,
+		outlineMargin = btnOutlineMargin,
+		onRelease = 
+			function ( event )
+				env.openFileInEditor( app.recentSourceFilePaths[1] )
+			end
+	}
+end
+
 local function setEditorButtons( repositionAddEditorBtn )
 	if repositionAddEditorBtn then
-		addEditorBtn.y = editorPicker.y + editorPicker.height + margin * 0.5
+		addEditorBtn.y = editorPicker.y + editorPicker.height + app.margin * 0.5
 	end
 	if #app.recentSourceFilePaths > 0 then
 		local _, filename = env.dirAndFilenameOfPath( app.recentSourceFilePaths[1] )
-		openInEditorBtn:setLabel( "Open " .. filename .. " in Editor" )
-		openInEditorBtn.y = addEditorBtn.y + addEditorBtn.height + margin * 0.5
-		openInEditorBtn.isVisible = true
+		-- openInEditorBtn:setLabel( "Open " .. filename .. " in Editor" )
+		-- openInEditorBtn.y = addEditorBtn.y + addEditorBtn.height + app.margin
+		-- openInEditorBtn.isVisible = true
+		makeOpenInEditorBtn( filename )
 	else
 		openInEditorBtn.isVisible = false
 	end
@@ -151,7 +176,7 @@ local function makeScrollView( parent )
 		scrollView = nil
 	end
 	scrollView = widget.newScrollView{
-		top = title.y + title.height + margin,
+		top = title.y + title.height + app.margin,
 		left = 0,
 		width = app.width,
 		height = app.height - title.height - app.dyStatusBar,
@@ -257,12 +282,6 @@ local function onAddEditor()
 	timer.performWithDelay( 50, addEditor )
 end
 
--- Open In Editor Button handler
--- Open most recent program file in text editor
-local function onOpenInEditor()
-	env.openFileInEditor( app.recentSourceFilePaths[1] )
-end
-
 
 --- Scene Methods ------------------------------------------------
 
@@ -274,22 +293,21 @@ function optionsView:create()
 	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 0.9 ) 
 	
 	-- Title
-	title = display.newText{
+	title = g.uiItem( display.newText{
 		parent = sceneGroup,
 		text = "Code12 Options",
-		x = app.width / 2,
+		x = 0,
 		y = topMargin,
-		font = native.systemFontBold,
-		fontSize = fontSize * 1.5,
-	}
-	title:setFillColor( 0 )
-	title.anchorY = 0
+		font = optionsFontBold,
+		fontSize = titleFontSize,
+	} )
+	title.x = math.round( app.width / 2 - title.width / 2)
 
 	-- Close button
 	closeBtn = widget.newButton{
 		defaultFile = "images/close.png",
-		x = app.width - margin,
-		y = margin,
+		x = app.width - app.margin,
+		y = app.margin,
 		width = 15,
 		height = 15,
 		onRelease = onClose,
@@ -318,11 +336,11 @@ function optionsView:create()
 	}
 	levelPicker = buttons.newSettingPicker{
 		parent = optionsGroup,
-		header = "Syntax Level:",
-		headerFont = native.systemFontBold,
+		header = "Java Language Syntax Level",
+		headerFont = optionsFontBold,
 		headerFontSize = fontSize,	
 		labels = syntaxLevels,
-		labelsFont = native.systemFont,
+		labelsFont = optionsFont,
 		labelsFontSize = fontSize,
 		style = "fillbox",
 		switchSize = switchSize,
@@ -334,10 +352,10 @@ function optionsView:create()
 	-- Tab width header
 	local tabWidthHeader  = display.newText{
 		parent = optionsGroup,
-		text = "Tab Width:",
+		text = "Tab Width for Source Code Display",
 		x = 0,
-		y = levelPicker.y + levelPicker.height + margin,
-		font = native.systemFontBold,
+		y = levelPicker.y + levelPicker.height + sectionMargin,
+		font = optionsFontBold,
 		fontSize = fontSize,
 	}
 	g.uiItem( tabWidthHeader )
@@ -349,7 +367,7 @@ function optionsView:create()
 	-- Tab width picker
 	tabWidthPicker = widget.newSegmentedControl{
 		x = 0,
-		y = tabWidthHeader.y + tabWidthHeader.height + margin * 0.5,
+		y = tabWidthHeader.y + tabWidthHeader.height + app.margin * 0.5,
 		segments = tabWidths,
 		segmentWidth = 30,
 		defaultSegment = app.tabWidth - 1,
@@ -368,16 +386,16 @@ function optionsView:create()
 	-- Variable Watch Window picker
 	varWatchPicker = buttons.newSettingPicker{
 		parent = optionsGroup,
-		header = "Variable Watch Mode:",
-		headerFont = native.systemFontBold,
+		header = "Program View",
+		headerFont = optionsFontBold,
 		headerFontSize = fontSize,
-		labels = { "Show the variable watch window" },
-		labelsFont = native.systemFont,
+		labels = { "Show the Variable Watch Window" },
+		labelsFont = optionsFont,
 		labelsFontSize = fontSize,
 		style = "checkbox",
 		switchSize = switchSize,
 		x = 0,
-		y = tabWidthPicker.y + tabWidthPicker.height + margin,
+		y = tabWidthPicker.y + tabWidthPicker.height + sectionMargin,
 		onPress = onVarWatchPress,
 	}
 
@@ -387,19 +405,13 @@ function optionsView:create()
 	-- Add Text Editor button
 	addEditorBtn = buttons.newOptionButton{
 		parent = optionsGroup,
-		x = 0,
-		y = editorPicker.y + editorPicker.height + margin * 0.5,
+		x = math.round( editorPicker.x + switchSize + app.margin * 0.5 ),
+		y = editorPicker.y + editorPicker.height + app.margin * 0.5,
 		onRelease = onAddEditor,
 		label = "Add a Text Editor",
-	}
-
-	-- Open In Editor button
-	openInEditorBtn = buttons.newOptionButton{
-		parent = optionsGroup,
-		x = 0,
-		y = addEditorBtn.y + addEditorBtn.height + margin * 0.5,
-		onRelease = onOpenInEditor,
-		label = "",
+		font = optionsFont,
+		fontSize = fontSize,
+		outlineMargin = btnOutlineMargin,
 	}
 
 	-- Center options group
@@ -442,7 +454,7 @@ function optionsView:resize()
 		makeScrollView( sceneGroup )
 		-- reposition objects
 		closeBtn.x = app.width - app.margin
-		title.x = app.width / 2
+		title.x = math.round( app.width / 2 - title.width / 2)
 		if app.width > optionsGroup.width then
 			optionsGroup.x = app.width / 2 - optionsGroup.width / 2
 		else
