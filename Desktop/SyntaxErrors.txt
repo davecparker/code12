@@ -115,3 +115,5 @@ public void start
 	String textColor = "black"
 		ct.text( "In Code We Trust", xField, flagTop + fieldHeight - textSize * 0.3
 				textSize, textColor );
+		bar.2.setSize(20, 20);
+		double xPlane = 50 
