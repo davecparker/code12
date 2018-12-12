@@ -147,7 +147,7 @@ local function makeOpenInEditorBtn( filename )
 		fontSize = fontSize,
 		outlineMargin = btnOutlineMargin,
 		onRelease = 
-			function ( event )
+			function ()
 				env.openFileInEditor( app.recentSourceFilePaths[1] )
 			end
 	}
@@ -159,11 +159,8 @@ local function setEditorButtons( repositionAddEditorBtn )
 	end
 	if #app.recentSourceFilePaths > 0 then
 		local _, filename = env.dirAndFilenameOfPath( app.recentSourceFilePaths[1] )
-		-- openInEditorBtn:setLabel( "Open " .. filename .. " in Editor" )
-		-- openInEditorBtn.y = addEditorBtn.y + addEditorBtn.height + app.margin
-		-- openInEditorBtn.isVisible = true
 		makeOpenInEditorBtn( filename )
-	else
+	elseif openInEditorBtn then
 		openInEditorBtn.isVisible = false
 	end
 end

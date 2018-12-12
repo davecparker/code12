@@ -51,7 +51,6 @@ function buttons.newOptionButton( options )
 	local labelWidth = tempText.width;
 	local labelHeight = tempText.height;
 	tempText:removeSelf()
-	tempText = nil
 	-- Make button
 	local button = widget.newButton{
 		x = options.x,
@@ -61,7 +60,7 @@ function buttons.newOptionButton( options )
 		font = options.font,
 		fontSize = options.fontSize,
 		width = labelWidth + btnOutlineMargin * 2,
-		height = options.fontSize + btnOutlineMargin * 2,
+		height = labelHeight + btnOutlineMargin * 2,
 		labelColor = { default = { 0 }, over = { 0 } },
 		fillColor = { default = { 1 }, over = { 0.8 } },
 		strokeColor = { default = { 0 }, over = { 0 } },
