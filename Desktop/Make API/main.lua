@@ -191,18 +191,18 @@ end
 -- given method name of the given class name, or nil if none.
 local function docLinkForMethod( className, methodName )
 	if className == "ct" then   
-		-- e.g. "#ct.circle" for API ct.circle
-		return "#ct." .. string.lower( methodName )
+		-- e.g. "API.html#ct.circle" for API ct.circle
+		return "API.html#ct." .. string.lower( methodName )
 	elseif className == "GameObj" then   
-		-- e.g. "#obj.gettext" for method GameObj.getText
-		return "#obj." .. string.lower( methodName )
+		-- e.g. "API.html#obj.gettext" for method GameObj.getText
+		return "API.html#obj." .. string.lower( methodName )
 	elseif className == "Code12Program" then
-		-- e.g. "#clickable" for field GameObj.clickable
-		return "#" .. string.lower( methodName )
+		-- e.g. "API.html#clickable" for field GameObj.clickable
+		return "API.html#" .. string.lower( methodName )
 	elseif className == "Math" then
-		return "#java-math-class-methods-and-fields-supported"
+		return "API.html#java-math-class-methods-and-fields-supported"
 	elseif className == "String" then
-		return "#java-string-class-methods-supported"
+		return "API.html#java-string-class-methods-supported"
 	end
 	return nil
 end

@@ -42,8 +42,7 @@ local optionsGroup        -- Display group containing the options objects
 local scrollView          -- Scroll view widget containing optionsGroup
 
 -- State variables
-local lastAppWidth        -- Value of app.width the last time optionsView was shown/resized
-local lastAppHeight       -- Value of app.height the last time optionsView was shown/resized
+local forceReprocess      -- true to reprocess source file after changes
 
 
 --- Internal Functions ------------------------------------------------
@@ -175,14 +174,14 @@ end
 --- Event Handlers ------------------------------------------------
 
 -- Close Button handler
--- Save settings and process user file or go back to getFile view
+-- Save settings and re-process the user file if necessary 
+-- or go back to the view we came from.
 local function onClose()
 	app.saveSettings()
-	local prevScene = composer.getSceneName( "previous" )
-	if prevScene == "getFile" then
-		composer.gotoScene( prevScene )
+	if g.runState ~= nil and forceReprocess then
+		app.processUserFile()   -- will go to runView or errView
 	else
-		app.processUserFile()
+		composer.gotoScene( composer.getSceneName( "previous" ) )
 	end
 end
 
@@ -192,8 +191,22 @@ end
 -- selected level and clear the remaining boxes.
 local function onSyntaxLevelPress( event )
 	local syntaxLevel = event.target.value
-	app.syntaxLevel = syntaxLevel
+	if syntaxLevel ~= app.syntaxLevel then
+		app.syntaxLevel = syntaxLevel
+		forceReprocess = true
+	end
 	fillBoxes( levelPicker.switches, syntaxLevel )
+end
+
+-- Handle press of the varWatch checkbox
+local function onVarWatchPress( event )
+	local show = event.target.isOn
+	if show ~= app.showVarWatch then
+		app.showVarWatch = show
+		if show then
+			forceReprocess = true
+		end
+	end
 end
 
 -- Show dialog to choose the editor and add the path to installed editors
@@ -290,11 +303,11 @@ function optionsView:create()
 
 	-- Syntax level picker
 	local syntaxLevels = {
-		"1. Procedure Calls",
+		"1. Function Calls",
 		"2. Comments",
 		"3. Variables",
 		"4. Expressions",
-		"5. Function Calls",
+		"5. Function Return Values",
 		"6. Object Data Fields",
 		"7. Object Method Calls",
 		"8. If-else",
@@ -345,6 +358,7 @@ function optionsView:create()
 		onPress =
 			function ( event )
 				app.tabWidth = event.target.segmentNumber + 1
+				forceReprocess = true
 			end
 	}
 	tabWidthPicker.anchorX = 0
@@ -364,10 +378,7 @@ function optionsView:create()
 		switchSize = switchSize,
 		x = 0,
 		y = tabWidthPicker.y + tabWidthPicker.height + margin,
-		onPress =
-			function ( event )
-				app.showVarWatch = event.target.isOn
-			end
+		onPress = onVarWatchPress,
 	}
 
 	-- Editor picker
@@ -401,20 +412,16 @@ function optionsView:create()
 
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
-	
-	-- Save app window size
-	lastAppWidth, lastAppHeight = app.width, app.height
 end
 
 -- Prepare to show the optionsView scene
 function optionsView:show( event )
 	if event.phase == "will" then
 		setSelectedOptions()
+		forceReprocess = false
 		toolbar.show( false )
 		setEditorButtons()
-		if lastAppWidth ~= app.width or lastAppHeight ~= app.height then
-			self:resize()
-		end
+		self:resize()
 	end
 end
 
@@ -441,8 +448,6 @@ function optionsView:resize()
 		else
 			optionsGroup.x = 0
 		end
-		lastAppWidth = app.width
-		lastAppHeight = app.height
 	end
 end
 

@@ -67,7 +67,7 @@ local function applyObjectSpeeds(screen)
 
 			-- Delete object if it went out of bounds
 			if x < xMin or x > xMax or y < yMin or y > yMax then
-				gameObj:removeAndDelete()
+				gameObj:removeAndDelete( true )
 			end
 		end
 	end
@@ -321,6 +321,7 @@ end
 -- Pause a run
 function runtime.pause()
 	if g.runState == "running" then
+		audio.pause()
 		g.runState = "paused"
 	end
 end
@@ -328,6 +329,7 @@ end
 -- Resume a paused run
 function runtime.resume()
 	if g.runState == "paused" then
+		audio.resume()
 		g.runState = "running"
 	end
 end
@@ -357,7 +359,8 @@ function runtime.stop( endState )
 		coRoutineUser = nil
 	end
 
-	-- Close output file if any
+	-- Stop any audio and close output file if any
+	audio.stop()
 	if g.outputFile then
 		g.outputFile:close()
 		g.outputFile = nil
@@ -369,6 +372,8 @@ function runtime.stop( endState )
 	g.clickX = 0
 	g.clickY = 0
 	g.charTyped = nil
+	g.xDialog = nil
+	g.yDialog = nil
 
 	-- Set the run state and restart if requested
 	g.runState = endState or "stopped"
@@ -432,7 +437,7 @@ function runtime.restart()
 end
 
 -- Stop and clear the current user program if any
-function runtime:clearProgram()
+function runtime.clearProgram()
 	runtime.stop()
 	ct.userVars = nil
 	ct.userFns = nil

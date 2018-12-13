@@ -48,6 +48,7 @@ local showVarWatchLast         -- last known value of app.showVarWatch
 local layoutNeeded             -- true when the layout has changed
 local screenOriginX            -- value of g.screen.originX
 local screenOriginY            -- value of g.screen.originY
+local firstRun = true          -- false after the first run
 
 
 --- Internal Functions ------------------------------------------------
@@ -292,7 +293,7 @@ local function showRuntimeError( lineNum, message )
 	composer.gotoScene( "errView" )
 end
 
--- Handle new frame events by calling layoutPanes if needed
+-- Handle new frame events to update the view as needed
 local function onNewFrame()
 	-- Update layout of panes if needed
 	if layoutNeeded then
@@ -333,6 +334,7 @@ function runView:create()
 	lowerGroup = g.makeGroup( sceneGroup )
 	console.create( lowerGroup, 0, 0, 0, 0 )
 	varWatch.create( sceneGroup, 0, rightBar.y, 0, 0 )
+	showVarWatchLast = app.showVarWatch
 	setOutputSize( maxOutputWidth(), maxOutputHeight() )
 
 	-- Set appContext data related to the view
@@ -355,22 +357,25 @@ end
 -- Prepare to show the runView scene
 function runView:show( event )
 	if event.phase == "did" then
+		-- Automatically run a new program
+		local showVarWatch = app.showVarWatch
 		if g.runState == nil then
-			-- Automatically run a new program
 			runtime.run()
-			setDefaultLayout()
-			if app.showVarWatch then
+			if showVarWatch then
 				varWatch.startNewRun( varWatchWidthAndHeight() )
 			end
-		elseif app.showVarWatch ~= showVarWatchLast then
-			-- Reset layout when app.showVarWatch changes
-			if app.showVarWatch then
-				setDefaultLayout()
-			else
-				layoutPanes()
-			end
 		end
-		showVarWatchLast = app.showVarWatch
+
+		-- Set the varWatch visibility then use the default layout
+		-- if this is the first run or if varWatch was just turned on.
+		varWatch.setVisible( showVarWatch )
+		if firstRun or (showVarWatch and not showVarWatchLast) then
+			setDefaultLayout()
+		else
+			layoutPanes()
+		end
+		firstRun = false
+		showVarWatchLast = showVarWatch
 	end
 end
 
@@ -378,9 +383,7 @@ end
 function runView:hide( event )
 	if event.phase == "will" then
 		-- Hide the varWatch table
-		if app.showVarWatch then
-			varWatch.hide()
-		end
+		varWatch.setVisible( false )
 	end
 end
 

@@ -1,1 +1,2 @@
 pandoc -s -t html5 -c API.css API.md -o ../Desktop/Code12/docs/API.html
+pandoc -s -t html5 -c API.css Java.md -o ../Desktop/Code12/docs/Java.html
