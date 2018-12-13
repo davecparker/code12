@@ -496,6 +496,150 @@ block.setSpeed( 0, 1 );</code></pre>
 <p>The Java data types <a href="#java-data-types">int</a>, <a href="#java-data-types">double</a>, and <a href="#java-data-types">boolean</a> are “primitive types” and do not support method calls.</p>
 <h6 id="java-language-help-object-method-calls"><a href="#top">Java Language Help</a> &gt; <a href="#object-method-calls">Object Method Calls</a></h6>
 <h3 id="if-else">If-else</h3>
+<p>The if-else structure allows you to specify that another statement (such as a <a href="#function-calls">function call</a> or <a href="#variables">variable assignment</a>), or a group of statements, should only happen if some condition is true. You can also specify what should happen if the condition is false.</p>
+<h4 id="examples-6">Examples</h4>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &gt; 17)
+    ct.println( &quot;You are an adult.&quot; );
+else
+    ct.println( &quot;You are a child.&quot; );   </code></pre>
+<p>The code above asks the user to input an age and then prints one of two messages depending on the value of <code>age</code>. Only one of the two messages will be printed.</p>
+<p>You can also leave off the <code>else</code> part if you want. For example:</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 0)
+    ct.println( &quot;That is not a valid age.&quot; );</code></pre>
+<p>Statements that are controlled by an if-else, in either the <code>if</code> section or the <code>else</code> section (if included), should be indented to indicate that they only happen if the controlling test above them passes.</p>
+<p>If more than one statement is controlled in either the <code>if</code> or <code>else</code> sections, then the controlled statements must be enclosed in curly brackets <code>{</code> and <code>}</code> as follows:</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &gt; 15)
+{
+    ct.println( &quot;You can apply for a driver&#39;s license.&quot; );
+    ct.println( &quot;If you already have one, you can drive.&quot; );
+}
+else
+{
+    ct.println( &quot;You are too young to drive by yourself.&quot; );
+    ct.println( &quot;Get a ride or take your bike.&quot; );
+}
+ct.println( &quot;Be careful!&quot; );    // this always prints</code></pre>
+<p>Note that the last <code>ct.println()</code> in the example above is past the if-else structure, so it executes afterwards no matter what.</p>
+<blockquote>
+<p>Although Java is fairly flexible about how if-else structures can be formatted in your code, Code12 requires that they be formatted as above (split over multiple lines and indented as shown), which helps identify mistakes in your code.</p>
+</blockquote>
+<h4 id="notes-7">Notes</h4>
+<p>The condition for an if-else statement is tested “on the spot” right when the <code>if</code> statment is encountered in your code. An if-else is <em>not</em> a general rule that says “whenever this is true, do this”. Instead, it says “If this is true right now, then do this right now”. After the condition is tested and the controlled statement(s) are executed (if any), execution continues with the next statement after the entire if-else structure.</p>
+<h5 id="comparison-tests">Comparison Tests</h5>
+<p>Immediately after the keyword <code>if</code>, there should be a condition in parentheses. There are several types of conditions you can test for, including these examples which compare two numbers:</p>
+<pre><code>Condition  Meaning
+---------  ---------------------------------
+(a &gt; b)    Greater than
+(a &lt; b)    Less than
+(a &gt;= b)   Greater than or equal to
+(a &lt;= b)   Less than or equal to
+(a == b)   Equal to (note: two equal signs!)
+(a != b)   Not equal to</code></pre>
+<p>Note that each condition results in a <code>true</code> or <code>false</code> result (either the test is true or not (false)).</p>
+<h5 id="testing-a-boolean-variable">Testing a boolean Variable</h5>
+<p>A variable of type <a href="#java-data-types">boolean</a> gives a <code>true</code> or <code>false</code> result by itself (without comparing it to anything), so you can also use a single <code>boolean</code> variable in a condition. For example:</p>
+<pre><code>boolean makeCircle = ct.inputYesNo( &quot;Would you like to make a circle?&quot; );
+
+if (makeCircle)
+    ct.circle( 50, 50, 20 );
+ct.println( &quot;Done&quot; );</code></pre>
+<blockquote>
+<p>Note that Java requires the condition to be in parentheses, even if it is just a single variable name.</p>
+</blockquote>
+<h5 id="testing-compound-conditions">Testing Compound Conditions</h5>
+<p>The condition for an if-else can also test for two different things that must both be true for the test to succeed. This is done using <code>&amp;&amp;</code>, which means “and” in Java. For example:</p>
+<pre><code>double inches = ct.inputNumber( &quot;Enter your height in inches&quot; );
+double pounds = ct.inputNumber( &quot;Enter your weight in pounds&quot; );
+
+if (inches &gt; 72 &amp;&amp; pounds &lt; 170)
+    ct.println( &quot;You are tall and thin&quot; );</code></pre>
+<p>You can also test for two different things where only one of them needs to be true. This is done using <code>||</code>, which means “or” in Java. For example:</p>
+<pre><code>int n = ct.inputInt( &quot;Enter a number from 1 to 10&quot; );
+
+if (n &lt; 1 || n &gt; 10)
+    ct.println( &quot;That number is out of range&quot; );</code></pre>
+<h5 id="boolean-expressions">Boolean Expressions</h5>
+<p>In all of the examples above, the condition for the if-else has to be something that results in a <code>true</code> or <code>false</code> condition. In fact, the way Java handles this is that the condition can be any <em>boolean expression</em>. A boolean expression is like an expression involving numbers (see <a href="#expressions">Expressions</a>), except that the end result needs to be <code>true</code> or <code>false</code> instead of a number.</p>
+<p>Symbols such as <code>&lt;</code>, <code>&gt;=</code>, <code>==</code>, <code>&amp;&amp;</code>, and <code>||</code> are considered <em>operands</em> in Java, because they appear between two values and combine them to produce a resulting value. In these cases, the resulting value is of type <a href="#java-data-types">boolean</a>, unlike for the operands used in numeric expressions such as <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code>, which produce numeric results.</p>
+<p>Like the numeric operators, however, the boolean operators can be built up into more complex expressions, and also grouped using parentheses. For example:</p>
+<pre><code>double inches = ct.inputNumber( &quot;Enter your height in inches&quot; );
+double pounds = ct.inputNumber( &quot;Enter your weight in pounds&quot; );
+
+// If the user is tall and thin, or short and fat, then we won&#39;t
+// have any cloths in stock that fit them.
+
+if ((inches &gt; 72 &amp;&amp; pounds &lt; 170) || (inches &lt; 48 &amp;&amp; pounds &gt; 200))
+    ct.println( &quot;Sorry, we don&#39;t have any cloths that fit you.&quot; );</code></pre>
+<h5 id="boolean-functions">Boolean Functions</h5>
+<p>An if-else condition (or part of a boolean expression) can also include using any <a href="#function-return-values">function return value</a> for a <a href="#function-calls">function call</a> or <a href="#object-method-calls">object method call</a> that has a <a href="#java-data-types">boolean</a> return value. For example:</p>
+<pre><code>if (ct.inputYesNo( &quot;Would you like to play again?&quot; ))
+    ct.restart();</code></pre>
+<h4 id="graphics-and-animation-examples">Graphics and Animation Examples</h4>
+<p>Although an if-else structure only tests its condition and executes its controlled statements when it is encountered in your program, the way the <code>update()</code> code block works in a Code12 program makes it easy to test conditions repeatedly.</p>
+<p>Code in your <code>update()</code> block is executed before each new animation frame, and animation frames happen 60 times per second, so this means that the entire sequence of statements in your <code>update()</code> block is repeated 60 times per second, which is very often compared to human perception. This means that an if-else test that you put in your <code>update()</code> block may appear to be tested “continuously”. In fact, it is not tested continuously, just repeatedly and quickly. For example:</p>
+<pre><code>GameObj dot;
+
+public void start()
+{
+    dot = ct.circle( 20, 50, 10);
+}
+
+public void update()
+{
+    if (dot.x &lt; 50)
+        ct.println( &quot;The dot is on the left&quot; );
+    else
+        ct.println( &quot;The dot is on the right&quot; );    
+}</code></pre>
+<p>The above example might not do what you first expect (and probably not what you wanted if you wrote it), but it helps show how the code gets executed.</p>
+<p>A more useful example would be:</p>
+<pre><code>GameObj button;
+
+public void start()
+{
+    button = ct.circle( 50, 50, 20);
+}
+
+public void update()
+{
+    if (button.clicked())
+        ct.println( &quot;You pressed the button!&quot; );    
+}</code></pre>
+<p>which easily detects “whenever” the button is pressed.</p>
+<p>As a final example, consider this simple game, which challenges you to click a moving dot:</p>
+<pre><code>GameObj dot;
+
+public void start()
+{
+    // Make a small red dot
+    dot = ct.circle( 20, 50, 5);
+}
+
+public void update()
+{
+    // Move the dot a bit to the right each frame, but restart
+    // it on the left if it goes off-screen to the right. 
+    dot.x += 0.5;
+    if (dot.x &gt; 100)
+        dot.x = 0;
+
+    // Did the user click on something?
+    if (ct.clicked())
+    {
+        // Did they click on the dot?
+        if (dot.clicked())
+            ct.println( &quot;You got the dot!&quot; );
+        else
+            ct.println( &quot;You missed&quot; );
+    }
+}</code></pre>
+<p>Note that this example includes in if-else that is “nested” inside another <code>if</code> structure. The inner <code>if</code> is only tested and executed if the outer <code>if</code> passes its test. What would happen if the outer <code>if</code> were removed? Try to predict the result, then try it and see.</p>
 <h6 id="java-language-help-if-else"><a href="#top">Java Language Help</a> &gt; <a href="#if-else">If-else</a></h6>
 <h3 id="function-definitions">Function Definitions</h3>
 <h6 id="java-language-help-function-definitions"><a href="#top">Java Language Help</a> &gt; <a href="#function-definitions">Function Definitions</a></h6>
