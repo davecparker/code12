@@ -1,6 +1,6 @@
 import Code12.*;
 
-class level1 extends Code12Program
+class Level1 extends Code12Program
 {
 
    
