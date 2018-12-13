@@ -372,7 +372,13 @@ local function defineMethod( func )
 		return
 	end
 
-	-- User-defined function: Check if already defined
+	-- User-defined function
+	if syntaxLevel < 9 then
+		err.setErrNode( func, "Unknown function name\n"
+				.. "(Use of user-defined functions requires syntax level 9)" )
+		return
+	end
+	-- Check if already defined
 	local methodFound, methodCorrectCase, nameCorrectCase 
 			= lookupID( nameNode, userMethods, true )
 	if methodFound then
@@ -1436,6 +1442,7 @@ function checkJava.checkProgram( programTree, level )
 	beforeStart = true
 	currentFunc = nil
 	currentLoop = nil
+	hasCode = false    -- set to true if the program has any code in it
 
 	-- Get method definitions first, since vars can forward reference them
 	assert( programTree.s == "program" )
@@ -1451,6 +1458,7 @@ function checkJava.checkProgram( programTree, level )
 	if vars then
 		for _, var in ipairs( vars ) do
 			checkVar( var )
+			hasCode = true
 		end
 	end
 
@@ -1465,15 +1473,25 @@ function checkJava.checkProgram( programTree, level )
 				if func.vt then
 					checkFuncReturns( func )
 				end
+				if func.block.stmts and #func.block.stmts > 0 then
+					hasCode = true
+				end
 			end
 		end
 	end
 	currentFunc = nil
 
-	-- Make sure that a start function was defined.
-	if not eventMethodFuncs["start"] then
+	-- Make sure that a start function was defined, then check
+	-- for an empty program (which generates a special "error").
+	local startFunc = eventMethodFuncs["start"]
+	if not startFunc then
 		err.setErrLineNum( source.numLines,
 				'A Code12 program must define a "start" function' )
+	elseif not hasCode then
+		-- Higlight the line after start's {, which will be a comment or the }
+		err.setErrLineNum( startFunc.block.iLineBegin + 1, 
+				"Add code to your program in a text editor and save the file to run it." )
+		err.addDocLink( "API.html" )
 	end
 end
 
