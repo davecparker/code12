@@ -301,17 +301,17 @@ function optionsView:create()
 	title.x = math.round( app.width / 2 - title.width / 2)
 
 	-- Close button
-	closeBtn = widget.newButton{
-		defaultFile = "images/close.png",
-		x = app.width - app.margin,
-		y = app.margin,
-		width = 15,
-		height = 15,
+	closeBtn = buttons.newIconAndTextButton{
+		parent = sceneGroup,
+		top = app.margin,
+		text = "Close",
+		imageFile = "close.png",
+		iconSize = 12,
+		defaultFillShade = 1,
+		overFillShade = 0.8,
 		onRelease = onClose,
 	}
-	sceneGroup:insert( closeBtn )
-	closeBtn.anchorX = 1
-	closeBtn.anchorY = 0
+	closeBtn.x = math.round( app.width - app.margin - closeBtn.width )
 
 	-- Options display group
 	optionsGroup = display.newGroup()
@@ -413,7 +413,7 @@ function optionsView:create()
 
 	-- Center options group
 	if app.width > optionsGroup.width then
-		optionsGroup.x = app.width / 2 - optionsGroup.width / 2
+		optionsGroup.x = math.round( app.width / 2 - optionsGroup.width / 2 )
 	end
 
 	-- Set up scroll view
@@ -450,10 +450,10 @@ function optionsView:resize()
 		-- remake scroll view
 		makeScrollView( sceneGroup )
 		-- reposition objects
-		closeBtn.x = app.width - app.margin
+		closeBtn.x = math.round( app.width - app.margin - closeBtn.width )
 		title.x = math.round( app.width / 2 - title.width / 2)
 		if app.width > optionsGroup.width then
-			optionsGroup.x = app.width / 2 - optionsGroup.width / 2
+			optionsGroup.x = math.round( app.width / 2 - optionsGroup.width / 2 )
 		else
 			optionsGroup.x = 0
 		end

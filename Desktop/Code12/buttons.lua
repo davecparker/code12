@@ -184,6 +184,73 @@ function buttons.newSettingPicker( options )
 	return newSettingPickerGroup
 end
 
+-- Return a display group containing a new button, icon, and text
+function buttons.newIconAndTextButton( options )
+	-- options = {
+	-- 	parent = (optional) parent display group,
+	-- 	left = x value for left of the display group (anchorX = 0),
+	-- 	top = y value for top of the display group (anchorY = 0),
+	-- 	text = string for label,
+	-- 	imageFile = string for image file name,
+	-- 	iconSize = size of the icon (width and height),
+	-- 	defaultFillShade = default shade for the button,
+	-- 	overFillShade = shade for when the button is pressed,
+	-- 	onRelease = listener function for button
+	-- }
+	local btnOutlineMargin = 4 -- space between edge of button and icon/label
+	local iconLabelMargin = 5  -- space between icon and label
+	-- Make button display group
+	local btnGroup = g.makeGroup( options.parent )
+	btnGroup.anchorX = 0
+	btnGroup.anchorY = 0
+	btnGroup.x = options.left
+	btnGroup.y = options.top
+	-- Make button icon
+	local icon = display.newImageRect( btnGroup, "images/" .. options.imageFile, options.iconSize, options.iconSize )
+	icon.anchorX = 0
+	-- icon.anchorY = 0
+	icon.x = btnOutlineMargin
+	-- icon.y = btnOutlineMargin
+	icon:setFillColor( unpack( labelColor ) )
+	-- Make button label
+	local label = display.newText{
+		parent = btnGroup,
+		text = options.text,
+		x = math.round(icon.x + options.iconSize + iconLabelMargin),
+		height = 0,
+		font = native.systemFontBold,
+		fontSize = app.fontSizeUI,
+	}
+	label.anchorX = 0
+	label:setFillColor( unpack( labelColor ) )
+	-- Make button
+	local btnHeight = math.max( options.iconSize, label.height ) + btnOutlineMargin * 2
+	local btn = widget.newButton{
+		x = 0,
+		y = 0,
+		onRelease = 
+			function ()
+				options.onRelease()
+			end,
+		shape = "roundedRect",
+		fillColor = { default = { options.defaultFillShade }, over = { options.overFillShade } },
+		strokeColor = { default = { app.borderShade }, over = { app.borderShade } },
+		strokeWidth = 1,
+		width = options.iconSize + label.width + btnOutlineMargin * 2 + iconLabelMargin,
+		height = btnHeight,
+	}
+	btn.anchorX = 0
+	btn.anchorY = 0
+	-- Add btn to btnGroup
+	btnGroup:insert( 1, btn )
+	-- Center icon and label vertically in button
+	local yBtnCenter = btnHeight / 2
+	icon.y = yBtnCenter
+	label.y = math.round( yBtnCenter )
+
+	return btnGroup
+end
+
 -- Return a display group containing a new button and its icon for the toolbar.
 -- Placement can be "left" or "right" to place the button on that side of the toolbar.
 function buttons.newToolbarButton( parent, label, imageFile, onRelease, placement, adjacentBtn, width )
