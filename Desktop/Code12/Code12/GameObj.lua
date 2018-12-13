@@ -45,6 +45,8 @@ end
  
 -- Update the size for a rectangular object
 local function updateSizeRect(gameObj, width, height, scale)
+	width = forceNotNegative(width)
+	height = forceNotNegative(height)
 	gameObj.width = width
 	gameObj.height = height
 	local obj = gameObj.obj
@@ -54,6 +56,8 @@ end
 
 -- Update the size for a circle object
 local function updateSizeCircle(gameObj, width, height, scale)
+	width = forceNotNegative(width)
+	height = forceNotNegative(height)
 	gameObj.width = width
 	gameObj.height = height
 	local obj = gameObj.obj
@@ -69,6 +73,7 @@ end
 
 -- Update the size for a text object (width is ignored)
 local function updateSizeText(gameObj, _, height, scale)
+	height = forceNotNegative(height)
 	local prevHeight = gameObj.height
 	gameObj.height = height
 	-- Determine and set new font size
@@ -97,6 +102,9 @@ local function updateSizeLine(gameObj, width, height, scale)
 			gameObj:setObj(newObj)
 			group:insert(i, newObj)   -- insert at same z-order as old line
 			gameObj:setLineColorFromColor(gameObj.lineColor)  -- sets color and stroke width
+			if gameObj.clickable then
+				newObj:addEventListener("touch", g.onTouchGameObj)
+			end
 			-- Remove old line
 			obj:removeSelf()
 			break
@@ -134,6 +142,7 @@ function GameObj:new(typeName, x, y, width, height)
 		-- obj = nil,            -- the Corona display object
 		-- hasSpeed = nil,       -- true if xSpeed or ySpeed was set
 		-- deleted = nil,        -- if true then obj is a dummy obj
+		-- autoDeleted = nil,    -- true if object was auto deleted
 	}
 
 	-- Assign default methods
@@ -167,19 +176,25 @@ function GameObj:setObj(obj)
 end
 
 -- Remove a GameObj and delete the display object.
+-- If autoDelete then the runtime is auto-deleting it, else an explicit delete.
 -- The GameObj will be subject to garbage collection when outstanding refs to it are gone.
-function GameObj:removeAndDelete()
+function GameObj:removeAndDelete( autoDelete )
 	if self.deleted then  -- This object was already deleted
-		runtime.warning("Attempt to delete an object that was already deleted")
+		if not (autoDelete or self.autoDeleted) then
+			runtime.warning("Attempt to delete an object that was already deleted")
+		end
 		return
 	end
 	local obj = self.obj
 	obj.code12GameObj = nil    -- remove display object's reference to the GameObj
 	obj:removeSelf()	       -- remove and destroy the display object
 	self.obj = GameObj.dummyObj    -- dummy display object to help client avoid crashes
-	self.deleted = true
 	self.visible = false       -- to reduce impact of any stale references
 	self.clickable = false
+	self.deleted = true
+	if autoDelete then
+		self.autoDeleted = true
+	end
 end
 
 -- Circle constructor
@@ -724,7 +739,7 @@ end
 
 -- API
 function GameObj:setSize(width, height)
-	self:updateSize(forceNotNegative(width), forceNotNegative(height), g.scale)
+	self:updateSize(width, height, g.scale)
 end
 
 -- API
@@ -871,10 +886,10 @@ function GameObj:hit(gameObj)
 	-- Make sure object is valid and visible first
 	if gameObj == nil then
 		return false
-	elseif gameObj.deleted then
+	elseif gameObj.deleted and not gameObj.autoDeleted then
 		runtime.warning("Attempt to test for hit with a deleted object")
 		return false
-	elseif self.deleted then
+	elseif self.deleted and not self.autoDeleted then
 		runtime.warning("Attempt to call hit method on a deleted object")
 		return false
 	elseif not gameObj.visible then

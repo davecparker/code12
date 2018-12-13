@@ -319,6 +319,7 @@ local function starToken()
 	elseif charNext == 47 then  -- /
 		setTokenErr( iChar - 1, iChar, 
 				"Close of comment without matching opening /*" )
+		err.addDocLink( "Java.html#comments" )
 		return nil
 	end
 	return "*"
@@ -342,6 +343,7 @@ local function skipBlockComment()
 			-- Apparent attempt at a nested block comment
 			err.setErrLineNumAndRefLineNum( lineNumber, lineRecord.iLineCommentStart, 
 					"Java does not allow nesting comments within comments using /* */" )
+			err.addDocLink( "Java.html#comments" )
 			iChar = iChar + 2   -- pass the 2nd /* and keep going per Java
 		elseif ch == nil then
 			-- Line ends with unclosed comment

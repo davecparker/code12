@@ -32,6 +32,9 @@ local err = {
 --     docLink,          -- string hashtag link to article in docs or nil if none
 -- }
 
+-- Error record for the last error set
+local errRecLast
+
 -- Line numbers for the first and last error known
 local iLineFirstErr
 local iLineLastErr
@@ -138,6 +141,7 @@ end
 function err.initProgram()
 	iLineFirstErr = nil
 	iLineLastErr = nil
+	errRecLast = nil
 end
 
 -- Record an error with:
@@ -154,9 +158,12 @@ function err.setErr( loc, refLoc, strErr, ... )
 	local iLineRank = iLineRankFromILine( loc.iLine )
 
 	-- Keep only the first error on each line
-	if source.lines[iLineRank].errRec == nil then
-		local errRec = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
-		source.lines[iLineRank].errRec = errRec
+	if source.lines[iLineRank].errRec then   -- this line already has an error
+		errRecLast = nil   -- ignoring this error
+	else
+		-- Make and store the errRec
+		errRecLast = makeErrRec( iLineRank, loc, refLoc, strErr, ... )
+		source.lines[iLineRank].errRec = errRecLast
 
 		-- Keep track of the first and last line numbers with errors
 		if iLineFirstErr == nil or iLineRank < iLineFirstErr then
@@ -166,18 +173,19 @@ function err.setErr( loc, refLoc, strErr, ... )
 			iLineLastErr = iLineRank
 		end
 
-		-- If last ... arg is table then use it as options
+		--[[ If last ... arg is table then use it as options
 		if ... then
 			local args = { ... }
 			local lastArg = args[#args]
 			if type(lastArg) == "table" then
 				for i, v in pairs(lastArg) do
 					if i == "docLink" then
-						errRec.docLink = v
+						errRecLast.docLink = v
 					end
 				end
 			end
 		end
+		--]]
 	end
 end
 
@@ -325,6 +333,14 @@ function err.addNoteToErrAtLineNum( iLine, strNote )
 		if errRec then
 			errRec.strNote = strNote
 		end
+	end
+end
+
+-- Add a docLink to the last error set
+function err.addDocLink( docLink )
+	-- An earlier one has precedence if any
+	if errRecLast and not errRecLast.docLink then
+		errRecLast.docLink = docLink
 	end
 end
 

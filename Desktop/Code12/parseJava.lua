@@ -23,7 +23,7 @@ local parseJava = {}
 
 -- Language feature names introduced at each syntax level
 local syntaxFeatures = {
-	"procedure calls",
+	"function calls",
 	"comments",
 	"variables",
 	"expressions",
@@ -171,6 +171,7 @@ local function possibleExpectedToken( ttExpected )
 				err.setErrNode( token, "Syntax Error: %s was unexpected here",
 						tokenDescription( token ) )
 			end
+			err.addDocLink( "Java.html#java-syntax-examples" )
 		end
 	end
 end
@@ -206,6 +207,7 @@ local function invalidTypeName( node )
 	else
 		err.setErrNode( node, "Expected a type name here" )
 	end
+	err.addDocLink( "Java.html#java-data-types" )
 end
 
 
@@ -258,6 +260,7 @@ local function parseOpExpr( leftSide, minPrecedence )
 		if rightSide == nil then
 			err.setErrNodeAndRef( tokens[iToken], op,
 					"Expected expression after %s operator", op.str )
+			err.addDocLink( "Java.html#expressions" )
 			return nil
 		end
 		-- Check for another op after this op's expr and compare precedence
@@ -364,14 +367,15 @@ local callHead = { t = "callHead",
 	{ 1, 12, "ct",				"ct", ".", "ID", "("					},
 	{ 1, 12, "System",			"System", ".", "ID", ".", "ID", "("		},
 	{ 5, 12, "Math",			"Math", ".", "ID", "("					},
-	{ 9, 12, "user",			"ID", "("								},
+	{ 1, 6,  "unknown",         "ID", ".", "ID", "("                    },
+	{ 1, 12, "user",			"ID", "("								},
 	{ 7, 12, "method",			"ID", index, ".", "ID", field, "("		},
 	-- Common Errors
 	{ 7, 0, "method",			"TYPE", index, ".", "ID", field, "(",	iNode = 1,
 		strErr = invalidVarName },
 }
 
--- A return type for a procedure/function definition
+-- A return type for a function definition
 local retType = { t = "retType",
 	{ 1, 12, "void",			"void"						},
 	{ 12, 12, "array",			"TYPE", "[", "]"			},
@@ -433,7 +437,7 @@ primaryExpr = { t = "expr",
 	{ 4, 12, "exprParens",		"(", expr, ")"						},
 	{ 4, 12, "neg",				"-", parsePrimaryExpr 				},
 	{ 4, 12, "not",				"!", parsePrimaryExpr 				},
-	{ 6, 12, "Math",			"Math", ".", "ID"					},
+	{ 5, 12, "Math",			"Math", ".", "ID"					},
 	{ 12, 12, "newArray",		"new", "TYPE", "[", expr, "]"		},	
 	{ 12, 12, "new",			"new", "ID", "(", exprList, ")"		},
 	-- More Common Errors
@@ -696,6 +700,7 @@ function parseGrammar( grammar )
 					else
 						err.setErrNode( nodes[iNode], strErr )
 					end
+					err.addDocLink( "Java.html#java-syntax-examples" )
 				end
 
 				-- Return the parse tree
@@ -875,8 +880,8 @@ local function parseCurrentLine( level )
 	tryLineParseAtLevel( level )
 	if findError.iTokenMax then
 		-- Tracking found and reported an error
-		print( string.format( '\nSyntax error at token %d "%s"', 
-				findError.iTokenMax, tokens[findError.iTokenMax].str ) )
+		print( string.format( '\nLine %s: Syntax error at token %d "%s"', 
+				lineNumber, findError.iTokenMax, tokens[findError.iTokenMax].str ) )
 		for _, parse in ipairs( findError.parses ) do
 			print( string.format( "    %s expected %s", 
 					parse.stmtPattern, parse.ttExpected ) )
@@ -885,6 +890,7 @@ local function parseCurrentLine( level )
 		-- Make a generic syntax error to use if a more specific error was not already set
 		local lastToken = tokens[#tokens - 1]  -- not counting the END
 		err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
+		err.addDocLink( "Java.html#java-syntax-examples" )
 	end
 	err.addNoteToErrAtLineNum( lineNumber, strNote )
 
@@ -964,6 +970,7 @@ function parseJava.isInvalidID( nameNode, usage, existing )
 	else
 		err.setErrNode( nameNode, 'Names are case-sensitive, known name is "%s"', strCorrectCase )
 	end
+	err.addDocLink( "Java.html" )
 	return true
 end
 
