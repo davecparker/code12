@@ -230,21 +230,24 @@ local function makeUIGroup( sceneGroup )
 
 	-- New Program Text Button
 	local newProgramTxtBtn = widget.newButton{
-		x = app.width / 2,
+		x = 0,
 		y = app.dyToolbar + extraMargin * 2,
 		onRelease = onNewProgram,
 		textOnly = true,
 		label = "New Program",
+		labelAlign = "left",
 		font = native.systemFontBold,
 		fontSize = largeFontSize,
 	}
-	UIGroup:insert( newProgramTxtBtn )
+	newProgramTxtBtn.x = math.round( app.width / 2 - newProgramTxtBtn.width / 2 )
+	newProgramTxtBtn.anchorX = 0
 	newProgramTxtBtn.anchorY = 0
 	local iconSize = newProgramTxtBtn.height
+	UIGroup:insert( newProgramTxtBtn )
 	
 	-- New Program Icon Button
 	local newProgramIcnBtn = widget.newButton{
-		x = newProgramTxtBtn.x - newProgramTxtBtn.width / 2 - margin,
+		x = newProgramTxtBtn.x - margin,
 		y = newProgramTxtBtn.y,
 		onRelease = onNewProgram,
 		width = iconSize,
@@ -379,11 +382,11 @@ local function makeUIGroup( sceneGroup )
 		parent = UIGroup,
 		labels = { "Also Open In Text Editor" },
 		labelsFont = native.systemFontBold,
-		labelsFontSize = largeFontSize,
+		labelsFontSize = medFontSize,
 		style = "checkbox",
-		switchSize = iconSize,
-		x = leftMargin - iconSize - margin ,
-		y = recentProgramsGroup.y + recentProgramsGroup.height + extraMargin,
+		switchSize = 16,
+		x = leftMargin,
+		y = recentProgramsGroup.y + recentProgramsGroup.height + extraMargin + margin,
 		onPress = onAlsoOpenInEditor,
 	}
 	openInEditorPicker.switches[1]:setState{ isOn = app.openFilesInEditor }
@@ -396,7 +399,7 @@ function getFile:create()
 	local sceneGroup = self.view
 
 	-- Background
-	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 0.9 ) 
+	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 1 ) 
 	
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
