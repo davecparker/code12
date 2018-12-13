@@ -21,6 +21,9 @@ local app =  {
 	consoleFont = "NotoMono-Regular.ttf",
 	consoleFontSize = 14,
 	fontSizeUI = 12,
+	optionsFont = native.systemFont,
+	optionsFontBold = native.systemFontBold,
+	optionsFontSize = 12,
 
 	-- Web folders
 	webHelpDir = "http://www.code12.org/docs/1/",
