@@ -1442,7 +1442,7 @@ function checkJava.checkProgram( programTree, level )
 	beforeStart = true
 	currentFunc = nil
 	currentLoop = nil
-	hasCode = false    -- set to true if the program has any code in it
+	local hasCode = false    -- set to true if the program has any code in it
 
 	-- Get method definitions first, since vars can forward reference them
 	assert( programTree.s == "program" )
@@ -1490,7 +1490,7 @@ function checkJava.checkProgram( programTree, level )
 	elseif not hasCode then
 		-- Higlight the line after start's {, which will be a comment or the }
 		err.setErrLineNum( startFunc.block.iLineBegin + 1, 
-				"Add code to your program in a text editor and save the file to run it." )
+				"Add code to your program in a text editor, and save the file to run it." )
 		err.addDocLink( "API.html" )
 	end
 end

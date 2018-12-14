@@ -17,6 +17,7 @@ local source = require( "source" )
 local buttons = require( "buttons" )
 local runtime = require( "Code12.runtime" )
 local runView = require( "runView" )
+local err = require( "err" )
 
 
 -- The toolbar module
@@ -44,6 +45,7 @@ local toolbarBtns         -- Array of buttons on the toolbar
 local function onChooseProgram()
 	runtime.clearProgram()
 	source.clear()
+	err.initProgram()
 	composer.gotoScene( "getFile" )
 end
 
