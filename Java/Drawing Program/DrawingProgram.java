@@ -237,19 +237,7 @@ class DrawingProgram extends Code12Program
          }
          else if ( selectedShapeBox == line )
          {
-            double dx = x - newObj.x;
-            double dy = y - newObj.y;
-            if ( dx > 0 && dy > 0 )
-            {
-               newObj.setSize( dx, dy );
-            }
-            else
-            {
-               double x1 = newObj.x;
-               double y1 = newObj.y;
-               newObj.delete();
-               newObj = ct.line( x1, y1, x1 + dx, y1 + dy, selectedColor );
-            }
+            newObj.setSize( x - newObj.x, y - newObj.y );
          }
       }
       else if ( obj != null && obj.group.equals( "drawing" ) )

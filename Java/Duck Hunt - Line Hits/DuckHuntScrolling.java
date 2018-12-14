@@ -51,11 +51,11 @@ public class DuckHuntLineHits extends Code12Program
 		double scoreHeight = 5;
 		String scoreColor = "dark magenta";
 		ducksHitDisplay = ct.text( "Ducks hit: ", 0, yMax, scoreHeight, scoreColor );
-		ducksHitDisplay.align( "bottom left", true );
+		ducksHitDisplay.align( "bottom left" );
 
 		// Make accuracyDisplay
 		accuracyDisplay = ct.text( "Shot Accuracy: ", 100, yMax, scoreHeight, scoreColor );
-		accuracyDisplay.align( "bottom right", true );
+		accuracyDisplay.align( "bottom right" );
 
 		// Make frameRateDisplay
 		frameRateDisplay = ct.text( "FrameRate: ", 0, 0, scoreHeight, scoreColor );
@@ -63,7 +63,7 @@ public class DuckHuntLineHits extends Code12Program
 
 		// Make gun
 		gun = ct.image( "gun.png", 50, yMax - scoreHeight, 8 );
-		gun.align( "bottom", true );
+		gun.align( "bottom" );
 
 		// Initialize arrays
 		maxSizeDucks = 20;
@@ -204,8 +204,8 @@ public class DuckHuntLineHits extends Code12Program
 		{
 			//GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
 			bullet = ct.line( xStart, yStart, xStart, yStart + 2, "blue" );
-			bullet.lineWidth = 5;
-			bullet.ySpeed = -3;
+			bullet.setLineWidth( 5 );
+			bullet.setSpeed( 0, -3 );
 			bulletsArr[bulletsCount] = bullet;
 			bulletsCount++;
 		}
@@ -232,7 +232,7 @@ public class DuckHuntLineHits extends Code12Program
 		if ( ducksCount < maxSizeDucks )
 		{
 			duck = ct.image( "rubber-duck.png", xStart, yStart, 5 );
-			duck.xSpeed = xSpeed;
+			duck.setSpeed( xSpeed, 0 );
 			ducksArr[ducksCount] = duck;
 			duckYStartsArr[ducksCount] = yStart;
 			ducksCount++;
@@ -258,9 +258,8 @@ public class DuckHuntLineHits extends Code12Program
 	// Makes a dead duck at duck's position
 	GameObj makeDeadDuck( GameObj duck )
 	{
-		GameObj deadDuck = ct.image( "dead-duck.png", duck.x, duck.y, duck.height );
-		deadDuck.autoDelete = true;
-		deadDuck.ySpeed = 1;
+		GameObj deadDuck = ct.image( "dead-duck.png", duck.x, duck.y, duck.getHeight() );
+		deadDuck.setSpeed( 0, 1 );
 		return deadDuck;
 	}
 
@@ -277,7 +276,7 @@ public class DuckHuntLineHits extends Code12Program
 
 		// Fire a new bullet
 		double xStart = gun.x;
-		double yStart = gun.y - gun.height * 0.9;
+		double yStart = gun.y - gun.getHeight() * 0.9;
 		fireBullet( xStart, yStart );
 	}
 
