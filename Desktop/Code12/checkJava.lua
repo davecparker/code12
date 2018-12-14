@@ -1490,7 +1490,7 @@ function checkJava.checkProgram( programTree, level )
 	elseif not hasCode then
 		-- Higlight the line after start's {, which will be a comment or the }
 		err.setErrLineNum( startFunc.block.iLineBegin + 1, 
-				"Add code to your program in a text editor, and save the file to run it." )
+				"Add code to your program in a text editor, then save the file to run it." )
 		err.addDocLink( "API.html" )
 	end
 end
