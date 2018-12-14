@@ -19,15 +19,24 @@ class FlyGame
 
 		// Make the score display
 		scoreText = ct.text( "0", 90, 10, 10, "brown" );
+
+		// Pre-load the sounds that are needed right away
+		ct.loadSound( "flap.wav" );
+		ct.loadSound( "crunch.wav" );
 	}
 
 	public void update()
 	{
 		// When the user clicks then the bird flys up, otherwise glides down
 		if (ct.clicked())
+		{
 			birdSpeed -= 0.6;
+			ct.sound( "flap.wav" );
+		}
 		else
+		{
 			birdSpeed += 0.03;
+		}
 		bird.y += birdSpeed;
 
 		// If the bird sinks to the ground then it stops there
@@ -60,6 +69,7 @@ class FlyGame
 		{
 			// Count a hit
 			score++;
+			ct.sound( "crunch.wav" );
 			scoreText.setText( ct.formatInt( score ) );
 
 			// The drones speed up when the score gets greater than 10
@@ -76,6 +86,7 @@ class FlyGame
 		{
 			// Delete the bird
 			bird.delete();
+			ct.sound( "buzz.wav" );
 
 			// Game Over
 			ct.text( "Game Over", 50, 15, 12 );
