@@ -994,6 +994,248 @@ not support method calls.
 
 
 ### If-else
+The if-else structure allows you to specify that another statement 
+(such as a [function call](#function-calls) or [variable assignment](#variables)), 
+or a group of statements, should only happen if some condition
+is true. You can also specify what should happen if the condition 
+is false.
+
+#### Examples
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age > 17)
+	ct.println( "You are an adult." );
+else
+	ct.println( "You are a child." );	
+```
+The code above asks the user to input an age and then
+prints one of two messages depending on the value of `age`.
+Only one of the two messages will be printed.
+
+You can also leave off the `else` part if you want. For example:
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 0)
+	ct.println( "That is not a valid age." );
+```
+Statements that are controlled by an if-else, in either the `if` 
+section or the `else` section (if included), should be indented 
+to indicate that they only happen if the controlling test above 
+them passes.
+
+If more than one statement is controlled in either the `if` or
+`else` sections, then the controlled statements must be enclosed
+in curly brackets `{` and `}` as follows:
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age > 15)
+{
+	ct.println( "You can apply for a driver's license." );
+	ct.println( "If you already have one, you can drive." );
+}
+else
+{
+	ct.println( "You are too young to drive by yourself." );
+	ct.println( "Get a ride or take your bike." );
+}
+ct.println( "Be careful!" );    // this always prints
+```
+Note that the last `ct.println()` in the example above is past the
+if-else structure, so it executes afterwards no matter what.
+
+> Although Java is fairly flexible about how if-else structures
+> can be formatted in your code, Code12 requires that they be
+> formatted as above (split over multiple lines and indented
+> as shown), which helps identify mistakes in your code.
+
+#### Notes
+The condition for an if-else statement is tested "on the spot" 
+right when the `if` statment is encountered in your code.
+An if-else is *not* a general rule that says "whenever this is
+true, do this". Instead, it says "If this is true right now, then
+do this right now". After the condition is tested and the 
+controlled statement(s) are executed (if any), execution continues
+with the next statement after the entire if-else structure.
+
+##### Comparison Tests
+Immediately after the keyword `if`, there should be a condition
+in parentheses. There are several types of conditions you can
+test for, including these examples which compare two numbers:
+```
+Condition  Meaning
+---------  ---------------------------------
+(a > b)    Greater than
+(a < b)    Less than
+(a >= b)   Greater than or equal to
+(a <= b)   Less than or equal to
+(a == b)   Equal to (note: two equal signs!)
+(a != b)   Not equal to
+```
+Note that each condition results in a `true` or `false` result
+(either the test is true or not (false)). 
+
+##### Testing a boolean Variable
+A variable of type [boolean](#java-data-types) gives a `true` or `false` 
+result by itself (without comparing it to anything), so you can also 
+use a single `boolean` variable in a condition. For example:
+```
+boolean makeCircle = ct.inputYesNo( "Would you like to make a circle?" );
+
+if (makeCircle)
+	ct.circle( 50, 50, 20 );
+ct.println( "Done" );
+```
+> Note that Java requires the condition to be in parentheses, 
+> even if it is just a single variable name.
+
+##### Testing Compound Conditions 
+The condition for an if-else can also test for two different things
+that must both be true for the test to succeed. This is done using `&&`, 
+which means "and" in Java. For example:
+```
+double inches = ct.inputNumber( "Enter your height in inches" );
+double pounds = ct.inputNumber( "Enter your weight in pounds" );
+
+if (inches > 72 && pounds < 170)
+	ct.println( "You are tall and thin" );
+```
+
+You can also test for two different things where only one of them
+needs to be true. This is done using `||`, which means "or" in Java.
+For example:
+```
+int n = ct.inputInt( "Enter a number from 1 to 10" );
+
+if (n < 1 || n > 10)
+	ct.println( "That number is out of range" );
+```
+
+##### Boolean Expressions
+In all of the examples above, the condition for the if-else has to
+be something that results in a `true` or `false` condition.
+In fact, the way Java handles this is that the condition can be any
+*boolean expression*. A boolean expression is like an expression
+involving numbers (see [Expressions]), except that the end result 
+needs to be `true` or `false` instead of a number.
+
+Symbols such as `<`, `>=`, `==`, `&&`, and `||` are considered 
+*operands* in Java, because they appear between two values and 
+combine them to produce a resulting value. In these cases, the
+resulting value is of type [boolean](#java-data-types), unlike for
+the operands used in numeric expressions such as `+`, `-`, `*`, 
+and `/`, which produce numeric results.
+
+Like the numeric operators, however, the boolean operators can
+be built up into more complex expressions, and also grouped using
+parentheses. For example:
+```
+double inches = ct.inputNumber( "Enter your height in inches" );
+double pounds = ct.inputNumber( "Enter your weight in pounds" );
+
+// If the user is tall and thin, or short and fat, then we won't
+// have any cloths in stock that fit them.
+
+if ((inches > 72 && pounds < 170) || (inches < 48 && pounds > 200))
+	ct.println( "Sorry, we don't have any cloths that fit you." );
+```
+##### Boolean Functions
+An if-else condition (or part of a boolean expression) can also include 
+using any [function return value](#function-return-values) for a
+[function call](#function-calls) or [object method call](#object-method-calls)
+that has a [boolean](#java-data-types) return value. For example:
+```
+if (ct.inputYesNo( "Would you like to play again?" ))
+	ct.restart();
+``` 
+
+#### Graphics and Animation Examples 
+Although an if-else structure only tests its condition and executes
+its controlled statements when it is encountered in your program,
+the way the `update()` code block works in a Code12 program makes it
+easy to test conditions repeatedly.
+
+Code in your `update()` block is executed before each new animation
+frame, and animation frames happen 60 times per second, so this means 
+that the entire sequence of statements in your `update()` block is
+repeated 60 times per second, which is very often compared to human
+perception. This means that an if-else test that you put in your 
+`update()` block may appear to be tested "continuously". In fact,
+it is not tested continuously, just repeatedly and quickly.
+For example:
+```
+GameObj dot;
+
+public void start()
+{
+	dot = ct.circle( 20, 50, 10);
+}
+
+public void update()
+{
+	if (dot.x < 50)
+		ct.println( "The dot is on the left" );
+	else
+		ct.println( "The dot is on the right" );	
+}
+```
+The above example might not do what you first expect (and probably
+not what you wanted if you wrote it), but it helps show how
+the code gets executed.
+
+A more useful example would be:
+```
+GameObj button;
+
+public void start()
+{
+	button = ct.circle( 50, 50, 20);
+}
+
+public void update()
+{
+	if (button.clicked())
+		ct.println( "You pressed the button!" );	
+}
+``` 
+which easily detects "whenever" the button is pressed.
+
+As a final example, consider this simple game, which challenges
+you to click a moving dot:
+```
+GameObj dot;
+
+public void start()
+{
+	// Make a small red dot
+	dot = ct.circle( 20, 50, 5);
+}
+
+public void update()
+{
+	// Move the dot a bit to the right each frame, but restart
+	// it on the left if it goes off-screen to the right. 
+	dot.x += 0.5;
+	if (dot.x > 100)
+		dot.x = 0;
+
+	// Did the user click on something?
+	if (ct.clicked())
+	{
+		// Did they click on the dot?
+		if (dot.clicked())
+			ct.println( "You got the dot!" );
+		else
+			ct.println( "You missed" );
+	}
+}
+```
+Note that this example includes in if-else that is "nested" inside
+another `if` structure. The inner `if` is only tested and executed 
+if the outer `if` passes its test. What would happen if the outer
+`if` were removed? Try to predict the result, then try it and see. 
 
 ###### [Java Language Help](#top) > [If-else]
 
