@@ -58,6 +58,10 @@ end
 
 -- API
 function ct.random(min, max)
+	if max < min then
+		runtime.warning( "ct.random has max < min" )
+		max = min
+	end
 	return math.random(min, max)
 end
 
@@ -68,7 +72,7 @@ end
 
 -- API
 function ct.roundDecimal(x, numPlaces)
-	local f = 10 ^ numPlaces
+	local f = 10 ^ g.forceNotNegative(numPlaces)
 	return math.round(x * f) / f
 end
 
@@ -148,6 +152,7 @@ end
 -- API
 function ct.formatDecimal(x, numPlaces)
 	if numPlaces then
+		numPlaces = g.forceNotNegative(numPlaces)
 		return string.format("%." .. numPlaces .. "f", x)
 	end
 	return tostring(x)
@@ -157,6 +162,7 @@ end
 function ct.formatInt(i, numPlaces)
 	i = math.round(i)
 	if numPlaces then
+		numPlaces = g.forceNotNegative(numPlaces)
 		return string.format("%0" .. numPlaces .. "d", i)
 	end
 	return tostring(i)
