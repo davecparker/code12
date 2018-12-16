@@ -376,7 +376,7 @@ local function defineMethod( func )
 	if syntaxLevel < 9 then
 		err.setErrNode( func, "Unknown function name\n"
 				.. "(Use of user-defined functions requires syntax level 9)" )
-		return
+		-- Let it get defined if correct anyway, so earlier calls don't error.
 	end
 	-- Check if already defined
 	local methodFound, methodCorrectCase, nameCorrectCase 
@@ -1453,6 +1453,8 @@ function checkJava.checkProgram( programTree, level )
 			defineMethod( func )
 		end
 	end
+
+	-- Stop if there is an error in a function definition since 
 
 	-- Check instance vars
 	if vars then

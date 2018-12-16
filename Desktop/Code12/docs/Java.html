@@ -642,6 +642,181 @@ public void update()
 <p>Note that this example includes in if-else that is “nested” inside another <code>if</code> structure. The inner <code>if</code> is only tested and executed if the outer <code>if</code> passes its test. What would happen if the outer <code>if</code> were removed? Try to predict the result, then try it and see.</p>
 <h6 id="java-language-help-if-else"><a href="#top">Java Language Help</a> &gt; <a href="#if-else">If-else</a></h6>
 <h3 id="function-definitions">Function Definitions</h3>
+<p>A function definition is a block of code with a name that you can reuse without having to copy and paste the code each time. The main program blocks <code>start()</code> and <code>update()</code> in your program are actually function definitions, and these functions are called (told to execute) at the appropriate time by the Code12 system. You can also define your own functions and execute them whenever you want using the <a href="#function-calls">function call</a> syntax.</p>
+<h4 id="example-1">Example</h4>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 4 targets at random locations
+        makeRandomTarget();
+        makeRandomTarget();
+        makeRandomTarget();
+        makeRandomTarget();
+    }
+
+    // Below is the function definition for makeRandomTarget(),
+    // which creates one target at a random (x, y) location.
+
+    void makeRandomTarget()
+    {
+        int x = ct.random( 0, 100 );
+        int y = ct.random( 0, 100 );
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+    }
+}</code></pre>
+<p>The code starting with <code>void makeRandomTarget()</code> is a <em>function definition</em> for a function named “makeRandomTarget”. The code for the function definition is enclosed in curly brackets <code>{</code> and <code>}</code> and can have as many lines of code as you want.</p>
+<p>The 4 lines in <code>start()</code> that say <code>makeRandomTarget();</code> are <em>calls</em> to the function named “makeRandomTarget()”. This is just like the syntax for a <a href="#function-calls">function call</a> that you already know, except in this case the definition of the function (the code that executes when the function is called) is written in your code instead of being defined by the Code12 system.</p>
+<h4 id="notes-8">Notes</h4>
+<p>Defining your own functions is a very powerful tool, and it is the basis for how complex software programs can be written in a reasonable amount of time, and how programmers can share work and build upon each other’s work.</p>
+<p>In the example above, note that all the code to make a target (here 5 lines of code), only appears once in the program, although it is used and executed 4 times. Each call to a function causes the program to go execute the lines of code in the function definition, then return back to where the call occured and continue with the next line after the call.</p>
+<p>Without using a function definition, the program could have been written like this:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make a target at a random location
+        int x = ct.random( 0, 100 );
+        int y = ct.random( 0, 100 );
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+
+        // Make another target at a random location
+        x = ct.random( 0, 100 );
+        y = ct.random( 0, 100 );
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+
+        // Make yet another target at a random location
+        x = ct.random( 0, 100 );
+        y = ct.random( 0, 100 );
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+
+        // And another
+        x = ct.random( 0, 100 );
+        y = ct.random( 0, 100 );
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+    }
+}</code></pre>
+<p>which works, but is longer and creates a maintenance program for the programmer, because any future change or fix to the target drawing code (e.g. make a target have 5 rings instead of 3) would need to be done in 4 different places. As programs become more complex, this problem would become critical and the code would become unmaintainable in practice.</p>
+<p>Instead, here is the program again using a function definition, and the function has been updated to draw 5 rings instead of 3:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 4 targets at random locations
+        makeRandomTarget();
+        makeRandomTarget();
+        makeRandomTarget();
+        makeRandomTarget();
+    }
+
+    // Below is the function definition for makeRandomTarget(),
+    // which creates one target at a random (x, y) location.
+
+    void makeRandomTarget()
+    {
+        int x = ct.random( 0, 100 );
+        int y = ct.random( 0, 100 );
+        ct.circle( x, y, 25, &quot;red&quot; );
+        ct.circle( x, y, 20, &quot;white&quot; );
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+    }
+}</code></pre>
+<p>Note that the code in <code>start()</code> required no modification at all. For large programs, involving many systems and sub-systems, this technique is the only way programmers could survive the need to make constant changes, fixes, and improvements to programs, which is the nature of software and technology.</p>
+<h5 id="semicolons-and-indentation">Semicolons and Indentation</h5>
+<p>A function definition has a header line, such as:</p>
+<pre><code>void makeRandomTarget()</code></pre>
+<p>and then a block of code enclosed in curly brackets, such as:</p>
+<pre><code>{
+    int x = ct.random( 0, 100 );
+    int y = ct.random( 0, 100 );
+    ct.circle( x, y, 15, &quot;red&quot; );
+    ct.circle( x, y, 10, &quot;white&quot; );
+    ct.circle( x, y, 5, &quot;red&quot; );
+}</code></pre>
+<p>Note that the header line does <em>not</em> have a semicolon after it (but the calls to the function do).</p>
+<p>The header line should be indented at the same level as the header lines for <code>start()</code> and <code>update()</code> in your program, and also like <code>start()</code> and <code>update()</code>, the code inside the curly brackets should be indented as shown in the examples above.</p>
+<h5 id="public-or-not">Public or not?</h5>
+<p>The header lines for <code>start()</code> and <code>update()</code> start with the keyword <code>public</code>, but you don’t need this keyword for your own function definitions. The <code>public</code> keyword is required by Java when the function being defined will be called from code that is outside the <code>class</code> block containing the function.</p>
+<p>If a function definition and all calls to the function are enclosed inside the same <code>class</code> block, then you don’t need to use <code>public</code>. In the full example above, the definition of <code>makeRandomTarget()</code> and all 4 calls to it are all enclosed within <code>class Example</code>.</p>
+<p>In the case of <code>start()</code> and <code>update()</code>, the function definitions are inside <code>class Example</code>, but the calls to these functions are technically inside the Code12 system (where you can’t see them), in a separate class that you didn’t write.</p>
+<blockquote>
+<p>The complete rules concerning <code>public</code> are more complicated than this, and Java also has other keywords such as <code>private</code> and <code>protected</code>, but these are not used by Code12.</p>
+</blockquote>
+<h5 id="void-and-functions-that-return-a-value">Void and Functions that Return a Value</h5>
+<p>The keyword <code>void</code> in a function definition header is required for a function that does <em>not</em> have a <em>return value</em>. You can define your own functions that return values, however, similar to some of the Code12 functions that have <a href="#function-return-values">Function Return Values</a> (for example, <a href="API.html#ct.inputnumber">ct.inputNumber()</a>).</p>
+<p>Here is an example program that defines a function named <code>randomCoord()</code> that computes a random coordinate value between 0 and 100 and then returns this value from the function. The code in <code>start()</code> then uses this function 4 times.</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 4 circles at random x locations
+        ct.circle( randomCoord(), 50, 10 );
+        ct.circle( randomCoord(), 50, 10 );
+        ct.circle( randomCoord(), 50, 10 );
+        ct.circle( randomCoord(), 50, 10 );
+    }
+
+    double randomCoord()
+    {
+        double r = ct.random( 0, 100 );
+        return r;
+    }
+}</code></pre>
+<p>The job of <code>randomCoord()</code> here is to compute a value internally, and then <em>return</em> this value from the function so that the calling code can use it. This requires two new bits of syntax. First, instead of <code>void</code> in the function header, you put the <em>type</em> of the return value (see <a href="#java-data-types">Java Data Types</a>), here <code>double</code>. Second, at the end of the function you specify the <em>value</em> to return after the <code>return</code> keyword. In this case, whatever value is in the variable <code>r</code> when the <code>return</code> is encountered will become the return value of the function that the calling code can use.</p>
+<h5 id="functions-calling-other-functions">Functions Calling Other Functions</h5>
+<p>Note that in a function definition such as:</p>
+<pre><code>void makeRandomTarget()
+{
+    int x = ct.random( 0, 100 );
+    int y = ct.random( 0, 100 );
+    ct.circle( x, y, 15, &quot;red&quot; );
+    ct.circle( x, y, 10, &quot;white&quot; );
+    ct.circle( x, y, 5, &quot;red&quot; );
+}</code></pre>
+<p>The code in the function body itself contains calls to other functions (here <code>ct.random()</code> and <code>ct.circle()</code>). In addition to calling Code12 functions in a function body, you also call other functions that you have defined yourself!</p>
+<p>Consider this example that combines two of the earlier examples above:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 4 targets at random locations
+        makeRandomTarget();
+        makeRandomTarget();
+        makeRandomTarget();
+        makeRandomTarget();
+    }
+
+    void makeRandomTarget()
+    {
+        double x = randomCoord();
+        double y = randomCoord();
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+    }
+
+    double randomCoord()
+    {
+        double r = ct.random( 0, 100 );
+        return r;
+    }
+}</code></pre>
+<p>Can you follow the flow and order of the statements here? How many times does the line of code:</p>
+<pre><code>double r = ct.random( 0, 100 );</code></pre>
+<p>in function <code>randomCoord()</code> end up being executed? <em>(Answer: 8)</em>.</p>
+<p>Once you understand and start to master this technique, you will come to understand how very complex programs can be written.</p>
 <h6 id="java-language-help-function-definitions"><a href="#top">Java Language Help</a> &gt; <a href="#function-definitions">Function Definitions</a></h6>
 <h3 id="parameters-1">Parameters</h3>
 <h6 id="java-language-help-parameters"><a href="#top">Java Language Help</a> &gt; <a href="#parameters-1">Parameters</a></h6>

@@ -1241,6 +1241,285 @@ if the outer `if` passes its test. What would happen if the outer
 
 
 ### Function Definitions
+A function definition is a block of code with a name that you can reuse
+without having to copy and paste the code each time. The main program
+blocks `start()` and `update()` in your program are actually function 
+definitions, and these functions are called (told to execute) at the 
+appropriate time by the Code12 system. You can also define your own 
+functions and execute them whenever you want using the 
+[function call](#function-calls) syntax.
+
+#### Example
+```
+class Example
+{
+	public void start()
+	{
+		// Make 4 targets at random locations
+		makeRandomTarget();
+		makeRandomTarget();
+		makeRandomTarget();
+		makeRandomTarget();
+	}
+
+	// Below is the function definition for makeRandomTarget(),
+	// which creates one target at a random (x, y) location.
+
+	void makeRandomTarget()
+	{
+		int x = ct.random( 0, 100 );
+		int y = ct.random( 0, 100 );
+		ct.circle( x, y, 15, "red" );
+		ct.circle( x, y, 10, "white" );
+		ct.circle( x, y, 5, "red" );
+	}
+}
+```
+The code starting with `void makeRandomTarget()` is a 
+*function definition* for a function named "makeRandomTarget".
+The code for the function definition is enclosed in 
+curly brackets `{` and `}` and can have as many lines of code
+as you want.
+
+The 4 lines in `start()` that say `makeRandomTarget();` are *calls*
+to the function named "makeRandomTarget()". This is just like
+the syntax for a [function call](#function-calls) that you already
+know, except in this case the definition of the function
+(the code that executes when the function is called) is written
+in your code instead of being defined by the Code12 system.
+
+#### Notes
+Defining your own functions is a very powerful tool, and it is the 
+basis for how complex software programs can be written in a reasonable 
+amount of time, and how programmers can share work and build upon
+each other's work.
+
+In the example above, note that all the code to make a target
+(here 5 lines of code), only appears once in the program, 
+although it is used and executed 4 times.
+Each call to a function causes the program to go execute the
+lines of code in the function definition, then return 
+back to where the call occured and continue with the next line 
+after the call. 
+
+Without using a function definition, the program could have been
+written like this:
+```
+class Example
+{
+	public void start()
+	{
+		// Make a target at a random location
+		int x = ct.random( 0, 100 );
+		int y = ct.random( 0, 100 );
+		ct.circle( x, y, 15, "red" );
+		ct.circle( x, y, 10, "white" );
+		ct.circle( x, y, 5, "red" );
+
+		// Make another target at a random location
+		x = ct.random( 0, 100 );
+		y = ct.random( 0, 100 );
+		ct.circle( x, y, 15, "red" );
+		ct.circle( x, y, 10, "white" );
+		ct.circle( x, y, 5, "red" );
+
+		// Make yet another target at a random location
+		x = ct.random( 0, 100 );
+		y = ct.random( 0, 100 );
+		ct.circle( x, y, 15, "red" );
+		ct.circle( x, y, 10, "white" );
+		ct.circle( x, y, 5, "red" );
+
+		// And another
+		x = ct.random( 0, 100 );
+		y = ct.random( 0, 100 );
+		ct.circle( x, y, 15, "red" );
+		ct.circle( x, y, 10, "white" );
+		ct.circle( x, y, 5, "red" );
+	}
+}
+```
+which works, but is longer and creates a maintenance program for the
+programmer, because any future change or fix to the target drawing code 
+(e.g. make a target have 5 rings instead of 3) would need to be done in 
+4 different places. As programs become more complex, this problem
+would become critical and the code would become unmaintainable in 
+practice.
+
+Instead, here is the program again using a function definition,
+and the function has been updated to draw 5 rings instead of 3:
+```
+class Example
+{
+	public void start()
+	{
+		// Make 4 targets at random locations
+		makeRandomTarget();
+		makeRandomTarget();
+		makeRandomTarget();
+		makeRandomTarget();
+	}
+
+	// Below is the function definition for makeRandomTarget(),
+	// which creates one target at a random (x, y) location.
+
+	void makeRandomTarget()
+	{
+		int x = ct.random( 0, 100 );
+		int y = ct.random( 0, 100 );
+		ct.circle( x, y, 25, "red" );
+		ct.circle( x, y, 20, "white" );
+		ct.circle( x, y, 15, "red" );
+		ct.circle( x, y, 10, "white" );
+		ct.circle( x, y, 5, "red" );
+	}
+}
+```
+Note that the code in `start()` required no modification at all.
+For large programs, involving many systems and sub-systems,
+this technique is the only way programmers could survive the need
+to make constant changes, fixes, and improvements to programs,
+which is the nature of software and technology.
+
+##### Semicolons and Indentation
+A function definition has a header line, such as:
+```
+void makeRandomTarget()
+```
+and then a block of code enclosed in curly brackets, such as:
+```
+{
+	int x = ct.random( 0, 100 );
+	int y = ct.random( 0, 100 );
+	ct.circle( x, y, 15, "red" );
+	ct.circle( x, y, 10, "white" );
+	ct.circle( x, y, 5, "red" );
+}
+```
+Note that the header line does *not* have a semicolon after it
+(but the calls to the function do).
+
+The header line should be indented at the same level as the header
+lines for `start()` and `update()` in your program, and also like 
+`start()` and `update()`, the code inside the curly brackets should 
+be indented as shown in the examples above.
+
+##### Public or not?
+The header lines for `start()` and `update()` start with the 
+keyword `public`, but you don't need this keyword for your own
+function definitions. The `public` keyword is required by Java 
+when the function being defined will be called from code that 
+is outside the `class` block containing the function. 
+
+If a function definition and all calls to the function are enclosed
+inside the same `class` block, then you don't need to use `public`.
+In the full example above, the definition of `makeRandomTarget()`
+and all 4 calls to it are all enclosed within `class Example`.
+
+In the case of `start()` and `update()`, the function definitions 
+are inside `class Example`, but the calls to these functions are 
+technically inside the Code12 system (where you can't see them), 
+in a separate class that you didn't write.
+
+> The complete rules concerning `public` are more complicated than
+> this, and Java also has other keywords such as `private` and
+> `protected`, but these are not used by Code12.
+
+##### Void and Functions that Return a Value
+The keyword `void` in a function definition header is required for a
+function that does *not* have a *return value*. You can define your
+own functions that return values, however, similar to some of the 
+Code12 functions that have [Function Return Values]\ (for example, 
+[ct.inputNumber()](API.html#ct.inputnumber)).
+
+Here is an example program that defines a function named `randomCoord()`
+that computes a random coordinate value between 0 and 100 and then
+returns this value from the function. The code in `start()` then
+uses this function 4 times.
+```
+class Example
+{
+	public void start()
+	{
+		// Make 4 circles at random x locations
+		ct.circle( randomCoord(), 50, 10 );
+		ct.circle( randomCoord(), 50, 10 );
+		ct.circle( randomCoord(), 50, 10 );
+		ct.circle( randomCoord(), 50, 10 );
+	}
+
+	double randomCoord()
+	{
+		double r = ct.random( 0, 100 );
+		return r;
+	}
+}
+```
+The job of `randomCoord()` here is to compute a value internally, and then
+*return* this value from the function so that the calling code can use
+it. This requires two new bits of syntax. First, instead of `void` in the 
+function header, you put the *type* of the return value
+(see [Java Data Types]), here `double`. Second, at the end of the function you
+specify the *value* to return after the `return` keyword. In this case, whatever
+value is in the variable `r` when the `return` is encountered will 
+become the return value of the function that the calling code can use.
+
+##### Functions Calling Other Functions
+Note that in a function definition such as:
+```
+void makeRandomTarget()
+{
+	int x = ct.random( 0, 100 );
+	int y = ct.random( 0, 100 );
+	ct.circle( x, y, 15, "red" );
+	ct.circle( x, y, 10, "white" );
+	ct.circle( x, y, 5, "red" );
+}
+```
+The code in the function body itself contains calls to other
+functions (here `ct.random()` and `ct.circle()`). 
+In addition to calling Code12 functions in a function body,
+you also call other functions that you have defined yourself!
+
+Consider this example that combines two of the earlier examples above:
+```
+class Example
+{
+	public void start()
+	{
+		// Make 4 targets at random locations
+		makeRandomTarget();
+		makeRandomTarget();
+		makeRandomTarget();
+		makeRandomTarget();
+	}
+
+	void makeRandomTarget()
+	{
+		double x = randomCoord();
+		double y = randomCoord();
+		ct.circle( x, y, 15, "red" );
+		ct.circle( x, y, 10, "white" );
+		ct.circle( x, y, 5, "red" );
+	}
+
+	double randomCoord()
+	{
+		double r = ct.random( 0, 100 );
+		return r;
+	}
+}
+```
+Can you follow the flow and order of the statements here?
+How many times does the line of code:
+```
+double r = ct.random( 0, 100 );
+``` 
+in function `randomCoord()` end up being executed? *(Answer: 8)*.
+
+Once you understand and start to master this technique,
+you will come to understand how very complex programs 
+can be written.
 
 ###### [Java Language Help](#top) > [Function Definitions]
 

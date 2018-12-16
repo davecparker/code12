@@ -27,7 +27,7 @@ class FlyGame
 
 	public void update()
 	{
-		// When the user clicks then the bird flys up, otherwise glides down
+		// When the user clicks the bird flys up, otherwise it glides down
 		if (ct.clicked())
 		{
 			birdSpeed -= 0.6;
@@ -72,7 +72,7 @@ class FlyGame
 			ct.sound( "crunch.wav" );
 			scoreText.setText( ct.formatInt( score ) );
 
-			// The drones speed up when the score gets greater than 10
+			// The drone speeds up when the score gets greater than 10
 			if (score > 10)
 				droneSpeed = 1.5;
 

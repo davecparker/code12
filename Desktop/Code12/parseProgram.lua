@@ -943,11 +943,11 @@ local function getMembers( programTree )
 			firstMemberIndentLevel = tree.indentLevel
 			if firstMemberIndentLevel == 0 then
 				err.setErrLineNum( firstMemberLineNum,
-						"Class-level variable and function definitions should be indented" )
+						"Code inside the class block should be indented" )
 			end
 		elseif tree.indentLevel ~= firstMemberIndentLevel then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
-					"Class-level variable and function definitions should all have the same indentation" )
+					"Class-level variable and function blocks should all have the same indentation" )
 		end
 		checkMultiLineIndent( tree )
 	end

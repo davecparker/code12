@@ -24,9 +24,9 @@ import java.util.Scanner;
 	GameObj button = ct.text("START", 0, 0, 10);
 	// ERROR "cannot be called before start()"
 	int intResult = intFunc();
-	// ERROR "Class-level variable and function definitions should all have the same indentation"
+	// ERROR "Class-level variable and function blocks should all have the same indentation"
 		int overIndentedInstanceVar;
-	// ERROR "Class-level variable and function definitions should all have the same indentation"
+	// ERROR "Class-level variable and function blocks should all have the same indentation"
 int underIndentedInstanceVar;
 	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 	int[] classLevelMultilineIntArray1 = { 1,
@@ -1692,11 +1692,11 @@ int underIndentedInstanceVar;
 	void onCharTyped( GameObj keyName )
 	{
 	}
-	// ERROR "Class-level variable and function definitions should all have the same indentation"
+	// ERROR "Class-level variable and function blocks should all have the same indentation"
 		void overIndentedFunc()
 		{
 		}
-	// ERROR "Class-level variable and function definitions should all have the same indentation"
+	// ERROR "Class-level variable and function blocks should all have the same indentation"
 void underIndentedFunc()
 {
 }

@@ -44,7 +44,7 @@ for example:
   with a few exceptions (such as after a comma in a parameter list).
 * if and else and the controlled statements must be all on their own lines.
 * { and } must always be on their own line.
-* Assignment operators (=, +=, etc.) and ++ and -- make statements not expressions.
+* Assignment operators (=, +=, etc. and ++ and --) make statements, not expressions.
 * Object field/method access cannot be chained, so no a.b.c or a().b
 * No overloading in user-defined functions (only one parameter list signature).
 * Indentation style is enforced.
@@ -110,11 +110,7 @@ for ways to use the Code12 API at each level:
 
 6. Object Data Fields
 ---------------------
-* Make a GameObj move smoothly by setting its xSpeed and/or ySpeed field in start() 
 * Make a GameObj move smoothly by changing its x and/or y fields in update()
-* Make an object grow/shrink by changing its width or height in update()
-* Make a thick outline by setting an object's lineWidth field after creation
-* Use autoDelete = true so objects delete after going offscreen via xSpeed/ySpeed 
 * Set the group field of a set of objects that you want to delete in bulk via ct.clearGroup()  
 
 7. Object Method Calls
