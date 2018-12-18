@@ -437,8 +437,8 @@ end
 -- Stop and clear the current user program if any
 function runtime.clearProgram()
 	runtime.stop()
-	ct.userVars = nil
-	ct.userFns = nil
+	ct.userVars = {}
+	ct.userFns = {}
 	codeFunction = nil
 	g.runState = nil
 end
