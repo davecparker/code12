@@ -90,65 +90,57 @@ end
 
 -- The enterFrame listener for each frame update
 local function onNewFrame()
-	-- Call or resume the current user function if not paused (start or update)
-	local status = false
-	local runState = g.runState
-	local userFn = g.userFn
-	if userFn and runState ~= "paused" then
-		status = runtime.runEventFunction(userFn)
-		if status == nil then   -- userFn finished
-			if userFn == ct.userFns.start then
-				-- User's start function finished
-				if g.outputFile then
-					g.outputFile:flush()   -- flush any print output
-				end
-				g.userFn = ct.userFns.update  -- now start calling update if defined
-			end
-		elseif status == "aborted" then
-			return
-		end
-	end
-
-	-- Clear the polled input state for this frame
-	g.clicked = false
-	g.gameObjClicked = nil
-	g.charTyped = nil
-
-	-- Update drawing objects as necessary
+	-- Apply object speeds if the current screen has any and is running
 	local screen = g.screen
-    if screen then
-		local objs = screen.objs
+	if screen == nil then
+		return
+	end
+	if screen.hasSpeed and g.runState == "running" then
+		applyObjectSpeeds(screen)
+	end
 
-		-- Apply speed to objects if screen has any and the program is running 
-		-- and userFn didn't yield (which interrupts the update cycle).
-		if screen.hasSpeed and runState == "running" and status ~= "yielded" then
-			applyObjectSpeeds(screen)
+	-- Call or resume the current userFn (start or update) if not paused
+	if g.runState ~= "paused" then
+		local userFn = g.userFn
+		if userFn then
+			local status = runtime.runEventFunction(userFn)
+			if status == nil then   -- userFn finished
+				if userFn == ct.userFns.start then
+					-- User's start function finished
+					if g.outputFile then
+						g.outputFile:flush()   -- flush any print output
+					end
+					g.userFn = ct.userFns.update  -- now start calling update if defined
+				end
+			elseif status == "aborted" then
+				return
+			end
 		end
 
-		-- If the window resized then we need to resize all the contents
-		local scale = g.scale
-		if g.window.resized then
-			-- Background object
-			screen.backObj:updateBackObj()
-			-- Screen origin
-			objs.x = -screen.originX * scale
-			objs.y = -screen.originY * scale
-			-- Graphic objects
-			syncObjects(objs, scale, true)
-			g.window.resized = false
-		else
-			-- Just sync object positions and visibility
-			syncObjects(objs, scale)
-		end
+		-- Clear the polled input state for this frame
+		g.clicked = false
+		g.gameObjClicked = nil
+		g.charTyped = nil
 	end
-end
 
--- Global key event handler for the runtime
-local function onKey(event)
-	if g.runState == "running" then
-		return g.onKey(event)
+	-- Update and sync the drawing objects as necessary.
+	-- If the window resized then we need to resize all the contents.
+	screen = g.screen    -- may have been changed in user's code
+	local objs = screen.objs
+	local scale = g.scale
+	if g.window.resized then
+		-- Background object
+		screen.backObj:updateBackObj()
+		-- Screen origin
+		objs.x = -screen.originX * scale
+		objs.y = -screen.originY * scale
+		-- Graphic objects
+		syncObjects(objs, scale, true)
+		g.window.resized = false
+	else
+		-- Just sync object positions and visibility
+		syncObjects(objs, scale)
 	end
-	return false
 end
 
 -- Get the device/output metrics in native units
@@ -223,15 +215,15 @@ local function initUserProgram()
 	end
 end
 
--- Init the runtime
-local function initRuntime()
-	-- Install the global event listeners
-	Runtime:addEventListener("enterFrame", onNewFrame)
-	Runtime:addEventListener("key", onKey)
-end
-
 
 ---------------- Module Functions ------------------------------------------
+
+-- Init the runtime
+function runtime.init()
+	-- Install the global event listeners
+	Runtime:addEventListener("enterFrame", onNewFrame)
+	Runtime:addEventListener("key", g.onKey)
+end
 
 -- Load the given string of Lua code as the user program and init the program.
 -- Return an error string if the program failed to load, or nil for success.
@@ -292,7 +284,7 @@ end
 -- Run the user input (mouse or keyboard) event func if any.
 -- Return result per runtime.runEventFunction().
 function runtime.runInputEvent(func, ...)
-	if func then
+	if func and g.runState == "running" then
 		local result = runtime.runEventFunction(func, ...)
 		runtime.syncScreenObjects()  -- in case screen redraws before next enterFrame
 		return result
@@ -383,7 +375,7 @@ end
 
 -- Start a new run of the user program after the user's code has been loaded
 function runtime.run()
-	-- Stop any existing run in case it wasn't ended explicitly
+	-- Stop any existing run and clear the input state
 	runtime.stop()
 
 	-- Create a main outer display group so that we can rotate and place it 
@@ -424,6 +416,12 @@ function runtime.run()
 	g.userFn = ct.userFns.start
 	g.startTime = system.getTimer()
 	-- Now onNewFrame called by enterFrame listener will start the action
+end
+
+-- Init the runtime and run the current program (for standalone Lua runs)
+function runtime.initAndRun()
+	runtime.init()
+	runtime.run()
 end
 
 -- Restart the current user program if any
@@ -519,7 +517,5 @@ end
 
 ----------------------------------------------------------------------------
 
--- Init and return the runtime module
-initRuntime()
 return runtime
 

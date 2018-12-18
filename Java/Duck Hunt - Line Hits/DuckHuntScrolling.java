@@ -126,7 +126,7 @@ public class DuckHuntLineHits extends Code12Program
 				duckSpeed = -0.75;
 			}
 			double x = 105 + screenOriginX;
-			double y = ct.random( 10, ct.toInt(yMax / 2) );
+			double y = ct.random( 10, (int) (yMax / 2) );
 			GameObj duck = createDuck( x, y, duckSpeed);
 		}
 
@@ -205,7 +205,7 @@ public class DuckHuntLineHits extends Code12Program
 			//GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
 			bullet = ct.line( xStart, yStart, xStart, yStart + 2, "blue" );
 			bullet.setLineWidth( 5 );
-			bullet.setSpeed( 0, -3 );
+			bullet.setYSpeed( -3 );
 			bulletsArr[bulletsCount] = bullet;
 			bulletsCount++;
 		}
@@ -232,7 +232,7 @@ public class DuckHuntLineHits extends Code12Program
 		if ( ducksCount < maxSizeDucks )
 		{
 			duck = ct.image( "rubber-duck.png", xStart, yStart, 5 );
-			duck.setSpeed( xSpeed, 0 );
+			duck.setXSpeed( xSpeed );
 			ducksArr[ducksCount] = duck;
 			duckYStartsArr[ducksCount] = yStart;
 			ducksCount++;
@@ -259,7 +259,7 @@ public class DuckHuntLineHits extends Code12Program
 	GameObj makeDeadDuck( GameObj duck )
 	{
 		GameObj deadDuck = ct.image( "dead-duck.png", duck.x, duck.y, duck.getHeight() );
-		deadDuck.setSpeed( 0, 1 );
+		deadDuck.setYSpeed( 1 );
 		return deadDuck;
 	}
 

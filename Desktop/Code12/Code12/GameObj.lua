@@ -720,6 +720,11 @@ function GameObj:getType()
 end
 
 -- API
+function GameObj:setSize(width, height)
+	self:updateSize(width, height, g.scale)
+end
+
+-- API
 function GameObj:getWidth()
 	return self.width
 end
@@ -730,21 +735,32 @@ function GameObj:getHeight()
 end
 
 -- API
-function GameObj:setSize(width, height)
-	self:updateSize(width, height, g.scale)
+function GameObj:setXSpeed(xSpeed)
+	self.xSpeed = xSpeed
+	self.hasSpeed = true
+	g.screen.hasSpeed = true
 end
 
 -- API
-function GameObj:setSpeed(xSpeed, ySpeed)
-	self.xSpeed = xSpeed
+function GameObj:setYSpeed(ySpeed)
 	self.ySpeed = ySpeed
 	self.hasSpeed = true
 	g.screen.hasSpeed = true
 end
 
 -- API
-function GameObj:getText()
-	return self.text
+function GameObj:getXSpeed()
+	return self.xSpeed
+end
+
+-- API
+function GameObj:getYSpeed()
+	return self.ySpeed
+end
+
+-- API
+function GameObj:align(alignment)
+	self:setAlignmentFromName(alignment or "center")
 end
 
 -- API
@@ -752,6 +768,11 @@ function GameObj:setText(text)
 	self.text = text
 	self.obj.text = text
 	-- TODO: Re-measure text
+end
+
+-- API
+function GameObj:getText()
+	return self.text
 end
 
 -- API
@@ -763,11 +784,6 @@ function GameObj:toString()
 		s = s .. " \"" .. self.text .. "\""
 	end
 	return s .. "]"
-end
-
--- API
-function GameObj:align(alignment)
-	self:setAlignmentFromName(alignment or "center")
 end
 
 -- API
@@ -815,11 +831,6 @@ function GameObj:setImage(filename)
 end
 
 -- API
-function GameObj:getLayer()
-	return self.layer
-end
-
--- API
 function GameObj:setLayer(layer)
 	-- Change the stored layer number
 	self.layer = layer
@@ -844,6 +855,11 @@ function GameObj:setLayer(layer)
 		runtime.warning("GameObj count now exceeds 1000")
 		g.screen.objsWarning = true
 	end
+end
+
+-- API
+function GameObj:getLayer()
+	return self.layer
 end
 
 -- API

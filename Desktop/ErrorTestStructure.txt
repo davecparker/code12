@@ -1695,31 +1695,28 @@
                                 call getVersion { class = ct }
 639.                    assign (=)
                             lValue: lValue { varID = i }
-                            expr: call toInt { #exprs = 1, class = ct }
-                                exprs:
-                                    lValue { varID = d }
+                            expr: cast { vtCast = 0 }
+                                expr: lValue { varID = d }
 640.                    assign (=)
                             lValue: lValue { varID = i }
-                            expr: call toInt { #exprs = 1, class = ct }
-                                exprs:
-                                    (*)
+                            expr: cast { vtCast = 0 }
+                                expr: parens
+                                    expr: (*)
                                         right: lValue { varID = i }
                                         left: lValue { varID = d }
 641.                    assign (=)
                             lValue: lValue { varID = i }
-                            expr: call toInt { #exprs = 1, class = ct }
-                                exprs:
-641.                                (.707)
+                            expr: cast { expr = .707, vtCast = 0 }
 642.                    assign (=)
                             lValue: lValue { varID = i }
-                            expr: call toInt { #exprs = 1, class = ct }
-                                exprs:
-                                    staticField { fieldID = PI, class = Math }
+                            expr: cast { vtCast = 0 }
+                                expr: staticField { fieldID = PI, class = Math }
 643.                    assign (=)
-                            lValue: lValue { varID = i }
-                            expr: call toInt { #exprs = 1, class = ct }
-                                exprs:
-643.                                (6.0221409e+2)
+                            lValue: lValue { varID = d }
+                            expr: (/)
+                                right: lValue { varID = i }
+                                left: cast { vtCast = 1 }
+                                    expr: lValue { varID = i }
 644.                    assign (=)
                             lValue: lValue { varID = i }
                             expr: call parseInt { #exprs = 1, class = ct }
@@ -1891,17 +1888,17 @@
                             lValue: lValue { varID = d }
                             expr: call getHeight
                                 lValue: lValue { varID = img }
-678.                    call setSpeed { #exprs = 2 }
+678.                    call setYSpeed { #exprs = 1 }
                             lValue: lValue { varID = circle }
                             exprs:
-678.                            (0)
-678.                            (3)
-679.                    call setSpeed { #exprs = 2 }
+                                (+) { right = 3 }
+                                    left: call getYSpeed
+                                        lValue: lValue { varID = circle }
+679.                    call setXSpeed { #exprs = 1 }
                             lValue: lValue { varID = rect }
                             exprs:
-679.                            (0.1)
-                                (/) { right = 2 }
-                                    left: lValue { varID = d }
+                                call getXSpeed
+                                    lValue: lValue { varID = circle }
 680.                    call align { #exprs = 1 }
                             lValue: lValue { varID = text }
                             exprs:
@@ -5341,11 +5338,10 @@
                                 left: lValue { varID = rect, fieldID = x }
                             block: block { #stmts = 1 }
                                 stmts:
-2835.                                call setSpeed { #exprs = 2 }
+2835.                                call setXSpeed { #exprs = 1 }
                                         lValue: lValue { varID = rect }
                                         exprs:
                                             unaryOp (neg) { expr = 1 }
-2835.                                        (0)
 2837.                    assign (=)
                             lValue: lValue { varID = boolVar }
                             expr: parens

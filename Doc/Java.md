@@ -1,32 +1,9 @@
 % Java Language Help
 
-##### [Java Language Constructs](#java-syntax-examples)
-* [Function Calls]
-* [Comments]
-* [Variables]
-* [Expressions]
-* [Function Return Values]
-* [Object Data Fields]
-* [Object Method Calls]
-* [If-else]
-* [Function Definitions]
-* [Parameters]
-* [Loops]
-* [Arrays]
+<div class="summary">
+<div class="summaryColumn">
 
-##### Java Language Elements
-* [Java Data Types]
-
-
-###### Code12 Version 1.0
-
-
-Java Syntax Examples
---------------------
-
-These sections contain examples of Java language syntax for 
-the 12 core programming constructs supported by Code12.
-
+##### Java Syntax Examples
 1. [Function Calls]
 2. [Comments]
 3. [Variables]
@@ -40,7 +17,16 @@ the 12 core programming constructs supported by Code12.
 11. [Loops]
 12. [Arrays]
 
-###### [Java Language Help](#top) > [Java Syntax Examples]
+</div>
+<div class="summaryColumn">
+
+##### Java Language Elements
+* [Java Data Types]
+
+</div>
+</div>
+
+###### Code12 Version 1.0
 
 
 ### Function Calls
@@ -873,7 +859,7 @@ bottom.setFillColor( "green" );
 ```
 GameObj block = ct.rect( 10, 10, 10, 10 );
 block.setSize( 20, 5 );
-block.setSpeed( 0.5, 0.25 );
+block.setXSpeed( 0.5 );
 block.setFillColorRGB( 200, 100, 50 );
 block.setLineColor( "gray" );
 block.setLineWidth( 3 );
@@ -956,7 +942,7 @@ with. In the following code:
 ct.circle( 30, 50, 20 );
 GameObj block = ct.rect( 70, 50, 20, 30 );
 
-block.setSpeed( 0, 1 );
+block.setYSpeed( 1 );
 ```
 the circle is created and drawn on the screen, but the 
 [return value](#function-return-values) of `ct.circle()`

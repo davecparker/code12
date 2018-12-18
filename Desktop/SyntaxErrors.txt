@@ -146,3 +146,5 @@ public void start
 	int[][] multiDimArr;
 	double classLevelOpAssign += 1;
 	String classLevelStringLength = classLevelString.length()
+		dot.setXSpeed( 0.3 );	}
+		dot.setYSpeed( -0.3 );	}

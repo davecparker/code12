@@ -20,28 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Java Language Help</h1>
 </header>
-<h5 id="java-language-constructs"><a href="#java-syntax-examples">Java Language Constructs</a></h5>
-<ul>
-<li><a href="#function-calls">Function Calls</a></li>
-<li><a href="#comments">Comments</a></li>
-<li><a href="#variables">Variables</a></li>
-<li><a href="#expressions">Expressions</a></li>
-<li><a href="#function-return-values">Function Return Values</a></li>
-<li><a href="#object-data-fields">Object Data Fields</a></li>
-<li><a href="#object-method-calls">Object Method Calls</a></li>
-<li><a href="#if-else">If-else</a></li>
-<li><a href="#function-definitions">Function Definitions</a></li>
-<li><a href="#parameters-1">Parameters</a></li>
-<li><a href="#loops">Loops</a></li>
-<li><a href="#arrays">Arrays</a></li>
-</ul>
-<h5 id="java-language-elements">Java Language Elements</h5>
-<ul>
-<li><a href="#java-data-types">Java Data Types</a></li>
-</ul>
-<h6 id="code12-version-1.0">Code12 Version 1.0</h6>
-<h2 id="java-syntax-examples">Java Syntax Examples</h2>
-<p>These sections contain examples of Java language syntax for the 12 core programming constructs supported by Code12.</p>
+<div class="summary">
+<div class="summaryColumn">
+<h5 id="java-syntax-examples">Java Syntax Examples</h5>
 <ol type="1">
 <li><a href="#function-calls">Function Calls</a></li>
 <li><a href="#comments">Comments</a></li>
@@ -56,7 +37,15 @@
 <li><a href="#loops">Loops</a></li>
 <li><a href="#arrays">Arrays</a></li>
 </ol>
-<h6 id="java-language-help-java-syntax-examples"><a href="#top">Java Language Help</a> &gt; <a href="#java-syntax-examples">Java Syntax Examples</a></h6>
+</div>
+<div class="summaryColumn">
+<h5 id="java-language-elements">Java Language Elements</h5>
+<ul>
+<li><a href="#java-data-types">Java Data Types</a></li>
+</ul>
+</div>
+</div>
+<h6 id="code12-version-1.0">Code12 Version 1.0</h6>
 <h3 id="function-calls">Function Calls</h3>
 <p>A function call is a named command for your program to execute, followed by a list of input values for the command to use.</p>
 <h4 id="examples">Examples</h4>
@@ -443,7 +432,7 @@ middle.setFillColor( &quot;yellow&quot; );
 bottom.setFillColor( &quot;green&quot; );</code></pre>
 <pre><code>GameObj block = ct.rect( 10, 10, 10, 10 );
 block.setSize( 20, 5 );
-block.setSpeed( 0.5, 0.25 );
+block.setXSpeed( 0.5 );
 block.setFillColorRGB( 200, 100, 50 );
 block.setLineColor( &quot;gray&quot; );
 block.setLineWidth( 3 );</code></pre>
@@ -484,7 +473,7 @@ ball.setFillColor( &quot;blue&quot; );    // method function call</code></pre>
 <pre><code>ct.circle( 30, 50, 20 );
 GameObj block = ct.rect( 70, 50, 20, 30 );
 
-block.setSpeed( 0, 1 );</code></pre>
+block.setYSpeed( 1 );</code></pre>
 <p>the circle is created and drawn on the screen, but the <a href="#function-return-values">return value</a> of <code>ct.circle()</code> is ignored and not assigned to a variable. This means there is no way to call a method function on it. The rectangle, however, is assigned to the variable <code>block</code>, which can then be used to call method functions.</p>
 <h5 id="gameobj-and-string-methods">GameObj and String Methods</h5>
 <p>A Code12 program can call method functions on two different types of data objects: <a href="#java-data-types">GameObj</a> and <a href="#java-data-types">String</a>. See the <a href="API.html#gameobj-methods">GameObj method functions</a> for the method functions supported for <code>GameObj</code> objects.</p>

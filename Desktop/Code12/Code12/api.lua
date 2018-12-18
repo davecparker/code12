@@ -77,6 +77,13 @@ function ct.roundDecimal(x, numPlaces)
 end
 
 -- API
+function ct.distance(x1, y1, x2, y2)
+	local dx = x1 - x2
+	local dy = y1 - y2
+	return math.sqrt(dx * dx + dy * dy)
+end
+
+-- API
 function ct.intDiv(n, d)
 	return math.floor( n / d )
 end
@@ -86,20 +93,8 @@ function ct.isError(x)
 	return x ~= x   -- NaN is not equal to itself but everything else is
 end
 
--- API
-function ct.distance(x1, y1, x2, y2)
-	local dx = x1 - x2
-	local dy = y1 - y2
-	return math.sqrt(dx * dx + dy * dy)
-end
-
 
 ---------------- Type Conversion API -----------------------------------------
-
--- API (Deprecated, use type cast instead)
-function ct.toInt(x)
-	return math.floor(x)
-end
 
 -- API
 function ct.parseInt(s)
@@ -111,18 +106,6 @@ function ct.parseInt(s)
 		end
 	end
 	return 0   -- failure
-end
-
--- API
-function ct.canParseInt(s)
-	if s ~= nil then
-		-- See if we can convert string to number
-		local i = tonumber(s)
-		if i and i == math.round(i) then
-			return true
-		end
-	end
-	return false
 end
 
 -- API
@@ -138,6 +121,18 @@ function ct.parseNumber(s)
 end
 
 -- API
+function ct.canParseInt(s)
+	if s ~= nil then
+		-- See if we can convert string to number
+		local i = tonumber(s)
+		if i and i == math.round(i) then
+			return true
+		end
+	end
+	return false
+end
+
+-- API
 function ct.canParseNumber(s)
 	if s ~= nil then
 		-- See if we can convert string to number
@@ -150,15 +145,6 @@ function ct.canParseNumber(s)
 end
 
 -- API
-function ct.formatDecimal(x, numPlaces)
-	if numPlaces then
-		numPlaces = g.forceNotNegative(numPlaces)
-		return string.format("%." .. numPlaces .. "f", x)
-	end
-	return tostring(x)
-end
-
--- API
 function ct.formatInt(i, numPlaces)
 	i = math.round(i)
 	if numPlaces then
@@ -166,6 +152,15 @@ function ct.formatInt(i, numPlaces)
 		return string.format("%0" .. numPlaces .. "d", i)
 	end
 	return tostring(i)
+end
+
+-- API
+function ct.formatDecimal(x, numPlaces)
+	if numPlaces then
+		numPlaces = g.forceNotNegative(numPlaces)
+		return string.format("%." .. numPlaces .. "f", x)
+	end
+	return tostring(x)
 end
 
 
@@ -225,6 +220,14 @@ function ct.restart()
 			error("restarted")   -- caught by the runtime
 		end
 	until false
+end
+
+
+-------------- Internal APIs for code gen (not documented) ----------------
+
+-- Return x truncated to an integer for an (int) type cast
+function ct.toInt(x)
+	return math.floor(x)
 end
 
 
