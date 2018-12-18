@@ -24,7 +24,7 @@ class Fish3D
 		fish.setSize( fish.getWidth() / z, fish.getHeight() / z );
 
 		// Set a scaled swimming speed based on distance
-		fish.setSpeed( 1 / z, 0 );
+		fish.setXSpeed( 1 / z );
 
 		// Make sure all fish start off-screen to the left
 		fish.x -= 120;

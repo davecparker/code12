@@ -27,7 +27,7 @@ class UserCode extends Code12Program
 		double x = (10 + 50 * 5    ///
 			+ (45 / 3 * 2))        ///  
 			/ 5.0;
-		int xInt = ct.toInt( x );
+		int xInt = (int) x;
 		String name = "Dave" + " " + "Parker";
 		boolean done, end;
 		// boolean _end = false;
@@ -181,7 +181,7 @@ class UserCode extends Code12Program
 	{
 		if (obj != null)
 		{
-			obj.setSpeed( .1, 0 );
+			obj.setXSpeed( .1 );
 			ct.println( obj.toString() + " was clicked" );
 		}
 		else
@@ -223,7 +223,7 @@ class UserCode extends Code12Program
 
 		for (double score : scores )
 		{
-			sum += ct.toInt( score );
+			sum += (int) score;
 		}
 
 // 		for (;;)

@@ -62,6 +62,77 @@ public class Game implements GameInterface
    }
 
 
+   //================ Graphics Object Creation API ===================
+   
+   public GameObj circle(double x, double y, double diameter)
+   {
+      return circle(x, y, diameter, "red");
+   }
+       
+   public GameObj circle(double x, double y, double diameter, String color)
+   {
+      GameObj obj = new GameCircle(this, x, y, diameter);
+      obj.setFillColor(color);
+      screen.addObj(obj);
+      return obj;
+   }
+
+   public GameObj rect(double x, double y, double width, double height)
+   {
+      return rect(x, y, width, height, "yellow");
+   }
+
+   public GameObj rect(double x, double y, double width, double height, String color)
+   {
+      GameObj obj = new GameRect(this, x, y, width, height);
+      obj.setFillColor(color);
+      screen.addObj(obj);
+      return obj;
+   }
+
+   public GameObj line(double x, double y, double x2, double y2)
+   {
+      return line(x, y, x2, y2, "black");
+   }
+                             
+   public GameObj line(double x, double y, double x2, double y2, String color)
+   {
+      GameObj obj = new GameLine(this, x, y, x2, y2);
+      obj.setLineColor(color);
+      screen.addObj(obj);
+      return obj;
+   }
+
+   public GameObj text(String text, double x, double y, double height)
+   {
+      return text(text, x, y, height, "black");
+   }
+   
+   public GameObj text(String text, double x, double y, double height, String color)
+   {
+      if (text == null)
+         text = "";
+         
+      GameObj obj = new GameText(this, text, x, y, height);
+      obj.setFillColor(color);
+      screen.addObj(obj);
+      return obj;
+   }
+
+   public GameObj image(String filename, double x, double y, double width)
+   {
+      GameImage obj = new GameImage(this, filename, x, y);
+      if (!obj.imageFound())
+      {
+         // Substitute text with red "X" for images that aren't found
+         return text("[x]", x, y, width, "red");
+      } 
+      obj.setSize(width, width * obj.height / obj.width);
+      screen.addObj(obj);
+      return obj;
+   }
+   
+
    //================ Text Output API ===================
 
    public void print(Object obj)
@@ -190,7 +261,14 @@ public class Game implements GameInterface
 
    //================ Screen Management API ===================
      
-   public void setTitle(String title)   { window.setTitle(title); }
+   public void setTitle(String title)       { window.setTitle(title); }
+   public double getWidth()                 { return WIDTH_L; }
+   public double getHeight()                { return heightL; }
+   public double getPixelsPerUnit()         { return scaleLToP; }
+   public String getScreen()                { return screen.name; }
+   public void clearScreen()                { screen.clear(null); }
+   public void clearGroup(String group)     { screen.clear(group); }
+
 
    public void setHeight(double height)
    {
@@ -202,11 +280,6 @@ public class Game implements GameInterface
       setPixelSize(widthP, heightP); 
    }
  
-   public double getWidth()          { return WIDTH_L; }
-   public double getHeight()         { return heightL; }
-   public double getPixelsPerUnit()  { return scaleLToP; }
-   public String getScreen()         { return screen.name; }
-
    public void setScreen(String name)
    {
       if (name == null)
@@ -226,16 +299,13 @@ public class Game implements GameInterface
          screens.put(name, screen);
       }  
    }
-   
+
    public void setScreenOrigin(double x, double y)
    {
       screen.xOrigin = x;
       screen.yOrigin = y;
    }
    
-   public void clearScreen()                { screen.clear(null); }
-   public void clearGroup(String group)     { screen.clear(group); }
-
    public void setBackColor(String name)
    { 
       GameObj rc = new GameRect(this, WIDTH_L / 2, heightL / 2, WIDTH_L, heightL); 
@@ -262,77 +332,6 @@ public class Game implements GameInterface
       }
    }
 
-
-   //================ GameObj Creation API ===================
-   
-   public GameObj circle(double x, double y, double diameter)
-   {
-      return circle(x, y, diameter, "red");
-   }
-       
-   public GameObj circle(double x, double y, double diameter, String color)
-   {
-      GameObj obj = new GameCircle(this, x, y, diameter);
-      obj.setFillColor(color);
-      screen.addObj(obj);
-      return obj;
-   }
-
-   public GameObj rect(double x, double y, double width, double height)
-   {
-      return rect(x, y, width, height, "yellow");
-   }
-
-   public GameObj rect(double x, double y, double width, double height, String color)
-   {
-      GameObj obj = new GameRect(this, x, y, width, height);
-      obj.setFillColor(color);
-      screen.addObj(obj);
-      return obj;
-   }
-
-   public GameObj line(double x, double y, double x2, double y2)
-   {
-      return line(x, y, x2, y2, "black");
-   }
-                             
-   public GameObj line(double x, double y, double x2, double y2, String color)
-   {
-      GameObj obj = new GameLine(this, x, y, x2, y2);
-      obj.setLineColor(color);
-      screen.addObj(obj);
-      return obj;
-   }
-
-   public GameObj text(String text, double x, double y, double height)
-   {
-      return text(text, x, y, height, "black");
-   }
-   
-   public GameObj text(String text, double x, double y, double height, String color)
-   {
-      if (text == null)
-         text = "";
-         
-      GameObj obj = new GameText(this, text, x, y, height);
-      obj.setFillColor(color);
-      screen.addObj(obj);
-      return obj;
-   }
-
-   public GameObj image(String filename, double x, double y, double width)
-   {
-      GameImage obj = new GameImage(this, filename, x, y);
-      if (!obj.imageFound())
-      {
-         // Substitute text with red "X" for images that aren't found
-         return text("[x]", x, y, width, "red");
-      } 
-      obj.setSize(width, width * obj.height / obj.width);
-      screen.addObj(obj);
-      return obj;
-   }
-   
 
    //=============== Mouse and Keyboard Input API =====================
    
@@ -366,7 +365,7 @@ public class Game implements GameInterface
    public void setSoundVolume(double d)        { audio.setVolume(d); }
  
 
-   //====================== Math and Misc. API ==========================
+   //====================== Math Utiliites API =========================
    
    public int random(int min, int max)
    {
@@ -380,8 +379,15 @@ public class Game implements GameInterface
    
    public double roundDecimal(double d, int numPlaces)
    {
+      if (numPlaces <= 0)
+         return Math.round(d);
       double f = Math.pow(10, numPlaces);
       return Math.rint(d * f) / f;
+   }
+   
+   public double distance(double x1, double y1, double x2, double y2)
+   {
+      return Math.hypot(x1 - x2, y1 - y2);
    }
    
    public int intDiv(int n, int d)
@@ -402,11 +408,99 @@ public class Game implements GameInterface
    {
       return Double.isNaN(d);
    }
+
+  
+   //===================== Type Conversion API ========================
    
-   public double distance(double x1, double y1, double x2, double y2)
+   public int toInt(double d)
    {
-      return Math.hypot(x1 - x2, y1 - y2);
+      return (int) d;
    }
+   
+   public int parseInt(String s)
+   {
+      int result = 0;  // if failure
+      try
+      {
+         result = Integer.parseInt(s.trim());
+      }
+      catch (Exception e)
+      {
+      }
+      return result;
+   }
+   
+   public double parseNumber(String s)
+   {      
+      double result = Double.NaN;   // if failure
+      try
+      {
+         result = Double.parseDouble(s.trim());
+      }
+      catch (Exception e)
+      {
+      }
+      return result;
+   }
+   
+   public boolean canParseInt(String s)
+   {
+      boolean result = true;
+      try
+      {
+         Integer.parseInt(s.trim());
+      }
+      catch (Exception e)
+      {
+         result = false;
+      }
+      return result;
+   }
+   
+   public boolean canParseNumber(String s)
+   {
+      boolean result = true;
+      try
+      {
+         Double.parseDouble(s.trim());
+      }
+      catch (Exception e)
+      {
+         result = false;
+      }
+      return result;
+   }
+   
+   public String formatInt(int i)
+   {
+      return String.valueOf(i);
+   }
+   
+   public String formatInt(int i, int numDigits)
+   {
+      if (numDigits <= 0)
+         return "";
+      
+      String fmt = "%0" + numDigits + "d";
+      return String.format(fmt, i);
+   }
+
+   public String formatDecimal(double d)
+   {
+      return String.valueOf(d);
+   }
+   
+   public String formatDecimal(double d, int numPlaces)
+   {
+      if (numPlaces <= 0)
+         return String.valueOf((int) Math.rint(d));
+      
+      String fmt = "%." + numPlaces + "f";
+      return String.format(fmt, d);
+   }
+   
+
+   //====================== Program Control API =========================
    
    public int getTimer()
    {
@@ -434,94 +528,7 @@ public class Game implements GameInterface
    public void restart()
    {
       logError("ct.restart() is not supported by the standalone Java runtime");
-   }
-   
-
-   //===================== Type Conversion API ========================
-   
-   public int toInt(double d)         { return (int) d; }
-   
-   public int parseInt(String s)
-   {
-      int result = 0;  // if failure
-      try
-      {
-         result = Integer.parseInt(s.trim());
-      }
-      catch (Exception e)
-      {
-      }
-      return result;
-   }
-   
-   public boolean canParseInt(String s)
-   {
-      boolean result = true;
-      try
-      {
-         Integer.parseInt(s.trim());
-      }
-      catch (Exception e)
-      {
-         result = false;
-      }
-      return result;
-   }
-   
-   public double parseNumber(String s)
-   {      
-      double result = Double.NaN;   // if failure
-      try
-      {
-         result = Double.parseDouble(s.trim());
-      }
-      catch (Exception e)
-      {
-      }
-      return result;
-   }
-   
-   public boolean canParseNumber(String s)
-   {
-      boolean result = true;
-      try
-      {
-         Double.parseDouble(s.trim());
-      }
-      catch (Exception e)
-      {
-         result = false;
-      }
-      return result;
-   }
-   
-   public String formatDecimal(double d)
-   {
-      return String.valueOf(d);
-   }
-   
-   public String formatDecimal(double d, int numPlaces)
-   {
-      if (numPlaces <= 0)
-         return String.valueOf((int) Math.rint(d));
-      
-      String fmt = "%." + numPlaces + "f";
-      return String.format(fmt, d);
-   }
-   
-   public String formatInt(int i)
-   {
-      return String.valueOf(i);
-   }
-   
-   public String formatInt(int i, int numDigits)
-   {
-      if (numDigits <= 0)
-         return "";
-      
-      String fmt = "%0" + numDigits + "d";
-      return String.format(fmt, i);
-   }
+   }   
 
 
    //===============================================================

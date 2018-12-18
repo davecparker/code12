@@ -17,6 +17,7 @@ local source = require( "source" )
 local buttons = require( "buttons" )
 local runtime = require( "Code12.runtime" )
 local runView = require( "runView" )
+local err = require( "err" )
 
 
 -- The toolbar module
@@ -44,11 +45,15 @@ local toolbarBtns         -- Array of buttons on the toolbar
 local function onChooseProgram()
 	runtime.clearProgram()
 	source.clear()
+	err.initProgram()
 	composer.gotoScene( "getFile" )
 end
 
 -- Event handler for the Options button
 local function onOptions()
+	if g.runState == "running" then
+		runtime.pause()
+	end
 	composer.gotoScene( "optionsView" )
 end
 
@@ -98,7 +103,7 @@ function toolbar.create()
 	toolbarBtns[#toolbarBtns + 1] = optionsBtn
 
 	-- Choose Program Button
-	chooseProgramBtn = buttons.newToolbarButton( toolbarGroup, "Choose Program", "choose-program-icon.png", 
+	chooseProgramBtn = buttons.newToolbarButton( toolbarGroup, "File", "choose-program-icon.png", 
 			onChooseProgram, "right", optionsBtn )
 	toolbarBtns[#toolbarBtns + 1] = chooseProgramBtn 
 
@@ -151,7 +156,7 @@ end
 function toolbar.update()
 	local runState = g.runState
 	if runState == "running" then
-		showButtons{ helpBtn, stopBtn, pauseBtn, gridBtn }
+		showButtons{ helpBtn, optionsBtn, stopBtn, pauseBtn, gridBtn }
 	elseif runState == "waiting" then
 		showButtons{ helpBtn, stopBtn, gridBtn }
 	elseif runState == "paused" then
