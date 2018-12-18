@@ -31,7 +31,6 @@ local optionsFont = app.optionsFont         -- Font for switch labels
 local optionsFontBold = app.optionsFontBold -- Font for title and switch headers
 local fontSize = app.optionsFontSize        -- Font size of switch headers and labels
 local switchSize = 16                       -- Size of radio buttons, checkboxes, and fillboxes
-local btnOutlineMargin = 4                  -- Outline margin for buttons
 
 -- Display objects and groups
 local title               -- Title text
@@ -140,12 +139,11 @@ local function makeOpenInEditorBtn( filename )
 	end
 	openInEditorBtn = buttons.newOptionButton{
 		parent = optionsGroup,
-		x = 0,
-		y = addEditorBtn.y + addEditorBtn.height + app.margin,
+		left = 0,
+		top = addEditorBtn.y + addEditorBtn.height + app.margin,
 		label = "Open " .. filename .. " in Editor",
 		font = optionsFont,
 		fontSize = fontSize,
-		outlineMargin = btnOutlineMargin,
 		onRelease = 
 			function ()
 				env.openFileInEditor( app.recentSourceFilePaths[1] )
@@ -173,13 +171,15 @@ local function makeScrollView( parent )
 		scrollView = nil
 	end
 	scrollView = widget.newScrollView{
-		top = title.y + title.height + app.margin,
-		left = 0,
+		x = 0,
+		y = title.y + title.height + app.margin,
 		width = app.width,
 		height = app.height - title.height - app.dyStatusBar,
 		isBounceEnabled = false,
 		backgroundColor = { 0.9 },
 	}
+	scrollView.anchorX = 0
+	scrollView.anchorY = 0
 	parent:insert( scrollView )
 	scrollView:insert( optionsGroup )
 	scrollView:setScrollWidth( optionsGroup.width )
@@ -303,8 +303,10 @@ function optionsView:create()
 	-- Close button
 	closeBtn = buttons.newIconAndTextButton{
 		parent = sceneGroup,
+		left = 0,
 		top = app.margin,
 		text = "Close",
+		colorText = true,
 		imageFile = "close.png",
 		iconSize = 12,
 		defaultFillShade = 1,
@@ -315,6 +317,8 @@ function optionsView:create()
 
 	-- Options display group
 	optionsGroup = display.newGroup()
+	optionsGroup.anchorX = 0
+	optionsGroup.anchorY = 0
 
 	-- Syntax level picker
 	local syntaxLevels = {
@@ -351,7 +355,7 @@ function optionsView:create()
 		parent = optionsGroup,
 		text = "Tab Width for Source Code Display",
 		x = 0,
-		y = levelPicker.y + levelPicker.height + sectionMargin,
+		y = math.round( levelPicker.y + levelPicker.height + sectionMargin ),
 		font = optionsFontBold,
 		fontSize = fontSize,
 	}
@@ -364,7 +368,7 @@ function optionsView:create()
 	-- Tab width picker
 	tabWidthPicker = widget.newSegmentedControl{
 		x = 0,
-		y = tabWidthHeader.y + tabWidthHeader.height + app.margin * 0.5,
+		y = math.round( tabWidthHeader.y + tabWidthHeader.height + app.margin * 0.5 ),
 		segments = tabWidths,
 		segmentWidth = 30,
 		defaultSegment = app.tabWidth - 1,
@@ -392,7 +396,7 @@ function optionsView:create()
 		style = "checkbox",
 		switchSize = switchSize,
 		x = 0,
-		y = tabWidthPicker.y + tabWidthPicker.height + sectionMargin,
+		y = math.round( tabWidthPicker.y + tabWidthPicker.height + sectionMargin ),
 		onPress = onVarWatchPress,
 	}
 
@@ -402,14 +406,14 @@ function optionsView:create()
 	-- Add Text Editor button
 	addEditorBtn = buttons.newOptionButton{
 		parent = optionsGroup,
-		x = math.round( editorPicker.x + switchSize + app.margin * 0.5 ),
-		y = editorPicker.y + editorPicker.height + app.margin * 0.5,
+		left = editorPicker.x + switchSize + app.margin * 0.5,
+		top = editorPicker.y + editorPicker.height + app.margin * 0.5,
 		onRelease = onAddEditor,
 		label = "Add a Text Editor",
 		font = optionsFont,
 		fontSize = fontSize,
-		outlineMargin = btnOutlineMargin,
 	}
+	print("addEditorBtn.y", addEditorBtn.y)
 
 	-- Center options group
 	if app.width > optionsGroup.width then
