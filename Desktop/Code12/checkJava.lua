@@ -376,7 +376,7 @@ local function defineMethod( func )
 	if syntaxLevel < 9 then
 		err.setErrNode( func, "Unknown function name\n"
 				.. "(Use of user-defined functions requires syntax level 9)" )
-		return
+		-- Let it get defined if correct anyway, so earlier calls don't error.
 	end
 	-- Check if already defined
 	local methodFound, methodCorrectCase, nameCorrectCase 
@@ -545,7 +545,7 @@ local function vtCheckLValue( lValue, assigned )
 				err.setErrNode( lValue, 
 						"Attempt to use function as a variable: missing ( ) for function call?" )
 			else
-				err.setErrNode( lValue, 'Unknown field "%s" for class %s',
+				err.setErrNode( lValue, 'Unknown field "%s" for type %s',
 						fieldID.str, className )
 			end
 			return nil
@@ -728,11 +728,11 @@ local function findObjectMethod( call )
 			local misName = findMisspelledName( nameStr, class.methods )
 			if misName then
 				err.setErrNodeAndRef( nameID, lValue, 
-						'Unknown or misspelled method for class %s, did you mean "%s" ?', 
+						'Unknown or misspelled method for type %s, did you mean "%s" ?', 
 						className, misName )
 			else
 				err.setErrNodeAndRef( nameID, lValue, 
-						'Unknown method "%s" for class %s', nameStr, className )
+						'Unknown method "%s" for type %s', nameStr, className )
 			end
 			return nil
 		end
@@ -1453,6 +1453,8 @@ function checkJava.checkProgram( programTree, level )
 			defineMethod( func )
 		end
 	end
+
+	-- Stop if there is an error in a function definition since 
 
 	-- Check instance vars
 	if vars then

@@ -109,7 +109,7 @@ local function writeLuaCode( codeStr )
 		outFile:write( "\n" )
 
 		-- Write the standalone init code
-		outFile:write( "\nrequire('Code12.api')\nrequire('Code12.runtime').run()\n" )
+		outFile:write( "\nrequire('Code12.api')\nrequire('Code12.runtime').initAndRun()\n" )
 		io.close( outFile )
 	end
 
@@ -394,6 +394,7 @@ end
 -- Init the app
 local function initApp()
 	-- Make the app context for the Code12 runtime to use
+	runtime.init()
 	runtime.appContext = {}
 
 	-- Make a default window title

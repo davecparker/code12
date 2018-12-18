@@ -23,7 +23,7 @@ class BubblePop
 			double y = ct.getHeight() + 25;
 			double size = ct.random(5, 20);
 			GameObj bubble = ct.image("bubble.png", x, y, size);
-			bubble.setSpeed(0, -1);
+			bubble.setYSpeed(-1);
 		}
 
 		// Check if any bubble got clicked

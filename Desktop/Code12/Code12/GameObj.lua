@@ -23,14 +23,6 @@ local GameObj = {}
 
 ---------------- Misc. Internal Functions  ----------------------------
 
--- Return 0 if num is negative, else num.
-local function forceNotNegative(num)
-	if num < 0 then
-		return 0
-	end
-	return num
-end
-
 -- Init the GameObj class
 local function initGameObjClass()
 	-- Create a dummy display object for deleted GameObj objects to reference,
@@ -45,8 +37,8 @@ end
  
 -- Update the size for a rectangular object
 local function updateSizeRect(gameObj, width, height, scale)
-	width = forceNotNegative(width)
-	height = forceNotNegative(height)
+	width = g.forceNotNegative(width)
+	height = g.forceNotNegative(height)
 	gameObj.width = width
 	gameObj.height = height
 	local obj = gameObj.obj
@@ -56,8 +48,8 @@ end
 
 -- Update the size for a circle object
 local function updateSizeCircle(gameObj, width, height, scale)
-	width = forceNotNegative(width)
-	height = forceNotNegative(height)
+	width = g.forceNotNegative(width)
+	height = g.forceNotNegative(height)
 	gameObj.width = width
 	gameObj.height = height
 	local obj = gameObj.obj
@@ -73,7 +65,7 @@ end
 
 -- Update the size for a text object (width is ignored)
 local function updateSizeText(gameObj, _, height, scale)
-	height = forceNotNegative(height)
+	height = g.forceNotNegative(height)
 	local prevHeight = gameObj.height
 	gameObj.height = height
 	-- Determine and set new font size
@@ -199,7 +191,7 @@ end
 
 -- Circle constructor
 function GameObj:newCircle(group, x, y, diameter, colorName)
-	diameter = forceNotNegative(diameter)
+	diameter = g.forceNotNegative(diameter)
 	local gameObj = GameObj:new("circle", x, y, diameter, diameter)
 	local scale = g.scale
 	gameObj:setObj(display.newCircle(group, x * scale, y * scale, 
@@ -214,8 +206,8 @@ end
 
 -- Rect constructor
 function GameObj:newRect(group, x, y, width, height, colorName)
-	width = forceNotNegative(width)
-	height = forceNotNegative(height)
+	width = g.forceNotNegative(width)
+	height = g.forceNotNegative(height)
 	local gameObj = GameObj:new("rect", x, y, width, height)
 	local scale = g.scale
 	gameObj:setObj(display.newRect(group, x * scale, y * scale, 
@@ -243,7 +235,7 @@ end
 -- Text constructor
 function GameObj:newText(group, text, x, y, height, colorName)
 	text = text or ""
-	height = forceNotNegative(height)
+	height = g.forceNotNegative(height)
 	local gameObj = GameObj:new("text", x, y, 0, height)  -- width set below
 	local scale = g.scale
 	local obj = display.newText(group, text, x * scale, y * scale, 
@@ -270,7 +262,7 @@ end
 
 -- Image constructor
 function GameObj:newImage(group, filename, x, y, width)
-	width = forceNotNegative(width)
+	width = g.forceNotNegative(width)
 	local scale = g.scale
 	if filename == "" then
 		filename = nil
@@ -728,6 +720,11 @@ function GameObj:getType()
 end
 
 -- API
+function GameObj:setSize(width, height)
+	self:updateSize(width, height, g.scale)
+end
+
+-- API
 function GameObj:getWidth()
 	return self.width
 end
@@ -738,21 +735,32 @@ function GameObj:getHeight()
 end
 
 -- API
-function GameObj:setSize(width, height)
-	self:updateSize(width, height, g.scale)
+function GameObj:setXSpeed(xSpeed)
+	self.xSpeed = xSpeed
+	self.hasSpeed = true
+	g.screen.hasSpeed = true
 end
 
 -- API
-function GameObj:setSpeed(xSpeed, ySpeed)
-	self.xSpeed = xSpeed
+function GameObj:setYSpeed(ySpeed)
 	self.ySpeed = ySpeed
 	self.hasSpeed = true
 	g.screen.hasSpeed = true
 end
 
 -- API
-function GameObj:getText()
-	return self.text
+function GameObj:getXSpeed()
+	return self.xSpeed
+end
+
+-- API
+function GameObj:getYSpeed()
+	return self.ySpeed
+end
+
+-- API
+function GameObj:align(alignment)
+	self:setAlignmentFromName(alignment or "center")
 end
 
 -- API
@@ -760,6 +768,11 @@ function GameObj:setText(text)
 	self.text = text
 	self.obj.text = text
 	-- TODO: Re-measure text
+end
+
+-- API
+function GameObj:getText()
+	return self.text
 end
 
 -- API
@@ -771,11 +784,6 @@ function GameObj:toString()
 		s = s .. " \"" .. self.text .. "\""
 	end
 	return s .. "]"
-end
-
--- API
-function GameObj:align(alignment)
-	self:setAlignmentFromName(alignment or "center")
 end
 
 -- API
@@ -823,11 +831,6 @@ function GameObj:setImage(filename)
 end
 
 -- API
-function GameObj:getLayer()
-	return self.layer
-end
-
--- API
 function GameObj:setLayer(layer)
 	-- Change the stored layer number
 	self.layer = layer
@@ -852,6 +855,11 @@ function GameObj:setLayer(layer)
 		runtime.warning("GameObj count now exceeds 1000")
 		g.screen.objsWarning = true
 	end
+end
+
+-- API
+function GameObj:getLayer()
+	return self.layer
 end
 
 -- API

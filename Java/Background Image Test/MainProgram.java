@@ -13,7 +13,7 @@ class MainProgram extends Code12Program
       double height = 224 / pixelsPerUnit;
       
       image = ct.image( "background.png", width, height, 100 );
-      image.setSpeed( 1, 0 );
+      image.setXSpeed( 1 );
    }
    
    public void update()
