@@ -80,6 +80,14 @@ function g.pinValue(value, min, max)
 	return value
 end
 
+-- Return 0 if num is negative, else num.
+function g.forceNotNegative(num)
+	if num < 0 then
+		return 0
+	end
+	return num
+end
+
 -- Create and return a display group in parent, optionally located at x, y
 function g.makeGroup(parent, x, y)
 	local group = display.newGroup()

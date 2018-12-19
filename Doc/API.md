@@ -30,8 +30,8 @@
 * [ct.getWidth()]
 * [ct.getHeight()]
 * [ct.getPixelsPerUnit()]
-* [ct.getScreen()]
 * [ct.setScreen()]
+* [ct.getScreen()]
 * [ct.setScreenOrigin()]
 * [ct.clearScreen()]
 * [ct.clearGroup()]
@@ -90,13 +90,16 @@
 
 ##### [GameObj Methods]	{#toc-gameobj-methods}
 * [obj.getType()]
+* [obj.setSize()]
 * [obj.getWidth()]
 * [obj.getHeight()]
-* [obj.setSize()]
-* [obj.setSpeed()]
+* [obj.setXSpeed()]
+* [obj.setYSpeed()]
+* [obj.getXSpeed()]
+* [obj.getYSpeed()]
 * [obj.align()]
-* [obj.getText()]
 * [obj.setText()]
+* [obj.getText()]
 * [obj.toString()]
 * [obj.setFillColor()]
 * [obj.setFillColorRGB()]
@@ -104,8 +107,8 @@
 * [obj.setLineColorRGB()]
 * [obj.setLineWidth()]
 * [obj.setImage()]
-* [obj.getLayer()]
 * [obj.setLayer()]
+* [obj.getLayer()]
 * [obj.delete()]
 * [obj.setClickable()]
 * [obj.clicked()]
@@ -178,7 +181,7 @@ ct.circle( 50, 70, 40, "blue" );
 ```
 ```
 GameObj ball = ct.circle( 0, 50, 10, "yellow" );
-ball.setSpeed( 1, 0 );
+ball.setXSpeed( 1 );
 ```
 ###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.circle()]
 
@@ -226,7 +229,7 @@ ct.rect( 50, 70, 80, 40, "blue" );
 ```
 ```
 GameObj platform = ct.rect( 0, 50, 30, 8, "orange" );
-platform.setSpeed( 1, 0 );
+platform.setXSpeed( 1 );
 ```
 ###### [Code12 Function Reference](#top) > [Graphics Object Creation] > [ct.rect()]
 
@@ -727,8 +730,8 @@ groups of objects.
 * [ct.getWidth()]
 * [ct.getHeight()]
 * [ct.getPixelsPerUnit()]
-* [ct.getScreen()]
 * [ct.setScreen()]
+* [ct.getScreen()]
 * [ct.setScreenOrigin()]
 * [ct.clearScreen()]
 * [ct.clearGroup()]
@@ -869,32 +872,6 @@ ct.circle( 50, 50, diameter );
 ###### [Code12 Function Reference](#top) > [Screen Management] > [ct.getPixelsPerUnit()]
 
 
-### ct.getScreen()
-Returns the name of the current screen, which is the most recent
-screen set using [ct.setScreen()].
-
-#### Syntax
-```
-ct.getScreen()
-```
-##### *Return Value*
-([String](#java-data-types)). The name of the current screen.
-The default screen name is `""` (empty string) if it has not been changed.
-
-#### Example
-```
-// If we are on the intro screen, then wait for a click 
-// to switch to the game screen.
-String screenName = ct.getScreen();
-if (screenName.equals( "intro" ))
-{
-    if (ct.clicked())
-    	ct.setScreen( "game" );
-}
-```
-###### [Code12 Function Reference](#top) > [Screen Management] > [ct.getScreen()]
-
-
 ### ct.setScreen()
 Sets the current screen to the screen with the specified name,
 creating a new screen if the screen name does not exist yet.
@@ -963,6 +940,32 @@ public void update()
 
 ```
 ###### [Code12 Function Reference](#top) > [Screen Management] > [ct.setScreen()]
+
+
+### ct.getScreen()
+Returns the name of the current screen, which is the most recent
+screen set using [ct.setScreen()].
+
+#### Syntax
+```
+ct.getScreen()
+```
+##### *Return Value*
+([String](#java-data-types)). The name of the current screen.
+The default screen name is `""` (empty string) if it has not been changed.
+
+#### Example
+```
+// If we are on the intro screen, then wait for a click 
+// to switch to the game screen.
+String screenName = ct.getScreen();
+if (screenName.equals( "intro" ))
+{
+    if (ct.clicked())
+    	ct.setScreen( "game" );
+}
+```
+###### [Code12 Function Reference](#top) > [Screen Management] > [ct.getScreen()]
 
 
 ### ct.setScreenOrigin()
@@ -2233,7 +2236,6 @@ public void update()
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.visible]
 
 
-
 ### obj.group
 ([String](#java-data-types)). An optional name that you can assign to a 
 [GameObj](#java-data-types) to associate it with other 
@@ -2290,13 +2292,16 @@ the `obj` can be any variable of type [GameObj](#java-data-types).
 The method function will access or modify the `obj` variable you specify.
 
 * [obj.getType()]
+* [obj.setSize()]
 * [obj.getWidth()]
 * [obj.getHeight()]
-* [obj.setSize()]
-* [obj.setSpeed()]
+* [obj.setXSpeed()]
+* [obj.setYSpeed()]
+* [obj.getXSpeed()]
+* [obj.getYSpeed()]
 * [obj.align()]
-* [obj.getText()]
 * [obj.setText()]
+* [obj.getText()]
 * [obj.toString()]
 * [obj.setFillColor()]
 * [obj.setFillColorRGB()]
@@ -2304,8 +2309,8 @@ The method function will access or modify the `obj` variable you specify.
 * [obj.setLineColorRGB()]
 * [obj.setLineWidth()]
 * [obj.setImage()]
-* [obj.getLayer()]
 * [obj.setLayer()]
+* [obj.getLayer()]
 * [obj.delete()]
 * [obj.setClickable()]
 * [obj.clicked()]
@@ -2337,6 +2342,61 @@ String type = dot.getType();
 ct.log( type );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getType()]
+
+
+### obj.setSize()
+Sets the size ([width](#graphics-coordinates) and [height](#graphics-coordinates)) 
+of a [GameObj](#java-data-types).
+
+#### Syntax
+```
+obj.setSize( width, height );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### width
+([double](#java-data-types)). The new [width](#graphics-coordinates) for the object. 
+
+##### height
+([double](#java-data-types)). The new [height](#graphics-coordinates) for the object. 
+
+#### Notes
+The different types of [GameObj](#java-data-types) objects
+react somewhat differently to changes in size, as follows:
+
+> ##### circle Objects
+> Although circles are always created round (see [ct.circle()]), you can create 
+> an ellipse by setting different `width` and `height` values.
+
+> ##### rect Objects
+> Rectangles (see [ct.rect()]) can be adjusted to any `width` and `height`.
+
+> ##### line Objects
+> For line objects (see [ct.line()]), the `width` and `height` specify 
+> offsets (positive or negative) from the first point to the second point.
+> The [obj.x] and [obj.y] data fields specify the location of the first point.
+> Calling `obj.setSize( width, height )` can be used to change the 
+> second point relative to the first point.
+
+> ##### text Objects
+> Text objects (see [ct.text()]) ignore the `width` passed. 
+> The `height` is used to set the new height and determine the 
+> new font size for the object, 
+> and the object's width is recalculated automatically.
+
+> ##### image Objects
+> Images (see [ct.image()]) are initially created with `height` calculated 
+> automatically to preserve the image's aspect ratio given the specified `width`.
+> However, once created, you can set any values for `width` and `height`,
+> and the image will scale and/or stretch as necessary to match the specified size.
+
+#### Example
+```
+GameObj blob = ct.circle( 50, 50, 30 );
+blob.setSize( 50, 30 );      // makes an ellipse
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSize()]
 
 
 ### obj.getWidth()
@@ -2396,68 +2456,13 @@ ct.log( heroHeight );
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getHeight()]
 
 
-### obj.setSize()
-Sets the size ([width](#graphics-coordinates) and [height](#graphics-coordinates)) 
-of a [GameObj](#java-data-types).
+### obj.setXSpeed()
+Sets the speed of a [GameObj](#java-data-types) in the x direction so that
+it moves horizontally on its own.
 
 #### Syntax
 ```
-obj.setSize( width, height );
-```
-##### obj
-([GameObj](#java-data-types)). The graphics object. 
-
-##### width
-([double](#java-data-types)). The new [width](#graphics-coordinates) for the object. 
-
-##### height
-([double](#java-data-types)). The new [height](#graphics-coordinates) for the object. 
-
-#### Notes
-The different types of [GameObj](#java-data-types) objects
-react somewhat differently to changes in size, as follows:
-
-> ##### circle Objects
-> Although circles are always created round (see [ct.circle()]), you can create 
-> an ellipse by setting different `width` and `height` values.
-
-> ##### rect Objects
-> Rectangles (see [ct.rect()]) can be adjusted to any `width` and `height`.
-
-> ##### line Objects
-> For line objects (see [ct.line()]), the `width` and `height` specify 
-> offsets (positive or negative) from the first point to the second point.
-> The [obj.x] and [obj.y] data fields specify the location of the first point.
-> Calling `obj.setSize( width, height )` can be used to change the 
-> second point relative to the first point.
-
-> ##### text Objects
-> Text objects (see [ct.text()]) ignore the `width` passed. 
-> The `height` is used to set the new height and determine the 
-> new font size for the object, 
-> and the object's width is recalculated automatically.
-
-> ##### image Objects
-> Images (see [ct.image()]) are initially created with `height` calculated 
-> automatically to preserve the image's aspect ratio given the specified `width`.
-> However, once created, you can set any values for `width` and `height`,
-> and the image will scale and/or stretch as necessary to match the specified size.
-
-#### Example
-```
-GameObj blob = ct.circle( 50, 50, 30 );
-blob.setSize( 50, 30 );      // makes an ellipse
-```
-###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSize()]
-
-
-### obj.setSpeed()
-Sets the speed of a [GameObj](#java-data-types) so that
-it moves on its own.
-
-#### Syntax
-```
-obj.setSpeed( xSpeed, ySpeed );
+obj.setXSpeed( xSpeed );
 ```
 ##### obj
 ([GameObj](#java-data-types)). The graphics object. 
@@ -2466,25 +2471,99 @@ obj.setSpeed( xSpeed, ySpeed );
 ([double](#java-data-types)). The horizontal speed for the object in 
 [x coordinate](#graphics-coordinates) units per animation frame. 
 
-##### ySpeed
-([double](#java-data-types)). The vertical speed for the object in 
-[y coordinate](#graphics-coordinates) units per animation frame.  
-
 #### Notes
-Before each new animation frame, the `xSpeed` and `ySpeed` are added to
-the [obj.x] and [obj.y] fields of the object, respectively. 
+Before each new animation frame, the value of `xSpeed` is added to
+the [obj.x] field of the object. 
 Animation frames occur 60 times per second, so an `xSpeed` of `1.0` will 
-cause the object to  move to the right at 60 units per second.
+cause the object to move to the right at 60 units per second.
 
-The `xSpeed` and `ySpeed` can be negative, so for example, a `ySpeed`
-of `-0.5` will cause the object to move up at 30 units per second.
+The `xSpeed` can be negative, so for example, an `xSpeed` of
+`-0.5` will cause the object to move to the left at 30 units per second.
 
 #### Example
 ```
-GameObj dot = ct.circle( 0, 70, 10 );
-dot.setSpeed( 0.3, -0.1 );
+GameObj dot = ct.circle( 0, 50, 10 );
+dot.setXSpeed( 0.3 );
 ```
-###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setSpeed()]
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setXSpeed()]
+
+
+### obj.setYSpeed()
+Sets the speed of a [GameObj](#java-data-types) in the y direction so that
+it moves vertically on its own.
+
+#### Syntax
+```
+obj.setYSpeed( ySpeed );
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### ySpeed
+([double](#java-data-types)). The vertical speed for the object in 
+[y coordinate](#graphics-coordinates) units per animation frame. 
+
+#### Notes
+Before each new animation frame, the value of `ySpeed` is added to
+the [obj.y] field of the object. 
+Animation frames occur 60 times per second, so a `ySpeed` of `1.0` will 
+cause the object to move downward at 60 units per second.
+
+The `ySpeed` can be negative, so for example, an `ySpeed` of
+`-0.5` will cause the object upwards at 30 units per second.
+
+#### Example
+```
+GameObj dot = ct.circle( 50, 100, 10 );
+dot.setYSpeed( -0.3 );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setYSpeed()]
+
+
+### obj.getXSpeed()
+Returns the horizontal speed of an object as set by [obj.setXSpeed()].
+
+#### Syntax
+```
+obj.getXSpeed()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([double](#java-data-types)). The horizontal speed of the object in 
+[coordinate units](#graphics-coordinates) per animation frame.
+
+#### Example
+```
+GameObj dot = ct.circle( 50, 50, 10 );
+dot.setXSpeed( ct.random( -2, 2 ) / 3.0 );
+ct.println( "Speed = " + dot.getXSpeed() );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getXSpeed()]
+
+
+### obj.getYSpeed()
+Returns the vertical speed of an object as set by [obj.setYSpeed()].
+
+#### Syntax
+```
+obj.getYSpeed()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([double](#java-data-types)). The vertical speed of the object in 
+[coordinate units](#graphics-coordinates) per animation frame.
+
+#### Example
+```
+GameObj dot = ct.circle( 50, 50, 10 );
+dot.setYSpeed( ct.random( -2, 2 ) / 3.0 );
+ct.println( "Speed = " + dot.getYSpeed() );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getYSpeed()]
 
 
 ### obj.align()
@@ -2533,6 +2612,50 @@ score.align( "top right" );
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.align()]
 
 
+### obj.setText()
+Sets the text of a [GameObj](#java-data-types).
+
+#### Syntax
+```
+obj.setText( text )
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### text
+([String](#java-data-types)). The text to store in the object,
+or `null` for none.
+For a text object (see [ct.text()]), this becomes the visible text.
+For other objects, this is just a string kept inside the object,
+which can be used to identity or describe the object (see [obj.getText()]).
+
+#### Notes
+For an image object (see [ct.image()]), the text defaults to the 
+image filename, but you can change it to something else.
+
+For circle, rect, and line objects, the default text is `null` (none). 
+
+The [obj.toString()] method includes the object text, if any,
+in the description of an object.
+
+#### Example
+```
+GameObj message;
+
+public void start()
+{
+	message = ct.text( "Waiting for a click", 50, 50, 10 );
+}
+
+public void update()
+{
+	if (ct.clicked())
+		message.setText( "You clicked" );
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setText()]
+
+
 ### obj.getText()
 Returns the text of a [GameObj](#java-data-types).
 
@@ -2577,50 +2700,6 @@ public void update()
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getText()]
-
-
-### obj.setText()
-Sets the text of a [GameObj](#java-data-types).
-
-#### Syntax
-```
-obj.setText( text )
-```
-##### obj
-([GameObj](#java-data-types)). The graphics object. 
-
-##### text
-([String](#java-data-types)). The text to store in the object,
-or `null` for none.
-For a text object (see [ct.text()]), this becomes the visible text.
-For other objects, this is just a string kept inside the object,
-which can be used to identity or describe the object (see [obj.getText()]).
-
-#### Notes
-For an image object (see [ct.image()]), the text defaults to the 
-image filename, but you can change it to something else.
-
-For circle, rect, and line objects, the default text is `null` (none). 
-
-The [obj.toString()] method includes the object text, if any,
-in the description of an object.
-
-#### Example
-```
-GameObj message;
-
-public void start()
-{
-	message = ct.text( "Waiting for a click", 50, 50, 10 );
-}
-
-public void update()
-{
-	if (ct.clicked())
-		message.setText( "You clicked" );
-}
-```
-###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setText()]
 
 
 ### obj.toString()
@@ -2874,30 +2953,6 @@ if (hero.hit( bullet ))
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setImage()]
 
 
-### obj.getLayer()
-Returns the layer number for a [GameObj](#java-data-types). 
-See [obj.setLayer()].
-
-#### Syntax
-```
-obj.getLayer()
-```
-##### obj
-([GameObj](#java-data-types)). The graphics object. 
-
-##### *Return Value*
-([int](#java-data-types)). The layer number as set by [obj.setLayer()], which
-helps determine the stacking order of objects.
-
-#### Example
-```
-GameObj target = ct.objectClicked();
-if (target != null && target.getLayer() == 0)
-	ct.println( "You clicked on one of the background items" );
-```
-###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getLayer()]
-
-
 ### obj.setLayer()
 Sets the layer number for a [GameObj](#java-data-types),
 which helps controls the stacking order of objects on the screen.
@@ -2962,6 +3017,30 @@ public void update()
 target.setLayer( target.getLayer() );
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.setLayer()]
+
+
+### obj.getLayer()
+Returns the layer number for a [GameObj](#java-data-types). 
+See [obj.setLayer()].
+
+#### Syntax
+```
+obj.getLayer()
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+##### *Return Value*
+([int](#java-data-types)). The layer number as set by [obj.setLayer()], 
+(or the default of 1), which helps determine the stacking order of objects.
+
+#### Example
+```
+GameObj target = ct.objectClicked();
+if (target != null && target.getLayer() == 0)
+	ct.println( "You clicked on one of the background items" );
+```
+###### [Code12 Function Reference](#top) > [GameObj Methods] > [obj.getLayer()]
 
 
 ### obj.delete()
@@ -3241,8 +3320,7 @@ public void start()
 	c.group = "targets";
 
 	bullet = ct.rect( 70, 100, 1, 10 );
-	bullet.setSpeed( 0, -1 );
-
+	bullet.setYSpeed( -1 );
 }
 
 public void update()

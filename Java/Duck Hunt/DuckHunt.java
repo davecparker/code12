@@ -44,15 +44,15 @@ public class DuckHunt extends Code12Program
 		double scoreHeight = 5;
 		String scoreColor = "dark magenta";
 		ducksHitDisplay = ct.text( "Ducks hit: ", 0, yMax, scoreHeight, scoreColor );
-		ducksHitDisplay.align( "bottom left", true );
+		ducksHitDisplay.align( "bottom left" );
 
 		// Make accuracyDisplay
 		accuracyDisplay = ct.text( "Shot Accuracy: ", 100, yMax, scoreHeight, scoreColor );
-		accuracyDisplay.align( "bottom right", true );
+		accuracyDisplay.align( "bottom right" );
 
 		// Make gun
 		gun = ct.image( "gun.png", 50, yMax - scoreHeight, 8 );
-		gun.align( "bottom", true );
+		gun.align( "bottom" );
 
 		// Initialize arrays
 		maxSize = 20;
@@ -67,11 +67,26 @@ public class DuckHunt extends Code12Program
 
 	public void update()
 	{
+		// Move the gun horizontally and fire a bullet when screen is clicked
+		if (ct.clicked())
+		{
+			// Play squirt sound
+			ct.sound( "squirt.wav" );
+
+			// Move the gun horizontally to match the click location
+			gun.x = ct.clickX();
+
+			// Fire a new bullet
+			double xStart = gun.x;
+			double yStart = gun.y - gun.getHeight() * 0.9;
+			fireBullet( xStart, yStart );
+		}
+
 		// Make ducks at random times and positions
 		if (ct.random(1, 50) == 1)
 		{
 			double x = ct.random( 110, 130 );
-			double y = ct.random( 10, ct.toInt(yMax / 2) );
+			double y = ct.random( 10, (int) (yMax / 2) );
 			GameObj duck = createDuck( x, y, -0.5 );
 		}
 
@@ -147,7 +162,7 @@ public class DuckHunt extends Code12Program
 		{
 			//GameObj bullet = ct.circle( xStart, yStart, 1, "blue" );
 			bullet = ct.rect( xStart, yStart, 0.5, 2, "blue" );
-			bullet.ySpeed = -2;
+			bullet.setYSpeed( -2 );
 			bulletsArr[bulletsCount] = bullet;
 			bulletsCount++;
 		}
@@ -178,7 +193,7 @@ public class DuckHunt extends Code12Program
 		if ( ducksCount < maxSize )
 		{
 			duck = ct.image( "rubber-duck.png", xStart, yStart, 5 );
-			duck.xSpeed = xSpeed;
+			duck.setXSpeed( xSpeed );
 			ducksArr[ducksCount] = duck;
 			duckYStartsArr[ducksCount] = yStart;
 			ducksCount++;
@@ -207,26 +222,9 @@ public class DuckHunt extends Code12Program
 	// Makes a dead duck at duck's position
 	GameObj makeDeadDuck( GameObj duck )
 	{
-		GameObj deadDuck = ct.image( "dead-duck.png", duck.x, duck.y, duck.height );
-		deadDuck.autoDelete = true;
-		deadDuck.ySpeed = 1;
+		GameObj deadDuck = ct.image( "dead-duck.png", duck.x, duck.y, duck.getHeight() );
+		deadDuck.setYSpeed( 1 );
 		return deadDuck;
-	}
-
-	// Moves the gun horizontally and fires a bullet when the mouse
-	// is clicked
-	public void onMousePress( GameObj obj, double x, double y )
-	{
-		// Play squirt sound
-		ct.sound( "squirt.wav" );
-
-		// Move the gun horizontally to match the click location
-		gun.x = x;
-
-		// Fire a new bullet
-		double xStart = gun.x;
-		double yStart = gun.y - gun.height * 0.9;
-		fireBullet( xStart, yStart );
 	}
 
 	// Main method

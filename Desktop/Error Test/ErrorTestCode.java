@@ -24,9 +24,9 @@ import java.util.Scanner;
 	GameObj button = ct.text("START", 0, 0, 10);
 	// ERROR "cannot be called before start()"
 	int intResult = intFunc();
-	// ERROR "Class-level variable and function definitions should all have the same indentation"
+	// ERROR "Class-level variable and function blocks should all have the same indentation"
 		int overIndentedInstanceVar;
-	// ERROR "Class-level variable and function definitions should all have the same indentation"
+	// ERROR "Class-level variable and function blocks should all have the same indentation"
 int underIndentedInstanceVar;
 	// ERROR "The lines after the first line of a multi-line statement should be indented further than the first line"
 	int[] classLevelMultilineIntArray1 = { 1,
@@ -636,11 +636,11 @@ int underIndentedInstanceVar;
 		d = ct.getVersion();
 		ct.round(ct.getVersion());
 		// Code12 API -- Type Conversion
-		i = ct.toInt(d);
-		i = ct.toInt(d * i);
-		i = ct.toInt(.707);
-		i = ct.toInt(Math.PI);
-		i = ct.toInt(6.0221409e+2);
+		i = (int) d;
+		i = (int) (d * i);
+		i = (int) .707;
+		i = (int) Math.PI;
+		d = (double) i / i;
 		i = ct.parseInt(s);
 		i = ct.parseInt("345");
 		b = ct.canParseInt(s);
@@ -675,8 +675,8 @@ int underIndentedInstanceVar;
 		img.setSize(img.getWidth() * 1.1, img.getHeight() * 1.1);
 		rect.setSize(10, 30);
 		d = img.getHeight();
-		circle.setSpeed(0, 3);
-		rect.setSpeed(0.1, d / 2);
+		circle.setYSpeed(circle.getYSpeed() + 3);
+		rect.setXSpeed(circle.getXSpeed());
 		text.align(s);
 		text.align("left");
 		text.align("right");
@@ -1692,11 +1692,11 @@ int underIndentedInstanceVar;
 	void onCharTyped( GameObj keyName )
 	{
 	}
-	// ERROR "Class-level variable and function definitions should all have the same indentation"
+	// ERROR "Class-level variable and function blocks should all have the same indentation"
 		void overIndentedFunc()
 		{
 		}
-	// ERROR "Class-level variable and function definitions should all have the same indentation"
+	// ERROR "Class-level variable and function blocks should all have the same indentation"
 void underIndentedFunc()
 {
 }
@@ -2832,7 +2832,7 @@ void underIndentedFunc()
 			boolVar = true;
 		// ERROR "compare for equality"
 		if (rect.x = 100)
-			rect.setSpeed(-1, 0);
+			rect.setXSpeed(-1);
 		// ERROR "compare for equality"
 		boolVar = (1 + 1 = 2);
 		// ERROR "compare for equality"
