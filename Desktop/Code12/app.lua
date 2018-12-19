@@ -23,7 +23,7 @@ local app =  {
 	fontSizeUI = 12,
 	optionsFont = native.systemFont,
 	optionsFontBold = native.systemFontBold,
-	optionsFontSize = 12,
+	optionsFontSize = 14,
 
 	-- Web folders
 	webHelpDir = "http://www.code12.org/docs/1/",
