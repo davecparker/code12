@@ -2857,6 +2857,11 @@ void underIndentedFunc()
 		ct.println(2 >> 1);
 		// ERROR "operator is not supported"
 		ct.println(2 << 1);
+		// ERROR "GameObj methods must be called on a GameObj variable"
+		ct.println( ct.getType( circle ) );
+		// ERROR "GameObj methods must be called on a GameObj variable"
+		if ( ct.hit( objArr[intVar] ) )
+			ct.logm( "hit", objArr[intVar], intVar );
 	}
 	// ERROR "The ending } of the program class should not be indented"
 	}

@@ -4837,7 +4837,7 @@
                                 stmts:
 2581.                                call println { class = ct }
 2586.        func testErrors1 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 2860, #stmts = 108, iLineBegin = 2587 }
+                block: block { iLineEnd = 2865, #stmts = 110, iLineBegin = 2587 }
                     stmts:
 2588.                    var intVar { vt = int, initExpr = 1 }
 2589.                    var dblVar { vt = double, initExpr = 1.2 }
@@ -5379,6 +5379,24 @@
 2859.                    call println { #exprs = 1, class = ct }
                             exprs:
                                 (<<) { right = 1, left = 2 }
+2861.                    call println { #exprs = 1, class = ct }
+                            exprs:
+                                call getType { #exprs = 1, class = ct }
+                                    exprs:
+                                        lValue { varID = circle }
+2863.                    if
+                            expr: call hit { #exprs = 1, class = ct }
+                                exprs:
+                                    lValue { varID = objArr }
+                                        indexExpr: lValue { varID = intVar }
+                            block: block { #stmts = 1 }
+                                stmts:
+2864.                                call logm { #exprs = 3, class = ct }
+                                        exprs:
+2864.                                        ("hit")
+                                            lValue { varID = objArr }
+                                                indexExpr: lValue { varID = intVar }
+                                            lValue { varID = intVar }
         vars:
   7.        var classLevelInt { vt = int, isGlobal = true, initExpr = 0 }
   8.        var classLevelDouble { vt = double, isGlobal = true, initExpr = 0 }
