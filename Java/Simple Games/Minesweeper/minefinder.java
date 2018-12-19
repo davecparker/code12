@@ -1,6 +1,6 @@
 import Code12.*;
 
-class minesweeper extends Code12Program
+class Minesweeper extends Code12Program
 {  
       int columns = 20;
       int rows = 14;
@@ -64,10 +64,10 @@ class minesweeper extends Code12Program
                   if( y >= 0 && y < rows )
                   {
                         int i = (y * columns) + x;
-                           if( i >= 0 && i <= squares.length - 1 )
-                           {
+                        if( i >= 0 && i <= squares.length - 1 )
+                        {
                               return true;
-                           }
+                        }
                   }
             }
             

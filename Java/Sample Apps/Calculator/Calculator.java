@@ -1,6 +1,6 @@
 import Code12.*;
 
-public class MainProgram extends Code12Program
+public class Calculator extends Code12Program
 {
 	//Instance Variables
 	GameObj display;
