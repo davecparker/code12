@@ -1511,6 +1511,209 @@ can be written.
 
 
 ### Parameters
+Just like many [function calls] to [Code12 functions](API.html) 
+require *parameters* to specify input values for the function,
+you can [define your own functions](#function-definitions) 
+that take parameters. This provides an easy way for the calling 
+code to supply additional information needed by the function.
+
+#### Examples
+Here is a more useful version of the first example sample shown 
+in [Function Definitions]:
+```
+class Example
+{
+	public void start()
+	{
+		// Make 4 targets at specified locations
+		makeTarget( 30, 30 );
+		makeTarget( 30, 70 );
+		makeTarget( 70, 30 );
+		makeTarget( 70, 70 );
+	}
+
+	// The function makeTarget() makes a target at the (x, y)
+	// location specified by its parameters.
+
+	void makeTarget(double x, double y)
+	{
+		ct.circle( x, y, 15, "red" );
+		ct.circle( x, y, 10, "white" );
+		ct.circle( x, y, 5, "red" );
+	}
+}
+```
+This is an example of defining a function that takes parameters
+and also returns a value:
+```
+class Example
+{
+	public void start()
+	{
+		// Compute and print 4 averages
+		ct.println( average( 10, 20 ) );
+		ct.println( average( 3, 4 ) );
+		ct.println( average( -5, 5 ) );
+		ct.println( average( 1.432, 5.902 ) );
+	}
+
+	double average(double a, double b)
+	{
+		double ave = (a + b) / 2;
+		return ave;
+	}
+}
+```
+#### Notes
+When you define a function that requires one or more parameters, 
+you need to *declare* (specify) the parameter(s) in the function 
+definition header, such as:
+```
+void makeTarget(double x, double y)
+```
+Here the first parameter is declared as `double x`, which means that 
+the value passed by the caller must be of type `double` (or `int`,
+which can automatically convert to `double`), and that the code in 
+the function body will refer to this value as the variable `x`.
+
+The parameter variables that are declared in a function header
+(`x` and `y` above) act like *local variables* (see [Variables]),
+because they are only defined within the body of the function being
+defined. A parameter variable comes into existance at the beginning 
+of the function body, where it is initialized to the value passed 
+in the function call, and ends at the end of the function body.
+Because a parameter variable is local, it doesn't matter if it
+shares the same name as a parameter in another function definition.
+If two function definitions both have a parameter named `x`, these
+are different variables and will not interfere with each other.
+
+> To help avoid mistakes, Code12 will not allow you to declare a
+> parameter with the same name as a class-level (non-local) variable,
+> although Java normally allows this.
+
+#### More Examples
+When you define a function, it is up to you to design how you want it
+to be called, including what parameters it will take and whether it has
+a return value. Consider this example:
+```
+class Example
+{
+	public void start()
+	{
+		// Make 3 coins
+		makeCoin( 20, 30, "orange" );
+		makeCoin( 40, 30, "light gray" );
+		makeCoin( 60, 30, "orange" );
+
+		// Make one more coin and make it drop
+		GameObj dime = makeCoin( 80, 30, "light gray" );
+		dime.setYSpeed( 0.5 );
+	}
+
+	// Make and return a round coin at (x, y) with the given color.
+	GameObj makeCoin( double x, double y, String color )
+	{
+		GameObj coin = ct.circle( x, y, 10, color );
+		coin.setLineColor( "gray" );
+		coin.setLineWidth( 2 );
+		return coin;
+	}
+}
+```
+The program above defines a "helper function" to make creating coins
+easier, because all coins need a certain line color and line width
+(so these are set in the helper function `makeCoin()`), but the (x, y)
+position and color varies, so these are passed as parameters.
+In addition, function `makeCoin()` returns the `GameObj` for the coin
+that was created so that the caller can capture this object and make
+further changes to it if desired (to make the last coin drop).
+
+The function header:
+```
+GameObj makeCoin( double x, double y, String color )
+```
+can be read as *"function `makeCoin()` takes 3 parameters: two values of type
+`double` then a value of type `String`. The function returns a `GameObj`"*.
+Furthermore, when reading the code that makes up the body of `makeCoin()`,
+there are variables that store the 1st, 2nd, and 3rd parameter values passed 
+named `x`, `y`, and `color`, respectively.
+
+##### Functions Calling Other Functions
+Remember that functions that you can define can also call other functions
+that you define (or functions defined by Code12), which allows you
+to create layers of capability. This powerful technique allows 
+programmers to manage the complexity of large programs. For example,
+consider this rewrite of the example above:
+```
+class Example
+{
+	public void start()
+	{
+		// Make 3 coins
+		makePenny( 20, 30 );
+		makeDime( 40, 30 );
+		makePenny( 60, 30 );
+
+		// Make one more dime and make it drop
+		GameObj dime = makeDime( 80, 30 );
+		dime.setYSpeed( 0.5 );
+	}
+
+	// Make a penny at the given location and return its GameObj
+	GameObj makePenny( double x, double y )
+	{
+		return makeCoin( x, y, "orange" );
+	}
+
+	// Make a dime at the given location and return its GameObj
+	GameObj makeDime( double x, double y )
+	{
+		return makeCoin( x, y, "light gray" );
+	}
+
+	// Make and return a round coin at (x, y) with the given color.
+	GameObj makeCoin( double x, double y, String color )
+	{
+		GameObj coin = ct.circle( x, y, 10, color );
+		coin.setLineColor( "gray" );
+		coin.setLineWidth( 2 );
+		return coin;
+	}
+}
+```
+The code in `start()` is now even simpler and easier to understand,
+and it would be even easier to extend to create more coins as desired.
+
+Here are some things to notice about the code above:
+
+The order of statements starts out as follows:
+
+1. `start()` calls `makePenny()`
+2. `makePenny()` then calls `makeCoin()`
+3. `makeCoin()` then calls `ct.circle()`
+4. The `ct.circle()` function definition is inside
+Code12 (where you can't see it). When it finishes,
+execution continues inside `makeCoin()`.
+5. When `makeCoin()` finishes, control returns to
+`makePenny()`, returning the same `GameObj` that got created, 
+which then returns to `start()` again returning the same `GameObj`.
+6. This puts the program back in `start()`, now at the 
+first call to `makeDime()`, which starts a similar sequence.
+
+The `x` and `y` parameters declared in `makePenny()`, `makeDime()`,
+and `makeCoin()` are all different variables and do not interfere 
+with each other. 
+
+A `return` statement can return a variable value, an expression value,
+or the result of another function call directly, so when `makePenny()` 
+does:
+```
+return makeCoin( x, y, "orange" );
+```
+this calls `makeCoin()` and then takes the return value 
+of the call (here a `GameObj`) and passes it on as the return value 
+from `makePenny()`.
+
 
 ###### [Java Language Help](#top) > [Parameters]
 

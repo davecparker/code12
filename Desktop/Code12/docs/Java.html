@@ -808,6 +808,137 @@ public void update()
 <p>Once you understand and start to master this technique, you will come to understand how very complex programs can be written.</p>
 <h6 id="java-language-help-function-definitions"><a href="#top">Java Language Help</a> &gt; <a href="#function-definitions">Function Definitions</a></h6>
 <h3 id="parameters-1">Parameters</h3>
+<p>Just like many <a href="#function-calls">function calls</a> to <a href="API.html">Code12 functions</a> require <em>parameters</em> to specify input values for the function, you can <a href="#function-definitions">define your own functions</a> that take parameters. This provides an easy way for the calling code to supply additional information needed by the function.</p>
+<h4 id="examples-7">Examples</h4>
+<p>Here is a more useful version of the first example sample shown in <a href="#function-definitions">Function Definitions</a>:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 4 targets at specified locations
+        makeTarget( 30, 30 );
+        makeTarget( 30, 70 );
+        makeTarget( 70, 30 );
+        makeTarget( 70, 70 );
+    }
+
+    // The function makeTarget() makes a target at the (x, y)
+    // location specified by its parameters.
+
+    void makeTarget(double x, double y)
+    {
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+    }
+}</code></pre>
+<p>This is an example of defining a function that takes parameters and also returns a value:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Compute and print 4 averages
+        ct.println( average( 10, 20 ) );
+        ct.println( average( 3, 4 ) );
+        ct.println( average( -5, 5 ) );
+        ct.println( average( 1.432, 5.902 ) );
+    }
+
+    double average(double a, double b)
+    {
+        double ave = (a + b) / 2;
+        return ave;
+    }
+}</code></pre>
+<h4 id="notes-9">Notes</h4>
+<p>When you define a function that requires one or more parameters, you need to <em>declare</em> (specify) the parameter(s) in the function definition header, such as:</p>
+<pre><code>void makeTarget(double x, double y)</code></pre>
+<p>Here the first parameter is declared as <code>double x</code>, which means that the value passed by the caller must be of type <code>double</code> (or <code>int</code>, which can automatically convert to <code>double</code>), and that the code in the function body will refer to this value as the variable <code>x</code>.</p>
+<p>The parameter variables that are declared in a function header (<code>x</code> and <code>y</code> above) act like <em>local variables</em> (see <a href="#variables">Variables</a>), because they are only defined within the body of the function being defined. A parameter variable comes into existance at the beginning of the function body, where it is initialized to the value passed in the function call, and ends at the end of the function body. Because a parameter variable is local, it doesn’t matter if it shares the same name as a parameter in another function definition. If two function definitions both have a parameter named <code>x</code>, these are different variables and will not interfere with each other.</p>
+<blockquote>
+<p>To help avoid mistakes, Code12 will not allow you to declare a parameter with the same name as a class-level (non-local) variable, although Java normally allows this.</p>
+</blockquote>
+<h4 id="more-examples-1">More Examples</h4>
+<p>When you define a function, it is up to you to design how you want it to be called, including what parameters it will take and whether it has a return value. Consider this example:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 3 coins
+        makeCoin( 20, 30, &quot;orange&quot; );
+        makeCoin( 40, 30, &quot;light gray&quot; );
+        makeCoin( 60, 30, &quot;orange&quot; );
+
+        // Make one more coin and make it drop
+        GameObj dime = makeCoin( 80, 30, &quot;light gray&quot; );
+        dime.setYSpeed( 0.5 );
+    }
+
+    // Make and return a round coin at (x, y) with the given color.
+    GameObj makeCoin( double x, double y, String color )
+    {
+        GameObj coin = ct.circle( x, y, 10, color );
+        coin.setLineColor( &quot;gray&quot; );
+        coin.setLineWidth( 2 );
+        return coin;
+    }
+}</code></pre>
+<p>The program above defines a “helper function” to make creating coins easier, because all coins need a certain line color and line width (so these are set in the helper function <code>makeCoin()</code>), but the (x, y) position and color varies, so these are passed as parameters. In addition, function <code>makeCoin()</code> returns the <code>GameObj</code> for the coin that was created so that the caller can capture this object and make further changes to it if desired (to make the last coin drop).</p>
+<p>The function header:</p>
+<pre><code>GameObj makeCoin( double x, double y, String color )</code></pre>
+<p>can be read as <em>“function <code>makeCoin()</code> takes 3 parameters: two values of type <code>double</code> then a value of type <code>String</code>. The function returns a <code>GameObj</code>”</em>. Furthermore, when reading the code that makes up the body of <code>makeCoin()</code>, there are variables that store the 1st, 2nd, and 3rd parameter values passed named <code>x</code>, <code>y</code>, and <code>color</code>, respectively.</p>
+<h5 id="functions-calling-other-functions-1">Functions Calling Other Functions</h5>
+<p>Remember that functions that you can define can also call other functions that you define (or functions defined by Code12), which allows you to create layers of capability. This powerful technique allows programmers to manage the complexity of large programs. For example, consider this rewrite of the example above:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 3 coins
+        makePenny( 20, 30 );
+        makeDime( 40, 30 );
+        makePenny( 60, 30 );
+
+        // Make one more dime and make it drop
+        GameObj dime = makeDime( 80, 30 );
+        dime.setYSpeed( 0.5 );
+    }
+
+    // Make a penny at the given location and return its GameObj
+    GameObj makePenny( double x, double y )
+    {
+        return makeCoin( x, y, &quot;orange&quot; );
+    }
+
+    // Make a dime at the given location and return its GameObj
+    GameObj makeDime( double x, double y )
+    {
+        return makeCoin( x, y, &quot;light gray&quot; );
+    }
+
+    // Make and return a round coin at (x, y) with the given color.
+    GameObj makeCoin( double x, double y, String color )
+    {
+        GameObj coin = ct.circle( x, y, 10, color );
+        coin.setLineColor( &quot;gray&quot; );
+        coin.setLineWidth( 2 );
+        return coin;
+    }
+}</code></pre>
+<p>The code in <code>start()</code> is now even simpler and easier to understand, and it would be even easier to extend to create more coins as desired.</p>
+<p>Here are some things to notice about the code above:</p>
+<p>The order of statements starts out as follows:</p>
+<ol type="1">
+<li><code>start()</code> calls <code>makePenny()</code></li>
+<li><code>makePenny()</code> then calls <code>makeCoin()</code></li>
+<li><code>makeCoin()</code> then calls <code>ct.circle()</code></li>
+<li>The <code>ct.circle()</code> function definition is inside Code12 (where you can’t see it). When it finishes, execution continues inside <code>makeCoin()</code>.</li>
+<li>When <code>makeCoin()</code> finishes, control returns to <code>makePenny()</code>, returning the same <code>GameObj</code> that got created, which then returns to <code>start()</code> again returning the same <code>GameObj</code>.</li>
+<li>This puts the program back in <code>start()</code>, now at the first call to <code>makeDime()</code>, which starts a similar sequence.</li>
+</ol>
+<p>The <code>x</code> and <code>y</code> parameters declared in <code>makePenny()</code>, <code>makeDime()</code>, and <code>makeCoin()</code> are all different variables and do not interfere with each other.</p>
+<p>A <code>return</code> statement can return a variable value, an expression value, or the result of another function call directly, so when <code>makePenny()</code> does:</p>
+<pre><code>return makeCoin( x, y, &quot;orange&quot; );</code></pre>
+<p>this calls <code>makeCoin()</code> and then takes the return value of the call (here a <code>GameObj</code>) and passes it on as the return value from <code>makePenny()</code>.</p>
 <h6 id="java-language-help-parameters"><a href="#top">Java Language Help</a> &gt; <a href="#parameters-1">Parameters</a></h6>
 <h3 id="loops">Loops</h3>
 <h6 id="java-language-help-loops"><a href="#top">Java Language Help</a> &gt; <a href="#loops">Loops</a></h6>
