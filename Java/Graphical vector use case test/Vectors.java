@@ -36,8 +36,8 @@ public class Vectors extends Code12Program
 
     public void defineVector(int i)
     {
-        int x = ct.random(-1, ct.toInt(ct.getWidth()) - 1);
-        int y = ct.random(-1, ct.toInt(ct.getHeight()) - 1);
+        int x = ct.random(-1, (int)(ct.getWidth()) - 1);
+        int y = ct.random(-1, (int)(ct.getHeight()) - 1);
         if (vectors[i] == null)
             vectors[i] = ct.circle(x, y, 2);
         else
@@ -70,7 +70,7 @@ public class Vectors extends Code12Program
     public void defineLine(int i, int j)
     {
         GameObj line = ct.line(vectors[i].x, vectors[i].y, vectors[j].x, vectors[j].y);
-        int minShade = ct.toInt(Math.min(shades[i], shades[j]));
+        int minShade = (int)(Math.min(shades[i], shades[j]));
         line.setLineColorRGB(minShade, minShade, minShade);
         line.group = "lines";
         line.setLayer(0);

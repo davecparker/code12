@@ -12,7 +12,7 @@
 
 // Type Conversion
 // ---------------
-// int ct.toInt( double d )                // truncates
+// int (int)( double d )                // truncates
 // int ct.parseInt( String s )             // 0 if failure
 // boolean ct.canParseInt( String s )
 // double ct.parseNumber( String s )       // NaN if failure
@@ -145,9 +145,9 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    
    public void testToInt( double d, int expected )
    {
-   	double output = ct.toInt(d);
+   	double output = (int)(d);
    	if ( output != expected )
-   	   printError( "ct.toInt(" + d + ") = " + output + "; " + expected + " expected" );
+   	   printError( "(int)(" + d + ") = " + output + "; " + expected + " expected" );
    }
    
    public void testParseInt( String s, int expected )
@@ -421,7 +421,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	   double hours = days * 24;
    	   double minutes = hours * 60;
    	   double seconds = minutes * 60 - countDownSec;
-   	   int extraTimeMs = ct.toInt(seconds * 1000);
+   	   int extraTimeMs = (int)(seconds * 1000);
    	   startTimeMs = ct.getTimer() - extraTimeMs;
    	   
    	   ct.println( "ct.getTimer() = "+ct.getTimer()+" when called from start()" );
@@ -433,7 +433,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	if ( run )
    	{
    	   int currentMs = ct.getTimer();
-   	   timerDisplay.setText( "Timer millis: " + ct.toInt(currentMs - startTimeMs) );
+   	   timerDisplay.setText( "Timer millis: " + (int)(currentMs - startTimeMs) );
    	   int secondsTillRollover = countDownSec - ct.intDiv(currentMs, 1000);
    	   countDownDisplay.setText( "Countdown to rollover: " + secondsTillRollover );
    	}
@@ -460,7 +460,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	   testToInt( 2147483647 * 1.0, 2147483647 );
    	   testToInt( -2147483648 * 1.0, -2147483648 );
 
-   	   ct.println( "ct.toInt tests done" );
+   	   ct.println( "(int) tests done" );
    	}
    }
    	

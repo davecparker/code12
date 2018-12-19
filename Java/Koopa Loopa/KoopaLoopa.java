@@ -39,7 +39,7 @@ public class KoopaLoopa extends Code12Program
       }
       
       // Make the ground
-      int numberOfTiles = ct.toInt(100 / tileSize) + 1;
+      int numberOfTiles = (int)(100 / tileSize) + 1;
       for (int i = 0; i < numberOfTiles; i++)
       {
          for ( int j = 0; j < 2; j++ )

@@ -90,7 +90,7 @@ public class EventsWhiteBoxTest extends Code12Program
                   if ( boxes[i*j].containsPoint(x,y) )
                   {
                      boxes[i*j].setFillColor("red");
-                     ct.println("A tile located at: [" + ct.toInt(boxes[i*j].x) + "," + ct.toInt(boxes[i*j].y) + " ] was clicked.");
+                     ct.println("A tile located at: [" + (int)(boxes[i*j].x) + "," + (int)(boxes[i*j].y) + " ] was clicked.");
                   }
                }
             

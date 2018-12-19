@@ -19,7 +19,7 @@ class MoreInputTesting extends Code12Program
       circles = new GameObj[number];
       for ( int i = 0; i < circles.length; i++ )
       {
-         circles[i] = ct.circle(ct.random(0,ct.toInt(ct.getWidth()) ), ct.random(0, ct.toInt(ct.getHeight()) ), ct.random(1,25));
+         circles[i] = ct.circle(ct.random(0,(int)(ct.getWidth()) ), ct.random(0, (int)(ct.getHeight()) ), ct.random(1,25));
          for ( int j = 0; j < colors.length; j++ )
          {
             circles[i].setFillColor(colors[j]);

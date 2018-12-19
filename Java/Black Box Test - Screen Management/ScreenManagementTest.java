@@ -173,8 +173,8 @@ class ScreenManagementTest extends Code12Program
          {
             // Make a shape or image on the screen in a random spot
             int shapeNum = ct.random( 1, 4 );
-            double x = ct.random( 0, ct.toInt(ct.getWidth()) );
-            double y = ct.random( 0, ct.toInt(ct.getHeight()) );
+            double x = ct.random( 0, (int)(ct.getWidth()) );
+            double y = ct.random( 0, (int)(ct.getHeight()) );
             GameObj shape;
             if ( shapeNum == 1 )
             {

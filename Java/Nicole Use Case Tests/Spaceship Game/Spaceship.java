@@ -66,7 +66,7 @@ public class Spaceship extends Code12Program
       asteroid.clickable = false;
       bg.clickable = false;
       rayGun.visible = false;
-      ct.setTitle( ct.toInt( 60 - (ct.getTimer() / 1000.0 ) ) + " seconds until the black hole" );
+      ct.setTitle( (int)( 60 - (ct.getTimer() / 1000.0 ) ) + " seconds until the black hole" );
       // Set the initial background down
       bg.ySpeed = 0.5;
       // Set the top background moving down
@@ -92,7 +92,7 @@ public class Spaceship extends Code12Program
          if ( spaceship.y <= asteroid.y )
          {
             asteroid.delete();
-            asteroid = ct.image("asteroid.png", ct.random(10,100),ct.random(ct.toInt(spaceship.y) - 10,100), ct.random(10,30) );
+            asteroid = ct.image("asteroid.png", ct.random(10,100),ct.random((int)(spaceship.y) - 10,100), ct.random(10,30) );
          }
 
           
@@ -114,7 +114,7 @@ public class Spaceship extends Code12Program
       if ( hit < 5 )
       {
          asteroid.delete();
-         asteroid = ct.image("asteroid.png", ct.random(10,100),ct.random(ct.toInt(spaceship.y),100), ct.random(10,30) );
+         asteroid = ct.image("asteroid.png", ct.random(10,100),ct.random((int)(spaceship.y),100), ct.random(10,30) );
       }
       
      

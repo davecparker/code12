@@ -156,7 +156,7 @@ public class Paint extends Code12Program
       if ( x > palette.width + 2 )
       {
          brush = ct.line( lastX, lastY, x, y ,currentColor);
-         brush.lineWidth = ct.toInt(size);
+         brush.lineWidth = (int)(size);
          // draw a bounding circle between lines (endpoints)
          if ( size == 6 || size == 8 )
             c = ct.circle(x, y, size / 10, currentColor);

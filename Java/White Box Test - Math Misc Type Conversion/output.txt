@@ -515,7 +515,7 @@ ct.distance(1.7976931348623e+308,0,0,0) = 1.#INF; 1.7976931348623e+308 expected
 ct.distance(0,1.7976931348623e+308,0,0) = 1.#INF; 1.7976931348623e+308 expected
 ct.distance tests done
 ct.getVersion tests done
-ct.toInt tests done
+(int) tests done
 ct.parseInt(5.0) = 5; 0 expected
 ct.parseInt tests done
 ct.canParseInt(5.0) = true; false expected

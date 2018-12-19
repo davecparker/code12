@@ -24,7 +24,7 @@
 
 // Type Conversion
 // ---------------
-// int ct.toInt( double d )                // truncates
+// int (int)( double d )                // truncates
 
 import Code12.*;
 
@@ -53,8 +53,8 @@ class RandomWalk extends Code12Program
    {
       // Choose a random direction
       String direction; // "up", "down", "left", "right"
-      int column = ct.toInt( marker.x / unitsPerSquare + 0.5 );
-      int row = ct.toInt( marker.y / unitsPerSquare + 0.5 );
+      int column = (int)( marker.x / unitsPerSquare + 0.5 );
+      int row = (int)( marker.y / unitsPerSquare + 0.5 );
       
       if ( row == 1 && column == 1)
       {
@@ -207,8 +207,8 @@ class RandomWalk extends Code12Program
       yMax = ct.getHeight();
       pixelsPerUnit = ct.getPixelsPerUnit();
       unitsPerSquare = pixelsPerSquare / pixelsPerUnit;
-      rowCount = ct.toInt( yMax / unitsPerSquare );
-      columnCount = ct.toInt( xMax / unitsPerSquare );
+      rowCount = (int)( yMax / unitsPerSquare );
+      columnCount = (int)( xMax / unitsPerSquare );
       
       // Draw horizontal lines
       for ( int i = 0; i < rowCount; i++ )
