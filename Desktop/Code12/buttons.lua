@@ -32,49 +32,6 @@ local dropDownSheet = graphics.newImageSheet( "images/drop-down.png", { width = 
 
 --- Module Functions ------------------------------------------------
 
--- Create and return a new button widget for the options view with 
--- standard color and shape
--- options = {
---     parent = (optional) display group to insert the widget into
---     x = x-value to position the button at (with anchorX = 0),
---     y = y-value to position the button at (with anchorY = 0),
---     onRelease = listener function for the button,
---     label = string for the button's label,
---     font = font for the button's label,
---     fontSize = fontSize for the button's label,
---     outlineMargin = Space between button edges and button label
--- }
-function buttons.newOptionButton( options )
-	local btnOutlineMargin = options.outlineMargin
-	-- Get width and height of label for determining button size
-	local tempText = display.newText( options.label, 0, 0, options.font, options.fontSize )
-	local labelWidth = tempText.width;
-	local labelHeight = tempText.height;
-	tempText:removeSelf()
-	-- Make button
-	local button = widget.newButton{
-		x = options.x,
-		y = options.y,
-		onRelease = options.onRelease,
-		label = options.label,
-		font = options.font,
-		fontSize = options.fontSize,
-		width = labelWidth + btnOutlineMargin * 2,
-		height = labelHeight + btnOutlineMargin * 2,
-		labelColor = { default = { 0 }, over = { 0 } },
-		fillColor = { default = { 1 }, over = { 0.8 } },
-		strokeColor = { default = { 0 }, over = { 0 } },
-		strokeWidth = 1,
-		shape = "roundedRect",
-	}
-	button.anchorX = 0
-	button.anchorY = 0
-	if options.parent then
-		options.parent:insert( button )
-	end
-	return button
-end
-
 -- Create and return a new display group containing a header and set of setting switches,
 -- options = {
 --     parent = (optional) display group to insert the widget into,
@@ -158,9 +115,10 @@ function buttons.newSettingPicker( options )
 			frameOn = 1,
 			frameOff = 2,
 			x = 0,
-			y = switchLabel.y + switchLabel.height / 2 - switchesGroup.y,
+			y = math.round( switchLabel.y + switchLabel.height / 2 - switchesGroup.y - options.switchSize / 2 ),
 		}
 		switch.anchorX = 0
+		switch.anchorY = 0
 		switchesGroup:insert( switch )
 		offset = math.ceil( offset + math.max( switch.height, switchLabel.height ) )
 	end
@@ -184,47 +142,55 @@ function buttons.newSettingPicker( options )
 	return newSettingPickerGroup
 end
 
--- Return a display group containing a new button, icon, and text
+-- Create and return a display group containing a new button, icon, and text
+-- options = {
+-- 	parent = (optional) parent display group,
+-- 	left = x value for left of the display group (anchorX = 0),
+-- 	top = y value for top of the display group (anchorY = 0),
+-- 	width = (optional) width for the button (defaults to fit icon and text)
+-- 	text = string for label,
+-- 	font = (optional) fort for label (defaults to native.systemFontBold)
+-- 	fontSize = (optional) font size for label (defaults to app.fontSizeUI)
+-- 	colorText = (optional) true to use labelColor for text and icon (defaults to black)
+-- 	imageFile = (optional) string for image file name,
+-- 	iconSize = (optional) size of the icon (width and height) if imageFile is given (defaults to fontSize),
+-- 	defaultFillShade = default shade for the button,
+-- 	overFillShade = shade for when the button is pressed,
+-- 	onRelease = listener function for button,
+-- }
 function buttons.newIconAndTextButton( options )
-	-- options = {
-	-- 	parent = (optional) parent display group,
-	-- 	left = x value for left of the display group (anchorX = 0),
-	-- 	top = y value for top of the display group (anchorY = 0),
-	-- 	text = string for label,
-	-- 	imageFile = string for image file name,
-	-- 	iconSize = size of the icon (width and height),
-	-- 	defaultFillShade = default shade for the button,
-	-- 	overFillShade = shade for when the button is pressed,
-	-- 	onRelease = listener function for button
-	-- }
 	local btnOutlineMargin = 4 -- space between edge of button and icon/label
-	local iconLabelMargin = 5  -- space between icon and label
+	local iconLabelMargin = 4  -- space between icon and label
 	-- Make button display group
 	local btnGroup = g.makeGroup( options.parent )
 	btnGroup.anchorX = 0
 	btnGroup.anchorY = 0
-	btnGroup.x = options.left
-	btnGroup.y = options.top
+	btnGroup.x = math.round( options.left )
+	btnGroup.y = math.round( options.top )
 	-- Make button icon
-	local icon = display.newImageRect( btnGroup, "images/" .. options.imageFile, options.iconSize, options.iconSize )
-	icon.anchorX = 0
-	-- icon.anchorY = 0
-	icon.x = btnOutlineMargin
-	-- icon.y = btnOutlineMargin
-	icon:setFillColor( unpack( labelColor ) )
+	local icon = nil
+	local iconSize = nil
+	if options.imageFile then
+		iconSize = (options.iconSize or options.fontSize) or app.fontSizeUI
+		icon = display.newImageRect( btnGroup, "images/" .. options.imageFile, iconSize, iconSize )
+		g.uiItem( icon )
+		if options.colorText then
+			icon:setFillColor( unpack( labelColor ) )
+		end
+	end
 	-- Make button label
-	local label = display.newText{
+	local label = g.uiItem( display.newText{
 		parent = btnGroup,
 		text = options.text,
-		x = math.round(icon.x + options.iconSize + iconLabelMargin),
 		height = 0,
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
-	}
-	label.anchorX = 0
-	label:setFillColor( unpack( labelColor ) )
+		font = options.font or native.systemFontBold,
+		fontSize = options.fontSize or app.fontSizeUI,
+	} )
+	if options.colorText then
+		label:setFillColor( unpack( labelColor ) )
+	end
 	-- Make button
-	local btnHeight = math.max( options.iconSize, label.height ) + btnOutlineMargin * 2
+	local btnHeight = math.max( iconSize or 0, label.height ) + btnOutlineMargin * 2
 	local btn = widget.newButton{
 		x = 0,
 		y = 0,
@@ -236,71 +202,75 @@ function buttons.newIconAndTextButton( options )
 		fillColor = { default = { options.defaultFillShade }, over = { options.overFillShade } },
 		strokeColor = { default = { app.borderShade }, over = { app.borderShade } },
 		strokeWidth = 1,
-		width = options.iconSize + label.width + btnOutlineMargin * 2 + iconLabelMargin,
+		width = options.width or ((options.iconSize or 0) + label.width + btnOutlineMargin * 2 + iconLabelMargin),
 		height = btnHeight,
 	}
 	btn.anchorX = 0
 	btn.anchorY = 0
 	-- Add btn to btnGroup
 	btnGroup:insert( 1, btn )
-	-- Center icon and label vertically in button
+	btnGroup.btn = btn
+	-- Position icon and label in button
 	local yBtnCenter = btnHeight / 2
-	icon.y = yBtnCenter
-	label.y = math.round( yBtnCenter )
+	local xBtnLabel
+	if icon then
+		icon.x = btnOutlineMargin
+		icon.y = math.round( yBtnCenter - icon.height / 2 )
+		xBtnLabel = math.round( icon.x + icon.width + iconLabelMargin )
+	else
+		xBtnLabel = btnOutlineMargin
+	end
+	label.x = xBtnLabel
+	label.y = math.round( yBtnCenter - label.height / 2 )
 
 	return btnGroup
 end
 
+-- Create and return a button with standard colors for the options view
+-- options = {
+--     parent = (optional) display group to insert the widget into
+--     x = x-value to position the button at (with anchorX = 0),
+--     y = y-value to position the button at (with anchorY = 0),
+--     onRelease = listener function for the button,
+--     label = string for the button's label,
+--     font = font for the button's label,
+--     fontSize = fontSize for the button's label,
+-- }
+function buttons.newOptionButton( options )
+	local button = buttons.newIconAndTextButton{
+		parent = options.parent,
+		left = options.left,
+		top = options.top,
+		text = options.label,
+		font = options.font,
+		fontSize = options.fontSize,
+		defaultFillShade = 1,
+		overFillShade = 0.8,
+		onRelease = options.onRelease,
+	}
+	return button
+end
+
 -- Return a display group containing a new button and its icon for the toolbar.
 -- Placement can be "left" or "right" to place the button on that side of the toolbar.
+-- Width is optional, defaults to fit icon and label 
 function buttons.newToolbarButton( parent, label, imageFile, onRelease, placement, adjacentBtn, width )
-	local iconSize = 16
-	local padding = 10
 	-- Make button display group
-	local btnGroup = display.newGroup()
-	parent:insert( btnGroup )
-	btnGroup.anchorX = 0
-	btnGroup.y = app.dyToolbar / 2
-	-- Make button icon
-	local icon = display.newImageRect( parent, "images/" .. imageFile, iconSize, iconSize )
-	icon.anchorX = 0
-	icon.x = padding / 2
-	icon:setFillColor( unpack( labelColor ) )
-	-- Make button label
-	local labelText = display.newText{
+	local btnGroup = buttons.newIconAndTextButton{
+		parent = parent,
+		left = 0,
+		top = 0,
+		width = width,
 		text = label,
-		x = math.round( icon.x + icon.width + margin / 2 ),
-		y = 0,
-		height = 0,
-		font = native.systemFontBold,
-		fontSize = app.fontSizeUI,
+		colorText = true,
+		imageFile = imageFile,
+		iconSize = 16,
+		defaultFillShade = app.toolbarShade * 1.125,
+		overFillShade = 1,
+		onRelease = onRelease,
 	}
-	labelText.anchorX = 0
-	labelText.anchorY = 0
-	labelText.y = math.round( -labelText.height / 2 )
-	labelText:setFillColor( unpack( labelColor ) )
-	-- Make button
-	local btn = widget.newButton{
-		x = 0,
-		y = 0,
-		onRelease = 
-			function ()
-				onRelease()
-			end,
-		shape = "roundedRect",
-		fillColor = { default = { app.toolbarShade * 1.125 }, over = { 1 } },
-		strokeColor = { default = { app.borderShade }, over = { app.borderShade } },
-		strokeWidth = 1,
-		width = width or icon.width + labelText.width + padding + margin / 2,
-		height = app.dyToolbar * 0.6,
-	}
-	btn.anchorX = 0
-	-- Add btn, icon and labelText to btnGroup
-	-- btn.width = icon.width + labelText.width + padding + margin / 2
-	btnGroup:insert( btn )
-	btnGroup:insert( icon )
-	btnGroup:insert( labelText )
-	btnGroup.btn = btn
+	local btn = btnGroup.btn
+	btnGroup.y = math.round( app.dyToolbar / 2 - btn.height / 2 )
 	-- Set horizontal position of button group
 	if placement == "left" then
 		if adjacentBtn then
