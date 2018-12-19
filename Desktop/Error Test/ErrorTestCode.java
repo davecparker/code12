@@ -4,8 +4,8 @@ import java.util.Scanner;
 	class ErrorTest extends Code12Program
 // ERROR "should not be indented"
 		{
-	int classLevelInt = 0;
-	double classLevelDouble = 0;
+	public int classLevelInt = 0;
+	private double classLevelDouble = 0;
 	boolean classLevelBoolean = false;
 	String classLevelString = "";
 	boolean classLevelBoolean2 = classLevelString.equals("");
@@ -1212,7 +1212,7 @@ int underIndentedInstanceVar;
 		// ERROR "Array index must be an integer value"
 		intArr[dblVar] = 1;
 
-		// ERROR "Arrays can only access their ".length" field
+		// ERROR "Arrays can only access their ".length" field"
 		int numObjs = objArr.Length;
 
 		// ERROR "Type String has no data fields"
@@ -1304,7 +1304,7 @@ int underIndentedInstanceVar;
 
 		// ERROR "An index in [brackets] can only be applied to an array"
 		boolVar[0].log(objVar);
-		// ERROR "was unexpected here"
+		// ERROR "Syntax Error: "[" was unexpected here"
 		dblVar = Math[intVar].tan(0);
 		
 		// ERROR "Method call on invalid type (array of int)"
@@ -1554,40 +1554,40 @@ int underIndentedInstanceVar;
 			voidFunc();
 		if (false)
 			voidFunc();
-		// ERROR This line is not controlled by the highlighted "if" above it"
+		// ERROR "This line is not controlled by the "if" above it"
 			voidFunc();
 		if (false)
 			voidFunc();
 		else
 			voidFunc();
-		// ERROR This line is not controlled by the highlighted "else" above it"
+		// ERROR "This line is not controlled by the "else" above it"
 			voidFunc();
 		if (false)
 			voidFunc();
 		else if (false)
 			voidFunc();
-		// ERROR This line is not controlled by the highlighted "elseif" above it"
+		// ERROR "This line is not controlled by the "elseif" above it"
 			voidFunc();
 		if (false)
 			voidFunc();
-		// ERROR This line is not controlled by the highlighted "if" above it"
+		// ERROR "This line is not controlled by the "if" above it"
 			while (false)
 				voidFunc();
 		for (;false;)
 			voidFunc();
-		// ERROR This line is not controlled by the highlighted "for" above it"
+		// ERROR "This line is not controlled by the "for" above it"
 			voidFunc();	
 		while (false)
 			voidFunc();
-		// ERROR This line is not controlled by the highlighted "while" above it"
+		// ERROR "This line is not controlled by the "while" above it"
 			voidFunc();
 		do
 			voidFunc();
-		// ERROR This line is not controlled by the highlighted "do" above it"
+		// ERROR "This line is not controlled by the "do" above it"
 			voidFunc();
 		do
 			voidFunc();
-			// ERROR This line is not controlled by the highlighted "do" above it"
+			// ERROR "This line is not controlled by the "do" above it"
 			while (false)
 		// ERROR "Access specifiers are only allowed on class-level variables"
 		private int privateInt = 0;
@@ -2862,6 +2862,38 @@ void underIndentedFunc()
 		// ERROR "GameObj methods must be called on a GameObj variable"
 		if ( ct.hit( objArr[intVar] ) )
 			ct.logm( "hit", objArr[intVar], intVar );
+			// ERROR "This line is not controlled by the" if above it.
+			{
+			// ERROR "Unexpected {"
+			{
 	}
+	// ERROR "Unexpected or extra {"
+	{
+		undefinedVar++;
+		undefinedFunc();
+	}
+	void funcWithOverIndentedBracket()
+		// ERROR "should have the same indentation"
+		{
+		}
+	// ERROR "Code12 does not support additional class definitions"
+	private class NestedClass
+	{
+		int nestedClassClassVar;
+		undefinedFunc( undefinedVar );
+		// ERROR "Unexpected change in indentation"
+				undefinedVar++;
+	}
+	// ERROR "Statement must be inside a function body"
+	undefinedFunc( undefinedVar );
+	// ERROR "Statement must be inside a function body"
+	--undefinedVar;
+// -- End of class ---------------------------------------------------
 	// ERROR "The ending } of the program class should not be indented"
 	}
+// -------------------------------------------------------------------
+// ERROR "Code12 does not allow defining additional classes"
+public class AdditionalClass
+// "Unexpected line after end of class" (if previous error is commented out)
+	undefinedFunc( undefinedVar );
+		undefinedVar++;

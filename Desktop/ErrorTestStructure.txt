@@ -1,4 +1,4 @@
-    program ErrorTest { #funcs = 111, #vars = 86 }
+    program ErrorTest { #funcs = 112, #vars = 86 }
         funcs:
 174.        func emptyFunc { #paramVars = 0, vt = void }
                 block: block { iLineEnd = 176, #stmts = 0, iLineBegin = 175 }
@@ -4837,7 +4837,7 @@
                                 stmts:
 2581.                                call println { class = ct }
 2586.        func testErrors1 { #paramVars = 0, vt = void }
-                block: block { iLineEnd = 2865, #stmts = 110, iLineBegin = 2587 }
+                block: block { iLineEnd = 2869, #stmts = 110, iLineBegin = 2587 }
                     stmts:
 2588.                    var intVar { vt = int, initExpr = 1 }
 2589.                    var dblVar { vt = double, initExpr = 1.2 }
@@ -5397,6 +5397,8 @@
                                             lValue { varID = objArr }
                                                 indexExpr: lValue { varID = intVar }
                                             lValue { varID = intVar }
+2875.        func funcWithOverIndentedBracket { #paramVars = 0, vt = void }
+                block: block { iLineEnd = 2878, #stmts = 0, iLineBegin = 2877 }
         vars:
   7.        var classLevelInt { vt = int, isGlobal = true, initExpr = 0 }
   8.        var classLevelDouble { vt = double, isGlobal = true, initExpr = 0 }
