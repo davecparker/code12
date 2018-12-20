@@ -130,7 +130,7 @@ public class DuckHuntLineHits extends Code12Program
 				ct.println("duck #" + ducksMissed + " hit left wall");
 			}
 			else
-				//duck.ySpeed = ct.random( -1, 1 ) / 4.0;
+				//duck.setYSpeed( ct.random( -1, 1 ) / 4.0 );
 				duck.y = duckYStartsArr[j] + amplitude * Math.sin( 2 * Math.PI / period * duck.x );
 		}
 
