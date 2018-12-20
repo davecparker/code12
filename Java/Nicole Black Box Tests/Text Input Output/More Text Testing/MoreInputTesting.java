@@ -1,12 +1,12 @@
 import Code12.*;
 
-GameObj[] circles;
-String[] colors = {"black", "white", "red", "green", "blue", "cyan", "magenta", "yellow"};
-boolean speed;
-int yourSpeed;
-
 class MoreInputTesting extends Code12Program
 {
+
+   GameObj[] circles;
+   String[] colors = {"black", "white", "red", "green", "blue", "cyan", "magenta", "yellow"};
+   boolean speed;
+   int yourSpeed;
 
    public static void main(String[] args)
    { 
@@ -15,8 +15,8 @@ class MoreInputTesting extends Code12Program
    
    public void start()
    {
-      int number = ct.inputInt("Enter number of circles to be drawn");
-      circles = new GameObj[number];
+      int numCircles = ct.inputInt("Enter number of circles to be drawn");
+      circles = new GameObj[numCircles];
       for ( int i = 0; i < circles.length; i++ )
       {
          circles[i] = ct.circle(ct.random(0,(int)(ct.getWidth()) ), ct.random(0, (int)(ct.getHeight()) ), ct.random(1,25));
@@ -43,7 +43,7 @@ class MoreInputTesting extends Code12Program
       {
             for ( int i = 0; i < circles.length; i++ )
             {
-               circles[i].xSpeed = ct.random(1, 5);
+               circles[i].setXSpeed( ct.random(1, 5) );
             }
       }
 
@@ -51,14 +51,13 @@ class MoreInputTesting extends Code12Program
       {
          for ( int i = 0; i < circles.length; i++ )
          {
-            circles[i].xSpeed = yourSpeed;
+            circles[i].setXSpeed( yourSpeed );
          }
       }
 
       for ( int i = 0; i < circles.length; i++ )
       {
          wrapAround(circles[i]);
-         circles[i].clickable = true;
       }
       
    }

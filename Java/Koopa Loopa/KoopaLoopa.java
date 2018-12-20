@@ -53,6 +53,8 @@ public class KoopaLoopa extends Code12Program
       double yStart = yGround - tileSize * numberOfLevels;
       koopa = ct.image( "koopa.png", 100, yStart, tileSize );
       koopa.align( "bottom right" );
+
+      ct.println( "Press the space bar to pause the animation." );
    }
    
    public void update()
@@ -63,12 +65,12 @@ public class KoopaLoopa extends Code12Program
          {
             // Reset koopa to top of staircase
             koopa.y = yGround - tileSize * numberOfLevels;
-            koopa.x = 100 + koopa.width;
+            koopa.x = 100 + koopa.getWidth();
          }
          else 
          {
             // Calculate the y-value of the step koopa should be on
-            double yStep = yGround;
+            double  yStep = yGround;
             for ( int i = 0; i <= numberOfLevels; i++)
             {
                if ( koopa.x >= 100 - tileSize * (2 + i) )

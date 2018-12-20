@@ -20,7 +20,7 @@ class TestRandom extends Code12Program
    
    public void update()
    {
-      topCircle.ySpeed = -1;
+      topCircle.setYSpeed( -1 );
       // Generate a random int from the value of the circle's y position to 100
       // circles y position starts off less than 100, but increases
       // drawing something at this position

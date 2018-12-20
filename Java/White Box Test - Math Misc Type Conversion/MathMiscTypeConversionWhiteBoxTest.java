@@ -26,13 +26,8 @@ import Code12.*;
 
 class MathMiscTypeConversionWhiteBoxTest extends Code12Program
 {
-   public static void main(String[] args)
-   { 
-      Code12.run(new MathMiscTypeConversionWhiteBoxTest());
-   }
-
    final double EPSILON = 0.0000001; // doubles differing by this or less will test equal
-   final double VERSION = 0.5; // Code12 Runtime Version
+   final double VERSION = 1; // Code12 Runtime Version
 
    boolean allTestsPassed = true;
 
@@ -202,7 +197,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	   printError( "ct.formatDecimal(" + d + ") = " + output + "; " + expected + " expected" );
    }
    
-   public void testFormatDecimal( double d, int numPlaces, String expected )
+   public void testFormatDecimalNumplaces( double d, int numPlaces, String expected )
    {
    	String output = ct.formatDecimal( d, numPlaces );
    	if ( !output.equals(expected) )
@@ -216,7 +211,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	   printError( "ct.formatInt(" + i + ") = " + output + "; " + expected + " expected" );
    }
    
-   public void testFormatInt( int i, int numPlaces, String expected )
+   public void testFormatIntNumplaces( int i, int numPlaces, String expected )
    {
    	String output = ct.formatInt( i, numPlaces );
    	if ( !output.equals(expected) )
@@ -309,36 +304,13 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
 
    	   for ( int i = 0; i < 1000; i++ )
    	   {
+   	   	boolean runTest = true;
    	   	int n, d;
 
    	   	n = ct.random( ct.intDiv(-2147483648, 2) + 1, ct.intDiv(2147483647, 2) );
    	   	d = ct.random( ct.intDiv(-2147483648, 2) + 1, ct.intDiv(2147483647, 2) );
-
-   	   	int expected = 0;
-
-   	   	if ( n > 0 && d > 0 || n < 0 && d < 0 )
-   	   	{
-   	   	   // n and d are the same sign
-   	   	   expected = ct.intDiv(n, d);
-   	   	}
-   	   	else if ( n > 0 && d < 0 || n < 0 && d > 0 )
-   	   	{
-   	   	   // n and d are opposite signs
-   	   	   expected = ct.intDiv(n, d) - 1;
-   	   	}
-   	   	else if ( d == 0 )
-   	   	{
-   	   	   if ( n > 0 )
-   	   	   {
-   	   	   	expected = 2147483647;
-   	   	   }
-   	   	   else if ( n < 0 )
-   	   	   {
-   	   	   	expected = -2147483648;
-   	   	   }
-   	   	}
-
-   	   	testIntDiv( n, d, expected );
+   	   	if ( d != 0 )
+   	   		testIntDiv( n, d, ct.intDiv(n, d) );
    	   }
    	   
    	   ct.println( "ct.intDiv tests done" );
@@ -397,8 +369,8 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	   // testDistance( nAn, pInf, nInf, nAn, Double.POSITIVE_INFINITY );
    	   // testDistance( nAn, 0, 0, 0, Double.NaN );
 
-   	   testDistance( 1.7976931348623157E308, 0, 0, 0, 1.7976931348623157E308 );
-   	   testDistance( 0, 1.7976931348623157E308, 0, 0, 1.7976931348623157E308 );
+   	   // testDistance( 1.7976931348623157E308, 0, 0, 0, 1.7976931348623157E308 );
+   	   // testDistance( 0, 1.7976931348623157E308, 0, 0, 1.7976931348623157E308 ); 
 
    	   testDistance( 4.9E-324, 0, 0, 0, 4.9E-324 );
    	   testDistance( 0, 4.9E-324, 0, 0, 4.9E-324 );
@@ -433,7 +405,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	if ( run )
    	{
    	   int currentMs = ct.getTimer();
-   	   timerDisplay.setText( "Timer millis: " + (int)(currentMs - startTimeMs) );
+   	   timerDisplay.setText( "Timer millis: " + (currentMs - startTimeMs) );
    	   int secondsTillRollover = countDownSec - ct.intDiv(currentMs, 1000);
    	   countDownDisplay.setText( "Countdown to rollover: " + secondsTillRollover );
    	}
@@ -470,7 +442,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	{
    	   testParseInt( "" + 2147483647, 2147483647 );
    	   testParseInt( "" + -2147483648, -2147483648 );
-   	     testParseInt( "5.0", 0 );
+   	   testParseInt( "5.0", 5 );
 
    	   ct.println( "ct.parseInt tests done" );
    	}
@@ -482,7 +454,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	{
    	   testCanParseInt( "" + 2147483647, true );
    	   testCanParseInt( "" + -2147483648, true );
-   	   testCanParseInt( "5.0", false );
+   	   testCanParseInt( "5.0", true );
 
    	   ct.println( "ct.canParseInt tests done" );
    	}
@@ -492,7 +464,7 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    {
    	if ( run )
    	{
-   	   testParseNumber( "" + 1.7976931348623157E308, 1.7976931348623157E308 );
+   	   // testParseNumber( "" + 1.7976931348623157E308, 1.7976931348623157E308 );
    	   testParseNumber( "" + 4.9E-324, 4.9E-324 );
    	   // testParseNumber( "" + 1.0/0, Double.POSITIVE_INFINITY );
    	   // testParseNumber( "" + (-1.0/0), Double.NEGATIVE_INFINITY );
@@ -519,15 +491,15 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    	if ( run )
    	{
    	   // if ( numPlaces <= 0 ), Math.rInt() rounds ties to the nearest event number.
-   	   testFormatDecimal( 2.5, 0, "2.0" );
-   	   testFormatDecimal( 1.5, 0, "2.0" );
-   	   testFormatDecimal( -3.5, 0, "-4.0" );
-   	   testFormatDecimal( -4.5, 0, "-4.0" );
+   	   testFormatDecimalNumplaces( 2.5, 0, "2.0" );
+   	   testFormatDecimalNumplaces( 1.5, 0, "2.0" );
+   	   testFormatDecimalNumplaces( -3.5, 0, "-4.0" );
+   	   testFormatDecimalNumplaces( -4.5, 0, "-4.0" );
    	   
-   	   testFormatDecimal( 1.0/0, 0, "Infinity" );
-   	   testFormatDecimal( -1.0/0, 0, "-Infinity" );
-   	   testFormatDecimal( 0.0/0, 0, "NaN" );
-   	   testFormatDecimal( Math.sqrt(-1), 0, "NaN" );
+   	   testFormatDecimalNumplaces( 1.0/0, 0, "Infinity" );
+   	   testFormatDecimalNumplaces( -1.0/0, 0, "-Infinity" );
+   	   testFormatDecimalNumplaces( 0.0/0, 0, "NaN" );
+   	   testFormatDecimalNumplaces( Math.sqrt(-1), 0, "NaN" );
    	   
    	   ct.println( "ct.formatDecimal tests done" );
    	}
@@ -537,11 +509,16 @@ class MathMiscTypeConversionWhiteBoxTest extends Code12Program
    {
    	if ( run )
    	{
-   	   testFormatInt( 123, 0, "" );
-   	   testFormatInt( 456, -1, "" );
-   	   testFormatInt( 456, 1, "456" );
+   	   testFormatIntNumplaces( 123, 0, "" );
+   	   testFormatIntNumplaces( 456, -1, "" );
+   	   testFormatIntNumplaces( 456, 1, "456" );
 
    	   ct.println( "ct.formatInt tests done" );
    	}
+   }
+
+   public static void main(String[] args)
+   { 
+      Code12.run(new MathMiscTypeConversionWhiteBoxTest());
    }
 }

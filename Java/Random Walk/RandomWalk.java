@@ -30,10 +30,6 @@ import Code12.*;
 
 class RandomWalk extends Code12Program
 {
-   public static void main(String[] args)
-   { 
-      Code12.run(new RandomWalk()); 
-   }
    // TODO: fields where initialized in restart(); causes Code12 runtime to see them as unitialized before use
    int pixelsPerSquare = 0; // Dimension of the lattice grid
    double xMax = 0.0; // Maximum x coordinate of the window
@@ -175,7 +171,7 @@ class RandomWalk extends Code12Program
       GameObj pathLine = ct.line( marker.x, marker.y, newX, newY, "red" );
       int lineWidth = ct.round( pixelsPerSquare / 3.0 );
       if ( lineWidth > 0 )
-         pathLine.lineWidth = lineWidth;
+         pathLine.setLineWidth(lineWidth);
       
       // Move marker
       marker.x = newX;
@@ -231,5 +227,10 @@ class RandomWalk extends Code12Program
       
       // Make the start marker
       GameObj startMarker = ct.circle( marker.x, marker.y, unitsPerSquare, "green" );
+   }
+   
+   public static void main(String[] args)
+   { 
+      Code12.run(new RandomWalk()); 
    }
 }
