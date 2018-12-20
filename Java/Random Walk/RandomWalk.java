@@ -24,16 +24,12 @@
 
 // Type Conversion
 // ---------------
-// int ct.toInt( double d )                // truncates
+// int (int)( double d )                // truncates
 
 import Code12.*;
 
 class RandomWalk extends Code12Program
 {
-   public static void main(String[] args)
-   { 
-      Code12.run(new RandomWalk()); 
-   }
    // TODO: fields where initialized in restart(); causes Code12 runtime to see them as unitialized before use
    int pixelsPerSquare = 0; // Dimension of the lattice grid
    double xMax = 0.0; // Maximum x coordinate of the window
@@ -53,8 +49,8 @@ class RandomWalk extends Code12Program
    {
       // Choose a random direction
       String direction; // "up", "down", "left", "right"
-      int column = ct.toInt( marker.x / unitsPerSquare + 0.5 );
-      int row = ct.toInt( marker.y / unitsPerSquare + 0.5 );
+      int column = (int)( marker.x / unitsPerSquare + 0.5 );
+      int row = (int)( marker.y / unitsPerSquare + 0.5 );
       
       if ( row == 1 && column == 1)
       {
@@ -175,7 +171,7 @@ class RandomWalk extends Code12Program
       GameObj pathLine = ct.line( marker.x, marker.y, newX, newY, "red" );
       int lineWidth = ct.round( pixelsPerSquare / 3.0 );
       if ( lineWidth > 0 )
-         pathLine.lineWidth = lineWidth;
+         pathLine.setLineWidth(lineWidth);
       
       // Move marker
       marker.x = newX;
@@ -207,8 +203,8 @@ class RandomWalk extends Code12Program
       yMax = ct.getHeight();
       pixelsPerUnit = ct.getPixelsPerUnit();
       unitsPerSquare = pixelsPerSquare / pixelsPerUnit;
-      rowCount = ct.toInt( yMax / unitsPerSquare );
-      columnCount = ct.toInt( xMax / unitsPerSquare );
+      rowCount = (int)( yMax / unitsPerSquare );
+      columnCount = (int)( xMax / unitsPerSquare );
       
       // Draw horizontal lines
       for ( int i = 0; i < rowCount; i++ )
@@ -231,5 +227,10 @@ class RandomWalk extends Code12Program
       
       // Make the start marker
       GameObj startMarker = ct.circle( marker.x, marker.y, unitsPerSquare, "green" );
+   }
+   
+   public static void main(String[] args)
+   { 
+      Code12.run(new RandomWalk()); 
    }
 }

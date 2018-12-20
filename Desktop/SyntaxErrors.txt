@@ -148,3 +148,4 @@ public void start
 	String classLevelStringLength = classLevelString.length()
 		dot.setXSpeed( 0.3 );	}
 		dot.setYSpeed( -0.3 );	}
+         spaceship.getySPEED() -= 0.075;

@@ -17,18 +17,18 @@ public class Game extends Code12Program
     {
         ct.setBackColor("gray");
 
-        player = ct.circle(( ct.toInt(ct.getWidth() / 2)), (3 * ct.toInt(ct.getHeight() / 4)), 5, "white");
+        player = ct.circle(( (int)(ct.getWidth() / 2)), (3 * (int)(ct.getHeight() / 4)), 5, "white");
         player.setLineColor("white");
 
-        goal = ct.circle(ct.random(0, ct.toInt(ct.getWidth())), ct.random(ct.toInt(ct.getHeight() / 3), ct.toInt(ct.getHeight())), 3, "light green");
+        goal = ct.circle(ct.random(0, (int)(ct.getWidth())), ct.random((int)(ct.getHeight() / 3), (int)(ct.getHeight())), 3, "light green");
         goal.setLineColor("light green");
 
-        score = ct.text("Score: " + scoreCount + "    Goal: 10", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 25), 5, "dark gray");
+        score = ct.text("Score: " + scoreCount + "    Goal: 10", (int)(ct.getWidth() / 2), (int)(ct.getHeight() / 25), 5, "dark gray");
 
         enemies = new GameObj[10];
         for (int i = 0; i < enemies.length; i++)
         {
-            enemies[i] = ct.rect(ct.random(0, ct.toInt(ct.getWidth())), -2, 3, 3, "dark gray");
+            enemies[i] = ct.rect(ct.random(0, (int)(ct.getWidth())), -2, 3, 3, "dark gray");
             enemies[i].setLineColor("dark gray");
             enemies[i].group = "enemies";
         }
@@ -107,14 +107,14 @@ public class Game extends Code12Program
 
     public void randomizeEnemyPosition(GameObj enemy)
     {
-        enemy.x = ct.random(0, ct.toInt(ct.getWidth()));
+        enemy.x = ct.random(0, (int)(ct.getWidth()));
         enemy.y = -2;
     }
 
     public void randomizeGoalPosition()
     {
-        goal.x = ct.random(0, ct.toInt(ct.getWidth()));
-        goal.y = ct.random(ct.toInt(ct.getHeight() / 3), ct.toInt(ct.getHeight()));
+        goal.x = ct.random(0, (int)(ct.getWidth()));
+        goal.y = ct.random((int)(ct.getHeight() / 3), (int)(ct.getHeight()));
     }
 
     public void incrementScore(String increment)
@@ -128,7 +128,7 @@ public class Game extends Code12Program
 
     public void winningAction()
     {
-        ct.text("You Lost", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 2), 10, "dark gray");
+        ct.text("You Lost", (int)(ct.getWidth() / 2), (int)(ct.getHeight() / 2), 10, "dark gray");
         player.delete();
         goal.delete();
         ct.clearGroup("enemies");
@@ -136,7 +136,7 @@ public class Game extends Code12Program
 
     public void losingAction()
     {
-        ct.text("You Won!", ct.toInt(ct.getWidth() / 2), ct.toInt(ct.getHeight() / 2), 10, "dark gray");
+        ct.text("You Won!", (int)(ct.getWidth() / 2), (int)(ct.getHeight() / 2), 10, "dark gray");
         player.delete();
         goal.delete();
         ct.clearGroup("enemies");
