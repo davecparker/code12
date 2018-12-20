@@ -65,15 +65,6 @@ public class EventsWhiteBoxTest extends Code12Program
    
    public void update()
    {
-      // Allow tiles to be clicked
-      for ( int i = 0; i < ROWS; i++ )
-      {
-         for ( int j = 0; j < COLS; j++ )
-         {
-            boxes[i*j].clickable = true;
-         }
-      }
-
    }
    
    public void onMousePress( GameObj obj, double x, double y )
@@ -90,14 +81,14 @@ public class EventsWhiteBoxTest extends Code12Program
                   if ( boxes[i*j].containsPoint(x,y) )
                   {
                      boxes[i*j].setFillColor("red");
-                     ct.println("A tile located at: [" + ct.toInt(boxes[i*j].x) + "," + ct.toInt(boxes[i*j].y) + " ] was clicked.");
+                     ct.println("A tile located at: [" + (int)(boxes[i*j].x) + "," + (int)(boxes[i*j].y) + " ] was clicked.");
                   }
                }
             
          }
       }
          
- }
+   }
 
    
 }

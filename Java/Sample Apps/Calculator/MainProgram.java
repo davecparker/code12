@@ -353,7 +353,7 @@ num++;
 			tempParen = afterParen.substring(0,i); //everything before the (
 			tempParen1 = ct.formatDecimal( parenReturn[0] );
 			result = ct.parseNumber( calculate( tempParen + tempParen1 ) );
-			i += ct.toInt( parenReturn[1] );
+			i += (int)( parenReturn[1] );
 			double[] results = { result, i + 1 };
 			return results;
 		 }
@@ -385,7 +385,7 @@ num++;
 			parenReturn = paren( toCalculate.substring(1) ); //stuffs the array of returned values from paren into a temporary array
 			valueCount += 1;
 			values[valueCount - 1] = parenReturn[0]; //the first return value is the evaluation of what was in the parenthesis
-			int y = ct.toInt( parenReturn[1] ) +1 ;
+			int y = (int)( parenReturn[1] ) +1 ;
 
 			if( y >= toCalculate.length() - 1 )
 			{
@@ -491,7 +491,7 @@ num++;
 	  
 		 if( result > 1 ) //large number
 		 {
-			expStr = ct.formatInt( ct.toInt( result ) );
+			expStr = ct.formatInt( (int)( result ) );
 			exp = expStr.length() - 1; 
 			
 			coefficient = result / Math.pow( 10 ,exp );
@@ -520,15 +520,15 @@ num++;
 	  returnMe = ct.formatDecimal(result);
 	  if (returnMe.length() > 12)
 	  {  
-		 returnMe = ct.formatInt( ct.toInt(result) );
+		 returnMe = ct.formatInt( (int)(result) );
 		 int decimalPlaces = 11 - returnMe.length(); //12(character limit) - . char         
 		 result = ct.roundDecimal( result, decimalPlaces );
 		 returnMe = ct.formatDecimal(result);
 	  }
 	  
-	  if ( ct.toInt(result) ==  result ) // checks if the value to be returned is an integar
+	  if ( (int)(result) ==  result ) // checks if the value to be returned is an integar
 	  {
-		 returnMe = ct.formatInt( ct.toInt(result) );
+		 returnMe = ct.formatInt( (int)(result) );
 		 return returnMe; //returns a string representing an int
 	  }
 	  
