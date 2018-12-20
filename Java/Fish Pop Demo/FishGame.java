@@ -9,8 +9,9 @@ class FishGame
 
 	public void start()
 	{
-		// Set the game title and background
+		// Set the game background
 		ct.setTitle( "Fish Pop" );
+		ct.setHeight( 120 );
 		ct.setBackImage( "underwater.jpg" );
 
 		// Make the fish
@@ -32,11 +33,16 @@ class FishGame
 		else
 			fish.setYSpeed( 0 );
 
-		// Keep the fish on the screen
+		// Make the fish recycle continuously left to right
 		if (fish.x > 110)
-			fish.x = -10;
-		if (fish.y > 90)
-			fish.y = 90;
+		{
+			fish.x = -10;   // off-screen to the left
+			ct.println( "Recycled after " + numBubbles + " bubbles" );
+		}
+
+		// Keep the fish on the screen vertically
+		if (fish.y > 105)
+			fish.y = 105;
 		else if (fish.y < 10)
 			fish.y = 10;
 
@@ -57,7 +63,6 @@ class FishGame
 			ct.sound( "pop.wav" );
 			bubbleHit.delete();
 			numHits++;
-			ct.showAlert("Hit!");
 		}
 
 		// Update the score
