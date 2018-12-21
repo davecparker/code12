@@ -28,7 +28,7 @@ local runView = composer.newScene()
 -- UI metrics
 local dxyPaneSplit = 10
 local gridLabelsFontSize = 11
-local gridLineShade = 0.6
+local gridlineShade = app.gridlineShade or app.defaultGridlineShade
 
 -- Display objects and groups
 local outputGroup              -- display group for program output area
@@ -36,10 +36,7 @@ local rightBar                 -- clipping bar to the right of the output area
 local paneSplitConsole         -- pane split between output and console
 local paneSplitRight           -- pane split between output and varWatch window
 local lowerGroup               -- display area below the pane split
-local gridLinesGroup           -- display group for grid lines
-local gridXLabels              -- array of text objs to label the vertical grid lines
-local gridYLabels              -- array of text objs to label the horizontal grid lines
-local gridGroup                -- display group for gridLinesGroup, gridXLabels and gridYLabels
+local gridGroup                -- display group for gridlines and their labels
 
 -- UI state
 local paneDragOffset           -- when dragging the pane split
@@ -72,19 +69,30 @@ local function varWatchWidthAndHeight()
 end
 
 -- Return a new text object at x, y which has been inserted into the gridGroup and has
--- fill color set to gridLineShade
+-- fill color set to gridlineShade
 local function newGridLabel( text, x, y )
 	local label = display.newText( gridGroup, text, x, y, native.systemFont, gridLabelsFontSize )
-	label:setFillColor( gridLineShade )
+	label:setFillColor( gridlineShade )
 	return label
 end
 
 -- Return an new line from x1, y1 to x2, y2 which has been inserted into the gridGroup and has
 -- stroke color set to grideLineShade
 local function newGridLine( x1, y1, x2, y2 )
-	local line = display.newLine( gridLinesGroup, x1, y1, x2, y2 )
-	line:setStrokeColor( gridLineShade )
+	local line = display.newLine( gridGroup.lines, x1, y1, x2, y2 )
+	line:setStrokeColor( gridlineShade )
 	return line
+end
+
+-- Remove gridGroup if it is not nil and initialize it
+local function makeGridGroup()
+	if gridGroup then
+		gridGroup:removeSelf()
+		gridGroup = nil
+	end
+	gridGroup = g.makeGroup( outputGroup )
+	gridGroup.XLabels = {}
+	gridGroup.YLabels = {}
 end
 
 -- Make the coordinate grideLines
@@ -94,18 +102,19 @@ local function makeGrid()
 	local scale = g.scale
 	local screen = g.screen
 	-- Remove existing grid lines
-	if gridLinesGroup then
-		gridLinesGroup:removeSelf()
-		gridLinesGroup = nil
+	if gridGroup.lines then
+		gridGroup.lines:removeSelf()
+		gridGroup.lines = nil
 	end
 	-- Make grid lines group
-	gridLinesGroup = g.makeGroup( gridGroup )
+	gridGroup.lines = g.makeGroup( gridGroup )
 	gridGroup:toFront()
 	-- Calculate x-value for first vertical grid line and label
 	screenOriginX = screen.originX
 	local xLine = math.floor( screenOriginX / 10 ) * 10 + 10
 	local x = (xLine - screenOriginX) * scale
 	-- Make vertical grid lines and labels
+	local gridXLabels = gridGroup.XLabels
 	local numLabels = #gridXLabels
 	local label
 	local n = 0 -- number of labels updated/created 
@@ -140,6 +149,7 @@ local function makeGrid()
 	local yLine = math.floor( screenOriginY / 10 ) * 10 + 10
 	local y = (yLine - screenOriginY) * scale
 	-- Make horizontal grideLines and labels
+	local gridYLabels = gridGroup.YLabels
 	numLabels = #gridYLabels
 	n = 0
 	while y < height do
@@ -319,9 +329,7 @@ function runView:create()
 
 	-- Make the display items
 	outputGroup = g.makeGroup( sceneGroup, 0, app.dyToolbar )
-	gridGroup = g.makeGroup( outputGroup )
-	gridXLabels = {}
-	gridYLabels = {}
+	makeGridGroup()
 	rightBar = g.uiItem( display.newRect( sceneGroup, 0, outputGroup.y, 0, 0 ), 
 						app.extraShade, app.borderShade )
 	paneSplitRight = g.uiItem( display.newRect( sceneGroup, 0, rightBar.y, 
@@ -376,6 +384,15 @@ function runView:show( event )
 		end
 		firstRun = false
 		showVarWatchLast = showVarWatch
+
+		-- Update the gridline labels' color if necessary
+		if gridlineShade ~= app.gridlineShade then
+			gridlineShade = app.gridlineShade
+			makeGridGroup()
+			if app.gridOn then
+				makeGrid()
+			end
+		end
 	end
 end
 
