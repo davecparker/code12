@@ -260,6 +260,7 @@ function app.updateSourceFile( path )
 		source.numLines = 0
 		app.addRecentSourceFilePath( path )
 		app.saveSettings()
+		app.gridlineShade = app.defaultGridlineShade
 	end
 end
 
