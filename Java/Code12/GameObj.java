@@ -53,22 +53,26 @@ public abstract class GameObj implements GameObjInterface
    }
 
 
-   //========================== API Methods =================================
+   //======================= GameObj API Methods ============================
 
    public String getType()                            { return type; }
    public double getWidth()                           { return width; }
    public double getHeight()                          { return height; }
-   public String getText()                            { return text; }
-   public void setText(String text)                   { this.text = text; }
+   public void setXSpeed(double xSpeed)               { this.xSpeed = xSpeed; }
+   public void setYSpeed(double ySpeed)               { this.ySpeed = ySpeed; }
+   public double getXSpeed()                          { return xSpeed; }
+   public double getYSpeed()                          { return ySpeed; } 
    public void align(String a)                        { setAlignFromString(a); }
+   public void setText(String text)                   { this.text = text; }
+   public String getText()                            { return text; }
    public void setFillColor(String name)              { fillColor = colorFromName(name); }
    public void setFillColorRGB(int r, int g, int b)   { fillColor = makeColor(r, g, b); }
    public void setLineColor(String name)              { lineColor = colorFromName(name); }
    public void setLineColorRGB(int r, int g, int b)   { lineColor = makeColor(r, g, b); }
    public void setLineWidth(int lineWidth)            { this.lineWidth = lineWidth; }
    public void setImage(String filename)              {}   // GameImage overrides
-   public int getLayer()                              { return layer; }
    public void setLayer(int layer)                    { game.setObjLayer(this, layer); }
+   public int getLayer()                              { return layer; }
    public void delete()                               { game.deleteObj(this); }
    public void setClickable(boolean clickable)        { this.clickable = clickable; }
    public boolean clicked()                           { return (game.input.clickedObj == this); }
@@ -78,12 +82,6 @@ public abstract class GameObj implements GameObjInterface
    {
       this.width = width;
       this.height = height;
-   }
-
-   public void setSpeed(double xSpeed, double ySpeed)
-   {
-      this.xSpeed = xSpeed;
-      this.ySpeed = ySpeed;
    }
 
    public String toString()
@@ -205,11 +203,12 @@ public abstract class GameObj implements GameObjInterface
          case "orange":        return new Color(255, 127, 0);
          case "pink":          return new Color(255, 192, 203);
          case "purple":        return new Color(64, 0, 127);
+         case "brown":         return new Color(130, 70, 30);
 
          case "light gray":    return new Color(191, 191, 191);
          case "light red":     return new Color(255, 127, 127);
          case "light green":   return new Color(127, 255, 127);
-         case "light blue":    return new Color(127, 127, 255);
+         case "light blue":    return new Color(170, 225, 255);
          case "light cyan":    return new Color(127, 255, 255);
          case "light magenta": return new Color(255, 127, 255);
          case "light yellow":  return new Color(255, 255, 127);
@@ -220,7 +219,7 @@ public abstract class GameObj implements GameObjInterface
          case "dark blue":     return new Color(0, 0, 127);
          case "dark cyan":     return new Color(0, 127, 127);
          case "dark magenta":  return new Color(127, 0, 127);
-         case "dark yellow":   return new Color(127, 127, 0);
+         case "dark yellow":   return new Color(220, 190, 0);
       }
       return new Color(127, 127, 127);   // Gray for color name not found
    }

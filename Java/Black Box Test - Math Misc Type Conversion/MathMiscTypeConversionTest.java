@@ -12,7 +12,7 @@
 
 // Type Conversion
 // ---------------
-// int ct.toInt( double d )                // truncates
+// int (int)( double d )                // truncates
 // int ct.parseInt( String s )             // 0 if failure
 // boolean ct.canParseInt( String s )
 // double ct.parseNumber( String s )       // NaN if failure
@@ -157,9 +157,9 @@ class MathMiscTypeConversionTest extends Code12Program
    
    public void testToInt( double d, int expected )
    {
-      double output = ct.toInt(d);
+      double output = (int)(d);
       if ( output != expected )
-         printError( "ct.toInt(" + d + ") = " + output + "; " + expected + " expected" );
+         printError( "(int)(" + d + ") = " + output + "; " + expected + " expected" );
    }
    
    public void testParseInt( String s, int expected )
@@ -430,7 +430,7 @@ class MathMiscTypeConversionTest extends Code12Program
          if ( timerStarted )
          {
             double sec = ( ct.getTimer() - timerStartTime ) / 1000.0;          
-            int time = ct.toInt( sec );
+            int time = (int)( sec );
             int hrs = ct.intDiv(time, 3600);
             time = time % 3600;
             int min = ct.intDiv(time, 60);
@@ -463,7 +463,7 @@ class MathMiscTypeConversionTest extends Code12Program
             testToInt( i, i );
 		     	testToInt( i / 10.0, ct.intDiv(i, 10) );
          }
-         ct.println( "ct.toInt tests done" );
+         ct.println( "(int) tests done" );
       }
    }
       

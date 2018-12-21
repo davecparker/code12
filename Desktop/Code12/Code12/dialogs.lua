@@ -148,8 +148,10 @@ local function onTouchDragBar(event)
 		-- Move dialog then make sure it's fully visible in the app window
 		local xMax = display.actualContentWidth - dialogFrame.width
 		local yMax = display.actualContentHeight - dialogFrame.height
-		dialogGroup.x = g.pinValue(event.x - dragOffsetX, 0, xMax)
-		dialogGroup.y = g.pinValue(event.y - dragOffsetY, 0, yMax)
+		g.xDialog = g.pinValue(event.x - dragOffsetX, 0, xMax)
+		g.yDialog = g.pinValue(event.y - dragOffsetY, 0, yMax)
+		dialogGroup.x = g.xDialog
+		dialogGroup.y = g.yDialog
 	end
 	if phase == "ended" or phase == "cancelled" then
 		g.setFocusObj(nil)
@@ -226,24 +228,27 @@ local function inputValue(message, valueType)
 		makeButton("OK", x, y, onNo)
 	end
 
-	-- Position the dialog centered on the output area if room,
+	-- If there is not already a preferred dialog position from a previous
+	-- dialog, then position the dialog centered on the output area if room,
 	-- otherwise centered on the entire app area.
-	local xDialog = math.round(g.window.width / 2 - dialogWidth / 2)
-	local yDialog = math.round(g.window.height / 2 - dialogHeight / 2)
-	if xDialog < 0 then 
-		xDialog = math.round(display.actualContentWidth / 2 - dialogWidth / 2)
-		if xDialog < 0 then
-			xDialog = 0
+	if not (g.xDialog and g.yDialog) then
+		g.xDialog = math.round(g.window.width / 2 - dialogWidth / 2)
+		g.yDialog = math.round(g.window.height / 2 - dialogHeight / 2)
+	end
+	if g.xDialog < 0 or g.xDialog + dialogWidth > display.actualContentWidth then 
+		g.xDialog = math.round(display.actualContentWidth / 2 - dialogWidth / 2)
+		if g.xDialog < 0 then
+			g.xDialog = 0
 		end
 	end
-	if yDialog < 0 then 
-		yDialog = math.round(display.actualContentHeight / 2 - dialogHeight / 2)
-		if yDialog < 0 then
-			yDialog = 0
+	if g.yDialog < 0 then 
+		g.yDialog = math.round(display.actualContentHeight / 2 - dialogHeight / 2)
+		if g.yDialog < 0 then
+			g.yDialog = 0
 		end
 	end
-	dialogGroup.x = xDialog
-	dialogGroup.y = yDialog
+	dialogGroup.x = g.xDialog
+	dialogGroup.y = g.yDialog
 
 	-- Init the input state, then block and yield until the dialog finishes
 	inputType = valueType

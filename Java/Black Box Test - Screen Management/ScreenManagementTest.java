@@ -81,11 +81,11 @@ class ScreenManagementTest extends Code12Program
       displayText.setLayer( 2 );
       
       cornerBox = ct.rect( 100, 0, 10, 10 );
-      cornerBox.align( "bottom right" ); 
+      cornerBox.align( "bottom right" );
       
       double pixelsPerUnit = ct.getPixelsPerUnit();
-      displayTextPixels = ct.round( displayText.height * pixelsPerUnit );
-      cornerBoxPixels = ct.round( cornerBox.height * pixelsPerUnit );
+      displayTextPixels = ct.round( displayText.getHeight() * pixelsPerUnit );
+      cornerBoxPixels = ct.round( cornerBox.getHeight() * pixelsPerUnit );
    }
    
    public void update()
@@ -104,7 +104,7 @@ class ScreenManagementTest extends Code12Program
                ct.setHeight( updateCount );
                displayText.setText( "ct.getHeight() = " + ct.getHeight() + ", ct.getWidth() = " + ct.getWidth() );
                displayText.y = ct.getHeight();
-               
+               cornerBox.y = ct.getHeight();
             }
             else if ( updateCount < 151 + 256 )
             {
@@ -169,12 +169,12 @@ class ScreenManagementTest extends Code12Program
       }
       else if ( screen.equals("2") )
       {  
-         if ( ct.random(1, 20) == 1 )
+         if ( !paused && ct.random(1, 20) == 1 )
          {
             // Make a shape or image on the screen in a random spot
             int shapeNum = ct.random( 1, 4 );
-            double x = ct.random( 0, ct.toInt(ct.getWidth()) );
-            double y = ct.random( 0, ct.toInt(ct.getHeight()) );
+            double x = ct.random( 0, (int)(ct.getWidth()) );
+            double y = ct.random( 0, (int)(ct.getHeight()) );
             GameObj shape;
             if ( shapeNum == 1 )
             {
@@ -189,7 +189,7 @@ class ScreenManagementTest extends Code12Program
             else if ( shapeNum == 3 )
             {
                shape = ct.line( x, y, x + 10, y + 10 );
-               shape.lineWidth = 3;
+               shape.setLineWidth( 3 );
                shape.group = "lines";
             }
             else
@@ -248,7 +248,7 @@ class ScreenManagementTest extends Code12Program
          cornerBox.y = ct.getHeight();
       }
       if ( displayText != null )
-         displayText.height = displayTextPixels / pixelsPerUnit ;
+         displayText.setSize( displayText.getWidth(), displayTextPixels / pixelsPerUnit );
    }
 
    public static void main(String[] args)

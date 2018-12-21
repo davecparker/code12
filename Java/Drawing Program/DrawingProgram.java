@@ -51,45 +51,47 @@ class DrawingProgram extends Code12Program
    double dxClick, dyClick; // initial displacement between obj.x, obj.y and click.x, click.y 
       
    public void start()
-   {  
+   {
       ct.setTitle( "Drawing Program" );
       boxSize = 5;
       double yBoxes = boxSize / 2;
       GameObj iconImage;
-      
+     
       // Make circle icon
       circle = ct.rect( boxSize / 2, yBoxes, boxSize, boxSize, "white" );
-      circle.clickable = true;
       iconImage = ct.circle( circle.x, circle.y, boxSize * 0.75, "white" );
+      iconImage.setClickable( false );
       circle.setLayer( 2 );
-      iconImage.setLayer( 2 );
+      iconImage.setLayer( 3 );
       
       // Make ellipse icon
       ellipse = ct.rect( circle.x + boxSize, yBoxes, boxSize, boxSize, "white" );
-      ellipse.clickable = true;
       iconImage = ct.circle( ellipse.x, ellipse.y, boxSize * 0.75, "white" );
-      iconImage.height *= 0.7;
+      iconImage.setClickable( false );
+      iconImage.setSize( iconImage.getWidth(), iconImage.getHeight() * 0.7 );
       ellipse.setLayer( 2 );
-      iconImage.setLayer( 2 );
+      iconImage.setLayer( 3 );
       
       // Make rectangle icon
       rectangle = ct.rect( ellipse.x + boxSize, yBoxes, boxSize, boxSize, "white" );
-      rectangle.clickable = true;
       iconImage = ct.rect( rectangle.x, rectangle.y, boxSize * 0.7, boxSize * 0.7, "white" );
+      iconImage.setClickable( false );
       rectangle.setLayer( 2 );
-      iconImage.setLayer( 2 );
+      iconImage.setLayer( 3 );
       
       // Make line icon
       line = ct.rect( rectangle.x + boxSize, yBoxes, boxSize, boxSize, "white" );
-      line.clickable = true;
       iconImage = ct.line( line.x - boxSize * 0.35, line.y + boxSize * 0.35, line.x + boxSize * 0.35, line.y - boxSize * 0.35 );
+      iconImage.setClickable( false );
       line.setLayer( 2 );
-      iconImage.setLayer( 2 );
+      iconImage.setLayer( 3 );
       
       // Make arrow icon for selecting objects
       selectBox = ct.rect( line.x + boxSize * 2, yBoxes, boxSize, boxSize, "white" );
-      selectBox.clickable = true;
       iconImage = ct.image( "arrow.png", selectBox.x, selectBox.y, boxSize );
+      selectBox.setLayer( 2 );
+      iconImage.setLayer( 3 );
+      iconImage.setClickable( false );
       
       // Make color boxes
       purple = ct.rect( 100 - boxSize / 2, yBoxes, boxSize, boxSize, "purple" );
@@ -102,8 +104,8 @@ class DrawingProgram extends Code12Program
       blue = ct.rect( cyan.x - boxSize, yBoxes, boxSize, boxSize, "blue" );
       green = ct.rect( blue.x - boxSize, yBoxes, boxSize, boxSize, "green" );
       red = ct.rect( green.x - boxSize, yBoxes, boxSize, boxSize, "red" );
-      black = ct.rect( red.x - boxSize, yBoxes, boxSize, boxSize, "black" );
-      white = ct.rect( black.x - boxSize, yBoxes, boxSize, boxSize, "white" );
+      white = ct.rect( red.x - boxSize, yBoxes, boxSize, boxSize, "white" );
+      black = ct.rect( white.x - boxSize, yBoxes, boxSize, boxSize, "black" );
       
       black.setLayer( 2 );
       white.setLayer( 2 );
@@ -117,45 +119,35 @@ class DrawingProgram extends Code12Program
       orange.setLayer( 2 );
       pink.setLayer( 2 );
       purple.setLayer( 2 );
-      
-      black.clickable = true;
-      white.clickable = true;
-      red.clickable = true;
-      green.clickable = true;
-      blue.clickable = true;
-      cyan.clickable = true;
-      magenta.clickable = true;
-      yellow.clickable = true;
-      gray.clickable = true;
-      orange.clickable = true;
-      pink.clickable = true;
-      purple.clickable = true;
-      
-      black.setText("black");
-      white.setText("white");
-      red.setText("red");
-      green.setText("green");
-      blue.setText("blue");
-      cyan.setText("cyan");
-      magenta.setText("magenta");
-      yellow.setText("yellow");
-      gray.setText("gray");
-      orange.setText("orange");
-      pink.setText("pink");
-      purple.setText("purple");
+           
+      black.setText( "black" );
+      white.setText( "white" );
+      red.setText( "red" );
+      green.setText( "green" );
+      blue.setText( "blue" );
+      cyan.setText( "cyan" );
+      magenta.setText( "magenta" );
+      yellow.setText( "yellow" );
+      gray.setText( "gray" );
+      orange.setText( "orange" );
+      pink.setText( "pink" );
+      purple.setText( "purple" );
       
       // Set xMinColors 
-      xMinColors = white.x - boxSize / 2;
+      xMinColors = black.x - boxSize / 2;
       
       // Set selected shape
       selectedShapeBox = circle;
-      selectedShapeBox.lineWidth = 3;
+      selectedShapeBox.setLineWidth( 3 );
       selectBoxOn = false;
       
       // Set selected color
-      selectedColor = "white";
-      selectedColorSwatch = white;
-      selectedColorSwatch.lineWidth = 3;
+      selectedColor = "black";
+      selectedColorSwatch = black;
+      selectedColorSwatch.setLineWidth( 3 );
+
+      ct.println( "Backspace: delete selected object" );
+      ct.println( "c: clear the canvas" );
    }
 
    public void update()
@@ -172,27 +164,24 @@ class DrawingProgram extends Code12Program
          {       
             // draw a new shape
             if ( selectedShapeBox == circle || selectedShapeBox == ellipse )
-               newObj = ct.circle( x, y, 0 );
+               newObj = ct.circle( x, y, 0, selectedColor );
             else if ( selectedShapeBox == rectangle )
-               newObj = ct.rect( x, y, 0, 0 );
+               newObj = ct.rect( x, y, 0, 0, selectedColor );
             else if ( selectedShapeBox == line )
             {
-               newObj = ct.line( x, y, x, y );
-               newObj.setLineColor( selectedColor );
+               newObj = ct.line( x, y, x, y, selectedColor );
             }
-            newObj.clickable = true;
-            if ( selectedShapeBox != line )
-            {
-               newObj.setFillColor( selectedColor );
-            }
+            newObj.group = "drawing";
             // Make newObj the selectedObj
             selectedObj = newObj;
          }
          else if ( obj != null )
          {
+            // Set selected object and bring to front
             selectedObj = obj;
             dxClick = x - obj.x;
             dyClick = y - obj.y;
+            obj.setLayer( 1 );
          }
       }
       else if ( obj != null )
@@ -200,19 +189,28 @@ class DrawingProgram extends Code12Program
          if ( x >= xMinColors )
          {
             // obj is a color swatch
-            selectedColorSwatch.lineWidth = 1;
+            selectedColorSwatch.setLineWidth( 1 );
             selectedColorSwatch = obj;
-            selectedColorSwatch.lineWidth = 3;
+            selectedColorSwatch.setLineWidth( 3 );
             selectedColorSwatch.setLayer( 2 );
             selectedColor = selectedColorSwatch.getText();
+            if ( selectedObj != null )
+            {
+               // if ( selectedObj.getType().equals( "line" ) )
+               String selectedObjType = selectedObj.getType();
+               if ( selectedObjType.equals( "line" ) )
+                  selectedObj.setLineColor( selectedColor );
+               else
+                  selectedObj.setFillColor( selectedColor );
+            }
          }
          else
          {
             // obj is a shape selector or the select box
-            selectedShapeBox.lineWidth = 1;
+            selectedShapeBox.setLineWidth( 1 );
             selectedShapeBox = obj;
-            selectedShapeBox.lineWidth = 3;
-                        
+            selectedShapeBox.setLineWidth( 3 );
+            selectedShapeBox.setLayer( 2 );
             if ( obj == selectBox )
                selectBoxOn = true;
             else
@@ -223,53 +221,59 @@ class DrawingProgram extends Code12Program
    
    public void onMouseDrag( GameObj obj, double x, double y )
    {
-      if ( y > boxSize )
+      if ( newObj != null )
       {
-         if ( !selectBoxOn )
+         // Move object being drawn
+         if ( selectedShapeBox == circle )
          {
-            if ( selectedShapeBox == circle )
-            {
-               double newDiameter = 2 * ct.distance( newObj.x, newObj.y, x, y );
-               newObj.width = newDiameter;
-               newObj.height = newDiameter;
-            }
-            else if ( selectedShapeBox == ellipse || selectedShapeBox == rectangle )
-            {
-               double newWidth = 2 * ct.distance( newObj.x, 0, x, 0 );
-               double newHeight = 2 * ct.distance( 0, newObj.y, 0, y );
-               newObj.width = newWidth;
-               newObj.height = newHeight;
-            }
-            else if ( selectedShapeBox == line )
-            {
-               newObj.width = x - newObj.x;
-               newObj.height = y - newObj.y;
-            }
-            newObj.group = "drawing";
+            double newDiameter = 2 * ct.distance( newObj.x, newObj.y, x, y );
+            newObj.setSize( newDiameter, newDiameter );
          }
-         else if ( obj != null )
+         else if ( selectedShapeBox == ellipse || selectedShapeBox == rectangle )
          {
-            obj.x = x - dxClick;
-            obj.y = y - dyClick;
-            obj.setLayer( 1 );
+            double newWidth = 2 * ct.distance( newObj.x, 0, x, 0 );
+            double newHeight = 2 * ct.distance( 0, newObj.y, 0, y );
+            newObj.setSize( newWidth, newHeight );
          }
+         else if ( selectedShapeBox == line )
+         {
+            newObj.setSize( x - newObj.x, y - newObj.y );
+         }
+      }
+      else if ( obj != null && obj.group.equals( "drawing" ) )
+      {
+         // Move drawing object with drag
+         obj.x = x - dxClick;
+         obj.y = y - dyClick;
       }
    }
    
+   public void onMouseRelease( GameObj obj, double x, double y )
+   {
+      if ( newObj != null )
+      {
+         selectedObj = newObj;
+         newObj = null;
+      }
+   }
+
    public void onKeyPress( String keyName )
    {
       if ( keyName.equals( "backspace" ) )
       {
-         ct.println("backspace key pressed");
+         // Delete selected drawing object
          if ( selectedObj != null )
             selectedObj.delete();
       }
       else if ( keyName.equals( "c" ) )
+      {
+         // Clear the canvas
          ct.clearGroup( "drawing" );
+      }
    }
    
-   public static void main(String[] args)
+   public static void main( String[] args )
    { 
-      Code12.run(new DrawingProgram()); 
+      Code12.run( new DrawingProgram() ); 
    }
 }
