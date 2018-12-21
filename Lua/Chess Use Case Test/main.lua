@@ -1,12 +1,12 @@
 package.path = package.path .. [[;../../Desktop/Code12/?.lua;C:\Users\lando\Documents\code12\Desktop\Code12\?.lua]]
 local ct, this, _fn = require('Code12.ct').getTables()
 
+local files = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}
 local board = {{}, {}, {}, {}, {}, {}, {}, {}}
 local pieces = {{}, {}}
-local isPlayerTurn
+local isPlayerTurn, isGameFinished
 local pCaptured, oCaptured = 0, 0
 local tileLength = 12
-local moveCount = 0
 local time
 
 -- Piece ---------------------------------------------------------------------
@@ -32,10 +32,9 @@ function newPiece(t, i, j, c)
 end
 
 function move(obj, i, j)
-    moveCount = moveCount + 1
     colorBoard()
     colorMove(obj.i, obj.j, i, j)
-    ct.logm(log(obj.i, obj.j, i, j), obj, getPieceAt(i, j))
+    ct.logm(log(obj.i, obj.j, i, j), obj.gameObj)
     ct.sound("chess sound.wav")
 
     if obj:isEnemyAt(i, j) then
@@ -44,6 +43,7 @@ function move(obj, i, j)
     obj.i, obj.j = i, j
     obj.gameObj.x, obj.gameObj.y = getCoords(i, j)
     updateAllPossibleMoves()
+    endingConditions()
 end
 
 function capture(obj)
@@ -54,7 +54,7 @@ function capture(obj)
         gameObj.x, gameObj.y = 3 * pCaptured, 3
     else
         oCaptured = oCaptured + 1
-        gameObj.x, gameObj.y = 3 * oCaptured, 105
+        gameObj.x, gameObj.y = 3 * oCaptured, 108
     end
     obj:delete()
 end
@@ -74,7 +74,7 @@ function sudoMove(obj, i, j)
     end
     obj.ni, obj.nj = obj.i, obj.j
     obj.i, obj.j = i, j
-    updateAllPossibleMoves()
+    obj:updatePossibleMoves()
 end
 
 function undoMove(obj)
@@ -85,7 +85,7 @@ function undoMove(obj)
         p.i, p.j = p.ni, p.nj
         p.ni, p.nj = nil, nil
     end
-    updateAllPossibleMoves()
+    obj:updatePossibleMoves()
 end
 
 function isAllyAt(obj, i, j)
@@ -129,10 +129,11 @@ end
 function movePawn(obj, i, j)
     obj.isFirstMove = nil
     move(obj, i, j)
-    if obj.i == 1 or obj.i == 8 then
+    if not isGameFinished and (obj.i == 1 or obj.i == 8) then
+        local i, j = getPieceIndex(obj)
         obj:promotion()
-        --TODO: log promotion
-        --NOTE: obj parameter is of type pawn at this point
+        local t = getPieceName(pieces[i][j].t)
+        ct.logm(j .. files[i] .. t, pieces[i][j].gameObj)
     end
 end
 
@@ -271,30 +272,22 @@ end
 
 function _fn.start()
     ct.setBackColor("dark gray")
-    createBoard()
-    local c = colorPrompt()
-    setupPieces(c)
-    updateAllPossibleMoves()
     --TODO: setOutputFile cannot open file
-    ct.setOutputFile("log.pgn")
+    ct.setOutputFile("log.txt")
     ct.println("Algebraic Notation Records")
     ct.println("\tFor more information visit: https://en.wikipedia.org/wiki/Algebraic_notation_(chess)")
     ct.setSoundVolume(0.5)
     ct.loadSound("chess sound.wav")
+    createBoard()
+    local c = colorPrompt()
+    setupPieces(c)
+    updateAllPossibleMoves()
     isPlayerTurn = c == 'w'
     time = ct.getTimer()
 end
 
 function _fn.update()
-    if not getOppKing() or isOppInCheckMate() then
-        --TODO: log player winning
-    elseif not getPlayerKing() or isPlayerInCheckMate() then
-        --TODO: log opponent winning
-    elseif isDraw() then
-        --TODO: log draw
-    end
-
-    if not isPlayerTurn and #pieces[2] > 0 and ct.getTimer() - time > 500 then
+    if not isPlayerTurn and not isGameFinished and #pieces[2] > 0 and ct.getTimer() - time > 500 then
         opponentMove()
         isPlayerTurn = true
     end
@@ -334,14 +327,16 @@ function _fn.onMouseRelease(gameObj, x, y)
     end
 end
 
---TODO: create labels for tiles
 function createBoard()
+    local x, y
     for i = 1, #board do
         for j = 1, #board do
-            local x, y = getCoords(i, j)
+            x, y = getCoords(i, j)
             board[i][j] = ct.rect(x, y, tileLength, tileLength)
-            board[i][j].lineWidth = 0
+            board[i][j]:setLineWidth(0)
+            ct.text(ct.parseInt(math.abs(j - 8) + 1), 1, x + 4, 2, "white")
         end
+        ct.text(files[i], y - 4, 103, 2, "white")
     end
     colorBoard()
 end
@@ -375,6 +370,32 @@ function opponentMove()
     rpiece:move(v[1], v[2])
 end
 
+--TODO: opponent winning is not working
+function endingConditions()
+    ct.print(not getPlayerKing())
+    ct.print(' ')
+    ct.println(isPlayerInCheckMate())
+    if not getOppKing() or isOppInCheckMate() then
+        isGameFinished = true
+        ct.text("Player Won!", 49, 49, 20, "white")
+        ct.text("Player Won!", 50, 50, 20, "dark cyan")
+        ct.println("Player Won!")
+    elseif not getPlayerKing() or isPlayerInCheckMate() then
+        isGameFinished = true
+        ct.text("Opponent Won", 49, 49, 16, "white")
+        ct.text("Opponent Won", 50, 50, 16, "light red")
+        ct.println("Opponent Won")
+    elseif isDraw() then
+        isGameFinished = true
+        ct.text("Draw", 49, 49, 20, "white")
+        ct.text("Draw", 50, 50, 20, "light blue")
+        ct.println("Draw")
+    end
+    if isGameFinished then
+        preventPiecesFromMoving()
+    end
+end
+
 function isInCheck(k)
     local king = getKing(k)
     local m = math.abs(k - 2) + 1
@@ -404,6 +425,27 @@ function isInCheckMate(m)
 end
 
 function isDraw()
+    local m = 2
+    if isPlayerTurn then
+        m = 1
+    end
+    for n = 1, #pieces[m] do
+        if #pieces[m][n].possibleMoves ~= 0 then
+            return false
+        end
+    end
+    return true
+end
+
+function log(i1, j1, i2, j2)
+    local piece = getPieceAt(i1, j1)
+    local t = getPieceName(piece.t)
+    local file1, rank1 = files[j1], math.abs(i1 - 8) + 1
+    local file2, rank2 = files[j2], math.abs(i2 - 8) + 1
+    if getPieceAt(i2, j2) then
+        return t .. file1 .. rank1 .. 'x' .. file2 .. rank2
+    end
+    return t .. file1 .. rank1 .. file2 .. rank2
 end
 
 function colorMove(i1, j1, i2, j2)
@@ -429,39 +471,6 @@ function colorTile(i, j)
     else
         board[i][j]:setFillColorRGB(100, 127, 127)
     end
-end
-
-function log(i1, j1, i2, j2)
-    local piece = getPieceAt(i1, j1)
-    local t, ch = piece.t, ''
-    local files = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'}
-    local file1, rank1 = files[j1], math.abs(i1 - 8) + 1
-    local file2, rank2 = files[j2], math.abs(i2 - 8) + 1
-    --TODO: change algorithm of logging check
-    -- if getPlayerKing() and getOppKing() then
-    --     local k = 2
-    --     if isPlayerPiece(piece) then
-    --         k = 1
-    --     end
-    --     piece:sudoMove(i2, j2)
-    --     if isInCheckMate(k) then
-    --         ch = '#'
-    --     elseif isInCheck(k) then
-    --         ch = '+'
-    --     end
-    --     piece:undoMove()
-    -- end
-    if t == "pawn" then
-        t = ''
-    elseif t == "knight" then
-        t = 'N'
-    else
-        t = t:sub(1, 1):upper()
-    end
-    if getPieceAt(i2, j2) then
-        return moveCount .. ". " .. t .. file1 .. rank1 .. 'x' .. file2 .. rank2 .. ch
-    end
-    return moveCount .. ". " .. t .. file1 .. rank1 .. file2 .. rank2 .. ch
 end
 
 function colorPrompt()
@@ -504,9 +513,16 @@ end
 function updateAllPossibleMoves()
     for m = 1, #pieces do
         for n = 1, #pieces[m] do
-            ct.println(pieces[m][n])
             pieces[m][n].possibleMoves = {}
             pieces[m][n]:updatePossibleMoves()
+        end
+    end
+end
+
+function preventPiecesFromMoving()
+    for m = 1, #pieces do
+        for n = 1, #pieces[m] do
+            pieces[m][n].gameObj:setClickable(false)
         end
     end
 end
@@ -598,6 +614,16 @@ end
 
 function getCoords(i, j)
     return tileLength * j - 4, tileLength * i
+end
+
+function getPieceName(t)
+    if t == "pawn" then
+        return ''
+    end
+    if t == "knight" then
+        return 'N'
+    end
+    return t:sub(1, 1):upper()
 end
 
 function isPlayerPiece(obj)

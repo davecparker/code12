@@ -1,138 +1,131 @@
 
-import Code12.*;
-
-public class Game extends Code12Program
+class Game
 {
     GameObj player, goal, score;
     double enemyCount = 0;
     int scoreCount = 0;
-
-    public static void main(String[] args)
-    {
-        Code12.run(new Game());
-    }
+    int xSpeed = 0;
+    int ySpeed = 0;
+    boolean isGameFinished = false;
 
     public void start()
     {
         ct.setBackColor("gray");
 
+        /*
+         * creates player object,
+         * user interactive via arrow keys
+         */
         player = ct.circle(50, 75, 5, "white");
         player.setLineColor("white");
 
+        /*
+         * creates goal object,
+         * increases score when player touches goal
+         */
         goal = ct.circle(ct.random(0, 100), ct.random(33, 100), 3, "light green");
         goal.setLineColor("light green");
+        goal.setLayer(0);
 
+        /*
+         * creates score object,
+         * keeps track of score,
+         * score updated every update cycle
+         */
         score = ct.text("Score: 0", 50, 4, 5, "dark gray");
     }
 
     public void update()
     {
-        if (isBeyondLeftBoundary())
+        // teleports player from left edge to right edge
+        if (player.x + player.getWidth() / 2 <= 0)
             player.x = 100;
-        else if (isBeyondRightBoundary())
+        // teleports player from right edge to left edge
+        else if (player.x - player.getWidth() / 2 >= 100)
             player.x = 0;
 
-        if (isBeyondUpperBoundary())
-            preventPassingUpperBoundary();
-        else if (isBeyondLowerBoundary())
-            preventPassingLowerBoundary();
+        // prevents player from going past upper edge
+        if (player.y - player.getHeight() / 2 <= 0)
+        {
+            player.y++;
+            player.setXSpeed(xSpeed);
+        }
+        // prevents player from going past lower edge
+        else if (player.y + player.getHeight() / 2 >= 100)
+        {
+            player.y--;
+            player.setXSpeed(xSpeed);
+        }
 
+        /*
+         * if player hits goal,
+         * move goal to random location,
+         * and increase score count
+         */
         if (player.hit(goal))
         {
-            randomizeGoalPosition();
-            incrementScore("++");
-        }
-
-        GameObj objHit = player.objectHitInGroup("enemies");
-        if (objHit != null && player.visible)
-        {
-            objHit.delete();
-            incrementScore("--");
-        }
-
-        if (scoreCount < 0)
-            losingAction();
-    }
-
-    public boolean isBeyondLeftBoundary()
-    {
-        return player.x + player.width / 2 <= 0;
-    }
-
-    public boolean isBeyondRightBoundary()
-    {
-        return player.x - player.width / 2 >= 100;
-    }
-
-    public boolean isBeyondUpperBoundary()
-    {
-        return player.y - player.height / 2 <= 0;
-    }
-
-    public boolean isBeyondLowerBoundary()
-    {
-        return player.y + player.height / 2 >= 100;
-    }
-
-    public void preventPassingUpperBoundary()
-    {
-        player.y++;
-        player.ySpeed = 0;
-    }
-
-    public void preventPassingLowerBoundary()
-    {
-        player.y--;
-        player.ySpeed = 0;
-    }
-
-    public void randomizeGoalPosition()
-    {
-        goal.x = ct.random(0, 100);
-        goal.y = ct.random(33, 100);
-    }
-
-    public void incrementScore(String increment)
-    {
-        if (increment.equals("++"))
+            goal.x = ct.random(10, 90);
+            goal.y = ct.random(35, 95);
             scoreCount++;
-        else
+        }
+        /*
+         * if player hits an enemy,
+         * delete enemy,
+         * and decrease score count
+         */
+        GameObj hitObj = player.objectHitInGroup("enemies");
+        if (hitObj != null && !isGameFinished)
+        {
+            hitObj.delete();
             scoreCount--;
+        }
+        // update score text
         score.setText("Score: " + scoreCount);
-    }
 
-    public void losingAction()
-    {
-        ct.text("You Lost", 50, 50, 10, "dark gray");
-        goal.visible = false;
-        player.visible = false;
+        // if score is less than zero, end game
+        if (scoreCount < 0)
+            end();
     }
 
     public void onKeyPress(String key)
     {
-        if (key.equals("up"))
-            player.ySpeed = -2;
-        else if (key.equals("down"))
-            player.ySpeed = 2;
-        else if (key.equals("left"))
-            player.xSpeed = -2;
-        else if (key.equals("right"))
-            player.xSpeed = 2;
+        // if game has not ended, change direction of player
+        if (!isGameFinished)
+        {
+            if (key.equals("up"))
+                ySpeed += -1;
+            else if (key.equals("down"))
+                ySpeed += 1;
+            else if (key.equals("left"))
+                xSpeed += -1;
+            else if (key.equals("right"))
+                xSpeed += 1;
+            player.setSpeed(xSpeed, ySpeed);
+        }
 
+        // create an object each time a key is pressed
         GameObj enemy = ct.rect(ct.random(0, 100), -1, 3, 3, "dark gray");
-        enemy.setLineColor("dark gray");
+        enemy.setLineWidth(0);
         enemy.setLayer(0);
-        enemy.ySpeed = 1;
-        enemy.autoDelete = true;
+        enemy.setSpeed(0, 1);
         enemy.group = "enemies";
     }
 
     public void onKeyRelease(String key)
     {
+        // if a key is released, stop player movement
         if (key.equals("up") || key.equals("down"))
-            player.ySpeed = 0;
+            ySpeed = 0;
         else if (key.equals("left") || key.equals("right"))
-            player.xSpeed = 0;
+            xSpeed = 0;
+        player.setSpeed(xSpeed, ySpeed);
+    }
+
+    // ends game
+    void end()
+    {
+        ct.text("You Lost", 50, 50, 10, "dark gray");
+        isGameFinished = true;
     }
 
 }

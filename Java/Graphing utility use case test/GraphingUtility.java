@@ -1,7 +1,5 @@
 
-import Code12.*;
-
-public class GraphingUtility extends Code12Program
+class GraphingUtility
 {
     GameObj xAxis, yAxis, equationText;
     GameObj[] buttons = new GameObj[17];
@@ -10,18 +8,13 @@ public class GraphingUtility extends Code12Program
     String[] simplifiedExpression;
     String equation = "";
 
-    public static void main(String[] args)
-    {
-        Code12.run(new GraphingUtility());
-    }
-
     public void start()
     {
         ct.setBackColor("light gray");
         xAxis = ct.line(0, 50, 100, 50, "white");
         yAxis = ct.line(50, 0, 50, 100, "white");
         equationText = ct.text("", 5, 89.5, 2, "white");
-        equationText.align("left", true);
+        equationText.align("left");
         equationText.setLayer(2);
 
         defineButtons();
@@ -76,7 +69,7 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public void defineLines()
+    void defineLines()
     {
         double y1 = -parse(-50) + 50;
         double y2 = -parse(-49.9) + 50;
@@ -88,38 +81,37 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public void defineLine(double x, double y, double x2, double y2)
+    void defineLine(double x, double y, double x2, double y2)
     {
         GameObj line = ct.line(x, y, x2, y2, "light blue");
         line.lineWidth = 3;
         line.group = "coordinates";
     }
 
-    public void defineButtons()
+    void defineButtons()
     {
         for (int i = 0; i < buttons.length; i++)
             defineButton(i);
     }
 
-    public void defineButton(int i)
+    void defineButton(int i)
     {
         double x = 5 * i % 55 + ct.intDiv(i, 16) * 25 + 25;
         double y = 93.33 + ct.intDiv(i, 11) * 5;
         buttons[i] = ct.rect(x, y, 3, 1, "white");
-        buttons[i].align("center", true);
         buttons[i].setLayer(2);
         buttonTexts[i] = ct.text(charAt("x0123456789+-*/^<", i), x, y, 1);
         buttonTexts[i].setLayer(2);
     }
 
-    public void enableButtons(String buttonsString)
+    void enableButtons(String buttonsString)
     {
         String[] buttonStrings = toCharArray(buttonsString);
         for (String buttonString: buttonStrings)
             enableButton(buttonString);
     }
 
-    public void enableButton(String buttonString)
+    void enableButton(String buttonString)
     {
         for (int i = 0; i < buttons.length; i++)
         {
@@ -133,14 +125,14 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public void disableButtons(String buttonsString)
+    void disableButtons(String buttonsString)
     {
         String[] buttonStrings = toCharArray(buttonsString);
         for (String buttonString: buttonStrings)
             disableButton(buttonString);
     }
 
-    public void disableButton(String buttonString)
+    void disableButton(String buttonString)
     {
         for (int i = 0; i < buttons.length; i++)
         {
@@ -154,7 +146,7 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public String getToBeDisabledButtons()
+    String getToBeDisabledButtons()
     {
         String buttonString = getLastChar(equationText.getText());
         if (buttonString.equals("x"))
@@ -168,7 +160,7 @@ public class GraphingUtility extends Code12Program
         return "x-";
     }
 
-    public void backspaceAction()
+    void backspaceAction()
     {
         String equationString = equationText.getText();
         equationString = equationString.substring(0, equationString.length() - 1);
@@ -179,7 +171,7 @@ public class GraphingUtility extends Code12Program
             disableButton("<");
     }
 
-    public void deconstructExpression()
+    void deconstructExpression()
     {
         String expression = equationText.getText();
         deconstructedExpression = new String[100];
@@ -195,7 +187,7 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public void substituteXVariable(double x)
+    void substituteXVariable(double x)
     {
         simplifiedExpression = new String[100];
         for (int i = 0; i < deconstructedExpression.length && deconstructedExpression[i] != null; i++)
@@ -212,7 +204,7 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public double parse(double x)
+    double parse(double x)
     {
         substituteXVariable(x);
         double solution = ct.parseNumber(simplifiedExpression[0]);
@@ -230,28 +222,28 @@ public class GraphingUtility extends Code12Program
         return solution;
     }
 
-    public boolean hasEquationChanged()
+    boolean hasEquationChanged()
     {
         return !equation.equals(equationText.getText());
     }
 
-    public boolean isParseable()
+    boolean isParseable()
     {
         String equationChar = getLastChar(equationText.getText());
         return !equationChar.equals("+") && !equationChar.equals("-") && !equationChar.equals("*") && !equationChar.equals("/") && !equationChar.equals("^") && !equationChar.equals("");
     }
 
-    public boolean isOperand(String value)
+    boolean isOperand(String value)
     {
         return value.equals("x") || value.equals("-") || value.equals(".") || value.equals("0") || value.equals("1") || value.equals("2") || value.equals("3") || value.equals("4") || value.equals("5") || value.equals("6") || value.equals("7") || value.equals("8") || value.equals("9");
     }
 
-    public boolean isOperator(String value)
+    boolean isOperator(String value)
     {
         return value.equals("+") || value.equals("*") || value.equals("/") || value.equals("^");
     }
 
-    public String[] toCharArray(String s)
+    String[] toCharArray(String s)
     {
         String[] charArray = new String[s.length()];
         for (int i = 0; i < s.length(); i++)
@@ -259,12 +251,12 @@ public class GraphingUtility extends Code12Program
         return charArray;
     }
 
-    public String getLastChar(String s)
+    String getLastChar(String s)
     {
         return charAt(s, s.length() - 1);
     }
 
-    public String charAt(String s, int i)
+    String charAt(String s, int i)
     {
         if (s.length() <= 0 || i < 0)
             return "";
