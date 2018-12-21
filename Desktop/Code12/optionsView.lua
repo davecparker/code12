@@ -435,7 +435,6 @@ function optionsView:create()
 		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
 		onPress = onGridlineColorPress,
 	}
-	-- gridlineColorPicker.switches[3]:setState{ isOn = true }
 	lastPicker = gridlineColorPicker
 
 	-- Editor picker
