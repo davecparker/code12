@@ -348,7 +348,7 @@ function optionsView:create()
 		"7. Object Method Calls",
 		"8. If-else",
 		"9. Function Definitions",
-		"10. Parameters",
+		"10. Function Parameters",
 		"11. Loops",
 		"12. Arrays",
 	}
