@@ -62,18 +62,19 @@ local checkStmt
 
 --- Misc Analysis Functions --------------------------------------------------
 
--- If the name does not start with a lower-case letter, then set the error state.
+-- If the name does not start with a lower-case letter, then set the error state
+-- with the optional docLink and return false, else return true.
 -- The usage should be a description of how the name is being used 
 -- (e.g. "variable", "function"). 
-local function checkLowerCaseStart( nameNode, usage )
+local function checkLowerCaseStart( nameNode, usage, docLink )
 	local chFirst = string.byte( nameNode.str, 1 )
 	if chFirst < 97 or chFirst > 122 then    -- a to z
 		err.setErrNode( nameNode, 
 				"By convention, %s names should start with a lower-case letter", usage )
-		if usage == "variable" then
-			err.addDocLink( "Java.html#variables" )
-		end
+		err.addDocLink( docLink )
+		return false
 	end
+	return true
 end
 
 -- Look up the name of nameToken in the nameTable (variables, userMethods, or API tables).
@@ -238,7 +239,7 @@ local function defineVar( var )
 
 	-- Enforce case convention
 	if not var.isConst then
-		checkLowerCaseStart( nameNode, "variable" )
+		checkLowerCaseStart( nameNode, "variable", "Java.html#variables" )
 	end
 
 	-- Define it and the case-insensitive lower-case version as well if necessary
@@ -321,7 +322,7 @@ local function defineMethod( func )
 		if parseJava.isInvalidID( nameID, "parameter" ) then
 			return
 		end
-		checkLowerCaseStart( nameID, "parameter" )
+		checkLowerCaseStart( nameID, "parameter", "Java.html#function-parameters" )
 		params[#params + 1] = { name = nameID.str, vt = var.vt }
 	end
 
@@ -333,9 +334,11 @@ local function defineMethod( func )
 			err.setErrNode( func, 
 					"Return type of %s function should be %s",
 					fnName, javaTypes.typeNameFromVt( event.vt ) )
+			err.addDocLink( event.docLink )
 		elseif #event.params ~= numParams then
 			err.setErrNode( func, 
 					"Wrong number of parameters for function %s ", fnName )
+			err.addDocLink( event.docLink )
 		else
 			for i = 1, numParams do
 				local vtExpected = event.params[i].vt
@@ -343,6 +346,7 @@ local function defineMethod( func )
 					err.setErrNodeAndRef( paramVars[i], nameNode,
 							"Wrong type for parameter %d of function %s (expected %s)",
 							i, fnName, javaTypes.typeNameFromVt( vtExpected ) )
+					err.addDocLink( event.docLink )
 					return
 				end
 			end
@@ -350,6 +354,7 @@ local function defineMethod( func )
 				err.setErrNode( func, 
 						'The %s function must be declared starting with "public"', 
 						fnName )
+				err.addDocLink( event.docLink )
 			end
 			if fnName == "main" then
 				if not func.isStatic then
@@ -359,6 +364,7 @@ local function defineMethod( func )
 			elseif func.isStatic then
 				err.setErrNode( func, 
 						"The %s function should not be declared static", fnName )
+				err.addDocLink( event.docLink )
 			end
 		end
 
@@ -376,6 +382,7 @@ local function defineMethod( func )
 	if syntaxLevel < 9 then
 		err.setErrNode( func, "Unknown function name\n"
 				.. "(Use of user-defined functions requires syntax level 9)" )
+		err.addDocLink( "API.html" )
 		-- Let it get defined if correct anyway, so earlier calls don't error.
 	end
 	-- Check if already defined
@@ -384,16 +391,18 @@ local function defineMethod( func )
 	if methodFound then
 		err.setErrNodeAndRef( func, methodFound.func, 
 				"Function %s was already defined", fnName )
+		err.addDocLink( "Java.html#function-definitions" )
 		return
 	elseif methodCorrectCase then
 		err.setErrNodeAndRef( func, methodCorrectCase.func, 
 				"Function %s differs only by upper/lower case from existing function %s", 
 				fnName, nameCorrectCase )
+		err.addDocLink( "Java.html#function-definitions" )
 		return
 	end
 
 	-- Enforce case convention
-	checkLowerCaseStart( nameNode, "function" )
+	checkLowerCaseStart( nameNode, "function", "Java.html#function-definitions" )
 
 	-- Add entry to userMethods table and lowercase mapping if different
 	userMethods[fnName] = { vt = func.vt, func = func, params = params }
@@ -451,6 +460,7 @@ local function canAssign( target, vtTarget, expr, vtExpr )
 					javaTypes.typeNameFromVt( vtTarget ) )
 	end
 	err.setErrNodeAndRef( target, expr, str )
+	err.addDocLink( "Java.html#java-data-types" )
 	return false
 end	
 
@@ -505,9 +515,11 @@ local function vtCheckLValue( lValue, assigned )
 		if type(vt) ~= "table" then
 			err.setErrNodeAndRef( indexExpr, varNode, 
 					"An index in [brackets] can only be applied to an array" )
+			err.addDocLink( "Java.html#arrays" )
 			return nil
 		elseif vtSetExprNode( indexExpr ) ~= 0 then
 			err.setErrNode( indexExpr, "Array index must be an integer value" )
+			err.addDocLink( "Java.html#arrays" )
 			return nil
 		end
 		vt = vt.vt   -- get element type of the array

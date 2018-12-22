@@ -13,7 +13,7 @@
 7. [Object Method Calls]
 8. [If-else]
 9. [Function Definitions]
-10. [Parameters]
+10. [Function Parameters]
 11. [Loops]
 12. [Arrays]
 
@@ -1510,7 +1510,7 @@ can be written.
 ###### [Java Language Help](#top) > [Function Definitions]
 
 
-### Parameters
+### Function Parameters
 Just like many [function calls] to [Code12 functions](API.html) 
 require *parameters* to specify input values for the function,
 you can [define your own functions](#function-definitions) 
@@ -1715,7 +1715,7 @@ of the call (here a `GameObj`) and passes it on as the return value
 from `makePenny()`.
 
 
-###### [Java Language Help](#top) > [Parameters]
+###### [Java Language Help](#top) > [Function Parameters]
 
 
 ### Loops
