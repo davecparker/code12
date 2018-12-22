@@ -1,15 +1,5 @@
 /* Style Sheet for www.code12.org */
 
-@font-face {    /* for headers */
-  font-family: 'Roboto-Bold';
-  src: url('Roboto-Bold.ttf');
-}
-
-@font-face {    /* for code */
-  font-family: 'NotoMono-Regular';
-  src: url('NotoMono-Regular.ttf');
-}
-
 body {
     margin: auto;
     padding-right: 0;
@@ -41,15 +31,15 @@ pre {
 }
 
 code {
-    font-family: "NotoMono-Regular", "NotoMono", monospace;
+    font-family: monospace;
     font-size: 10pt;
     color: black;
     background-color: #eeeeee;
 }
 
 h1, h2, h3, h4, h5 { 
-    font-family: "Roboto-Bold", "Roboto", "Verdana", sans-serif;
-    font-weight: normal;
+    font-family: "Helvetica", sans-serif;
+    font-weight: bold;
     color: black 
 }
 

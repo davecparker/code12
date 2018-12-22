@@ -15,7 +15,6 @@ local g = require( "Code12.globals" )
 local app = require( "app" )
 local source = require( "source" )
 local err = require( "err" )
-local env = require( "env" )
 
 
 -- The errView module and scene
@@ -147,7 +146,7 @@ local function makeCodeGroup( numSourceLines )
 end
 
 -- Listener function for the docs native web view
-local function webViewListener( event )
+local function webViewListener()
 	-- Update Back and Forward buttons after link is fully resolved
 	timer.performWithDelay( 100, updateDocsToolbar )
 end
