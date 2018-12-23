@@ -4,7 +4,7 @@
 --
 -- Test driver for Code12's High-level parsing and Semantic Error Checking
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 

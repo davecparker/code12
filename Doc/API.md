@@ -1,7 +1,12 @@
 % Code12 Function Reference
 
+<div class="rightLink">
+[Java Language Help](Java.html)
+</div>
+
 <div class="summary">
 <div class="summaryColumn">
+
 
 ##### [Graphics Object Creation] {#toc-graphics-object-creation}
 * [ct.circle()]
@@ -3999,5 +4004,5 @@ so typing 'A' uses the "a" key, and typing '$' uses the "4" key.
 <footer>
 	Code12 Version 1.0
 
-	(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved. 
+	Copyright (c) 2019 Code12. All Rights Reserved. 
 </footer> 

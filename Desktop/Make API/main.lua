@@ -5,7 +5,7 @@
 -- Tool to create Lua tables representing the Code12 API (methods, param types, etc.)
 -- based on the "API Summary.txt" file.
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 

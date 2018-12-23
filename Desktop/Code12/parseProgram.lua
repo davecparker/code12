@@ -4,7 +4,7 @@
 --
 -- High-level parsing for a Code 12 Java program
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules

@@ -4,7 +4,7 @@
 --
 -- Implements parsing for Java in the Code12 system.
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules used

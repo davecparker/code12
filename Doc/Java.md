@@ -1,5 +1,9 @@
 % Java Language Help
 
+<div class="rightLink">
+[Code12 Function Reference](API.html)
+</div>
+
 <div class="summary">
 <div class="summaryColumn">
 
@@ -1761,6 +1765,5 @@ also access and change the object later using the [GameObj Data Fields] and [Gam
 <footer>
 	Code12 Version 1.0
 
-	(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved. 
+	Copyright (c) 2019 Code12. All Rights Reserved. 
 </footer> 
-
