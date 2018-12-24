@@ -32,7 +32,6 @@ class Vectors
     // redefines a vector (vectors[i])
     void updateVector(int i)
     {
-<<<<<<< HEAD
         /*
          * only difference between this and defineVector(i) is these next two lines,
          * a vector does not need to be created since it already exists, instead only relocated,
@@ -41,20 +40,6 @@ class Vectors
         vectors[i].x = ct.random(1, 99);
         vectors[i].y = ct.random(1, 99);
         setRandomSpeeds(i);
-=======
-        int x = ct.random(-1, (int)(ct.getWidth()) - 1);
-        int y = ct.random(-1, (int)(ct.getHeight()) - 1);
-        if (vectors[i] == null)
-            vectors[i] = ct.circle(x, y, 2);
-        else
-        {
-            vectors[i].x = x;
-            vectors[i].y = y;
-        }
-        double[] speeds = getRandomSpeeds();
-        vectors[i].xSpeed = speeds[0];
-        vectors[i].ySpeed = speeds[1];
->>>>>>> master
         shades[i] = 127;
     }
 
@@ -75,7 +60,6 @@ class Vectors
     // increments a vectors RGB fill color (shades[i]) and sets the vector's (vectors[i]) fill color
     void updateShade(int i)
     {
-<<<<<<< HEAD
         shades[i]++;
         vectors[i].setLayer(shades[i] - 126); // vectors (vectors[i]) are set on a higher layer to display according to their shade
         vectors[i].setFillColorRGB(shades[i], shades[i], shades[i]);
@@ -85,11 +69,7 @@ class Vectors
     void defineLine(int i, int j)
     {
         GameObj line = ct.line(vectors[i].x, vectors[i].y, vectors[j].x, vectors[j].y); // line from (x[i], y[i]) -> (x[j], y[j])
-        int minShade = (int) Math.min(shades[i], shades[j]); // the minimum shade is the darkest and also closest color to that of the background
-=======
-        GameObj line = ct.line(vectors[i].x, vectors[i].y, vectors[j].x, vectors[j].y);
-        int minShade = (int)(Math.min(shades[i], shades[j]));
->>>>>>> master
+        int minShade = Math.min(shades[i], shades[j]); // the minimum shade is the darkest and also closest color to that of the background
         line.setLineColorRGB(minShade, minShade, minShade);
         line.group = "lines";
         line.setLayer(0);
@@ -138,10 +118,11 @@ class Vectors
     // returns true if vector is outside of window
     boolean isOutsideOfBoundary(GameObj vector)
     {
-        double x = vector.x;
-        double y = vector.y;
-        double radius = vector.getWidth() / 2.0;
-        return (x + radius < 0) || (x - radius > 100) || (y + radius < 0) || (y - radius > 100);
+        boolean outsideLeft   = vector.x + vector.getWidth() / 2 < 0;
+        boolean outsideRight  = vector.x - vector.getWidth() / 2 > 100;
+        boolean outsideTop    = vector.y + vector.getWidth() / 2 < 0;
+        boolean outsideBottom = vector.y - vector.getWidth() / 2 > 100;
+        return outsideLeft || outsideRight || outsideTop || outsideBottom;
     }
 
 }

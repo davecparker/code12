@@ -8,6 +8,7 @@ class GraphingUtility
     String[] simplifiedExpression;
     String equation = "";
 
+    // TODO: make buttons turn red, not text, so buttonTexts can be deleted
     public void start()
     {
         ct.setBackColor("light gray");
@@ -24,18 +25,30 @@ class GraphingUtility
 
     public void onMouseRelease(GameObj obj, double x, double y)
     {
-        String equationString = equationText.getText();
-        if (obj == buttons[16] || obj == buttonTexts[16] && equationString.length() > 0)
-            backspaceAction();
-        for (int i = 0; i < buttons.length - 1; i++)
+        // NOTE: new addition
+        // TODO: verify this works
+        if (isButton(obj))
         {
-            if (obj == buttons[i] || obj == buttonTexts[i] && buttons[i].clickable)
+            String buttonText = obj.getText();
+            if (buttonText.equals("<"))
+                backspaceAction();
+            else
             {
-                equationText.setText(equationText.getText() + buttonTexts[i].getText());
+                equationText.setText(equationText.getText() + buttonText);
                 enableButtons("x+-*/^0123456789<");
                 disableButtons(getToBeDisabledButtons());
             }
         }
+
+        // for (int i = 0; i < buttons.length - 1; i++)
+        // {
+        //     if (obj == buttons[i] || obj == buttonTexts[i] && buttons[i].clickable)
+        //     {
+        //         equationText.setText(equationText.getText() + buttonTexts[i].getText());
+        //         enableButtons("x+-*/^0123456789<");
+        //         disableButtons(getToBeDisabledButtons());
+        //     }
+        // }
     }
 
     public void onKeyRelease(String keyName)
@@ -71,19 +84,19 @@ class GraphingUtility
 
     void defineLines()
     {
-        double y1 = -parse(-50) + 50;
-        double y2 = -parse(-49.9) + 50;
+        double y1 = 50 - parse(-50);
+        double y2 = 50 - parse(-49.9);
         for (double x = 0; x < 100; x += 0.1)
         {
             defineLine(x, y1, x + 0.1, y2);
             y1 = y2;
-            y2 = -parse(x - 49.9) + 50;
+            y2 = 50 - parse(x - 49.9);
         }
     }
 
-    void defineLine(double x, double y, double x2, double y2)
+    void defineLine(double x1, double y1, double x2, double y2)
     {
-        GameObj line = ct.line(x, y, x2, y2, "light blue");
+        GameObj line = ct.line(x1, y1, x2, y2, "light blue");
         line.lineWidth = 3;
         line.group = "coordinates";
     }
@@ -98,10 +111,15 @@ class GraphingUtility
     {
         double x = 5 * i % 55 + ct.intDiv(i, 16) * 25 + 25;
         double y = 93.33 + ct.intDiv(i, 11) * 5;
+        String c = charAt("x0123456789+-*/^<", i);
         buttons[i] = ct.rect(x, y, 3, 1, "white");
+        // NOTE: new addition
+        buttons[i].setText(c);
         buttons[i].setLayer(2);
-        buttonTexts[i] = ct.text(charAt("x0123456789+-*/^<", i), x, y, 1);
-        buttonTexts[i].setLayer(2);
+        buttons[i].group = "buttons";
+        GameObj text = ct.text(c, x, y, 1);
+        //text.setLayer(2);
+        text.group = "buttons";
     }
 
     void enableButtons(String buttonsString)
@@ -113,6 +131,11 @@ class GraphingUtility
 
     void enableButton(String buttonString)
     {
+        // NOTE: new addition
+        GameObj button = getButton(buttonString);
+        button.setClickable(true);
+        // NOTE: button texts will still be able to be clicked if button is disabled
+        // maybe place labels above buttons
         for (int i = 0; i < buttons.length; i++)
         {
             if (buttonString.equals(buttonTexts[i].getText()))
@@ -162,13 +185,16 @@ class GraphingUtility
 
     void backspaceAction()
     {
-        String equationString = equationText.getText();
-        equationString = equationString.substring(0, equationString.length() - 1);
-        equationText.setText(equationString);
-        enableButtons("x+-*/^0123456789<");
-        disableButtons(getToBeDisabledButtons());
-        if (equationString.length() == 0)
-            disableButton("<");
+        if (equationString.length() > 0)
+        {
+            String equationString = equationText.getText();
+            equationString = equationString.substring(0, equationString.length() - 1);
+            equationText.setText(equationString);
+            enableButtons("x+-*/^0123456789<");
+            disableButtons(getToBeDisabledButtons());
+            if (equationString.length() == 0)
+                disableButton("<");
+        }
     }
 
     void deconstructExpression()
@@ -263,6 +289,25 @@ class GraphingUtility
         if (i == s.length())
             return s.substring(i);
         return s.substring(i, i + 1);
+    }
+
+    // NOTE: new addition
+    GameObj getButton(String buttonString)
+    {
+        for (int i = 0; i < buttons.length; i++)
+        {
+            if (buttonString.equals(buttons[i].getText()))
+                return buttons[i];
+        }
+    }
+
+    // NOTE: new addition
+    boolean isButton(GameObj obj)
+    {
+        if (obj == null)
+            return false;
+        String group = obj.group;
+        return group.equals("buttons");
     }
 
 }

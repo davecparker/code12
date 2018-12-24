@@ -3,13 +3,12 @@ class NaturalSelectionVisualization
 {
     GameObj goal, timer, maxFitness, gen;
     GameObj[] dots;
-    int[] directions = new int[(60 * 10) * 50];
-    boolean[] killed = new boolean[50];
+    boolean[] killed;
+    int[] directions;
     int veteran, step;
     double time;
 
-// TODO: finishing comments
-// main methods ///////////////////////////////////////////////////////////////
+// defining methods ///////////////////////////////////////////////////////////
 
     // creates objects and environment
     public void start()
@@ -44,32 +43,29 @@ class NaturalSelectionVisualization
         gen = ct.text("Gen 1", 10, 95, 5, "white");
         gen.setLayer(3);
 
+        /*
+         * killed is a parallel array with dots (dots[50]),
+         * the corresponding index in dots represents whether the dot is dead,
+         * for example, dots[2] is dead if killed[2] == true
+         */
+        killed = new boolean[50];
+
+        /*
+         * directions is a parallel array with dots (dots[50]),
+         * (60 * 10) directions for each dot (60 directions per second for 10 seconds)
+         * integers 0-3 represent directions: 0 = up, 1 = down, 2 = left, 3 = right
+         */
+        directions = new int[60 * 10 * 50];
+
         time = ct.getTimer(); // used to calculate timer
         veteran = 0;          // index of 'veteran' (highest fitness) dot
         step = 0;             // index of current direction,
                               // dots have 600 directions (60 per second for each update cycle)
 
         // intial prep
-        defineObstacles();
         defineDots();
+        defineObstacles();
         defineDirections();
-    }
-
-// defining methods ///////////////////////////////////////////////////////////
-
-    // creates ten obstacles with random locations and dimensions
-    void defineObstacles()
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            int x = ct.random(0, 100);
-            int y = ct.random(20, 80);
-            int width = ct.random(1, 8);
-            int height = ct.random(1, 15);
-            GameObj obstacle = ct.rect(x, y, width, height, "dark gray");
-            obstacle.setLayer(-1);
-            obstacle.group = "obstacles";
-        }
     }
 
     // creates population (fifty dots) at point (50, 98)
@@ -94,6 +90,21 @@ class NaturalSelectionVisualization
             directions[i] = ct.random(0, 3);
     }
 
+    // creates ten obstacles with random locations and dimensions
+    void defineObstacles()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            int x = ct.random(0, 100);
+            int y = ct.random(20, 80);
+            int width = ct.random(1, 8);
+            int height = ct.random(1, 15);
+            GameObj obstacle = ct.rect(x, y, width, height, "dark gray");
+            obstacle.setLayer(-1);
+            obstacle.group = "obstacles";
+        }
+    }
+
 // program methods ////////////////////////////////////////////////////////////
 
     // move the goal or any obstacle to any location on screen
@@ -108,13 +119,6 @@ class NaturalSelectionVisualization
                 obj.y = y;
             }
         }
-    }
-
-    // alters fifty random directions of a given dot (dots[i]) to random directions
-    void mutate(int i)
-    {
-        for (int j = 0; j < 50; j++)
-            directions[600 * i + ct.random(0, 590)] = ct.random(0, 3);
     }
 
     // move a given dot (dot[i]) according to it's next direction (directions[600 * i + step])
@@ -135,6 +139,13 @@ class NaturalSelectionVisualization
             dots[i].setXSpeed(0.5);
         else if (direction == 3) // right
             dots[i].setXSpeed(-0.5);
+    }
+
+    // alters fifty random directions of a given dot (dots[i]) to random directions
+    void mutate(int i)
+    {
+        for (int j = 0; j < 50; j++)
+            directions[600 * i + ct.random(0, 590)] = ct.random(0, 3);
     }
 
 // update methods /////////////////////////////////////////////////////////////

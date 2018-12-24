@@ -80,4 +80,4 @@ function stepAutoDelete(i)
 end
 
 require('Code12.api')
-require('Code12.runtime').run()
+require('Code12.runtime').initAndRun()

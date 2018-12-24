@@ -163,7 +163,7 @@ class FractalTreeGame
          */
         double x2 = x1 + branchLength * Math.cos(phi);
         double y2 = y1 - branchLength * Math.sin(phi);
-        GameObj nbranch = ct.line(x1, y1, x2, y2, "light blue");
+        GameObj nbranch = ct.line(x1, y1, x2, y2, "light red");
         nbranch.group = "referance branches";
         nbranch.setLayer(0);
         if (bundles > 0)
@@ -185,7 +185,7 @@ class FractalTreeGame
             prevTheta = theta;                              // update prevTheta and prevBranch
             prevBranch = branch;
             ct.clearGroup("player branches");               // delete entire player tree
-            defineBranches(50, 100, Math.PI / 2, branch, 6);// redraw player tree
+            defineBranches(50, 100, Math.PI / 2, branch, 7);// redraw player tree
         }
     }
 
