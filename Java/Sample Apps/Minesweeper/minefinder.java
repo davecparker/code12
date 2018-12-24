@@ -5,7 +5,7 @@ class Minesweeper extends Code12Program
       //Global Variables
       int columns = 20; //number of columns in the play area
       int rows = 14; //number of rows in the play area
-      int numbmines = 20; //number of mine in the game
+      int numbmines = 25; //number of mine in the game
       double timer = 0; //variable to track the amount of time the mouse is held down
 
       boolean mouseDown = false; //boolean to track the status of the mouse click
