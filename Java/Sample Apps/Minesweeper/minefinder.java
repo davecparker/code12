@@ -2,22 +2,29 @@ import Code12.*;
 
 class Minesweeper extends Code12Program
 {  
-      int columns = 20;
-      int rows = 14;
-      GameObj[] squares = new GameObj[rows * columns];
-      GameObj[] flags = new GameObj[rows * columns];
-      int numbFlags = 0;
-      GameObj numb;
-      int numbmines = 20;
-      String squareState;
-      double timer = 0;
-      boolean mouseDown = false;
-      GameObj gameStateIndicator;
-      boolean gameOver = false;
-      int squareIndex;
+      //Global Variables
+      int columns = 20; //number of columns in the play area
+      int rows = 14; //number of rows in the play area
+      int numbmines = 20; //number of mine in the game
+      double timer = 0; //variable to track the amount of time the mouse is held down
+
+      boolean mouseDown = false; //boolean to track the status of the mouse click
+      boolean gameOver = false; //boolean to track the state of the game
+
+      GameObj[] squares = new GameObj[rows * columns]; //array of all squares
+      GameObj[] flags = new GameObj[rows * columns]; //array of all flags
+      GameObj gameStateIndicator; //smiley/afraid/win/lose face at the top of the play area
+      
+      //Placeholder variables
+      int squareIndex; //placeholder variable used to index the squares array
+      GameObj numb; // placeholder object used to create the mine indication numbers 
+      String squareState; //placeholder string used to query and compare the status of a square
+                         //which is stored in object.text
+
 
       public void start()
       { 
+            //Game Initialization
             ct.setHeight(80.5); //sets the screen height to match the grid size
 
             gameStateIndicator = ct.image( "smiley.jpg", 50, 5, 10 ); //Default game state
@@ -26,7 +33,7 @@ class Minesweeper extends Code12Program
             {
                   for( int x = 0; x < columns; x++ ) // x = x cord of the square
                   {
-                        GameObj square = ct.rect( 2.7+(x*5), 12.9+(y*5), 5, 5, "gray");
+                        GameObj square = ct.rect( 2.7+(x*5), 12.9+(y*5), 4.8, 4.8, "gray");
                         square.setLayer( 2 );
                         square.setText("");
                         square.group = "square"; //Puts the square into the square group
@@ -40,12 +47,12 @@ class Minesweeper extends Code12Program
 
             while( m < numbmines )
             {
-                  int randX = ct.random( 0, columns - 1 );
-                  int randY = ct.random( 0, rows - 1 );
-                  //Checks if there is already a mine at this randomly selected coordinate
-                  boolean uniqueMine = true; 
-                  int newMineCord = (columns * randY) + randX;
+                  int randX = ct.random( 0, columns - 1 ); //random x position within play area
+                  int randY = ct.random( 0, rows - 1 );  //random y position within play area
                   
+                  //Checks if there is already a mine at this randomly selected coordinate
+                  boolean uniqueMine = true; //if false another mine at the same location exists
+                  int newMineCord = (columns * randY) + randX;
                   for( int mineChord : mineCords )
                   {
                         if( mineChord == newMineCord )     
@@ -125,32 +132,36 @@ class Minesweeper extends Code12Program
             }
       }
 
-      //Function to put the squares into a pseudo 2d array
+      //Set of functions to create a pseudo 2d array for the squares
       public void setSquare( int x, int y, GameObj square )
       {
+            //given a x and y position within the play area puts a square into the 2d array
             int i = (y * columns) + x;
             squares[i] = square;
       }
 
       public int getSquareIndex( GameObj square )
       {
+            //given a square object finds the index of that square within the array
             for( int i = 0; i < squares.length; i++ )
             {
                   if( square == squares[i] )
                         return i;
             }
-            return -1;
+            return -1; //return value if square is not found
       }
 
       public void setSquareValue( int x, int y, String value )
       {
+            //given an x and y position and a square value sets a square within the array's value
             int i = (y * columns) + x;
             GameObj setMe = squares[i];
             setMe.setText( value );
       }
 
       public String getSquareValue( int x, int y )
-      {
+      {     
+            //given an x and y position and a square value returns a square within the array's value
             int i = (y * columns) + x;
             GameObj getMe = squares[i];
             return getMe.getText();
@@ -158,12 +169,14 @@ class Minesweeper extends Code12Program
 
       public GameObj getSquare( int x, int y )
       {
+            //given an x and y position returns the square at that location 
             int i = (y * columns) + x;
             return squares[i];
       }
 
       public boolean goodIndex( int x, int y )
       {
+            //given an x and y position checks if it is within the play area
             if( x >= 0 && x < columns )
             {
                   if( y >= 0 && y < rows )
@@ -179,32 +192,32 @@ class Minesweeper extends Code12Program
       }
       // end of pseudo 2-d array functions
 
-      //Handles the user clicking an empty box
+      //Handles the user clicking a square with no adjacent mines
       public void emptySquare( int i )
       {
-            int x = i % columns;
-            int y = ct.intDiv( i , columns );
+            int x = i % columns; //finds the x position of the square given its index
+            int y = ct.intDiv( i , columns ); //finds the y position of the square given its index
 
-            for( int j = -1; j <= 1; j++ )
+            //loops through the adjacent squares to the one clicked
+            for( int j = -1; j <= 1; j++ ) 
             {
                   for( int k = -1; k <= 1; k++ )
                   {  
-                        if( goodIndex( x + j, y + k ) )
+                        if( goodIndex( x + j, y + k ) ) //makes sure that the index is within play area
                         {     
                               GameObj otherSquare = getSquare( x + j, y + k );
-                              if( otherSquare.visible )
+                              if( otherSquare.visible ) //if the given adjacent square has not yet been revealed
                               {
-                                    otherSquare.visible = false;
-                                    int otherSquareI = getSquareIndex( otherSquare );
-                                    if (flags[otherSquareI] != null)
+                                    otherSquare.visible = false; //reveal it
+                                    int otherSquareI = getSquareIndex( otherSquare ); //gets the other square's index
+                                    if (flags[otherSquareI] != null) //checks if the square being revealed has a flag
                                     {
-                                          flags[otherSquareI].delete();
+                                          flags[otherSquareI].delete(); //if it does removes that flag
                                     }
-                                    String compare = otherSquare.getText();
-                                    if( compare.equals("0") )
+                                    String compare = otherSquare.getText(); //gets the other square's value
+                                    if( compare.equals("0") ) //if it also does not have any adjacent mine
                                     {
-                                          otherSquareI = getSquareIndex( otherSquare );
-                                          emptySquare( otherSquareI );
+                                          emptySquare( otherSquareI ); //calls the empty square function with its index
                                     }
                               }
                         }
@@ -226,29 +239,29 @@ class Minesweeper extends Code12Program
       {
             if( mouseDown ) //tracks how long the mouse is held down 
             {
-                  timer += 1;
+                  timer += 1; //one incriment for each tick
             }
       }
 
       public void onMouseRelease( GameObj obj, double x, double y )
       {
-            mouseDown = false;
-
-            if (!gameOver) //If the game is not over
+            mouseDown = false; //turns of the timer
+            if (!gameOver) //if the game is not over
             {
-                  gameStateIndicator.setImage("smiley.jpg"); //Updates the game state indicator
+                  gameStateIndicator.setImage("smiley.jpg"); //updates the game state indicator
             }
 
-            if( timer <= 15 ) //Normal click
+            if( timer <= 15 ) //normal click
             {
-                  if( obj != null)
+                  if( obj != null) //ensures that the user clicked a flag or square (gamestate indicator is not clickable)
                   {
-                        if ( obj.group.equals("square") ) //something else has been pressed
+                        if ( obj.group.equals("square") ) //a square has been pressed
                         {
                               squareIndex = getSquareIndex( obj );
-                              if ( flags[squareIndex] != null ) //Checks if the square clicked has aa flag
+                              if ( flags[squareIndex] != null ) //Checks if the square clicked has a flag
                               {
-                                    flags[squareIndex].delete();
+                                    flags[squareIndex].delete(); //deletes the flag
+                                    flags[squareIndex] = null;
                               }
                               else
                               {
@@ -257,7 +270,7 @@ class Minesweeper extends Code12Program
 
                                     if( squareState.equals("mine") ) //Checks if a mine has been clicked
                                     {
-                                          endState( false ); 
+                                          endState( false ); //starts the endgame lose funtion
                                     }
                   
                                     if( squareState.equals("0") )
@@ -284,25 +297,25 @@ class Minesweeper extends Code12Program
                                     }    
                               }   
                         }
-                        else
+                        else //a flag has been pressed
                         {
-                             obj.delete(); //deletes the flag 
+                              obj.delete(); //deletes the flag
+                              flags[squareIndex] = null; //removes the flag from the flag array
                         }
                   }
             }
-            else //Held down click
+            else //held down click
             {
                   if( obj!= null )
                   {
                         if ( obj.group.equals("square") ) //checks if the object clicked is a square
                         {
                               GameObj flag = ct.image( "flag.png", obj.x, obj.y, 3 );
-                              flag.setLayer( 3 );
-                              flag.setText( obj.getText() );
+                              flag.setLayer( 3 ); //sets the flag layer so it is on top of the squares
+                             // flag.setText( obj.getText() ); //matches the flag text to the square text
                               flag.group = "flag";
                               squareIndex = getSquareIndex(obj);
                               flags[squareIndex] = flag;
-                              numbFlags += 1;
                         }
                                               
                   }      
@@ -363,7 +376,7 @@ class Minesweeper extends Code12Program
             } 
 
             GameObj endTextObj = ct.text( endText, 50, 20, 20 ); //Displays the endgame text depending on if the game is won or lost
-            endTextObj.setLayer(3); 
+            endTextObj.setLayer(4); //sets the layer so the endgame text is above everything else
             endTextObj.setClickable(false);
       }
 }
