@@ -16,6 +16,7 @@ local app =  {
 	borderShade = 0.5,
 	enabledShade = 0.3,
 	disabledShade = 0.7,
+	defaultGridlineShade = 0.6,
 
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
@@ -23,7 +24,7 @@ local app =  {
 	fontSizeUI = 12,
 	optionsFont = native.systemFont,
 	optionsFontBold = native.systemFontBold,
-	optionsFontSize = 12,
+	optionsFontSize = 14,
 
 	-- Web folders
 	webHelpDir = "http://www.code12.org/docs/1/",
@@ -58,6 +59,7 @@ local app =  {
 	customEditors = {},          -- table of custom editors, e.g. { name = "Atom", path = "C:\...\atom.exe" }
 	showVarWatch = true,         -- when true, show the variable watch window
 	gridOn = false,              -- when true, the coordinate gridlines are visible over the program output
+	gridlineShade = nil,         -- current gridline shade
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started

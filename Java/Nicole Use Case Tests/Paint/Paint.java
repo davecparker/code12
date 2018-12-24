@@ -75,19 +75,6 @@ public class Paint extends Code12Program
    
    public void update()
    {
-      redRect.clickable = true;
-      orangeRect.clickable = true;
-      yellowRect.clickable = true;
-      greenRect.clickable = true;
-      blueRect.clickable = true;
-      indigoRect.clickable = true;
-      purpleRect.clickable = true;
-      magentaRect.clickable = true;
-      eraseRect.clickable = true;
-
-      small.clickable = true;
-      medium.clickable = true;
-      large.clickable = true;
    }
    
   
@@ -153,10 +140,10 @@ public class Paint extends Code12Program
       // then draw a line between those coordinates and the current 
 
       // user can only draw on canvas(null space), not on other game objects
-      if ( x > palette.width + 2 )
+      if ( x > palette.getWidth() + 2 )
       {
          brush = ct.line( lastX, lastY, x, y ,currentColor);
-         brush.lineWidth = ct.toInt(size);
+         brush.setLineWidth( (int)(size) );
          // draw a bounding circle between lines (endpoints)
          if ( size == 6 || size == 8 )
             c = ct.circle(x, y, size / 10, currentColor);

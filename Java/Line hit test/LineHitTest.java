@@ -3,10 +3,6 @@ import Code12.*;
 
 class LineHitTest extends Code12Program
 {
-   public static void main(String[] args)
-   {
-      Code12.run(new LineHitTest());
-   }
    GameObj[] objs;
    GameObj clickedObj = null;
    double startSpeed;
@@ -24,12 +20,12 @@ class LineHitTest extends Code12Program
       objs[0] = ct.rect(25, 90, 15, 10, "gray");  // rect
       objs[1] = ct.circle(75, 90, 10, "gray");    // circle
 
-   	objs[2] = ct.line(2, 0, 98, 0, "blue");     // top wall
-   	objs[3] = ct.line(2, 100, 98, 100, "blue");   // bottom wall
-   	objs[4] = ct.line(0, 2, 0, 98, "blue");     // left wall
+      objs[2] = ct.line(2, 0, 98, 0, "blue");     // top wall
+      objs[3] = ct.line(2, 100, 98, 100, "blue");   // bottom wall
+      objs[4] = ct.line(0, 2, 0, 98, "blue");     // left wall
       objs[5] = ct.line(100, 2, 100, 98, "blue");   // right wall
       for (int i = 2; i <= 5; i++)
-         objs[i].lineWidth = 5;
+         objs[i].setLineWidth(5);
       // static lines in center cross
       objs[6] = ct.line(30, 30, 70, 70, "blue");  // diagonal line top left to bottom right
       objs[7] = ct.line(30, 70, 70, 30, "blue");  // diagonal line bottom left to top right
@@ -40,25 +36,27 @@ class LineHitTest extends Code12Program
       objs[11] = ct.line(20, 5, 35, 5);
       objs[12] = ct.line(65, 5, 80, 5);
       for (int i = 10; i <= 12; i++)
-         objs[i].ySpeed = startSpeed;
+         objs[i].setYSpeed( startSpeed );
       objs[13] = ct.line(5, 40, 5, 60);    // vertical lines at left
       objs[14] = ct.line(5, 20, 5, 35);
       objs[15] = ct.line(5, 65, 5, 80);
       for (int i = 13; i <= 15; i++)
-         objs[i].xSpeed = startSpeed;
+         objs[i].setXSpeed( startSpeed );
       objs[16] = ct.line(40, 90, 60, 90);    // horizontal line at bottom
-      objs[16].ySpeed = startSpeed;
+      objs[16].setYSpeed( startSpeed );
       objs[17] = ct.line(90, 40, 90, 60);    // vertical line at right
-      objs[17].xSpeed = startSpeed;
+      objs[17].setXSpeed( startSpeed );
       objs[18] = ct.line(95, 95, 90, 90);    // diagonal line lower right corner
-      objs[18].xSpeed = -startSpeed;
-      objs[18].ySpeed = -startSpeed;
+      objs[18].setXSpeed( -startSpeed );
+      objs[18].setYSpeed( -startSpeed );
 
       for (int i = 0; i < objs.length; i++)
       {
-         objs[i].clickable = true;
          if (i > 1)
+         {
             objs[i].group = "line";
+         }
+         objs[i].setText("1");
       }
 
    }
@@ -88,10 +86,10 @@ class LineHitTest extends Code12Program
             if (obj1.hit(obj2))
             {
                obj1HitNothing = false;
-               obj1.xSpeed = 0;
-               obj1.ySpeed = 0;
-               obj2.xSpeed = 0;
-               obj2.ySpeed = 0;
+               obj1.setXSpeed( 0 );
+               obj1.setYSpeed( 0 );
+               obj2.setXSpeed( 0 );
+               obj2.setYSpeed( 0 );
                if (group1.equals("line"))
                   obj1.setLineColor("red");
                else
@@ -105,69 +103,89 @@ class LineHitTest extends Code12Program
       }
    }
 
-	public void onMousePress( GameObj obj, double x, double y )
-	{
-		if ( obj == null )
+   public void onMousePress( GameObj obj, double x, double y )
+   {
+      if ( obj == null )
       {
          clickedObj = null;
       }
       else
-		{
-			clickedObj = obj;
+      {
+         clickedObj = obj;
          dx = x - obj.x;
          dy = y - obj.y;
          ct.println(obj.toString() + " clicked");
-		}
-	}
+      }
+   }
 
-	public void onMouseDrag( GameObj obj, double x, double y )
-	{
-		if ( obj != null )
-		{
-			obj.x = x - dx;
-			obj.y = y - dy;
-		}
-	}
+   public void onMouseDrag( GameObj obj, double x, double y )
+   {
+      if ( obj != null )
+      {
+         obj.x = x - dx;
+         obj.y = y - dy;
+      }
+   }
 
 
    public void onKeyPress( String keyName )
    {
-      if (keyName.equals("t"))
+      if (keyName.equals("+"))
       {
          if (clickedObj != null)
          {
-            clickedObj.lineWidth++;
+            int lineWidth = ct.parseInt(clickedObj.getText());
+            lineWidth++;
+            clickedObj.setLineWidth(lineWidth);
+            clickedObj.setText("" + lineWidth);
+         }
+      }
+      else if (keyName.equals("-"))
+      {
+         if (clickedObj != null)
+         {
+            int lineWidth = ct.parseInt(clickedObj.getText());
+            if (lineWidth > 0)
+            {
+               lineWidth--;
+               clickedObj.setLineWidth(lineWidth);
+               clickedObj.setText("" + lineWidth);
+            }
          }
       }
       else if (clickedObj != null)
       {
          if (keyName.equals("up"))
          {
-            clickedObj.ySpeed = -speed;
-            clickedObj.xSpeed = 0;
+            clickedObj.setYSpeed( -speed );
+            clickedObj.setXSpeed( 0 );
          }
          else if (keyName.equals("down"))
          {
-            clickedObj.ySpeed = speed;
-            clickedObj.xSpeed = 0;
+            clickedObj.setYSpeed( speed );
+            clickedObj.setXSpeed( 0 );
 
          }
          else if (keyName.equals("left"))
          {
-            clickedObj.xSpeed = -speed;
-            clickedObj.ySpeed = 0;
+            clickedObj.setXSpeed( -speed );
+            clickedObj.setYSpeed( 0 );
          }
          else if (keyName.equals("right"))
          {
-            clickedObj.xSpeed = speed;
-            clickedObj.ySpeed = 0;
+            clickedObj.setXSpeed( speed );
+            clickedObj.setYSpeed( 0 );
          }
          else if (keyName.equals("space"))
          {
-            clickedObj.xSpeed = 0;
-            clickedObj.ySpeed = 0;         
+            clickedObj.setXSpeed( 0 );
+            clickedObj.setYSpeed( 0 );         
          }
       }
    }
 
+   public static void main(String[] args)
+   {
+      Code12.run(new LineHitTest());
+   }
 }

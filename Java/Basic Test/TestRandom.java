@@ -20,16 +20,16 @@ class TestRandom extends Code12Program
    
    public void update()
    {
-      topCircle.ySpeed = -1;
+      topCircle.setYSpeed( -1 );
       // Generate a random int from the value of the circle's y position to 100
       // circles y position starts off less than 100, but increases
       // drawing something at this position
-      ct.print( ct.random ( ct.toInt(topCircle.y), 100)  );
+      ct.print( ct.random ( (int)(topCircle.y), 100)  );
       // check to see if circle and image hit
       if ( topCircle.hit(image) )
       {
          image.delete();
-         image = ct.image("test.png", ct.random(10,50), ct.random(ct.toInt(topCircle.y), 50), 30);
+         image = ct.image("test.png", ct.random(10,50), ct.random((int)(topCircle.y), 50), 30);
          
          //  What if top circle's y is greater than 50?
          topCircle.y = ct.getHeight();

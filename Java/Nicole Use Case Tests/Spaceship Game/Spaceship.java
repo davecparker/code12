@@ -40,11 +40,11 @@ public class Spaceship extends Code12Program
 
       // Background one fills screen initally
       bg = ct.image("seamless_tileable_nebula.jpg",width/2,height/2,width);
-      bg.height = height;
+      bg.setSize(bg.getWidth(), height);
 
       // Second background is off of screen upwards
       topBg = ct.image("seamless_tileable_nebula.jpg", width/2, height/2 - height, width );
-      topBg.height = height;
+      topBg.setSize(topBg.getWidth(), height);
       beginText = ct.text("Click on the spaceship to begin!" , width/2, height - 40, 4,"white");
       traveledText = ct.text("Light years traveled: " + 0, 15, 5, 3,"white" );
 
@@ -53,7 +53,7 @@ public class Spaceship extends Code12Program
       spaceship = ct.image("spacecraft.png", width/2, height - 10, 5 );
       spaceship.setLayer(2);
       
-      flame = ct.image("transparent-flame.png", spaceship.x, spaceship.y + spaceship.height/2, 5 );
+      flame = ct.image("transparent-flame.png", spaceship.x, spaceship.y + spaceship.getHeight()/2, 5 );
       flame.visible = false;
       
       rayGun = ct.circle( spaceship.x, spaceship.y - 2, 1, "red");
@@ -62,18 +62,15 @@ public class Spaceship extends Code12Program
    
    public void update()
    {
-      flame.clickable = false;
-      asteroid.clickable = false;
-      bg.clickable = false;
       rayGun.visible = false;
-      ct.setTitle( ct.toInt( 60 - (ct.getTimer() / 1000.0 ) ) + " seconds until the black hole" );
+      ct.setTitle( (int)( 60 - (ct.getTimer() / 1000.0 ) ) + " seconds until the black hole" );
       // Set the initial background down
-      bg.ySpeed = 0.5;
+      bg.setYSpeed(0.5);
       // Set the top background moving down
-      topBg.ySpeed = 0.5;
+      topBg.setYSpeed(0.5);
            
       // Once the utmost point of the top background reaches the game window 
-      if ( (topBg.y - topBg.height/2) >= 0 )
+      if ( (topBg.y - topBg.getHeight()/2) >= 0 )
       {
          // Subtract one background height from both of the background's vertical positions 
          topBg.y -= ct.getHeight();
@@ -86,13 +83,13 @@ public class Spaceship extends Code12Program
 
 
       // If the spaceship is moving upwards and the current time is less than one minute (basically, while game is active)
-      if ( spaceship.ySpeed != 0 && ct.getTimer() / 1000.0 < 60 )
+      if ( spaceship.getYSpeed() != 0 && ct.getTimer() / 1000.0 < 60 )
       {
          // If spaceship is higher than or equal to than asteroid, relative to the top of the game window, re-draw it
          if ( spaceship.y <= asteroid.y )
          {
             asteroid.delete();
-            asteroid = ct.image("asteroid.png", ct.random(10,100),ct.random(ct.toInt(spaceship.y) - 10,100), ct.random(10,30) );
+            asteroid = ct.image("asteroid.png", ct.random(10,100),ct.random((int)(spaceship.y) - 10,100), ct.random(10,30) );
          }
 
           
@@ -114,42 +111,42 @@ public class Spaceship extends Code12Program
       if ( hit < 5 )
       {
          asteroid.delete();
-         asteroid = ct.image("asteroid.png", ct.random(10,100),ct.random(ct.toInt(spaceship.y),100), ct.random(10,30) );
+         asteroid = ct.image("asteroid.png", ct.random(10,100),ct.random((int)(spaceship.y),100), ct.random(10,30) );
       }
       
      
       // Check for collisions with spaceship and asteroid)        
       collision = ct.distance(spaceship.x, spaceship.y, asteroid.x, asteroid.y );
          
-       if ( collision < 5 )
-       {
-            ct.sound("explosion.wav");
-            blackHole = ct.image("seamless_tileable_nebula.jpg", ct.getWidth()/2, ct.getHeight()/2, ct.getWidth() );
-            blackHole.height = ct.getHeight();
-            spaceshipWreck = ct.image("spacecraft-wreck.png", spaceship.x, spaceship.y, spaceship.width + 10 );
-            spaceship.ySpeed = 0;
-            asteroid.delete();         
-            traveledText.delete();
-            //ct.text("Game over! You traveled: " + lightYears + " light years.", ct.getWidth() /2, ct.getHeight() - 10, 5,"white" );
-        }
-      
+      if ( collision < 5 )
+      {
+         ct.sound("explosion.wav");
+         blackHole = ct.image("seamless_tileable_nebula.jpg", ct.getWidth()/2, ct.getHeight()/2, ct.getWidth() );
+         blackHole.setSize(blackHole.getWidth(), ct.getHeight());
+         spaceshipWreck = ct.image("spacecraft-wreck.png", spaceship.x, spaceship.y, spaceship.getWidth() + 10 );
+         spaceship.setYSpeed(0);
+         asteroid.delete();         
+         traveledText.delete();
+         //ct.text("Game over! You traveled: " + lightYears + " light years.", ct.getWidth() /2, ct.getHeight() - 10, 5,"white" );
+      }
+
       //Enter the black hole after 1 minute
-         if ( ct.getTimer() / 1000.0 > 60 )
-         {
-               blackHole = ct.image("a0620-00.jpg", ct.getWidth()/2, ct.getHeight()/2, ct.getWidth() );
-               blackHole.height = ct.getHeight();
-               
-               // A circle GameObj serves as the origin which all game objs "gravitate" towards
-               GameObj origin = ct.circle(ct.getWidth()/2 + 10, ct.getHeight()/2, 10,"black");
-               spaceship.xSpeed = (origin.x - spaceship.x) / 15.0;
-               spaceship.ySpeed = (origin.y - spaceship.y) / 15.0;
-               asteroid.xSpeed = (origin.x - asteroid.x) / 15.0;
-               asteroid.ySpeed = (origin.y - asteroid.y) / 15.0;
-               traveledText.delete();
-               ct.setTitle("Game over");
-               ct.text("Game over! You traveled: " + lightYears + " light years.", ct.getWidth() /2, ct.getHeight() - 20, 5,"white" );
-               
-         }
+      if ( ct.getTimer() / 1000.0 > 60 )
+      {
+            blackHole = ct.image("a0620-00.jpg", ct.getWidth()/2, ct.getHeight()/2, ct.getWidth() );
+            blackHole.setSize(blackHole.getWidth(), ct.getHeight());
+            
+            // A circle GameObj serves as the origin which all game objs "gravitate" towards
+            GameObj origin = ct.circle(ct.getWidth()/2 + 10, ct.getHeight()/2, 10,"black");
+            spaceship.setXSpeed( (origin.x - spaceship.x) / 15.0 );
+            spaceship.setYSpeed( (origin.y - spaceship.y) / 15.0 );
+            asteroid.setXSpeed( (origin.x - asteroid.x) / 15.0 );
+            asteroid.setYSpeed( (origin.y - asteroid.y) / 15.0 );
+            traveledText.delete();
+            ct.setTitle("Game over");
+            ct.text("Game over! You traveled: " + lightYears + " light years.", ct.getWidth() /2, ct.getHeight() - 20, 5,"white" );
+            
+      }
 
    }
    
@@ -159,14 +156,14 @@ public class Spaceship extends Code12Program
       {
          spaceship.x += 5;
          rayGun.x += 5;
-         if ( spaceship.ySpeed != 0 )
+         if ( spaceship.getYSpeed() != 0 )
             flame.x += 5;
       }
       else if ( keyName.equals("left") && spaceship.x > 0 )
       {
          spaceship.x -= 5;
          rayGun.x -= 5;
-         if ( spaceship.ySpeed != 0 )
+         if ( spaceship.getYSpeed() != 0 )
             flame.x -= 5;
       }
 
@@ -177,7 +174,7 @@ public class Spaceship extends Code12Program
       // Shoot from spaceship
       if ( keyName.equals("up") )
       {
-         rayGun.ySpeed = - 2;
+         rayGun.setYSpeed( - 2 );
          ct.sound("raygun.wav");
       }    
    }
@@ -187,10 +184,10 @@ public class Spaceship extends Code12Program
       // If spaceship is clicked on, flame is "active" and both move upward
       if ( obj == spaceship )
       {
-         spaceship.ySpeed -= 0.075;
-         flame = ct.image("transparent-flame.png", spaceship.x, spaceship.y + spaceship.height/2, 5 );
+         spaceship.setYSpeed(spaceship.getYSpeed() - 0.075);
+         flame = ct.image("transparent-flame.png", spaceship.x, spaceship.y + spaceship.getHeight()/2, 5 );
          flame.visible = true;
-         flame.ySpeed = spaceship.ySpeed;
+         flame.setYSpeed( spaceship.getYSpeed() );
          ct.sound("spaceship-engine-short.wav");
          beginText.delete();
 
@@ -203,7 +200,7 @@ public class Spaceship extends Code12Program
       // there is no movement ( besides the background )
       if ( obj != null )
       {
-         spaceship.ySpeed = 0;
+         spaceship.setYSpeed( 0 );
          flame.delete();
       }
    }

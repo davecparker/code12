@@ -31,7 +31,7 @@ local optionsFont = app.optionsFont         -- Font for switch labels
 local optionsFontBold = app.optionsFontBold -- Font for title and switch headers
 local fontSize = app.optionsFontSize        -- Font size of switch headers and labels
 local switchSize = 16                       -- Size of radio buttons, checkboxes, and fillboxes
-local btnOutlineMargin = 4                  -- Outline margin for buttons
+local yEditorPicker                         -- Y-coordinate for the top of editorPicker
 
 -- Display objects and groups
 local title               -- Title text
@@ -40,6 +40,7 @@ local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
 local varWatchPicker      -- Variable watch window mode picker
+local gridlineColorPicker -- Gridline color picker
 local addEditorBtn        -- Add a Text Editor button
 local openInEditorBtn     -- Open current source file in editor button
 local optionsGroup        -- Display group containing the options objects
@@ -72,7 +73,7 @@ local function setSelectedOptions()
 	-- Set the active segment of the tabWidthPicker
 	tabWidthPicker:setActiveSegment( app.tabWidth - 1 )
 
-	-- Set the checked box of the editorPicker
+	-- Set the selected radio button of the editorPicker
 	if app.useDefaultEditor or #env.installedEditors == 1 then
 		-- Check on "System Default"
 		editorPicker.switches[1]:setState{ isOn = true }
@@ -102,6 +103,16 @@ local function setSelectedOptions()
 	else
 		varWatchPicker.switches[1]:setState{ isOn = false }
 	end
+
+	-- Set the selected radio button of the gridlineColorPicker
+	local gridColorSwitches = gridlineColorPicker.switches
+	local shade = app.gridlineShade or app.defaultGridlineShade
+	for i = 1, gridColorSwitches.numChildren do
+		if gridColorSwitches[i].value == shade then
+			gridColorSwitches[i]:setState{ isOn = true }
+			break
+		end
+	end
 end
 
 local function makeEditorPicker( parent )
@@ -124,7 +135,7 @@ local function makeEditorPicker( parent )
 		style = "radio",
 		switchSize = switchSize,
 		x = 0,
-		y = math.round( varWatchPicker.y + varWatchPicker.height + sectionMargin ),
+		y = yEditorPicker,
 		onPress = 
 			function ( event )
 				app.editorPath = env.installedEditors[event.target.value].path
@@ -140,12 +151,11 @@ local function makeOpenInEditorBtn( filename )
 	end
 	openInEditorBtn = buttons.newOptionButton{
 		parent = optionsGroup,
-		x = 0,
-		y = addEditorBtn.y + addEditorBtn.height + app.margin,
+		left = 0,
+		top = addEditorBtn.y + addEditorBtn.height + app.margin,
 		label = "Open " .. filename .. " in Editor",
 		font = optionsFont,
 		fontSize = fontSize,
-		outlineMargin = btnOutlineMargin,
 		onRelease = 
 			function ()
 				env.openFileInEditor( app.recentSourceFilePaths[1] )
@@ -173,13 +183,15 @@ local function makeScrollView( parent )
 		scrollView = nil
 	end
 	scrollView = widget.newScrollView{
-		top = title.y + title.height + app.margin,
-		left = 0,
+		x = 0,
+		y = title.y + title.height + app.margin,
 		width = app.width,
 		height = app.height - title.height - app.dyStatusBar,
 		isBounceEnabled = false,
 		backgroundColor = { 0.9 },
 	}
+	scrollView.anchorX = 0
+	scrollView.anchorY = 0
 	parent:insert( scrollView )
 	scrollView:insert( optionsGroup )
 	scrollView:setScrollWidth( optionsGroup.width )
@@ -229,6 +241,11 @@ local function onVarWatchPress( event )
 			forceReprocess = true
 		end
 	end
+end
+
+-- Gridline Color Switch handler
+local function onGridlineColorPress( event )
+	app.gridlineShade = event.target.value
 end
 
 -- Show dialog to choose the editor and add the path to installed editors
@@ -303,8 +320,10 @@ function optionsView:create()
 	-- Close button
 	closeBtn = buttons.newIconAndTextButton{
 		parent = sceneGroup,
+		left = 0,
 		top = app.margin,
 		text = "Close",
+		colorText = true,
 		imageFile = "close.png",
 		iconSize = 12,
 		defaultFillShade = 1,
@@ -315,6 +334,8 @@ function optionsView:create()
 
 	-- Options display group
 	optionsGroup = display.newGroup()
+	optionsGroup.anchorX = 0
+	optionsGroup.anchorY = 0
 
 	-- Syntax level picker
 	local syntaxLevels = {
@@ -327,7 +348,7 @@ function optionsView:create()
 		"7. Object Method Calls",
 		"8. If-else",
 		"9. Function Definitions",
-		"10. Parameters",
+		"10. Function Parameters",
 		"11. Loops",
 		"12. Arrays",
 	}
@@ -345,13 +366,14 @@ function optionsView:create()
 		y = 0,
 		onPress = onSyntaxLevelPress,
 	}
+	local lastPicker = levelPicker
 
 	-- Tab width header
 	local tabWidthHeader  = display.newText{
 		parent = optionsGroup,
 		text = "Tab Width for Source Code Display",
 		x = 0,
-		y = levelPicker.y + levelPicker.height + sectionMargin,
+		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
 		font = optionsFontBold,
 		fontSize = fontSize,
 	}
@@ -360,11 +382,10 @@ function optionsView:create()
 	for i = 2, 8 do
 		tabWidths[i - 1] = tostring( i )
 	end
-
 	-- Tab width picker
 	tabWidthPicker = widget.newSegmentedControl{
 		x = 0,
-		y = tabWidthHeader.y + tabWidthHeader.height + app.margin * 0.5,
+		y = math.round( tabWidthHeader.y + tabWidthHeader.height + app.margin * 0.5 ),
 		segments = tabWidths,
 		segmentWidth = 30,
 		defaultSegment = app.tabWidth - 1,
@@ -379,6 +400,7 @@ function optionsView:create()
 	tabWidthPicker.anchorX = 0
 	tabWidthPicker.anchorY = 0
 	optionsGroup:insert( tabWidthPicker )
+	lastPicker = tabWidthPicker
 
 	-- Variable Watch Window picker
 	varWatchPicker = buttons.newSettingPicker{
@@ -392,23 +414,42 @@ function optionsView:create()
 		style = "checkbox",
 		switchSize = switchSize,
 		x = 0,
-		y = tabWidthPicker.y + tabWidthPicker.height + sectionMargin,
+		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
 		onPress = onVarWatchPress,
 	}
+	lastPicker = varWatchPicker
+
+	-- Gridline Color Picker
+	gridlineColorPicker = buttons.newSettingPicker{
+		parent = optionsGroup,
+		header = "Gridline Color",
+		headerFont = optionsFontBold,
+		headerFontSize = fontSize,
+		labels = { "Black", "White", "Gray (default)" },
+		values = { 0, 1, app.defaultGridlineShade },
+		labelsFont = optionsFont,
+		labelsFontSize = fontSize,
+		style = "radio",
+		switchSize = switchSize,
+		x = 0,
+		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
+		onPress = onGridlineColorPress,
+	}
+	lastPicker = gridlineColorPicker
 
 	-- Editor picker
-	makeEditorPicker( optionsGroup, varWatchPicker )
+	yEditorPicker = math.round( lastPicker.y + lastPicker.height + sectionMargin )
+	makeEditorPicker( optionsGroup )
 
 	-- Add Text Editor button
 	addEditorBtn = buttons.newOptionButton{
 		parent = optionsGroup,
-		x = math.round( editorPicker.x + switchSize + app.margin * 0.5 ),
-		y = editorPicker.y + editorPicker.height + app.margin * 0.5,
+		left = editorPicker.x + switchSize + app.margin * 0.5,
+		top = editorPicker.y + editorPicker.height + app.margin * 0.5,
 		onRelease = onAddEditor,
 		label = "Add a Text Editor",
 		font = optionsFont,
 		fontSize = fontSize,
-		outlineMargin = btnOutlineMargin,
 	}
 
 	-- Center options group

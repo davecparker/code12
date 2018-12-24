@@ -45,8 +45,8 @@ class VarWatchTest extends Code12Program
 			intArr2[i] += 5;
 		if ( gObj != null )
 		{
-			gObj.width += 0.01;
-			gObj.height += 0.01;
+			double increase = 0.01;
+			gObj.setSize( gObj.getWidth() + increase, gObj.getHeight() + increase );
 		}
 	}
 
@@ -70,8 +70,8 @@ class VarWatchTest extends Code12Program
 			{
 				gObj = ct.rect(5, 10, 10, 10);
 				gObj.group = "rectangles";
-				gObj.xSpeed = 0.1;
-				gObj.ySpeed = 0.1;
+				gObj.setXSpeed( 0.1 );
+				gObj.setYSpeed( 0.1 );
 			}
 			else
 			{
@@ -88,8 +88,8 @@ class VarWatchTest extends Code12Program
 				{
 					gObjArr[i] = ct.circle(0, 10*i, 10);
 					gObjArr[i].group = "circles";
-					gObjArr[i].xSpeed = ct.random(0,10) / 100.0;
-					gObjArr[i].ySpeed = ct.random(0,10) / 100.0;
+					gObjArr[i].setXSpeed( ct.random(0,10) / 100.0 );
+					gObjArr[i].setYSpeed( ct.random(0,10) / 100.0 );
 				}
 			} 
 			else
@@ -107,7 +107,7 @@ class VarWatchTest extends Code12Program
 			{
 				gObj = ct.rect(5, 10, 10, 10);
 				gObj.group = "rectangles";
-				// gObj.xSpeed = 0.1;
+				// gObj.setXSpeed( 0.1 );
 			}
 			else
 			{

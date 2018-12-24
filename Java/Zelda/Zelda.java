@@ -4,12 +4,7 @@
 import Code12.*;
 
 class MainProgram extends Code12Program
-{
-   public static void main(String[] args)
-   { 
-      Code12.run(new MainProgram()); 
-   }
-   
+{ 
    double screenWidth, screenHeight;
    GameObj link;
    GameObj zelda;
@@ -237,10 +232,10 @@ class MainProgram extends Code12Program
       link = ct.image( "link.png", screenWidth / 2, screenHeight / 2, linkWidth );
       
       // Set bounds for Link's x and y values
-      xMin = link.width/2 + wallWidth;
-      xMax = screenWidth - (link.width/2 + wallWidth);
-      yMin = link.height/2 + wallWidth;
-      yMax = screenHeight - (link.height/2 + wallWidth);
+      xMin = link.getWidth()/2 + wallWidth;
+      xMax = screenWidth - (link.getWidth()/2 + wallWidth);
+      yMin = link.getHeight()/2 + wallWidth;
+      yMax = screenHeight - (link.getHeight()/2 + wallWidth);
    }
    
    public void update()
@@ -278,8 +273,8 @@ class MainProgram extends Code12Program
          
          double horizDist = ct.distance( link.x, 0, obj.x, 0 );
          double vertDist = ct.distance( 0, link.y, 0, obj.y );
-         double horizHitDist = (link.width + obj.width) / 2;
-         double vertHitDist = (link.height + obj.height) / 2;
+         double horizHitDist = (link.getWidth() + obj.getWidth()) / 2;
+         double vertHitDist = (link.getHeight() + obj.getHeight()) / 2;
          if ( obj.visible && (horizDist < horizHitDist && vertDist < vertHitDist) )
          {
             noHits = false;
@@ -305,16 +300,16 @@ class MainProgram extends Code12Program
                         // Put Zelda on his left
                         sign = -1;
                      }
-                     double zeldaX = link.x + sign * link.width;
+                     double zeldaX = link.x + sign * link.getWidth();
                      double zeldaY = link.y;
-                     zelda = ct.image( "zelda.png", zeldaX, zeldaY, link.width );
+                     zelda = ct.image( "zelda.png", zeldaX, zeldaY, link.getWidth() );
                   }
             }
             else if ( group.equals("door") )
             {            
                // Save Link's data and delete him
-               double xSpeed = link.xSpeed;
-               double ySpeed = link.ySpeed;
+               double xSpeed = link.getXSpeed();
+               double ySpeed = link.getYSpeed();
                double x = link.x;
                double y = link.y;
                link.delete();
@@ -331,28 +326,28 @@ class MainProgram extends Code12Program
                   // went through a right door, set him at left side of new screen
                   link.x = wallWidth / 2 + horizHitDist;
                   link.y = y;
-                  link.xSpeed = xSpeed;
+                  link.setXSpeed( xSpeed );
                }
                else if ( xSpeed < 0 )
                {
                   // went through a left door, set him at the right side of new screen
                   link.x = screenWidth - (wallWidth / 2 + horizHitDist);
                   link.y = y;
-                  link.xSpeed = xSpeed;
+                  link.setXSpeed( xSpeed );
                }
                else if ( ySpeed > 0 )
                {
                   // went through a top door, set him at bottom of new screen
                   link.y = wallWidth / 2 + vertHitDist;
                   link.x = x;
-                  link.ySpeed = ySpeed;
+                  link.setYSpeed( ySpeed );
                }
                else if ( ySpeed < 0 )
                {
                   // went through a bottom door, set him at top of new screen
                   link.y = screenHeight - (wallWidth / 2 + vertHitDist);
                   link.x = x;
-                  link.ySpeed = ySpeed;
+                  link.setYSpeed( ySpeed );
                }
             }
          }
@@ -363,23 +358,23 @@ class MainProgram extends Code12Program
          if ( link.x < xMin )
          {
             link.x = xMin;
-            link.xSpeed = 0;
+            link.setXSpeed( 0 );
          }
          else if ( link.x > xMax )
          {
             link.x = xMax;
-            link.xSpeed = 0;
+            link.setXSpeed( 0 );
          }
          
          if ( link.y < yMin )
          {
             link.y = yMin;
-            link.ySpeed = 0;
+            link.setYSpeed( 0 );
          }
          else if ( link.y > yMax )
          {
             link.y = yMax;
-            link.ySpeed = 0;
+            link.setYSpeed( 0 );
          } 
       }
    }
@@ -409,23 +404,23 @@ class MainProgram extends Code12Program
       
       if ( keyName.equals( "up" ) && link.y > yMin )
       {
-         link.xSpeed = 0;
-         link.ySpeed = -linkSpeed;
+         link.setXSpeed( 0 );
+         link.setYSpeed( -linkSpeed );
       }
       else if ( keyName.equals( "down" ) && link.y < yMax )
       {
-         link.xSpeed = 0;
-         link.ySpeed = linkSpeed;
+         link.setXSpeed( 0 );
+         link.setYSpeed( linkSpeed );
       }
       else if ( keyName.equals( "left" ) && link.x > xMin )
       {
-         link.xSpeed = -linkSpeed;
-         link.ySpeed = 0;
+         link.setXSpeed( -linkSpeed );
+         link.setYSpeed( 0 );
       }
       else if ( keyName.equals( "right" ) && link.x < xMax )
       {
-         link.xSpeed = linkSpeed;
-         link.ySpeed = 0;
+         link.setXSpeed( linkSpeed );
+         link.setYSpeed( 0 );
       }
    }
    
@@ -433,8 +428,13 @@ class MainProgram extends Code12Program
    {
       if ( keyName.equals("up") || keyName.equals("down") || keyName.equals("left") || keyName.equals("right") )
       {
-         link.xSpeed = 0;
-         link.ySpeed = 0;      
+         link.setXSpeed( 0 );
+         link.setYSpeed( 0 );      
       }
+   }
+
+   public static void main(String[] args)
+   { 
+      Code12.run(new MainProgram()); 
    }
 }
