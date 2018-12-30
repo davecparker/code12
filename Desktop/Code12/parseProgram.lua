@@ -296,20 +296,22 @@ end
 -- Return true if the pattern was a variable pattern, else false.
 local function getVar( p, nodes, structs, isGlobal )
 	if p == "varInit" then
-		-- e.g. int x = 10;
+		-- access TYPE ID = expr ;
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
 									nodes[3], makeExpr( nodes[5] ) )
 	elseif p == "varDecl" then
-		-- e.g. int x, y;
+		-- access TYPE idList ;
 		for _, nameID in ipairs( nodes[3].nodes ) do
 			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], nameID )
 		end
 	elseif p == "constInit" then
-		-- e.g. final int LIMIT = 100;
-		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[3], 
-									nodes[4], makeExpr( nodes[6] ), nil, true )			
+		-- access final TYPE ID = expr ;
+		local var = makeVar( isGlobal, nodes[1], nodes[3], 
+							nodes[4], makeExpr( nodes[6] ), nil, true )
+		var.firstToken = nodes[2]
+		structs[#structs + 1] = var		
 	elseif p == "arrayInit" then
-		-- e.g. int[] a = { 1, 2, 3 };   or   int[] a = new int[10];
+		-- access TYPE [ ] ID = arrayInit ;
 		local initExpr
 		local arrayInit = nodes[7]
 		if arrayInit.p == "list" then
@@ -320,7 +322,7 @@ local function getVar( p, nodes, structs, isGlobal )
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
 									nodes[5], initExpr, true )						
 	elseif p == "arrayDecl" then
-		-- e.g. GameObj[] coins, walls;
+		-- access TYPE [ ] idList ;
 		for _, nameID in ipairs( nodes[5].nodes ) do
 			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
 										nameID, nil, true )

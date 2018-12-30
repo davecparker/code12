@@ -264,10 +264,13 @@ end
 -- If isVarAssign is not true then also check to make sure the variable has 
 -- been assigned and if not then set the error state. 
 local function getVariable( varNode, isVarAssign )
+	-- Check for valid name
 	assert( varNode.tt == "ID" )
 	if parseJava.isInvalidID( varNode, "variable", true ) then
 		return nil
 	end
+
+	-- Check that the variable is defined
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
 		-- Variable is undefined. Check old (out of scope) variables and choose an error.
@@ -291,11 +294,17 @@ local function getVariable( varNode, isVarAssign )
 		err.addDocLink( "Java.html#variables" )
 		return nil
 	end
+
+	-- Check if used before assigned, or assignment to a constant
 	if isVarAssign then
+		if varFound.isConst then
+			err.setErrNodeAndRef( varNode, varFound,  
+				"final variable %s cannot be reassigned", varNode.str )
+		end
 		varFound.assigned = true
 	elseif not varFound.assigned then
-		err.setErrNode( varNode,  
-			"Variable %s must be assigned before it is used", varNode.str )
+		err.setErrNodeAndRef( varNode, varFound, 
+			"Variable %s must be initialized or assigned before it is used", varNode.str )
 		err.addDocLink( "Java.html#variables" )
 	end
 	return varFound
@@ -922,6 +931,9 @@ local function canOpAssign( lValue, opNode, expr )
 			return false
 		end
 	end
+
+	-- Then check assignment on the lValue
+	vtCheckLValue( lValue, true )
 	return true
 end
 
