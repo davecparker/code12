@@ -594,6 +594,9 @@ function javalex.getTokens( lineRec, iLineCommentStart )
 				local indentLevel = tokens[1].iChar - 1
 				lineRec.indentLevel = indentLevel
 				lineRec.indentStr = string.sub( sourceStr, 1, indentLevel )
+				-- Put location of END token before COMMENT to end of line, if any 
+				local lastToken = tokens[#tokens]
+				iCharStart = lastToken.iChar + string.len(lastToken.str)
 			end
 			-- Add sentinal token and return tokens
 			tokens[#tokens + 1] = { tt = "END", str = " ", 

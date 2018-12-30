@@ -5331,16 +5331,16 @@ line (stmt)
     stmt (assign)
         ID (x)
         INT (10)
-*** Line 592 char 37: Statement should end with a semicolon (;)
+*** Line 592 char 7: Statement should end with a semicolon (;)
 
 593. int x = 10		// missing ; in varInit
-*** Line 593 char 36: Syntax Error: expected a semicolon
+*** Line 593 char 11: Syntax Error: expected a semicolon
 
 594. int x 			// missing ; in varDecl
-*** Line 594 char 33: Syntax Error: end of line was unexpected here
+*** Line 594 char 6: Syntax Error: end of line was unexpected here
 
 595. final int x = 10 // missing ; in constInit
-*** Line 595 char 43: Syntax Error: expected a semicolon
+*** Line 595 char 17: Syntax Error: expected a semicolon
 
 596. foo(x, );       // missing expr in exprList
 *** Line 596 char 8: Syntax Error: ")" was unexpected here
@@ -5433,7 +5433,7 @@ line (stmt)
 
 624. foo(x,          // (incomplete line continued below)
 -- Incomplete line carried forward
-*** Line 625 char 29: Statement should end with a semicolon (;)
+*** Line 625 char 3: Statement should end with a semicolon (;)
 
 625. y)              // missing ;
 line (stmt)
@@ -5456,7 +5456,7 @@ line (stmt)
 *** Line 628 char 15: Syntax Error: ")" was unexpected here
 
 629. if ( i == 1 	// missing closing parenthesis with if
-*** Line 629 char 52: Syntax Error: expected ")"
+*** Line 629 char 12: Syntax Error: expected ")"
 
 630. if ( i == 1 ); 	// if statment ended by ;
 line (if)
@@ -5506,7 +5506,7 @@ line (stmt)
                 expr (lValue)
                     ID (x)
                 INT (2)
-*** Line 636 char 45: Statement should end with a semicolon (;)
+*** Line 636 char 16: Statement should end with a semicolon (;)
 
 637. for(int i=0, i<n, i++) 	// commas in place of semicolons
 line (for)
@@ -5656,14 +5656,14 @@ line (varInit)
     INT (2)
     ID (z)
     INT (3)
-*** Line 666 chars 1-79: Code12 requires each variable initialization to be on its own line
+*** Line 666 chars 1-25: Code12 requires each variable initialization to be on its own line
 
 667. import java.io.PrintWriter;   // import other than Code12.*
 line (import)
     ID (java)
     ID (io)
     ID (PrintWriter)
-*** Line 667 chars 1-60: Code12 does not support importing other classes
+*** Line 667 chars 1-28: Code12 does not support importing other classes
 
 668. protected int secretVar;        // protected access
 *** Line 668 chars 1-9: Unsupported reserved word "protected"
@@ -5702,7 +5702,7 @@ line (stmt)
             ID (a)
     ID (y)
     ID (b)
-*** Line 676 chars 1-59: Code12 requires each statement to be on its own line
+*** Line 676 chars 1-14: Code12 requires each statement to be on its own line
 
 677. if (x == 0) ct.println("x is zero"); // control structures must be on their own lines
 line (if)
