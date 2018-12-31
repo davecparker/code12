@@ -1,11 +1,8 @@
 // A backgammon game (two player human vs. human)
 class Backgammon
 {
-	// Game constants
-	final int CHIPS_PER_PLAYER = 15;     // chip count for each player
-	final int POINTS_PER_SIDE = 12;      // 12 triangle points on top and bottom
-
 	// Layout constants aligned with the background image
+	final int POINTS_PER_SIDE = 12;    // 12 triangle points on top and bottom
 	final double POINT_WIDTH = 7.65;   // width of the point triangles
 	final double Y_POINT_TOP = 6.2;    // first chip y on top points
 	final double Y_POINT_BOTTOM = 94;  // first chip y on bottom points
@@ -24,41 +21,40 @@ class Backgammon
 	final int POINT_LAST = POINTS_PER_SIDE * 2;
 	final int BAR_DARK = POINT_LAST + 1;
 	final int BAR_LAST = BAR_DARK;
-	double[] xPoint = new double[BAR_LAST + 1];
+	double[] xPoint = new double[BAR_LAST + 1];    // values set in start()
 
 	// The layout of chips on the board is stored in two arrays indexed
-	// by point number that gives the number of chips on that point.
+	// by point number that give the number of chips on that point.
 	// Initialize to the standard starting position.
 	int[] lightChipCounts = { 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5,
 	                          0, 0, 0, 0, 3, 0, 5, 0, 0, 0, 0, 0, 0 };
 	int[] darkChipCounts =  { 0, 0, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, 0,
 	                          5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0 };
 
-	// The game chips
-	GameObj[] lightChips = new GameObj[CHIPS_PER_PLAYER];
-	GameObj[] darkChips = new GameObj[CHIPS_PER_PLAYER];
-
-	// The dots images and dice squares
+	// The dice squares and dots images 
 	final double DICE_SIZE = 5;
 	final double DICE_OFFSET = DICE_SIZE * 0.7;
-	GameObj[] dots = new GameObj[2];
 	GameObj[] dice = new GameObj[2];
+	GameObj[] dots = new GameObj[2];
 
 	// The dice roll values
 	int numMoves = 0;            // 4 if doubles, otherwise 2 when rolled
-	int[] moves = new int[4];    // each 1-6, negative if already moved, 0 if unused 
+	int[] moves = new int[4];    // each 1-6, 0 if unused or already used
 
 	// Data indexed by player (LIGHT or DARK)
 	final int LIGHT = 0;
 	final int DARK = 1;
-	String[] labels = { "light", "dark" };
-	String[] colors = { "yellow", "red" };
+	String[] labelForPlayer = { "light", "dark" };
+	String[] colorForPlayer = { "yellow", "red" };
+	int[] barForPlayer = { BAR_LIGHT, BAR_DARK };
+	double[] xDiceForPlayer = { 75, 25 };            // center x between the dice
+	int[] directionForPlayer = { 1, -1 };            // DARK moves "backwards"
 
 	// Game state variables
 	int player = LIGHT;          // current player, LIGHT or DARK  
 	int[] playerChipCounts;      // either lightChipCounts or darkChipCounts
 	int[] opponentChipCounts;    // either lightChipCounts or darkChipCounts
-	int opponentBar;             // either BAR_LIGHT or BAR_DARK
+	int playerBar, opponentBar;  // either BAR_LIGHT or BAR_DARK
 	boolean dragging = false;    // true when dragging a chip
 	double xStart, yStart;       // starting position of chip being dragged
 
@@ -84,10 +80,8 @@ class Backgammon
 			xPoint[i] = xPoint[25 - i];   // bottom reflects top
 
 		// Create and place the chips
-		createAndPlaceChips( lightChips, lightChipCounts, 
-				colors[LIGHT], labels[LIGHT] );
-		createAndPlaceChips( darkChips, darkChipCounts,
-				colors[DARK], labels[DARK] );
+		createAndPlaceChips( LIGHT, lightChipCounts );
+		createAndPlaceChips( DARK, darkChipCounts );
 
 		// Make the dice squares and dots images
 		dice[0] = ct.rect( 0, Y_CENTER, DICE_SIZE, DICE_SIZE );
@@ -128,23 +122,22 @@ class Backgammon
 			return -CHIP_SPACING;
 	}
 
-	// Create and place the chips using the given chips and counts arrays
-	// and the given color and label for the chips.
-	void createAndPlaceChips( GameObj[] chips, int[] counts, String color, String label )
+	// Create and place chips for the given player using the given chip count array
+	void createAndPlaceChips( int iPlayer, int[] chipCounts )
 	{
-		int iChip = 0;
+		String color = colorForPlayer[iPlayer];
+		String label = labelForPlayer[iPlayer];
+
 		for (int iPoint = 0; iPoint < BAR_LAST; iPoint++ )
 		{
 			double x = xPoint[iPoint];
 			double y = yPoint( iPoint );
 
-			for (int i = 0; i < counts[iPoint]; i++)
+			for (int i = 0; i < chipCounts[iPoint]; i++)
 			{
 				GameObj chip = ct.circle( x, y, CHIP_DIAMETER, color );
 				chip.group = "chips";
 				chip.setText( label );
-				chips[iChip] = chip;
-				iChip++;
 				y += chipSpacing( iPoint );
 			}
 		}
@@ -179,10 +172,10 @@ class Backgammon
 		return -1;   // no point found close enough
 	}
 
-	// Roll the dice and set moves, numMoves, and the dots images
+	// Roll the dice and update their graphics, and set moves and numMoves.
 	void rollDice()
 	{
-		// Set the moves values
+		// Get new random moves values
 		moves[0] = ct.random( 1, 6 );
 		moves[1] = ct.random( 1, 6 );
 		numMoves = 2;
@@ -194,43 +187,45 @@ class Backgammon
 			numMoves = 4;
 		}
 
-		// Set the dice images
+		// Place and color the dice squares
+		dice[0].x = xDiceForPlayer[player] - DICE_OFFSET;
+		dice[1].x = xDiceForPlayer[player] + DICE_OFFSET;
+		dice[0].setFillColor( colorForPlayer[player] );
+		dice[1].setFillColor( colorForPlayer[player] );
+
+		// Place and set the dots images
 		dots[0].setImage( moves[0] + ".png" );
 		dots[1].setImage( moves[1] + ".png" );
+		dots[0].x = dice[0].x;
+		dots[1].x = dice[1].x;
 	}
 
 	// Set the turn to the other player (LIGHT or DARK) 
 	// and set game state that depends on the player.
 	void changeTurn()
 	{
-		// Get a new dice roll
-		rollDice();
-
 		// Change the turn state
-		if (player == DARK)
+		opponentBar = barForPlayer[player];
+		player = 1 - player;   // LIGHT <-> DARK
+		playerBar = barForPlayer[player];
+		if (player == LIGHT)
 		{
-			player = LIGHT;
 			playerChipCounts = lightChipCounts;
 			opponentChipCounts = darkChipCounts;
-			opponentBar = BAR_DARK;
-			dice[0].x = 75 - DICE_OFFSET;
-			dots[0].x = dice[0].x;
-			dice[1].x = 75 + DICE_OFFSET;
-			dots[1].x = dice[1].x;
 		}
 		else
 		{
-			player = DARK;
 			playerChipCounts = darkChipCounts;
 			opponentChipCounts = lightChipCounts;
-			opponentBar = BAR_LIGHT;
-			dice[0].x = 25 - DICE_OFFSET;
-			dots[0].x = dice[0].x;
-			dice[1].x = 25 + DICE_OFFSET;
-			dots[1].x = dice[1].x;
 		}
-		dice[0].setFillColor( colors[player] );
-		dice[1].setFillColor( colors[player] );
+
+		// Get a new dice roll and check if the player is unable to move
+		rollDice();
+		if (noValidMoves())
+		{
+			ct.showAlert( "No possible moves for " + colorForPlayer[player] );
+			changeTurn();
+		}
 	}
 
 	// If a move from iPointStart to iPointEnd is valid then return the
@@ -238,9 +233,7 @@ class Backgammon
 	int iMove( int iPointStart, int iPointEnd )
 	{
 		// Calculate the distance
-		int distance = iPointEnd - iPointStart;
-		if (player == DARK)
-			distance = -distance;   // DARK moves "backwards"
+		int distance = (iPointEnd - iPointStart) * directionForPlayer[player];
 
 		// See if this distance matches one of the dice moves
 		for (int i = 0; i < numMoves; i++)
@@ -262,6 +255,55 @@ class Backgammon
 		return true;
 	}
 
+	// Return true if the given move index can be used for a chip 
+	// of the current player starting at iPointStart
+	boolean isValidMove( int iMove, int iPointStart )
+	{
+		// The move must be available
+		if (moves[iMove] == 0)
+			return false;
+
+		// The player must have a chip at iPointStart
+		if (playerChipCounts[iPointStart] < 1)
+			return false;
+
+		// Get the move distance and compute iPointEnd
+		int iPointEnd = iPointStart + moves[iMove] * directionForPlayer[player];
+		if (iPointEnd < POINT_FIRST || iPointEnd > POINT_LAST)
+			return false;    // off the board
+
+		// Check opponent chip count at iPointEnd
+		return opponentChipCounts[iPointEnd] <= 1;
+	}
+
+	// Return true if the player can't use any of the remaining move(s). 
+	boolean noValidMoves()
+	{
+		// Check each remaining move
+		for (int iMove = 0; iMove < numMoves; iMove++)
+		{
+			if (moves[iMove] > 0)
+			{
+				// If the player has a chip on the bar, it must move first
+				if (playerChipCounts[playerBar] > 0)
+				{
+					if (isValidMove( iMove, playerBar ))
+						return false;    // chip on bar can use this move
+				}
+				else
+				{
+					// Check each point with a player chip on it
+					for (int iPoint = POINT_FIRST; iPoint <= POINT_LAST; iPoint++)
+					{
+						if (isValidMove( iMove, iPoint ))
+							return false;    // found a valid move
+					}
+				}
+			}
+		}
+		return true;   // no valid move found
+	}
+
 	// Handle mouse press event
 	public void onMousePress( GameObj chip, double x, double y )
 	{
@@ -269,16 +311,20 @@ class Backgammon
 		if (chip == null)
 			return;
 		String label = chip.getText();
-		if (!label.equals( labels[player] ))
+		if (!label.equals( labelForPlayer[player] ))
 			return;
 
 		// Only the last chip on a point or bar can be dragged
 		int iPoint = iPointFromPosition( chip.x, chip.y );
 		if (iPoint < 0)
 			return;
-		int count = lightChipCounts[iPoint] + darkChipCounts[iPoint];
+		int count = playerChipCounts[iPoint];
 		double yLast = yPoint( iPoint ) + chipSpacing( iPoint ) * (count - 1);
 		if (!chip.containsPoint( xPoint[iPoint], yLast ))
+			return;
+
+		// If the player has a chip on the bar, it must be moved first
+		if (iPoint != playerBar && playerChipCounts[playerBar] > 0)
 			return;
 		
 		// OK to drag this chip, remember its starting position
@@ -317,8 +363,7 @@ class Backgammon
 			// Can the chip move here?
 			int iPointStart = iPointFromPosition( xStart, yStart );
 			int iMove = iMove( iPointStart, iPoint );
-			int opponentCount = opponentChipCounts[iPoint];
-			if (iMove >= 0 && opponentCount <= 1)
+			if (iMove >= 0 && isValidMove( iMove, iPointStart ))
 			{
 				// Move the chip
 				playerChipCounts[iPointStart]--;   // decrease count at starting point
@@ -327,7 +372,7 @@ class Backgammon
 				playerChipCounts[iPoint]++;    // increase count at destination point
 
 				// Did we hit a single opponent chip?
-				if (opponentCount == 1)
+				if (opponentChipCounts[iPoint] == 1)
 				{
 					// Move opponent chip to the bar
 					GameObj opponentChip = chip.objectHitInGroup( "chips" );
@@ -339,13 +384,16 @@ class Backgammon
 					opponentChipCounts[opponentBar]++;
 				}
 
-				// Use this move, if all moves are used then change turns
-				moves[iMove] = -moves[iMove];
+				// Use this move then check if the turn is over
+				moves[iMove] = 0;    // mark move as used
 				if (allMovesUsed())
 					changeTurn();
-
-				// Successful move
-				return;
+				else if (noValidMoves())
+				{
+					ct.showAlert( "No possible moves remaining" );
+					changeTurn();
+				}
+				return;   // successfully dragged this chip
 			}
 		}
 

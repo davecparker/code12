@@ -99,22 +99,19 @@ local function onNewFrame()
 		applyObjectSpeeds(screen)
 	end
 
-	-- Call or resume the current userFn (start or update) if not paused
+	-- Call or resume the current user or event function if not paused
 	if g.runState ~= "paused" then
-		local userFn = g.userFn
-		if userFn then
-			local status = runtime.runEventFunction(userFn)
-			if status == nil then   -- userFn finished
-				if userFn == ct.userFns.start then
-					-- User's start function finished
-					if g.outputFile then
-						g.outputFile:flush()   -- flush any print output
-					end
-					g.userFn = ct.userFns.update  -- now start calling update if defined
+		local status = runtime.runEventFunction(g.userFn)
+		if status == nil then   -- user function finished
+			if g.userFn == ct.userFns.start then
+				-- User's start function finished
+				if g.outputFile then
+					g.outputFile:flush()   -- flush any print output
 				end
-			elseif status == "aborted" then
-				return
+				g.userFn = ct.userFns.update  -- call update next if defined
 			end
+		elseif status == "aborted" then
+			return
 		end
 
 		-- Clear the polled input state for this frame
