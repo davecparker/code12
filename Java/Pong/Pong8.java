@@ -102,8 +102,8 @@ class Pong8
 			{
 				// Ball went off left edge
 				// Update rightScore
-				int newScore = ct.parseInt( leftScore.getText() ) + 1;
-				leftScore.setText( "" + newScore );
+				int newScore = ct.parseInt( rightScore.getText() ) + 1;
+				rightScore.setText( "" + newScore );
 				ballInPlay = false;
 			}
 		}
