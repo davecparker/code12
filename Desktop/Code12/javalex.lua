@@ -40,7 +40,7 @@ local ttForKnownName = {
 	["catch"] 			= false,	
 	["char"]			= "TYPE",	
 	["class"] 			= "class",	
-	["const"] 			= "const",	
+	["const"] 			= false,	
 	["continue"] 		= false,
 	["default"] 		= false,
 	["do"] 				= "do",	
@@ -176,6 +176,7 @@ end
 -- Set the error state for invalid use of ? or :, and return nil.
 local function invalidTernaryToken()
 	setTokenErr( iChar, iChar, "Invalid character (The \"? :\" operator is not supported by Code12)")
+	err.addDocLink( "Java.html#java-operators" )
 	return nil
 end
 
@@ -188,9 +189,11 @@ local function equalsToken()
 		return "=="
 	elseif charNext == 60 then  --  <
 		setTokenErr( iChar - 1, iChar, "Invalid operator. Did you mean <= ?" )
+		err.addDocLink( "Java.html#java-operators" )
 		return nil
 	elseif charNext == 62 then  --  >
 		setTokenErr( iChar - 1, iChar, "Invalid operator. Did you mean >= ?" )
+		err.addDocLink( "Java.html#java-operators" )
 		return nil
 	end
 	return "="
@@ -405,6 +408,7 @@ end
 -- (not supported in Code12), and return nil.
 local function charLiteralToken()
 	setTokenErr( iChar, iChar, "char type not supported, use double quotes" )
+	err.addDocLink( "Java.html#java-data-types" )
 	return nil
 end
 
@@ -418,6 +422,7 @@ local function stringLiteralToken()
 	while charNext ~= 34 do   -- "
 		if charNext == nil then
 			setTokenErr( iCharStart, iChar - 1, "Unclosed string literal" )
+			err.addDocLink( "Java.html#java-data-types" )
 			return nil
 		elseif charNext == 92 then   -- \
 			iChar = iChar + 1 -- check next char for supported escape sequence
@@ -571,6 +576,7 @@ function javalex.getTokens( lineRec, iLineCommentStart )
 				-- Unsupported reserved word
 				setTokenErr( iCharStart, iCharEnd, 
 						"Unsupported reserved word \"%s\"", str )
+				err.addDocLink( "Java.html#unsupported-java-keywords" )
 				return nil
 			end
 			tokens[#tokens + 1] = { tt = tt, str = str, 
