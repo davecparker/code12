@@ -1073,11 +1073,11 @@ ct.log( n );</code></pre>
 <p>(<a href="#java-data-types">boolean</a>). <code>true</code> if <code>number</code> is an error (NaN) value, or <code>false</code> if <code>number</code> is a valid number.</p>
 <p>An error (NaN or “Not a Number”) value can result from certain calculations or functions that return a <a href="#java-data-types">double</a> but the calculation results in an error or invalid number. See the examples below.</p>
 <h4 id="example-28">Example</h4>
-<pre><code>// One of these is not considered a NaN error...
-ct.log( ct.isError( 0.0 / 0.0 ) );                  // undefined
-ct.log( ct.isError( Math.sqrt( -1 ) ) );            // imaginary
-ct.log( ct.isError( 0.0 / 2.0 ) );                  // infinity
-ct.log( ct.isError( ct.parseNumber( &quot;nope&quot; ) ) );   // error</code></pre>
+<pre><code>// One of these is not considered a NaN error
+ct.log( ct.isError( 0.0 / 0.0 ) );                  // undefined (NaN)
+ct.log( ct.isError( Math.sqrt( -1 ) ) );            // imaginary (NaN)
+ct.log( ct.isError( 2.0 / 0.0 ) );                  // infinity
+ct.log( ct.isError( ct.parseNumber( &quot;nope&quot; ) ) );   // error (NaN)</code></pre>
 <h6 id="code12-function-reference-math-utilities-ct.iserror"><a href="#top">Code12 Function Reference</a> &gt; <a href="#math-utilities">Math Utilities</a> &gt; <a href="#ct.iserror">ct.isError()</a></h6>
 <h2 id="type-conversion">Type Conversion</h2>
 <p>These functions allow you to convert text strings to numbers and vice-versa.</p>

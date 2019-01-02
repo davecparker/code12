@@ -119,14 +119,14 @@ end
 -- End the previous line of Lua code and begin a new line for line number iLine
 -- or the next line if iLine is nil. If strCode then start the new line with it.
 local function beginLuaLine( iLine, strCode )
-	-- If the new line is on the same line number as the previous line, 
-	-- then separate them with a semicolon, else end the previous line and add
+	-- If the new line is on the same line number as the previous line 
+	-- then separate them with spaces, else end the previous line and add
 	-- any extra blank lines to catch up to the new line number as necessary.
 	local indent = true
 	if iLine == nil then
 		endLuaLine()
 	elseif iLine <= luaLineNum then
-		luaCodeStrs[#luaCodeStrs + 1] = "; "
+		luaCodeStrs[#luaCodeStrs + 1] = "  "
 		indent = false
 	else
 		endLuaLine()
