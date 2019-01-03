@@ -1,7 +1,5 @@
 
-import Code12.*;
-
-public class GraphingUtility extends Code12Program
+class GraphingUtility
 {
     GameObj xAxis, yAxis, equationText;
     GameObj[] buttons = new GameObj[17];
@@ -10,20 +8,14 @@ public class GraphingUtility extends Code12Program
     String[] simplifiedExpression;
     String equation = "";
 
-    public static void main(String[] args)
-    {
-        Code12.run(new GraphingUtility());
-    }
-
+    // TODO: make buttons turn red, not text, so buttonTexts can be deleted
     public void start()
     {
         ct.setBackColor("light gray");
-        xAxis = ct.line(0, ct.getHeight() / 2, ct.getWidth(), ct.getHeight() / 2, "white");
-        xAxis.align("center", true);
-        yAxis = ct.line(ct.getWidth() / 2, 0, ct.getWidth() / 2, ct.getHeight(), "white");
-        yAxis.align("center", true);
-        equationText = ct.text("", ct.getWidth() / 20, 7*ct.getHeight() / 8 + 2, 2, "white");
-        equationText.align("left", true);
+        xAxis = ct.line(0, 50, 100, 50, "white");
+        yAxis = ct.line(50, 0, 50, 100, "white");
+        equationText = ct.text("", 5, 89.5, 2, "white");
+        equationText.align("left");
         equationText.setLayer(2);
 
         defineButtons();
@@ -33,22 +25,36 @@ public class GraphingUtility extends Code12Program
 
     public void onMouseRelease(GameObj obj, double x, double y)
     {
-        if (obj == buttons[16] || obj == buttonTexts[16])
-            backspaceAction();
-        for (int i = 0; i < buttons.length - 1; i++)
+        // NOTE: new addition
+        // TODO: verify this works
+        if (isButton(obj))
         {
-            if (obj == buttons[i] || obj == buttonTexts[i] && buttons[i].clickable)
+            String buttonText = obj.getText();
+            if (buttonText.equals("<"))
+                backspaceAction();
+            else
             {
-                equationText.setText(equationText.getText() + buttonTexts[i].getText());
+                equationText.setText(equationText.getText() + buttonText);
                 enableButtons("x+-*/^0123456789<");
                 disableButtons(getToBeDisabledButtons());
             }
         }
+
+        // for (int i = 0; i < buttons.length - 1; i++)
+        // {
+        //     if (obj == buttons[i] || obj == buttonTexts[i] && buttons[i].clickable)
+        //     {
+        //         equationText.setText(equationText.getText() + buttonTexts[i].getText());
+        //         enableButtons("x+-*/^0123456789<");
+        //         disableButtons(getToBeDisabledButtons());
+        //     }
+        // }
     }
 
     public void onKeyRelease(String keyName)
     {
-        if (keyName.equals("backspace"))
+        String equationString = equationText.getText();
+        if (keyName.equals("backspace") && equationString.length() > 0)
             backspaceAction();
     }
 
@@ -76,52 +82,60 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public void defineLines()
+    void defineLines()
     {
-        double y = -parse(-50) + ct.getHeight() / 2;
-        double y2 = -parse(-49.99) + ct.getHeight() / 2;
-        for (double x = 0; x < ct.getWidth(); x += 0.01)
+        double y1 = 50 - parse(-50);
+        double y2 = 50 - parse(-49.9);
+        for (double x = 0; x < 100; x += 0.1)
         {
-            defineLine(x, y, x + 0.01, y2);
-            y = y2;
-            y2 = -parse((x + 0.01) - 50) + ct.getHeight() / 2;
+            defineLine(x, y1, x + 0.1, y2);
+            y1 = y2;
+            y2 = 50 - parse(x - 49.9);
         }
     }
 
-    public void defineLine(double x, double y, double x2, double y2)
+    void defineLine(double x1, double y1, double x2, double y2)
     {
-        GameObj line = ct.line(x, y, x2, y2, "light blue");
+        GameObj line = ct.line(x1, y1, x2, y2, "light blue");
         line.lineWidth = 3;
         line.group = "coordinates";
     }
 
-    public void defineButtons()
+    void defineButtons()
     {
         for (int i = 0; i < buttons.length; i++)
             defineButton(i);
     }
 
-    public void defineButton(int i)
+    void defineButton(int i)
     {
-        double x = 25 + 5 * (i % 11) + ct.intDiv(i, 16) * 25;
-        double y = 5*ct.getHeight() / 6 + 10 + ct.intDiv(i, 11) * 5;
+        double x = 5 * i % 55 + ct.intDiv(i, 16) * 25 + 25;
+        double y = 93.33 + ct.intDiv(i, 11) * 5;
+        String c = charAt("x0123456789+-*/^<", i);
         buttons[i] = ct.rect(x, y, 3, 1, "white");
-        buttons[i].align("center", true);
+        // NOTE: new addition
+        buttons[i].setText(c);
         buttons[i].setLayer(2);
-        buttonTexts[i] = ct.text(charAt("x0123456789+-*/^<", i), x, y, 1);
-        buttonTexts[i].align("center", true);
-        buttonTexts[i].setLayer(2);
+        buttons[i].group = "buttons";
+        GameObj text = ct.text(c, x, y, 1);
+        //text.setLayer(2);
+        text.group = "buttons";
     }
 
-    public void enableButtons(String buttonsString)
+    void enableButtons(String buttonsString)
     {
         String[] buttonStrings = toCharArray(buttonsString);
         for (String buttonString: buttonStrings)
             enableButton(buttonString);
     }
 
-    public void enableButton(String buttonString)
+    void enableButton(String buttonString)
     {
+        // NOTE: new addition
+        GameObj button = getButton(buttonString);
+        button.setClickable(true);
+        // NOTE: button texts will still be able to be clicked if button is disabled
+        // maybe place labels above buttons
         for (int i = 0; i < buttons.length; i++)
         {
             if (buttonString.equals(buttonTexts[i].getText()))
@@ -134,14 +148,14 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public void disableButtons(String buttonsString)
+    void disableButtons(String buttonsString)
     {
         String[] buttonStrings = toCharArray(buttonsString);
         for (String buttonString: buttonStrings)
             disableButton(buttonString);
     }
 
-    public void disableButton(String buttonString)
+    void disableButton(String buttonString)
     {
         for (int i = 0; i < buttons.length; i++)
         {
@@ -155,7 +169,7 @@ public class GraphingUtility extends Code12Program
         }
     }
 
-    public String getToBeDisabledButtons()
+    String getToBeDisabledButtons()
     {
         String buttonString = getLastChar(equationText.getText());
         if (buttonString.equals("x"))
@@ -169,18 +183,21 @@ public class GraphingUtility extends Code12Program
         return "x-";
     }
 
-    public void backspaceAction()
+    void backspaceAction()
     {
-        String equationString = equationText.getText();
-        equationString = equationString.substring(0, equationString.length() - 1);
-        equationText.setText(equationString);
-        enableButtons("x+-*/^0123456789<");
-        disableButtons(getToBeDisabledButtons());
-        if (equationString.length() == 0)
-            disableButton("<");
+        if (equationString.length() > 0)
+        {
+            String equationString = equationText.getText();
+            equationString = equationString.substring(0, equationString.length() - 1);
+            equationText.setText(equationString);
+            enableButtons("x+-*/^0123456789<");
+            disableButtons(getToBeDisabledButtons());
+            if (equationString.length() == 0)
+                disableButton("<");
+        }
     }
 
-    public void deconstructExpression()
+    void deconstructExpression()
     {
         String expression = equationText.getText();
         deconstructedExpression = new String[100];
@@ -189,14 +206,31 @@ public class GraphingUtility extends Code12Program
         {
             deconstructedExpression[count] = "";
             for (; i < expression.length() && isOperand(charAt(expression, i)); i++)
-                deconstructedExpression[count] += charAt(expression, i);
+                deconstructedExpression[count] = deconstructedExpression[count] + charAt(expression, i);
             if (isOperator(charAt(expression, i)))
                 deconstructedExpression[count + 1] = charAt(expression, i);
             count += 2;
         }
     }
 
-    public double parse(double x)
+    void substituteXVariable(double x)
+    {
+        simplifiedExpression = new String[100];
+        for (int i = 0; i < deconstructedExpression.length && deconstructedExpression[i] != null; i++)
+        {
+            String token = deconstructedExpression[i];
+            if (token.equals("-x") && x > 0)
+                simplifiedExpression[i] = "-" + ct.formatDecimal(x);
+            else if (token.equals("-x") && x <= 0)
+                simplifiedExpression[i] = ct.formatDecimal(Math.abs(x));
+            else if (token.equals("x") || token.equals("-x") && x <= 0)
+                simplifiedExpression[i] = ct.formatDecimal(x);
+            else
+                simplifiedExpression[i] = deconstructedExpression[i];
+        }
+    }
+
+    double parse(double x)
     {
         substituteXVariable(x);
         double solution = ct.parseNumber(simplifiedExpression[0]);
@@ -214,45 +248,28 @@ public class GraphingUtility extends Code12Program
         return solution;
     }
 
-    public void substituteXVariable(double x)
-    {
-        simplifiedExpression = new String[100];
-        for (int i = 0; i < deconstructedExpression.length && deconstructedExpression[i] != null; i++)
-        {
-            String token = deconstructedExpression[i];
-            if (token.equals("-x") && x > 0)
-                simplifiedExpression[i] = "-" + ct.formatDecimal(x);
-            else if (token.equals("-x") && x <= 0)
-                simplifiedExpression[i] = ct.formatDecimal(Math.abs(x));
-            else if (token.equals("x") || token.equals("-x") && x <= 0)
-                simplifiedExpression[i] = ct.formatDecimal(x);
-            else
-                simplifiedExpression[i] = deconstructedExpression[i];
-        }
-    }
-
-    public boolean hasEquationChanged()
+    boolean hasEquationChanged()
     {
         return !equation.equals(equationText.getText());
     }
 
-    public boolean isParseable()
+    boolean isParseable()
     {
         String equationChar = getLastChar(equationText.getText());
         return !equationChar.equals("+") && !equationChar.equals("-") && !equationChar.equals("*") && !equationChar.equals("/") && !equationChar.equals("^") && !equationChar.equals("");
     }
 
-    public boolean isOperand(String value)
+    boolean isOperand(String value)
     {
         return value.equals("x") || value.equals("-") || value.equals(".") || value.equals("0") || value.equals("1") || value.equals("2") || value.equals("3") || value.equals("4") || value.equals("5") || value.equals("6") || value.equals("7") || value.equals("8") || value.equals("9");
     }
 
-    public boolean isOperator(String value)
+    boolean isOperator(String value)
     {
         return value.equals("+") || value.equals("*") || value.equals("/") || value.equals("^");
     }
 
-    public String[] toCharArray(String s)
+    String[] toCharArray(String s)
     {
         String[] charArray = new String[s.length()];
         for (int i = 0; i < s.length(); i++)
@@ -260,18 +277,37 @@ public class GraphingUtility extends Code12Program
         return charArray;
     }
 
-    public String getLastChar(String s)
+    String getLastChar(String s)
     {
         return charAt(s, s.length() - 1);
     }
 
-    public String charAt(String s, int i)
+    String charAt(String s, int i)
     {
         if (s.length() <= 0 || i < 0)
             return "";
         if (i == s.length())
             return s.substring(i);
         return s.substring(i, i + 1);
+    }
+
+    // NOTE: new addition
+    GameObj getButton(String buttonString)
+    {
+        for (int i = 0; i < buttons.length; i++)
+        {
+            if (buttonString.equals(buttons[i].getText()))
+                return buttons[i];
+        }
+    }
+
+    // NOTE: new addition
+    boolean isButton(GameObj obj)
+    {
+        if (obj == null)
+            return false;
+        String group = obj.group;
+        return group.equals("buttons");
     }
 
 }
