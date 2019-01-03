@@ -212,6 +212,19 @@ String playerOneName, playerTwoName;</code></pre>
 <blockquote>
 <p>Only class-level (permanent) variables are displayed in the variable watch window in the Code12 application, because all local variables come and go very quickly in practice.</p>
 </blockquote>
+<h5 id="constant-final-variables">Constant (final) Variables</h5>
+<p>If the keyword <code>final</code> is used before a variable declaration, then the variable becomes a “constant”, meaning the value cannot change. The variable must be initialized at the point of declaration and cannot be reassigned later.</p>
+<p>A common convention for constant variable names is to use all capital letters with underscores between words. For example:</p>
+<pre><code>class MyProgram
+{
+    final double DOT_SIZE = 20;
+
+    public void start()
+    {       
+        ct.circle( 30, 50, DOT_SIZE );
+        ct.circle( 70, 50, DOT_SIZE );
+    }
+}</code></pre>
 <h6 id="java-language-help-variables"><a href="#top">Java Language Help</a> &gt; <a href="#variables">Variables</a></h6>
 <h3 id="expressions">Expressions</h3>
 <p>An expression is a combination of numbers (or values of other types), variables, and <em>operators</em> such as <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code>, which causes the computer to do the calculations and get a resulting value.</p>

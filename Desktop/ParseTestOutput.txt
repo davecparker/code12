@@ -5198,7 +5198,7 @@ line (varDecl)
 *** Line 550 chars 8-12: Syntax Error: "class" was unexpected here
 
 551. boolean const;
-*** Line 551 chars 9-13: Syntax Error: "const" was unexpected here
+*** Line 551 chars 9-13: Unsupported reserved word "const"
 
 552. boolean continue;
 *** Line 552 chars 9-16: Unsupported reserved word "continue"
@@ -5856,7 +5856,7 @@ Comma not supported
 *** Line 719 chars 1-8: Unsupported reserved word "volatile"
 ======= Test Complete =========================================
 
-719 lines processed in 102 ms
+719 lines processed in 715 ms
 
 0 unexpected errors
 0 uncaught errors (182 expected errors)

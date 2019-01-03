@@ -374,6 +374,26 @@ are therefore also "temporary" variables in practice.
 > variable watch window in the Code12 application, because all
 > local variables come and go very quickly in practice. 
 
+##### Constant (final) Variables
+If the keyword `final` is used before a variable declaration,
+then the variable becomes a "constant", meaning the value cannot
+change. The variable must be initialized at the point of declaration 
+and cannot be reassigned later. 
+
+A common convention for constant variable names is to use all
+capital letters with underscores between words. For example:
+```
+class MyProgram
+{
+	final double DOT_SIZE = 20;
+
+	public void start()
+	{		
+		ct.circle( 30, 50, DOT_SIZE );
+		ct.circle( 70, 50, DOT_SIZE );
+	}
+}
+```
 ###### [Java Language Help](#top) > [Variables]
 
 

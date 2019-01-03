@@ -142,7 +142,7 @@ int underIndentedInstanceVar;
 	int intVarMethodCall = classLevelInt.delete();
 	// ERROR "Unknown method"
 	String stringSize = classLevelString.size();
-	// ERROR "Unknown or unsupported Math method"
+	// ERROR "Unknown or unsupported Math function"
 	double unknownMathMethod = Math.foo();
 	// ERROR "does not return a value"
 	String greeting = System.out.println("hello");
@@ -1322,7 +1322,7 @@ int underIndentedInstanceVar;
 
 		// ERROR "Unknown method"
 		objArr[0].foo();
-		// ERROR "Unknown or unsupported Math method"
+		// ERROR "Unknown or unsupported Math function"
 		Math.foo();
 		
 		// ERROR "requires 1 parameter"
@@ -1941,7 +1941,7 @@ void underIndentedFunc()
 		intArr = new int[intArr.foo * 2];
 		// ERROR "no data fields"
 		ct.print(intVar.x);
-		// ERROR "function as a variable"
+		// ERROR "function as a field"
 		rect.setText = strVar;
 		// ERROR "Unknown field"
 		dblVar = rect.foo;
@@ -1965,7 +1965,7 @@ void underIndentedFunc()
 		System.foo.bar();
 		// ERROR "supported System functions are"
 		System.err.println("File opening failed:");
-		// ERROR "Unknown or unsupported Math method"
+		// ERROR "Unknown or unsupported Math function"
 		double stdev = Math.foo(doubleVar);
 		// ERROR "Unknown or misspelled method"
 		rect.getWidht(dblVar);

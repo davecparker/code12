@@ -171,6 +171,7 @@ local function checkBlockBegin()
 		return true
 	end
 	err.overrideErrLineParseTree( tree, "Expected {" )	
+	err.addDocLink( "Java.html" )
 	return false
 end
 
@@ -1234,9 +1235,11 @@ function parseProgram.getProgramTree( syntaxLevel )
 			if tree.p == "class" then
 				err.overrideErrLineParseTree( tree,
 						"Code12 does not allow defining additional classes" )
+				err.addDocLink( "Java.html#unsupported-java-language-features" )
 			else
 				err.overrideErrLineParseTree( tree,
 						"Unexpected line after end of class -- mismatched { } brackets?" )
+				err.addDocLink( "Java.html" )
 			end
 		end
 	end
