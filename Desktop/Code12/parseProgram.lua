@@ -4,7 +4,7 @@
 --
 -- High-level parsing for a Code 12 Java program
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
@@ -108,6 +108,7 @@ local function checkIndentTabsAndSpaces( lineRec, lineRecPrev )
 				or indLvl < prevIndLvl and string.sub( prevIndentStr, 1, indLvl ) ~= indentStr then
 			err.setErrLineNumAndRefLineNum( lineRec.iLine, lineRecPrev.iLine,
 					"Mix of tabs and spaces used for indentation is not consistent with the previous line of code" )
+			err.addDocLink( "Java.html#indentation-and-brace-placement" )
 		end
 	end
 end
@@ -137,6 +138,7 @@ local function indentErrBlockBegin( tree, prevTree )
 		strErr = "The {  beginning a block should have the same indentation as the line before it"
 	end
 	err.setErrLineNumAndRefLineNum( tree.iLine, prevTree.iLineStart, strErr )
+	err.addDocLink( "Java.html#indentation-and-brace-placement" )
 end
 
 -- Check indentation for multi-line var decls, function defs, and calls
@@ -148,6 +150,7 @@ local function checkMultiLineIndent( tree )
 			if lineRec.hasCode and lineRec.indentLevel <= startIndent then
 				err.setErrLineNumAndRefLineNum( lineNum, tree.iLineStart, 
 						"The lines after the first line of a multi-line statement should be indented further than the first line" )
+				err.addDocLink( "Java.html#indentation-and-brace-placement" )
 				break
 			end
 		end
@@ -168,6 +171,7 @@ local function checkBlockBegin()
 		return true
 	end
 	err.overrideErrLineParseTree( tree, "Expected {" )	
+	err.addDocLink( "Java.html" )
 	return false
 end
 
@@ -200,6 +204,7 @@ local function getProgramHeader()
 		err.clearErr( iLine )
 		err.setErrLineNum( iLine, 
 				"Code12 programs must start with:\nclass YourProgramName" )
+		err.addDocLink( "Java.html#main-program-structure" )
 		return nil
 	end
 
@@ -216,6 +221,7 @@ local function getProgramHeader()
 	if access and access.p ~= "public" then
 		err.setErrNode( access, 
 				'A Code12 class should be declared "public" or nothing/default' )
+		err.addDocLink( "Java.html#main-program-structure" )
 	end
 
 	-- Check that class name is valid (not a defined class) and starts with upper case letter
@@ -234,6 +240,7 @@ local function getProgramHeader()
 	-- Check that the class header is not indented
 	if tree.indentLevel ~= 0 then
 		err.setErrLineNum( tree.iLineStart, "The class header shouldn't be indented" )
+		err.addDocLink( "Java.html#main-program-structure" )
 	end
 
 	-- Check for the { to start the class block
@@ -241,6 +248,7 @@ local function getProgramHeader()
 		-- Report this error on the line right after the class even if blank or comment
 		err.clearErr( tree.iLine + 1 )
 		err.setErrLineNum( tree.iLine + 1, "Expected {  to start the class body" )
+		err.addDocLink( "Java.html#main-program-structure" )
 	end
 
 	-- Return the root program structure node
@@ -253,6 +261,7 @@ local function makeVar( isGlobal, access, typeNode, nameID, initExpr, isArray, i
 	-- Access is optional and ignored for instance variables, not allowed otherwise
 	if not isGlobal and access then
 		err.setErrNode( access, "Access specifiers are only allowed on class-level variables" )
+		err.addDocLink( "Java.html#variables" )
 	end
 
 	return {
@@ -296,20 +305,22 @@ end
 -- Return true if the pattern was a variable pattern, else false.
 local function getVar( p, nodes, structs, isGlobal )
 	if p == "varInit" then
-		-- e.g. int x = 10;
+		-- access TYPE ID = expr ;
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
 									nodes[3], makeExpr( nodes[5] ) )
 	elseif p == "varDecl" then
-		-- e.g. int x, y;
+		-- access TYPE idList ;
 		for _, nameID in ipairs( nodes[3].nodes ) do
 			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], nameID )
 		end
 	elseif p == "constInit" then
-		-- e.g. final int LIMIT = 100;
-		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[3], 
-									nodes[4], makeExpr( nodes[6] ), nil, true )			
+		-- access final TYPE ID = expr ;
+		local var = makeVar( isGlobal, nodes[1], nodes[3], 
+							nodes[4], makeExpr( nodes[6] ), nil, true )
+		var.firstToken = nodes[2]
+		structs[#structs + 1] = var		
 	elseif p == "arrayInit" then
-		-- e.g. int[] a = { 1, 2, 3 };   or   int[] a = new int[10];
+		-- access TYPE [ ] ID = arrayInit ;
 		local initExpr
 		local arrayInit = nodes[7]
 		if arrayInit.p == "list" then
@@ -320,7 +331,7 @@ local function getVar( p, nodes, structs, isGlobal )
 		structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
 									nodes[5], initExpr, true )						
 	elseif p == "arrayDecl" then
-		-- e.g. GameObj[] coins, walls;
+		-- access TYPE [ ] idList ;
 		for _, nameID in ipairs( nodes[5].nodes ) do
 			structs[#structs + 1] = makeVar( isGlobal, nodes[1], nodes[2], 
 										nameID, nil, true )
@@ -417,10 +428,12 @@ local function getControlledBlock()
 		return getBlock()
 	elseif p == "end" then
 		err.setErrNode( tree, "} without matching {" )
+		err.addDocLink( "Java.html#indentation-and-brace-placement" )
 		return nil
 	elseif p == "varInit" or p == "varDecl" or p == "arrayInit" or p == "arrayDecl" then
 		-- Var decls are not allowed as a single controlled statement
 		err.setErrNode( tree, "Variable declarations are not allowed here" )
+		err.addDocLink( "Java.html#variables" )
 		return nil
 	else
 		-- Single controlled stmt
@@ -428,6 +441,7 @@ local function getControlledBlock()
 		if stmtIndent <= ctrlIndent then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, ctrlTree.iLineStart, 
 					"This line should be indented more than its controlling \"%s\"", ctrlTree.p )
+			err.addDocLink( "Java.html#indentation-and-brace-placement" )
 		end
 		iTree = iTree + 1  -- pass the controlled stmt as expected by getLineStmts
 		local stmts = {}
@@ -440,12 +454,18 @@ local function getControlledBlock()
 				if nextP == "end" then
 					if nextIndent >= ctrlIndent then
 						err.setErrLineNum( nextTree.iLineStart, "Unexpected indentation. Stray closing } bracket?" )
+						err.addDocLink( "Java.html#indentation-and-brace-placement" )
 					end
 				elseif nextIndent == stmtIndent and nextIndent ~= ctrlIndent
 						and not (ctrlTree.p == "do" and nextTree.p == "while" and nextTree.nodes[4].p == "doWhile") then
 					err.setErrLineNumAndRefLineNum( nextTree.iLineStart, ctrlTree.iLineStart,
 							'This line is not controlled by the "%s" above it. Missing { } bracket(s) or improperly indented?', 
 							ctrlTree.p )
+					if ctrlTree.p == "if" or ctrlTree.p == "else" then
+						err.addDocLink( "Java.html#if-else" )
+					else
+						err.addDocLink( "Java.html#loops" )
+					end
 				end
 			end
 			return { s = "block", stmts = stmts }
@@ -464,6 +484,7 @@ local function getElseBlock( ifTree )
 		if tree.indentLevel ~= ifTree.indentLevel then
 			err.setErrLineNumAndRefLineNum( tree.iLine, ifTree.iLineStart, 
 					'An "else" should have the same indentation as its "if"' )
+			err.addDocLink( "Java.html#if-else" )
 		end
 		iTree = iTree + 1
 		return getControlledBlock()
@@ -471,6 +492,7 @@ local function getElseBlock( ifTree )
 		if tree.indentLevel ~= ifTree.indentLevel then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, ifTree.iLineStart, 
 					'An "else if" should have the same indentation as the first "if"' )
+			err.addDocLink( "Java.html#if-else" )
 		end
 		checkMultiLineIndent( tree )
 		-- Controlled stmts is a single stmt, which is the following if
@@ -598,6 +620,7 @@ function getLineStmts( tree, stmts )
 		-- Handling of an if above should also consume the else if any,
 		-- so an else here is without a matching if.
 		err.setErrNode( tree, "else without matching if (misplaced { } brackets?)")
+		err.addDocLink( "Java.html#if-else" )
 		return false
 	elseif p == "returnVal" then
 		-- return expr ;
@@ -616,16 +639,19 @@ function getLineStmts( tree, stmts )
 		if endTree.p ~= "while" then
 			err.setErrNodeAndRef( endTree, tree, 
 					"Expected while statement to end do-while loop" )
+			err.addDocLink( "Java.html#loops" )
 			return nil
 		end
 		local whileEnd = endTree.nodes[4]
 		if whileEnd.p ~= "doWhile" then
 			err.setErrNodeAndRef( whileEnd, tree, 
 					"while statement at end of do-while loop must end with a semicolon" )
+			err.addDocLink( "Java.html#loops" )
 			return nil
 		end
 		if endTree.indentLevel ~= tree.indentLevel then
 			err.setErrNodeAndRef( endTree, tree, "This while statement should have the same indentation as its \"do\"" )
+			err.addDocLink( "Java.html#loops" )
 		end
 		stmt.expr = makeExpr( endTree.nodes[3] )
 		stmt.iLineWhile = endTree.iLine
@@ -635,6 +661,7 @@ function getLineStmts( tree, stmts )
 		local whileEnd = nodes[4]
 		if whileEnd.p ~= "while" then
 			err.setErrNode( whileEnd, "while loop header should not end with a semicolon" )
+			err.addDocLink( "Java.html#loops" )
 			return nil
 		end
 		stmt = { s = "while", expr = makeExpr( nodes[3] ), block = getControlledBlock(),
@@ -652,6 +679,7 @@ function getLineStmts( tree, stmts )
 		else
 			err.setErrNode( tree, "Unexpected statement" )
 		end
+		err.addDocLink( "Java.html" )
 		return false
 	end
 
@@ -685,6 +713,7 @@ function getBlock()
 		if prevTree.p ~= "end" and blockIndent <= beginIndent then
 			err.setErrLineNumAndRefLineNum( prevTree.iLineStart, iLineStart,
 					"Lines within { } brackets should be indented" )
+			err.addDocLink( "Java.html#indentation-and-brace-placement" )
 		end
 	end
 
@@ -699,17 +728,20 @@ function getBlock()
 		if p == "begin" then
 			-- Ad-hoc blocks are not supported
 			err.setErrLineNum( tree.iLine, "Unexpected {" )
+			err.addDocLink( "Java.html" )
 		elseif p == "end" then
 			-- This ends our block
 			if currIndent ~= beginIndent then
 				err.setErrLineNumAndRefLineNum( tree.iLineStart, iLineStart, 
 						"A block's ending } should have the same indentation as its beginning {" )
+				err.addDocLink( "Java.html#indentation-and-brace-placement" )
 			end
 			return { s = "block", iLineBegin = iLineStart, stmts = stmts, iLineEnd = tree.iLine }
 		else
 			if currIndent ~= blockIndent then
 				err.setErrLineNumAndRefLineNum( tree.iLineStart, prevTree.iLineStart, 
 						"Unexpected change in indentation (Missing/misplaced { } brackets?)" )
+				err.addDocLink( "Java.html#indentation-and-brace-placement" )
 			else
 				prevTree = tree
 			end
@@ -720,6 +752,7 @@ function getBlock()
 	-- Got to EOF before finding matching }
 	err.setErrLineNumAndRefLineNum( source.numLines + 1, iLineStart,
 		"Missing } to end block starting at line %d", iLineStart )
+	err.addDocLink( "Java.html" )
 	return nil
 end
 
@@ -870,6 +903,7 @@ local function skipBlock()
 	-- Got to EOF before finding matching }
 	err.setErrLineNum( source.numLines + 1, 
 		"Missing } to end block starting at line %d", iLineStart )
+	err.addDocLink( "Java.html" )
 	return nil
 end
 
@@ -907,20 +941,24 @@ local function getMembers( programTree )
 			-- because it greatly complicates keeping Java and Lua line numbers in sync.
 			if gotFunc then
 				err.setErrNode( tree, "Class-level variables must be defined at the beginning of the class" )
+				err.addDocLink( "Java.html#variables" )
 			end
 		elseif p == "end" then
 			-- The end of the class
 			if tree.indentLevel ~= 0 then
 				err.setErrLineNum( tree.iLine, "The ending } of the program class should not be indented" )
+				err.addDocLink( "Java.html#indentation-and-brace-placement" )
 			end
 			return true
 		elseif p == "begin" then
 			-- Ad-hoc blocks are unexpected, but try to process the block anyway
 			err.setErrNode( tree, "Unexpected or extra {" )
+			err.addDocLink( "Java.html" )
 			iTree = iTree - 1   -- back to the { line
 			getBlock()
 		elseif p == "class" then
 			err.setErrNode( tree, "Code12 does not support additional class definitions" )
+			err.addDocLink( "Java.html#unsupported-java-language-features" )
 			getBlock()
 		else
 			-- Unexpected line in the class block.
@@ -933,6 +971,7 @@ local function getMembers( programTree )
 			else
 				err.overrideErrLineParseTree( tree, 
 						"Statement must be inside a function body -- mismatched { } brackets?" )
+				err.addDocLink( "Java.html" )
 			end
 		end
 
@@ -944,16 +983,19 @@ local function getMembers( programTree )
 			if firstMemberIndentLevel == 0 then
 				err.setErrLineNum( firstMemberLineNum,
 						"Code inside the class block should be indented" )
+				err.addDocLink( "Java.html#indentation-and-brace-placement" )
 			end
 		elseif tree.indentLevel ~= firstMemberIndentLevel then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, firstMemberLineNum,
 					"Class-level variable and function blocks should all have the same indentation" )
+			err.addDocLink( "Java.html#indentation-and-brace-placement" )
 		end
 		checkMultiLineIndent( tree )
 	end
 
 	-- Reached EOF before finding the end of the class
 	err.setErrLineNum( source.numLines + 1, "Missing } to end the program class" )
+	err.addDocLink( "Java.html#main-program-structure" )
 	return false
 end
 
@@ -1193,9 +1235,11 @@ function parseProgram.getProgramTree( syntaxLevel )
 			if tree.p == "class" then
 				err.overrideErrLineParseTree( tree,
 						"Code12 does not allow defining additional classes" )
+				err.addDocLink( "Java.html#unsupported-java-language-features" )
 			else
 				err.overrideErrLineParseTree( tree,
 						"Unexpected line after end of class -- mismatched { } brackets?" )
+				err.addDocLink( "Java.html" )
 			end
 		end
 	end

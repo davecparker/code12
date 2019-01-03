@@ -4,7 +4,7 @@
 --
 -- The view for displaying program errors for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Corona modules

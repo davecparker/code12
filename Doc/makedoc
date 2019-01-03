@@ -1,3 +1,2 @@
 pandoc -s -t html5 -c API.css API.md -o Website/docs/1/API.html
 pandoc -s -t html5 -c API.css Java.md -o Website/docs/1/Java.html
-cp API.css Website/docs/1/API.css

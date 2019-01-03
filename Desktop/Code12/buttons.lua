@@ -4,7 +4,7 @@
 --
 -- The buttons module for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by Code12. All Rights Reserved.
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Corona modules

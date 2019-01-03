@@ -1,7 +1,12 @@
 % Code12 Function Reference
 
+<div class="rightLink">
+[Java Language Help](Java.html)
+</div>
+
 <div class="summary">
 <div class="summaryColumn">
+
 
 ##### [Graphics Object Creation] {#toc-graphics-object-creation}
 * [ct.circle()]
@@ -1728,11 +1733,11 @@ in an error or invalid number. See the examples below.
 
 #### Example
 ```
-// One of these is not considered a NaN error...
-ct.log( ct.isError( 0.0 / 0.0 ) );                  // undefined
-ct.log( ct.isError( Math.sqrt( -1 ) ) );            // imaginary
-ct.log( ct.isError( 0.0 / 2.0 ) );                  // infinity
-ct.log( ct.isError( ct.parseNumber( "nope" ) ) );   // error
+// One of these is not considered a NaN error
+ct.log( ct.isError( 0.0 / 0.0 ) );                  // undefined (NaN)
+ct.log( ct.isError( Math.sqrt( -1 ) ) );            // imaginary (NaN)
+ct.log( ct.isError( 2.0 / 0.0 ) );                  // infinity
+ct.log( ct.isError( ct.parseNumber( "nope" ) ) );   // error (NaN)
 ```
 ###### [Code12 Function Reference](#top) > [Math Utilities] > [ct.isError()]
 
@@ -3999,5 +4004,5 @@ so typing 'A' uses the "a" key, and typing '$' uses the "4" key.
 <footer>
 	Code12 Version 1.0
 
-	(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved. 
+	Copyright (c) 2019 Code12. All Rights Reserved. 
 </footer> 

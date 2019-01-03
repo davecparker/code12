@@ -20,6 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Java Language Help</h1>
 </header>
+<div class="rightLink">
+<p><a href="API.html">Code12 Function Reference</a></p>
+</div>
 <div class="summary">
 <div class="summaryColumn">
 <h5 id="java-syntax-examples">Java Syntax Examples</h5>
@@ -42,6 +45,13 @@
 <h5 id="java-language-elements">Java Language Elements</h5>
 <ul>
 <li><a href="#java-data-types">Java Data Types</a></li>
+<li><a href="#java-operators">Java Operators</a></li>
+</ul>
+<h5 id="differences-between-code12-and-java">Differences between Code12 and Java</h5>
+<ul>
+<li><a href="#main-program-structure">Main Program Structure</a></li>
+<li><a href="#unsupported-java-language-features">Unsupported Java Language Features</a></li>
+<li><a href="#indentation-and-brace-placement">Indentation and Brace Placement</a></li>
 </ul>
 </div>
 </div>
@@ -202,6 +212,19 @@ String playerOneName, playerTwoName;</code></pre>
 <blockquote>
 <p>Only class-level (permanent) variables are displayed in the variable watch window in the Code12 application, because all local variables come and go very quickly in practice.</p>
 </blockquote>
+<h5 id="constant-final-variables">Constant (final) Variables</h5>
+<p>If the keyword <code>final</code> is used before a variable declaration, then the variable becomes a “constant”, meaning the value cannot change. The variable must be initialized at the point of declaration and cannot be reassigned later.</p>
+<p>A common convention for constant variable names is to use all capital letters with underscores between words. For example:</p>
+<pre><code>class MyProgram
+{
+    final double DOT_SIZE = 20;
+
+    public void start()
+    {       
+        ct.circle( 30, 50, DOT_SIZE );
+        ct.circle( 70, 50, DOT_SIZE );
+    }
+}</code></pre>
 <h6 id="java-language-help-variables"><a href="#top">Java Language Help</a> &gt; <a href="#variables">Variables</a></h6>
 <h3 id="expressions">Expressions</h3>
 <p>An expression is a combination of numbers (or values of other types), variables, and <em>operators</em> such as <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code>, which causes the computer to do the calculations and get a resulting value.</p>
@@ -957,9 +980,174 @@ public void update()
 <h4 id="gameobj">GameObj</h4>
 <p>A <code>GameObj</code> (Game Object) is a reference to a graphical object (circle, rectangle, line, text, or image) that you can create for display on the screen. To create a <code>GameObj</code>, see [Graphics Object Creation]. If you store a <code>GameObj</code> in a variable then you can also access and change the object later using the [GameObj Data Fields] and [GameObj Methods].</p>
 <h6 id="java-language-help-java-data-types"><a href="#top">Java Language Help</a> &gt; <a href="#java-data-types">Java Data Types</a></h6>
+<h3 id="java-operators">Java Operators</h3>
+<p>Code12 supports the following Java operators in <a href="#expressions">expressions</a>. These are listed in groups from highest precedence to lowest precedence (see <a href="#order-of-operations-and-parentheses">Order of Operations and Parentheses</a>). Within each group, operators execute from left to right.</p>
+<h5 id="unary-operators-operate-on-only-one-value">Unary Operators (operate on only one value)</h5>
+<pre><code>-a        // (Negate) a is numeric, result is numeric
+!a        // (NOT) a is boolean, result is boolean</code></pre>
+<h5 id="multiplication-and-division">Multiplication and Division</h5>
+<pre><code>a * b     // (Multiply) a and b are numeric, result is numeric
+a / b     // (Divide) a and b are numeric, result is numeric
+a % b     // (Mod) a and b are numeric, result is numeric</code></pre>
+<h5 id="addition-and-subtraction">Addition and Subtraction</h5>
+<pre><code>a + b     // (Add) a and b are numeric, result is numeric
+a - b     // (Subtract) a and b are numeric, result is numeric
+a + b     // (Concatenation) either a or b is String, result is String</code></pre>
+<h5 id="inequality-comparison">Inequality Comparison</h5>
+<pre><code>a &lt; b     // (Less than) a and b are numeric, result is boolean
+a &lt;= b    // (Less than or equal to) a and b are numeric, result is boolean
+a &gt; b     // (Greater than) a and b are numeric, result is boolean
+a &gt;= b    // (Greater than or equal to) a and b are numeric, result is boolean</code></pre>
+<h5 id="equality-comparison">Equality Comparison</h5>
+<pre><code>a == b    // (Equal to) a and b are compatible types, result is boolean
+a != b    // (Not equal to) a and b are compatible types, result is boolean</code></pre>
+<h5 id="logical-and">Logical AND</h5>
+<pre><code>a &amp;&amp; b    // (AND) a and b are boolean, result is boolean</code></pre>
+<h5 id="logical-or">Logical OR</h5>
+<pre><code>a || b    // (OR) a and b are boolean, result is boolean</code></pre>
+<h6 id="java-language-help-java-operators"><a href="#top">Java Language Help</a> &gt; <a href="#java-operators">Java Operators</a></h6>
+<h3 id="main-program-structure">Main Program Structure</h3>
+<p>A Code12 Java program running in the Code12 Application consists of a single user-defined class corresponding to the main program. Declaring or importing additional classes is not supported.</p>
+<blockquote>
+<p>Use the <a href="http://www.code12.org/download.html">Code12 Java Package</a> when you are ready to start using additional classes.</p>
+</blockquote>
+<p>In addition, your program does not need the standard Java <code>main()</code> function. Instead, your program will define a <code>start()</code> function where the program begins. For example:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Your program starts here
+        ct.circle( 50, 30, 20 );
+    }
+}</code></pre>
+<p>Your program can also contain an optional <a href="API.html#main-program-functions">update() function</a> and optional <a href="API.html#input-event-functions">Input Event Functions</a>.</p>
+<h6 id="java-language-help-main-program-structure"><a href="#top">Java Language Help</a> &gt; <a href="#main-program-structure">Main Program Structure</a></h6>
+<h3 id="unsupported-java-language-features">Unsupported Java Language Features</h3>
+<p>The Code12 Application supports a subset of the full Java language, in order to avoid the typical syntax ambiguities that make traditional Java error messages frequently confusing to beginners, and to keep the focus on the <a href="#top">12 fundamental programming concepts</a>.</p>
+<blockquote>
+<p>You can use the <a href="http://www.code12.org/download.html">Code12 Java Package</a> with the Java development environment of your choice if you want to use the <a href="API.html">Code12 API</a> with the full Java language.</p>
+</blockquote>
+<h5 id="no-class-definitions">No Class Definitions</h5>
+<p>The main restriction is that class definitions other than the main program class are not supported, and importing classes is not allowed. This means that other than the main program class, the only classes that a Code12 program will use are:</p>
+<ol type="1">
+<li>The main <code>ct</code> class/instance defined by the Code12 API</li>
+<li>The <code>GameObj</code> class defined by the Code12 API (a graphical object)</li>
+<li>The standard Java <code>String</code> class (a subset of methods is supported)</li>
+<li>The Java <code>Math</code> class (a subset of methods is supported)</li>
+</ol>
+<h5 id="other-unsupported-java-features">Other Unsupported Java Features</h5>
+<p>In addition to restricting a program to a single user-defined class, the following Java features are not supported by the Code12 Application:</p>
+<ol type="1">
+<li>Importing classes and packages, including the Java Class Library</li>
+<li>Class inheritance, interfaces, etc.</li>
+<li>Using <code>new</code> to create object instances (except arrays)</li>
+<li>The byte, char, float, long and short data types</li>
+<li>Enumeration (enum) types</li>
+<li>Exception handling (try, catch, throw, etc.)</li>
+<li>The switch statement (switch, case, default)</li>
+<li>The continue statement</li>
+<li>Bit operators (&lt;&lt;, &gt;&gt;, &gt;&gt;&gt;, &amp;, |, ^)</li>
+<li>The ternary operator (? :)</li>
+<li>Multi-dimentional arrays or arrays of arrays</li>
+</ol>
+<h5 id="restricted-java-features">Restricted Java Features</h5>
+<p>To further help prevent common errors and sources of confusion, Code12 also intentionally restricts the use of some language features:</p>
+<ol type="1">
+<li>The assignment and increment operators (=, +=, ++, etc.) do not result in values. Assignments are statements, not expressions.</li>
+<li>Integer division that may produce (and lose) a remainder is not allowed directly. A function ct.intDiv() is provided if desired.</li>
+<li>Local variables and parameters cannot hide (be named the same as) a class-level variable.</li>
+<li>Variable names are not allowed to differ only by case from existing names.</li>
+<li>Functions calls returning objects cannot be be used to access fields or methods of the object directly. An object variable must be used.</li>
+</ol>
+<h4 id="unsupported-java-keywords">Unsupported Java Keywords</h4>
+<p>The following Java keywords are not supported by the Code12 Application:</p>
+<pre><code>Data Types     Classes        Flow Control    Other
+----------     -------        ------------    -----
+byte           abstract       assert          native
+char           extends        case            strictfp
+enum           implements     catch           synchronized
+float          import         continue        transient
+long           instanceof     default         volatile
+short          interface      finally
+               package        switch
+               protected      throw
+               static         try
+               super
+               this
+               throws</code></pre>
+<p>In addition, the following Java keywords have reduced or limited support:</p>
+<pre><code>class       (only for the main program class)
+new         (only for arrays)
+private     (ignored when allowed)
+public      (ignored when allowed)</code></pre>
+<h6 id="java-language-help-unsupported-java-language-features"><a href="#top">Java Language Help</a> &gt; <a href="#unsupported-java-language-features">Unsupported Java Language Features</a></h6>
+<h3 id="indentation-and-brace-placement">Indentation and Brace Placement</h3>
+<p>The Java language is normally defined to treat line breaks the same as spaces, and to ignore indentation. However, to help you find common errors in your program, the Code12 Application detects and enforces consistent use of indentation and a “style” of placing braces (curly brackets) as follows:</p>
+<pre><code>class Example
+{
+    // Class-level variables and function bodies are indented inside
+    // the class, all starting at the same level.
+
+    int size = 20;
+
+    public void start()
+    {
+        // Code inside function bodies is indented more
+
+        ct.circle( 50, 30, size );
+        if (size &lt; 10)
+            size = 10;    // controlled statements are indented further
+        else
+        {
+            // Braces to enclose a block are always on their own lines,
+            // the enclosed statements are indented further, and 
+            // the close brace lines up with the matching open brace.
+
+            ct.circle( 50, 30, size );
+            size -= 10;
+            ct.circle( 50, 30, size );
+        }
+    }
+}</code></pre>
+<p>For more information on the brace placement for specific structures, see:</p>
+<ul>
+<li><a href="#main-program-structure">Main Program Structure</a></li>
+<li><a href="#if-else">If-else</a></li>
+<li><a href="#loops">Loops</a></li>
+<li><a href="#function-definitions">Function Definitions</a></li>
+</ul>
+<h4 id="line-breaks">Line Breaks</h4>
+<p>In addition to the rules for indentation, the Code12 Application requires each statement to be on its own line and restricts how and where statements can be broken with a line break:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Each statement must be on its own line
+
+        double a = 50;
+        double b = 20;
+        double y = 30;
+
+        // Long statements can be broken after a comma,
+        // and the continuation line(s) must be indented.
+
+        ct.circle( (a + (b * 2) / 3) + ct.random( 0, 10 ),
+                y + ct.random( 2, 8 ), 20 );
+
+        // Any line can also be broken after the special comment ///
+        if ((a &lt; 10 &amp;&amp; b &gt; 30 &amp;&amp; y &lt; a + b)      ///
+            || (a &gt; 50 &amp;&amp; b &lt; 10 &amp;&amp; y &gt; a - b))
+        {
+            a = 0;
+            b += 10;
+        }
+    }
+}</code></pre>
+<p>These restrictions help Code12 provide accurate placement and wording of error messages that correspond to the actual mistakes made by the programmer.</p>
+<h6 id="java-language-help-indentation-and-brace-placement"><a href="#top">Java Language Help</a> &gt; <a href="#indentation-and-brace-placement">Indentation and Brace Placement</a></h6>
 <footer>
 <p>Code12 Version 1.0</p>
-(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved.
+Copyright (c) 2019 Code12. All Rights Reserved.
 </footer>
 </body>
 </html>

@@ -4,7 +4,7 @@
 --
 -- Semantic Analysis and Error Checking for Java for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker 
+-- Copyright (c) 2018-2019 Code12 
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules
@@ -264,10 +264,13 @@ end
 -- If isVarAssign is not true then also check to make sure the variable has 
 -- been assigned and if not then set the error state. 
 local function getVariable( varNode, isVarAssign )
+	-- Check for valid name
 	assert( varNode.tt == "ID" )
 	if parseJava.isInvalidID( varNode, "variable", true ) then
 		return nil
 	end
+
+	-- Check that the variable is defined
 	local varFound = lookupID( varNode, variables )
 	if varFound == nil then
 		-- Variable is undefined. Check old (out of scope) variables and choose an error.
@@ -291,11 +294,18 @@ local function getVariable( varNode, isVarAssign )
 		err.addDocLink( "Java.html#variables" )
 		return nil
 	end
+
+	-- Check if used before assigned, or assignment to a constant
 	if isVarAssign then
+		if varFound.isConst then
+			err.setErrNodeAndRef( varNode, varFound,  
+				"final variable %s cannot be reassigned", varNode.str )
+			err.addDocLink( "Java.html#variables" )
+		end
 		varFound.assigned = true
 	elseif not varFound.assigned then
-		err.setErrNode( varNode,  
-			"Variable %s must be assigned before it is used", varNode.str )
+		err.setErrNodeAndRef( varNode, varFound, 
+			"Variable %s must be initialized or assigned before it is used", varNode.str )
 		err.addDocLink( "Java.html#variables" )
 	end
 	return varFound
@@ -540,11 +550,13 @@ local function vtCheckLValue( lValue, assigned )
 			else
 				err.setErrNodeAndRef( fieldID, lValue,
 					"Arrays can only access their \".length\" field" )
+				err.addDocLink( "Java.html#arrays" )
 				return nil
 			end
 		else
 			err.setErrNodeAndRef( fieldID, lValue, "Type %s has no data fields",
 					javaTypes.typeNameFromVt( vt ) )
+			err.addDocLink( "Java.html#java-data-types" )
 			return nil
 		end
 		local class = apiTables[className]
@@ -555,10 +567,20 @@ local function vtCheckLValue( lValue, assigned )
 			if lookupID( fieldID, class.methods ) then
 				-- Trying to use a method as a data field
 				err.setErrNode( lValue, 
-						"Attempt to use function as a variable: missing ( ) for function call?" )
+						"Attempt to use function as a field: missing ( ) for function call?" )
+				if className == "GameObj" then
+					err.addDocLink( "API.html#gameobj-methods" )
+				else
+					err.addDocLink( "API.html" )
+				end
 			else
 				err.setErrNode( lValue, 'Unknown field "%s" for type %s',
 						fieldID.str, className )
+				if className == "GameObj" then
+					err.addDocLink( "API.html#gameobj-data-fields" )
+				else
+					err.addDocLink( "API.html" )
+				end
 			end
 			return nil
 		end
@@ -675,8 +697,8 @@ local function findStaticMethod( call )
 		method = lookupID( nameID, apiTables["Math"].methods )
 		if method == nil then
 			err.setErrNodeSpan( classNode, nameID, 
-					"Unknown or unsupported Math method" )
-			err.addDocLink( "API.html#java-math-methods" )
+					"Unknown or unsupported Math function" )
+			err.addDocLink( "API.html#java-math-functions" )
 			return nil
 		end
 		return method, "function Math." .. nameStr
@@ -710,7 +732,7 @@ local function findStaticMethod( call )
 	if misName then
 		err.setErrNodeSpan( classNode, nameID, 
 				'Unknown or misspelled function name, did you mean "Math.%s" ?', misName )
-		err.addDocLink( "API.html#java-math-methods" )
+		err.addDocLink( "API.html#java-math-functions" )
 		return nil
 	end
 
@@ -746,6 +768,13 @@ local function findObjectMethod( call )
 				err.setErrNodeAndRef( nameID, lValue, 
 						'Unknown method "%s" for type %s', nameStr, className )
 			end
+			if className == "GameObj" then
+				err.addDocLink( "API.html#gameobj-methods" )
+			elseif className == "String" then
+				err.addDocLink( "API.html#java-string-methods" )
+			else
+				err.addDocLink( "API.html" )
+			end
 			return nil
 		end
 		return method, className .. " method " .. nameStr
@@ -754,6 +783,7 @@ local function findObjectMethod( call )
 	-- Error: e.g. intVar.delete()
 	err.setErrNodeSpan( lValue, nameID, "Method call on invalid type (%s)",
 			javaTypes.typeNameFromVt( vt ) )
+	err.addDocLink( "API.html#java-data-types" )
 	return nil
 end
 
@@ -894,6 +924,7 @@ end
 local function checkLoopExpr( expr )
 	if vtSetExprNode( expr ) ~= true then
 		err.setErrNode( expr, "Loop test must evaluate to a boolean (true or false)" )
+		err.addDocLink( "Java.html#loops" )
 	end
 end
 
@@ -906,6 +937,7 @@ local function canOpAssign( lValue, opNode, expr )
 	if type(vtLValue) ~= "number" then
 		err.setErrNodeAndRef( opNode, lValue, 
 				"%s can only be applied to numbers", opNode.str )
+		err.addDocLink( "Java.html#java-data-types" )
 		return false
 	end
 
@@ -915,13 +947,18 @@ local function canOpAssign( lValue, opNode, expr )
 		if type(vtExpr) ~= "number" then
 			err.setErrNodeAndRef( expr, opNode, 
 					"Expression for %s must be numeric", opNode.str )
+			err.addDocLink( "Java.html#expressions" )
 			return false
 		elseif vtExpr == 1 and vtLValue == 0 then
 			err.setErrNodeAndRef( expr, lValue, 
 					"Value of type double cannot be assigned to int" )
+			err.addDocLink( "Java.html#java-data-types" )
 			return false
 		end
 	end
+
+	-- Then check assignment on the lValue
+	vtCheckLValue( lValue, true )
 	return true
 end
 
@@ -959,6 +996,7 @@ function checkStmt( stmt )
 		-- { s = "if", iLine, expr, stmts, elseStmts }
 		if vtSetExprNode( stmt.expr ) ~= true then
 			err.setErrNode( stmt.expr, "Conditional test must be boolean (true or false)" )
+			err.addDocLink( "Java.html#if-else" )
 		end
 		checkBlock( stmt.block )
 		checkBlock( stmt.elseBlock )
@@ -995,10 +1033,12 @@ function checkStmt( stmt )
 		local vtExpr = vtSetExprNode( stmt.expr )
 		if type(vtExpr) ~= "table" then
 			err.setErrNode( stmt.expr, "A for-each loop must operate on an array" )
+			err.addDocLink( "Java.html#arrays" )
 		elseif vtExpr.vt ~= var.vt then
 			err.setErrNodeAndRef( var, stmt.expr,
 					"The loop array contains elements of type %s",
 					javaTypes.typeNameFromVt( vtExpr.vt ) )
+			err.addDocLink( "Java.html#arrays" )
 		else
 			var.assigned = true
 			checkLoopBlock( stmt )
@@ -1012,21 +1052,25 @@ function checkStmt( stmt )
 			if vtFunc == false then   -- function is void
 				err.setErrNodeAndRef( stmt, currentFunc,
 						"void functions cannot return a value" )
+				err.addDocLink( "Java.html#function-definitions" )
 			elseif not javaTypes.vtCanAcceptVtExpr( vtFunc, vtExpr ) then
 				err.setErrNodeAndRef( stmt, currentFunc,
 						"Incorrect return value type (%s) for function %s (requires %s)",
 						javaTypes.typeNameFromVt( vtExpr ), currentFunc.nameID.str,
 						javaTypes.typeNameFromVt( vtFunc ) )
+				err.addDocLink( "Java.html#function-definitions" )
 			end
 		elseif vtFunc ~= false then  -- missing return value
 			err.setErrNodeAndRef( stmt, currentFunc,
 				"Function %s requires a return value of type %s",
 				 currentFunc.nameID.str, javaTypes.typeNameFromVt( vtFunc ) )
+			err.addDocLink( "Java.html#function-definitions" )
 		end
 	elseif s == "break" then
 		-- { s = "break" }
 		if currentLoop == nil then
 			err.setErrNode( stmt, "break statements are only allowed inside loops" )
+			err.addDocLink( "Java.html#loops" )
 		end
 	else
 		error( "Unknown stmt structure " .. s )
@@ -1054,6 +1098,7 @@ local function checkUnreachableStmts( block )
 			if i < numStmts and stmt.s == "return" then
 				err.setErrNodeAndRef( stmts[i + 1], stmt, 
 						"This statement is unreachable because there is a return before it.")
+				err.addDocLink( "Java.html#function-definitions" )
 				return
 			end
 		end
@@ -1102,6 +1147,7 @@ local function checkFuncReturns( func )
 		end
 		err.setErrLineNumAndRefLineNum( iLine, func.iLine, 
 				strErr, javaTypes.typeNameFromVt( func.vt ) )
+		err.addDocLink( "Java.html#function-definitions" )
 	end
 end
 
@@ -1124,6 +1170,7 @@ local function vtExprCast( node )
 		else
 			err.setErrNode( node, "(int) type cast can only be applied to type double" )
 		end
+		err.addDocLink( "Java.html#java-data-types" )
 	elseif node.vtCast == 1 then -- (double)
 		if vtExpr == 0 then
 			return 1   -- valid cast of int to double
@@ -1132,8 +1179,10 @@ local function vtExprCast( node )
 		else
 			err.setErrNode( node, "(double) type cast can only be applied to type int" )
 		end
+		err.addDocLink( "Java.html#java-data-types" )
 	end
 	err.setErrNode( node, "Type casts can only be (int) or (double)" )
+	err.addDocLink( "Java.html#java-data-types" )
 	return nil
 end
 
@@ -1145,6 +1194,7 @@ local function vtExprStaticField( node )
 		return 1   -- double
 	end
 	err.setErrNode( node, "Unknown data field of Math class" )
+	err.addDocLink( "API.html#java-math-functions" )
 	return nil 
 end
 
@@ -1159,6 +1209,7 @@ local function vtExprNeg( node )
 	if type(vt) ~= "number" then
 		err.setErrNodeAndRef( node.opToken, node.expr, 
 				"The negate operator (-) can only apply to numbers" )
+		err.addDocLink( "Java.html#java-operators" )
 		return nil
 	end
 	return vt
@@ -1170,6 +1221,7 @@ local function vtExprNot( node )
 	if vt ~= true then
 		err.setErrNodeAndRef( node.opToken, node.expr, 
 				"The not operator (!) can only apply to boolean values" )
+		err.addDocLink( "Java.html#java-operators" )
 		return nil
 	end
 	return vt
@@ -1180,6 +1232,7 @@ local function vtExprNewArray( node )
 	local vtCount = vtSetExprNode( node.lengthExpr )
 	if vtCount ~= 0 then
 		err.setErrNode( node.lengthExpr, "Array count must be an integer" )
+		err.addDocLink( "Java.html#arrays" )
 		return nil
 	end
 	return { vt = node.vtElement }  -- array of element type
@@ -1188,6 +1241,7 @@ end
 -- new
 local function vtExprNew( node )
 	err.setErrNode( node, "Code12 does not support making objects with new" )
+	err.addDocLink( "Java.html#unsupported-java-language-features" )
 	return nil
 end
 
@@ -1196,6 +1250,7 @@ local function vtExprArrayInit( node )
 	local exprs = node.exprs
 	if not exprs then
 		err.setErrNode( node, "Array initializer cannot be empty" )
+		err.addDocLink( "Java.html#arrays" )
 		return nil
 	end
 	-- Check that all members are the same type, handling possible null entries
@@ -1206,6 +1261,7 @@ local function vtExprArrayInit( node )
 			return nil
 		elseif type(vt) == "table" then
 			err.setErrNode( node, "Code12 does not support arrays of arrays" )
+			err.addDocLink( "Java.html#unsupported-java-language-features" )
 			return nil
 		elseif vtMembers == nil then
 			vtMembers = vt
@@ -1218,6 +1274,7 @@ local function vtExprArrayInit( node )
 				-- null is compatible with existing object type
 			else
 				err.setErrNode( node, "Array initializers must all be the same type" )
+				err.addDocLink( "Java.html#arrays" )
 				return nil
 			end
 		end
@@ -1246,7 +1303,8 @@ local function vtExprPlus( node )
 		end
 		if type(vtOther) == "table" then
 			err.setErrNodeAndRef( node.opToken, exprOther, 
-					"The (+) operator cannot be applied to arrays" ) 
+					"The (+) operator cannot be applied to arrays" )
+			err.addDocLink( "Java.html#java-operators" )
 		end
 		return "String"   -- all primitive types can promote to a string 
 	else
@@ -1259,6 +1317,7 @@ local function vtExprPlus( node )
 		end
 		err.setErrNodeAndRef( node.opToken, exprOther, 
 				"The (+) operator can only apply to numbers or Strings" )
+		err.addDocLink( "Java.html#java-operators" )
 	end
 	return nil
 end
@@ -1274,6 +1333,7 @@ local function vtExprNumeric( node )
 	local exprErr = ((type(vtLeft) ~= "number" and node.left) or node.right)
 	err.setErrNodeAndRef( node.opToken, exprErr, 
 			"Numeric operator (%s) can only apply to numbers", node.opToken.str )
+	err.addDocLink( "Java.html#java-operators" )
 	return nil
 end
 
@@ -1315,6 +1375,7 @@ local function vtExprLogical( node )
 	local exprErr = ((vtLeft ~= true and node.left) or node.right)
 	err.setErrNodeAndRef( node.opToken, exprErr, 
 			"Logical operator (%s) can only apply to boolean values", node.opToken.str )
+	err.addDocLink( "Java.html#java-operators" )
 	return nil
 end
 
@@ -1329,6 +1390,7 @@ local function vtExprInequality( node )
 	local exprErr = ((type(vtLeft) ~= "number" and node.left) or node.right)
 	err.setErrNodeAndRef( node.opToken, exprErr, 
 			"Inequality operator (%s) can only apply to numbers", node.opToken.str )
+	err.addDocLink( "Java.html#java-operators" )
 	return nil
 end
 
@@ -1346,12 +1408,14 @@ local function vtExprEquality( node )
 				err.setErrNodeAndRef( node.opToken, node.left,
 						"Strings cannot be compared with ==. You must use the equals method, which requires level 7" )
 			end
+			err.addDocLink( "API.html#java-string-methods" )
 			return nil
 		end
 		return true
 	end
 	err.setErrNodeAndRef( node.left, node.right, "Cannot compare %s to %s", 
 		javaTypes.typeNameFromVt( vtLeft ), javaTypes.typeNameFromVt( vtRight ) )
+	err.addDocLink( "Java.html#java-data-types" )
 	return nil
 end
 
@@ -1359,6 +1423,7 @@ end
 local function vtExprBadEquality( node )
 	err.setErrNodeAndRef( node.opToken, node.left,
 					"Use == to compare for equality (= is for assignment)" )
+	err.addDocLink( "Java.html#java-operators" )
 	return nil
 end
 
@@ -1425,6 +1490,7 @@ function vtSetExprNode( node )
 		if fnVt == nil then
 			err.setErrNode( node.opToken, 
 					"The %s operator is not supported by Code12 ", node.opToken.str )
+			err.addDocLink( "Java.html#unsupported-java-language-features" )
 			return nil
 		end
 	else
@@ -1501,6 +1567,7 @@ function checkJava.checkProgram( programTree, level )
 	if not startFunc then
 		err.setErrLineNum( source.numLines,
 				'A Code12 program must define a "start" function' )
+		err.addDocLink( "Java.html#main-program-structure" )
 	elseif not hasCode then
 		-- Higlight the line after start's {, which will be a comment or the }
 		err.setErrLineNum( startFunc.block.iLineBegin + 1, 

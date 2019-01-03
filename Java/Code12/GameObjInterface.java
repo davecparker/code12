@@ -1,4 +1,4 @@
-package Code12;  // (c)Copyright 2018 by David C. Parker 
+package Code12;  // Copyright (c) 2018-2019 Code12 
 
 
 // These are the methods you can call on a GameObj object
