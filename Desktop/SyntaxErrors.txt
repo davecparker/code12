@@ -149,3 +149,10 @@ public void start
 		dot.setXSpeed( 0.3 );	}
 		dot.setYSpeed( -0.3 );	}
          spaceship.getySPEED() -= 0.075;
+		final GameObj p;
+		XP;
+		dime.x-;
+		dime.x-- ++;
+		dime.x
+		dime.x    // what?
+	private final int XP;

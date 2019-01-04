@@ -162,6 +162,12 @@ ol a {
     padding-right: 2em;
 }
 
+.rightLink {
+    margin-top: -1em;
+    padding-top: 0;
+    text-align: right;
+}
+
 footer {
     margin-top: 1em; 
     border-top: double black; 

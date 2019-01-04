@@ -4,7 +4,7 @@
 --
 -- Test driver for Code12's Java line-level parsing
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 

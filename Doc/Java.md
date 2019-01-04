@@ -1,5 +1,9 @@
 % Java Language Help
 
+<div class="rightLink">
+[Code12 Function Reference](API.html)
+</div>
+
 <div class="summary">
 <div class="summaryColumn">
 
@@ -22,6 +26,12 @@
 
 ##### Java Language Elements
 * [Java Data Types]
+* [Java Operators]
+
+##### Differences between Code12 and Java
+* [Main Program Structure]
+* [Unsupported Java Language Features]
+* [Indentation and Brace Placement]
 
 </div>
 </div>
@@ -364,6 +374,26 @@ are therefore also "temporary" variables in practice.
 > variable watch window in the Code12 application, because all
 > local variables come and go very quickly in practice. 
 
+##### Constant (final) Variables
+If the keyword `final` is used before a variable declaration,
+then the variable becomes a "constant", meaning the value cannot
+change. The variable must be initialized at the point of declaration 
+and cannot be reassigned later. 
+
+A common convention for constant variable names is to use all
+capital letters with underscores between words. For example:
+```
+class MyProgram
+{
+	final double DOT_SIZE = 20;
+
+	public void start()
+	{		
+		ct.circle( 30, 50, DOT_SIZE );
+		ct.circle( 70, 50, DOT_SIZE );
+	}
+}
+```
 ###### [Java Language Help](#top) > [Variables]
 
 
@@ -1758,9 +1788,239 @@ also access and change the object later using the [GameObj Data Fields] and [Gam
 ###### [Java Language Help](#top) > [Java Data Types]
 
 
+### Java Operators
+Code12 supports the following Java operators in [expressions]. 
+These are listed in groups from highest precedence to lowest precedence
+(see [Order of Operations and Parentheses]). Within each group,
+operators execute from left to right.
+
+##### Unary Operators (operate on only one value)
+```
+-a        // (Negate) a is numeric, result is numeric
+!a        // (NOT) a is boolean, result is boolean
+```
+##### Multiplication and Division
+```
+a * b     // (Multiply) a and b are numeric, result is numeric
+a / b     // (Divide) a and b are numeric, result is numeric
+a % b     // (Mod) a and b are numeric, result is numeric
+```
+##### Addition and Subtraction
+```
+a + b     // (Add) a and b are numeric, result is numeric
+a - b     // (Subtract) a and b are numeric, result is numeric
+a + b     // (Concatenation) either a or b is String, result is String
+```
+##### Inequality Comparison
+```
+a < b     // (Less than) a and b are numeric, result is boolean
+a <= b    // (Less than or equal to) a and b are numeric, result is boolean
+a > b     // (Greater than) a and b are numeric, result is boolean
+a >= b    // (Greater than or equal to) a and b are numeric, result is boolean
+```
+##### Equality Comparison
+```
+a == b    // (Equal to) a and b are compatible types, result is boolean
+a != b    // (Not equal to) a and b are compatible types, result is boolean
+```
+##### Logical AND
+```
+a && b    // (AND) a and b are boolean, result is boolean
+```
+##### Logical OR
+```
+a || b    // (OR) a and b are boolean, result is boolean
+```
+
+###### [Java Language Help](#top) > [Java Operators]
+
+### Main Program Structure
+A Code12 Java program running in the Code12 Application consists of a single
+user-defined class corresponding to the main program. Declaring or importing 
+additional classes is not supported.
+
+> Use the [Code12 Java Package](http://www.code12.org/download.html) 
+> when you are ready to start using additional classes.
+
+In addition, your program does not need the standard Java `main()` function. 
+Instead, your program will define a `start()` function where the program
+begins. For example:
+```
+class Example
+{
+	public void start()
+	{
+		// Your program starts here
+		ct.circle( 50, 30, 20 );
+	}
+}
+```
+Your program can also contain an optional
+[update() function](API.html#main-program-functions) and optional
+[Input Event Functions](API.html#input-event-functions).
+
+###### [Java Language Help](#top) > [Main Program Structure]
+
+
+### Unsupported Java Language Features
+The Code12 Application supports a subset of the full Java language,
+in order to avoid the typical syntax ambiguities that make traditional
+Java error messages frequently confusing to beginners, and to keep
+the focus on the [12 fundamental programming concepts](#top).
+
+> You can use the [Code12 Java Package](http://www.code12.org/download.html) 
+> with the Java development environment of your choice if you want to 
+> use the [Code12 API](API.html) with the full Java language.
+
+##### No Class Definitions
+The main restriction is that class definitions other than the main program
+class are not supported, and importing classes is not allowed.
+This means that other than the main program class, the only classes that 
+a Code12 program will use are: 
+
+1. The main `ct` class/instance defined by the Code12 API
+2. The `GameObj` class defined by the Code12 API (a graphical object)
+3. The standard Java `String` class (a subset of methods is supported)
+4. The Java `Math` class (a subset of methods is supported)
+
+##### Other Unsupported Java Features
+In addition to restricting a program to a single user-defined class, 
+the following Java features are not supported by the Code12 Application:
+
+1. Importing classes and packages, including the Java Class Library
+2. Class inheritance, interfaces, etc.
+3. Using `new` to create object instances (except arrays)
+4. The byte, char, float, long and short data types
+5. Enumeration (enum) types
+6. Exception handling (try, catch, throw, etc.)
+7. The switch statement (switch, case, default)
+8. The continue statement
+9. Bit operators (<<, >>, >>>, &, |, ^)
+10. The ternary operator (? :)
+11. Multi-dimentional arrays or arrays of arrays
+
+##### Restricted Java Features
+To further help prevent common errors and sources of confusion,
+Code12 also intentionally restricts the use of some language features:
+
+1. The assignment and increment operators (=, +=, ++, etc.) do not
+result in values. Assignments are statements, not expressions.
+2. Integer division that may produce (and lose) a remainder is not 
+allowed directly. A function ct.intDiv() is provided if desired.
+3. Local variables and parameters cannot hide (be named the same as)
+a class-level variable.
+4. Variable names are not allowed to differ only by case from existing names.
+5. Functions calls returning objects cannot be be used to access fields
+or methods of the object directly. An object variable must be used.
+
+
+#### Unsupported Java Keywords
+The following Java keywords are not supported by the Code12 Application:
+```
+Data Types     Classes        Flow Control    Other
+----------     -------        ------------    -----
+byte           abstract       assert          native
+char           extends        case            strictfp
+enum           implements     catch           synchronized
+float          import         continue        transient
+long           instanceof     default         volatile
+short          interface      finally
+               package        switch
+               protected      throw
+               static         try
+               super
+               this
+               throws
+```
+In addition, the following Java keywords have reduced or limited support:
+```
+class       (only for the main program class)
+new         (only for arrays)
+private     (ignored when allowed)
+public      (ignored when allowed)
+```
+###### [Java Language Help](#top) > [Unsupported Java Language Features]
+
+### Indentation and Brace Placement
+The Java language is normally defined to treat line breaks the same as 
+spaces, and to ignore indentation. However, to help you find common errors 
+in your program, the Code12 Application detects and enforces consistent use
+of indentation and a "style" of placing braces (curly brackets) as follows:
+```
+class Example
+{
+	// Class-level variables and function bodies are indented inside
+	// the class, all starting at the same level.
+
+	int size = 20;
+
+	public void start()
+	{
+		// Code inside function bodies is indented more
+
+		ct.circle( 50, 30, size );
+		if (size < 10)
+			size = 10;    // controlled statements are indented further
+		else
+		{
+			// Braces to enclose a block are always on their own lines,
+			// the enclosed statements are indented further, and 
+			// the close brace lines up with the matching open brace.
+
+			ct.circle( 50, 30, size );
+			size -= 10;
+			ct.circle( 50, 30, size );
+		}
+	}
+}
+```
+For more information on the brace placement for specific structures, see:
+
+* [Main Program Structure]
+* [If-else]
+* [Loops]
+* [Function Definitions]
+
+#### Line Breaks
+In addition to the rules for indentation, the Code12 Application requires 
+each statement to be on its own line and restricts how and where
+statements can be broken with a line break:
+```
+class Example
+{
+	public void start()
+	{
+		// Each statement must be on its own line
+
+		double a = 50;
+		double b = 20;
+		double y = 30;
+
+		// Long statements can be broken after a comma,
+		// and the continuation line(s) must be indented.
+
+		ct.circle( (a + (b * 2) / 3) + ct.random( 0, 10 ),
+				y + ct.random( 2, 8 ), 20 );
+
+		// Any line can also be broken after the special comment ///
+		if ((a < 10 && b > 30 && y < a + b)      ///
+			|| (a > 50 && b < 10 && y > a - b))
+		{
+			a = 0;
+			b += 10;
+		}
+	}
+}
+```
+These restrictions help Code12 provide accurate placement and wording
+of error messages that correspond to the actual mistakes made by
+the programmer.
+
+###### [Java Language Help](#top) > [Indentation and Brace Placement]
+
+
 <footer>
 	Code12 Version 1.0
 
-	(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved. 
+	Copyright (c) 2019 Code12. All Rights Reserved. 
 </footer> 
-

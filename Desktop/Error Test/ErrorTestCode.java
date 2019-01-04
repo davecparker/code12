@@ -96,7 +96,7 @@ int underIndentedInstanceVar;
 	boolean classLevelBoolean = classLevelBoolean + classLevelBoolean;
 	// ERROR "can only apply to numbers or Strings"
 	double classLevelDouble = button + button;
-	// ERROR "must be assigned before it is used"
+	// ERROR "must be initialized or assigned before it is used"
 	double classLevelDouble = 2 + classLevelGameObj;
 	// ERROR "Undefined variable"
 	double classLevelDouble = rect.x + false;
@@ -126,7 +126,7 @@ int underIndentedInstanceVar;
 	GameObj[] classLevelGameObjArr = new GameObj[2 * (int) classLevelString];
 	// ERROR "already of type double"
 	double doubleCastOnDouble = (double) (10 * 2.3);
-	// ERROR "must be assigned before it is used"
+	// ERROR "must be initialized or assigned before it is used"
 	String stringCast = (String) classLevelGameObj.group;
 	// ERROR "Type casts can only be (int) or (double)"
 	String stringCast2 = (String) classLevelDouble;
@@ -142,7 +142,7 @@ int underIndentedInstanceVar;
 	int intVarMethodCall = classLevelInt.delete();
 	// ERROR "Unknown method"
 	String stringSize = classLevelString.size();
-	// ERROR "Unknown or unsupported Math method"
+	// ERROR "Unknown or unsupported Math function"
 	double unknownMathMethod = Math.foo();
 	// ERROR "does not return a value"
 	String greeting = System.out.println("hello");
@@ -982,11 +982,11 @@ int underIndentedInstanceVar;
 		int j = 3;
 
 		int uninitializedVar;
-		// ERROR "must be assigned before it is used"
+		// ERROR "must be initialized or assigned before it is used"
 		if (uninitializedVar < 0)
 			uninitializedVar = 0;
 		GameObj g;
-		// ERROR "must be assigned before it is used"
+		// ERROR "must be initialized or assigned before it is used"
 		g.xSpeed = 1;
 
 		// ERROR "Unknown type name"
@@ -1322,7 +1322,7 @@ int underIndentedInstanceVar;
 
 		// ERROR "Unknown method"
 		objArr[0].foo();
-		// ERROR "Unknown or unsupported Math method"
+		// ERROR "Unknown or unsupported Math function"
 		Math.foo();
 		
 		// ERROR "requires 1 parameter"
@@ -1850,11 +1850,13 @@ void underIndentedFunc()
 		undeclaredVar = 0;
 		// ERROR "Undefined variable"
 		classLevelGameObj.setText(undeclaredVar);
-		// ERROR "must be assigned before it is used"
+		// ERROR "must be initialized or assigned before it is used"
 		ct.print(classLevelUnassignedVar);
 		int unassignedVar;
-		// ERROR "must be assigned before it is used"
+		// ERROR "must be initialized or assigned before it is used"
 		ct.print(unassignedVar);
+		// ERROR "cannot be reassigned"
+		MAX_ENEMIES = 200;
 	}
 	// ERROR "Return type" (for Code12 events)
 	public boolean onMousePress( GameObj obj, double x, double y )
@@ -1939,7 +1941,7 @@ void underIndentedFunc()
 		intArr = new int[intArr.foo * 2];
 		// ERROR "no data fields"
 		ct.print(intVar.x);
-		// ERROR "function as a variable"
+		// ERROR "function as a field"
 		rect.setText = strVar;
 		// ERROR "Unknown field"
 		dblVar = rect.foo;
@@ -1963,7 +1965,7 @@ void underIndentedFunc()
 		System.foo.bar();
 		// ERROR "supported System functions are"
 		System.err.println("File opening failed:");
-		// ERROR "Unknown or unsupported Math method"
+		// ERROR "Unknown or unsupported Math function"
 		double stdev = Math.foo(doubleVar);
 		// ERROR "Unknown or misspelled method"
 		rect.getWidht(dblVar);

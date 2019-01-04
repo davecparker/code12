@@ -4,7 +4,7 @@
 --
 -- Data structures and utilities for the source code of a Code 12 program.
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 

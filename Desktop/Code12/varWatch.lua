@@ -4,7 +4,7 @@
 --
 -- Implementation of the variable watch window for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by Code12. All Rights Reserved.
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Code12 app modules
