@@ -14,7 +14,7 @@ settings =
 	},
 
 	window =
-    {
+	{
 		defaultViewWidth = 600,
 		defaultViewHeight = 800,
 		minViewWidth = 320,
@@ -23,14 +23,25 @@ settings =
 		enableMaximizeButton = true,
 	},  
 
-    macos =
-    {
-        plist =
-        {
+	macos =
+	{
+		plist =
+		{
 			DeveloperURL = "http://www.code12.org/docs/1/API.html",
-            NSHumanReadableCopyright = "Copyright © 2019 Code12"
-        },
-    },
+			NSHumanReadableCopyright = "Copyright © 2019 Code12",
+			NSAppTransportSecurity =
+			{
+				NSExceptionDomains =
+				{
+					["code12.org"] =
+					{
+						NSIncludesSubdomains = true,
+						NSThirdPartyExceptionAllowsInsecureHTTPLoads = true,
+					},
+				},
+			},
+		},
+	},
 
 	--
 	-- Android section
@@ -53,6 +64,17 @@ settings =
 		{
 			UIStatusBarHidden = false,
 			UILaunchStoryboardName = "LaunchScreen",
+			NSAppTransportSecurity =
+			{
+				NSExceptionDomains =
+				{
+					["code12.org"] =
+					{
+						NSIncludesSubdomains = true,
+						NSThirdPartyExceptionAllowsInsecureHTTPLoads = true,
+					},
+				},
+			},
 		},
 	},
 
