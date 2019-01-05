@@ -4,7 +4,7 @@
 --
 -- Class to implement a vertical or horizontal scrollbar for the Code12 Desktop app.
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules

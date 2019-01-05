@@ -4,7 +4,7 @@
 --
 -- Implements parsing for Java in the Code12 system.
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules used
@@ -171,7 +171,7 @@ local function possibleExpectedToken( ttExpected )
 				err.setErrNode( token, "Syntax Error: %s was unexpected here",
 						tokenDescription( token ) )
 			end
-			err.addDocLink( "Java.html#java-syntax-examples" )
+			err.addDocLink( "Java.html" )
 		end
 	end
 end
@@ -700,7 +700,7 @@ function parseGrammar( grammar )
 					else
 						err.setErrNode( nodes[iNode], strErr )
 					end
-					err.addDocLink( "Java.html#java-syntax-examples" )
+					err.addDocLink( "Java.html" )
 				end
 
 				-- Return the parse tree
@@ -890,7 +890,7 @@ local function parseCurrentLine( level )
 		-- Make a generic syntax error to use if a more specific error was not already set
 		local lastToken = tokens[#tokens - 1]  -- not counting the END
 		err.setErrNodeSpan( tokens[1], lastToken, "Syntax error (unrecognized code)" )
-		err.addDocLink( "Java.html#java-syntax-examples" )
+		err.addDocLink( "Java.html" )
 	end
 	err.addNoteToErrAtLineNum( lineNumber, strNote )
 

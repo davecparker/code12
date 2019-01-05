@@ -4,7 +4,7 @@
 --
 -- Utilities to create and track the Error state for Code12.
 --
--- (c)Copyright 2018 by David C. Parker 
+-- Copyright (c) 2018-2019 Code12 
 -----------------------------------------------------------------------------------------
 
 -- Code12 modules

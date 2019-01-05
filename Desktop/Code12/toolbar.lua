@@ -4,7 +4,7 @@
 --
 -- The toolbar for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Corona modules
@@ -27,7 +27,7 @@ local toolbar = {}
 -- File local state
 local toolbarGroup        -- display group for toolbar
 local bgRect              -- background rect
-local chooseProgramBtn    -- Choose Program button
+local fileBtn             -- File button
 local optionsBtn          -- Options button
 local restartBtn          -- Restart button
 local stopBtn             -- Stop button
@@ -41,8 +41,8 @@ local toolbarBtns         -- Array of buttons on the toolbar
 
 --- Internal Functions ------------------------------------------------
 
--- Event handler for the Choose Program button
-local function onChooseProgram()
+-- Event handler for the File button
+local function onFile()
 	runtime.clearProgram()
 	source.clear()
 	err.initProgram()
@@ -102,10 +102,10 @@ function toolbar.create()
 			onOptions, "right", helpBtn )
 	toolbarBtns[#toolbarBtns + 1] = optionsBtn
 
-	-- Choose Program Button
-	chooseProgramBtn = buttons.newToolbarButton( toolbarGroup, "File", "choose-program-icon.png", 
-			onChooseProgram, "right", optionsBtn )
-	toolbarBtns[#toolbarBtns + 1] = chooseProgramBtn 
+	-- File Button
+	fileBtn = buttons.newToolbarButton( toolbarGroup, "File", "file-icon.png", 
+			onFile, "right", optionsBtn )
+	toolbarBtns[#toolbarBtns + 1] = fileBtn 
 
 	-- Stop button
 	stopBtn = buttons.newToolbarButton( toolbarGroup, " Stop", "stop-icon.png", 
@@ -156,19 +156,19 @@ end
 function toolbar.update()
 	local runState = g.runState
 	if runState == "running" then
-		showButtons{ helpBtn, optionsBtn, stopBtn, pauseBtn, gridBtn }
+		showButtons{ helpBtn, optionsBtn, fileBtn, stopBtn, pauseBtn, gridBtn }
 	elseif runState == "waiting" then
 		showButtons{ helpBtn, stopBtn, gridBtn }
 	elseif runState == "paused" then
 		if runtime.canStepOneFrame() then
-			showButtons{ helpBtn, optionsBtn, resumeBtn, stopBtn, nextFrameBtn, gridBtn }
+			showButtons{ helpBtn, optionsBtn, fileBtn, resumeBtn, stopBtn, nextFrameBtn, gridBtn }
 		else
 			showButtons{ helpBtn, resumeBtn, stopBtn, gridBtn }
 		end
 	elseif runState == "stopped" then
-		showButtons{ helpBtn, optionsBtn, chooseProgramBtn, restartBtn, gridBtn }
+		showButtons{ helpBtn, optionsBtn, fileBtn, restartBtn, gridBtn }
 	elseif runState == "error" then
-		showButtons{ helpBtn, optionsBtn, chooseProgramBtn, }
+		showButtons{ helpBtn, optionsBtn, fileBtn, }
 	else
 		showButtons{ helpBtn, optionsBtn }
 	end

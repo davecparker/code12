@@ -20,6 +20,9 @@
 <header id="title-block-header">
 <h1 class="title">Java Language Help</h1>
 </header>
+<div class="rightLink">
+<p><a href="API.html">Code12 Function Reference</a></p>
+</div>
 <div class="summary">
 <div class="summaryColumn">
 <h5 id="java-syntax-examples">Java Syntax Examples</h5>
@@ -33,7 +36,7 @@
 <li><a href="#object-method-calls">Object Method Calls</a></li>
 <li><a href="#if-else">If-else</a></li>
 <li><a href="#function-definitions">Function Definitions</a></li>
-<li><a href="#parameters-1">Parameters</a></li>
+<li><a href="#function-parameters">Function Parameters</a></li>
 <li><a href="#loops">Loops</a></li>
 <li><a href="#arrays">Arrays</a></li>
 </ol>
@@ -42,6 +45,13 @@
 <h5 id="java-language-elements">Java Language Elements</h5>
 <ul>
 <li><a href="#java-data-types">Java Data Types</a></li>
+<li><a href="#java-operators">Java Operators</a></li>
+</ul>
+<h5 id="differences-between-code12-and-java">Differences between Code12 and Java</h5>
+<ul>
+<li><a href="#main-program-structure">Main Program Structure</a></li>
+<li><a href="#unsupported-java-language-features">Unsupported Java Language Features</a></li>
+<li><a href="#indentation-and-brace-placement">Indentation and Brace Placement</a></li>
 </ul>
 </div>
 </div>
@@ -202,6 +212,19 @@ String playerOneName, playerTwoName;</code></pre>
 <blockquote>
 <p>Only class-level (permanent) variables are displayed in the variable watch window in the Code12 application, because all local variables come and go very quickly in practice.</p>
 </blockquote>
+<h5 id="constant-final-variables">Constant (final) Variables</h5>
+<p>If the keyword <code>final</code> is used before a variable declaration, then the variable becomes a “constant”, meaning the value cannot change. The variable must be initialized at the point of declaration and cannot be reassigned later.</p>
+<p>A common convention for constant variable names is to use all capital letters with underscores between words. For example:</p>
+<pre><code>class MyProgram
+{
+    final double DOT_SIZE = 20;
+
+    public void start()
+    {       
+        ct.circle( 30, 50, DOT_SIZE );
+        ct.circle( 70, 50, DOT_SIZE );
+    }
+}</code></pre>
 <h6 id="java-language-help-variables"><a href="#top">Java Language Help</a> &gt; <a href="#variables">Variables</a></h6>
 <h3 id="expressions">Expressions</h3>
 <p>An expression is a combination of numbers (or values of other types), variables, and <em>operators</em> such as <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code>, which causes the computer to do the calculations and get a resulting value.</p>
@@ -807,8 +830,139 @@ public void update()
 <p>in function <code>randomCoord()</code> end up being executed? <em>(Answer: 8)</em>.</p>
 <p>Once you understand and start to master this technique, you will come to understand how very complex programs can be written.</p>
 <h6 id="java-language-help-function-definitions"><a href="#top">Java Language Help</a> &gt; <a href="#function-definitions">Function Definitions</a></h6>
-<h3 id="parameters-1">Parameters</h3>
-<h6 id="java-language-help-parameters"><a href="#top">Java Language Help</a> &gt; <a href="#parameters-1">Parameters</a></h6>
+<h3 id="function-parameters">Function Parameters</h3>
+<p>Just like many <a href="#function-calls">function calls</a> to <a href="API.html">Code12 functions</a> require <em>parameters</em> to specify input values for the function, you can <a href="#function-definitions">define your own functions</a> that take parameters. This provides an easy way for the calling code to supply additional information needed by the function.</p>
+<h4 id="examples-7">Examples</h4>
+<p>Here is a more useful version of the first example sample shown in <a href="#function-definitions">Function Definitions</a>:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 4 targets at specified locations
+        makeTarget( 30, 30 );
+        makeTarget( 30, 70 );
+        makeTarget( 70, 30 );
+        makeTarget( 70, 70 );
+    }
+
+    // The function makeTarget() makes a target at the (x, y)
+    // location specified by its parameters.
+
+    void makeTarget(double x, double y)
+    {
+        ct.circle( x, y, 15, &quot;red&quot; );
+        ct.circle( x, y, 10, &quot;white&quot; );
+        ct.circle( x, y, 5, &quot;red&quot; );
+    }
+}</code></pre>
+<p>This is an example of defining a function that takes parameters and also returns a value:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Compute and print 4 averages
+        ct.println( average( 10, 20 ) );
+        ct.println( average( 3, 4 ) );
+        ct.println( average( -5, 5 ) );
+        ct.println( average( 1.432, 5.902 ) );
+    }
+
+    double average(double a, double b)
+    {
+        double ave = (a + b) / 2;
+        return ave;
+    }
+}</code></pre>
+<h4 id="notes-9">Notes</h4>
+<p>When you define a function that requires one or more parameters, you need to <em>declare</em> (specify) the parameter(s) in the function definition header, such as:</p>
+<pre><code>void makeTarget(double x, double y)</code></pre>
+<p>Here the first parameter is declared as <code>double x</code>, which means that the value passed by the caller must be of type <code>double</code> (or <code>int</code>, which can automatically convert to <code>double</code>), and that the code in the function body will refer to this value as the variable <code>x</code>.</p>
+<p>The parameter variables that are declared in a function header (<code>x</code> and <code>y</code> above) act like <em>local variables</em> (see <a href="#variables">Variables</a>), because they are only defined within the body of the function being defined. A parameter variable comes into existance at the beginning of the function body, where it is initialized to the value passed in the function call, and ends at the end of the function body. Because a parameter variable is local, it doesn’t matter if it shares the same name as a parameter in another function definition. If two function definitions both have a parameter named <code>x</code>, these are different variables and will not interfere with each other.</p>
+<blockquote>
+<p>To help avoid mistakes, Code12 will not allow you to declare a parameter with the same name as a class-level (non-local) variable, although Java normally allows this.</p>
+</blockquote>
+<h4 id="more-examples-1">More Examples</h4>
+<p>When you define a function, it is up to you to design how you want it to be called, including what parameters it will take and whether it has a return value. Consider this example:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 3 coins
+        makeCoin( 20, 30, &quot;orange&quot; );
+        makeCoin( 40, 30, &quot;light gray&quot; );
+        makeCoin( 60, 30, &quot;orange&quot; );
+
+        // Make one more coin and make it drop
+        GameObj dime = makeCoin( 80, 30, &quot;light gray&quot; );
+        dime.setYSpeed( 0.5 );
+    }
+
+    // Make and return a round coin at (x, y) with the given color.
+    GameObj makeCoin( double x, double y, String color )
+    {
+        GameObj coin = ct.circle( x, y, 10, color );
+        coin.setLineColor( &quot;gray&quot; );
+        coin.setLineWidth( 2 );
+        return coin;
+    }
+}</code></pre>
+<p>The program above defines a “helper function” to make creating coins easier, because all coins need a certain line color and line width (so these are set in the helper function <code>makeCoin()</code>), but the (x, y) position and color varies, so these are passed as parameters. In addition, function <code>makeCoin()</code> returns the <code>GameObj</code> for the coin that was created so that the caller can capture this object and make further changes to it if desired (to make the last coin drop).</p>
+<p>The function header:</p>
+<pre><code>GameObj makeCoin( double x, double y, String color )</code></pre>
+<p>can be read as <em>“function <code>makeCoin()</code> takes 3 parameters: two values of type <code>double</code> then a value of type <code>String</code>. The function returns a <code>GameObj</code>”</em>. Furthermore, when reading the code that makes up the body of <code>makeCoin()</code>, there are variables that store the 1st, 2nd, and 3rd parameter values passed named <code>x</code>, <code>y</code>, and <code>color</code>, respectively.</p>
+<h5 id="functions-calling-other-functions-1">Functions Calling Other Functions</h5>
+<p>Remember that functions that you can define can also call other functions that you define (or functions defined by Code12), which allows you to create layers of capability. This powerful technique allows programmers to manage the complexity of large programs. For example, consider this rewrite of the example above:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Make 3 coins
+        makePenny( 20, 30 );
+        makeDime( 40, 30 );
+        makePenny( 60, 30 );
+
+        // Make one more dime and make it drop
+        GameObj dime = makeDime( 80, 30 );
+        dime.setYSpeed( 0.5 );
+    }
+
+    // Make a penny at the given location and return its GameObj
+    GameObj makePenny( double x, double y )
+    {
+        return makeCoin( x, y, &quot;orange&quot; );
+    }
+
+    // Make a dime at the given location and return its GameObj
+    GameObj makeDime( double x, double y )
+    {
+        return makeCoin( x, y, &quot;light gray&quot; );
+    }
+
+    // Make and return a round coin at (x, y) with the given color.
+    GameObj makeCoin( double x, double y, String color )
+    {
+        GameObj coin = ct.circle( x, y, 10, color );
+        coin.setLineColor( &quot;gray&quot; );
+        coin.setLineWidth( 2 );
+        return coin;
+    }
+}</code></pre>
+<p>The code in <code>start()</code> is now even simpler and easier to understand, and it would be even easier to extend to create more coins as desired.</p>
+<p>Here are some things to notice about the code above:</p>
+<p>The order of statements starts out as follows:</p>
+<ol type="1">
+<li><code>start()</code> calls <code>makePenny()</code></li>
+<li><code>makePenny()</code> then calls <code>makeCoin()</code></li>
+<li><code>makeCoin()</code> then calls <code>ct.circle()</code></li>
+<li>The <code>ct.circle()</code> function definition is inside Code12 (where you can’t see it). When it finishes, execution continues inside <code>makeCoin()</code>.</li>
+<li>When <code>makeCoin()</code> finishes, control returns to <code>makePenny()</code>, returning the same <code>GameObj</code> that got created, which then returns to <code>start()</code> again returning the same <code>GameObj</code>.</li>
+<li>This puts the program back in <code>start()</code>, now at the first call to <code>makeDime()</code>, which starts a similar sequence.</li>
+</ol>
+<p>The <code>x</code> and <code>y</code> parameters declared in <code>makePenny()</code>, <code>makeDime()</code>, and <code>makeCoin()</code> are all different variables and do not interfere with each other.</p>
+<p>A <code>return</code> statement can return a variable value, an expression value, or the result of another function call directly, so when <code>makePenny()</code> does:</p>
+<pre><code>return makeCoin( x, y, &quot;orange&quot; );</code></pre>
+<p>this calls <code>makeCoin()</code> and then takes the return value of the call (here a <code>GameObj</code>) and passes it on as the return value from <code>makePenny()</code>.</p>
+<h6 id="java-language-help-function-parameters"><a href="#top">Java Language Help</a> &gt; <a href="#function-parameters">Function Parameters</a></h6>
 <h3 id="loops">Loops</h3>
 <h6 id="java-language-help-loops"><a href="#top">Java Language Help</a> &gt; <a href="#loops">Loops</a></h6>
 <h3 id="arrays">Arrays</h3>
@@ -826,9 +980,174 @@ public void update()
 <h4 id="gameobj">GameObj</h4>
 <p>A <code>GameObj</code> (Game Object) is a reference to a graphical object (circle, rectangle, line, text, or image) that you can create for display on the screen. To create a <code>GameObj</code>, see [Graphics Object Creation]. If you store a <code>GameObj</code> in a variable then you can also access and change the object later using the [GameObj Data Fields] and [GameObj Methods].</p>
 <h6 id="java-language-help-java-data-types"><a href="#top">Java Language Help</a> &gt; <a href="#java-data-types">Java Data Types</a></h6>
+<h3 id="java-operators">Java Operators</h3>
+<p>Code12 supports the following Java operators in <a href="#expressions">expressions</a>. These are listed in groups from highest precedence to lowest precedence (see <a href="#order-of-operations-and-parentheses">Order of Operations and Parentheses</a>). Within each group, operators execute from left to right.</p>
+<h5 id="unary-operators-operate-on-only-one-value">Unary Operators (operate on only one value)</h5>
+<pre><code>-a        // (Negate) a is numeric, result is numeric
+!a        // (NOT) a is boolean, result is boolean</code></pre>
+<h5 id="multiplication-and-division">Multiplication and Division</h5>
+<pre><code>a * b     // (Multiply) a and b are numeric, result is numeric
+a / b     // (Divide) a and b are numeric, result is numeric
+a % b     // (Mod) a and b are numeric, result is numeric</code></pre>
+<h5 id="addition-and-subtraction">Addition and Subtraction</h5>
+<pre><code>a + b     // (Add) a and b are numeric, result is numeric
+a - b     // (Subtract) a and b are numeric, result is numeric
+a + b     // (Concatenation) either a or b is String, result is String</code></pre>
+<h5 id="inequality-comparison">Inequality Comparison</h5>
+<pre><code>a &lt; b     // (Less than) a and b are numeric, result is boolean
+a &lt;= b    // (Less than or equal to) a and b are numeric, result is boolean
+a &gt; b     // (Greater than) a and b are numeric, result is boolean
+a &gt;= b    // (Greater than or equal to) a and b are numeric, result is boolean</code></pre>
+<h5 id="equality-comparison">Equality Comparison</h5>
+<pre><code>a == b    // (Equal to) a and b are compatible types, result is boolean
+a != b    // (Not equal to) a and b are compatible types, result is boolean</code></pre>
+<h5 id="logical-and">Logical AND</h5>
+<pre><code>a &amp;&amp; b    // (AND) a and b are boolean, result is boolean</code></pre>
+<h5 id="logical-or">Logical OR</h5>
+<pre><code>a || b    // (OR) a and b are boolean, result is boolean</code></pre>
+<h6 id="java-language-help-java-operators"><a href="#top">Java Language Help</a> &gt; <a href="#java-operators">Java Operators</a></h6>
+<h3 id="main-program-structure">Main Program Structure</h3>
+<p>A Code12 Java program running in the Code12 Application consists of a single user-defined class corresponding to the main program. Declaring or importing additional classes is not supported.</p>
+<blockquote>
+<p>Use the <a href="http://www.code12.org/download.html">Code12 Java Package</a> when you are ready to start using additional classes.</p>
+</blockquote>
+<p>In addition, your program does not need the standard Java <code>main()</code> function. Instead, your program will define a <code>start()</code> function where the program begins. For example:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Your program starts here
+        ct.circle( 50, 30, 20 );
+    }
+}</code></pre>
+<p>Your program can also contain an optional <a href="API.html#main-program-functions">update() function</a> and optional <a href="API.html#input-event-functions">Input Event Functions</a>.</p>
+<h6 id="java-language-help-main-program-structure"><a href="#top">Java Language Help</a> &gt; <a href="#main-program-structure">Main Program Structure</a></h6>
+<h3 id="unsupported-java-language-features">Unsupported Java Language Features</h3>
+<p>The Code12 Application supports a subset of the full Java language, in order to avoid the typical syntax ambiguities that make traditional Java error messages frequently confusing to beginners, and to keep the focus on the <a href="#top">12 fundamental programming concepts</a>.</p>
+<blockquote>
+<p>You can use the <a href="http://www.code12.org/download.html">Code12 Java Package</a> with the Java development environment of your choice if you want to use the <a href="API.html">Code12 API</a> with the full Java language.</p>
+</blockquote>
+<h5 id="no-class-definitions">No Class Definitions</h5>
+<p>The main restriction is that class definitions other than the main program class are not supported, and importing classes is not allowed. This means that other than the main program class, the only classes that a Code12 program will use are:</p>
+<ol type="1">
+<li>The main <code>ct</code> class/instance defined by the Code12 API</li>
+<li>The <code>GameObj</code> class defined by the Code12 API (a graphical object)</li>
+<li>The standard Java <code>String</code> class (a subset of methods is supported)</li>
+<li>The Java <code>Math</code> class (a subset of methods is supported)</li>
+</ol>
+<h5 id="other-unsupported-java-features">Other Unsupported Java Features</h5>
+<p>In addition to restricting a program to a single user-defined class, the following Java features are not supported by the Code12 Application:</p>
+<ol type="1">
+<li>Importing classes and packages, including the Java Class Library</li>
+<li>Class inheritance, interfaces, etc.</li>
+<li>Using <code>new</code> to create object instances (except arrays)</li>
+<li>The byte, char, float, long and short data types</li>
+<li>Enumeration (enum) types</li>
+<li>Exception handling (try, catch, throw, etc.)</li>
+<li>The switch statement (switch, case, default)</li>
+<li>The continue statement</li>
+<li>Bit operators (&lt;&lt;, &gt;&gt;, &gt;&gt;&gt;, &amp;, |, ^)</li>
+<li>The ternary operator (? :)</li>
+<li>Multi-dimentional arrays or arrays of arrays</li>
+</ol>
+<h5 id="restricted-java-features">Restricted Java Features</h5>
+<p>To further help prevent common errors and sources of confusion, Code12 also intentionally restricts the use of some language features:</p>
+<ol type="1">
+<li>The assignment and increment operators (=, +=, ++, etc.) do not result in values. Assignments are statements, not expressions.</li>
+<li>Integer division that may produce (and lose) a remainder is not allowed directly. A function ct.intDiv() is provided if desired.</li>
+<li>Local variables and parameters cannot hide (be named the same as) a class-level variable.</li>
+<li>Variable names are not allowed to differ only by case from existing names.</li>
+<li>Functions calls returning objects cannot be be used to access fields or methods of the object directly. An object variable must be used.</li>
+</ol>
+<h4 id="unsupported-java-keywords">Unsupported Java Keywords</h4>
+<p>The following Java keywords are not supported by the Code12 Application:</p>
+<pre><code>Data Types     Classes        Flow Control    Other
+----------     -------        ------------    -----
+byte           abstract       assert          native
+char           extends        case            strictfp
+enum           implements     catch           synchronized
+float          import         continue        transient
+long           instanceof     default         volatile
+short          interface      finally
+               package        switch
+               protected      throw
+               static         try
+               super
+               this
+               throws</code></pre>
+<p>In addition, the following Java keywords have reduced or limited support:</p>
+<pre><code>class       (only for the main program class)
+new         (only for arrays)
+private     (ignored when allowed)
+public      (ignored when allowed)</code></pre>
+<h6 id="java-language-help-unsupported-java-language-features"><a href="#top">Java Language Help</a> &gt; <a href="#unsupported-java-language-features">Unsupported Java Language Features</a></h6>
+<h3 id="indentation-and-brace-placement">Indentation and Brace Placement</h3>
+<p>The Java language is normally defined to treat line breaks the same as spaces, and to ignore indentation. However, to help you find common errors in your program, the Code12 Application detects and enforces consistent use of indentation and a “style” of placing braces (curly brackets) as follows:</p>
+<pre><code>class Example
+{
+    // Class-level variables and function bodies are indented inside
+    // the class, all starting at the same level.
+
+    int size = 20;
+
+    public void start()
+    {
+        // Code inside function bodies is indented more
+
+        ct.circle( 50, 30, size );
+        if (size &lt; 10)
+            size = 10;    // controlled statements are indented further
+        else
+        {
+            // Braces to enclose a block are always on their own lines,
+            // the enclosed statements are indented further, and 
+            // the close brace lines up with the matching open brace.
+
+            ct.circle( 50, 30, size );
+            size -= 10;
+            ct.circle( 50, 30, size );
+        }
+    }
+}</code></pre>
+<p>For more information on the brace placement for specific structures, see:</p>
+<ul>
+<li><a href="#main-program-structure">Main Program Structure</a></li>
+<li><a href="#if-else">If-else</a></li>
+<li><a href="#loops">Loops</a></li>
+<li><a href="#function-definitions">Function Definitions</a></li>
+</ul>
+<h4 id="line-breaks">Line Breaks</h4>
+<p>In addition to the rules for indentation, the Code12 Application requires each statement to be on its own line and restricts how and where statements can be broken with a line break:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Each statement must be on its own line
+
+        double a = 50;
+        double b = 20;
+        double y = 30;
+
+        // Long statements can be broken after a comma,
+        // and the continuation line(s) must be indented.
+
+        ct.circle( (a + (b * 2) / 3) + ct.random( 0, 10 ),
+                y + ct.random( 2, 8 ), 20 );
+
+        // Any line can also be broken after the special comment ///
+        if ((a &lt; 10 &amp;&amp; b &gt; 30 &amp;&amp; y &lt; a + b)      ///
+            || (a &gt; 50 &amp;&amp; b &lt; 10 &amp;&amp; y &gt; a - b))
+        {
+            a = 0;
+            b += 10;
+        }
+    }
+}</code></pre>
+<p>These restrictions help Code12 provide accurate placement and wording of error messages that correspond to the actual mistakes made by the programmer.</p>
+<h6 id="java-language-help-indentation-and-brace-placement"><a href="#top">Java Language Help</a> &gt; <a href="#indentation-and-brace-placement">Indentation and Brace Placement</a></h6>
 <footer>
 <p>Code12 Version 1.0</p>
-(c)Copyright 2018 Code12 and David C. Parker. All Rights Reserved.
+Copyright (c) 2019 Code12. All Rights Reserved.
 </footer>
 </body>
 </html>

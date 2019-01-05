@@ -4,7 +4,7 @@
 --
 -- Application global data and functions for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 
@@ -28,6 +28,7 @@ local app =  {
 
 	-- Web folders
 	webHelpDir = "http://www.code12.org/docs/1/",
+	-- webHelpDir = "file:///Users/davecparker/Documents/Git%20Projects/code12/Doc/Website/docs/1/",
 
 	-- UI metrics
 	margin = 10,                 -- generic margin to leave between many UI items

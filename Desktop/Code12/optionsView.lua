@@ -4,7 +4,7 @@
 --
 -- The view for displaying user options for the Code 12 Desktop app
 --
--- (c)Copyright 2018 by David C. Parker
+-- Copyright (c) 2018-2019 Code12
 -----------------------------------------------------------------------------------------
 
 -- Corona modules
@@ -348,7 +348,7 @@ function optionsView:create()
 		"7. Object Method Calls",
 		"8. If-else",
 		"9. Function Definitions",
-		"10. Parameters",
+		"10. Function Parameters",
 		"11. Loops",
 		"12. Arrays",
 	}
