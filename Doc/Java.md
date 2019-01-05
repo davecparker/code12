@@ -1744,11 +1744,353 @@ this calls `makeCoin()` and then takes the return value
 of the call (here a `GameObj`) and passes it on as the return value 
 from `makePenny()`.
 
-
 ###### [Java Language Help](#top) > [Function Parameters]
 
 
 ### Loops
+A loop allows your program to repeat a section of code multiple times,
+until some ending condition is met. For example, you could use a loop
+to draw 20 circles on the screen without having to copy and paste the
+call to `ct.circle()` and related code 20 times.
+
+#### Examples
+The Java language has three different kinds of loops to choose from: 
+the `while` loop, the `do-while` loop, and the `for` loop. 
+Here is an example of each, all doing the same task:
+```
+// Draw 20 circles across the screen using a while loop
+double x = 2.5;
+while (x < 100)
+{
+	ct.circle( x, 50, 4 );
+	x += 5;
+}
+```
+```
+// Draw 20 circles across the screen using a do-while loop
+double x = 2.5;
+do
+{
+	ct.circle( x, 50, 4 );
+	x += 5;
+}
+while (x < 100);
+```
+```
+// Draw 20 circles across the screen using a for loop
+for (double x = 2.5; x < 100; x += 5)
+{
+	ct.circle( x, 50, 4 );
+}
+```
+#### The "while" Loop
+The syntax of a `while` loop is very similar to the syntax of an `if` statement
+(see [if-else]):
+```
+if (test)
+{
+	// Code to do if test is true
+}
+```
+```
+while (test)
+{
+	// Code to repeat as long as test is true
+}
+```
+For example:
+```
+double x = 2.5;
+
+// If x is on the screen, then draw a circle there and increase x by 5
+if (x < 100)
+{
+	ct.circle( x, 50, 4 );
+	x += 5;	
+}
+```
+```
+double x = 2.5;
+
+// As long as x is still on the screen, draw a circle there, 
+// increase x by 5, and repeat
+while (x < 100)
+{
+	ct.circle( x, 50, 4 );
+	x += 5;	
+}
+```
+A `while` loop starts by evaluating the test condition in the parentheses. 
+Just like [if-else], this condition can be any expression that results in a 
+[boolean](#java-data-types) (true or false) value, such as:
+
+* One of the [Java Operators] that results in a `boolean` result (such as `<`)
+* A [boolean](#java-data-types) variable
+* A function call that [returns a value](#function-return-values) of type `boolean`
+
+If the test result is false then the body of the loop (the code in curly brackets) 
+is skipped, and execution continues after the loop (the loop body does not execute 
+at all). If the test result is true, the loop body executes then execution goes back
+up to the line with the test and repeats the entire process. The test is evaluated 
+again to see if it is still true (typically variable values or something will have 
+changed since the first test so the result may be different). If the test is still
+true, the body is executed again, and execution goes back to the test again. 
+The entire loop process stops once the test result becomes false.
+
+> **Warning**: If the test remains true and never changes, then the loop will execute
+> forever, resulting in an "inifite loop". This will cause your program to "hang",
+> the Code12 Application will become unreponsive, and will you need to "end task"
+> or "force quit" Code12 from the operating system, fix your code, and try again!
+
+##### More "while" Loop Examples
+```
+// Count from 1 to 10
+int i = 1;
+while (i <= 10)
+{
+	ct.println( i );
+	i++;
+}
+```
+```
+// A loop with user input
+boolean keepGoing = true;
+ct.println( "Lets get started" );
+while (keepGoing)
+{
+	ct.println( "This is text output" );
+	keepGoing = ct.inputYesNo( "Do you want to keep going?" );
+}
+ct.println( "We're done" );
+```
+```
+// Print powers of 2 less than 1 million
+int i = 1;
+while (i < 1000000)
+{
+	ct.println( i );
+	i *= 2;
+}
+```
+#### The "do-while" Loop
+A `do-while` loop works just like a `while` loop, except that the test is after 
+the loop body instead of before it:
+```
+while (test)
+{
+	// Loop body code
+} 
+```
+```
+do
+{
+	// Loop body code
+}
+while (test);
+```
+> **Note**: The test line at the end of a `do-while` loop must end with a semicolon,
+> whereas the test line at the beginning of a `while` loop must **not** have a semicolon.
+
+Since the loop body of a `do-while` is first, it always executes at least once, 
+then the test is evaluated to determine if (and how long) the loop repeats. 
+Sometimes this can simplify the code required to get the behavior you want compared to 
+using a `while` loop. For example, consider one of the `while` examples above
+rewritten to use a `do-while`:
+```
+// A while loop with user input
+boolean keepGoing = true;
+ct.println( "Lets get started" );
+while (keepGoing)
+{
+	ct.println( "This is text output" );
+	keepGoing = ct.inputYesNo( "Do you want to keep going?" );
+}
+ct.println( "We're done" );
+```
+```
+// A do-while loop with user input
+ct.println( "Lets get started" );
+do
+{
+	ct.println( "This is text output" );
+}
+while( ct.inputYesNo( "Do you want to keep going?" ) );
+ct.println( "We're done" );
+```
+However, if the correct behavior you want means that sometimes the loop body
+should be executed 0 times (be skipped completely), then you must use a 
+`while` loop instead of a `do-while` loop.
+
+#### The "for" loop
+The `for` loop structure is a convenient shorthand for a common pattern that often
+occurs in loops in practice. Compared to using a `while` loop, using a `for` loop 
+results in fewer lines of code when writing loops that follow these patterns. 
+For example:
+```
+// Count from 1 to 10
+int i = 1;
+while (i <= 10)
+{
+	ct.println( i );
+	i++;
+}
+```
+```
+// Count from 1 to 10
+for (int i = 1; i <= 10; i++)
+{
+	ct.println( i );
+}
+```
+The pattern for the `while` loop here is:
+
+1. Set the starting value
+2. While the value is still valid:
+	3. Use the value
+	4. Get the next value
+
+The header line of a `for` loop packs steps 1, 2, and 4 all into one line,
+resulting in fewer lines of code. Otherwise, a `for` loop behaves the same as
+the corresponding `while` loop. 
+
+Written briefly with placeholders, the corresponding pattern for the `while` 
+and `for` loops is: 
+```
+initialize;
+while (test)
+{
+	process;
+	advance;
+}
+```
+```
+for (initialize; test; advance)
+{
+	process;
+}
+```
+> Note that although the "advance" statement occurs before the loop body in
+> a `for` loop, it is not executed until after the loop body, in the same order
+> as the corresponding `while` loop pattern.
+
+The header of a `for` loop is complex and takes some practice to write correctly,
+but once you get used to it, experienced programmers can find it easier to 
+understand the behavior of the loop because it makes the pattern easier to see.
+In the example above, you can think of the loop header as saying 
+
+> "for values of i starting at 1, going up to and including 10, increasing 
+> by 1 each time, do the following:"
+
+##### More "for" Loop Examples
+```
+// Count to 100 by 10s
+for (int i = 10; i <= 100; i += 10)
+{
+	ct.println( i );
+}
+```
+```
+// Count backwards from 99 by 3s
+for (int i = 99; i > 0; i -= 3)
+{
+	ct.println( i );
+}
+```
+```
+// Draw 20 circles at random positions
+for (int i = 1; i <= 20; i++)
+{
+	ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+}
+```
+#### The "break" Statement
+Inside the body of a `while`, `do-while`, or `for` loop, you can end the loop
+early with the `break` statement. For example:
+```
+// Draw up to 20 labelled circles at random positions, but stop if one 
+// would have been near the bottom of the screen.
+for (int i = 1; i <= 20; i++)
+{
+	int x = ct.random( 10, 90 );
+	int y = ct.random( 10, 90 );
+	if (y > 85)
+		break;
+	ct.circle( x, y, 10 );
+	ct.text( ct.formatInt( i ), x, y, 8 );
+}
+```
+As soon as a `break` statement is encountered (they are typically controlled by
+an `if` as above), the loop body is exited (no more statements in the loop body
+are executed), and the entire loop ends (regardless of the current test result).
+A `break` statement can only occur inside of a loop.
+
+#### More Loop Syntax
+Like the [if-else] structure, if the body of a `while`, `do-while`, or `for` loop
+is just a single statement, then you can omit the curly brackets if you want.
+For example:
+```
+// Count to 100 by 10s
+for (int i = 10; i <= 100; i += 10)
+	ct.println( i );
+```
+The three parts of a `for` loop header (*initialize*, *test*, and *advance*) are all
+optional and can be left out if desired (but the two semicolons must be left in place). 
+Leaving out the *initalize* or *advance* statements just means that no statement happens
+at that stage of the loop. Leaving out the *test* means that the test defaults to `true`,
+and the loop must be ended internally with a `break` statement. Examples:
+```
+// Count backwards from user-entered starting value by 3s
+int i = ct.inputInt( "Enter starting value" );
+for (; i > 0; i -= 3)
+{
+	ct.println( i );
+}
+```
+```
+// Draw labelled circles at random positions until one 
+// would have been near the bottom of the screen.
+for (int i = 1; ; i++)
+{
+	int x = ct.random( 10, 90 );
+	int y = ct.random( 10, 90 );
+	if (y > 85)
+		break;
+	ct.circle( x, y, 10 );
+	ct.text( ct.formatInt( i ), x, y, 8 );
+}
+```
+```
+// Draw circles as long as the user wants to keep going
+for (;;)
+{
+	ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+	if (!ct.inputYesNo( "Do you want to keep making circles?" ))
+		break;
+}
+```
+Finally, note that the *initialize* and *advance* statements in a `for` loop can be any 
+single valid Java statement (not necessarily a variable initialization and 
+variable increment/assignment), including function calls.
+
+#### Loops and Code12 Animation Frames
+Because loops allow you to repeat behavior, you might think that you could use a loop to
+create animation effects (by repeatedly moving an object by a little bit) or to control 
+repeating behavior in a game. However, due to way the [start()](API.html#start), 
+[update()](API.html#update), and [Input Event Functions](API.html#input-event-functions) 
+in Code12 work, this strategy will not work. Although animation frames occur 60 times per 
+second, each function body in your program will always *execute to completion* before the 
+next animation frame is drawn (even if the 1/60th of a second interval is passed).
+This means that any loop in your code will always execute to completion before the screen 
+is redrawn. So if you include a loop in your code, only the final results at the end of 
+the loop will be displayed. 
+
+Animation and repeating behaviors in a game should be handled by considering the 
+automatic repeating nature of the [update()](API.html#update) function. In effect,
+there is a loop inside of the Code12 system that is repeatedly preparing and drawing
+new animation frames. The contents of your `update()` function are essentially inside 
+the body of this loop. So, your `update()` function should typically do what is necessary
+for *one* animation frame of your game, letting itself get called repeatedly by
+the Code12 system. 
 
 ###### [Java Language Help](#top) > [Loops]
 
@@ -1856,7 +2198,7 @@ class Example
 }
 ```
 Your program can also contain an optional
-[update() function](API.html#main-program-functions) and optional
+[update()](API.html#main-program-functions) function and optional
 [Input Event Functions](API.html#input-event-functions).
 
 ###### [Java Language Help](#top) > [Main Program Structure]

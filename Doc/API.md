@@ -3539,7 +3539,7 @@ by you and *called by the Code12 system*.
 > mouse/touch or keyboard input. You can also use the 
 > [Mouse and Keyboard Input] functions. Using input event functions
 > is a more advanced technique that can be more flexible and more
-> efficent.
+> efficient.
 
 If defined in your program, the following functions will be called 
 by the system when the corresponding input event occurs:

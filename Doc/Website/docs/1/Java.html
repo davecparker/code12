@@ -964,6 +964,230 @@ public void update()
 <p>this calls <code>makeCoin()</code> and then takes the return value of the call (here a <code>GameObj</code>) and passes it on as the return value from <code>makePenny()</code>.</p>
 <h6 id="java-language-help-function-parameters"><a href="#top">Java Language Help</a> &gt; <a href="#function-parameters">Function Parameters</a></h6>
 <h3 id="loops">Loops</h3>
+<p>A loop allows your program to repeat a section of code multiple times, until some ending condition is met. For example, you could use a loop to draw 20 circles on the screen without having to copy and paste the call to <code>ct.circle()</code> and related code 20 times.</p>
+<h4 id="examples-8">Examples</h4>
+<p>The Java language has three different kinds of loops to choose from: the <code>while</code> loop, the <code>do-while</code> loop, and the <code>for</code> loop. Here is an example of each, all doing the same task:</p>
+<pre><code>// Draw 20 circles across the screen using a while loop
+double x = 2.5;
+while (x &lt; 100)
+{
+    ct.circle( x, 50, 4 );
+    x += 5;
+}</code></pre>
+<pre><code>// Draw 20 circles across the screen using a do-while loop
+double x = 2.5;
+do
+{
+    ct.circle( x, 50, 4 );
+    x += 5;
+}
+while (x &lt; 100);</code></pre>
+<pre><code>// Draw 20 circles across the screen using a for loop
+for (double x = 2.5; x &lt; 100; x += 5)
+{
+    ct.circle( x, 50, 4 );
+}</code></pre>
+<h4 id="the-while-loop">The “while” Loop</h4>
+<p>The syntax of a <code>while</code> loop is very similar to the syntax of an <code>if</code> statement (see <a href="#if-else">if-else</a>):</p>
+<pre><code>if (test)
+{
+    // Code to do if test is true
+}</code></pre>
+<pre><code>while (test)
+{
+    // Code to repeat as long as test is true
+}</code></pre>
+<p>For example:</p>
+<pre><code>double x = 2.5;
+
+// If x is on the screen, then draw a circle there and increase x by 5
+if (x &lt; 100)
+{
+    ct.circle( x, 50, 4 );
+    x += 5; 
+}</code></pre>
+<pre><code>double x = 2.5;
+
+// As long as x is still on the screen, draw a circle there, 
+// increase x by 5, and repeat
+while (x &lt; 100)
+{
+    ct.circle( x, 50, 4 );
+    x += 5; 
+}</code></pre>
+<p>A <code>while</code> loop starts by evaluating the test condition in the parentheses. Just like <a href="#if-else">if-else</a>, this condition can be any expression that results in a <a href="#java-data-types">boolean</a> (true or false) value, such as:</p>
+<ul>
+<li>One of the <a href="#java-operators">Java Operators</a> that results in a <code>boolean</code> result (such as <code>&lt;</code>)</li>
+<li>A <a href="#java-data-types">boolean</a> variable</li>
+<li>A function call that <a href="#function-return-values">returns a value</a> of type <code>boolean</code></li>
+</ul>
+<p>If the test result is false then the body of the loop (the code in curly brackets) is skipped, and execution continues after the loop (the loop body does not execute at all). If the test result is true, the loop body executes then execution goes back up to the line with the test and repeats the entire process. The test is evaluated again to see if it is still true (typically variable values or something will have changed since the first test so the result may be different). If the test is still true, the body is executed again, and execution goes back to the test again. The entire loop process stops once the test result becomes false.</p>
+<blockquote>
+<p><strong>Warning</strong>: If the test remains true and never changes, then the loop will execute forever, resulting in an “inifite loop”. This will cause your program to “hang”, the Code12 Application will become unreponsive, and will you need to “end task” or “force quit” Code12 from the operating system, fix your code, and try again!</p>
+</blockquote>
+<h5 id="more-while-loop-examples">More “while” Loop Examples</h5>
+<pre><code>// Count from 1 to 10
+int i = 1;
+while (i &lt;= 10)
+{
+    ct.println( i );
+    i++;
+}</code></pre>
+<pre><code>// A loop with user input
+boolean keepGoing = true;
+ct.println( &quot;Lets get started&quot; );
+while (keepGoing)
+{
+    ct.println( &quot;This is text output&quot; );
+    keepGoing = ct.inputYesNo( &quot;Do you want to keep going?&quot; );
+}
+ct.println( &quot;We&#39;re done&quot; );</code></pre>
+<pre><code>// Print powers of 2 less than 1 million
+int i = 1;
+while (i &lt; 1000000)
+{
+    ct.println( i );
+    i *= 2;
+}</code></pre>
+<h4 id="the-do-while-loop">The “do-while” Loop</h4>
+<p>A <code>do-while</code> loop works just like a <code>while</code> loop, except that the test is after the loop body instead of before it:</p>
+<pre><code>while (test)
+{
+    // Loop body code
+} </code></pre>
+<pre><code>do
+{
+    // Loop body code
+}
+while (test);</code></pre>
+<blockquote>
+<p><strong>Note</strong>: The test line at the end of a <code>do-while</code> loop must end with a semicolon, whereas the test line at the beginning of a <code>while</code> loop must <strong>not</strong> have a semicolon.</p>
+</blockquote>
+<p>Since the loop body of a <code>do-while</code> is first, it always executes at least once, then the test is evaluated to determine if (and how long) the loop repeats. Sometimes this can simplify the code required to get the behavior you want compared to using a <code>while</code> loop. For example, consider one of the <code>while</code> examples above rewritten to use a <code>do-while</code>:</p>
+<pre><code>// A while loop with user input
+boolean keepGoing = true;
+ct.println( &quot;Lets get started&quot; );
+while (keepGoing)
+{
+    ct.println( &quot;This is text output&quot; );
+    keepGoing = ct.inputYesNo( &quot;Do you want to keep going?&quot; );
+}
+ct.println( &quot;We&#39;re done&quot; );</code></pre>
+<pre><code>// A do-while loop with user input
+ct.println( &quot;Lets get started&quot; );
+do
+{
+    ct.println( &quot;This is text output&quot; );
+}
+while( ct.inputYesNo( &quot;Do you want to keep going?&quot; ) );
+ct.println( &quot;We&#39;re done&quot; );</code></pre>
+<p>However, if the correct behavior you want means that sometimes the loop body should be executed 0 times (be skipped completely), then you must use a <code>while</code> loop instead of a <code>do-while</code> loop.</p>
+<h4 id="the-for-loop">The “for” loop</h4>
+<p>The <code>for</code> loop structure is a convenient shorthand for a common pattern that often occurs in loops in practice. Compared to using a <code>while</code> loop, using a <code>for</code> loop results in fewer lines of code when writing loops that follow these patterns. For example:</p>
+<pre><code>// Count from 1 to 10
+int i = 1;
+while (i &lt;= 10)
+{
+    ct.println( i );
+    i++;
+}</code></pre>
+<pre><code>// Count from 1 to 10
+for (int i = 1; i &lt;= 10; i++)
+{
+    ct.println( i );
+}</code></pre>
+<p>The pattern for the <code>while</code> loop here is:</p>
+<ol type="1">
+<li>Set the starting value</li>
+<li>While the value is still valid:
+<ol start="3" type="1">
+<li>Use the value</li>
+<li>Get the next value</li>
+</ol></li>
+</ol>
+<p>The header line of a <code>for</code> loop packs steps 1, 2, and 4 all into one line, resulting in fewer lines of code. Otherwise, a <code>for</code> loop behaves the same as the corresponding <code>while</code> loop.</p>
+<p>Written briefly with placeholders, the corresponding pattern for the <code>while</code> and <code>for</code> loops is:</p>
+<pre><code>initialize;
+while (test)
+{
+    process;
+    advance;
+}</code></pre>
+<pre><code>for (initialize; test; advance)
+{
+    process;
+}</code></pre>
+<blockquote>
+<p>Note that although the “advance” statement occurs before the loop body in a <code>for</code> loop, it is not executed until after the loop body, in the same order as the corresponding <code>while</code> loop pattern.</p>
+</blockquote>
+<p>The header of a <code>for</code> loop is complex and takes some practice to write correctly, but once you get used to it, experienced programmers can find it easier to understand the behavior of the loop because it makes the pattern easier to see. In the example above, you can think of the loop header as saying</p>
+<blockquote>
+<p>“for values of i starting at 1, going up to and including 10, increasing by 1 each time, do the following:”</p>
+</blockquote>
+<h5 id="more-for-loop-examples">More “for” Loop Examples</h5>
+<pre><code>// Count to 100 by 10s
+for (int i = 10; i &lt;= 100; i += 10)
+{
+    ct.println( i );
+}</code></pre>
+<pre><code>// Count backwards from 99 by 3s
+for (int i = 99; i &gt; 0; i -= 3)
+{
+    ct.println( i );
+}</code></pre>
+<pre><code>// Draw 20 circles at random positions
+for (int i = 1; i &lt;= 20; i++)
+{
+    ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+}</code></pre>
+<h4 id="the-break-statement">The “break” Statement</h4>
+<p>Inside the body of a <code>while</code>, <code>do-while</code>, or <code>for</code> loop, you can end the loop early with the <code>break</code> statement. For example:</p>
+<pre><code>// Draw up to 20 labelled circles at random positions, but stop if one 
+// would have been near the bottom of the screen.
+for (int i = 1; i &lt;= 20; i++)
+{
+    int x = ct.random( 10, 90 );
+    int y = ct.random( 10, 90 );
+    if (y &gt; 85)
+        break;
+    ct.circle( x, y, 10 );
+    ct.text( ct.formatInt( i ), x, y, 8 );
+}</code></pre>
+<p>As soon as a <code>break</code> statement is encountered (they are typically controlled by an <code>if</code> as above), the loop body is exited (no more statements in the loop body are executed), and the entire loop ends (regardless of the current test result). A <code>break</code> statement can only occur inside of a loop.</p>
+<h4 id="more-loop-syntax">More Loop Syntax</h4>
+<p>Like the <a href="#if-else">if-else</a> structure, if the body of a <code>while</code>, <code>do-while</code>, or <code>for</code> loop is just a single statement, then you can omit the curly brackets if you want. For example:</p>
+<pre><code>// Count to 100 by 10s
+for (int i = 10; i &lt;= 100; i += 10)
+    ct.println( i );</code></pre>
+<p>The three parts of a <code>for</code> loop header (<em>initialize</em>, <em>test</em>, and <em>advance</em>) are all optional and can be left out if desired (but the two semicolons must be left in place). Leaving out the <em>initalize</em> or <em>advance</em> statements just means that no statement happens at that stage of the loop. Leaving out the <em>test</em> means that the test defaults to <code>true</code>, and the loop must be ended internally with a <code>break</code> statement. Examples:</p>
+<pre><code>// Count backwards from user-entered starting value by 3s
+int i = ct.inputInt( &quot;Enter starting value&quot; );
+for (; i &gt; 0; i -= 3)
+{
+    ct.println( i );
+}</code></pre>
+<pre><code>// Draw labelled circles at random positions until one 
+// would have been near the bottom of the screen.
+for (int i = 1; ; i++)
+{
+    int x = ct.random( 10, 90 );
+    int y = ct.random( 10, 90 );
+    if (y &gt; 85)
+        break;
+    ct.circle( x, y, 10 );
+    ct.text( ct.formatInt( i ), x, y, 8 );
+}</code></pre>
+<pre><code>// Draw circles as long as the user wants to keep going
+for (;;)
+{
+    ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+    if (!ct.inputYesNo( &quot;Do you want to keep making circles?&quot; ))
+        break;
+}</code></pre>
+<p>Finally, note that the <em>initialize</em> and <em>advance</em> statements in a <code>for</code> loop can be any single valid Java statement (not necessarily a variable initialization and variable increment/assignment), including function calls.</p>
+<h4 id="loops-and-code12-animation-frames">Loops and Code12 Animation Frames</h4>
+<p>Because loops allow you to repeat behavior, you might think that you could use a loop to create animation effects (by repeatedly moving an object by a little bit) or to control repeating behavior in a game. However, due to way the <a href="API.html#start">start()</a>, <a href="API.html#update">update()</a>, and <a href="API.html#input-event-functions">Input Event Functions</a> in Code12 work, this strategy will not work. Although animation frames occur 60 times per second, each function body in your program will always <em>execute to completion</em> before the next animation frame is drawn (even if the 1/60th of a second interval is passed). This means that any loop in your code will always execute to completion before the screen is redrawn. So if you include a loop in your code, only the final results at the end of the loop will be displayed.</p>
+<p>Animation and repeating behaviors in a game should be handled by considering the automatic repeating nature of the <a href="API.html#update">update()</a> function. In effect, there is a loop inside of the Code12 system that is repeatedly preparing and drawing new animation frames. The contents of your <code>update()</code> function are essentially inside the body of this loop. So, your <code>update()</code> function should typically do what is necessary for <em>one</em> animation frame of your game, letting itself get called repeatedly by the Code12 system.</p>
 <h6 id="java-language-help-loops"><a href="#top">Java Language Help</a> &gt; <a href="#loops">Loops</a></h6>
 <h3 id="arrays">Arrays</h3>
 <h6 id="java-language-help-arrays"><a href="#top">Java Language Help</a> &gt; <a href="#arrays">Arrays</a></h6>
@@ -1020,7 +1244,7 @@ a != b    // (Not equal to) a and b are compatible types, result is boolean</cod
         ct.circle( 50, 30, 20 );
     }
 }</code></pre>
-<p>Your program can also contain an optional <a href="API.html#main-program-functions">update() function</a> and optional <a href="API.html#input-event-functions">Input Event Functions</a>.</p>
+<p>Your program can also contain an optional <a href="API.html#main-program-functions">update()</a> function and optional <a href="API.html#input-event-functions">Input Event Functions</a>.</p>
 <h6 id="java-language-help-main-program-structure"><a href="#top">Java Language Help</a> &gt; <a href="#main-program-structure">Main Program Structure</a></h6>
 <h3 id="unsupported-java-language-features">Unsupported Java Language Features</h3>
 <p>The Code12 Application supports a subset of the full Java language, in order to avoid the typical syntax ambiguities that make traditional Java error messages frequently confusing to beginners, and to keep the focus on the <a href="#top">12 fundamental programming concepts</a>.</p>
