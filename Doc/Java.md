@@ -2096,6 +2096,190 @@ the Code12 system.
 
 
 ### Arrays
+An array is a way to store an entire list or sequence of values in a single variable.
+You can then access one entry in the sequence by using an integer *index* in 
+square brackets after the array name. The first entry is at index 0, the second is
+at index 1, etc.
+
+#### Example
+```
+// Declare and initialize an array of double values named sizes
+double[] sizes = { 2, 5, 1, 3.5, 1 };
+
+// Use the 4th size (index 3) to make a circle
+ct.circle( 50, 50, sizes[3] );    // diameter will be 3.5
+```
+#### Notes
+The syntax `double[]` is the type for the variable `sizes` above and can be read
+as "double array", meaning an array of `double` values. 
+You can make an array of any of the [Java Data Types]. Note that all entries
+in the array must be the same type. For example:
+```
+int[] counts = { 2, 0, 1, 6 };
+double[] sizes = { 2, 5, 1, 3.5, 1 };
+boolean[] hits = { true, false, false, true };
+String[] names = { "Doug", "Sue", "Pat" };
+GameObj[] walls = { leftWall, topWall, bottomWall };
+```
+> In the `GameObj[] walls` example above, assume that the variables `leftWall`,
+> `topWall`, and `bottomWall` are existing `GameObj` variables that were already
+> created (using [ct.rect()](API.html#ct.rect), for example).
+
+##### Getting and Setting Array Values
+You can access the entries of an array (often called the *elements* of the array)
+using an integer index. Like a regular variable, you can get the value at 
+a particular index, and you can also set (change) the value at an index by using
+an assignment statement. For example:
+```
+String[] names = { "Doug", "Sue", "Pat" };
+
+ct.println( names[0] );      // Doug
+ct.println( names[1] );      // Sue
+ct.println( names[2] );      // Pat
+
+// Change the second name (index 1) 
+names[1] = "Abby";
+
+ct.println( names[0] );      // Doug
+ct.println( names[1] );      // Abby
+ct.println( names[2] );      // Pat
+```
+##### Using an Index Expression
+What really makes arrays a powerful tool is that you can use an `int` variable, 
+or any [expression](#expressions) of type `int`, as an index to choose which element 
+to access, not just a number directly. For example:
+```
+double[] sizes = { 2, 5, 1, 3.5, 1 };
+
+int i = 1;
+ct.println( sizes[i] );    // 5
+```
+```
+String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+int month = ct.inputInt( "Enter month number" );
+
+// The correct months index is one less than the month number. 
+// For example, "Jan" is month number 1 and index 0.
+
+ct.println( months[month - 1] );
+```
+##### Invalid Array Indexes
+In an array of 3 items, such as:
+```
+String[] names = { "Doug", "Sue", "Pat" };
+```
+the valid index values are 0, 1, and 2. Attempting to access an item at an 
+invalid index (e.g. past the end of the array) will produce an error. 
+For example:
+```
+String[] names = { "Doug", "Sue", "Pat" };
+
+ct.println( names[3] );   // This causes an error
+```
+> Note that unlike most error messages that you get for problems with your code,
+> an invalid array index causes an error at "runtime" (after your program 
+> has already started running). 
+
+##### Using Loops with Arrays
+Arrays are especially powerful when used in conjunction with [Loops].
+A loop can be used to repeat some code for every element in the array
+by modifying an *index variable* and using it inside the loop body.
+For example:
+```
+String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+// Print all the months
+for (int i = 0; i < 12; i++ )
+{
+	ct.println( months[i] );
+}
+```
+##### Creating an Empty Array
+An array variable initialization such as:
+```
+String[] names = { "Doug", "Sue", "Pat" };
+```
+declares the array variable `names` and also initializes the array to contain
+the values given in the curly brackets.
+
+You can also declare and create an array that leaves the individual array elements
+"blank" but has room for them to be assigned (set) later:
+```
+String[] names = new String[3];      // blank array with room for 3 Strings
+
+names[0] = "Doug";
+names[1] = "Sue";
+names[2] = "Pat";
+```
+Carefully note the syntax `new String[3]`. After `new` goes the type for the
+elements in the array (this must be declared up front), then the *size* of the
+array in square brackets (here 3).
+
+Creating an array in this way is useful when you need code to calculate or 
+create the array elements. For example:
+```
+// Create a blank array of 10 int values to store sizes
+int[] sizes = new int[10];
+
+// Set all the sizes to random values
+for (int i = 0; i < 10; i++)
+{
+	sizes[i] = ct.random( 0, 5 );
+}
+
+// Print all the sizes
+for (int i = 0; i < 10; i++)
+{
+	ct.println( sizes[i] );
+}
+```
+When you create a "blank" array, the elements of the array are actually all 
+initialized right away to an initial default value depending on their type
+as follows:
+```
+Type      Default Value
+----      -------------
+int       0
+double    0.0
+boolean   false
+String    null
+GameObj   null
+```
+##### An Array of GameObj Objects
+Especially useful in games is the ability to create and array of 
+[GameObj](#java-data-types) objects. In conjunction with [Loops],
+You can create many objects on the screen and keep track of and
+manipulate all of them. For example:
+```
+class Example
+{
+	// An array that can hold 10 GameObj objects
+	GameObj[] balls = new GameObj[10];
+
+	public void start()
+	{
+		// Create the balls at random locations
+		for (int i = 0; i < 10; i++)
+		{
+			balls[i] = ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+		}
+	}
+
+	public void update()
+	{
+		// Move all the balls and recycle them when they go off-screen
+		for (int i = 0; i < 10; i++)
+		{
+			balls[i].x += 0.5;
+			if (balls[i].x > 110)
+				balls[i].x = -10;
+		}
+	}
+}
+```
 
 ###### [Java Language Help](#top) > [Arrays]
 

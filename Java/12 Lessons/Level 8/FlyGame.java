@@ -2,7 +2,7 @@ class FlyGame
 {
 	GameObj bird, fly, drone, scoreText;
 	final double FLY_SPEED = 1.0;
-	final double droneSpeed = 0.5;
+	double droneSpeed = 0.5;
 	int score = 0;
 	double birdSpeed = 0;
 
