@@ -23,7 +23,6 @@ class Pong12
 	GameObj instructions;  // Text for showing gameplay instructions
 	GameObj endGameMsg;    // Text for showing end of game message
 	String[] colors = { "red", "orange", "yellow", "green", "cyan", "blue", "magenta" };
-	GameObj[] goalBlocks;
 
 	public void start()
 	{
@@ -114,7 +113,6 @@ class Pong12
 			arr[j] = temp;
 		}
 	}
-
 
 	public void makeGoalBlocks()
 	{

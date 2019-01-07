@@ -11,47 +11,59 @@ class DuckHunt8
 	final double GUN_SPEED = 1;
 	final double BULLET_SPEED = 2;
 	final double BOMB_SPEED = 0.5;
-	final String DUCK_HIT = "quack.wav";
-	final String GUN_FIRED = "shotgun.wav";
+	final String DUCK_HIT_SOUND = "quack.wav";
+	final String GUN_FIRED_SOUND = "shotgun.wav";
 
 	String imageDir = "images/";
 	GameObj gun;
 	GameObj bullet = null;
+	GameObj ducksHitDisplay;
+	int ducksHitCount = 0;
 
 	public void start()
 	{
+		double x, y, width, height;
+		String filename;
 		// Set the game height
 		ct.setHeight( GAME_HEIGHT );
 		// Set the background image
-		String filename = imageDir + "background.png";
+		filename = imageDir + "background.png";
 		ct.setBackImage( filename );
+		// Make ducks hit display
+		height = 4;
+		x = 0;
+		y = GAME_HEIGHT;
+		ducksHitDisplay = ct.text( "Ducks Hit: 0", x, y, height, "yellow" );
+		ducksHitDisplay.align( "bottom left" );
 		// Draw the gun
 		filename = imageDir + "gun.png";
-		double x = 50;
-		double y = 50;
-		double width = 6;
+		x = 50;
+		y = ducksHitDisplay.y - ducksHitDisplay.getHeight();
+		width = 6;
 		gun = ct.image( filename, x, y, width );
+		gun.align( "bottom" );
 		// Load sounds
-		ct.loadSound( DUCK_HIT );
-		ct.loadSound( GUN_FIRED );
+		ct.loadSound( DUCK_HIT_SOUND );
+		ct.loadSound( GUN_FIRED_SOUND );
 	}
 
 	public void update()
 	{
-		if ( ct.random( 1, 100 ) == 1 )
+		if ( ct.random( 1, 80 ) == 1 )
 		{
-			// Make a new duck
+			// Make a new duck at a random height
 			String filename = imageDir + "duck.png";
 			double duckWidth = 10;
 			double x = -duckWidth;
 			int yMinDuck = (int) ( duckWidth );
-			int yMaxDuck = (int) ( GAME_HEIGHT - gun.getHeight() - duckWidth );
+			int yMaxDuck = (int) ( gun.y - gun.getHeight() - duckWidth );
 			double y = ct.random( yMinDuck, yMaxDuck );
 			GameObj duck = ct.image( filename, x, y, duckWidth );
 			duck.group = "ducks";
-			// Start the duck moving to the right
+			// Start the duck moving to the right with a random speed
 			duck.setXSpeed( ct.random( 1, 3 ) / 3.0 );
 		}
+
 		// Left/right arrow keys control the gun
 		if ( ct.keyPressed( "left" ) )
 			gun.setXSpeed( -GUN_SPEED );
@@ -59,6 +71,7 @@ class DuckHunt8
 			gun.setXSpeed( GUN_SPEED );
 		else
 			gun.setXSpeed( 0 );
+
 		// Make sure gun doesn't go off edge of screen
 		double gunHalfWidth = gun.getWidth() / 2;
 		double xMinGun = gunHalfWidth;
@@ -78,6 +91,8 @@ class DuckHunt8
 				gun.setXSpeed( 0 );
 			}
 		}
+
+		// File bullet or check for it hitting any ducks
 		if ( bullet == null )
 		{
 			// Space bar fires a bullet from the gun
@@ -86,13 +101,13 @@ class DuckHunt8
 				// Draw a bullet above the gun
 				double diameter = 1;
 				double x = gun.x + gun.getWidth() * 0.35;
-				double y = gun.y - gun.getHeight() / 2 - diameter / 2;
+				double y = gun.y - gun.getHeight() - diameter / 2;
 				String color = "black";
 				bullet = ct.circle( x, y, diameter, color );
 				// Start the bullet moving up
 				bullet.setYSpeed( -BULLET_SPEED );
 				// Play gun fired sound
-				ct.sound( GUN_FIRED );
+				ct.sound( GUN_FIRED_SOUND );
 			}
 		}
 		else
@@ -104,11 +119,15 @@ class DuckHunt8
 				// Change the duck's image to a dead duck and make it fall
 				duckHit.setImage( imageDir + "falling_duck.png" );
 				duckHit.setYSpeed( BOMB_SPEED );
+				duckHit.group = "dead ducks";
 				// Delete the bullet
 				bullet.delete();
 				bullet = null;
 				// Play duck hit sound
-				ct.sound( DUCK_HIT );
+				ct.sound( DUCK_HIT_SOUND );
+				// Record the hit
+				ducksHitCount++;
+				ducksHitDisplay.setText( "Ducks Hit: " + ducksHitCount );
 			}
 			else if ( bullet.y < -10 )
 			{
