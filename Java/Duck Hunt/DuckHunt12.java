@@ -9,7 +9,7 @@
 // Left/right arrows move the gun.
 // Space bar fires the gun.
 
-class DuckHunt10
+class DuckHunt12
 {
 	final double ASPECT_RATIO = (double) 16 / 9;
 	final double GAME_HEIGHT = 100 / ASPECT_RATIO;
