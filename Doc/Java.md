@@ -1166,6 +1166,96 @@ that has a [boolean](#java-data-types) return value. For example:
 if (ct.inputYesNo( "Would you like to play again?" ))
 	ct.restart();
 ``` 
+##### Nested if-else Structures
+You can put whatever code you want in the `if` and `else` branches
+of an if-else structure, including other if-else structures. 
+For example:
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 18)
+{
+	ct.println( "You are a child." );
+	if (ct.inputYesNo( "Is your parent with you?" ) )
+		ct.println( "You two must sit together" );
+	else
+	{
+		ct.println( "Sorry you can't go on this ride." );
+		ct.println( "Try the train ride." );
+	}
+}
+else
+{
+	ct.println( "You are an adult." );
+	ct.println( "Enjoy the ride!" );
+}
+```
+In this case, the question `"Is your parent with you?"` is only asked
+if the first `if` succeeds, and then the result `"You two must sit together"`
+only happens if both `if` tests succeed. 
+
+Note that the indentation level of the code increases each time you enter 
+another level of if-else, and if curly brackets are needed to group the 
+controlled statements then they are also indented accordingly.
+
+There is no limit to the number of levels you can "nest" if-else structures
+or the complexity of the tests, other than your ability as a programmer to
+keep all the cases straight!
+
+> Humans are notoriously weak in their ability to decode multiple levels
+> of logic conditions, and computers are brutally literal in their 
+> execution of them (doing exactly what you said, perhaps not what you meant), 
+> often resulting in bugs. Organizing logic in a way that is not overly
+> complex to understand is a skill that programmers build over time.
+
+##### Testing Multiple Conditions with "else if"
+Sometimes you may have multiple variations on a condition that need to
+be tested. For example, the following code identifies three different
+age ranges (child, adult, or senior):
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 18)
+	ct.println( "child" );	
+if (age >= 18 && age < 65)
+	ct.println( "adult" );
+if (age >= 65)
+	ct.println( "senior" );
+```
+The above conditions could be made simpler and more efficient by using
+`else` sections and also nested if-else structures as follows:
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 18)
+	ct.println( "child" );
+else
+{
+	if (age < 65)
+		ct.println( "adult" );
+	else
+		ct.println( "senior" );
+}
+```
+Note how much simpler the `if` conditions are. Also, the first example
+always tests all three `if` conditions regardless of the age, but the
+second one often skips one or more of them. Patterns such as the above
+are common and can be written more compactly using `else if`, as follows:
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 18)
+	ct.println( "child" );
+else if (age < 65)
+	ct.println( "adult" );
+else
+	ct.println( "senior" );
+```
+You can have as many `else if` sections as you want. When structured this
+way, the various `if` tests are executed sequentially until one of them
+tests `true`, then all the remaining ones are skipped. It is important to
+write the various conditions and the order of the tests in a way that 
+produces the result you want in all cases.
 
 #### Graphics and Animation Examples 
 Although an if-else structure only tests its condition and executes
@@ -1248,10 +1338,10 @@ public void update()
 	}
 }
 ```
-Note that this example includes in if-else that is "nested" inside
-another `if` structure. The inner `if` is only tested and executed 
-if the outer `if` passes its test. What would happen if the outer
-`if` were removed? Try to predict the result, then try it and see. 
+Note that this example includes a nested if-else structure.
+The inner `if` is only tested and executed if the outer `if` passes 
+its test. What would happen if the outer `if` were removed? 
+Try to predict the result, then try it and see. 
 
 ###### [Java Language Help](#top) > [If-else]
 
@@ -2236,8 +2326,8 @@ for (int i = 0; i < 10; i++)
 	ct.println( sizes[i] );
 }
 ```
-When you create a "blank" array, the elements of the array are actually all 
-initialized right away to an initial default value depending on their type
+Note that when you create a "blank" array, the elements of the array are actually 
+all initialized right away to an initial default value depending on their type
 as follows:
 ```
 Type      Default Value
@@ -2249,7 +2339,7 @@ String    null
 GameObj   null
 ```
 ##### An Array of GameObj Objects
-Especially useful in games is the ability to create and array of 
+Especially useful in games is the ability to create an array of 
 [GameObj](#java-data-types) objects. In conjunction with [Loops],
 You can create many objects on the screen and keep track of and
 manipulate all of them. For example:

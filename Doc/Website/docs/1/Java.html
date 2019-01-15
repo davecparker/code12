@@ -592,6 +592,64 @@ if ((inches &gt; 72 &amp;&amp; pounds &lt; 170) || (inches &lt; 48 &amp;&amp; po
 <p>An if-else condition (or part of a boolean expression) can also include using any <a href="#function-return-values">function return value</a> for a <a href="#function-calls">function call</a> or <a href="#object-method-calls">object method call</a> that has a <a href="#java-data-types">boolean</a> return value. For example:</p>
 <pre><code>if (ct.inputYesNo( &quot;Would you like to play again?&quot; ))
     ct.restart();</code></pre>
+<h5 id="nested-if-else-structures">Nested if-else Structures</h5>
+<p>You can put whatever code you want in the <code>if</code> and <code>else</code> branches of an if-else structure, including other if-else structures. For example:</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 18)
+{
+    ct.println( &quot;You are a child.&quot; );
+    if (ct.inputYesNo( &quot;Is your parent with you?&quot; ) )
+        ct.println( &quot;You two must sit together&quot; );
+    else
+    {
+        ct.println( &quot;Sorry you can&#39;t go on this ride.&quot; );
+        ct.println( &quot;Try the train ride.&quot; );
+    }
+}
+else
+{
+    ct.println( &quot;You are an adult.&quot; );
+    ct.println( &quot;Enjoy the ride!&quot; );
+}</code></pre>
+<p>In this case, the question <code>&quot;Is your parent with you?&quot;</code> is only asked if the first <code>if</code> succeeds, and then the result <code>&quot;You two must sit together&quot;</code> only happens if both <code>if</code> tests succeed.</p>
+<p>Note that the indentation level of the code increases each time you enter another level of if-else, and if curly brackets are needed to group the controlled statements then they are also indented accordingly.</p>
+<p>There is no limit to the number of levels you can “nest” if-else structures or the complexity of the tests, other than your ability as a programmer to keep all the cases straight!</p>
+<blockquote>
+<p>Humans are notoriously weak in their ability to decode multiple levels of logic conditions, and computers are brutally literal in their execution of them (doing exactly what you said, perhaps not what you meant), often resulting in bugs. Organizing logic in a way that is not overly complex to understand is a skill that programmers build over time.</p>
+</blockquote>
+<h5 id="testing-multiple-conditions-with-else-if">Testing Multiple Conditions with “else if”</h5>
+<p>Sometimes you may have multiple variations on a condition that need to be tested. For example, the following code identifies three different age ranges (child, adult, or senior):</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 18)
+    ct.println( &quot;child&quot; );  
+if (age &gt;= 18 &amp;&amp; age &lt; 65)
+    ct.println( &quot;adult&quot; );
+if (age &gt;= 65)
+    ct.println( &quot;senior&quot; );</code></pre>
+<p>The above conditions could be made simpler and more efficient by using <code>else</code> sections and also nested if-else structures as follows:</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 18)
+    ct.println( &quot;child&quot; );
+else
+{
+    if (age &lt; 65)
+        ct.println( &quot;adult&quot; );
+    else
+        ct.println( &quot;senior&quot; );
+}</code></pre>
+<p>Note how much simpler the <code>if</code> conditions are. Also, the first example always tests all three <code>if</code> conditions regardless of the age, but the second one often skips one or more of them. Patterns such as the above are common and can be written more compactly using <code>else if</code>, as follows:</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 18)
+    ct.println( &quot;child&quot; );
+else if (age &lt; 65)
+    ct.println( &quot;adult&quot; );
+else
+    ct.println( &quot;senior&quot; );</code></pre>
+<p>You can have as many <code>else if</code> sections as you want. When structured this way, the various <code>if</code> tests are executed sequentially until one of them tests <code>true</code>, then all the remaining ones are skipped. It is important to write the various conditions and the order of the tests in a way that produces the result you want in all cases.</p>
 <h4 id="graphics-and-animation-examples">Graphics and Animation Examples</h4>
 <p>Although an if-else structure only tests its condition and executes its controlled statements when it is encountered in your program, the way the <code>update()</code> code block works in a Code12 program makes it easy to test conditions repeatedly.</p>
 <p>Code in your <code>update()</code> block is executed before each new animation frame, and animation frames happen 60 times per second, so this means that the entire sequence of statements in your <code>update()</code> block is repeated 60 times per second, which is very often compared to human perception. This means that an if-else test that you put in your <code>update()</code> block may appear to be tested “continuously”. In fact, it is not tested continuously, just repeatedly and quickly. For example:</p>
@@ -651,7 +709,7 @@ public void update()
             ct.println( &quot;You missed&quot; );
     }
 }</code></pre>
-<p>Note that this example includes in if-else that is “nested” inside another <code>if</code> structure. The inner <code>if</code> is only tested and executed if the outer <code>if</code> passes its test. What would happen if the outer <code>if</code> were removed? Try to predict the result, then try it and see.</p>
+<p>Note that this example includes a nested if-else structure. The inner <code>if</code> is only tested and executed if the outer <code>if</code> passes its test. What would happen if the outer <code>if</code> were removed? Try to predict the result, then try it and see.</p>
 <h6 id="java-language-help-if-else"><a href="#top">Java Language Help</a> &gt; <a href="#if-else">If-else</a></h6>
 <h3 id="function-definitions">Function Definitions</h3>
 <p>A function definition is a block of code with a name that you can reuse without having to copy and paste the code each time. The main program blocks <code>start()</code> and <code>update()</code> in your program are actually function definitions, and these functions are called (told to execute) at the appropriate time by the Code12 system. You can also define your own functions and execute them whenever you want using the <a href="#function-calls">function call</a> syntax.</p>
@@ -1282,7 +1340,7 @@ for (int i = 0; i &lt; 10; i++)
 {
     ct.println( sizes[i] );
 }</code></pre>
-<p>When you create a “blank” array, the elements of the array are actually all initialized right away to an initial default value depending on their type as follows:</p>
+<p>Note that when you create a “blank” array, the elements of the array are actually all initialized right away to an initial default value depending on their type as follows:</p>
 <pre><code>Type      Default Value
 ----      -------------
 int       0
@@ -1291,7 +1349,7 @@ boolean   false
 String    null
 GameObj   null</code></pre>
 <h5 id="an-array-of-gameobj-objects">An Array of GameObj Objects</h5>
-<p>Especially useful in games is the ability to create and array of <a href="#java-data-types">GameObj</a> objects. In conjunction with <a href="#loops">Loops</a>, You can create many objects on the screen and keep track of and manipulate all of them. For example:</p>
+<p>Especially useful in games is the ability to create an array of <a href="#java-data-types">GameObj</a> objects. In conjunction with <a href="#loops">Loops</a>, You can create many objects on the screen and keep track of and manipulate all of them. For example:</p>
 <pre><code>class Example
 {
     // An array that can hold 10 GameObj objects
