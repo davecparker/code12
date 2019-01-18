@@ -1,5 +1,6 @@
 // Pong4.java
 // Expressions
+// Draws the start of a game of pong.
 
 class Pong4
 {

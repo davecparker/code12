@@ -1,5 +1,6 @@
 // Pong5.java
 // Function Return Values
+// Draws the start of a game of pong.
 
 class Pong5
 {

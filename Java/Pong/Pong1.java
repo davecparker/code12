@@ -1,5 +1,6 @@
 // Pong1.java
 // Function Calls
+// Draws the start of a game of pong.
 
 class Pong1
 {

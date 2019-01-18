@@ -1,5 +1,6 @@
 // Pong3.java
 // Variables
+// Draws the start of a game of pong.
 
 class Pong3
 {

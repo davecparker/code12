@@ -1,5 +1,7 @@
 // Pong7.java
 // Object Method Calls
+// Draws the start of a game of pong.
+// Animates the ball (using obj.set[XY]Speed) and right paddle.
 
 class Pong7
 {

@@ -1,5 +1,7 @@
 // Pong6.java
 // Object Data Fields
+// Draws the start of a game of pong.
+// Animates the ball and right paddle.
 
 class Pong6
 {

@@ -1,14 +1,15 @@
-// Pong9.java
-// Function definitions
+// Pong11.java
+// Loops
 // A playable two-player Pong-like game.
 // w and s keys control the left paddle, up and down keys control the right paddle.
 
-class Pong9
+class Pong11
 {
 	final double WIDTH = 100;             // Graphics output window width
 	final double HEIGHT = WIDTH / 1.5;    // Graphics output window height
-	final double SPEED = 1;               // Speed of the paddles
+	final double PADDLE_SPEED = 1;               // Speed of the paddles
 	final double MAX_SCORE = 15;          // Score needed to win the game
+	final double SCORE_HEIGHT = 10;       // Height of the score displays
 	int leftScore;              // Left player's score
 	int rightScore;             // Right player's score
 	GameObj leftScoreDisplay;   // Left player's score display
@@ -30,6 +31,7 @@ class Pong9
 		ct.setBackColor( "black" );
 		// Make display objects
 		makeCenterLine();
+		makeGoalBlocks();
 		makeScoreDisplays();
 		makePaddles();
 		makeBall();
@@ -42,17 +44,17 @@ class Pong9
 	{
 		// Up/down arrow keys control the right paddle
 		if (ct.keyPressed( "up" ))
-			rightPaddle.setYSpeed( -SPEED );
+			rightPaddle.setYSpeed( -PADDLE_SPEED );
 		else if (ct.keyPressed( "down" ))
-			rightPaddle.setYSpeed( SPEED );
+			rightPaddle.setYSpeed( PADDLE_SPEED );
 		else
 			rightPaddle.setYSpeed( 0 );
 		
 		// w/s letter keys control the left paddle
 		if (ct.keyPressed( "w" ))
-			leftPaddle.setYSpeed( -SPEED );
+			leftPaddle.setYSpeed( -PADDLE_SPEED );
 		else if (ct.keyPressed( "s" ))
-			leftPaddle.setYSpeed( SPEED );
+			leftPaddle.setYSpeed( PADDLE_SPEED );
 		else
 			leftPaddle.setYSpeed( 0 );
 
@@ -61,10 +63,17 @@ class Pong9
 			// Make ball bounce off the the top and bottom of the game window and the paddles
 			boolean ballHitTop = ball.y < ball.getWidth() / 2;
 			boolean ballHitBottom = ball.y > HEIGHT - ball.getWidth() / 2;
-			if ( ballHitTop || ballHitBottom )
+			GameObj blockHit = ball.objectHitInGroup( "goalBlocks" );
+			if ( blockHit != null )
+			{
+				blockHit.delete();
+				ball.setXSpeed( -ball.getXSpeed() );
+			}
+			else if ( ballHitTop || ballHitBottom )
 				ball.setYSpeed( -ball.getYSpeed() );
 			else if ( ball.hit( leftPaddle ) || ball.hit( rightPaddle ) )
 				ball.setXSpeed( -ball.getXSpeed() );
+
 
 			// Update the score if the ball goes off the right or left edge of the game window
 			boolean ballOffRightEdge = ball.x > WIDTH + ball.getWidth() / 2;
@@ -83,6 +92,36 @@ class Pong9
 			serveBall();
 	}
 
+	public GameObj newGoalBlock( double x, double y, double h, String side )
+	{
+		GameObj block = ct.rect( x, y, 2, h, "red" );
+		block.group = "goalBlocks";
+		block.align( "top " + side );
+		return block;
+	}
+
+	public void makeGoalBlocks()
+	{
+		double blockWidth = 2;
+		double blockHeight = 10;
+		// Make left goal blocks with a for loop
+		int numBlocks = (int) Math.ceil( HEIGHT / blockHeight );
+		for ( int i = 0; i < numBlocks; i++ )
+		{
+			double y = i * blockHeight;
+			newGoalBlock( 0, y, blockHeight, "left" );
+		}
+		// Make right goal blocks with a while loop
+		int i = 0;
+		double y = 0;
+		while ( y < HEIGHT )
+		{
+			newGoalBlock( WIDTH, y, blockHeight, "right" );
+			i++;
+			y += blockHeight;
+		}
+	}
+
 	public void makeCenterLine()
 	{
 		// Make center dividing line
@@ -94,34 +133,30 @@ class Pong9
 		ct.line( x1, y1, x2, y2, color );
 	}
 
+	public GameObj newScoreDisplay( double x, double y )
+	{
+		return ct.text( "0", x, y, SCORE_HEIGHT, "white" );
+	}
+
 	public void makeScoreDisplays()
 	{
-		// Make left score display
-		String text = "0";
-		double scoreHeight = 10;
+		double y = SCORE_HEIGHT / 2;
 		double scoreOffset = 25;
-		double x = WIDTH / 2 - scoreOffset;
-		double y = scoreHeight / 2;
-		String color = "white";
-		leftScoreDisplay = ct.text( text, x, y, scoreHeight, color );
-		// Make right score display
-		x = WIDTH / 2 + scoreOffset;
-		rightScoreDisplay = ct.text( text, x, y, scoreHeight, color );
+		leftScoreDisplay = newScoreDisplay( WIDTH / 2 - scoreOffset, y );
+		rightScoreDisplay = newScoreDisplay( WIDTH / 2 + scoreOffset, y );
+	}
+
+	public GameObj newPaddle( double x, double y )
+	{
+		return ct.rect( x, y, 2, 10, "white" );
 	}
 
 	public void makePaddles()
 	{
 		double paddleMargin = 10;
-		double paddleWidth = 2;
-		double paddleHeight = 10;
 		double y = HEIGHT / 2;
-		String color = "white";
-		// Make left paddle
-		double x = paddleMargin;
-		leftPaddle = ct.rect( x, y, paddleWidth, paddleHeight, color );
-		// Make right paddle
-		x = WIDTH - paddleMargin;
-		rightPaddle = ct.rect( x, y, paddleWidth, paddleHeight, color );
+		leftPaddle = newPaddle( paddleMargin, y );
+		rightPaddle = newPaddle( WIDTH - paddleMargin, y );
 	}
 
 	public void makeBall()
@@ -134,18 +169,20 @@ class Pong9
 		ball.visible = false;
 	}
 
+	public GameObj newTextDisplay( String text, double x, double y )
+	{
+		return ct.text( text, x, y, 5, "yellow" );
+	}
+
 	public void makeTextDisplays()
 	{
 		// Make instructions display
-		String text = "Press space to serve the ball";
 		double x = WIDTH / 2;
 		double y = HEIGHT / 2;
-		double h = 5;
-		String color = "yellow";
-		instructions = ct.text( text, x, y, h, color );
+		instructions = newTextDisplay( "Press space to serve the ball", x, y );
 		// Make end of game display
 		y = instructions.y - instructions.getHeight() * 2;
-		endGameMsg = ct.text( "", x, y, h, color );
+		endGameMsg = newTextDisplay( "", x, y );
 	}
 
 	public void initStateVariables()
@@ -192,6 +229,13 @@ class Pong9
 		}
 	}
 
+	public void setVelocity( GameObj obj, double speed, double degrees )
+	{
+		double radians = degrees * Math.PI / 180;
+		ball.setXSpeed( speed * Math.cos( radians ) );
+		ball.setYSpeed( speed * Math.sin( radians ) );
+	}
+
 	// Serve the ball away from the side that last scored
 	public void serveBall()
 	{
@@ -220,9 +264,8 @@ class Pong9
 		}
 		// Set the ball's velocity
 		double ballSpeed = 1.5;
-		double radians = directionAngle * Math.PI / 180;
-		ball.setXSpeed( ballSpeed * Math.cos( radians ) );
-		ball.setYSpeed( ballSpeed * Math.sin( radians ) ); 
+		setVelocity( ball, ballSpeed, directionAngle );
+
 		// Set the ball at the center of the screen
 		ball.x = WIDTH / 2;
 		ball.y = HEIGHT / 2;
