@@ -44,30 +44,37 @@ local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
 
 ---------------- Internal Runtime Functions ------------------------------------------
 
--- Apply xSpeed and ySpeed to all the objects in the screen
--- and delete any that went out of bounds.
+-- Apply xSpeed and ySpeed to all the objects in the screen with speed,
+-- and perform auto-delete cleanup of them if necessary.
 local function applyObjectSpeeds(screen)
-	-- Objects using xSpeed and ySpeed automatically get deleted if they
-	-- go more than 100 units off-screen. 
-	local xMin = screen.originX - 100
-	local xMax = xMin + g.WIDTH + 200
-	local yMin = screen.originY - 100
-	local yMax = yMin + g.height + 200
-
-	-- Look for objects with hasSpeed set
+	-- Apply speed to objects with hasSpeed set
 	local objs = screen.objs
-	for i = objs.numChildren, 1, -1 do
+	local numObjs = objs.numChildren
+	for i = 1, numObjs do
 		local gameObj = objs[i].code12GameObj
 		if gameObj.hasSpeed then
-			-- Apply the speed
-			local x = gameObj.x + gameObj.xSpeed
-			local y = gameObj.y + gameObj.ySpeed
-			gameObj.x = x
-			gameObj.y = y
+			gameObj.x = gameObj.x + gameObj.xSpeed
+			gameObj.y = gameObj.y + gameObj.ySpeed
+		end
+	end
 
-			-- Delete object if it went out of bounds
-			if x < xMin or x > xMax or y < yMin or y > yMax then
-				gameObj:removeAndDelete( true )
+	-- If more than 100 objects have been created since start() finished,
+	-- then auto-delete recent ones using xSpeed and ySpeed that are more than
+	-- 100 units off-screen (assume these were created, sent, and ignored).
+	if numObjs > screen.numObjsStart + 100 then
+		local xMin = screen.originX - 100
+		local xMax = xMin + g.WIDTH + 200
+		local yMin = screen.originY - 100
+		local yMax = yMin + g.height + 200
+
+		for i = numObjs, 50, -1 do   -- Leave the first 50 no matter what
+			local gameObj = objs[i].code12GameObj
+			if gameObj.hasSpeed then
+				local x = gameObj.x
+				local y = gameObj.y
+				if x < xMin or x > xMax or y < yMin or y > yMax then
+					gameObj:removeAndDelete( true )
+				end
 			end
 		end
 	end
@@ -105,6 +112,7 @@ local function onNewFrame()
 		if status == nil then   -- user function finished
 			if g.userFn == ct.userFns.start then
 				-- User's start function finished
+				screen.numObjsStart = screen.objs.numChildren
 				if g.outputFile then
 					g.outputFile:flush()   -- flush any print output
 				end

@@ -461,7 +461,7 @@ local function getControlledBlock()
 					err.setErrLineNumAndRefLineNum( nextTree.iLineStart, ctrlTree.iLineStart,
 							'This line is not controlled by the "%s" above it. Missing { } bracket(s) or improperly indented?', 
 							ctrlTree.p )
-					if ctrlTree.p == "if" or ctrlTree.p == "else" then
+					if ctrlTree.p == "if" or ctrlTree.p == "else" or ctrlTree.p == "elseif" then
 						err.addDocLink( "Java.html#if-else" )
 					else
 						err.addDocLink( "Java.html#loops" )
