@@ -134,9 +134,7 @@ local function newProgram()
 	end
 	-- Open Save As dialog for user to choose name and folder
 	while true do -- breaks internally when path is valid
-		print( "Proposed: ", path )
 		path = env.pathFromSaveFileDialog( "Save New Program As", path )
-		print( "Got: ", path )
 		if not path then
 			-- User clicked "Cancel" in save program dialog
 			native.setActivityIndicator( false )
@@ -150,7 +148,6 @@ local function newProgram()
 			path = path .. ".java"
 		end
 		-- Check for valid filename
-		print( "Checking: ", path )
 		if not isValidClassName( className ) or ext ~= "java" then
 			env.showErrAlert( "Invalid Filename", 
 					"A Java filename should start with a capital letter, "
