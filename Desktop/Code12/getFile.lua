@@ -126,60 +126,40 @@ end
 
 -- Show dialog to create a new user source code file
 local function newProgram()
-	-- Ask the user for a program name
-	local programName = nil
-	local className, ext
-	while true do -- breaks internally when valid program name is entered
-		programName = env.strFromInputBoxDialog( "New Program", 
-				"Enter a name for your new program, then press OK to choose where to save it.",
-				programName )
-		if not programName then
-			-- User clicked "Cancel" in new program dialog
-			native.setActivityIndicator( false )
-			return nil
-		end
-		-- Check for valid Java class name, and ext must be .java if included
-		className, ext = env.basenameAndExtFromFilename( programName )
-		if not isValidClassName( className ) then
-			env.showErrAlert( "Invalid Program Name", 
-					"Program names must start with a capital letter, then contain only letters and digits (no spaces)." )
-		elseif ext and ext ~= "java" then
-			env.showErrAlert( "Invalid Program Name", "Java programs must have an extension of .java" )
-		else
-			break  -- valid name entered
-		end
-	end
-	local defaultPath = ""
+	-- Start with a default path and program name
+	local path = "MyProgram.java"
 	if firstSave then
 		-- Try to default to Documents folder on first use
-		defaultPath = env.documentsPath()
+		path = env.documentsPath() .. path
 	end
-	-- Append className and ".java" to defaultPath
-	defaultPath = defaultPath .. className .. [[.java]]
-	-- Open Save As dialog for user to save file
-	local path
+	-- Open Save As dialog for user to choose name and folder
 	while true do -- breaks internally when path is valid
-		path = env.pathFromSaveFileDialog( "Save New Program As", defaultPath )
+		print( "Proposed: ", path )
+		path = env.pathFromSaveFileDialog( "Save New Program As", path )
+		print( "Got: ", path )
 		if not path then
 			-- User clicked "Cancel" in save program dialog
 			native.setActivityIndicator( false )
 			return nil
 		end
 		local _, fileName = env.dirAndFilenameOfPath( path )
-		className, ext = env.basenameAndExtFromFilename( fileName )
-		if not isValidClassName( className ) then
-			env.showErrAlert( "Invalid Filename", 
-					"The filename must be a valid program name. It must start with a " .. 
-							"capital letter and contain only letters and digits." )
-		elseif not ext then
-			-- path is valid except missing extension
+		local className, ext = env.basenameAndExtFromFilename( fileName )
+		-- Default file extension to java if not included
+		if not ext then
+			ext = "java"
 			path = path .. ".java"
-			break
-		elseif ext ~= "java" then
-			env.showErrAlert( "Invalid Filename", "The filename extension must be .java" )
+		end
+		-- Check for valid filename
+		print( "Checking: ", path )
+		if not isValidClassName( className ) or ext ~= "java" then
+			env.showErrAlert( "Invalid Filename", 
+					"A Java filename should start with a capital letter, "
+					.. "contain only letters and digits, and end with .java" )
+		elseif env.canRead( path ) then
+			env.showErrAlert( "Filename already exists",
+					"Code12 does not allow overwriting an existing program file. Choose another name." )
 		else
-			-- path is valid and includes extension
-			break
+			break  -- got a valid filename
 		end
 	end	
 	-- Save the new program
