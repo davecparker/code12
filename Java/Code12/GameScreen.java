@@ -126,7 +126,7 @@ public class GameScreen
    void update()
    {
       // Objects that move via xSpeed/ySpeed get automatically deleted if they
-      // go more then 100 units off-screen.
+      // go more then 100 units off-screen and there are > 500 objects.
       double xMin = xOrigin - 100;
       double xMax = xMin + width + 200;
       double yMin = yOrigin - 100;
@@ -138,7 +138,7 @@ public class GameScreen
          GameObj obj = objects.get(i);
          if (obj.update())    // true if the object moved via speed
          {
-            if (obj.x < xMin || obj.x > xMax || obj.y < yMin || obj.y > yMax)
+            if (i > 500 && (obj.x < xMin || obj.x > xMax || obj.y < yMin || obj.y > yMax))
                objects.remove(i);
          }
       }

@@ -1166,6 +1166,96 @@ that has a [boolean](#java-data-types) return value. For example:
 if (ct.inputYesNo( "Would you like to play again?" ))
 	ct.restart();
 ``` 
+##### Nested if-else Structures
+You can put whatever code you want in the `if` and `else` branches
+of an if-else structure, including other if-else structures. 
+For example:
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 18)
+{
+	ct.println( "You are a child." );
+	if (ct.inputYesNo( "Is your parent with you?" ) )
+		ct.println( "You two must sit together" );
+	else
+	{
+		ct.println( "Sorry you can't go on this ride." );
+		ct.println( "Try the train ride." );
+	}
+}
+else
+{
+	ct.println( "You are an adult." );
+	ct.println( "Enjoy the ride!" );
+}
+```
+In this case, the question `"Is your parent with you?"` is only asked
+if the first `if` succeeds, and then the result `"You two must sit together"`
+only happens if both `if` tests succeed. 
+
+Note that the indentation level of the code increases each time you enter 
+another level of if-else, and if curly brackets are needed to group the 
+controlled statements then they are also indented accordingly.
+
+There is no limit to the number of levels you can "nest" if-else structures
+or the complexity of the tests, other than your ability as a programmer to
+keep all the cases straight!
+
+> Humans are notoriously weak in their ability to decode multiple levels
+> of logic conditions, and computers are brutally literal in their 
+> execution of them (doing exactly what you said, perhaps not what you meant), 
+> often resulting in bugs. Organizing logic in a way that is not overly
+> complex to understand is a skill that programmers build over time.
+
+##### Testing Multiple Conditions with "else if"
+Sometimes you may have multiple variations on a condition that need to
+be tested. For example, the following code identifies three different
+age ranges (child, adult, or senior):
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 18)
+	ct.println( "child" );	
+if (age >= 18 && age < 65)
+	ct.println( "adult" );
+if (age >= 65)
+	ct.println( "senior" );
+```
+The above conditions could be made simpler and more efficient by using
+`else` sections and also nested if-else structures as follows:
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 18)
+	ct.println( "child" );
+else
+{
+	if (age < 65)
+		ct.println( "adult" );
+	else
+		ct.println( "senior" );
+}
+```
+Note how much simpler the `if` conditions are. Also, the first example
+always tests all three `if` conditions regardless of the age, but the
+second one often skips one or more of them. Patterns such as the above
+are common and can be written more compactly using `else if`, as follows:
+```
+int age = ct.inputInt( "Enter your age" );
+
+if (age < 18)
+	ct.println( "child" );
+else if (age < 65)
+	ct.println( "adult" );
+else
+	ct.println( "senior" );
+```
+You can have as many `else if` sections as you want. When structured this
+way, the various `if` tests are executed sequentially until one of them
+tests `true`, then all the remaining ones are skipped. It is important to
+write the various conditions and the order of the tests in a way that 
+produces the result you want in all cases.
 
 #### Graphics and Animation Examples 
 Although an if-else structure only tests its condition and executes
@@ -1248,10 +1338,10 @@ public void update()
 	}
 }
 ```
-Note that this example includes in if-else that is "nested" inside
-another `if` structure. The inner `if` is only tested and executed 
-if the outer `if` passes its test. What would happen if the outer
-`if` were removed? Try to predict the result, then try it and see. 
+Note that this example includes a nested if-else structure.
+The inner `if` is only tested and executed if the outer `if` passes 
+its test. What would happen if the outer `if` were removed? 
+Try to predict the result, then try it and see. 
 
 ###### [Java Language Help](#top) > [If-else]
 
@@ -1744,16 +1834,542 @@ this calls `makeCoin()` and then takes the return value
 of the call (here a `GameObj`) and passes it on as the return value 
 from `makePenny()`.
 
-
 ###### [Java Language Help](#top) > [Function Parameters]
 
 
 ### Loops
+A loop allows your program to repeat a section of code multiple times,
+until some ending condition is met. For example, you could use a loop
+to draw 20 circles on the screen without having to copy and paste the
+call to `ct.circle()` and related code 20 times.
+
+#### Examples
+The Java language has three different kinds of loops to choose from: 
+the `while` loop, the `do-while` loop, and the `for` loop. 
+Here is an example of each, all doing the same task:
+```
+// Draw 20 circles across the screen using a while loop
+double x = 2.5;
+while (x < 100)
+{
+	ct.circle( x, 50, 4 );
+	x += 5;
+}
+```
+```
+// Draw 20 circles across the screen using a do-while loop
+double x = 2.5;
+do
+{
+	ct.circle( x, 50, 4 );
+	x += 5;
+}
+while (x < 100);
+```
+```
+// Draw 20 circles across the screen using a for loop
+for (double x = 2.5; x < 100; x += 5)
+{
+	ct.circle( x, 50, 4 );
+}
+```
+#### The "while" Loop
+The syntax of a `while` loop is very similar to the syntax of an `if` statement
+(see [if-else]):
+```
+if (test)
+{
+	// Code to do if test is true
+}
+```
+```
+while (test)
+{
+	// Code to repeat as long as test is true
+}
+```
+For example:
+```
+double x = 2.5;
+
+// If x is on the screen, then draw a circle there and increase x by 5
+if (x < 100)
+{
+	ct.circle( x, 50, 4 );
+	x += 5;	
+}
+```
+```
+double x = 2.5;
+
+// As long as x is still on the screen, draw a circle there, 
+// increase x by 5, and repeat
+while (x < 100)
+{
+	ct.circle( x, 50, 4 );
+	x += 5;	
+}
+```
+A `while` loop starts by evaluating the test condition in the parentheses. 
+Just like [if-else], this condition can be any expression that results in a 
+[boolean](#java-data-types) (true or false) value, such as:
+
+* One of the [Java Operators] that results in a `boolean` result (such as `<`)
+* A [boolean](#java-data-types) variable
+* A function call that [returns a value](#function-return-values) of type `boolean`
+
+If the test result is false then the body of the loop (the code in curly brackets) 
+is skipped, and execution continues after the loop (the loop body does not execute 
+at all). If the test result is true, the loop body executes then execution goes back
+up to the line with the test and repeats the entire process. The test is evaluated 
+again to see if it is still true (typically variable values or something will have 
+changed since the first test so the result may be different). If the test is still
+true, the body is executed again, and execution goes back to the test again. 
+The entire loop process stops once the test result becomes false.
+
+> **Warning**: If the test remains true and never changes, then the loop will execute
+> forever, resulting in an "inifite loop". This will cause your program to "hang",
+> the Code12 Application will become unreponsive, and will you need to "end task"
+> or "force quit" Code12 from the operating system, fix your code, and try again!
+
+##### More "while" Loop Examples
+```
+// Count from 1 to 10
+int i = 1;
+while (i <= 10)
+{
+	ct.println( i );
+	i++;
+}
+```
+```
+// A loop with user input
+boolean keepGoing = true;
+ct.println( "Lets get started" );
+while (keepGoing)
+{
+	ct.println( "This is text output" );
+	keepGoing = ct.inputYesNo( "Do you want to keep going?" );
+}
+ct.println( "We're done" );
+```
+```
+// Print powers of 2 less than 1 million
+int i = 1;
+while (i < 1000000)
+{
+	ct.println( i );
+	i *= 2;
+}
+```
+#### The "do-while" Loop
+A `do-while` loop works just like a `while` loop, except that the test is after 
+the loop body instead of before it:
+```
+while (test)
+{
+	// Loop body code
+} 
+```
+```
+do
+{
+	// Loop body code
+}
+while (test);
+```
+> **Note**: The test line at the end of a `do-while` loop must end with a semicolon,
+> whereas the test line at the beginning of a `while` loop must **not** have a semicolon.
+
+Since the loop body of a `do-while` is first, it always executes at least once, 
+then the test is evaluated to determine if (and how long) the loop repeats. 
+Sometimes this can simplify the code required to get the behavior you want compared to 
+using a `while` loop. For example, consider one of the `while` examples above
+rewritten to use a `do-while`:
+```
+// A while loop with user input
+boolean keepGoing = true;
+ct.println( "Lets get started" );
+while (keepGoing)
+{
+	ct.println( "This is text output" );
+	keepGoing = ct.inputYesNo( "Do you want to keep going?" );
+}
+ct.println( "We're done" );
+```
+```
+// A do-while loop with user input
+ct.println( "Lets get started" );
+do
+{
+	ct.println( "This is text output" );
+}
+while( ct.inputYesNo( "Do you want to keep going?" ) );
+ct.println( "We're done" );
+```
+However, if the correct behavior you want means that sometimes the loop body
+should be executed 0 times (be skipped completely), then you must use a 
+`while` loop instead of a `do-while` loop.
+
+#### The "for" loop
+The `for` loop structure is a convenient shorthand for a common pattern that often
+occurs in loops in practice. Compared to using a `while` loop, using a `for` loop 
+results in fewer lines of code when writing loops that follow these patterns. 
+For example:
+```
+// Count from 1 to 10
+int i = 1;
+while (i <= 10)
+{
+	ct.println( i );
+	i++;
+}
+```
+```
+// Count from 1 to 10
+for (int i = 1; i <= 10; i++)
+{
+	ct.println( i );
+}
+```
+The pattern for the `while` loop here is:
+
+1. Set the starting value
+2. While the value is still valid:
+	3. Use the value
+	4. Get the next value
+
+The header line of a `for` loop packs steps 1, 2, and 4 all into one line,
+resulting in fewer lines of code. Otherwise, a `for` loop behaves the same as
+the corresponding `while` loop. 
+
+Written briefly with placeholders, the corresponding pattern for the `while` 
+and `for` loops is: 
+```
+initialize;
+while (test)
+{
+	process;
+	advance;
+}
+```
+```
+for (initialize; test; advance)
+{
+	process;
+}
+```
+> Note that although the "advance" statement occurs before the loop body in
+> a `for` loop, it is not executed until after the loop body, in the same order
+> as the corresponding `while` loop pattern.
+
+The header of a `for` loop is complex and takes some practice to write correctly,
+but once you get used to it, experienced programmers can find it easier to 
+understand the behavior of the loop because it makes the pattern easier to see.
+In the example above, you can think of the loop header as saying 
+
+> "for values of i starting at 1, going up to and including 10, increasing 
+> by 1 each time, do the following:"
+
+##### More "for" Loop Examples
+```
+// Count to 100 by 10s
+for (int i = 10; i <= 100; i += 10)
+{
+	ct.println( i );
+}
+```
+```
+// Count backwards from 99 by 3s
+for (int i = 99; i > 0; i -= 3)
+{
+	ct.println( i );
+}
+```
+```
+// Draw 20 circles at random positions
+for (int i = 1; i <= 20; i++)
+{
+	ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+}
+```
+#### The "break" Statement
+Inside the body of a `while`, `do-while`, or `for` loop, you can end the loop
+early with the `break` statement. For example:
+```
+// Draw up to 20 labelled circles at random positions, but stop if one 
+// would have been near the bottom of the screen.
+for (int i = 1; i <= 20; i++)
+{
+	int x = ct.random( 10, 90 );
+	int y = ct.random( 10, 90 );
+	if (y > 85)
+		break;
+	ct.circle( x, y, 10 );
+	ct.text( ct.formatInt( i ), x, y, 8 );
+}
+```
+As soon as a `break` statement is encountered (they are typically controlled by
+an `if` as above), the loop body is exited (no more statements in the loop body
+are executed), and the entire loop ends (regardless of the current test result).
+A `break` statement can only occur inside of a loop.
+
+#### More Loop Syntax
+Like the [if-else] structure, if the body of a `while`, `do-while`, or `for` loop
+is just a single statement, then you can omit the curly brackets if you want.
+For example:
+```
+// Count to 100 by 10s
+for (int i = 10; i <= 100; i += 10)
+	ct.println( i );
+```
+The three parts of a `for` loop header (*initialize*, *test*, and *advance*) are all
+optional and can be left out if desired (but the two semicolons must be left in place). 
+Leaving out the *initalize* or *advance* statements just means that no statement happens
+at that stage of the loop. Leaving out the *test* means that the test defaults to `true`,
+and the loop must be ended internally with a `break` statement. Examples:
+```
+// Count backwards from user-entered starting value by 3s
+int i = ct.inputInt( "Enter starting value" );
+for (; i > 0; i -= 3)
+{
+	ct.println( i );
+}
+```
+```
+// Draw labelled circles at random positions until one 
+// would have been near the bottom of the screen.
+for (int i = 1; ; i++)
+{
+	int x = ct.random( 10, 90 );
+	int y = ct.random( 10, 90 );
+	if (y > 85)
+		break;
+	ct.circle( x, y, 10 );
+	ct.text( ct.formatInt( i ), x, y, 8 );
+}
+```
+```
+// Draw circles as long as the user wants to keep going
+for (;;)
+{
+	ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+	if (!ct.inputYesNo( "Do you want to keep making circles?" ))
+		break;
+}
+```
+Finally, note that the *initialize* and *advance* statements in a `for` loop can be any 
+single valid Java statement (not necessarily a variable initialization and 
+variable increment/assignment), including function calls.
+
+#### Loops and Code12 Animation Frames
+Because loops allow you to repeat behavior, you might think that you could use a loop to
+create animation effects (by repeatedly moving an object by a little bit) or to control 
+repeating behavior in a game. However, due to way the [start()](API.html#start), 
+[update()](API.html#update), and [Input Event Functions](API.html#input-event-functions) 
+in Code12 work, this strategy will not work. Although animation frames occur 60 times per 
+second, each function body in your program will always *execute to completion* before the 
+next animation frame is drawn (even if the 1/60th of a second interval is passed).
+This means that any loop in your code will always execute to completion before the screen 
+is redrawn. So if you include a loop in your code, only the final results at the end of 
+the loop will be displayed. 
+
+Animation and repeating behaviors in a game should be handled by considering the 
+automatic repeating nature of the [update()](API.html#update) function. In effect,
+there is a loop inside of the Code12 system that is repeatedly preparing and drawing
+new animation frames. The contents of your `update()` function are essentially inside 
+the body of this loop. So, your `update()` function should typically do what is necessary
+for *one* animation frame of your game, letting itself get called repeatedly by
+the Code12 system. 
 
 ###### [Java Language Help](#top) > [Loops]
 
 
 ### Arrays
+An array is a way to store an entire list or sequence of values in a single variable.
+You can then access one entry in the sequence by using an integer *index* in 
+square brackets after the array name. The first entry is at index 0, the second is
+at index 1, etc.
+
+#### Example
+```
+// Declare and initialize an array of double values named sizes
+double[] sizes = { 2, 5, 1, 3.5, 1 };
+
+// Use the 4th size (index 3) to make a circle
+ct.circle( 50, 50, sizes[3] );    // diameter will be 3.5
+```
+#### Notes
+The syntax `double[]` is the type for the variable `sizes` above and can be read
+as "double array", meaning an array of `double` values. 
+You can make an array of any of the [Java Data Types]. Note that all entries
+in the array must be the same type. For example:
+```
+int[] counts = { 2, 0, 1, 6 };
+double[] sizes = { 2, 5, 1, 3.5, 1 };
+boolean[] hits = { true, false, false, true };
+String[] names = { "Doug", "Sue", "Pat" };
+GameObj[] walls = { leftWall, topWall, bottomWall };
+```
+> In the `GameObj[] walls` example above, assume that the variables `leftWall`,
+> `topWall`, and `bottomWall` are existing `GameObj` variables that were already
+> created (using [ct.rect()](API.html#ct.rect), for example).
+
+##### Getting and Setting Array Values
+You can access the entries of an array (often called the *elements* of the array)
+using an integer index. Like a regular variable, you can get the value at 
+a particular index, and you can also set (change) the value at an index by using
+an assignment statement. For example:
+```
+String[] names = { "Doug", "Sue", "Pat" };
+
+ct.println( names[0] );      // Doug
+ct.println( names[1] );      // Sue
+ct.println( names[2] );      // Pat
+
+// Change the second name (index 1) 
+names[1] = "Abby";
+
+ct.println( names[0] );      // Doug
+ct.println( names[1] );      // Abby
+ct.println( names[2] );      // Pat
+```
+##### Using an Index Expression
+What really makes arrays a powerful tool is that you can use an `int` variable, 
+or any [expression](#expressions) of type `int`, as an index to choose which element 
+to access, not just a number directly. For example:
+```
+double[] sizes = { 2, 5, 1, 3.5, 1 };
+
+int i = 1;
+ct.println( sizes[i] );    // 5
+```
+```
+String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+int month = ct.inputInt( "Enter month number" );
+
+// The correct months index is one less than the month number. 
+// For example, "Jan" is month number 1 and index 0.
+
+ct.println( months[month - 1] );
+```
+##### Invalid Array Indexes
+In an array of 3 items, such as:
+```
+String[] names = { "Doug", "Sue", "Pat" };
+```
+the valid index values are 0, 1, and 2. Attempting to access an item at an 
+invalid index (e.g. past the end of the array) will produce an error. 
+For example:
+```
+String[] names = { "Doug", "Sue", "Pat" };
+
+ct.println( names[3] );   // This causes an error
+```
+> Note that unlike most error messages that you get for problems with your code,
+> an invalid array index causes an error at "runtime" (after your program 
+> has already started running). 
+
+##### Using Loops with Arrays
+Arrays are especially powerful when used in conjunction with [Loops].
+A loop can be used to repeat some code for every element in the array
+by modifying an *index variable* and using it inside the loop body.
+For example:
+```
+String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+// Print all the months
+for (int i = 0; i < 12; i++ )
+{
+	ct.println( months[i] );
+}
+```
+##### Creating an Empty Array
+An array variable initialization such as:
+```
+String[] names = { "Doug", "Sue", "Pat" };
+```
+declares the array variable `names` and also initializes the array to contain
+the values given in the curly brackets.
+
+You can also declare and create an array that leaves the individual array elements
+"blank" but has room for them to be assigned (set) later:
+```
+String[] names = new String[3];      // blank array with room for 3 Strings
+
+names[0] = "Doug";
+names[1] = "Sue";
+names[2] = "Pat";
+```
+Carefully note the syntax `new String[3]`. After `new` goes the type for the
+elements in the array (this must be declared up front), then the *size* of the
+array in square brackets (here 3).
+
+Creating an array in this way is useful when you need code to calculate or 
+create the array elements. For example:
+```
+// Create a blank array of 10 int values to store sizes
+int[] sizes = new int[10];
+
+// Set all the sizes to random values
+for (int i = 0; i < 10; i++)
+{
+	sizes[i] = ct.random( 0, 5 );
+}
+
+// Print all the sizes
+for (int i = 0; i < 10; i++)
+{
+	ct.println( sizes[i] );
+}
+```
+Note that when you create a "blank" array, the elements of the array are actually 
+all initialized right away to an initial default value depending on their type
+as follows:
+```
+Type      Default Value
+----      -------------
+int       0
+double    0.0
+boolean   false
+String    null
+GameObj   null
+```
+##### An Array of GameObj Objects
+Especially useful in games is the ability to create an array of 
+[GameObj](#java-data-types) objects. In conjunction with [Loops],
+You can create many objects on the screen and keep track of and
+manipulate all of them. For example:
+```
+class Example
+{
+	// An array that can hold 10 GameObj objects
+	GameObj[] balls = new GameObj[10];
+
+	public void start()
+	{
+		// Create the balls at random locations
+		for (int i = 0; i < 10; i++)
+		{
+			balls[i] = ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+		}
+	}
+
+	public void update()
+	{
+		// Move all the balls and recycle them when they go off-screen
+		for (int i = 0; i < 10; i++)
+		{
+			balls[i].x += 0.5;
+			if (balls[i].x > 110)
+				balls[i].x = -10;
+		}
+	}
+}
+```
 
 ###### [Java Language Help](#top) > [Arrays]
 
@@ -1856,7 +2472,7 @@ class Example
 }
 ```
 Your program can also contain an optional
-[update() function](API.html#main-program-functions) and optional
+[update()](API.html#main-program-functions) function and optional
 [Input Event Functions](API.html#input-event-functions).
 
 ###### [Java Language Help](#top) > [Main Program Structure]

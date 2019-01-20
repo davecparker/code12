@@ -891,7 +891,7 @@ end
 
 -- API
 function GameObj:hit(gameObj)
-	-- Make sure object is valid and visible first
+	-- Make sure objects are valid and visible first
 	if gameObj == nil then
 		return false
 	elseif gameObj.deleted and not gameObj.autoDeleted then
@@ -900,7 +900,7 @@ function GameObj:hit(gameObj)
 	elseif self.deleted and not self.autoDeleted then
 		runtime.warning("Attempt to call hit method on a deleted object")
 		return false
-	elseif not gameObj.visible then
+	elseif not (gameObj.visible and self.visible) then
 		return false
 	end
 	return self:hitObj(gameObj)
