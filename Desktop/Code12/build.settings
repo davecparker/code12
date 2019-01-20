@@ -40,6 +40,19 @@ settings =
 					},
 				},
 			},
+
+			CFBundleDocumentTypes = 
+			{ 
+				{
+					-- CFBundleTypeExtensions = { "java", },
+					CFBundleTypeIconFile = "app.icns",
+					CFBundleTypeName = "public.text",
+					CFBundleTypeRole = "Viewer",
+					LSHandlerRank = "Alternate",
+					LSItemContentTypes = { "public.text", },
+					-- NSExportableTypes = { "public.text" },
+				},
+			},
 		},
 	},
 
