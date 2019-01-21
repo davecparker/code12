@@ -12,7 +12,7 @@ class ProjectileMotion
 	public void start()
 	{
 		ct.setHeight( 100.0 * 9 / 16 );
-		ct.setScreenOrigin( -2, -50 );
+		ct.setScreenOrigin( -2, -54 );
 		ground = ct.rect( 0, 0, 1000, 1000, "green" );
 		addObj( ground );
 		ground.align( "top" );
