@@ -3,9 +3,9 @@ class ProjectileMotion
 	double initialVelocity = 1;
 	double gravity = 0.01;
 	int numObjsMade = 0;
-	double startTime;
-	double secondsBetweenNewobjs = 0.1;
-	double bounceLoss = 0.75;
+	double frameCount = 0;
+	double framesBetweenNewObjs = 6;
+	double dampeningFactor = 0.75;
 	GameObj ground, sky;
 	GameObj[] objs = new GameObj[2000];
 
@@ -20,41 +20,44 @@ class ProjectileMotion
 		addObj( sky );
 		sky.align( "bottom" );
 		makeBalls();
-		startTime = ct.getTimer();
-
 	}
 
 	public void update()
 	{
+		frameCount++;
+
 		for ( int i = 2; i < numObjsMade; i++ )
 		{
 			GameObj b = objs[i];
-			if ( !b.hit( ground ) )
+			if ( -b.y > b.getHeight() / 2 )
 				b.setYSpeed( b.getYSpeed() + gravity );
 			else
 			{
-				b.y = -b.getHeight() / 2 - 0.1;
-				b.setYSpeed( -b.getYSpeed() * bounceLoss );
+				b.y = -b.getHeight() / 2;
+				if ( Math.abs( b.getYSpeed() ) > 0.1 )
+					b.setYSpeed( -b.getYSpeed() * dampeningFactor );
+				else
+					b.setYSpeed( 0 );
 			}
 		}
 
-		if ( ct.getTimer() - startTime > secondsBetweenNewobjs * 1000 )
+		if ( frameCount % framesBetweenNewObjs == 0 )
 		{
 			makeBalls();
-			startTime = ct.getTimer();
 		}
 
 	}
 
 	public void makeBalls()
 	{
-		for ( double degrees = 10; degrees > -90; degrees -= 10 )
+		for ( double degrees = -10; degrees > -90; degrees -= 10 )
 		{
 			if ( numObjsMade < objs.length )
 			{
 				double diameter = 3;
 				GameObj ball = ct.circle( 0, -diameter / 2 - 1, diameter, "red" );
 				double radians = degrees * Math.PI / 180;
+				ball.setText( degrees + " degrees" );
 				ball.setXSpeed( initialVelocity * Math.cos( radians ) );
 				ball.setYSpeed( initialVelocity * Math.sin( radians ) );
 				addObj( ball );
