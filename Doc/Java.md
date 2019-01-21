@@ -1343,6 +1343,158 @@ The inner `if` is only tested and executed if the outer `if` passes
 its test. What would happen if the outer `if` were removed? 
 Try to predict the result, then try it and see. 
 
+#### Comparing Object References and null
+A comparison such as `if (a == b)` can be used to see if two numbers
+(`int` or `double`) are equal, or if two `boolean` values are equal.
+You can also compare `GameObj` objects, although what this means is 
+slightly different. 
+
+The [GameObj](#java-data-types) and [String](#java-data-types) types in 
+Java are examples of *Object* types, as opposed to the *primitive* types 
+`int`, `double`, and `boolean`. Whereas a primitive type only stores a 
+single value (e.g. a single number), an Object can be made up of many 
+values (accessible via [Object Data Fields] and [Object Method Calls]).
+
+A variable of type [GameObj](#java-data-types) or [String](#java-data-types)
+is technically a *reference* to the underlying object, not the object itself.
+Physically, a reference to an object is the *memory address* where
+the underlying object is stored, which is just a number.
+This distinction matters when you assign and compare object variables. 
+When you assign an object variable to an existing object, such as:
+```
+GameObj dot = ct.circle( 50, 50, 20 );
+GameObj ball = dot;
+```
+The assignment of `ball` to `dot` makes another reference to the same circle
+object. It does not make a copy of the object or create another circle.
+Now both variables refer to the same object, and either one can be used 
+to access or modify it:
+```
+GameObj dot = ct.circle( 50, 50, 20 );
+GameObj ball = dot;
+
+dot.x = 70;                 // moves the circle to x = 70
+ct.println( ball.x );       // prints 70 because ball is the same as dot
+ct.println( dot == ball );  // prints true
+``` 
+An example of how this is used in practice would be using the Code12 function
+[ct.objectClicked()](API.html#ct.objectclicked). This function has a return
+value of type `GameObj`, which means that it returns a reference to the 
+object that got clicked. For example:
+```
+class Example
+{
+	GameObj ball1, ball2, ball3;
+
+	public void start()
+	{
+		// Make 3 balls
+		ball1 = ct.circle( 30, 50, 10 );    // left
+		ball2 = ct.circle( 50, 50, 10 );    // middle
+		ball3 = ct.circle( 70, 50, 10 );    // right
+	}
+
+	public void update()
+	{
+		// See if the middle ball was clicked
+		GameObj obj = ct.objectClicked();
+		if ( obj == ball2 )
+			ct.println( "You clicked the middle ball" );
+	}
+}
+```
+Here the statement `GameObj obj = ct.objectClicked();` sets `obj` to
+another reference to whichever ball got clicked (note that each circle 
+already has a variable referencing it). It does not make a copy of that 
+ball or a new ball. Then the test `if ( obj == ball2 )` can be used 
+to see if the clicked object (`obj`) refers to the same object
+as `ball2`, which is the middle ball. 
+
+##### A null Object Reference
+It is also possible that none of the three balls got clicked, in which
+case the `ct.objectClicked()` function returns the special value `null`,
+which means "no object". The value `null` is pre-defined by Java for this
+purpose. You can compare an object reference to `null` to see if it
+references any object:
+```
+class Example
+{
+	GameObj ball1, ball2, ball3;
+
+	public void start()
+	{
+		// Make 3 balls
+		ball1 = ct.circle( 30, 50, 10 );    // left
+		ball2 = ct.circle( 50, 50, 10 );    // middle
+		ball3 = ct.circle( 70, 50, 10 );    // right
+	}
+
+	public void update()
+	{
+		// See if any object was clicked
+		GameObj obj = ct.objectClicked();
+		if ( obj != null )
+			ct.println( "You clicked on an object" );
+	}
+}
+```
+You can also assign an object variable to `null` if you want
+to indicate that the variable doesn't reference an object yet,
+or no longer references an object. In this case, note that if you 
+try to use a field or method of the null variable, then you will 
+generate an error. For example:
+```
+class Example
+{
+	GameObj ball1, ball2, ball3;
+	GameObj selectedBall = null;   // no selection initially
+
+	public void start()
+	{
+		// Make 3 balls
+		ball1 = ct.circle( 30, 50, 10 );    // left
+		ball2 = ct.circle( 50, 50, 10 );    // middle
+		ball3 = ct.circle( 70, 50, 10 );    // right
+
+		// Select the first ball
+		selectedBall = ball1;
+
+		// Print the x-coordinate of the selected ball
+		ct.println( selectedBall.x );    // prints 30
+
+		// Clear the selection (doesn't affect the circles)
+		selectedBall = null;
+
+		// Is there a ball selected?
+		if (selectedBall == null)
+			ct.println( "No ball is selected now" );
+
+		// This would produce an error if we tried it now
+		// ct.println( selectedBall.x );
+	}
+
+}
+```
+#### Comparing Strings
+Variables of type [String](#java-data-types) are also considered objects
+in Java, so the rules for object references above also apply. 
+In particular, if you tried to compare two `String` variables with 
+`if (a == b)`, you would get true only if the two variables referenced 
+the exact same string in memory, not just if their text was the same,
+which is almost never what you want in practice. To test if two strings 
+have the same text, use the `str.equals()` method. For example:
+```
+String firstName = ct.inputString( "Enter your first name" );
+
+if (firstName.equals( "Dave" ))
+	ct.showAlert( "Hey, my name is Dave too!" );
+
+String lastName = ct.inputString( "Enter your last name" );
+
+if (lastName.equals( firstName ))
+	ct.showAlert( "That's weird, your first and last name are the same!" );
+```
+
 ###### [Java Language Help](#top) > [If-else]
 
 
@@ -2287,6 +2439,23 @@ for (int i = 0; i < 12; i++ )
 	ct.println( months[i] );
 }
 ```
+If you want to read and process all the elements of an array in order
+(such as in the example above), Java also offers a special shortcut
+syntax for this called the "Enhanced For Loop":
+```
+String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+// Print all the months
+for (String month: months )
+{
+	ct.println( month );
+}
+```
+In the Enhanced For Loop, instead of using an integer index, the loop
+variable is the same type as the elements in the array, and it will be
+assigned in turn to each element in the array, in order.
+
 ##### Creating an Empty Array
 An array variable initialization such as:
 ```

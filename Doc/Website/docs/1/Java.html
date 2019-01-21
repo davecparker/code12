@@ -710,6 +710,105 @@ public void update()
     }
 }</code></pre>
 <p>Note that this example includes a nested if-else structure. The inner <code>if</code> is only tested and executed if the outer <code>if</code> passes its test. What would happen if the outer <code>if</code> were removed? Try to predict the result, then try it and see.</p>
+<h4 id="comparing-object-references-and-null">Comparing Object References and null</h4>
+<p>A comparison such as <code>if (a == b)</code> can be used to see if two numbers (<code>int</code> or <code>double</code>) are equal, or if two <code>boolean</code> values are equal. You can also compare <code>GameObj</code> objects, although what this means is slightly different.</p>
+<p>The <a href="#java-data-types">GameObj</a> and <a href="#java-data-types">String</a> types in Java are examples of <em>Object</em> types, as opposed to the <em>primitive</em> types <code>int</code>, <code>double</code>, and <code>boolean</code>. Whereas a primitive type only stores a single value (e.g. a single number), an Object can be made up of many values (accessible via <a href="#object-data-fields">Object Data Fields</a> and <a href="#object-method-calls">Object Method Calls</a>).</p>
+<p>A variable of type <a href="#java-data-types">GameObj</a> or <a href="#java-data-types">String</a> is technically a <em>reference</em> to the underlying object, not the object itself. Physically, a reference to an object is the <em>memory address</em> where the underlying object is stored, which is just a number. This distinction matters when you assign and compare object variables. When you assign an object variable to an existing object, such as:</p>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+GameObj ball = dot;</code></pre>
+<p>The assignment of <code>ball</code> to <code>dot</code> makes another reference to the same circle object. It does not make a copy of the object or create another circle. Now both variables refer to the same object, and either one can be used to access or modify it:</p>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+GameObj ball = dot;
+
+dot.x = 70;                 // moves the circle to x = 70
+ct.println( ball.x );       // prints 70 because ball is the same as dot
+ct.println( dot == ball );  // prints true</code></pre>
+<p>An example of how this is used in practice would be using the Code12 function <a href="API.html#ct.objectclicked">ct.objectClicked()</a>. This function has a return value of type <code>GameObj</code>, which means that it returns a reference to the object that got clicked. For example:</p>
+<pre><code>class Example
+{
+    GameObj ball1, ball2, ball3;
+
+    public void start()
+    {
+        // Make 3 balls
+        ball1 = ct.circle( 30, 50, 10 );    // left
+        ball2 = ct.circle( 50, 50, 10 );    // middle
+        ball3 = ct.circle( 70, 50, 10 );    // right
+    }
+
+    public void update()
+    {
+        // See if the middle ball was clicked
+        GameObj obj = ct.objectClicked();
+        if ( obj == ball2 )
+            ct.println( &quot;You clicked the middle ball&quot; );
+    }
+}</code></pre>
+<p>Here the statement <code>GameObj obj = ct.objectClicked();</code> sets <code>obj</code> to another reference to whichever ball got clicked (note that each circle already has a variable referencing it). It does not make a copy of that ball or a new ball. Then the test <code>if ( obj == ball2 )</code> can be used to see if the clicked object (<code>obj</code>) refers to the same object as <code>ball2</code>, which is the middle ball.</p>
+<h5 id="a-null-object-reference">A null Object Reference</h5>
+<p>It is also possible that none of the three balls got clicked, in which case the <code>ct.objectClicked()</code> function returns the special value <code>null</code>, which means “no object”. The value <code>null</code> is pre-defined by Java for this purpose. You can compare an object reference to <code>null</code> to see if it references any object:</p>
+<pre><code>class Example
+{
+    GameObj ball1, ball2, ball3;
+
+    public void start()
+    {
+        // Make 3 balls
+        ball1 = ct.circle( 30, 50, 10 );    // left
+        ball2 = ct.circle( 50, 50, 10 );    // middle
+        ball3 = ct.circle( 70, 50, 10 );    // right
+    }
+
+    public void update()
+    {
+        // See if any object was clicked
+        GameObj obj = ct.objectClicked();
+        if ( obj != null )
+            ct.println( &quot;You clicked on an object&quot; );
+    }
+}</code></pre>
+<p>You can also assign an object variable to <code>null</code> if you want to indicate that the variable doesn’t reference an object yet, or no longer references an object. In this case, note that if you try to use a field or method of the null variable, then you will generate an error. For example:</p>
+<pre><code>class Example
+{
+    GameObj ball1, ball2, ball3;
+    GameObj selectedBall = null;   // no selection initially
+
+    public void start()
+    {
+        // Make 3 balls
+        ball1 = ct.circle( 30, 50, 10 );    // left
+        ball2 = ct.circle( 50, 50, 10 );    // middle
+        ball3 = ct.circle( 70, 50, 10 );    // right
+
+        // Select the first ball
+        selectedBall = ball1;
+
+        // Print the x-coordinate of the selected ball
+        ct.println( selectedBall.x );    // prints 30
+
+        // Clear the selection (doesn&#39;t affect the circles)
+        selectedBall = null;
+
+        // Is there a ball selected?
+        if (selectedBall == null)
+            ct.println( &quot;No ball is selected now&quot; );
+
+        // This would produce an error if we tried it now
+        // ct.println( selectedBall.x );
+    }
+
+}</code></pre>
+<h4 id="comparing-strings">Comparing Strings</h4>
+<p>Variables of type <a href="#java-data-types">String</a> are also considered objects in Java, so the rules for object references above also apply. In particular, if you tried to compare two <code>String</code> variables with <code>if (a == b)</code>, you would get true only if the two variables referenced the exact same string in memory, not just if their text was the same, which is almost never what you want in practice. To test if two strings have the same text, use the <code>str.equals()</code> method. For example:</p>
+<pre><code>String firstName = ct.inputString( &quot;Enter your first name&quot; );
+
+if (firstName.equals( &quot;Dave&quot; ))
+    ct.showAlert( &quot;Hey, my name is Dave too!&quot; );
+
+String lastName = ct.inputString( &quot;Enter your last name&quot; );
+
+if (lastName.equals( firstName ))
+    ct.showAlert( &quot;That&#39;s weird, your first and last name are the same!&quot; );</code></pre>
 <h6 id="java-language-help-if-else"><a href="#top">Java Language Help</a> &gt; <a href="#if-else">If-else</a></h6>
 <h3 id="function-definitions">Function Definitions</h3>
 <p>A function definition is a block of code with a name that you can reuse without having to copy and paste the code each time. The main program blocks <code>start()</code> and <code>update()</code> in your program are actually function definitions, and these functions are called (told to execute) at the appropriate time by the Code12 system. You can also define your own functions and execute them whenever you want using the <a href="#function-calls">function call</a> syntax.</p>
@@ -1314,6 +1413,16 @@ for (int i = 0; i &lt; 12; i++ )
 {
     ct.println( months[i] );
 }</code></pre>
+<p>If you want to read and process all the elements of an array in order (such as in the example above), Java also offers a special shortcut syntax for this called the “Enhanced For Loop”:</p>
+<pre><code>String[] months = { &quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;,
+                    &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot; };
+
+// Print all the months
+for (String month: months )
+{
+    ct.println( month );
+}</code></pre>
+<p>In the Enhanced For Loop, instead of using an integer index, the loop variable is the same type as the elements in the array, and it will be assigned in turn to each element in the array, in order.</p>
 <h5 id="creating-an-empty-array">Creating an Empty Array</h5>
 <p>An array variable initialization such as:</p>
 <pre><code>String[] names = { &quot;Doug&quot;, &quot;Sue&quot;, &quot;Pat&quot; };</code></pre>
