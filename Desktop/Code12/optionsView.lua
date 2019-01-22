@@ -17,6 +17,7 @@ local app = require( "app" )
 local env = require( "env" )
 local toolbar = require( "toolbar" )
 local buttons = require( "buttons" )
+local Scrollbar = require( "Scrollbar" )
 
 
 -- The optionsView module and scene
@@ -25,7 +26,7 @@ local optionsView = composer.newScene()
 
 -- UI Metrics
 local sectionMargin = 15                    -- Space between sections
-local topMargin = app.margin                -- Top margin of the scene
+local topMargin                             -- Top margin of the options group (bottom of title)
 local titleFontSize = 30                    -- Font size for the title
 local optionsFont = app.optionsFont         -- Font for switch labels
 local optionsFontBold = app.optionsFontBold -- Font for title and switch headers
@@ -35,6 +36,7 @@ local yEditorPicker                         -- Y-coordinate for the top of edito
 
 -- Display objects and groups
 local title               -- Title text
+local topBar              -- Background rectangle for title
 local closeBtn            -- Close view button
 local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
@@ -44,6 +46,7 @@ local gridlineColorPicker -- Gridline color picker
 local addEditorBtn        -- Add a Text Editor button
 local openInEditorBtn     -- Open current source file in editor button
 local optionsGroup        -- Display group containing the options objects
+local scrollbarV          -- vertical scrollbar
 
 -- State variables
 local forceReprocess      -- true to reprocess source file after changes
@@ -174,6 +177,14 @@ local function setEditorButtons( repositionAddEditorBtn )
 	end
 end
 
+local function adjustScrollbarV()
+	local scrollbarLength = app.height - app.dyStatusBar - topMargin
+	scrollbarV:setPosition( app.width - Scrollbar.width, topMargin, scrollbarLength )
+	local optionsGroupH = math.ceil( optionsGroup.height )
+	local rangeMax = math.max( optionsGroupH - scrollbarLength, 0 )
+	local ratio = scrollbarLength / optionsGroupH
+	scrollbarV:adjust( 0, rangeMax, 0, ratio )
+end
 
 --- Event Handlers ------------------------------------------------
 
@@ -256,7 +267,7 @@ local function addEditor()
 		makeEditorPicker( optionsGroup )
 		setEditorButtons( true )
 		setSelectedOptions()
-		-- TODO: resize scroll bar
+		adjustScrollbarV()
 	end
 end
 
@@ -264,6 +275,11 @@ end
 local function onAddEditor()
 	native.setActivityIndicator( true )
 	timer.performWithDelay( 50, addEditor )
+end
+
+-- Scroll callback for the vertical scrollbar
+local function onScrollVert( newPos )
+	optionsGroup.y = topMargin - newPos
 end
 
 
@@ -274,39 +290,13 @@ function optionsView:create()
 	local sceneGroup = self.view
 
 	-- Background
-	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 0.9 ) 
+	local backgroundShade = 0.9
+	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), backgroundShade ) 
 	
-	-- Title
-	title = g.uiItem( display.newText{
-		parent = sceneGroup,
-		text = "Code12 Options",
-		x = 0,
-		y = topMargin,
-		font = optionsFontBold,
-		fontSize = titleFontSize,
-	} )
-	title.x = math.round( app.width / 2 - title.width / 2)
-
-	-- Close button
-	closeBtn = buttons.newIconAndTextButton{
-		parent = sceneGroup,
-		left = 0,
-		top = app.margin,
-		text = "Close",
-		colorText = true,
-		imageFile = "close.png",
-		iconSize = 12,
-		defaultFillShade = 1,
-		overFillShade = 0.8,
-		onRelease = onClose,
-	}
-	closeBtn.x = math.round( app.width - app.margin - closeBtn.width )
-
 	-- Options display group
 	optionsGroup = display.newGroup()
 	optionsGroup.anchorX = 0
 	optionsGroup.anchorY = 0
-	optionsGroup.y = math.round( title.y + title.height + app.margin )
 
 	-- Syntax level picker
 	local syntaxLevels = {
@@ -422,14 +412,49 @@ function optionsView:create()
 		font = optionsFont,
 		fontSize = fontSize,
 	}
+	-- Add optionsGroup to scene
+	sceneGroup:insert( optionsGroup )
 
-	-- Center options group
+	-- Make title
+	title = g.uiItem( display.newText{
+		parent = sceneGroup,
+		text = "Code12 Options",
+		x = 0,
+		y = app.margin,
+		font = optionsFontBold,
+		fontSize = titleFontSize,
+	} )
+	title.x = math.round( app.width / 2 - title.width / 2)
+	topMargin = math.round( title.y + title.height + app.margin )
+	topBar = g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, topMargin ), backgroundShade )
+	topBar:toFront()
+	title:toFront()
+
+	-- Set options group position
 	if app.width > optionsGroup.width then
 		optionsGroup.x = math.round( app.width / 2 - optionsGroup.width / 2 )
 	end
+	optionsGroup.y = topMargin
 
-	-- TODO: Make scrollbar
-	sceneGroup:insert( optionsGroup )
+	-- Make close button
+	closeBtn = buttons.newIconAndTextButton{
+		parent = sceneGroup,
+		left = 0,
+		top = app.margin,
+		text = "Close",
+		colorText = true,
+		imageFile = "close.png",
+		iconSize = 12,
+		defaultFillShade = 1,
+		overFillShade = 0.8,
+		onRelease = onClose,
+	}
+	closeBtn.x = math.round( app.width - app.margin - closeBtn.width )
+
+	-- Make scrollbar
+	scrollbarV = Scrollbar:new( sceneGroup, app.width - Scrollbar.width, topMargin, 
+	                            0, onScrollVert )
+	adjustScrollbarV()
 
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
@@ -457,11 +482,9 @@ function optionsView:hide( event )
 end
 
 -- Window resize handler
--- TODO: Fix Corona runtime error or replace scrollView with scrollbar.lua
 function optionsView:resize()
 	if composer.getSceneName( "current" ) == "optionsView" then
-		-- TODO: resize scroll bar
-		-- reposition objects
+		-- Reposition objects
 		closeBtn.x = math.round( app.width - app.margin - closeBtn.width )
 		title.x = math.round( app.width / 2 - title.width / 2)
 		if app.width > optionsGroup.width then
@@ -469,6 +492,9 @@ function optionsView:resize()
 		else
 			optionsGroup.x = 0
 		end
+		optionsGroup.y = topMargin -- TODO: Remember scroll pos?
+		-- Adjust vertical scrollbar
+		adjustScrollbarV()
 	end
 end
 
