@@ -44,7 +44,6 @@ local gridlineColorPicker -- Gridline color picker
 local addEditorBtn        -- Add a Text Editor button
 local openInEditorBtn     -- Open current source file in editor button
 local optionsGroup        -- Display group containing the options objects
-local scrollView          -- Scroll view widget containing optionsGroup
 
 -- State variables
 local forceReprocess      -- true to reprocess source file after changes
@@ -175,35 +174,6 @@ local function setEditorButtons( repositionAddEditorBtn )
 	end
 end
 
--- Make the scroll view, insert it into the scene, and insert optionsGroup into it
-local function makeScrollView( parent )
-	parent:insert( optionsGroup )
-	if scrollView then
-		scrollView:removeSelf()
-		scrollView = nil
-	end
-	scrollView = widget.newScrollView{
-		x = 0,
-		y = title.y + title.height + app.margin,
-		width = app.width,
-		height = app.height - title.height - app.dyStatusBar,
-		isBounceEnabled = false,
-		backgroundColor = { 0.9 },
-	}
-	scrollView.anchorX = 0
-	scrollView.anchorY = 0
-	parent:insert( scrollView )
-	scrollView:insert( optionsGroup )
-	scrollView:setScrollWidth( optionsGroup.width )
-	scrollView:setScrollHeight( optionsGroup.height + app.dyStatusBar )
-	if optionsGroup.width <= app.width then
-		scrollView:setIsLocked( true, "horizontal" )
-	end
-	if scrollView.y + optionsGroup.height <= app.height then
-		scrollView:setIsLocked( true, "vertical" )
-	end
-end
-
 
 --- Event Handlers ------------------------------------------------
 
@@ -286,7 +256,7 @@ local function addEditor()
 		makeEditorPicker( optionsGroup )
 		setEditorButtons( true )
 		setSelectedOptions()
-		makeScrollView( optionsView.view )
+		-- TODO: resize scroll bar
 	end
 end
 
@@ -336,6 +306,7 @@ function optionsView:create()
 	optionsGroup = display.newGroup()
 	optionsGroup.anchorX = 0
 	optionsGroup.anchorY = 0
+	optionsGroup.y = math.round( title.y + title.height + app.margin )
 
 	-- Syntax level picker
 	local syntaxLevels = {
@@ -457,8 +428,8 @@ function optionsView:create()
 		optionsGroup.x = math.round( app.width / 2 - optionsGroup.width / 2 )
 	end
 
-	-- Set up scroll view
-	makeScrollView( sceneGroup )
+	-- TODO: Make scrollbar
+	sceneGroup:insert( optionsGroup )
 
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
@@ -471,6 +442,8 @@ function optionsView:show( event )
 		forceReprocess = false
 		toolbar.show( false )
 		setEditorButtons()
+	end
+	if event.phase == "did" then
 		self:resize()
 	end
 end
@@ -487,9 +460,7 @@ end
 -- TODO: Fix Corona runtime error or replace scrollView with scrollbar.lua
 function optionsView:resize()
 	if composer.getSceneName( "current" ) == "optionsView" then
-		local sceneGroup = self.view
-		-- remake scroll view
-		makeScrollView( sceneGroup )
+		-- TODO: resize scroll bar
 		-- reposition objects
 		closeBtn.x = math.round( app.width - app.margin - closeBtn.width )
 		title.x = math.round( app.width / 2 - title.width / 2)
