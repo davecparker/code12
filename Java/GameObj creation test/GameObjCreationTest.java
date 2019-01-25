@@ -1,21 +1,14 @@
 
-import Code12.*;
-
-public class GameObjCreationTest extends Code12Program
+class GameObjCreationTest
 {
     GameObj[] screenButtons, screenLabels;
-    GameObj title, speedRefrence, objText, fps;
+    GameObj title, speedReference, objText, fps;
     double objCount, time, inf, nan;
     String[] colors = {"black", "white", "red", "green", "blue", "cyan", "magenta", "yellow",
                         "gray", "orange", "pink", "purple",
                         "light gray", "light red", "light green", "light blue", "light cyan", "light magenta", "light yellow",
                         "dark gray", "dark red", "dark green", "dark blue", "dark cyan", "dark magenta", "dark yellow",
                         null};
-
-    public static void main(String[] args)
-    {
-        Code12.run(new GameObjCreationTest());
-    }
 
     public void start()
     {
@@ -27,7 +20,7 @@ public class GameObjCreationTest extends Code12Program
         enableMainScreen();
     }
 
-    public void defineScreens()
+    void defineScreens()
     {
         title = ct.text("", 50, 8, 8);
         screenButtons = new GameObj[7];
@@ -41,49 +34,49 @@ public class GameObjCreationTest extends Code12Program
         disableScreens();
     }
 
-    public void enableMainScreen()
+    void enableMainScreen()
     {
         title.setText("GameObj Creation Testing");
         String[] labels = {"", "Circle Tests", "Rect Tests", "Line Tests", "Text Tests", "Image Tests"};
         enableScreen(labels);
     }
 
-    public void enableCircleScreen()
+    void enableCircleScreen()
     {
         title.setText("Circle Tests");
         String[] labels = {"Back", "Diameter Test", "Inf & Nan Test", "Color Test", "Performance Test"};
         enableScreen(labels);
     }
 
-    public void enableRectScreen()
+    void enableRectScreen()
     {
         title.setText("Rect Tests");
         String[] labels = {"Back", "Height & Width Test", "Inf & Nan Test", "Color Test", "Performance Test"};
         enableScreen(labels);
     }
 
-    public void enableLineScreen()
+    void enableLineScreen()
     {
         title.setText("Line Tests");
         String[] labels = {"Back", "Coordinate Test", "Inf & Nan Test", "Color Test", "Performance Test"};
         enableScreen(labels);
     }
 
-    public void enableTextScreen()
+    void enableTextScreen()
     {
         title.setText("Text Tests");
         String[] labels = {"Back", "String Test", "String Length Test", "Height Test", "Inf & Nan Test", "Color Test", "Performance Test"};
         enableScreen(labels);
     }
 
-    public void enableImageScreen()
+    void enableImageScreen()
     {
         title.setText("Image Tests");
         String[] labels = {"Back", "Filename Test", "Width Test", "Inf & Nan Test", "Performance Test"};
         enableScreen(labels);
     }
 
-    public void enableScreen(String[] labels)
+    void enableScreen(String[] labels)
     {
         for (int i = 0; i < labels.length; i++)
         {
@@ -93,7 +86,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void disableScreens()
+    void disableScreens()
     {
         for (int i = 1; i < screenButtons.length; i++)
         {
@@ -103,7 +96,7 @@ public class GameObjCreationTest extends Code12Program
         ct.clearGroup("testObjs");
     }
 
-    public void circleDiameterTest()
+    void circleDiameterTest()
     {
         title.setText("Circle Diameter Test");
         for (int i = -10; i <= 10; i += 2)
@@ -117,7 +110,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void circleInfNanTest()
+    void circleInfNanTest()
     {
         title.setText("Circle Inf & Nan Test");
         GameObj[] testObjs = new GameObj[10];
@@ -135,7 +128,7 @@ public class GameObjCreationTest extends Code12Program
             testObjs[i].group = "testObjs";
     }
 
-    public void circleColorTest()
+    void circleColorTest()
     {
         title.setText("Circle Color Test");
         for (int i = 0; i < colors.length; i++)
@@ -153,14 +146,14 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void circlePerformanceTest()
+    void circlePerformanceTest()
     {
         performanceTestUpdate();
         GameObj circle = ct.circle(ct.random(0, 100), ct.random(25, 100), 3);
         circle.group = "performanceObjs";
     }
 
-    public void rectHeightWidthTest()
+    void rectHeightWidthTest()
     {
         title.setText("Rect Height & Width Test");
         for (int i = -8; i <= 8; i += 2)
@@ -179,7 +172,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void rectInfNanTest()
+    void rectInfNanTest()
     {
         title.setText("Rect Inf & Nan Test");
         GameObj[] testObjs = new GameObj[16];
@@ -203,7 +196,7 @@ public class GameObjCreationTest extends Code12Program
             testObjs[i].group = "testObjs";
     }
 
-    public void rectColorTest()
+    void rectColorTest()
     {
         title.setText("Rect Color Test");
         for (int i = 0; i < colors.length; i++)
@@ -221,14 +214,14 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void rectPerformanceTest()
+    void rectPerformanceTest()
     {
         performanceTestUpdate();
         GameObj rect = ct.rect(ct.random(0, 100), ct.random(25, 100), 3, 3);
         rect.group = "performanceObjs";
     }
 
-    public void lineCoordTest()
+    void lineCoordTest()
     {
         title.setText("Line Coordinate Test");
         for (int i = -8; i <= 8; i += 2)
@@ -249,7 +242,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void lineInfNanTest()
+    void lineInfNanTest()
     {
         title.setText("Line Inf & Nan Test");
         GameObj[] testObjs = new GameObj[20];
@@ -277,7 +270,7 @@ public class GameObjCreationTest extends Code12Program
             testObjs[i].group = "testObjs";
     }
 
-    public void lineColorTest()
+    void lineColorTest()
     {
         title.setText("Line Color Test");
         GameObj rect = ct.rect(30, 25, 8, 8, "black");
@@ -287,7 +280,7 @@ public class GameObjCreationTest extends Code12Program
             double x = 15 * i % 90 + 10;
             double y = ct.intDiv(i, 6) * 15 + 20;
             GameObj line = ct.line(x, y, x + 10, y + 10, colors[i]);
-            line.lineWidth = 5;
+            line.setLineWidth(5);
             GameObj text;
             if (i == 26)
                 text = ct.text("null", x + 5, y + 11, 3);
@@ -298,14 +291,14 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void linePerformanceTest()
+    void linePerformanceTest()
     {
         performanceTestUpdate();
         GameObj line = ct.line(ct.random(0, 100), ct.random(25, 100), ct.random(0, 100), ct.random(25, 100));
         line.group = "performanceObjs";
     }
 
-    public void textStringTest()
+    void textStringTest()
     {
         title.setText("Text String Test");
         String[] stringArray = {"(1)\t(2)\t(3)", "(1)\n(2)\n(3)", null};
@@ -319,7 +312,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void textStringLengthTest()
+    void textStringLengthTest()
     {
         title.setText("Text String Length Test");
         String textString = "";
@@ -327,7 +320,7 @@ public class GameObjCreationTest extends Code12Program
         for (double i = 0; i < 10.1; i++)
         {
             GameObj text = ct.text(textString, x, 8 * i + 20, 4);
-            GameObj length = ct.text(ct.formatDecimal(text.width, 2), x - text.width / 2 - 8, text.y, 3);
+            GameObj length = ct.text(ct.formatDecimal(text.getWidth(), 2), x - text.getWidth() / 2 - 8, text.y, 3);
             textString = textString + ct.formatDecimal(i, 0);
             text.group = "testObjs";
             length.group = "testObjs";
@@ -339,7 +332,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void textHeightTest()
+    void textHeightTest()
     {
         title.setText("Text Height Test");
         for (int i = -8; i <= 8; i += 2)
@@ -353,7 +346,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void textInfNanTest()
+    void textInfNanTest()
     {
         title.setText("Text Inf & Nan Test");
         GameObj[] testObjs = new GameObj[8];
@@ -369,7 +362,7 @@ public class GameObjCreationTest extends Code12Program
             testObjs[i].group = "testObjs";
     }
 
-    public void textColorTest()
+    void textColorTest()
     {
         title.setText("Text Color Test");
         GameObj rect = ct.rect(20, 35, 12, 5, "black");
@@ -385,14 +378,14 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void textPerformanceTest()
+    void textPerformanceTest()
     {
         performanceTestUpdate();
         GameObj text = ct.text("code12", ct.random(0, 100), ct.random(25, 100), 2);
         text.group = "performanceObjs";
     }
 
-    public void imageFilenameTest()
+    void imageFilenameTest()
     {
         title.setText("Image Filename Test");
         String[] stringArray = {"goldfish.png", "goldfish.pg", "goldfish", "", null, "jpg image.jpg", "code12 image.code12", "GameObjCreationTest.java"};
@@ -412,7 +405,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void imageWidthTest()
+    void imageWidthTest()
     {
         title.setText("Image Width Test");
         for (int i = -8; i <= 8; i += 2)
@@ -426,7 +419,7 @@ public class GameObjCreationTest extends Code12Program
         }
     }
 
-    public void imageInfNanTest()
+    void imageInfNanTest()
     {
         title.setText("Image Inf & Nan Test");
         GameObj[] testObjs = new GameObj[8];
@@ -442,20 +435,20 @@ public class GameObjCreationTest extends Code12Program
             testObjs[i].group = "testObjs";
     }
 
-    public void imagePerformanceTest()
+    void imagePerformanceTest()
     {
         performanceTestUpdate();
         GameObj image = ct.image("goldfish.png", ct.random(0, 100), ct.random(25, 100), 3);
         image.group = "performanceObjs";
     }
 
-    public void performanceTestPrep(String objType)
+    void performanceTestPrep(String objType)
     {
         title.setText(objType + " Performance Test");
-        speedRefrence = ct.circle(10, 20, 5, "green");
-        speedRefrence.xSpeed = 4;
-        speedRefrence.setLayer(2);
-        speedRefrence.group = "performanceObjs";
+        speedReference = ct.circle(10, 20, 5, "green");
+        speedReference.setXSpeed(4);
+        speedReference.setLayer(2);
+        speedReference.group = "performanceObjs";
         objText = ct.text("0", 90, 15, 5);
         objText.group = "performanceObjs";
         fps = ct.text("0.0", 10, 15, 5);
@@ -464,13 +457,13 @@ public class GameObjCreationTest extends Code12Program
         time = ct.getTimer();
     }
 
-    public void performanceTestUpdate()
+    void performanceTestUpdate()
     {
         String timePerFrame = ct.formatDecimal(1000 / (ct.getTimer() - time), 2);
         fps.setText(timePerFrame);
         ct.println(timePerFrame);
-        if (speedRefrence.x >= 100 || speedRefrence.x <= 0)
-           speedRefrence.xSpeed *= -1;
+        if (speedReference.x >= 100 || speedReference.x <= 0)
+           speedReference.setXSpeed(-1 * speedReference.getXSpeed());
         objCount++;
         objText.setText(ct.formatDecimal(objCount));
         time = ct.getTimer();
@@ -513,7 +506,7 @@ public class GameObjCreationTest extends Code12Program
             imageScreenAction(obj);
     }
 
-    public boolean objClicked(GameObj obj)
+    boolean objClicked(GameObj obj)
     {
         for (int i = 0; i < screenButtons.length; i++)
         {
@@ -523,7 +516,7 @@ public class GameObjCreationTest extends Code12Program
         return false;
     }
 
-    public void backButtonAction()
+    void backButtonAction()
     {
         disableScreens();
         String titleName = title.getText();
@@ -543,7 +536,7 @@ public class GameObjCreationTest extends Code12Program
             enableImageScreen();
     }
 
-    public void mainScreenAction(GameObj obj)
+    void mainScreenAction(GameObj obj)
     {
         disableScreens();
         if (obj == screenButtons[1] || obj == screenLabels[1])
@@ -558,7 +551,7 @@ public class GameObjCreationTest extends Code12Program
             enableImageScreen();
     }
 
-    public void circleScreenAction(GameObj obj)
+    void circleScreenAction(GameObj obj)
     {
         disableScreens();
         if (obj == screenButtons[1] || obj == screenLabels[1])
@@ -571,7 +564,7 @@ public class GameObjCreationTest extends Code12Program
             performanceTestPrep("Circle");
     }
 
-    public void rectScreenAction(GameObj obj)
+    void rectScreenAction(GameObj obj)
     {
         disableScreens();
         if (obj == screenButtons[1] || obj == screenLabels[1])
@@ -584,7 +577,7 @@ public class GameObjCreationTest extends Code12Program
             performanceTestPrep("Rect");
     }
 
-    public void lineScreenAction(GameObj obj)
+    void lineScreenAction(GameObj obj)
     {
         disableScreens();
         if (obj == screenButtons[1] || obj == screenLabels[1])
@@ -597,7 +590,7 @@ public class GameObjCreationTest extends Code12Program
             performanceTestPrep("Line");
     }
 
-    public void textScreenAction(GameObj obj)
+    void textScreenAction(GameObj obj)
     {
         disableScreens();
         if (obj == screenButtons[1] || obj == screenLabels[1])
@@ -614,7 +607,7 @@ public class GameObjCreationTest extends Code12Program
             performanceTestPrep("Text");
     }
 
-    public void imageScreenAction(GameObj obj)
+    void imageScreenAction(GameObj obj)
     {
         disableScreens();
         if (obj == screenButtons[1] || obj == screenLabels[1])
