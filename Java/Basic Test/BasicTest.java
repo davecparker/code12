@@ -90,7 +90,11 @@ class BasicTest extends Code12Program
          fish.x = -30;
          
       if (fish.hit(wall))
+      {
          fish.setXSpeed(0);
+         ct.println("Hit");
+         // wall.visible = false;
+      }
       
       if (circle.clicked())
       {

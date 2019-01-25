@@ -113,7 +113,8 @@ public abstract class GameObj implements GameObjInterface
 
    public boolean hit(GameObj obj)
    {
-      if (obj == null || obj.deleted || !obj.visible)
+      // Make sure both objects are valid and visible
+      if (obj == null || obj.deleted || !obj.visible || deleted || !visible)
          return false;
           
    	if (obj.isLine())

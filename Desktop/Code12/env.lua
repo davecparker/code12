@@ -249,20 +249,6 @@ function env.findInstalledEditors()
 	end
 end
 
--- Run the Input Box dialog with the given title, message, and optional default text.
--- Return the string inputed or nil if cancelled.
-function env.strFromInputBoxDialog( title, message, default )
-	local result = fileDialogs.inputBox{
-		title = title,
-		message = message,
-		default_input = default,
-	}
-	if type(result) == "string" then
-		return result
-	end
-	return nil
-end
-
 
 --- Main Chunk -------------------------------------------------------
 

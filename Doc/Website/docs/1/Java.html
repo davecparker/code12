@@ -592,6 +592,64 @@ if ((inches &gt; 72 &amp;&amp; pounds &lt; 170) || (inches &lt; 48 &amp;&amp; po
 <p>An if-else condition (or part of a boolean expression) can also include using any <a href="#function-return-values">function return value</a> for a <a href="#function-calls">function call</a> or <a href="#object-method-calls">object method call</a> that has a <a href="#java-data-types">boolean</a> return value. For example:</p>
 <pre><code>if (ct.inputYesNo( &quot;Would you like to play again?&quot; ))
     ct.restart();</code></pre>
+<h5 id="nested-if-else-structures">Nested if-else Structures</h5>
+<p>You can put whatever code you want in the <code>if</code> and <code>else</code> branches of an if-else structure, including other if-else structures. For example:</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 18)
+{
+    ct.println( &quot;You are a child.&quot; );
+    if (ct.inputYesNo( &quot;Is your parent with you?&quot; ) )
+        ct.println( &quot;You two must sit together&quot; );
+    else
+    {
+        ct.println( &quot;Sorry you can&#39;t go on this ride.&quot; );
+        ct.println( &quot;Try the train ride.&quot; );
+    }
+}
+else
+{
+    ct.println( &quot;You are an adult.&quot; );
+    ct.println( &quot;Enjoy the ride!&quot; );
+}</code></pre>
+<p>In this case, the question <code>&quot;Is your parent with you?&quot;</code> is only asked if the first <code>if</code> succeeds, and then the result <code>&quot;You two must sit together&quot;</code> only happens if both <code>if</code> tests succeed.</p>
+<p>Note that the indentation level of the code increases each time you enter another level of if-else, and if curly brackets are needed to group the controlled statements then they are also indented accordingly.</p>
+<p>There is no limit to the number of levels you can “nest” if-else structures or the complexity of the tests, other than your ability as a programmer to keep all the cases straight!</p>
+<blockquote>
+<p>Humans are notoriously weak in their ability to decode multiple levels of logic conditions, and computers are brutally literal in their execution of them (doing exactly what you said, perhaps not what you meant), often resulting in bugs. Organizing logic in a way that is not overly complex to understand is a skill that programmers build over time.</p>
+</blockquote>
+<h5 id="testing-multiple-conditions-with-else-if">Testing Multiple Conditions with “else if”</h5>
+<p>Sometimes you may have multiple variations on a condition that need to be tested. For example, the following code identifies three different age ranges (child, adult, or senior):</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 18)
+    ct.println( &quot;child&quot; );  
+if (age &gt;= 18 &amp;&amp; age &lt; 65)
+    ct.println( &quot;adult&quot; );
+if (age &gt;= 65)
+    ct.println( &quot;senior&quot; );</code></pre>
+<p>The above conditions could be made simpler and more efficient by using <code>else</code> sections and also nested if-else structures as follows:</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 18)
+    ct.println( &quot;child&quot; );
+else
+{
+    if (age &lt; 65)
+        ct.println( &quot;adult&quot; );
+    else
+        ct.println( &quot;senior&quot; );
+}</code></pre>
+<p>Note how much simpler the <code>if</code> conditions are. Also, the first example always tests all three <code>if</code> conditions regardless of the age, but the second one often skips one or more of them. Patterns such as the above are common and can be written more compactly using <code>else if</code>, as follows:</p>
+<pre><code>int age = ct.inputInt( &quot;Enter your age&quot; );
+
+if (age &lt; 18)
+    ct.println( &quot;child&quot; );
+else if (age &lt; 65)
+    ct.println( &quot;adult&quot; );
+else
+    ct.println( &quot;senior&quot; );</code></pre>
+<p>You can have as many <code>else if</code> sections as you want. When structured this way, the various <code>if</code> tests are executed sequentially until one of them tests <code>true</code>, then all the remaining ones are skipped. It is important to write the various conditions and the order of the tests in a way that produces the result you want in all cases.</p>
 <h4 id="graphics-and-animation-examples">Graphics and Animation Examples</h4>
 <p>Although an if-else structure only tests its condition and executes its controlled statements when it is encountered in your program, the way the <code>update()</code> code block works in a Code12 program makes it easy to test conditions repeatedly.</p>
 <p>Code in your <code>update()</code> block is executed before each new animation frame, and animation frames happen 60 times per second, so this means that the entire sequence of statements in your <code>update()</code> block is repeated 60 times per second, which is very often compared to human perception. This means that an if-else test that you put in your <code>update()</code> block may appear to be tested “continuously”. In fact, it is not tested continuously, just repeatedly and quickly. For example:</p>
@@ -651,7 +709,106 @@ public void update()
             ct.println( &quot;You missed&quot; );
     }
 }</code></pre>
-<p>Note that this example includes in if-else that is “nested” inside another <code>if</code> structure. The inner <code>if</code> is only tested and executed if the outer <code>if</code> passes its test. What would happen if the outer <code>if</code> were removed? Try to predict the result, then try it and see.</p>
+<p>Note that this example includes a nested if-else structure. The inner <code>if</code> is only tested and executed if the outer <code>if</code> passes its test. What would happen if the outer <code>if</code> were removed? Try to predict the result, then try it and see.</p>
+<h4 id="comparing-object-references-and-null">Comparing Object References and null</h4>
+<p>A comparison such as <code>if (a == b)</code> can be used to see if two numbers (<code>int</code> or <code>double</code>) are equal, or if two <code>boolean</code> values are equal. You can also compare <code>GameObj</code> objects, although what this means is slightly different.</p>
+<p>The <a href="#java-data-types">GameObj</a> and <a href="#java-data-types">String</a> types in Java are examples of <em>Object</em> types, as opposed to the <em>primitive</em> types <code>int</code>, <code>double</code>, and <code>boolean</code>. Whereas a primitive type only stores a single value (e.g. a single number), an Object can be made up of many values (accessible via <a href="#object-data-fields">Object Data Fields</a> and <a href="#object-method-calls">Object Method Calls</a>).</p>
+<p>A variable of type <a href="#java-data-types">GameObj</a> or <a href="#java-data-types">String</a> is technically a <em>reference</em> to the underlying object, not the object itself. Physically, a reference to an object is the <em>memory address</em> where the underlying object is stored, which is just a number. This distinction matters when you assign and compare object variables. When you assign an object variable to an existing object, such as:</p>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+GameObj ball = dot;</code></pre>
+<p>The assignment of <code>ball</code> to <code>dot</code> makes another reference to the same circle object. It does not make a copy of the object or create another circle. Now both variables refer to the same object, and either one can be used to access or modify it:</p>
+<pre><code>GameObj dot = ct.circle( 50, 50, 20 );
+GameObj ball = dot;
+
+dot.x = 70;                 // moves the circle to x = 70
+ct.println( ball.x );       // prints 70 because ball is the same as dot
+ct.println( dot == ball );  // prints true</code></pre>
+<p>An example of how this is used in practice would be using the Code12 function <a href="API.html#ct.objectclicked">ct.objectClicked()</a>. This function has a return value of type <code>GameObj</code>, which means that it returns a reference to the object that got clicked. For example:</p>
+<pre><code>class Example
+{
+    GameObj ball1, ball2, ball3;
+
+    public void start()
+    {
+        // Make 3 balls
+        ball1 = ct.circle( 30, 50, 10 );    // left
+        ball2 = ct.circle( 50, 50, 10 );    // middle
+        ball3 = ct.circle( 70, 50, 10 );    // right
+    }
+
+    public void update()
+    {
+        // See if the middle ball was clicked
+        GameObj obj = ct.objectClicked();
+        if ( obj == ball2 )
+            ct.println( &quot;You clicked the middle ball&quot; );
+    }
+}</code></pre>
+<p>Here the statement <code>GameObj obj = ct.objectClicked();</code> sets <code>obj</code> to another reference to whichever ball got clicked (note that each circle already has a variable referencing it). It does not make a copy of that ball or a new ball. Then the test <code>if ( obj == ball2 )</code> can be used to see if the clicked object (<code>obj</code>) refers to the same object as <code>ball2</code>, which is the middle ball.</p>
+<h5 id="a-null-object-reference">A null Object Reference</h5>
+<p>It is also possible that none of the three balls got clicked, in which case the <code>ct.objectClicked()</code> function returns the special value <code>null</code>, which means “no object”. The value <code>null</code> is pre-defined by Java for this purpose. You can compare an object reference to <code>null</code> to see if it references any object:</p>
+<pre><code>class Example
+{
+    GameObj ball1, ball2, ball3;
+
+    public void start()
+    {
+        // Make 3 balls
+        ball1 = ct.circle( 30, 50, 10 );    // left
+        ball2 = ct.circle( 50, 50, 10 );    // middle
+        ball3 = ct.circle( 70, 50, 10 );    // right
+    }
+
+    public void update()
+    {
+        // See if any object was clicked
+        GameObj obj = ct.objectClicked();
+        if ( obj != null )
+            ct.println( &quot;You clicked on an object&quot; );
+    }
+}</code></pre>
+<p>You can also assign an object variable to <code>null</code> if you want to indicate that the variable doesn’t reference an object yet, or no longer references an object. In this case, note that if you try to use a field or method of the null variable, then you will generate an error. For example:</p>
+<pre><code>class Example
+{
+    GameObj ball1, ball2, ball3;
+    GameObj selectedBall = null;   // no selection initially
+
+    public void start()
+    {
+        // Make 3 balls
+        ball1 = ct.circle( 30, 50, 10 );    // left
+        ball2 = ct.circle( 50, 50, 10 );    // middle
+        ball3 = ct.circle( 70, 50, 10 );    // right
+
+        // Select the first ball
+        selectedBall = ball1;
+
+        // Print the x-coordinate of the selected ball
+        ct.println( selectedBall.x );    // prints 30
+
+        // Clear the selection (doesn&#39;t affect the circles)
+        selectedBall = null;
+
+        // Is there a ball selected?
+        if (selectedBall == null)
+            ct.println( &quot;No ball is selected now&quot; );
+
+        // This would produce an error if we tried it now
+        // ct.println( selectedBall.x );
+    }
+
+}</code></pre>
+<h4 id="comparing-strings">Comparing Strings</h4>
+<p>Variables of type <a href="#java-data-types">String</a> are also considered objects in Java, so the rules for object references above also apply. In particular, if you tried to compare two <code>String</code> variables with <code>if (a == b)</code>, you would get true only if the two variables referenced the exact same string in memory, not just if their text was the same, which is almost never what you want in practice. To test if two strings have the same text, use the <code>str.equals()</code> method. For example:</p>
+<pre><code>String firstName = ct.inputString( &quot;Enter your first name&quot; );
+
+if (firstName.equals( &quot;Dave&quot; ))
+    ct.showAlert( &quot;Hey, my name is Dave too!&quot; );
+
+String lastName = ct.inputString( &quot;Enter your last name&quot; );
+
+if (lastName.equals( firstName ))
+    ct.showAlert( &quot;That&#39;s weird, your first and last name are the same!&quot; );</code></pre>
 <h6 id="java-language-help-if-else"><a href="#top">Java Language Help</a> &gt; <a href="#if-else">If-else</a></h6>
 <h3 id="function-definitions">Function Definitions</h3>
 <p>A function definition is a block of code with a name that you can reuse without having to copy and paste the code each time. The main program blocks <code>start()</code> and <code>update()</code> in your program are actually function definitions, and these functions are called (told to execute) at the appropriate time by the Code12 system. You can also define your own functions and execute them whenever you want using the <a href="#function-calls">function call</a> syntax.</p>
@@ -964,8 +1121,369 @@ public void update()
 <p>this calls <code>makeCoin()</code> and then takes the return value of the call (here a <code>GameObj</code>) and passes it on as the return value from <code>makePenny()</code>.</p>
 <h6 id="java-language-help-function-parameters"><a href="#top">Java Language Help</a> &gt; <a href="#function-parameters">Function Parameters</a></h6>
 <h3 id="loops">Loops</h3>
+<p>A loop allows your program to repeat a section of code multiple times, until some ending condition is met. For example, you could use a loop to draw 20 circles on the screen without having to copy and paste the call to <code>ct.circle()</code> and related code 20 times.</p>
+<h4 id="examples-8">Examples</h4>
+<p>The Java language has three different kinds of loops to choose from: the <code>while</code> loop, the <code>do-while</code> loop, and the <code>for</code> loop. Here is an example of each, all doing the same task:</p>
+<pre><code>// Draw 20 circles across the screen using a while loop
+double x = 2.5;
+while (x &lt; 100)
+{
+    ct.circle( x, 50, 4 );
+    x += 5;
+}</code></pre>
+<pre><code>// Draw 20 circles across the screen using a do-while loop
+double x = 2.5;
+do
+{
+    ct.circle( x, 50, 4 );
+    x += 5;
+}
+while (x &lt; 100);</code></pre>
+<pre><code>// Draw 20 circles across the screen using a for loop
+for (double x = 2.5; x &lt; 100; x += 5)
+{
+    ct.circle( x, 50, 4 );
+}</code></pre>
+<h4 id="the-while-loop">The “while” Loop</h4>
+<p>The syntax of a <code>while</code> loop is very similar to the syntax of an <code>if</code> statement (see <a href="#if-else">if-else</a>):</p>
+<pre><code>if (test)
+{
+    // Code to do if test is true
+}</code></pre>
+<pre><code>while (test)
+{
+    // Code to repeat as long as test is true
+}</code></pre>
+<p>For example:</p>
+<pre><code>double x = 2.5;
+
+// If x is on the screen, then draw a circle there and increase x by 5
+if (x &lt; 100)
+{
+    ct.circle( x, 50, 4 );
+    x += 5; 
+}</code></pre>
+<pre><code>double x = 2.5;
+
+// As long as x is still on the screen, draw a circle there, 
+// increase x by 5, and repeat
+while (x &lt; 100)
+{
+    ct.circle( x, 50, 4 );
+    x += 5; 
+}</code></pre>
+<p>A <code>while</code> loop starts by evaluating the test condition in the parentheses. Just like <a href="#if-else">if-else</a>, this condition can be any expression that results in a <a href="#java-data-types">boolean</a> (true or false) value, such as:</p>
+<ul>
+<li>One of the <a href="#java-operators">Java Operators</a> that results in a <code>boolean</code> result (such as <code>&lt;</code>)</li>
+<li>A <a href="#java-data-types">boolean</a> variable</li>
+<li>A function call that <a href="#function-return-values">returns a value</a> of type <code>boolean</code></li>
+</ul>
+<p>If the test result is false then the body of the loop (the code in curly brackets) is skipped, and execution continues after the loop (the loop body does not execute at all). If the test result is true, the loop body executes then execution goes back up to the line with the test and repeats the entire process. The test is evaluated again to see if it is still true (typically variable values or something will have changed since the first test so the result may be different). If the test is still true, the body is executed again, and execution goes back to the test again. The entire loop process stops once the test result becomes false.</p>
+<blockquote>
+<p><strong>Warning</strong>: If the test remains true and never changes, then the loop will execute forever, resulting in an “inifite loop”. This will cause your program to “hang”, the Code12 Application will become unreponsive, and will you need to “end task” or “force quit” Code12 from the operating system, fix your code, and try again!</p>
+</blockquote>
+<h5 id="more-while-loop-examples">More “while” Loop Examples</h5>
+<pre><code>// Count from 1 to 10
+int i = 1;
+while (i &lt;= 10)
+{
+    ct.println( i );
+    i++;
+}</code></pre>
+<pre><code>// A loop with user input
+boolean keepGoing = true;
+ct.println( &quot;Lets get started&quot; );
+while (keepGoing)
+{
+    ct.println( &quot;This is text output&quot; );
+    keepGoing = ct.inputYesNo( &quot;Do you want to keep going?&quot; );
+}
+ct.println( &quot;We&#39;re done&quot; );</code></pre>
+<pre><code>// Print powers of 2 less than 1 million
+int i = 1;
+while (i &lt; 1000000)
+{
+    ct.println( i );
+    i *= 2;
+}</code></pre>
+<h4 id="the-do-while-loop">The “do-while” Loop</h4>
+<p>A <code>do-while</code> loop works just like a <code>while</code> loop, except that the test is after the loop body instead of before it:</p>
+<pre><code>while (test)
+{
+    // Loop body code
+} </code></pre>
+<pre><code>do
+{
+    // Loop body code
+}
+while (test);</code></pre>
+<blockquote>
+<p><strong>Note</strong>: The test line at the end of a <code>do-while</code> loop must end with a semicolon, whereas the test line at the beginning of a <code>while</code> loop must <strong>not</strong> have a semicolon.</p>
+</blockquote>
+<p>Since the loop body of a <code>do-while</code> is first, it always executes at least once, then the test is evaluated to determine if (and how long) the loop repeats. Sometimes this can simplify the code required to get the behavior you want compared to using a <code>while</code> loop. For example, consider one of the <code>while</code> examples above rewritten to use a <code>do-while</code>:</p>
+<pre><code>// A while loop with user input
+boolean keepGoing = true;
+ct.println( &quot;Lets get started&quot; );
+while (keepGoing)
+{
+    ct.println( &quot;This is text output&quot; );
+    keepGoing = ct.inputYesNo( &quot;Do you want to keep going?&quot; );
+}
+ct.println( &quot;We&#39;re done&quot; );</code></pre>
+<pre><code>// A do-while loop with user input
+ct.println( &quot;Lets get started&quot; );
+do
+{
+    ct.println( &quot;This is text output&quot; );
+}
+while( ct.inputYesNo( &quot;Do you want to keep going?&quot; ) );
+ct.println( &quot;We&#39;re done&quot; );</code></pre>
+<p>However, if the correct behavior you want means that sometimes the loop body should be executed 0 times (be skipped completely), then you must use a <code>while</code> loop instead of a <code>do-while</code> loop.</p>
+<h4 id="the-for-loop">The “for” loop</h4>
+<p>The <code>for</code> loop structure is a convenient shorthand for a common pattern that often occurs in loops in practice. Compared to using a <code>while</code> loop, using a <code>for</code> loop results in fewer lines of code when writing loops that follow these patterns. For example:</p>
+<pre><code>// Count from 1 to 10
+int i = 1;
+while (i &lt;= 10)
+{
+    ct.println( i );
+    i++;
+}</code></pre>
+<pre><code>// Count from 1 to 10
+for (int i = 1; i &lt;= 10; i++)
+{
+    ct.println( i );
+}</code></pre>
+<p>The pattern for the <code>while</code> loop here is:</p>
+<ol type="1">
+<li>Set the starting value</li>
+<li>While the value is still valid:
+<ol start="3" type="1">
+<li>Use the value</li>
+<li>Get the next value</li>
+</ol></li>
+</ol>
+<p>The header line of a <code>for</code> loop packs steps 1, 2, and 4 all into one line, resulting in fewer lines of code. Otherwise, a <code>for</code> loop behaves the same as the corresponding <code>while</code> loop.</p>
+<p>Written briefly with placeholders, the corresponding pattern for the <code>while</code> and <code>for</code> loops is:</p>
+<pre><code>initialize;
+while (test)
+{
+    process;
+    advance;
+}</code></pre>
+<pre><code>for (initialize; test; advance)
+{
+    process;
+}</code></pre>
+<blockquote>
+<p>Note that although the “advance” statement occurs before the loop body in a <code>for</code> loop, it is not executed until after the loop body, in the same order as the corresponding <code>while</code> loop pattern.</p>
+</blockquote>
+<p>The header of a <code>for</code> loop is complex and takes some practice to write correctly, but once you get used to it, experienced programmers can find it easier to understand the behavior of the loop because it makes the pattern easier to see. In the example above, you can think of the loop header as saying</p>
+<blockquote>
+<p>“for values of i starting at 1, going up to and including 10, increasing by 1 each time, do the following:”</p>
+</blockquote>
+<h5 id="more-for-loop-examples">More “for” Loop Examples</h5>
+<pre><code>// Count to 100 by 10s
+for (int i = 10; i &lt;= 100; i += 10)
+{
+    ct.println( i );
+}</code></pre>
+<pre><code>// Count backwards from 99 by 3s
+for (int i = 99; i &gt; 0; i -= 3)
+{
+    ct.println( i );
+}</code></pre>
+<pre><code>// Draw 20 circles at random positions
+for (int i = 1; i &lt;= 20; i++)
+{
+    ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+}</code></pre>
+<h4 id="the-break-statement">The “break” Statement</h4>
+<p>Inside the body of a <code>while</code>, <code>do-while</code>, or <code>for</code> loop, you can end the loop early with the <code>break</code> statement. For example:</p>
+<pre><code>// Draw up to 20 labelled circles at random positions, but stop if one 
+// would have been near the bottom of the screen.
+for (int i = 1; i &lt;= 20; i++)
+{
+    int x = ct.random( 10, 90 );
+    int y = ct.random( 10, 90 );
+    if (y &gt; 85)
+        break;
+    ct.circle( x, y, 10 );
+    ct.text( ct.formatInt( i ), x, y, 8 );
+}</code></pre>
+<p>As soon as a <code>break</code> statement is encountered (they are typically controlled by an <code>if</code> as above), the loop body is exited (no more statements in the loop body are executed), and the entire loop ends (regardless of the current test result). A <code>break</code> statement can only occur inside of a loop.</p>
+<h4 id="more-loop-syntax">More Loop Syntax</h4>
+<p>Like the <a href="#if-else">if-else</a> structure, if the body of a <code>while</code>, <code>do-while</code>, or <code>for</code> loop is just a single statement, then you can omit the curly brackets if you want. For example:</p>
+<pre><code>// Count to 100 by 10s
+for (int i = 10; i &lt;= 100; i += 10)
+    ct.println( i );</code></pre>
+<p>The three parts of a <code>for</code> loop header (<em>initialize</em>, <em>test</em>, and <em>advance</em>) are all optional and can be left out if desired (but the two semicolons must be left in place). Leaving out the <em>initalize</em> or <em>advance</em> statements just means that no statement happens at that stage of the loop. Leaving out the <em>test</em> means that the test defaults to <code>true</code>, and the loop must be ended internally with a <code>break</code> statement. Examples:</p>
+<pre><code>// Count backwards from user-entered starting value by 3s
+int i = ct.inputInt( &quot;Enter starting value&quot; );
+for (; i &gt; 0; i -= 3)
+{
+    ct.println( i );
+}</code></pre>
+<pre><code>// Draw labelled circles at random positions until one 
+// would have been near the bottom of the screen.
+for (int i = 1; ; i++)
+{
+    int x = ct.random( 10, 90 );
+    int y = ct.random( 10, 90 );
+    if (y &gt; 85)
+        break;
+    ct.circle( x, y, 10 );
+    ct.text( ct.formatInt( i ), x, y, 8 );
+}</code></pre>
+<pre><code>// Draw circles as long as the user wants to keep going
+for (;;)
+{
+    ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+    if (!ct.inputYesNo( &quot;Do you want to keep making circles?&quot; ))
+        break;
+}</code></pre>
+<p>Finally, note that the <em>initialize</em> and <em>advance</em> statements in a <code>for</code> loop can be any single valid Java statement (not necessarily a variable initialization and variable increment/assignment), including function calls.</p>
+<h4 id="loops-and-code12-animation-frames">Loops and Code12 Animation Frames</h4>
+<p>Because loops allow you to repeat behavior, you might think that you could use a loop to create animation effects (by repeatedly moving an object by a little bit) or to control repeating behavior in a game. However, due to way the <a href="API.html#start">start()</a>, <a href="API.html#update">update()</a>, and <a href="API.html#input-event-functions">Input Event Functions</a> in Code12 work, this strategy will not work. Although animation frames occur 60 times per second, each function body in your program will always <em>execute to completion</em> before the next animation frame is drawn (even if the 1/60th of a second interval is passed). This means that any loop in your code will always execute to completion before the screen is redrawn. So if you include a loop in your code, only the final results at the end of the loop will be displayed.</p>
+<p>Animation and repeating behaviors in a game should be handled by considering the automatic repeating nature of the <a href="API.html#update">update()</a> function. In effect, there is a loop inside of the Code12 system that is repeatedly preparing and drawing new animation frames. The contents of your <code>update()</code> function are essentially inside the body of this loop. So, your <code>update()</code> function should typically do what is necessary for <em>one</em> animation frame of your game, letting itself get called repeatedly by the Code12 system.</p>
 <h6 id="java-language-help-loops"><a href="#top">Java Language Help</a> &gt; <a href="#loops">Loops</a></h6>
 <h3 id="arrays">Arrays</h3>
+<p>An array is a way to store an entire list or sequence of values in a single variable. You can then access one entry in the sequence by using an integer <em>index</em> in square brackets after the array name. The first entry is at index 0, the second is at index 1, etc.</p>
+<h4 id="example-2">Example</h4>
+<pre><code>// Declare and initialize an array of double values named sizes
+double[] sizes = { 2, 5, 1, 3.5, 1 };
+
+// Use the 4th size (index 3) to make a circle
+ct.circle( 50, 50, sizes[3] );    // diameter will be 3.5</code></pre>
+<h4 id="notes-10">Notes</h4>
+<p>The syntax <code>double[]</code> is the type for the variable <code>sizes</code> above and can be read as “double array”, meaning an array of <code>double</code> values. You can make an array of any of the <a href="#java-data-types">Java Data Types</a>. Note that all entries in the array must be the same type. For example:</p>
+<pre><code>int[] counts = { 2, 0, 1, 6 };
+double[] sizes = { 2, 5, 1, 3.5, 1 };
+boolean[] hits = { true, false, false, true };
+String[] names = { &quot;Doug&quot;, &quot;Sue&quot;, &quot;Pat&quot; };
+GameObj[] walls = { leftWall, topWall, bottomWall };</code></pre>
+<blockquote>
+<p>In the <code>GameObj[] walls</code> example above, assume that the variables <code>leftWall</code>, <code>topWall</code>, and <code>bottomWall</code> are existing <code>GameObj</code> variables that were already created (using <a href="API.html#ct.rect">ct.rect()</a>, for example).</p>
+</blockquote>
+<h5 id="getting-and-setting-array-values">Getting and Setting Array Values</h5>
+<p>You can access the entries of an array (often called the <em>elements</em> of the array) using an integer index. Like a regular variable, you can get the value at a particular index, and you can also set (change) the value at an index by using an assignment statement. For example:</p>
+<pre><code>String[] names = { &quot;Doug&quot;, &quot;Sue&quot;, &quot;Pat&quot; };
+
+ct.println( names[0] );      // Doug
+ct.println( names[1] );      // Sue
+ct.println( names[2] );      // Pat
+
+// Change the second name (index 1) 
+names[1] = &quot;Abby&quot;;
+
+ct.println( names[0] );      // Doug
+ct.println( names[1] );      // Abby
+ct.println( names[2] );      // Pat</code></pre>
+<h5 id="using-an-index-expression">Using an Index Expression</h5>
+<p>What really makes arrays a powerful tool is that you can use an <code>int</code> variable, or any <a href="#expressions">expression</a> of type <code>int</code>, as an index to choose which element to access, not just a number directly. For example:</p>
+<pre><code>double[] sizes = { 2, 5, 1, 3.5, 1 };
+
+int i = 1;
+ct.println( sizes[i] );    // 5</code></pre>
+<pre><code>String[] months = { &quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;,
+                    &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot; };
+
+int month = ct.inputInt( &quot;Enter month number&quot; );
+
+// The correct months index is one less than the month number. 
+// For example, &quot;Jan&quot; is month number 1 and index 0.
+
+ct.println( months[month - 1] );</code></pre>
+<h5 id="invalid-array-indexes">Invalid Array Indexes</h5>
+<p>In an array of 3 items, such as:</p>
+<pre><code>String[] names = { &quot;Doug&quot;, &quot;Sue&quot;, &quot;Pat&quot; };</code></pre>
+<p>the valid index values are 0, 1, and 2. Attempting to access an item at an invalid index (e.g. past the end of the array) will produce an error. For example:</p>
+<pre><code>String[] names = { &quot;Doug&quot;, &quot;Sue&quot;, &quot;Pat&quot; };
+
+ct.println( names[3] );   // This causes an error</code></pre>
+<blockquote>
+<p>Note that unlike most error messages that you get for problems with your code, an invalid array index causes an error at “runtime” (after your program has already started running).</p>
+</blockquote>
+<h5 id="using-loops-with-arrays">Using Loops with Arrays</h5>
+<p>Arrays are especially powerful when used in conjunction with <a href="#loops">Loops</a>. A loop can be used to repeat some code for every element in the array by modifying an <em>index variable</em> and using it inside the loop body. For example:</p>
+<pre><code>String[] months = { &quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;,
+                    &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot; };
+
+// Print all the months
+for (int i = 0; i &lt; 12; i++ )
+{
+    ct.println( months[i] );
+}</code></pre>
+<p>If you want to read and process all the elements of an array in order (such as in the example above), Java also offers a special shortcut syntax for this called the “Enhanced For Loop”:</p>
+<pre><code>String[] months = { &quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;,
+                    &quot;Jul&quot;, &quot;Aug&quot;, &quot;Sep&quot;, &quot;Oct&quot;, &quot;Nov&quot;, &quot;Dec&quot; };
+
+// Print all the months
+for (String month: months )
+{
+    ct.println( month );
+}</code></pre>
+<p>In the Enhanced For Loop, instead of using an integer index, the loop variable is the same type as the elements in the array, and it will be assigned in turn to each element in the array, in order.</p>
+<h5 id="creating-an-empty-array">Creating an Empty Array</h5>
+<p>An array variable initialization such as:</p>
+<pre><code>String[] names = { &quot;Doug&quot;, &quot;Sue&quot;, &quot;Pat&quot; };</code></pre>
+<p>declares the array variable <code>names</code> and also initializes the array to contain the values given in the curly brackets.</p>
+<p>You can also declare and create an array that leaves the individual array elements “blank” but has room for them to be assigned (set) later:</p>
+<pre><code>String[] names = new String[3];      // blank array with room for 3 Strings
+
+names[0] = &quot;Doug&quot;;
+names[1] = &quot;Sue&quot;;
+names[2] = &quot;Pat&quot;;</code></pre>
+<p>Carefully note the syntax <code>new String[3]</code>. After <code>new</code> goes the type for the elements in the array (this must be declared up front), then the <em>size</em> of the array in square brackets (here 3).</p>
+<p>Creating an array in this way is useful when you need code to calculate or create the array elements. For example:</p>
+<pre><code>// Create a blank array of 10 int values to store sizes
+int[] sizes = new int[10];
+
+// Set all the sizes to random values
+for (int i = 0; i &lt; 10; i++)
+{
+    sizes[i] = ct.random( 0, 5 );
+}
+
+// Print all the sizes
+for (int i = 0; i &lt; 10; i++)
+{
+    ct.println( sizes[i] );
+}</code></pre>
+<p>Note that when you create a “blank” array, the elements of the array are actually all initialized right away to an initial default value depending on their type as follows:</p>
+<pre><code>Type      Default Value
+----      -------------
+int       0
+double    0.0
+boolean   false
+String    null
+GameObj   null</code></pre>
+<h5 id="an-array-of-gameobj-objects">An Array of GameObj Objects</h5>
+<p>Especially useful in games is the ability to create an array of <a href="#java-data-types">GameObj</a> objects. In conjunction with <a href="#loops">Loops</a>, You can create many objects on the screen and keep track of and manipulate all of them. For example:</p>
+<pre><code>class Example
+{
+    // An array that can hold 10 GameObj objects
+    GameObj[] balls = new GameObj[10];
+
+    public void start()
+    {
+        // Create the balls at random locations
+        for (int i = 0; i &lt; 10; i++)
+        {
+            balls[i] = ct.circle( ct.random( 10, 90 ), ct.random( 10, 90 ), 10 );
+        }
+    }
+
+    public void update()
+    {
+        // Move all the balls and recycle them when they go off-screen
+        for (int i = 0; i &lt; 10; i++)
+        {
+            balls[i].x += 0.5;
+            if (balls[i].x &gt; 110)
+                balls[i].x = -10;
+        }
+    }
+}</code></pre>
 <h6 id="java-language-help-arrays"><a href="#top">Java Language Help</a> &gt; <a href="#arrays">Arrays</a></h6>
 <h3 id="java-data-types">Java Data Types</h3>
 <p>Code12 supports the standard Java data types <code>int</code>, <code>double</code>, <code>boolean</code>, and <code>String</code>, plus the <code>GameObj</code> type defined by Code12.</p>
@@ -1020,7 +1538,7 @@ a != b    // (Not equal to) a and b are compatible types, result is boolean</cod
         ct.circle( 50, 30, 20 );
     }
 }</code></pre>
-<p>Your program can also contain an optional <a href="API.html#main-program-functions">update() function</a> and optional <a href="API.html#input-event-functions">Input Event Functions</a>.</p>
+<p>Your program can also contain an optional <a href="API.html#main-program-functions">update()</a> function and optional <a href="API.html#input-event-functions">Input Event Functions</a>.</p>
 <h6 id="java-language-help-main-program-structure"><a href="#top">Java Language Help</a> &gt; <a href="#main-program-structure">Main Program Structure</a></h6>
 <h3 id="unsupported-java-language-features">Unsupported Java Language Features</h3>
 <p>The Code12 Application supports a subset of the full Java language, in order to avoid the typical syntax ambiguities that make traditional Java error messages frequently confusing to beginners, and to keep the focus on the <a href="#top">12 fundamental programming concepts</a>.</p>

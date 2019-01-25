@@ -1,5 +1,6 @@
 // Pong2.java
 // Comments
+// Draws the start of a game of pong.
 
 class Pong2
 {
