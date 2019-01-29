@@ -2567,8 +2567,10 @@ Examples: `"hello"`, `"What is your name?"`, `"3"`, `"food4u*$-!)"`
 #### GameObj
 A `GameObj` (Game Object) is a reference to a graphical object (circle, rectangle, 
 line, text, or image) that you can create for display on the screen. To create a `GameObj`,
-see [Graphics Object Creation]. If you store a `GameObj` in a variable then you can 
-also access and change the object later using the [GameObj Data Fields] and [GameObj Methods].
+see [Graphics Object Creation](API.html#graphics-object-creation). 
+If you store a `GameObj` in a variable then you can also access and change the object later 
+using the [GameObj Data Fields](API.html#gameobj-data-fields) and 
+[GameObj Methods](API.html#gameobj-methods).
 
 ###### [Java Language Help](#top) > [Java Data Types]
 
