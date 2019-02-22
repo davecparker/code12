@@ -16,33 +16,59 @@ class Cube
         bottomPoints[1] = ct.circle(50, 60, 1, "dark blue");
         bottomPoints[2] = ct.circle(70, 70, 1, "dark blue");
         bottomPoints[3] = ct.circle(50, 80, 1, "dark blue");
+
+        for (int i = 0; i < topPoints.length; i++)
+        {
+            topPoints[i].setFillColorRGB(0, 76, 153);
+            bottomPoints[i].setFillColorRGB(0, 76, 153);
+            topPoints[i].setLineWidth(0);
+            bottomPoints[i].setLineWidth(0);
+            topPoints[i].group = "points";
+            bottomPoints[i].group = "points";
+        }
     }
 
     public void update()
     {
+        ct.clearGroup("");
         for (int i = 0; i < topPoints.length; i++)
         {
-            if (topPoints[i].y < 30 || topPoints[i].x == 30)
+            if (topPoints[i].y < 30 || ct.roundDecimal(topPoints[i].x, 1) == 30)
             {
-                topPoints[i].x += 0.1;
-                bottomPoints[i].x += 0.1;
-                double f = 10 * Math.sqrt(1 - 0.0025 * Math.pow(topPoints[i].x - 50, 2));
-
-                if (!(30 - f >= 20))
-                    ct.println(topPoints[i].x);
-
+                topPoints[i].x += 0.05;
+                bottomPoints[i].x += 0.05;
+                double f = ellipse(topPoints[i].x);
                 topPoints[i].y = 30 - f;
                 bottomPoints[i].y = 70 - f;
             }
-            else if (topPoints[i].y > 30 || topPoints[i].x == 70)
+            else if (topPoints[i].y > 30 || ct.roundDecimal(topPoints[i].x, 1) == 70)
             {
-                topPoints[i].x -= 0.1;
-                bottomPoints[i].x -= 0.1;
-                double f = 10 * Math.sqrt(1 - 0.0025 * Math.pow(topPoints[i].x - 50, 2));
+                topPoints[i].x -= 0.05;
+                bottomPoints[i].x -= 0.05;
+                double f = ellipse(topPoints[i].x);
                 topPoints[i].y = 30 + f;
                 bottomPoints[i].y = 70 + f;
             }
 
         }
+        createLines();
+    }
+
+    double ellipse(double x)
+    {
+        return 10 * Math.sqrt(1 - 0.0025 * Math.pow(ct.roundDecimal(x, 1) - 50, 2));
+    }
+
+    void createLines()
+    {
+        for (int i = 0; i < topPoints.length; i++)
+            ct.line(topPoints[i].x, topPoints[i].y, bottomPoints[i].x, bottomPoints[i].y, "white");
+        for (int i = 1; i < topPoints.length; i++)
+        {
+            ct.line(topPoints[i - 1].x, topPoints[i - 1].y, topPoints[i].x, topPoints[i].y, "white");
+            ct.line(bottomPoints[i - 1].x, bottomPoints[i - 1].y, bottomPoints[i].x, bottomPoints[i].y, "white");
+        }
+        ct.line(topPoints[0].x, topPoints[0].y, topPoints[3].x, topPoints[3].y, "white");
+        ct.line(bottomPoints[0].x, bottomPoints[0].y, bottomPoints[3].x, bottomPoints[3].y, "white");
     }
 }
