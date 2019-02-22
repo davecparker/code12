@@ -11,7 +11,7 @@ class BinaryConverter
         input = ct.inputInt("Please enter a positive integer to convert to binary:");
 
         // calculate how many digits will be in the binary equivalent
-        while (input >= Math.pow(2, digits) - 1)
+        while (input >= Math.pow(2, digits))
             digits++;
 
         // spending method of binary conversion
