@@ -1,7 +1,5 @@
 
-import Code12.*;
-
-public class GameObjMethodsTest extends Code12Program
+class GameObjMethodsTest
 {
     GameObj title, backButton, backText;
     GameObj[] screenButtons, screenLabels, testObjs;
@@ -11,11 +9,6 @@ public class GameObjMethodsTest extends Code12Program
                         "light gray", "light red", "light green", "light blue", "light cyan", "light magenta", "light yellow",
                         "dark gray", "dark red", "dark green", "dark blue", "dark cyan", "dark magenta", "dark yellow", null};
 
-    public static void main(String[] args)
-    {
-        Code12.run(new GameObjMethodsTest());
-    }
-
     public void start()
     {
         testObjs = new GameObj[10];
@@ -23,7 +16,7 @@ public class GameObjMethodsTest extends Code12Program
         enableMainScreen();
     }
 
-    public void defineScreens()
+    void defineScreens()
     {
         title = ct.text("", 50, 8, 8);
         backButton = ct.rect(10, 2.5, 20, 5, "light blue");
@@ -40,7 +33,7 @@ public class GameObjMethodsTest extends Code12Program
         disableScreens();
     }
 
-    public void enableMainScreen()
+    void enableMainScreen()
     {
         title.setText("GameObj Method Testing");
         String[] labels = {"getType", "get/setText", "toString", "setSize", "align", "setFillColor", "setFillColorRGB", "setLineColor", "setLineColorRGB",
@@ -53,7 +46,7 @@ public class GameObjMethodsTest extends Code12Program
         }
     }
 
-    public void disableScreens()
+    void disableScreens()
     {
         for (int i = 0; i < screenButtons.length; i++)
         {
@@ -65,7 +58,7 @@ public class GameObjMethodsTest extends Code12Program
         deleteTestObjs();
     }
 
-    public void deleteTestObjs()
+    void deleteTestObjs()
     {
         for (int i = 0; i < testObjs.length; i++)
         {
@@ -77,13 +70,13 @@ public class GameObjMethodsTest extends Code12Program
         }
     }
 
-    public void backButtonAction()
+    void backButtonAction()
     {
         disableScreens();
         enableMainScreen();
     }
 
-    public void mainScreenAction(GameObj obj)
+    void mainScreenAction(GameObj obj)
     {
         disableScreens();
         backButton.visible = true;
@@ -144,7 +137,7 @@ public class GameObjMethodsTest extends Code12Program
             userMouseDragInteraction(obj, x, y);
     }
 
-    public void userMousePressInteraction(GameObj obj, double x, double y)
+    void userMousePressInteraction(GameObj obj, double x, double y)
     {
         String titleName = title.getText();
         if (titleName.equals("get/setText Test") && isTestObjIndexWithin(obj, 0, 5))
@@ -165,7 +158,7 @@ public class GameObjMethodsTest extends Code12Program
             hitClickAction(obj);
     }
 
-    public void userMouseDragInteraction(GameObj obj, double x, double y)
+    void userMouseDragInteraction(GameObj obj, double x, double y)
     {
         obj.x = x;
         obj.y = y;
@@ -176,7 +169,7 @@ public class GameObjMethodsTest extends Code12Program
             objectHitInGroupDragAction();
     }
 
-    public void getTypeTest()
+    void getTypeTest()
     {
         title.setText("getType Test");
         ct.println("\n**getType Test**");
@@ -185,7 +178,7 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i] = ct.text(testObjs[i - 5].getType(), 50, 15 * i - 45, 6);
     }
 
-    public void getsetTextTest()
+    void getsetTextTest()
     {
         title.setText("get/setText Test");
         ct.println("\n**get/setText Test**");
@@ -195,14 +188,14 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i] = ct.text(testObjs[i - 5].getText(), 50, 15 * i - 45, 6);
     }
 
-    public void getsetTextClickAction(GameObj obj)
+    void getsetTextClickAction(GameObj obj)
     {
         String input = ct.inputString("Enter a string to modify the object's text: ");
         obj.setText(input);
         testObjs[getTestObjIndex(obj) + 5].setText(obj.getText());
     }
 
-    public void toStringTest()
+    void toStringTest()
     {
         title.setText("toString Test");
         ct.println("\n**toString Test**");
@@ -213,7 +206,7 @@ public class GameObjMethodsTest extends Code12Program
             ct.println(testObjs[i]);
     }
 
-    public void setSizeTest()
+    void setSizeTest()
     {
         title.setText("setSize Test");
         ct.println("\n**setSize Test**");
@@ -222,7 +215,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs = getBasicTestObjs(9, 50);
     }
 
-    public void setSizeClickAction(GameObj obj)
+    void setSizeClickAction(GameObj obj)
     {
         ct.clearGroup("reference points");
         String type = obj.getType();
@@ -259,7 +252,7 @@ public class GameObjMethodsTest extends Code12Program
                 testObjs[i].group = "reference points";
         }
         double userGivenArea = (testObjs[8].y - testObjs[7].y) * Math.pow(ct.getPixelsPerUnit(), 2);
-        double objArea = obj.width * obj.height * Math.pow(ct.getPixelsPerUnit(), 2);
+        double objArea = obj.getWidth() * obj.getHeight() * Math.pow(ct.getPixelsPerUnit(), 2);
         if (!type.equals("text"))
             userGivenArea *= (testObjs[6].x - testObjs[5].x);
 
@@ -267,7 +260,7 @@ public class GameObjMethodsTest extends Code12Program
             ct.showAlert("ERROR: the object did not set it's height and/or width correctly");
     }
 
-    public void alignTest()
+    void alignTest()
     {
         // TODO: null parameter does not make fill color null
         title.setText("align Test");
@@ -277,7 +270,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs = getBasicTestObjs(15, 50);
         for (int i = 5; i < 10; i++)
         {
-            testObjs[i] = ct.rect(50, 15 * i - 45, testObjs[i - 5].width, testObjs[i - 5].height, null);
+            testObjs[i] = ct.rect(50, 15 * i - 45, testObjs[i - 5].getWidth(), testObjs[i - 5].getHeight(), null);
             testObjs[i].setFillColor(null);
             testObjs[i].setLineColor("green");
         }
@@ -285,7 +278,7 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i] = ct.circle(50, 15 * i - 120, 1, "black");
     }
 
-    public void alignClickAction(GameObj obj)
+    void alignClickAction(GameObj obj)
     {
         String input = ct.inputString("Enter an alignment: ('null' for null value):");
         if (input.equals("null"))
@@ -294,7 +287,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs[getTestObjIndex(obj) + 5].align(input);
     }
 
-    public void setFillColorTest()
+    void setFillColorTest()
     {
         title.setText("setFillColor Test");
         ct.println("\n**setFillColor Test**");
@@ -314,7 +307,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs = testObjsCopy;
     }
 
-    public void setLineColor()
+    void setLineColor()
     {
         title.setText("setLineColor Test");
         ct.println("\n**setLineColor Test**");
@@ -326,7 +319,7 @@ public class GameObjMethodsTest extends Code12Program
             double y = ct.intDiv(i, 8) * 18 + 30;
             testObjsCopy[i] = ct.circle(x, y, 10, "light gray");
             testObjsCopy[i].setLineColor(colors[i]);
-            testObjsCopy[i].lineWidth = 5;
+            testObjsCopy[i].setLineWidth(5);
             if (i == 26)
                 testObjsCopy[i + 27] = ct.text("null", x, y + 8, 2);
             else
@@ -335,7 +328,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs = testObjsCopy;
     }
 
-    public void setFillLineColorClickAction(GameObj obj)
+    void setFillLineColorClickAction(GameObj obj)
     {
         String input = ct.inputString("Enter a color: ('null' for null value):");
         if (input.equals("null"))
@@ -348,7 +341,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs[getTestObjIndex(obj) + 27].setText(input);
     }
 
-    public void setFillColorRGBTest()
+    void setFillColorRGBTest()
     {
         title.setText("setFillColorRGB Test");
         ct.println("\n**setFillColorRGB Test**");
@@ -367,7 +360,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs = testObjsCopy;
     }
 
-    public void setLineColorRGBTest()
+    void setLineColorRGBTest()
     {
         title.setText("setLineColorRGB Test");
         ct.println("\n**setLineColorRGB Test**");
@@ -380,14 +373,14 @@ public class GameObjMethodsTest extends Code12Program
             double y = ct.intDiv(i, 8) * 15 + 30;
             testObjsCopy[i] = ct.rect(x, y, 8, 8, "light gray");
             testObjsCopy[i].setLineColorRGB(color, color, color);
-            testObjsCopy[i].lineWidth = 5;
+            testObjsCopy[i].setLineWidth(5);
             String rgb = "{" + color + ", " + color + ", " + color + "}";
             testObjsCopy[i + 40] = ct.text(rgb, x, y + 8, 2);
         }
         testObjs = testObjsCopy;
     }
 
-    public void setFillLineColorRGBClickAction(GameObj obj)
+    void setFillLineColorRGBClickAction(GameObj obj)
     {
         int r = ct.inputInt("Enter a red value:");
         int g = ct.inputInt("Enter a green value:");
@@ -401,7 +394,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs[getTestObjIndex(obj) + 40].setText(rgb);
     }
 
-    public void getsetLayerTest()
+    void getsetLayerTest()
     {
         title.setText("get/setLayer Test");
         ct.println("\n**get/setLayer Test**");
@@ -411,14 +404,14 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i] = ct.text("1", 50, 15 * i - 45, 6);
     }
 
-    public void getsetLayerClickAction(GameObj obj)
+    void getsetLayerClickAction(GameObj obj)
     {
         obj.setLayer(ct.inputInt("Enter a layer number for " + obj.getType() + " object"));
         int i = getTestObjIndex(obj);
         testObjs[i + 5].setText(ct.formatInt(testObjs[i].getLayer()));
     }
 
-    public void deleteTest()
+    void deleteTest()
     {
         title.setText("delete Test");
         ct.println("\n**delete Test**");
@@ -430,14 +423,14 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i].getText();
             testObjs[i].setText("deleted");
             testObjs[i].toString();
-            testObjs[i].setSize(5, 5);
-            testObjs[i].align("right", true);
+            //testObjs[i].setSize(5, 5);
+            testObjs[i].align("right");
             testObjs[i].setFillColor("green");
             testObjs[i].setFillColorRGB(255, 0, 0);
-            testObjs[i].setLineColor("blue");
-            testObjs[i].setLineColorRGB(0, 255, 255);
+            //testObjs[i].setLineColor("blue");
+            //testObjs[i].setLineColorRGB(0, 255, 255);
             testObjs[i].getLayer();
-            testObjs[i].setLayer(2);
+            //testObjs[i].setLayer(2);
             testObjs[i].delete();
             testObjs[i].clicked();
             testObjs[i].containsPoint(50, 50);
@@ -445,20 +438,20 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i].objectHitInGroup("delete");
             testObjs[i].x = testObjs[i].x;
             testObjs[i].y = testObjs[i].y;
-            testObjs[i].width = testObjs[i].width;
-            testObjs[i].height = testObjs[i].height;
-            testObjs[i].xSpeed = testObjs[i].xSpeed;
-            testObjs[i].ySpeed = testObjs[i].ySpeed;
-            testObjs[i].lineWidth = testObjs[i].lineWidth;
+            //testObjs[i].setSize(1, 1);
+            testObjs[i].getWidth();
+            testObjs[i].getHeight();
+            testObjs[i].setXSpeed(testObjs[i].getXSpeed());
+            testObjs[i].setYSpeed(testObjs[i].getYSpeed());
+            //testObjs[i].setLineWidth(1);
+            //testObjs[i].setClickable(true);
             testObjs[i].visible = testObjs[i].visible;
-            testObjs[i].clickable = testObjs[i].clickable;
-            testObjs[i].autoDelete = testObjs[i].autoDelete;
             testObjs[i].group = testObjs[i].group;
         }
         ct.println("\tPassed deletion");
     }
 
-    public void clickedTest()
+    void clickedTest()
     {
         title.setText("clicked Test");
         ct.println("\n**clicked Test**");
@@ -466,7 +459,7 @@ public class GameObjMethodsTest extends Code12Program
         testObjs = getBasicTestObjs(5, 50);
     }
 
-    public void clickedUpdateAction()
+    void clickedUpdateAction()
     {
         for (int i = 0; i < 5; i++)
         {
@@ -475,7 +468,7 @@ public class GameObjMethodsTest extends Code12Program
         }
     }
 
-    public void containsPointTest()
+    void containsPointTest()
     {
         title.setText("containsPoint Test");
         ct.println("\n**containsPoint Test**");
@@ -485,7 +478,7 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i + 5] = ct.text("Set " + testObjs[i].getType() + "'s size", 75, 15 * i + 30, 4);
     }
 
-    public void containsPointClickAction(GameObj obj, double x, double y)
+    void containsPointClickAction(GameObj obj, double x, double y)
     {
         for (int i = 5; i < 10; i++)
         {
@@ -516,7 +509,7 @@ public class GameObjMethodsTest extends Code12Program
     }
 
     // TODO: set size as well
-    public void hitTest()
+    void hitTest()
     {
         title.setText("hit Test");
         ct.println("\n**hit Test**");
@@ -526,7 +519,7 @@ public class GameObjMethodsTest extends Code12Program
             testObjs[i + 5] = ct.text("Set " + testObjs[i].getType() + "'s size", 85, 15 * i + 30, 3);
     }
 
-    public void hitClickAction(GameObj obj)
+    void hitClickAction(GameObj obj)
     {
         for (int i = 5; i < 10; i++)
         {
@@ -535,7 +528,7 @@ public class GameObjMethodsTest extends Code12Program
         }
     }
 
-    public void hitDragAction()
+    void hitDragAction()
     {
         for (int i = 0; i < 5; i++)
         {
@@ -547,7 +540,7 @@ public class GameObjMethodsTest extends Code12Program
         }
     }
 
-    public void objectHitInGroupTest()
+    void objectHitInGroupTest()
     {
         title.setText("objectHitInGroup Test");
         ct.println("\n**objectHitInGroup Test**");
@@ -565,7 +558,7 @@ public class GameObjMethodsTest extends Code12Program
         }
     }
 
-    public void objectHitInGroupDragAction()
+    void objectHitInGroupDragAction()
     {
         for (int i = 0; i < 5; i++)
         {
@@ -576,7 +569,7 @@ public class GameObjMethodsTest extends Code12Program
         }
     }
 
-    public GameObj[] getBasicTestObjs(int index, double x)
+    GameObj[] getBasicTestObjs(int index, double x)
     {
         GameObj[] objArray = new GameObj[index];
         objArray[0] = ct.circle(x, 30, 10);
@@ -587,7 +580,7 @@ public class GameObjMethodsTest extends Code12Program
         return objArray;
     }
 
-    public boolean clickedButton(GameObj obj)
+    boolean clickedButton(GameObj obj)
     {
         for (int i = 0; i < screenButtons.length; i++)
         {
@@ -597,12 +590,12 @@ public class GameObjMethodsTest extends Code12Program
         return false;
     }
 
-    public boolean clickedTestObj(GameObj obj)
+    boolean clickedTestObj(GameObj obj)
     {
         return getTestObjIndex(obj) != -1;
     }
 
-    public int getTestObjIndex(GameObj obj)
+    int getTestObjIndex(GameObj obj)
     {
         if (obj == null)
             return -1;
@@ -614,7 +607,7 @@ public class GameObjMethodsTest extends Code12Program
         return -1;
     }
 
-    public boolean isTestObjIndexWithin(GameObj obj, int min, int max)
+    boolean isTestObjIndexWithin(GameObj obj, int min, int max)
     {
         int index = getTestObjIndex(obj);
         for (int i = min; i < max; i++)
