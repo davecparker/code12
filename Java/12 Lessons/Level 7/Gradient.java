@@ -13,8 +13,8 @@ class Gradient
 		dot.setFillColorRGB( (int) (dot.x * 2.55), (int) (dot.y * 2.55), 0 );
 		dot.setLineWidth( 0 );   // remove the outline
 
-		// Set its size based on its height
-		double size = dot.y / 5;
+		// Set its size based on its y-coordinate
+		double size = dot.y / 8 + 3;
 		dot.setSize( size, size );
 	}
 }

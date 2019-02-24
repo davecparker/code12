@@ -3,6 +3,9 @@
 
 class Flag4
 {
+	// Constants
+	final double FLAG_ASPECT = 1.5;
+
 	// The overall location of the flag
 	double xFlag = 50;
 	double yFlag = 44;
@@ -14,7 +17,7 @@ class Flag4
 	String fieldColor = "dark blue";
 
 	// Computed measurements
-	double flagHeight = flagWidth * 0.65;
+	double flagHeight = flagWidth / FLAG_ASPECT;
 	double top = yFlag - flagHeight / 2;
 	double stripeHeight = flagHeight / 13;
 	double left = xFlag - flagWidth / 2;

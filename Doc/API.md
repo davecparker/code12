@@ -1037,7 +1037,7 @@ ct.clearScreen();
 ct.setBackColor( "gray" );
 ct.circle( 50, 50, 20 );
 ct.rect( 50, 70, 40, 10 );
-ct.clearScreen();     // screen is now just solid red
+ct.clearScreen();     // screen is now just solid gray
 ```
 ###### [Code12 Function Reference](#top) > [Screen Management] > [ct.clearScreen()]
 
