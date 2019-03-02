@@ -3485,7 +3485,7 @@ at 60 units per second.
 
 Another use of animation frames is to test repeatedly for user input,
 using functions such as [ct.clicked()], [ct.keyPressed()],
-and [ct.keyTyped()], and [obj.clicked()].
+[ct.charTyped()], and [obj.clicked()].
 
 You can also use animation frames to test repeatedly for object interactions
 that can occur when objects are moving. You can call functions such as

@@ -36,7 +36,7 @@ class Pong8A
 	public void start()
 	{
 		// Make the background and dividing line
-		ct.setTitle( "Pong 8" );
+		ct.setTitle( "Pong 8A" );
 		ct.setHeight( HEIGHT );
 		ct.setBackColor( "black" );
 		ct.line( WIDTH / 2, 0, WIDTH / 2, HEIGHT, COLOR );

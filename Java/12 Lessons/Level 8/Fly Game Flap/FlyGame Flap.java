@@ -1,3 +1,8 @@
+/*
+	This game was inspired by the mobile app "Flapy Bird".
+	You click anywhere to make the bird fly up a bit, otherwise it falls down.
+	You try to eat the fly targets, but you must avoid the drone.
+*/
 class FlyGame
 {
 	GameObj bird, fly, drone, scoreText;
