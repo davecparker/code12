@@ -658,7 +658,7 @@ ct.setScreenOrigin( 25, 0 );       // entire scene scrolls to the left</code></p
 <pre><code>ct.setBackColor( &quot;gray&quot; );
 ct.circle( 50, 50, 20 );
 ct.rect( 50, 70, 40, 10 );
-ct.clearScreen();     // screen is now just solid red</code></pre>
+ct.clearScreen();     // screen is now just solid gray</code></pre>
 <h6 id="code12-function-reference-screen-management-ct.clearscreen"><a href="#top">Code12 Function Reference</a> &gt; <a href="#screen-management">Screen Management</a> &gt; <a href="#ct.clearscreen">ct.clearScreen()</a></h6>
 <h3 id="ct.cleargroup">ct.clearGroup()</h3>
 <p>Removes and deletes all graphics (<code>GameObj</code>) objects on the current screen whose <a href="#obj.group">group name</a> matches the name passed.</p>
@@ -2135,7 +2135,7 @@ str.trim()                                        String</code></pre>
 <blockquote>
 <p>A common mistake is to create <a href="#java-data-types">GameObj</a> objects in the <a href="#update">update()</a> function in a way that causes many copies of an object to be created over and over. Note that you should not call functions like <a href="#ct.image">ct.image()</a> to “draw” an image for each frame in an animation. Instead, you typically want to call <a href="#ct.image">ct.image()</a> to create the object once in your <a href="#start">start()</a> function then modify the existing image (e.g. change its <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a>) in your <a href="#update">update()</a> function.</p>
 </blockquote>
-<p>Another use of animation frames is to test repeatedly for user input, using functions such as <a href="#ct.clicked">ct.clicked()</a>, <a href="#ct.keypressed">ct.keyPressed()</a>, and [ct.keyTyped()], and <a href="#obj.clicked">obj.clicked()</a>.</p>
+<p>Another use of animation frames is to test repeatedly for user input, using functions such as <a href="#ct.clicked">ct.clicked()</a>, <a href="#ct.keypressed">ct.keyPressed()</a>, <a href="#ct.chartyped">ct.charTyped()</a>, and <a href="#obj.clicked">obj.clicked()</a>.</p>
 <p>You can also use animation frames to test repeatedly for object interactions that can occur when objects are moving. You can call functions such as <a href="#obj.containspoint">obj.containsPoint()</a> and <a href="#obj.hit">obj.hit()</a>, or examine object locations using <a href="#obj.x">obj.x</a> and <a href="#obj.y">obj.y</a> and write any code you want that tests what you need to detect.</p>
 <p>Finally, note that you can call <a href="#ct.gettimer">ct.getTimer()</a> to detect the passage of certain amounts of time if you want to do something less frequently than every animation frame.</p>
 <h4 id="examples-21">Examples</h4>

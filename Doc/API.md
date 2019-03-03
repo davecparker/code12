@@ -1037,7 +1037,7 @@ ct.clearScreen();
 ct.setBackColor( "gray" );
 ct.circle( 50, 50, 20 );
 ct.rect( 50, 70, 40, 10 );
-ct.clearScreen();     // screen is now just solid red
+ct.clearScreen();     // screen is now just solid gray
 ```
 ###### [Code12 Function Reference](#top) > [Screen Management] > [ct.clearScreen()]
 
@@ -3485,7 +3485,7 @@ at 60 units per second.
 
 Another use of animation frames is to test repeatedly for user input,
 using functions such as [ct.clicked()], [ct.keyPressed()],
-and [ct.keyTyped()], and [obj.clicked()].
+[ct.charTyped()], and [obj.clicked()].
 
 You can also use animation frames to test repeatedly for object interactions
 that can occur when objects are moving. You can call functions such as
