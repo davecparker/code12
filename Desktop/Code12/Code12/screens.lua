@@ -89,11 +89,6 @@ function ct.getPixelsPerUnit()
 end
 
 -- API
-function ct.getScreen()
-	return g.screen.name
-end
-
--- API
 function ct.setScreen(name)
 	-- Make nil name same as empty string
 	name = name or ""
@@ -132,6 +127,11 @@ function ct.setScreen(name)
 	-- Show new screen and make sure it does a full resize at next update
 	screen.group.isVisible = true
 	g.window.resized = true
+end
+
+-- API
+function ct.getScreen()
+	return g.screen.name
 end
 
 -- API

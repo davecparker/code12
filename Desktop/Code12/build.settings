@@ -23,6 +23,12 @@ settings =
 		enableMaximizeButton = true,
 	},  
 
+	osx = {
+		plist = {
+			DeveloperURL = "http://www.code12.org/docs/1/API.html",
+		},
+	},
+
 	--
 	-- Android section
 	--

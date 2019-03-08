@@ -15,7 +15,7 @@ local platform = system.getInfo("platform")
 -- The global state table
 local g = {
 	-- The runtime version number
-	version = 0.5,
+	version = 1.0,
 
 	-- Platform info
 	platform = platform,
@@ -58,6 +58,8 @@ local g = {
 	clickX = 0,            -- Last click x location 
 	clickY = 0,            -- Last click x location 
 	charTyped = nil,       -- char typed during this update frame (string), nil if none
+	xDialog = nil,         -- x coord (physical, left) for input dialog placement
+	yDialog = nil,         -- y coord (physical, top) for input dialog placement
 
 	-- The run state
 	runState = nil,    -- "running", "waiting", "paused", "stopped", "error", or nil
@@ -76,6 +78,14 @@ function g.pinValue(value, min, max)
 		return max
 	end
 	return value
+end
+
+-- Return 0 if num is negative, else num.
+function g.forceNotNegative(num)
+	if num < 0 then
+		return 0
+	end
+	return num
 end
 
 -- Create and return a display group in parent, optionally located at x, y

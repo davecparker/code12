@@ -5,7 +5,7 @@ ct.roundDecimal tests done
 ct.isError tests done
 ct.distance tests done
 ct.getVersion tests done
-ct.toInt tests done
+(int) tests done
 ct.parseInt tests done
 ct.canParseInt tests done
 ct.parseNumber(0xFFFF00) = 16776960; NaN expected

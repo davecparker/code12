@@ -71,7 +71,7 @@ class BasicTest extends Code12Program
          fish = ct.image("goldfish.png", x, 85, 20);
          // fish.setText("Bob");
          ct.log(fish);
-         fish.setSpeed(-1, 0);
+         fish.setXSpeed(-1);
          fishes[1] = fish;
       }
             
@@ -79,14 +79,18 @@ class BasicTest extends Code12Program
    }
    
    public void update()
-   {      
+   {
+      String screen = ct.getScreen();
+      if (screen.equals("end"))
+         return;
+
       if (fish.x < -30)
          fish.x = 130;
       else if (fish.x > 130)
          fish.x = -30;
          
       if (fish.hit(wall))
-         fish.setSpeed(0, 0);
+         fish.setXSpeed(0);
       
       if (circle.clicked())
       {
@@ -118,13 +122,18 @@ class BasicTest extends Code12Program
       else if (ct.charTyped("-"))
          fish.setSize(fish.getWidth() / scale, fish.getHeight() / scale);
       else if (ct.charTyped("f"))
-         fish.setSpeed(-1, 0);
+         fish.setXSpeed(-1);
       else if (ct.charTyped("r"))
-         fish.setSpeed(1, 0);         
+         fish.setXSpeed(1);         
       else if (ct.charTyped("u"))
-         fish.setSpeed(0, -1);
+         fish.setYSpeed(fish.getYSpeed() - 0.2);
       else if (ct.charTyped("d"))
-         fish.setSpeed(0, 1);         
+         fish.setYSpeed(fish.getYSpeed() + 0.2);         
+      else if (ct.charTyped("s"))
+      {
+         fish.setXSpeed(0);         
+         fish.setYSpeed(0);         
+      }
    }
 
 /*      

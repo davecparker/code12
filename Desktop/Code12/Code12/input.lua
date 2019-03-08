@@ -30,11 +30,6 @@ local function clickEvent(event, gameObj)
 		g.setFocusObj(nil)
 	end
 
-	-- Ignore events if the game is not supposed to be getting them now
-	if g.runState ~= "running" then
-		return false
-	end
-
 	-- Get logical click location 
 	local xP, yP = g.mainGroup:contentToLocal(event.x, event.y)
 	local xOrigin = g.screen.originX
@@ -70,10 +65,12 @@ local function clickEvent(event, gameObj)
 		g.clickX = x
 		g.clickY = y
 
-		-- Automatically take the touch focus.
-		g.setFocusObj(focusObj)
+		-- Automatically take the touch focus if running
+		if g.runState == "running" then
+			g.setFocusObj(focusObj)
+		end
 
-		-- Call client event
+		-- Call client press event
 		runtime.runInputEvent(ct.userFns.onMousePress, gameObj, x, y)
 	elseif event.target ~= focusObj then
 		return false    -- click did not begin on this object
@@ -182,9 +179,11 @@ function g.onKey(event)
 
 	-- Process the key
 	if event.phase == "down" then
-		-- keyPress
-		keysDown[keyName] = true
-		runtime.runInputEvent(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
+		-- Send keyPress event only if not already down
+		if not keysDown[keyName] then
+			keysDown[keyName] = true
+			runtime.runInputEvent(ct.userFns.onKeyPress, keyName)  -- TODO: if yielded
+		end
 
 		-- Check for charTyped
 		local ch = charTypedFromKeyEvent(event)

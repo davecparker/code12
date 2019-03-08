@@ -16,11 +16,18 @@ local app =  {
 	borderShade = 0.5,
 	enabledShade = 0.3,
 	disabledShade = 0.7,
+	defaultGridlineShade = 0.6,
 
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
 	consoleFontSize = 14,
 	fontSizeUI = 12,
+	optionsFont = native.systemFont,
+	optionsFontBold = native.systemFontBold,
+	optionsFontSize = 14,
+
+	-- Web folders
+	webHelpDir = "http://www.code12.org/docs/1/",
 
 	-- UI metrics
 	margin = 10,                 -- generic margin to leave between many UI items
@@ -52,6 +59,7 @@ local app =  {
 	customEditors = {},          -- table of custom editors, e.g. { name = "Atom", path = "C:\...\atom.exe" }
 	showVarWatch = true,         -- when true, show the variable watch window
 	gridOn = false,              -- when true, the coordinate gridlines are visible over the program output
+	gridlineShade = nil,         -- current gridline shade
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
@@ -178,6 +186,12 @@ function app.addRecentSourceFilePath( path )
 		table.remove( recentPaths )
 	end
 end
+
+-- Show the reference docs in a new browser window
+function app.showHelp()
+	system.openURL( app.webHelpDir .. "API.html" )   -- TODO: use starting index page
+end
+
 
 ------------------------------------------------------------------------------
 return app

@@ -1,1 +1,0 @@
-application = { content = { width = 600, height = 900, scale = 'adaptive', fps = 60 } }

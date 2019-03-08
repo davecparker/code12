@@ -24,10 +24,14 @@ local optionsView = composer.newScene()
 
 
 -- UI Metrics
-local margin = app.margin -- Space between most UI elements
-local topMargin = margin  -- Top margin of the scene
-local switchSize = 20     -- Size of radio buttons, checkboxes, and fillboxes
-local fontSize = 20       -- Font size of switch headers and labels
+local sectionMargin = 15                    -- Space between sections
+local topMargin = app.margin                -- Top margin of the scene
+local titleFontSize = 30                    -- Font size for the title
+local optionsFont = app.optionsFont         -- Font for switch labels
+local optionsFontBold = app.optionsFontBold -- Font for title and switch headers
+local fontSize = app.optionsFontSize        -- Font size of switch headers and labels
+local switchSize = 16                       -- Size of radio buttons, checkboxes, and fillboxes
+local yEditorPicker                         -- Y-coordinate for the top of editorPicker
 
 -- Display objects and groups
 local title               -- Title text
@@ -36,14 +40,14 @@ local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
 local editorPicker        -- Text editor picker
 local varWatchPicker      -- Variable watch window mode picker
+local gridlineColorPicker -- Gridline color picker
 local addEditorBtn        -- Add a Text Editor button
 local openInEditorBtn     -- Open current source file in editor button
 local optionsGroup        -- Display group containing the options objects
 local scrollView          -- Scroll view widget containing optionsGroup
 
 -- State variables
-local lastAppWidth        -- Value of app.width the last time optionsView was shown/resized
-local lastAppHeight       -- Value of app.height the last time optionsView was shown/resized
+local forceReprocess      -- true to reprocess source file after changes
 
 
 --- Internal Functions ------------------------------------------------
@@ -69,7 +73,7 @@ local function setSelectedOptions()
 	-- Set the active segment of the tabWidthPicker
 	tabWidthPicker:setActiveSegment( app.tabWidth - 1 )
 
-	-- Set the checked box of the editorPicker
+	-- Set the selected radio button of the editorPicker
 	if app.useDefaultEditor or #env.installedEditors == 1 then
 		-- Check on "System Default"
 		editorPicker.switches[1]:setState{ isOn = true }
@@ -99,6 +103,16 @@ local function setSelectedOptions()
 	else
 		varWatchPicker.switches[1]:setState{ isOn = false }
 	end
+
+	-- Set the selected radio button of the gridlineColorPicker
+	local gridColorSwitches = gridlineColorPicker.switches
+	local shade = app.gridlineShade or app.defaultGridlineShade
+	for i = 1, gridColorSwitches.numChildren do
+		if gridColorSwitches[i].value == shade then
+			gridColorSwitches[i]:setState{ isOn = true }
+			break
+		end
+	end
 end
 
 local function makeEditorPicker( parent )
@@ -112,16 +126,16 @@ local function makeEditorPicker( parent )
 	end
 	editorPicker = buttons.newSettingPicker{
 		parent = parent,
-		header = "Text Editor:",
-		headerFont = native.systemFontBold,
+		header = "Text Editor",
+		headerFont = optionsFontBold,
 		headerFontSize = fontSize,
 		labels = editorNames,
-		labelsFont = native.systemFont,
+		labelsFont = optionsFont,
 		labelsFontSize = fontSize,
 		style = "radio",
 		switchSize = switchSize,
 		x = 0,
-		y = varWatchPicker.y + varWatchPicker.height + margin,
+		y = yEditorPicker,
 		onPress = 
 			function ( event )
 				app.editorPath = env.installedEditors[event.target.value].path
@@ -130,16 +144,33 @@ local function makeEditorPicker( parent )
 	}
 end
 
+local function makeOpenInEditorBtn( filename )
+	if openInEditorBtn then
+		openInEditorBtn:removeSelf()
+		openInEditorBtn = nil
+	end
+	openInEditorBtn = buttons.newOptionButton{
+		parent = optionsGroup,
+		left = 0,
+		top = addEditorBtn.y + addEditorBtn.height + app.margin,
+		label = "Open " .. filename .. " in Editor",
+		font = optionsFont,
+		fontSize = fontSize,
+		onRelease = 
+			function ()
+				env.openFileInEditor( app.recentSourceFilePaths[1] )
+			end
+	}
+end
+
 local function setEditorButtons( repositionAddEditorBtn )
 	if repositionAddEditorBtn then
-		addEditorBtn.y = editorPicker.y + editorPicker.height + margin * 0.5
+		addEditorBtn.y = editorPicker.y + editorPicker.height + app.margin * 0.5
 	end
 	if #app.recentSourceFilePaths > 0 then
 		local _, filename = env.dirAndFilenameOfPath( app.recentSourceFilePaths[1] )
-		openInEditorBtn:setLabel( "Open " .. filename .. " in Editor" )
-		openInEditorBtn.y = addEditorBtn.y + addEditorBtn.height + margin * 0.5
-		openInEditorBtn.isVisible = true
-	else
+		makeOpenInEditorBtn( filename )
+	elseif openInEditorBtn then
 		openInEditorBtn.isVisible = false
 	end
 end
@@ -152,13 +183,15 @@ local function makeScrollView( parent )
 		scrollView = nil
 	end
 	scrollView = widget.newScrollView{
-		top = title.y + title.height + margin,
-		left = 0,
+		x = 0,
+		y = title.y + title.height + app.margin,
 		width = app.width,
 		height = app.height - title.height - app.dyStatusBar,
 		isBounceEnabled = false,
 		backgroundColor = { 0.9 },
 	}
+	scrollView.anchorX = 0
+	scrollView.anchorY = 0
 	parent:insert( scrollView )
 	scrollView:insert( optionsGroup )
 	scrollView:setScrollWidth( optionsGroup.width )
@@ -175,14 +208,14 @@ end
 --- Event Handlers ------------------------------------------------
 
 -- Close Button handler
--- Save settings and process user file or go back to getFile view
+-- Save settings and re-process the user file if necessary 
+-- or go back to the view we came from.
 local function onClose()
 	app.saveSettings()
-	local prevScene = composer.getSceneName( "previous" )
-	if prevScene == "getFile" then
-		composer.gotoScene( prevScene )
+	if g.runState ~= nil and forceReprocess then
+		app.processUserFile()   -- will go to runView or errView
 	else
-		app.processUserFile()
+		composer.gotoScene( composer.getSceneName( "previous" ) )
 	end
 end
 
@@ -192,8 +225,27 @@ end
 -- selected level and clear the remaining boxes.
 local function onSyntaxLevelPress( event )
 	local syntaxLevel = event.target.value
-	app.syntaxLevel = syntaxLevel
+	if syntaxLevel ~= app.syntaxLevel then
+		app.syntaxLevel = syntaxLevel
+		forceReprocess = true
+	end
 	fillBoxes( levelPicker.switches, syntaxLevel )
+end
+
+-- Handle press of the varWatch checkbox
+local function onVarWatchPress( event )
+	local show = event.target.isOn
+	if show ~= app.showVarWatch then
+		app.showVarWatch = show
+		if show then
+			forceReprocess = true
+		end
+	end
+end
+
+-- Gridline Color Switch handler
+local function onGridlineColorPress( event )
+	app.gridlineShade = event.target.value
 end
 
 -- Show dialog to choose the editor and add the path to installed editors
@@ -244,12 +296,6 @@ local function onAddEditor()
 	timer.performWithDelay( 50, addEditor )
 end
 
--- Open In Editor Button handler
--- Open most recent program file in text editor
-local function onOpenInEditor()
-	env.openFileInEditor( app.recentSourceFilePaths[1] )
-end
-
 
 --- Scene Methods ------------------------------------------------
 
@@ -261,55 +307,58 @@ function optionsView:create()
 	g.uiItem( display.newRect( sceneGroup, 0, 0, 10000, 10000 ), 0.9 ) 
 	
 	-- Title
-	title = display.newText{
+	title = g.uiItem( display.newText{
 		parent = sceneGroup,
 		text = "Code12 Options",
-		x = app.width / 2,
+		x = 0,
 		y = topMargin,
-		font = native.systemFontBold,
-		fontSize = fontSize * 1.5,
-	}
-	title:setFillColor( 0 )
-	title.anchorY = 0
+		font = optionsFontBold,
+		fontSize = titleFontSize,
+	} )
+	title.x = math.round( app.width / 2 - title.width / 2)
 
 	-- Close button
-	closeBtn = widget.newButton{
-		defaultFile = "images/close.png",
-		x = app.width - margin,
-		y = margin,
-		width = 15,
-		height = 15,
+	closeBtn = buttons.newIconAndTextButton{
+		parent = sceneGroup,
+		left = 0,
+		top = app.margin,
+		text = "Close",
+		colorText = true,
+		imageFile = "close.png",
+		iconSize = 12,
+		defaultFillShade = 1,
+		overFillShade = 0.8,
 		onRelease = onClose,
 	}
-	sceneGroup:insert( closeBtn )
-	closeBtn.anchorX = 1
-	closeBtn.anchorY = 0
+	closeBtn.x = math.round( app.width - app.margin - closeBtn.width )
 
 	-- Options display group
 	optionsGroup = display.newGroup()
+	optionsGroup.anchorX = 0
+	optionsGroup.anchorY = 0
 
 	-- Syntax level picker
 	local syntaxLevels = {
-		"1. Procedure Calls",
+		"1. Function Calls",
 		"2. Comments",
 		"3. Variables",
 		"4. Expressions",
-		"5. Function Calls",
+		"5. Function Return Values",
 		"6. Object Data Fields",
 		"7. Object Method Calls",
 		"8. If-else",
 		"9. Function Definitions",
-		"10. Parameters",
+		"10. Function Parameters",
 		"11. Loops",
 		"12. Arrays",
 	}
 	levelPicker = buttons.newSettingPicker{
 		parent = optionsGroup,
-		header = "Syntax Level:",
-		headerFont = native.systemFontBold,
+		header = "Java Language Syntax Level",
+		headerFont = optionsFontBold,
 		headerFontSize = fontSize,	
 		labels = syntaxLevels,
-		labelsFont = native.systemFont,
+		labelsFont = optionsFont,
 		labelsFontSize = fontSize,
 		style = "fillbox",
 		switchSize = switchSize,
@@ -317,14 +366,15 @@ function optionsView:create()
 		y = 0,
 		onPress = onSyntaxLevelPress,
 	}
+	local lastPicker = levelPicker
 
 	-- Tab width header
 	local tabWidthHeader  = display.newText{
 		parent = optionsGroup,
-		text = "Tab Width:",
+		text = "Tab Width for Source Code Display",
 		x = 0,
-		y = levelPicker.y + levelPicker.height + margin,
-		font = native.systemFontBold,
+		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
+		font = optionsFontBold,
 		fontSize = fontSize,
 	}
 	g.uiItem( tabWidthHeader )
@@ -332,11 +382,10 @@ function optionsView:create()
 	for i = 2, 8 do
 		tabWidths[i - 1] = tostring( i )
 	end
-
 	-- Tab width picker
 	tabWidthPicker = widget.newSegmentedControl{
 		x = 0,
-		y = tabWidthHeader.y + tabWidthHeader.height + margin * 0.5,
+		y = math.round( tabWidthHeader.y + tabWidthHeader.height + app.margin * 0.5 ),
 		segments = tabWidths,
 		segmentWidth = 30,
 		defaultSegment = app.tabWidth - 1,
@@ -345,55 +394,67 @@ function optionsView:create()
 		onPress =
 			function ( event )
 				app.tabWidth = event.target.segmentNumber + 1
+				forceReprocess = true
 			end
 	}
 	tabWidthPicker.anchorX = 0
 	tabWidthPicker.anchorY = 0
 	optionsGroup:insert( tabWidthPicker )
+	lastPicker = tabWidthPicker
 
 	-- Variable Watch Window picker
 	varWatchPicker = buttons.newSettingPicker{
 		parent = optionsGroup,
-		header = "Variable Watch Mode:",
-		headerFont = native.systemFontBold,
+		header = "Program View",
+		headerFont = optionsFontBold,
 		headerFontSize = fontSize,
-		labels = { "Show the variable watch window" },
-		labelsFont = native.systemFont,
+		labels = { "Show the Variable Watch Window" },
+		labelsFont = optionsFont,
 		labelsFontSize = fontSize,
 		style = "checkbox",
 		switchSize = switchSize,
 		x = 0,
-		y = tabWidthPicker.y + tabWidthPicker.height + margin,
-		onPress =
-			function ( event )
-				app.showVarWatch = event.target.isOn
-			end
+		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
+		onPress = onVarWatchPress,
 	}
+	lastPicker = varWatchPicker
+
+	-- Gridline Color Picker
+	gridlineColorPicker = buttons.newSettingPicker{
+		parent = optionsGroup,
+		header = "Gridline Color",
+		headerFont = optionsFontBold,
+		headerFontSize = fontSize,
+		labels = { "Black", "White", "Gray (default)" },
+		values = { 0, 1, app.defaultGridlineShade },
+		labelsFont = optionsFont,
+		labelsFontSize = fontSize,
+		style = "radio",
+		switchSize = switchSize,
+		x = 0,
+		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
+		onPress = onGridlineColorPress,
+	}
+	lastPicker = gridlineColorPicker
 
 	-- Editor picker
-	makeEditorPicker( optionsGroup, varWatchPicker )
+	yEditorPicker = math.round( lastPicker.y + lastPicker.height + sectionMargin )
+	makeEditorPicker( optionsGroup )
 
 	-- Add Text Editor button
 	addEditorBtn = buttons.newOptionButton{
 		parent = optionsGroup,
-		x = 0,
-		y = editorPicker.y + editorPicker.height + margin * 0.5,
+		left = editorPicker.x + switchSize + app.margin * 0.5,
+		top = editorPicker.y + editorPicker.height + app.margin * 0.5,
 		onRelease = onAddEditor,
 		label = "Add a Text Editor",
-	}
-
-	-- Open In Editor button
-	openInEditorBtn = buttons.newOptionButton{
-		parent = optionsGroup,
-		x = 0,
-		y = addEditorBtn.y + addEditorBtn.height + margin * 0.5,
-		onRelease = onOpenInEditor,
-		label = "",
+		font = optionsFont,
+		fontSize = fontSize,
 	}
 
 	-- Center options group
 	if app.width > optionsGroup.width then
-		optionsGroup.x = app.width / 2 - optionsGroup.width / 2
+		optionsGroup.x = math.round( app.width / 2 - optionsGroup.width / 2 )
 	end
 
 	-- Set up scroll view
@@ -401,20 +462,16 @@ function optionsView:create()
 
 	-- Install resize handler
 	Runtime:addEventListener( "resize", self )
-	
-	-- Save app window size
-	lastAppWidth, lastAppHeight = app.width, app.height
 end
 
 -- Prepare to show the optionsView scene
 function optionsView:show( event )
 	if event.phase == "will" then
 		setSelectedOptions()
+		forceReprocess = false
 		toolbar.show( false )
 		setEditorButtons()
-		if lastAppWidth ~= app.width or lastAppHeight ~= app.height then
-			self:resize()
-		end
+		self:resize()
 	end
 end
 
@@ -434,15 +491,13 @@ function optionsView:resize()
 		-- remake scroll view
 		makeScrollView( sceneGroup )
 		-- reposition objects
-		closeBtn.x = app.width - app.margin
-		title.x = app.width / 2
+		closeBtn.x = math.round( app.width - app.margin - closeBtn.width )
+		title.x = math.round( app.width / 2 - title.width / 2)
 		if app.width > optionsGroup.width then
-			optionsGroup.x = app.width / 2 - optionsGroup.width / 2
+			optionsGroup.x = math.round( app.width / 2 - optionsGroup.width / 2 )
 		else
 			optionsGroup.x = 0
 		end
-		lastAppWidth = app.width
-		lastAppHeight = app.height
 	end
 end
 

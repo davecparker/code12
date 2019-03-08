@@ -43,8 +43,8 @@ public class MainProgram extends Code12Program
         obstacles = new GameObj[10];
         for (int i = 0; i < obstacles.length; i++)
         {
-            int x = ct.random(0, ct.toInt(ct.getWidth()));
-            int y = ct.random(ct.toInt(ct.getHeight() / 5), ct.toInt(ct.getHeight()) - ct.toInt(ct.getHeight() / 5));
+            int x = ct.random(0, (int)(ct.getWidth()));
+            int y = ct.random((int)(ct.getHeight() / 5), (int)(ct.getHeight()) - (int)(ct.getHeight() / 5));
             obstacles[i] = ct.rect(x, y, ct.random(1, 8), ct.random(1, 15), "dark gray");
             obstacles[i].align("center", true);
         }

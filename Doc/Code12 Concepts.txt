@@ -8,11 +8,11 @@ this order:
 
 Concept                     Example
 -------                     ----------
-1. Procedure Calls          ct.circle( 100, 200, 50 )
+1. Function Calls           ct.circle( 100, 200, 50 )
 2. Comments                 // Make the borders
 3. Variables                int x = 50;
 4. Expressions              (i * 3) + 20
-5. Function Calls           fish = ct.image( "goldfish.png", 100, 200, 50 )
+5. Function Return Values   fish = ct.image( "goldfish.png", 100, 200, 50 )
 6. Object Data Fields       fish.x
 7. Object Method Calls      ball.setFillColor( "blue" )
 8. If-else                  if (fish.x < 0)
@@ -44,7 +44,7 @@ for example:
   with a few exceptions (such as after a comma in a parameter list).
 * if and else and the controlled statements must be all on their own lines.
 * { and } must always be on their own line.
-* Assignment operators (=, +=, etc.) and ++ and -- make statements not expressions.
+* Assignment operators (=, +=, etc. and ++ and --) make statements, not expressions.
 * Object field/method access cannot be chained, so no a.b.c or a().b
 * No overloading in user-defined functions (only one parameter list signature).
 * Indentation style is enforced.
@@ -56,8 +56,8 @@ If the 12 programming concepts are taught in order, then the user can progress
 through 12 programming levels, which each add a capability. Here are some ideas
 for ways to use the Code12 API at each level:
 
-1. Procedure Calls
-------------------
+1. Function Calls
+-----------------
 * Print messages using ct.println()
 * Use mixtures of ct.print() and ct.println()
 * Show messages with ct.showAlert()
@@ -69,13 +69,13 @@ for ways to use the Code12 API at each level:
 
 2. Comments
 -----------
-* Make sequences of procedure calls easier to understand with comments before code lines
+* Make sequences of function calls easier to understand with comments before code lines
 * Draw a complex scene, broken up with comments and blank lines
 * Explain the purpose of a program with a comment at the beginning of the program
 * Put your name, date, assignment number, etc. in a program in a comment
-* Explain something about a procedure call with a comment at the end of the line
+* Explain something about a function call with a comment at the end of the line
 * Disable a line by commenting it out with //, then bring it back by removing the //
-* Disable a large block of procedure calls with a block comment /* */
+* Disable a large block of function calls with a block comment /* */
 
 3. Variables
 ------------
@@ -84,7 +84,7 @@ for ways to use the Code12 API at each level:
 * Define int shade and use it for ct.setBackColorRRGB( shade, shade, shade )
 * Set a String variable to a message or ASCII art, and use it with repeated ct.println() calls
 * Try the above with 3-4 String variables to print the american flag.
-* Write a series of procedure calls to draw something with variables, then copy-paste it to re-use 
+* Write a series of function calls to draw something with variables, then copy-paste it to re-use 
   several times unmodified but with different variable assignments before each use.
 
 4. Expressions
@@ -94,13 +94,13 @@ for ways to use the Code12 API at each level:
 * Calculate the midpoint of two x values and use it to draw something in the middle
 * Draw a scene where coordiantes and sizes are calculated relative to a few variables
 * Draw several rectangles of the same aspect (a variable), at different positions and sizes
-* Write a series of procedure calls to draw something with variables, then copy-paste it to 
+* Write a series of function calls to draw something with variables, then copy-paste it to 
   re-use several times unmodified but with y = y + 10 and similar between them.
 * Calculate and draw graphs and geometry. For example, draw coordinate axes, then plot 
   y = mx + b given variables m and b
 
-5. Function Calls
------------------
+5. Function Return Values
+-------------------------
 * Use ct.inputNumber() to ask for inputs to a calculation or game parameters
 * Use ct.inputString() to ask the user their name then display/output using it
 * Use ct.random() to draw objects at random positions and/or sizes
@@ -110,11 +110,7 @@ for ways to use the Code12 API at each level:
 
 6. Object Data Fields
 ---------------------
-* Make a GameObj move smoothly by setting its xSpeed and/or ySpeed field in start() 
 * Make a GameObj move smoothly by changing its x and/or y fields in update()
-* Make an object grow/shrink by changing its width or height in update()
-* Make a thick outline by setting an object's lineWidth field after creation
-* Use autoDelete = true so objects delete after going offscreen via xSpeed/ySpeed 
 * Set the group field of a set of objects that you want to delete in bulk via ct.clearGroup()  
 
 7. Object Method Calls

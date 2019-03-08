@@ -3,7 +3,7 @@
 
 class CT
 {
-	// Graphic Object Creation
+	// Graphics Object Creation
 	//------------------------
 	GameObj circle( double x, double y, double diameter )
 	GameObj circle( double x, double y, double diameter, String color )
@@ -39,8 +39,8 @@ class CT
 	double getWidth( )                // always 100.0
 	double getHeight( )               // default 100.0
 	double getPixelsPerUnit()         // scale factor to convert coordinate units to pixels
-	String getScreen( )
 	void setScreen( String name )
+	String getScreen( )
 	void setScreenOrigin( double x, double y )
 	void clearScreen( )
 	void clearGroup( String group )
@@ -74,7 +74,6 @@ class CT
 
 	// Type Conversion
 	//----------------
-	int toInt( double number )             // (deprecated) truncates
 	int parseInt( String str )             // 0 if failure
 	double parseNumber( String str )       // NaN if failure
 	boolean canParseInt( String str )
@@ -105,22 +104,25 @@ class GameObj
 	// GameObj Methods
 	// ---------------
 	String getType( )                                  // "circle", "image", etc.
+	void setSize( double width, double height )
 	double getWidth( )
 	double getHeight( )
-	void setSize( double width, double height )
-	void setSpeed( double xSpeed, double ySpeed )      // at 60 fps
+	void setXSpeed( double xSpeed )                    // at 60 fps
+	void setYSpeed( double ySpeed )                    // at 60 fps
+	double getXSpeed()
+	double getYSpeed()
 	void align( String alignment )                     // "top left", "top", "center", etc.
-	String getText( )
 	void setText( String text )                        // included in print output
+	String getText( )
 	String toString( )                                 // "[type at (x, y) "text"]"
 	void setFillColor( String color )                  // "red", "white", etc. or null
 	void setFillColorRGB( int red, int green, int blue )
 	void setLineColor( String color )
 	void setLineColorRGB( int red, int green, int blue )
-	void setLineWidth( int lineWidth );                // in pixels
-	void setImage( String filename );                  // only for image objects
-	int getLayer( )
+	void setLineWidth( int lineWidth )                 // in pixels
+	void setImage( String filename )                   // only for image objects
 	void setLayer( int layer )                         // objects default to layer 1
+	int getLayer( )
 	void delete( )
 	void setClickable( boolean clickable )             // default true
 	boolean clicked( )
