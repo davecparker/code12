@@ -1,6 +1,6 @@
 import Code12.*;
 
-class level4 extends Code12Program
+class Level4 extends Code12Program
 {
    public static void main(String[] args)
    { 

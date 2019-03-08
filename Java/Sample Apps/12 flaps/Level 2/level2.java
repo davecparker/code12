@@ -1,13 +1,7 @@
 import Code12.*;
 
-class level2 extends Code12Program
+class Level2 extends Code12Program
 {
-
-   
-   public static void main(String[] args)
-   { 
-      Code12.run( new level2() ); 
-   }
    
    public void start()
    {  

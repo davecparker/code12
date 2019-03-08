@@ -72,8 +72,8 @@ class Level8 extends Code12Program
       back2 = ct.image("background-day.png", 1.5*screenWidth, screenHeight / 2, screenWidth );
       back1.setLayer(0);
       back2.setLayer(0);
-      back1.xSpeed = -0.5;
-      back2.xSpeed = -0.5;
+      back1.setSpeed( -0.5, 0 );
+      back2.setSpeed( -0.5, 0 );
 
       //draws the bird ct.image("filename", x, y, h)
       birdX = screenWidth / 2.0; // sets x to 50 (the x position of the bird)
@@ -82,7 +82,7 @@ class Level8 extends Code12Program
       bird = ct.image( "yellowbird-downflap.png", birdX, birdY, BIRDHIEGHT ); //uses x and y to stand in for 50, 64
       ghostBird = ct.rect( birdX, birdY, 4.5, 4.5);
       ghostBird.visible = false;
-      ghostBird.ySpeed = 0.5;
+      ghostBird.setSpeed( 0, 0.5 );
       //draws the count
       //the value of x does not change (the x position of the bird and number are equal)
       scoreX = birdX; //sets y to 16 (the y position of the number)
@@ -104,31 +104,31 @@ class Level8 extends Code12Program
 
       randY = ct.random( 38, 90);
       goal1 = ct.rect( screenWidth + 40, randY, BIRDHIEGHT, BIRDHIEGHT * 2.5 );
-      goal1.xSpeed = -0.5;
+      goal1.setSpeed( -0.5, 0 );
       goal1.setFillColor(null);
       goal1.setLineColor(null);
 
       randY = ct.random( 38, 90);
       goal2 = ct.rect( screenWidth + 110, randY, BIRDHIEGHT, BIRDHIEGHT * 2.5 );
-      goal2.xSpeed = -0.5;
+      goal2.setSpeed( -0.5, 0 );
       goal2.setFillColor(null);
       goal2.setLineColor(null);
 
       //Creates the pipes
       pipeUp1 = ct.image("pipe_green_up.png", goal1.x, goal1.y+75, 10.5);
-      pipeUp1.xSpeed = -0.5;
+      pipeUp1.setSpeed( -0.5, 0 );
       pipeUp1.setLayer(2);
 
       pipeUp2 = ct.image("pipe_green_up.png", goal2.x, goal2.y+75, 10.5);
-      pipeUp2.xSpeed = -0.5;
+      pipeUp2.setSpeed( -0.5, 0 );
       pipeUp2.setLayer(2);
 
       pipeDown1 = ct.image("pipe_green_down.png", goal1.x, goal1.y-75, 10.5);
-      pipeDown1.xSpeed = -0.5;
+      pipeDown1.setSpeed( -0.5, 0 );
       pipeDown1.setLayer(2);
 
       pipeDown2 = ct.image("pipe_green_down.png", goal2.x, goal2.y-75, 10.5);
-      pipeDown2.xSpeed = -0.5;
+      pipeDown2.setSpeed( -0.5, 0 );
       pipeDown2.setLayer(2);
 
       //End screen variables
@@ -161,14 +161,14 @@ class Level8 extends Code12Program
          if( ct.clicked() || ct.charTyped(" ") )
          {
             ghostBird.y -= 3.5;
-            ghostBird.ySpeed = -1;
+            ghostBird.setSpeed( 0, -1 );
          } 
 
          //Keeps the visible bird at the same y position as the invisible tracker bird
          if( bird.y != ghostBird.y )
          {
             bird.y = ghostBird.y;
-            bird.ySpeed = ghostBird.ySpeed;
+            bird.setSpeed( 0, ghostBird.getySpeed );
          }
 
          if( (ghostBird.hit( goal1 ) && !hit1) )

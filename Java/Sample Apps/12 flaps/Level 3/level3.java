@@ -1,6 +1,6 @@
 import Code12.*;
 
-class level3 extends Code12Program
+class Level3 extends Code12Program
 {
    public static void main(String[] args)
    { 
@@ -17,7 +17,7 @@ class level3 extends Code12Program
       ct.setHeight( h );
 
       //draws the bird ct.image("filename", x, y, h)
-      int x = h; // sets x to 50 (the x position of the bird)
+      int x = 50; // sets x to 50 (the x position of the bird)
       int y = 64; // sets y to 64  (the y position of the bird)
       h = 10; //height of the bird (the height of the bird)
       ct.image( "yellowbird-downflap.png", x, y, h ); //uses x and y to stand in for 50, 64

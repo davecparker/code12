@@ -3,12 +3,6 @@ import Code12.*;
 class Level1 extends Code12Program
 {
 
-   
-   public static void main(String[] args)
-   { 
-      Code12.run( new level1() ); 
-   }
-   
    public void start()
    {  
       //draws the background

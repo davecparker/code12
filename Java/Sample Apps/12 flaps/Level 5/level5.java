@@ -1,26 +1,21 @@
 import Code12.*;
 
-class level5 extends Code12Program
+class Level5 extends Code12Program
 {
-//Global variable
-int frame = 0;
-String frameNumb;
-double h;
-double w;
-double birdX;
-double birdY;
-GameObj bird;
-int hbird = 10;
-int updates = 0;
-int halfseconds = 0;
-GameObj score;
-double scoreX;
-double scoreY;
-
-   public static void main(String[] args)
-   { 
-      Code12.run( new level5() ); 
-   }
+   //Global variable
+   int frame = 0;
+   String frameNumb;
+   double h;
+   double w;
+   double birdX;
+   double birdY;
+   GameObj bird;
+   int hbird = 10;
+   int updates = 0;
+   int halfseconds = 0;
+   GameObj score;
+   double scoreX;
+   double scoreY;
    
    public void start()
    {  
@@ -64,8 +59,7 @@ double scoreY;
       frame = ct.intDiv( frame, 10 ); // divides the number we got from the previous calculation by 10 and throws aways the ones place 
       frameNumb = ct.formatInt( frame ); //creates a string with the frame we want which changes every 10 updates or 1/6th of a second
       String filename = "yellowbird" + frameNumb + ".png"; //the filenames of the three frames are yellowbird0.png, yellowbird1.png, yellowbird2.png 
-      bird.delete();
-      bird = ct.image( filename, birdX, birdY, hbird ); 
+      bird.setImage( filename );
       ////////////////////////////////////////////////////
 
       //Handles the animation of the numbers
@@ -74,8 +68,6 @@ double scoreY;
       frame = halfseconds % 10; // a new frame value we will use to draw the correct number
       frameNumb = ct.formatInt( frame );
       filename = frameNumb + ".png";
-      score.delete();
-      score = ct.image( filename, scoreX, scoreY, 5 );
+      score.setImage( filename );
    }
-
 }
