@@ -67,6 +67,7 @@ class Test
 		ct.rect( 10, 10, 10 ,10 );
 
 		ct.showAlert("test");
+		ct.pause();
 	}
 }
 	
