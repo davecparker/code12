@@ -111,6 +111,7 @@ return {
         ["y"] = { vt = 1 },
         ["visible"] = { vt = true },
         ["group"] = { vt = "String" },
+        ["id"] = { vt = 0 },
     },
     methods = {
         ["getType"] = { vt = "String", params = {}, docLink = "API.html#obj.gettype" },

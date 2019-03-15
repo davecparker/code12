@@ -10,6 +10,7 @@ public abstract class GameObj implements GameObjInterface
    public double x, y;              // position of object or start point if line
    public boolean visible;          // true if object is visible
    public String group;             // group name, default ""
+   public int id;                   // numerical identifier, default 0
 
    // Protected instance variables
    protected Game game;             // back pointer to Game this object lives in
@@ -34,6 +35,7 @@ public abstract class GameObj implements GameObjInterface
       this.y = y;
       visible = true;
       group = "";
+      id = 0;
 
       this.game = game;
       type = "GameObj";
