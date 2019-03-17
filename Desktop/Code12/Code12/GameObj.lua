@@ -115,8 +115,8 @@ function GameObj:new(typeName, x, y, width, height)
 		x = x,                   -- logical units
 		y = y,                   -- logical units
 		visible = true,          -- false to not display
-		group = "",              -- name set by user
 		id = 0,                  -- numerical identifier set by user
+		group = "",              -- name set by user
 
 		-- Private fields
 		width = width,           -- logical units

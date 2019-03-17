@@ -99,8 +99,8 @@ class GameObj
 	double x;
 	double y;
 	boolean visible;          // default true
-	String group;             // default ""
 	int id;                   // default 0
+	String group;             // default ""
 
 	// GameObj Methods
 	// ---------------
