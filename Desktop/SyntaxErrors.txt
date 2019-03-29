@@ -156,3 +156,4 @@ public void start
 		dime.x
 		dime.x    // what?
 	private final int XP;
+		c.setSize( 20, 2 );;

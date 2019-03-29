@@ -15,7 +15,7 @@ local platform = system.getInfo("platform")
 -- The global state table
 local g = {
 	-- The runtime version number
-	version = 1.0,
+	version = 2.0,
 
 	-- Platform info
 	platform = platform,
