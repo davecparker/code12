@@ -10,6 +10,7 @@
 -- Code12 app modules
 local g = require( "Code12.globals" )
 local ct = require( "Code12.ct" )
+local runtime = require("Code12.runtime")
 local app = require( "app" )
 local javaTypes = require( "javaTypes" )
 local checkJava = require( "checkJava" )
@@ -47,6 +48,7 @@ local showVarWatch            -- true if variable watch is active
 
 -- varWatch data
 local vars                    -- array of user program's global variables
+local localVars               -- array of { name = name, value = value } for local vars, if any
 local displayData             -- array of data for displaying variables
 local scrollbar               -- the varWatch scrollbar
 local scrollOffset            -- starting line if scrolled back or nil if at end
@@ -302,6 +304,15 @@ end
 -- Update the variable watch window if it is on in the user's settings
 local function onNewFrame()
 	if showVarWatch then
+		-- Update local vars if they changed
+		local localVarsNew = runtime.userLocals()
+		if localVarsNew ~= localVars then
+			localVars = localVarsNew
+			-- Just print them for now (TODO)
+			for _, var in ipairs(localVars) do
+				print( var.name, var.value )
+			end
+		end
 		if arrayAssigned then
 			-- save top row data if scrolled
 			local topData

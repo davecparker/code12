@@ -39,6 +39,7 @@ local runtime = {
 local codeFunction       -- function for the loaded Lua user program        
 local coRoutineUser      -- coroutine running an event or nil if none
 local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
+local userLocals         -- array of { name = string, value = v } for user locals
 
 
 
@@ -268,6 +269,27 @@ function runtime.runEventFunction(func, ...)
 		end
 	end
 	return false
+end
+
+-- Get the names and values of all currently defined local variables in 
+-- the user's code at the given stackLevel and store them in userLocals, 
+-- which can then be accessed by calling runtime.userLocals()
+function runtime.getUserLocals( stackLevel )
+	userLocals = {}
+	local i = 1
+	repeat
+		local name, value = debug.getlocal( stackLevel + 1, i )
+		if name then
+			userLocals[i] = { name = name, value = value }
+			i = i + 1
+		end
+	until not name
+end
+
+-- Return an array of { name = string, value = v } for the user local variables
+-- defined at the last call to runtime.getUserLocals()
+function runtime.userLocals()
+	return userLocals
 end
 
 -- Block and yield the user's code then return any message from the

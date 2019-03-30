@@ -187,6 +187,7 @@ function ct.pause()
 		-- Change run state to paused then block and yield
 		runtime.message("ct.pause()")
 		g.runState = "paused"
+		runtime.getUserLocals( 2 )   -- get snapshot of locals for varWatch
 		repeat
 			if runtime.blockAndYield() == "abort" then
 				g.runState = "stopped"
