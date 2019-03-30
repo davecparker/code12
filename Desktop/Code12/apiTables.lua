@@ -110,6 +110,7 @@ return {
         ["x"] = { vt = 1 },
         ["y"] = { vt = 1 },
         ["visible"] = { vt = true },
+        ["id"] = { vt = 0 },
         ["group"] = { vt = "String" },
     },
     methods = {

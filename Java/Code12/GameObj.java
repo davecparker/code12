@@ -9,6 +9,7 @@ public abstract class GameObj implements GameObjInterface
    // Public instance variables (client can get or set these directly)
    public double x, y;              // position of object or start point if line
    public boolean visible;          // true if object is visible
+   public int id;                   // numerical identifier, default 0
    public String group;             // group name, default ""
 
    // Protected instance variables
@@ -33,6 +34,7 @@ public abstract class GameObj implements GameObjInterface
       this.x = x;
       this.y = y;
       visible = true;
+      id = 0;
       group = "";
 
       this.game = game;

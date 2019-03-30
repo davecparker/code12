@@ -2,14 +2,13 @@
 class Vectors
 {
     GameObj[] vectors = new GameObj[40];
-    int[] shades = new int[40];
 
     // creates objects and environment
     public void start()
     {
         ct.setBackColor("gray");
         for (int i = 0; i < vectors.length; i++)
-            defineVector(i);
+            vectors[i] = defineVector();
     }
 
     // redefines all vectors and lines between them
@@ -20,69 +19,70 @@ class Vectors
         defineLines();
     }
 
-    // creates a vector (vectors[i]) with random speed
-    void defineVector(int i)
+    // creates a vector with random speed
+    GameObj defineVector()
     {
-        vectors[i] = ct.circle(ct.random(1, 99), ct.random(1, 99), 2); // random location within window
-        vectors[i].setLineWidth(0);
-        setRandomSpeeds(i);
-        shades[i] = 127; // shares color with background color, "gray" RGB: (127, 127, 127)
+        GameObj v = ct.circle(ct.random(1, 99), ct.random(1, 99), 2); // random location within window
+        v.id = 127; // shares color with background color, "gray" RGB: (127, 127, 127)
+        v.setLineWidth(0);
+        setRandomSpeeds(v);
+        return v;
     }
 
-    // redefines a vector (vectors[i])
-    void updateVector(int i)
+    // redefines a vector
+    void updateVector(GameObj v)
     {
         /*
-         * only difference between this and defineVector(i) is these next two lines,
+         * only difference between this and defineVector(v) is these next two lines,
          * a vector does not need to be created since it already exists, instead only relocated,
          * used in updateVectors, and therefore the update method
          */
-        vectors[i].x = ct.random(1, 99);
-        vectors[i].y = ct.random(1, 99);
-        setRandomSpeeds(i);
-        shades[i] = 127;
+        v.x = ct.random(1, 99);
+        v.y = ct.random(1, 99);
+        v.id = 127;
+        setRandomSpeeds(v);
     }
 
-    // collectively redefines all vectors and their fill color (shades[i])
+    // collectively redefines all vectors and their fill color
     void updateVectors()
     {
         for (int i = 0; i < vectors.length; i++)
         {
-            // a vector (vectors[i]) is only redefined if the vector leaves the window
+            // a vector is only redefined if the vector leaves the window
             if (isOutsideOfBoundary(vectors[i]))
-                updateVector(i);
-            // a vector's fill color (shades[i]) is updated from 127 ("gray") to 255 ("white")
-            if (shades[i] < 255)
-                updateShade(i);
+                updateVector(vectors[i]);
+            // a vector's fill color is updated from 127 ("gray") to 255 ("white")
+            if (vectors[i].id < 255)
+                updateShade(vectors[i]);
         }
     }
 
-    // increments a vectors RGB fill color (shades[i]) and sets the vector's (vectors[i]) fill color
-    void updateShade(int i)
+    // increments a vectors RGB fill color and sets the vector's fill color
+    void updateShade(GameObj v)
     {
-        shades[i]++;
-        vectors[i].setLayer(shades[i] - 126); // vectors (vectors[i]) are set on a higher layer to display according to their shade
-        vectors[i].setFillColorRGB(shades[i], shades[i], shades[i]);
+        v.id++;
+        v.setLayer(v.id - 126); // vectors are set on a higher layer to display according to their shade
+        v.setFillColorRGB(v.id, v.id, v.id);
     }
 
-    // creates a line between two vectors (vectors[i] and vectors[j]) with the lowest shade between them
-    void defineLine(int i, int j)
+    // creates a line between two vectors with the lowest shade between them
+    void defineLine(GameObj v1, GameObj v2)
     {
-        GameObj line = ct.line(vectors[i].x, vectors[i].y, vectors[j].x, vectors[j].y); // line from (x[i], y[i]) -> (x[j], y[j])
-        int minShade = Math.min(shades[i], shades[j]); // the minimum shade is the darkest and also closest color to that of the background
+        GameObj line = ct.line(v1.x, v1.y, v2.x, v2.y); // line from (v1.x, v1.y) -> (v2.x, v2.y)
+        int minShade = Math.min(v1.id, v2.id); // the minimum shade is the darkest and also closest color to that of the background
         line.setLineColorRGB(minShade, minShade, minShade);
         line.group = "lines";
         line.setLayer(0);
     }
 
-    // defines all lines between vectors (vectors[i] and vectors[j]) that are within a radius of 20 units
+    // defines all lines between vectors that are within a radius of 20 units
     void defineLines()
     {
         /*
          * for each vector in vectors:
-         *   set current vector (vectors[i]) in visited set,
-         *   determine if all unvisited vectors (vectors[j]) are within 20 units of current vector (vectors[i]),
-         *     if so, create a line between them (defineLine(i, j))
+         *   set current vector in visited set,
+         *   determine if all unvisited vectors are within 20 units of current vector,
+         *     if so, create a line between them (defineLine(v1, v2))
          *   then repeat with next vector (vectors[i + 1]) until all vectors are visited
          */
         for (int i = 0; i < vectors.length; i++)
@@ -90,13 +90,13 @@ class Vectors
             for (int j = i + 1; j < vectors.length; j++)
             {
                 if (ct.distance(vectors[i].x, vectors[i].y, vectors[j].x, vectors[j].y) <= 20)
-                    defineLine(i, j);
+                    defineLine(vectors[i], vectors[j]);
             }
         }
     }
 
-    // sets speed of vector (vectors[i]) to random x and y speed
-    void setRandomSpeeds(int i)
+    // sets speed of vector to random x and y speed
+    void setRandomSpeeds(GameObj v)
     {
         double[] speeds = {-0.05, 0, 0.05}; // all possible x and y speeds
         double xSpeed, ySpeed;
@@ -111,17 +111,17 @@ class Vectors
             if (xSpeed != 0 || ySpeed != 0)
                 break;
         }
-        vectors[i].setXSpeed(xSpeed);
-        vectors[i].setYSpeed(ySpeed);
+        v.setXSpeed(xSpeed);
+        v.setYSpeed(ySpeed);
     }
 
     // returns true if vector is outside of window
-    boolean isOutsideOfBoundary(GameObj vector)
+    boolean isOutsideOfBoundary(GameObj v)
     {
-        boolean outsideLeft   = vector.x + vector.getWidth() / 2 < 0;
-        boolean outsideRight  = vector.x - vector.getWidth() / 2 > 100;
-        boolean outsideTop    = vector.y + vector.getWidth() / 2 < 0;
-        boolean outsideBottom = vector.y - vector.getWidth() / 2 > 100;
+        boolean outsideLeft   = v.x + v.getWidth() / 2 < 0;
+        boolean outsideRight  = v.x - v.getWidth() / 2 > 100;
+        boolean outsideTop    = v.y + v.getWidth() / 2 < 0;
+        boolean outsideBottom = v.y - v.getWidth() / 2 > 100;
         return outsideLeft || outsideRight || outsideTop || outsideBottom;
     }
 
