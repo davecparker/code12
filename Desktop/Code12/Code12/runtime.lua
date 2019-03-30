@@ -501,7 +501,7 @@ function runtime.printTextLine(text, rgb)
 end
 
 -- Return the current line number in the user's code or nil if unknown
-local function userLineNumber()
+function runtime.userLineNumber()
 	-- Look back on the stack trace to find the user's code (string)
 	-- so we can get the line number.
 	local info
@@ -519,7 +519,7 @@ end
 -- Print a runtime message to the console, followed by "at line #"
 -- if the user's code line number can be determined.
 function runtime.message(message)
-	local lineNum = userLineNumber()
+	local lineNum = runtime.userLineNumber()
 	if lineNum then
 		message = message .. " at line " .. lineNum
 	end
@@ -529,7 +529,7 @@ end
 -- Print a warning message to the console with optional quoted name
 function runtime.warning(message, name)
 	local s
-	local lineNum = userLineNumber()
+	local lineNum = runtime.userLineNumber()
 	if lineNum then
 		s = "WARNING (line " .. lineNum .. "): " .. message
 	else

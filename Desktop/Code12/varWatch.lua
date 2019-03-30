@@ -58,7 +58,7 @@ local scrollOffsetChanged     -- true when scrollOffset has changed and displayR
 -- Names of GameObj public data fields to show
 local gameObjFields = { 
 	-- Public fields
-	"x", "y", "visible", "group", 
+	"x", "y", "visible", "id", "group",
 	-- Additional fields
 	"width", "height", "xSpeed", "ySpeed", "text", "fillColor", "lineColor", 
 	"lineWidth", "layer", "clickable",

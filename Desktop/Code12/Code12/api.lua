@@ -184,8 +184,15 @@ end
 function ct.pause()
 	-- This API is ignored if not running in the Code12 app
 	if runtime.appContext then 
+		--Gets the line number and assembles the paused message
+		local message = "Program paused by ct.paused()"; --In case lineNum unknown
+		local lineNum = runtime.userLineNumber()
+		if lineNum then
+			message = "Paused by ct.pause() at line " .. lineNum 
+		end
+		ct.showAlert(message);
+
 		-- Change run state to paused then block and yield
-		runtime.message("ct.pause()")
 		g.runState = "paused"
 		runtime.getUserLocals( 2 )   -- get snapshot of locals for varWatch
 		repeat
