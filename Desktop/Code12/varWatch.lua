@@ -309,8 +309,13 @@ local function onNewFrame()
 		if localVarsNew ~= localVars then
 			localVars = localVarsNew
 			-- Just print them for now (TODO)
-			for _, var in ipairs(localVars) do
-				print( var.name, var.value )
+			if localVars then
+				print( "===== " .. #localVars .. " local variables =====" )
+				for _, var in ipairs(localVars) do
+					print( var.name, var.value )
+				end
+			else
+				print( "===== No local vars =====" )
 			end
 		end
 		if arrayAssigned then

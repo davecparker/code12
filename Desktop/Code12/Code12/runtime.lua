@@ -349,6 +349,7 @@ end
 function runtime.resume()
 	if g.runState == "paused" then
 		audio.resume()
+		userLocals = nil   -- user locals are only defined when paused
 		g.runState = "running"
 	end
 end
@@ -356,6 +357,7 @@ end
 -- When the run state is paused, advance one frame then pause again.
 function runtime.stepOneFrame()
 	if g.runState == "paused" then
+		userLocals = nil   -- user locals are only defined when user code yields
 		g.runState = "running"
 		onNewFrame()
 		g.runState = "paused"
@@ -377,6 +379,7 @@ function runtime.stop( endState )
 		end
 		coRoutineUser = nil
 	end
+	userLocals = nil   -- user locals are only defined when user code is yielded
 
 	-- Stop any audio and close output file if any
 	audio.stop()
