@@ -130,7 +130,7 @@
 </div>
 </div>
 
-###### Code12 Version 1.0
+###### Code12 Version 2.0
 
 
 Graphics Object Creation
@@ -2014,7 +2014,7 @@ Returns the version number of the Code12 runtime system.
 ct.getVersion()
 ```
 ##### *Return Value*
-([double](#java-data-types)). The Code12 version number (for example 1.0).
+([double](#java-data-types)). The Code12 version number (for example 2.0).
 
 #### Examples
 ```
@@ -2139,25 +2139,31 @@ obj.x
 
 #### Notes
 You can access ("get") or change ("set") the [x coordinate](#graphics-coordinates)
-of a [GameObj](#java-data-types) at any time.
+of a [GameObj](#java-data-types) at any time. Changing it will move the object
+on the screen (which will become visible at the next animation frame).
 
 #### Example
 ```
-GameObj dot;
-
-public void start()
+class MovingBall
 {
-	dot = ct.circle( 0, 50, 10 );	
-}
+	GameObj ball;
 
-public void update()
-{
-	// Move dot a little to the right each animation frame
-	dot.x = dot.x + 1;
+	public void start()
+	{
+		ball = ct.circle( 0, 50, 10 );
+		ct.log( ball.x );	
+	}
 
-	// If dot goes off-screen to the right, start over at the left
-	if (dot.x > 100)
-		dot.x = 0;
+	public void update()
+	{
+		// Move the ball a little to the right each animation frame
+		ball.x = ball.x + 1;
+		ct.log( ball.x );
+
+		// If the ball goes off-screen to the right, start over at the left
+		if (ball.x > 100)
+			ball.x = 0;
+	}
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.x]
@@ -2176,25 +2182,31 @@ obj.y
 
 #### Notes
 You can access ("get") or change ("set") the [y coordinate](#graphics-coordinates)
-of a [GameObj](#java-data-types) at any time.
+of a [GameObj](#java-data-types) at any time. Changing it will move the object
+on the screen (which will become visible at the next animation frame).
 
 #### Example
 ```
-GameObj slab;
-
-public void start()
+class FallingSlab
 {
-	slab = ct.rect( 50, 0, 40, 10 );	
-}
+	GameObj slab;
 
-public void update()
-{
-	// Move slab down a little each animation frame
-	slab.y = slab.y + 1;
+	public void start()
+	{
+		slab = ct.rect( 50, 0, 40, 10 );
+		ct.log( slab.y );	
+	}
 
-	// If slab reaches the bottom, start over at the top
-	if (slab.y > ct.getHeight())
-		slab.y = 0;
+	public void update()
+	{
+		// Move the slab down a little each animation frame
+		slab.y = slab.y + 1;
+		ct.log( slab.y );
+
+		// If the slab reaches the bottom, start over at the top
+		if (slab.y > ct.getHeight())
+			slab.y = 0;
+	}
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.y]
@@ -2221,21 +2233,41 @@ back by setting `visible` back to `true`.
 > mouse clicks (from [ct.objectClicked()], for example) and do not
 > register as "hitting" other objects (see [obj.hit()], for example]).
 
-#### Example
+#### Examples
 ```
-public void start()
+class HideOne
 {
-	ct.circle( 50, 30, 10 );
-	ct.rect( 30, 70, 30, 10 );
-	ct.text( "Hey", 70, 50, 10 );
-}
+	public void start()
+	{
+		GameObj redBall = ct.circle( 40, 20, 10, "red" );
+		GameObj blueBall = ct.circle( 60, 20, 10, "blue" );
+		ct.log( redBall.visible, blueBall.visible );
 
-public void update()
+		ct.showAlert( "Press OK to hide the red ball" );
+
+		redBall.visible = false;
+		ct.log( redBall.visible, blueBall.visible );
+	} 
+}
+```
+```
+class ClickToHide
 {
-	// Hide objects that get clicked
-	GameObj obj = ct.objectClicked();
-	if (obj != null)
-		obj.visible = false;
+	public void start()
+	{
+		ct.circle( 50, 30, 10 );
+		ct.rect( 30, 70, 30, 10 );
+		ct.text( "Hey", 70, 50, 10 );
+		ct.println( "Click objects to hide them" );
+	} 
+
+	public void update()
+	{
+		// Hide objects that get clicked
+		GameObj target = ct.objectClicked();
+		if (target != null)
+			target.visible = false;
+	}
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.visible]
@@ -2243,8 +2275,7 @@ public void update()
 
 ### obj.group
 ([String](#java-data-types)). An optional name that you can assign to a 
-[GameObj](#java-data-types) to associate it with other 
-similar objects.
+[GameObj](#java-data-types) to associate it with other similar objects.
 
 #### Syntax
 ```
@@ -2256,35 +2287,35 @@ obj.group
 #### Notes
 The default group name for an object is `""` (empty string) when it is created.
 If you assign a group name, you can access and check it when you have an
-unknown object reference to see what kind it is.
+unknown object reference to see what kind it is. Group names are for your own
+use, can be any String value, and don't have any special meaning to the system.
 
 The `group` field is also used by the functions [ct.clearGroup()] 
 and [obj.objectHitInGroup()].
 
-#### Examples
+#### Example
 ```
-GameObj block;
-GameObj coin1, coin2;
-
-public void start()
+class Money
 {
-	block = ct.rect( 50, 70, 20, 20 );
+	public void start()
+	{
+		GameObj penny = ct.circle( 30, 10, 6, "orange" );
+		penny.group = "coins";
 
-	coin1 = ct.circle( 30, 30, 10, "orange" );
-	coin1.group = "coins";
+		GameObj dime = ct.circle( 50, 10, 6, "light gray" );
+		dime.group = "coins";
 
-	coin2 = ct.circle( 70, 30, 10, "orange" );
-	coin2.group = "coins";
-}
+		GameObj bill = ct.rect( 75, 10, 20, 10, "dark green" );
+		bill.group = "bills";
 
-public void update()
-{
-	// Hide (only) coins that get clicked
-	GameObj target = ct.objectClicked();
-	if (target != null && target.group.equals("coins"))
-		target.visible = false;	
+		ct.log( penny.group, dime.group, bill.group );
+
+		ct.showAlert( "Click OK to delete the coins" );
+		ct.clearGroup( "coins" );
+	}
 }
 ```
+
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.group]
 
 
@@ -4002,7 +4033,7 @@ so typing 'A' uses the "a" key, and typing '$' uses the "4" key.
 
 
 <footer>
-	Code12 Version 1.0
+	Code12 Version 2.0
 
 	Copyright (c) 2019 Code12. All Rights Reserved. 
 </footer> 

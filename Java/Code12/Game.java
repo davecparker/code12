@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 public class Game implements GameInterface
 {
    // The version number of the Code 12 Runtime
-   private static final double VERSION = 1.0;
+   private static final double VERSION = 2.0;
       
    //  Instance data
    Code12Program program;                // the main program callback interface

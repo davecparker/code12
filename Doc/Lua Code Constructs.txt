@@ -124,35 +124,7 @@ fish = ct.image( "goldfish.png", 100, 200, 50 )
 ct.setHeight( calcHeight() )
 
 
-6. Object Data Fields
-=====================
-As we use them data fields have the same syntax using "." (dot).
-
-Java
-----
-fish.x = fish.x + 1;
-
-Lua
----
-fish.x = fish.x + 1
-
-
-7. Object Method Calls
-======================
-In Lua, an object-oriented method call is called using a colon (:)
-instead of a dot (.) as in Java. You will also see dot used in Lua,
-but these calls are not in the full OOP way (Lua gives you the choice).
-
-Java
-----
-ball.setFillColor( "blue" );
-
-Lua
----
-ball:setFillColor( "blue" )
-
-
-8. If-else 
+6. If-else 
 ==========
 Take a look at the following examples to see the syntax.
 Also shown are the Lua equivalents to Java's &&, ||, and !
@@ -204,6 +176,34 @@ elseif not done then
 else
 	x = y + 1
 end
+
+
+7. Object Data Fields
+=====================
+As we use them data fields have the same syntax using "." (dot).
+
+Java
+----
+fish.x = fish.x + 1;
+
+Lua
+---
+fish.x = fish.x + 1
+
+
+8. Object Method Calls
+======================
+In Lua, an object-oriented method call is called using a colon (:)
+instead of a dot (.) as in Java. You will also see dot used in Lua,
+but these calls are not in the full OOP way (Lua gives you the choice).
+
+Java
+----
+ball.setFillColor( "blue" );
+
+Lua
+---
+ball:setFillColor( "blue" )
 
 
 9. Function Definitions

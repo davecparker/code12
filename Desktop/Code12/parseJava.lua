@@ -23,18 +23,18 @@ local parseJava = {}
 
 -- Language feature names introduced at each syntax level
 local syntaxFeatures = {
-	"function calls",
-	"comments",
-	"variables",
-	"expressions",
-	"function return values",
-	"object data fields",
-	"object method calls",
-	"if-else statements",
-	"user-defined functions",
-	"parameters in user-defined functions",
-	"loops",
-	"arrays",
+	--[[ 1 ]]   "function calls",
+	--[[ 2 ]]   "comments",        -- actually allowed at all levels
+	--[[ 3 ]]   "variables",
+	--[[ 4 ]]   "expressions",
+	--[[ 5 ]]   "function return values",
+	--[[ 6 ]]   "if-else statements",
+	--[[ 7 ]]   "object data fields",
+	--[[ 8 ]]   "object method calls",
+	--[[ 9 ]]   "user-defined functions",
+	--[[ 10 ]]  "parameters in user-defined functions",
+	--[[ 11 ]]  "loops",
+	--[[ 12 ]]  "arrays",
 }
 local numSyntaxLevels = #syntaxFeatures
 
@@ -331,7 +331,7 @@ local function lValue()
 	iToken = iToken + 1
 
 	-- Check for index and/or field and re-parse as lValueFull if needed
-	if syntaxLevel >= 6 then
+	if syntaxLevel >= 7 then
 		local tt = tokens[iToken].tt
 		if tt == "." or tt == "[" then
 			iToken = iToken - 1   -- start over with the variable ID
@@ -352,7 +352,7 @@ local index = { t = "index",
 
 -- An field reference or empty
 local field = { t = "field",
-	{ 6, 12, "field",			".", "ID"				},
+	{ 7, 12, "field",			".", "ID"				},
 	{ 1, 12, false										},
 }
 
@@ -367,11 +367,11 @@ local callHead = { t = "callHead",
 	{ 1, 12, "ct",				"ct", ".", "ID", "("					},
 	{ 1, 12, "System",			"System", ".", "ID", ".", "ID", "("		},
 	{ 5, 12, "Math",			"Math", ".", "ID", "("					},
-	{ 1, 6,  "unknown",         "ID", ".", "ID", "("                    },
+	{ 1, 7,  "unknown",         "ID", ".", "ID", "("                    },
 	{ 1, 12, "user",			"ID", "("								},
-	{ 7, 12, "method",			"ID", index, ".", "ID", field, "("		},
+	{ 8, 12, "method",			"ID", index, ".", "ID", field, "("		},
 	-- Common Errors
-	{ 7, 0, "method",			"TYPE", index, ".", "ID", field, "(",	iNode = 1,
+	{ 8, 0, "method",			"TYPE", index, ".", "ID", field, "(",	iNode = 1,
 		strErr = invalidVarName },
 }
 
@@ -526,11 +526,11 @@ local line = { t = "line",
 	{ 3, 12, "varDecl",			access, "TYPE", idList, ";",							"END" },
 	{ 3, 12, "constInit", 		access, "final", "TYPE", "ID", "=", expr, ";",			"END" },
 	{ 1, 12, "func",			access, retType, "ID", "(", paramList, ")",				"END" },
-	{ 8, 12, "if",				"if", "(", expr, ")",									"END" },
-	{ 8, 12, "elseif",			"else", "if", "(", expr, ")",							"END" },
-	{ 8, 12, "else",			"else", 												"END" },
+	{ 6, 12, "if",				"if", "(", expr, ")",									"END" },
+	{ 6, 12, "elseif",			"else", "if", "(", expr, ")",							"END" },
+	{ 6, 12, "else",			"else", 												"END" },
 	{ 9, 12, "returnVal",		"return", expr, ";",									"END" },
-	{ 8, 12, "return",			"return", ";",											"END" },
+	{ 6, 12, "return",			"return", ";",											"END" },
 	{ 11, 12, "do",				"do", 													"END" },
 	{ 11, 12, "while",			"while", "(", expr, whileEnd,							"END" },
 	{ 11, 12, "for",			"for", "(", forControl, ")",							"END" },
@@ -559,7 +559,7 @@ local line = { t = "line",
 	-- Common errors: missing semicolon
 	{ 1, 0, "stmt", 		stmt, "END", 											iNode = 2 }, 
 	{ 9, 0, "returnVal", 	"return", expr, "END", 									iNode = 3 }, 
-	{ 9, 0, "return", 		"return", "END", 										iNode = 2 },
+	{ 6, 0, "return", 		"return", "END", 										iNode = 2 },
 	{ 11, 0, "break",		"break", "END",											iNode = 2 },
 	{ 3, 0, "varInit",		access, "ID", "ID", "=", expr, "END",					iNode = 6 }, 
 	{ 3, 0, "constInit", 	access, "final", "ID", "ID", "=", expr, "END",			iNode = 7 }, 
@@ -572,11 +572,11 @@ local line = { t = "line",
 	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	";", "END",	iNode = 7,
 			strErr = "function header should not end with a semicolon" },
 
-	{ 8, 0, "if",			"if", "(", expr, ")", ";", 0,							iNode = 5 },
-	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,					iNode = 6,
+	{ 6, 0, "if",			"if", "(", expr, ")", ";", 0,							iNode = 5 },
+	{ 6, 0, "elseif",		"else", "if", "(", expr, ")", ";", 0,					iNode = 6,
 			strErr = "if statement should not end with a semicolon" },
 
-	{ 8, 0, "else",			"else", ";", 0,											iNode = 2, 
+	{ 6, 0, "else",			"else", ";", 0,											iNode = 2, 
 			strErr = "else statement should not end with a semicolon" },
 
 	{ 11, 0, "do",			"do", ";", 0,											iNode = 2, 
@@ -590,9 +590,9 @@ local line = { t = "line",
 
 	-- Common errors: unsupported bracket style
 	{ 1, 0, "func",			access, retType, "ID", "(", paramList, ")",	"{", 0,		iNode = 7 },
-	{ 8, 0, "if",			"if", "(", expr, ")", "{", 0,							iNode = 5 },
-	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", "{", 0,					iNode = 6 },
-	{ 8, 0, "else",			"else", "{", 0,											iNode = 2 },
+	{ 6, 0, "if",			"if", "(", expr, ")", "{", 0,							iNode = 5 },
+	{ 6, 0, "elseif",		"else", "if", "(", expr, ")", "{", 0,					iNode = 6 },
+	{ 6, 0, "else",			"else", "{", 0,											iNode = 2 },
 	{ 11, 0, "do",			"do", "{", 0,											iNode = 2 },
 	{ 11, 0, "while",		"while", "(", expr, whileEnd, "{", 0,					iNode = 5 },
 	{ 11, 0, "for",			"for", "(", forControl, ")", "{", 0,					iNode = 5 },
@@ -612,11 +612,11 @@ local line = { t = "line",
 	{ 3, 0, "constInit", 	access, "final", "TYPE", "ID", "=", expr, ";", 2, 
 			strErr = "Code12 requires each variable initialization to be on its own line" },
 
-	{ 8, 0, "if",			"if", "(", expr, ")", 2, 								iNode = 5, toEnd = true },
-	{ 8, 0, "elseif",		"else", "if", "(", expr, ")", 2,						iNode = 6, toEnd = true,
+	{ 6, 0, "if",			"if", "(", expr, ")", 2, 								iNode = 5, toEnd = true },
+	{ 6, 0, "elseif",		"else", "if", "(", expr, ")", 2,						iNode = 6, toEnd = true,
 			strErr = "Code12 requires code after an if statement to be on its own line" },
 
-	{ 8, 0, "else",			"else", stmt,											iNode = 2, toEnd = true,
+	{ 6, 0, "else",			"else", stmt,											iNode = 2, toEnd = true,
 			strErr = "Code12 requires code after an else to be on its own line" },
 
 	{ 11, 0, "do",			"do", 2,												iNode = 2, toEnd = true	},
