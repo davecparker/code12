@@ -91,6 +91,7 @@
 * [obj.x]
 * [obj.y]
 * [obj.visible]
+* [obj.id]
 * [obj.group]
 
 ##### [GameObj Methods]	{#toc-gameobj-methods}
@@ -2121,6 +2122,7 @@ shown as `obj`. In your program, you will replace `obj` with the name of the
 * [obj.x]
 * [obj.y]
 * [obj.visible]
+* [obj.id]
 * [obj.group]
 
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields]
@@ -2271,6 +2273,50 @@ class ClickToHide
 }
 ```
 ###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.visible]
+
+
+### obj.id
+([int](#java-data-types)). An optional number that you can assign to a 
+[GameObj](#java-data-types) to help you identify it.
+
+#### Syntax
+```
+obj.id
+```
+##### obj
+([GameObj](#java-data-types)). The graphics object. 
+
+#### Notes
+The default id for an object is 0 when it is created.
+If you assign a different id, you can access and check it when you have an
+unknown object reference to help you identify it. The id values are for your own
+use, can be any integer value, and don't have any special meaning to the system.
+
+#### Example
+```
+class Balls
+{
+	public void start()
+	{
+		GameObj ball1 = ct.circle( 30, 10, 6, "red" );
+		ball1.id = 1;
+
+		GameObj ball2 = ct.circle( 50, 10, 6, "yellow" );
+		ball2.id = 2;
+
+		GameObj ball3 = ct.circle( 70, 10, 6, "blue" );
+		ball3.id = 3;
+	}
+
+	public void update()
+	{
+		GameObj ball = ct.objectClicked();
+		if (ball != null)
+			ct.println( "You clicked ball #" + ball.id );
+	}
+}
+```
+###### [Code12 Function Reference](#top) > [GameObj Data Fields] > [obj.id]
 
 
 ### obj.group
