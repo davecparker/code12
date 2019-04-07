@@ -804,7 +804,7 @@ end
 -- Check a call stmt or expr structure.
 -- If there is an error then set the error state and return nil, 
 -- otherwise return the vt for the return type vt if successful.
-local function vtCheckCall( call )
+local function vtCheckCall( call, isExpr )
 	-- { s = "call", class, lValue, nameID, exprs }
 	-- Find the method
 	local method, fnName = methodAndDisplayNameFromCall( call )
@@ -814,6 +814,22 @@ local function vtCheckCall( call )
 	local refFunc = method.func   -- for user-defined methods, nil for API
 	if refFunc and refFunc.isError then
 		return nil     -- don't check calls to funcs with isError
+	end
+
+	-- Check if fn return value is ignored
+	if not isExpr and method.vt then
+		local validFnStmts = {
+			["function ct.circle"]    = 1,
+			["function ct.rect"]      = 1,
+			["function ct.line"]      = 1,
+			["function ct.text"]      = 1,
+			["function ct.image"]     = 1,
+			["function ct.loadSound"] = 1,
+		}
+		if not validFnStmts[fnName] then
+			err.setErrNode( call, fnName .. " is not a valid statement" )
+			return nil
+		end
 	end
 
 	-- Check parameter count
