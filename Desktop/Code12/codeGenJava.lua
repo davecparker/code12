@@ -514,6 +514,7 @@ end
 -- Generate Lua code for the given for stmt
 local function generateFor( stmt )
 	-- Start with the initStmt if any
+	addLua( " do " )
 	if stmt.initStmt then
 		generateStmt( stmt.initStmt )
 	end
@@ -533,6 +534,7 @@ local function generateFor( stmt )
 		generateStmt( stmt.nextStmt )
 	end
 	endBlock( stmt.block )
+	addLua( " end" )
 end
 
 -- Generate Lua code for the given forArray stmt
