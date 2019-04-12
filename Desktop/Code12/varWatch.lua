@@ -274,7 +274,7 @@ local function updateValues()
 	if vars then
 		for i = 1, #displayRows do
 			local d = displayData[i + scrollOffset]
-			if not d then
+			if not d or d.isLocal then
 				break
 			end
 			local index = d.index
@@ -307,13 +307,35 @@ local function onNewFrame()
 		-- Update local vars if they changed
 		local localVarsNew = runtime.userLocals()
 		if localVarsNew ~= localVars then
+			if localVars then
+				for i = 1, #localVars do
+					displayData[#displayData] = nil
+				end
+				remakeDisplayRows()
+			end
 			localVars = localVarsNew
 			-- Just print them for now (TODO)
 			if localVars then
 				print( "===== " .. #localVars .. " local variables =====" )
 				for _, var in ipairs(localVars) do
-					print( var.name, var.value )
+					print( var.name, var.value, type(var.value) )
+					local varValue = var.value
+					local varType = type( varValue )
+					if varType == nil then
+						varValue = "null"
+					elseif varType == "string" then
+						varValue = '"' .. varValue .. '"'
+					else
+						varValue = tostring( varValue )
+					end
+					local d = {}
+					d.isLocal = true
+					d.var = var
+					d.initRowTexts = { var.name, varValue }
+					d.textIndents = stdIndents
+					displayData[#displayData + 1] = d
 				end
+				varWatch.addDisplayRows()
 			else
 				print( "===== No local vars =====" )
 			end
