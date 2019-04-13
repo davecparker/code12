@@ -1114,7 +1114,7 @@ end
 -- If the block is missing a return statement on one of its code paths
 -- then return the line number for the missing return. Return nil if OK.
 -- TODO: Doesn't check for infinite loops and flow within loops.
-local function iLineMissingReturn( block )
+local function iLineMissingReturn( block, isElse )
 	if block then
 		-- Look at the last stmt
 		local stmts = block.stmts
@@ -1126,10 +1126,10 @@ local function iLineMissingReturn( block )
 		local s = stmt.s
 		if s == "return" then
 			return nil   -- found required return
-		elseif s == "if" and stmt.elseBlock then
+		elseif s == "if" and stmt.elseBlock or isElse then
 			-- Both sub-blocks must return a value if one does
-			local iLine = iLineMissingReturn( stmt.block )
-			local iLineElse = iLineMissingReturn( stmt.elseBlock )
+			local iLine = iLineMissingReturn( stmt.block, false )
+			local iLineElse = iLineMissingReturn( stmt.elseBlock, true )
 			if not (iLine and iLineElse) then
 				return iLine or iLineElse
 			end
@@ -1143,7 +1143,7 @@ end
 -- Existing return statements have already been type checked.
 -- Here we are checking that each code path ends in a return.
 local function checkFuncReturns( func )
-	local iLine = iLineMissingReturn( func.block )
+	local iLine = iLineMissingReturn( func.block, false )
 	if iLine then
 		local strErr
 		if iLine == func.block.iLineEnd then
