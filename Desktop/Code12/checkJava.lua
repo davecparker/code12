@@ -817,19 +817,9 @@ local function vtCheckCall( call, isExpr )
 	end
 
 	-- Check if fn return value is ignored
-	if not isExpr and method.vt then
-		local validFnStmts = {
-			["function ct.circle"]    = 1,
-			["function ct.rect"]      = 1,
-			["function ct.line"]      = 1,
-			["function ct.text"]      = 1,
-			["function ct.image"]     = 1,
-			["function ct.loadSound"] = 1,
-		}
-		if not validFnStmts[fnName] then
-			err.setErrNode( call, fnName .. " is not a valid statement" )
-			return nil
-		end
+	if not isExpr and method.vt and not method.retOptional then
+		err.setErrNode( call, "Return value of " .. fnName .. " is ignored" )
+		return nil
 	end
 
 	-- Check parameter count
@@ -994,7 +984,7 @@ function checkStmt( stmt )
 		checkVar( stmt )
 	elseif s == "call" then
 		-- { s = "call", iLine, className, objLValue, nameID, exprs }
-		vtCheckCall( stmt )
+		vtCheckCall( stmt, false )
 	elseif s == "assign" then
 		-- { s = "assign", iLine, lValue, opToken, opType, expr }   opType: =, +=, -=, *=, /=, ++, --	
 		local lValue = stmt.lValue
@@ -1445,7 +1435,7 @@ end
 
 -- call used as an expression
 local function vtExprCall( node )
-	local vt = vtCheckCall( node ) 
+	local vt = vtCheckCall( node, true )
 	if vt == false then
 		local method, fnName = methodAndDisplayNameFromCall( node )
 		err.setErrNode( node, 
