@@ -70,22 +70,60 @@ local numPublicGameObjFields = 4
 
 -- Fill the vars array with the user program's global variables
 local function getVars()
-	vars = checkJava.globalVars()
-	if vars then
-		local maxVarNameWidth = dropDownBtnSize + maxGameObjFieldWidth -- minimum width to ensure space for GameObj fields
-		for i = 1, #vars do
-			local var = vars[i]
-			local varNameWidth = math.ceil( string.len( var.nameID.str ) * charWidth )
-			if maxVarNameWidth < varNameWidth then
-				maxVarNameWidth = varNameWidth
-			end
-			local vt = var.vt
-			if type(vt) == "table" then
-				var.arrayType = javaTypes.typeNameFromVt( vt.vt )
-			end
-		end
-		xCols = { margin, margin + maxVarNameWidth + padding, margin + maxVarNameWidth + padding + centerColWidth }
+	local globalVars = checkJava.globalVars()
+	if not globalVars and not localVars then
+		vars = nil
+		return
 	end
+	-- Add globars and local variables to varWatch vars table
+	vars = {}
+	if globalVars then
+		for i = 1, #globalVars do
+			local var = globalVars[i]
+			var.name = var.nameID.str
+			if type( var.vt ) == "table" then
+				var.arrayType = javaTypes.typeNameFromVt( var.vt.vt )
+			end
+			vars[#vars + 1] = var
+		end
+	end
+	if localVars then
+		-- TODO: add dividing row between global and local vars
+		for i = 1, #localVars do
+			local var = localVars[i]
+			if var.value == nil then -- Can't tell what it is, treat it as a null string
+				var.vt = "String"
+			else
+				local typeVarValue = type( var.value )				
+				if typeVarValue == "number" then
+					-- Can't tell int from double, treat it as a double
+					var.vt = 1
+				elseif typeVarValue == "boolean" then
+					var.vt = true
+				elseif typeVarValue == "string" then
+					var.vt = "String"
+				elseif typeVarValue == "table" then
+					if var.value.vt then
+						var.arrayType = javaTypes.typeNameFromVt( var.value.vt )
+					else
+						var.vt = "GameObj"
+					end
+				end
+			end
+			var.isLocal = true
+			vars[#vars + 1] = var
+		end
+	end
+	-- Determine values for varWatch column x-values
+	local maxVarNameWidth = dropDownBtnSize + maxGameObjFieldWidth -- minimum width to ensure space for GameObj fields
+	for i = 1, #vars do
+		local var = vars[i]
+		local varNameWidth = math.ceil( string.len( var.name ) * charWidth )
+		if maxVarNameWidth < varNameWidth then
+			maxVarNameWidth = varNameWidth
+		end
+	end
+	xCols = { margin, margin + maxVarNameWidth + padding, margin + maxVarNameWidth + padding + centerColWidth }
 end
 
 -- Returns a string for the given (int, double, or boolean) value
@@ -109,6 +147,14 @@ local function textForGameObjValue( value )
 		return "(deleted GameObj)"
 	end
 	return value:toString()
+end
+
+-- Returns a string for the given array value and type
+local function textForArrayValue( value, arrayType )
+	if value == nil then
+		return "null"
+	end
+	return tostring( arrayType ) .. "[" .. tostring( value.length ) .. "]"
 end
 
 -- Returns a string for the given GameObj value and field
@@ -138,30 +184,31 @@ local function makeDisplayData()
 			local isOpen = var.isOpen
 			local vt = var.vt
 			local arrayType = var.arrayType
-			local varName = var.nameID.str
-			local value = ct.userVars[varName]
+			local varName = var.name
+			local value = var.value or ct.userVars[varName] -- (local or global var)
 			local d = {}
+			-- Add display data for this var to d
 			d.var = var
 			d.initRowTexts = { varName, "" }
 			d.textIndents = stdIndents
+			-- Determine d.textForValue from vt
 			if vt == "String" then
 				d.textForValue = textForStringValue
 			elseif vt == "GameObj" then
 				d.textForValue = textForGameObjValue
 				d.dropDownVisible = 1
 			elseif arrayType then
-				-- d.textForValue = textForArrayValue
+				d.textForValue = textForArrayValue
 				if value and value.length then
 					d.dropDownVisible = 1
-					d.initRowTexts[2] = arrayType.."["..value.length.."]"
-				else
-					d.initRowTexts[2] = "null"
 				end
 			else
 				d.textForValue = textForPrimitiveValue
 			end
+			-- Add data vor this var to displayData table
 			displayData[iRow] = d
 			iRow = iRow + 1
+			-- Add GameObj or array data for open drop-down buttons
 			if isOpen and vt == "GameObj" then
 				-- add GameObj data fields
 				for j = 1, #gameObjFields do
@@ -184,10 +231,9 @@ local function makeDisplayData()
 						d = { var = var, index = j }
 						d.initRowTexts = { "["..(j - 1).."]", "" }
 						d.textIndents = indexOrFieldIndents
-						local arrVt = vt.vt
-						if arrVt == "String" then
+						if arrayType == "String" then
 							d.textForValue = textForStringValue
-						elseif arrVt == "GameObj" then
+						elseif arrayType == "GameObj" then
 							d.textForValue = textForGameObjValue
 							d.dropDownVisible = 2
 						else
@@ -274,13 +320,15 @@ local function updateValues()
 	if vars then
 		for i = 1, #displayRows do
 			local d = displayData[i + scrollOffset]
-			if not d or d.isLocal then
-				break
-			end
 			local index = d.index
 			local field = d.field
 			local var = d.var
-			local value = ct.userVars[var.nameID.str]
+			local value
+			if var.isLocal then
+				value = var.value
+			else
+				value = ct.userVars[var.name]
+			end
 			local textForValue = d.textForValue
 			if index then
 				if field then  -- Value of a GameObj field of a GameObj in an array
@@ -288,14 +336,10 @@ local function updateValues()
 				else           -- Value of an indexed array
 					displayRows[i][2].text = textForValue( value[index] or value.default )
 				end
-			else
-				if field then  -- Value of a field of a GameObj
-					displayRows[i][2].text = textForValue( value, field )
-				else           -- Value of a top-level variable
-					if textForValue then
-						displayRows[i][2].text = textForValue( value )
-					end  -- TODO: else what?
-				end
+			elseif field then  -- Value of a field of a GameObj
+				displayRows[i][2].text = textForValue( value, field )
+			else               -- Value of a top-level variable
+				displayRows[i][2].text = textForValue( value, var.arrayType )
 			end
 		end
 	end
@@ -307,38 +351,29 @@ local function onNewFrame()
 		-- Update local vars if they changed
 		local localVarsNew = runtime.userLocals()
 		if localVarsNew ~= localVars then
-			if localVars then
-				for i = 1, #localVars do
-					displayData[#displayData] = nil
-				end
-				remakeDisplayRows()
-			end
 			localVars = localVarsNew
 			-- Just print them for now (TODO)
 			if localVars then
 				print( "===== " .. #localVars .. " local variables =====" )
 				for _, var in ipairs(localVars) do
-					print( var.name, var.value, type(var.value) )
-					local varValue = var.value
-					local varType = type( varValue )
-					if varType == nil then
-						varValue = "null"
-					elseif varType == "string" then
-						varValue = '"' .. varValue .. '"'
-					else
-						varValue = tostring( varValue )
+					local vt
+					print( var.name, var.value, '"'..type(var.value)..'"' )
+					if type( var.value ) == "table" then
+						for k, v in pairs( var.value ) do
+							print( " ."..tostring(k).."="..tostring(v) )
+						end
 					end
-					local d = {}
-					d.isLocal = true
-					d.var = var
-					d.initRowTexts = { var.name, varValue }
-					d.textIndents = stdIndents
-					displayData[#displayData + 1] = d
 				end
-				varWatch.addDisplayRows()
 			else
 				print( "===== No local vars =====" )
 			end
+			-- Update vars and display data
+			getVars()
+			makeDisplayData()
+			-- Remake display rows
+			remakeDisplayRows()
+			updateValues()
+			adjustScrollbar()
 		end
 		if arrayAssigned then
 			-- save top row data if scrolled
