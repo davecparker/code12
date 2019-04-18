@@ -75,9 +75,10 @@ local function getVars()
 		vars = nil
 		return
 	end
-	-- Add globars and local variables to varWatch vars table
+	-- Initialize vars table
 	vars = {}
 	if globalVars then
+		-- Add global variables to vars table
 		for i = 1, #globalVars do
 			local var = globalVars[i]
 			var.name = var.nameID.str
@@ -88,7 +89,9 @@ local function getVars()
 		end
 	end
 	if localVars then
-		-- TODO: add dividing row between global and local vars
+		-- Add divider between global and local variables
+		vars[#vars + 1] = { isDivider = true, name = "" }
+		-- Add local variables to vars table
 		for i = 1, #localVars do
 			local var = localVars[i]
 			if var.value == nil then -- Can't tell what it is, treat it as a null string
@@ -181,80 +184,84 @@ local function makeDisplayData()
 		local iRow = 1
 		for i = 1, #vars do
 			local var = vars[i]
-			local isOpen = var.isOpen
-			local vt = var.vt
-			local arrayType = var.arrayType
-			local varName = var.name
-			local value = var.value or ct.userVars[varName] -- (local or global var)
-			local d = {}
-			-- Add display data for this var to d
-			d.var = var
-			d.initRowTexts = { varName, "" }
-			d.textIndents = stdIndents
-			-- Determine d.textForValue from vt
-			if vt == "String" then
-				d.textForValue = textForStringValue
-			elseif vt == "GameObj" then
-				d.textForValue = textForGameObjValue
-				d.dropDownVisible = 1
-			elseif arrayType then
-				d.textForValue = textForArrayValue
-				if value and value.length then
-					d.dropDownVisible = 1
-				end
+			if var.isDivider then
+				displayData[iRow] = var
+				iRow = iRow + 1
 			else
-				d.textForValue = textForPrimitiveValue
-			end
-			-- Add data vor this var to displayData table
-			displayData[iRow] = d
-			iRow = iRow + 1
-			-- Add GameObj or array data for open drop-down buttons
-			if isOpen and vt == "GameObj" then
-				-- add GameObj data fields
-				for j = 1, #gameObjFields do
-					local gameObjField = gameObjFields[j]
-					d = { var = var, field = gameObjField }
-					if j <= numPublicGameObjFields then
-						d.initRowTexts = { "." .. gameObjField, "" }
-					else
-						d.initRowTexts = { gameObjField, "" }
+				local d = { var = var }
+				-- Add display data for this var to d
+				local isOpen = var.isOpen
+				local vt = var.vt
+				local arrayType = var.arrayType
+				local varName = var.name
+				local value = var.value or ct.userVars[varName] -- (local or global var)
+				d.initRowTexts = { varName, "" }
+				d.textIndents = stdIndents
+				-- Determine d.textForValue from vt
+				if vt == "String" then
+					d.textForValue = textForStringValue
+				elseif vt == "GameObj" then
+					d.textForValue = textForGameObjValue
+					d.dropDownVisible = 1
+				elseif arrayType then
+					d.textForValue = textForArrayValue
+					if value and value.length then
+						d.dropDownVisible = 1
 					end
-					d.textIndents = indexOrFieldIndents
-					d.textForValue = textForGameObjField
-					displayData[iRow] = d
-					iRow = iRow + 1
+				else
+					d.textForValue = textForPrimitiveValue
 				end
-			elseif isOpen and arrayType then
-				-- add array indices
-				if value then
-					for j = 1, value.length do
-						d = { var = var, index = j }
-						d.initRowTexts = { "["..(j - 1).."]", "" }
-						d.textIndents = indexOrFieldIndents
-						if arrayType == "String" then
-							d.textForValue = textForStringValue
-						elseif arrayType == "GameObj" then
-							d.textForValue = textForGameObjValue
-							d.dropDownVisible = 2
+				-- Add d to displayData table
+				displayData[iRow] = d
+				iRow = iRow + 1
+				-- Add GameObj or array data for open drop-down buttons
+				if isOpen and vt == "GameObj" then
+					-- add GameObj data fields
+					for j = 1, #gameObjFields do
+						local gameObjField = gameObjFields[j]
+						d = { var = var, field = gameObjField }
+						if j <= numPublicGameObjFields then
+							d.initRowTexts = { "." .. gameObjField, "" }
 						else
-							d.textForValue = textForPrimitiveValue
+							d.initRowTexts = { gameObjField, "" }
 						end
+						d.textIndents = indexOrFieldIndents
+						d.textForValue = textForGameObjField
 						displayData[iRow] = d
 						iRow = iRow + 1
-						if arrayType == "GameObj" and var[j.."isOpen"] then
-							-- add GameObj fields for this open GameObj in array
-							for k = 1, #gameObjFields do
-								local gameObjField = gameObjFields[k]
-								d = { var = var, index = j, field = gameObjField, }
-								if k <= numPublicGameObjFields then
-									d.initRowTexts = { "", "." .. gameObjField, "" }
-								else
-									d.initRowTexts = { "", gameObjField, "" }
+					end
+				elseif isOpen and arrayType then
+					-- add array indices
+					if value then
+						for j = 1, value.length do
+							d = { var = var, index = j }
+							d.initRowTexts = { "["..(j - 1).."]", "" }
+							d.textIndents = indexOrFieldIndents
+							if arrayType == "String" then
+								d.textForValue = textForStringValue
+							elseif arrayType == "GameObj" then
+								d.textForValue = textForGameObjValue
+								d.dropDownVisible = 2
+							else
+								d.textForValue = textForPrimitiveValue
+							end
+							displayData[iRow] = d
+							iRow = iRow + 1
+							if arrayType == "GameObj" and var[j.."isOpen"] then
+								-- add GameObj fields for this open GameObj in array
+								for k = 1, #gameObjFields do
+									local gameObjField = gameObjFields[k]
+									d = { var = var, index = j, field = gameObjField, }
+									if k <= numPublicGameObjFields then
+										d.initRowTexts = { "", "." .. gameObjField, "" }
+									else
+										d.initRowTexts = { "", gameObjField, "" }
+									end
+									d.textIndents = indexAndFieldIndents
+									d.textForValue = textForGameObjField
+									displayData[iRow] = d
+									iRow = iRow + 1
 								end
-								d.textIndents = indexAndFieldIndents
-								d.textForValue = textForGameObjField
-								displayData[iRow] = d
-								iRow = iRow + 1
 							end
 						end
 					end
@@ -320,26 +327,28 @@ local function updateValues()
 	if vars then
 		for i = 1, #displayRows do
 			local d = displayData[i + scrollOffset]
-			local index = d.index
-			local field = d.field
-			local var = d.var
-			local value
-			if var.isLocal then
-				value = var.value
-			else
-				value = ct.userVars[var.name]
-			end
-			local textForValue = d.textForValue
-			if index then
-				if field then  -- Value of a GameObj field of a GameObj in an array
-					displayRows[i][3].text = textForValue( value[index], field )
-				else           -- Value of an indexed array
-					displayRows[i][2].text = textForValue( value[index] or value.default )
+			if not d.isDivider then
+				local index = d.index
+				local field = d.field
+				local var = d.var
+				local value
+				if var.isLocal then
+					value = var.value
+				else
+					value = ct.userVars[var.name]
 				end
-			elseif field then  -- Value of a field of a GameObj
-				displayRows[i][2].text = textForValue( value, field )
-			else               -- Value of a top-level variable
-				displayRows[i][2].text = textForValue( value, var.arrayType )
+				local textForValue = d.textForValue
+				if index then
+					if field then  -- Value of a GameObj field of a GameObj in an array
+						displayRows[i][3].text = textForValue( value[index], field )
+					else           -- Value of an indexed array
+						displayRows[i][2].text = textForValue( value[index] or value.default )
+					end
+				elseif field then  -- Value of a field of a GameObj
+					displayRows[i][2].text = textForValue( value, field )
+				else               -- Value of a top-level variable
+					displayRows[i][2].text = textForValue( value, var.arrayType )
+				end
 			end
 		end
 	end
@@ -352,21 +361,6 @@ local function onNewFrame()
 		local localVarsNew = runtime.userLocals()
 		if localVarsNew ~= localVars then
 			localVars = localVarsNew
-			-- Just print them for now (TODO)
-			if localVars then
-				print( "===== " .. #localVars .. " local variables =====" )
-				for _, var in ipairs(localVars) do
-					local vt
-					print( var.name, var.value, '"'..type(var.value)..'"' )
-					if type( var.value ) == "table" then
-						for k, v in pairs( var.value ) do
-							print( " ."..tostring(k).."="..tostring(v) )
-						end
-					end
-				end
-			else
-				print( "===== No local vars =====" )
-			end
 			-- Update vars and display data
 			getVars()
 			makeDisplayData()
@@ -460,52 +454,65 @@ end
 -- Adds rows to displayRows until the varWatch window is filled and return #displayRows
 -- Assumes numDisplayableRows is up to date since last resize
 function varWatch.addDisplayRows()
+	local gridlineLength = 2000
 	local n = #displayRows
 	while n < numDisplayableRows do
 		n = n + 1
-		local d = displayData[n + scrollOffset]
+		local iDisplay = n + scrollOffset
+		local d = displayData[iDisplay]
 		if not d then
-			return n - 1
+			return n - 1		
 		end
 		local row = g.makeGroup( varWatch.table, 0, topMargin + (n - 1) * rowHeight )
-		local numColumns = #d.initRowTexts
-		-- Make row text objs
-		for colNum = 1, numColumns do
-			g.uiBlack( display.newText{
-				parent = row,
-				text = d.initRowTexts[colNum],
-				x = xCols[colNum] + d.textIndents[colNum],
-				y = 1,
-				font = varFont,
-				fontSize = varFontSize,
-			} )
-		end
-		-- Make row gridlines
-		local gridline
-		-- horizontal gridline on bottom of row
-		local x1 = xCols[1]
-		local y1 = rowHeight
-		gridline = display.newLine( row, x1, y1, x1 + 2000, y1 )
-		gridline:setStrokeColor( gridShade )
-		-- vertical gridlines
-		for i = 2, numColumns do
-			x1 = xCols[i]
-			gridline = display.newLine( row, x1, y1, x1, y1 - rowHeight )
-			gridline:setStrokeColor( gridShade )
-		end
-		-- Make drop down button if needed
-		if d.dropDownVisible then
-			local yBtn = row[1].y + row[1].height / 2
-			if d.dropDownVisible == 1 then
-				local btn1 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
-				btn1.rowNumber = n
-				btn1:setState{ isOn = d.var.isOpen or false }
-				row.dropDownBtn1 = btn1
-			else
-				local btn2 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn2 )
-				btn2.rowNumber = n
-				btn2:setState{ isOn = d.var[d.index.."isOpen"] or false }
-				row.dropDownBtn2 = btn2
+		if d.isDivider then
+			local dividerWidth = gridlineLength
+			local dividerHeight = rowHeight / 3
+			local dividerRect = display.newRect( row, xCols[1], rowHeight / 2, dividerWidth, dividerHeight )
+			dividerRect:setFillColor( gridShade )
+			dividerRect.anchorX = 0
+		else
+			local numColumns = #d.initRowTexts
+			-- Make row text objs
+			for colNum = 1, numColumns do
+				g.uiBlack( display.newText{
+					parent = row,
+					text = d.initRowTexts[colNum],
+					x = xCols[colNum] + d.textIndents[colNum],
+					y = 1,
+					font = varFont,
+					fontSize = varFontSize,
+				} )
+			end
+			-- Make row gridlines
+			local gridline
+			local x1 = xCols[1]
+			local y1 = rowHeight
+			local nextData = displayData[iDisplay + 1]
+			if nextData and not nextData.isDivider then
+				-- make horizontal gridline on bottom of row
+				gridline = display.newLine( row, x1, y1, x1 + gridlineLength, y1 )
+				gridline:setStrokeColor( gridShade )
+			end
+			-- make vertical gridlines
+			for i = 2, numColumns do
+				x1 = xCols[i]
+				gridline = display.newLine( row, x1, y1, x1, y1 - rowHeight )
+				gridline:setStrokeColor( gridShade )
+			end
+			-- Make drop down button if needed
+			if d.dropDownVisible then
+				local yBtn = row[1].y + row[1].height / 2
+				if d.dropDownVisible == 1 then
+					local btn1 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
+					btn1.rowNumber = n
+					btn1:setState{ isOn = d.var.isOpen or false }
+					row.dropDownBtn1 = btn1
+				else
+					local btn2 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn2 )
+					btn2.rowNumber = n
+					btn2:setState{ isOn = d.var[d.index.."isOpen"] or false }
+					row.dropDownBtn2 = btn2
+				end
 			end
 		end
 		displayRows[n] = row
