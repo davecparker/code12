@@ -359,21 +359,18 @@ local function onNewFrame()
 	if showVarWatch then
 		-- Update local vars if they changed
 		local localVarsNew = runtime.userLocals()
-		if localVarsNew ~= localVars then
-			localVars = localVarsNew
-			-- Update vars and display data
-			getVars()
-			makeDisplayData()
-			-- Remake display rows
-			remakeDisplayRows()
-			updateValues()
-			adjustScrollbar()
-		end
-		if arrayAssigned then
+		if arrayAssigned or localVarsNew ~= localVars then
 			-- save top row data if scrolled
 			local topData
 			if scrollOffset > 0 then
 				topData = displayData[scrollOffset + 1]
+			end
+			if arrayAssigned then
+				arrayAssigned = false
+			else -- localVarsNew ~= localVars
+				localVars = localVarsNew
+				-- Update vars to include localVars
+				getVars()
 			end
 			-- remake display data
 			makeDisplayData()
@@ -400,7 +397,6 @@ local function onNewFrame()
 			-- remake display rows
 			remakeDisplayRows()
 			adjustScrollbar()
-			arrayAssigned = false
 		end
 		if scrollOffsetChanged then
 			remakeDisplayRows()
