@@ -88,7 +88,7 @@ local function getVars()
 			vars[#vars + 1] = var
 		end
 	end
-	if localVars then
+	if localVars and #localVars > 0 then
 		-- Add divider between global and local variables
 		vars[#vars + 1] = { isDivider = true, name = "" }
 		-- Add local variables to vars table
@@ -462,7 +462,7 @@ function varWatch.addDisplayRows()
 		local row = g.makeGroup( varWatch.table, 0, topMargin + (n - 1) * rowHeight )
 		if d.isDivider then
 			local dividerWidth = gridlineLength
-			local dividerHeight = rowHeight / 3
+			local dividerHeight = 3
 			local dividerRect = display.newRect( row, xCols[1], rowHeight / 2, dividerWidth, dividerHeight )
 			dividerRect:setFillColor( gridShade )
 			dividerRect.anchorX = 0
