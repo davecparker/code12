@@ -29,12 +29,12 @@ local classes      -- api information for all classes found
 
 -- Valid function statements with non-void return types
 local validFnStmts = {
-	["circle"]    = 1,
-	["rect"]      = 1,
-	["line"]      = 1,
-	["text"]      = 1,
-	["image"]     = 1,
-	["loadSound"] = 1,
+	["circle"]    = true,
+	["rect"]      = true,
+	["line"]      = true,
+	["text"]      = true,
+	["image"]     = true,
+	["loadSound"] = true,
 }
 
 
@@ -114,7 +114,7 @@ local function buildTables()
 			end
 
 			-- Check if method has optional return type
-			local retOptional
+			local retOptional = nil
 			if class.name == "ct" and validFnStmts[methodName] then
 				retOptional = true
 			end
