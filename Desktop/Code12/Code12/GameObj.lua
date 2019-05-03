@@ -13,6 +13,7 @@ local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
 
 
+
 -- Constants
 local textObjectFont = "Roboto-Bold.ttf"
 
@@ -274,8 +275,16 @@ function GameObj:newImage(group, filename, x, y, width)
 		obj = display.newImage(group, path, baseDir, x * scale, y * scale)
 	end
 	if not obj then
-		-- Can't open image, substitute a text object with a red X
-		runtime.warning("Cannot find image file", filename)
+		-- Can't open image, check if user's program is on correct drive then give appropriate error
+		local appContext = runtime.appContext
+		if appContext and appContext.driveMismatch then 
+			-- Image saved on flashdrive/different hard drive from code12 warning
+			runtime.warning("Code12 cannot load images saved on usb drives")	
+		else
+			-- Filename mispelled or incorrect warning
+			runtime.warning("Cannot find image file", filename)
+		end	
+		-- Can't open image, substitute a text object with a red X and give warning message
 		return GameObj:newText(group, "[x]", x, y, width, "red")
 	end
 

@@ -22,6 +22,7 @@ local runtime = {
 	--     sourceFilename = string,  -- user code filename (in sourceDir)
 	--     mediaBaseDir = (const),   -- Corona baseDir to use for media files  
 	--     mediaDir = string,        -- media dir relative to mediaBaseDir
+	--     driveMismatch = boolean,  -- true when source code drive is different from the sandbox drive
 	--     outputGroup = group,      -- display group where output should go
 	--     widthP = number,          -- pixel width of output area
 	--     heightP = number,         -- pixel height of output area
