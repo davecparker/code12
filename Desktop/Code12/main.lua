@@ -147,7 +147,7 @@ function app.processUserFile()
 	appContext.mediaBaseDir = env.baseDirDocs
 	appContext.mediaDir = env.relativePath( env.docsDir, appContext.sourceDir )
 
-	--Checks for files saved on drives other than C or saved on flash drives
+	--Checks for files saved on a drive other than the drive that the documents dir is on
 	if env.isWindows then
 		local fileDrive = string.sub( source.path, 1, 1 ) --the drive that the user's file is saved on
 		local docsDrive = string.sub( env.docsDir, 1, 1 ) --the drive that the documents dir is on

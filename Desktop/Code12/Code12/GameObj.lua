@@ -279,7 +279,7 @@ function GameObj:newImage(group, filename, x, y, width)
 		local appContext = runtime.appContext
 		if appContext and appContext.driveMismatch then 
 			local drive = appContext.docsDrive
-			-- Image saved on flashdrive/different hard drive from code12 warning
+			-- Image saved on unaccesible drive warning
 			runtime.warning("Cannot load image file. Copy program folder to " .. drive .. ": drive")	
 		else
 			-- Filename mispelled or incorrect warning
