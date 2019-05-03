@@ -70,6 +70,8 @@ public class DuckHunt extends Code12Program
 		// Move the gun horizontally and fire a bullet when screen is clicked
 		if (ct.clicked())
 		{
+			ct.println( "mouse clicked" );
+			
 			// Play squirt sound
 			ct.sound( "squirt.wav" );
 

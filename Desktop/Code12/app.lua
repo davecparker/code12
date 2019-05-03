@@ -20,7 +20,7 @@ local app =  {
 
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
-	consoleFontSize = 14,
+	consoleFontSize = 14, -- default, can be changed by app.preferredFontSize
 	fontSizeUI = 12,
 	optionsFont = native.systemFont,
 	optionsFontBold = native.systemFontBold,
@@ -61,6 +61,7 @@ local app =  {
 	showVarWatch = true,         -- when true, show the variable watch window
 	gridOn = false,              -- when true, the coordinate gridlines are visible over the program output
 	gridlineShade = nil,         -- current gridline shade
+	preferredFontSize = nil,     -- when set, use for app.consoleFontSize on load of user settings
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started
