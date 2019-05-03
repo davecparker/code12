@@ -500,7 +500,8 @@ local function getElseBlock( ifTree )
 		local stmt = { s = "if", expr = makeExpr( tree.nodes[4] ), 
 						block = getControlledBlock(), 
 						elseBlock = getElseBlock( ifTree ),
-						entireLine = true }
+						entireLine = true,
+						iLine = tree.iLineStart or tree.iLine }
 		return { s = "block", stmts = { stmt } }
 	end
 	return nil	

@@ -336,9 +336,19 @@ local function binOpCode( expr )
 	return exprCode( expr.left ) .. luaOp .. exprCode( expr.right )
 end
 
+-- Return vt in quotes if the lua type of vt is string
+-- (for displaying local arrays in varWatch)
+local function arrayTypeValue( vt )
+	if type( vt ) == "string" then
+		return '"' .. vt .. '"'
+	end
+	return vt
+end
+
 -- Return the Lua code string for a newArray expr
 local function newArrayCode( expr )
 	return "{ length = " .. exprCode( expr.lengthExpr )
+			.. ", vt = " .. arrayTypeValue( expr.vt.vt )
 			.. ", default = " ..  defaultValueCodeForVt( expr.vtElement ) .. " }"
 end
 
@@ -354,6 +364,7 @@ local function arrayInitCode( expr )
 		end
 	end
 	codeStrs[#codeStrs + 1] = "length = " .. length
+	codeStrs[#codeStrs + 1] = ", vt = " .. arrayTypeValue( expr.vt.vt )
 	codeStrs[#codeStrs + 1] = " }"
 	return table.concat( codeStrs )
 end
@@ -514,6 +525,7 @@ end
 -- Generate Lua code for the given for stmt
 local function generateFor( stmt )
 	-- Start with the initStmt if any
+	addLua( " do " )
 	if stmt.initStmt then
 		generateStmt( stmt.initStmt )
 	end
@@ -533,6 +545,7 @@ local function generateFor( stmt )
 		generateStmt( stmt.nextStmt )
 	end
 	endBlock( stmt.block )
+	addLua( " end" )
 end
 
 -- Generate Lua code for the given forArray stmt
