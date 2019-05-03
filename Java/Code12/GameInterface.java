@@ -54,7 +54,7 @@ public interface GameInterface
    public boolean charTyped(String ch);
    
    // Audio
-   public boolean loadSound(String filename);
+   public void loadSound(String filename);
    public void sound(String filename);
    public void setSoundVolume(double d);
    
