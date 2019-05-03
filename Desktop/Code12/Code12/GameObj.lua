@@ -278,8 +278,9 @@ function GameObj:newImage(group, filename, x, y, width)
 		-- Can't open image, check if user's program is on correct drive then give appropriate error
 		local appContext = runtime.appContext
 		if appContext and appContext.driveMismatch then 
+			local drive = appContext.docsDrive
 			-- Image saved on flashdrive/different hard drive from code12 warning
-			runtime.warning("Code12 cannot load images saved on usb drives")	
+			runtime.warning("Cannot load image file. Copy program folder to " .. drive .. ": drive")	
 		else
 			-- Filename mispelled or incorrect warning
 			runtime.warning("Cannot find image file", filename)

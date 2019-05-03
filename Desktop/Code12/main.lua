@@ -152,6 +152,7 @@ function app.processUserFile()
 		local fileDrive = string.sub( source.path, 1, 1 ) --the drive that the user's file is saved on
 		local docsDrive = string.sub( env.docsDir, 1, 1 ) --the drive that the documents dir is on
 		if fileDrive ~= docsDrive then
+			appContext.docsDrive = docsDrive
 			appContext.driveMismatch = true
 		end
 	end
