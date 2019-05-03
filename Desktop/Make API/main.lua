@@ -34,7 +34,6 @@ local validFnStmts = {
 	["line"]      = true,
 	["text"]      = true,
 	["image"]     = true,
-	["loadSound"] = true,
 }
 
 
