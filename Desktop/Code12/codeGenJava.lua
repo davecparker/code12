@@ -550,11 +550,14 @@ end
 
 -- Generate Lua code for the given forArray stmt
 local function generateForArray( stmt )
-	beginLuaLine( stmt.iLine, "for _, " )
+	beginLuaLine( stmt.iLine, "for _i = 0, (" )
+	local exprCode = exprCode( stmt.expr ) 
+	addLua( exprCode )
+	addLua( ").length - 1 do " )
 	addLua( varNameCode( stmt.var.nameID.str ) )
-	addLua( " in ipairs(" )
-	addLua( exprCode( stmt.expr ) )
-	addLua( ") do" )
+	addLua( " = ct.indexArray(" )
+	addLua( exprCode )
+	addLua( ", _i) ")
 	generateBlockStmts( stmt.block )
 	endBlock( stmt.block )
 end
