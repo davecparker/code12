@@ -448,8 +448,12 @@ local function generateAssign( stmt )
 		addLua( lValueCode( stmt.lValue ) )
 		addLua( luaOpFromOpType[opType] )
 	else   -- +=, -=, *=, /=
+		local catOp = nil
+		if stmt.lValue.vt == "String" and opType == "+=" then
+			catOp = " .. "
+		end
 		addLua( lValueCode( stmt.lValue ) )
-		addLua( luaOpFromOpType[opType] )
+		addLua( catOp or luaOpFromOpType[opType] )
 		addLua( "(" )
 		addLua( exprCode( stmt.expr ) )
 		addLua( ")" )
