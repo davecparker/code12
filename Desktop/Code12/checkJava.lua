@@ -804,7 +804,7 @@ end
 -- Check a call stmt or expr structure.
 -- If there is an error then set the error state and return nil, 
 -- otherwise return the vt for the return type vt if successful.
-local function vtCheckCall( call )
+local function vtCheckCall( call, isExpr )
 	-- { s = "call", class, lValue, nameID, exprs }
 	-- Find the method
 	local method, fnName = methodAndDisplayNameFromCall( call )
@@ -814,6 +814,12 @@ local function vtCheckCall( call )
 	local refFunc = method.func   -- for user-defined methods, nil for API
 	if refFunc and refFunc.isError then
 		return nil     -- don't check calls to funcs with isError
+	end
+
+	-- Check if fn return value is ignored
+	if not isExpr and method.vt and not method.retOptional then
+		err.setErrNode( call, "Return value of " .. fnName .. " is ignored" )
+		return nil
 	end
 
 	-- Check parameter count
@@ -978,7 +984,7 @@ function checkStmt( stmt )
 		checkVar( stmt )
 	elseif s == "call" then
 		-- { s = "call", iLine, className, objLValue, nameID, exprs }
-		vtCheckCall( stmt )
+		vtCheckCall( stmt, false )
 	elseif s == "assign" then
 		-- { s = "assign", iLine, lValue, opToken, opType, expr }   opType: =, +=, -=, *=, /=, ++, --	
 		local lValue = stmt.lValue
@@ -1429,7 +1435,7 @@ end
 
 -- call used as an expression
 local function vtExprCall( node )
-	local vt = vtCheckCall( node ) 
+	local vt = vtCheckCall( node, true )
 	if vt == false then
 		local method, fnName = methodAndDisplayNameFromCall( node )
 		err.setErrNode( node, 
