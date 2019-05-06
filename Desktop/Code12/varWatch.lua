@@ -473,8 +473,8 @@ function varWatch.addDisplayRows()
 					text = d.initRowTexts[colNum],
 					x = xCols[colNum] + d.textIndents[colNum],
 					y = 1,
-					font = varFont,
-					fontSize = varFontSize,
+					font = app.consoleFont,
+					fontSize = app.consoleFontSize,
 				} )
 			end
 			-- Make row gridlines
