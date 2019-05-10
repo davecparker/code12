@@ -70,6 +70,8 @@ public class DuckHunt extends Code12Program
 		// Move the gun horizontally and fire a bullet when screen is clicked
 		if (ct.clicked())
 		{
+			ct.println( "mouse clicked" );
+
 			// Play squirt sound
 			ct.sound( "squirt.wav" );
 
@@ -155,7 +157,7 @@ public class DuckHunt extends Code12Program
 
 	// Makes a bullet at position xStart, yStart that will then
 	// move up the window and delete itself once outside the window
-	GameObj fireBullet( double xStart, double yStart )
+	void fireBullet( double xStart, double yStart )
 	{
 		GameObj bullet = null;
 		if ( bulletsCount < maxSize )
@@ -170,7 +172,6 @@ public class DuckHunt extends Code12Program
 		{
 			ct.println( "Too many bullets on screen." );
 		}
-		return bullet;
 	}
 
 	// Deletes a bullet
@@ -220,11 +221,10 @@ public class DuckHunt extends Code12Program
 	}
 
 	// Makes a dead duck at duck's position
-	GameObj makeDeadDuck( GameObj duck )
+	void makeDeadDuck( GameObj duck )
 	{
 		GameObj deadDuck = ct.image( "dead-duck.png", duck.x, duck.y, duck.getHeight() );
 		deadDuck.setYSpeed( 1 );
-		return deadDuck;
 	}
 
 	// Main method

@@ -30,8 +30,6 @@ local topMargin = 5           -- margin for the top of the variable watch window
 local dropDownBtnSize = 10    -- width and height of the drop down buttons
 local margin = app.margin     -- space between UI elements 
 local padding = 3             -- min space between the end of text and a vertical gridline
-local varFont = app.consoleFont           -- font used in the variable display
-local varFontSize = app.consoleFontSize   -- font size used in the variable display
 local stdIndents = { 0, dropDownBtnSize } -- indents for standard top-level variable display rows
 local indexOrFieldIndents = { dropDownBtnSize, dropDownBtnSize * 2 }     -- indents for rows with an index xor a field
 local indexAndFieldIndents = { 0, dropDownBtnSize * 3, dropDownBtnSize } -- indents for rows with an index and a field
@@ -475,8 +473,8 @@ function varWatch.addDisplayRows()
 					text = d.initRowTexts[colNum],
 					x = xCols[colNum] + d.textIndents[colNum],
 					y = 1,
-					font = varFont,
-					fontSize = varFontSize,
+					font = app.consoleFont,
+					fontSize = app.consoleFontSize,
 				} )
 			end
 			-- Make row gridlines

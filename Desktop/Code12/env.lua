@@ -190,6 +190,16 @@ function env.openFileInEditor( path )
 	end
 end
 
+-- Show an info alert message dialog with an OK button and the given
+-- title and message
+function env.showInfoAlert( title, message )
+	fileDialogs.messageBox{
+		title = title,
+		message = message,
+		icon_type = "info",
+	}
+end
+
 -- Show an error alert message dialog with an OK button and the given
 -- title and message
 function env.showErrAlert( title, message )
