@@ -13,7 +13,6 @@ local g = require("Code12.globals")
 local runtime = require("Code12.runtime")
 
 
-
 -- Constants
 local textObjectFont = "Roboto-Bold.ttf"
 
@@ -275,6 +274,7 @@ function GameObj:newImage(group, filename, x, y, width)
 		local path, baseDir = pathAndBaseDirForImage(filename)
 		obj = display.newImage(group, path, baseDir, x * scale, y * scale)
 	end
+	
 	if not obj then
 		-- Can't open image, check if user's program is on correct drive then give appropriate error
 		local appContext = runtime.appContext
