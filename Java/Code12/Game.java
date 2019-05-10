@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 public class Game implements GameInterface
 {
    // The version number of the Code 12 Runtime
-   private static final double VERSION = 1.0;
+   private static final double VERSION = 2.0;
       
    //  Instance data
    Code12Program program;                // the main program callback interface
@@ -360,7 +360,7 @@ public class Game implements GameInterface
 
    //========================= Audio API ===============================
 
-   public boolean loadSound(String filename)   { return audio.load(filename); }
+   public void loadSound(String filename)      { audio.load(filename); }
    public void sound(String filename)          { audio.play(filename); }
    public void setSoundVolume(double d)        { audio.setVolume(d); }
  

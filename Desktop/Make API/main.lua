@@ -27,6 +27,15 @@ local outFile           -- output Lua file
 local parseTrees   -- array of parse trees
 local classes      -- api information for all classes found
 
+-- Valid function statements with non-void return types
+local validFnStmts = {
+	["circle"]    = true,
+	["rect"]      = true,
+	["line"]      = true,
+	["text"]      = true,
+	["image"]     = true,
+}
+
 
 -- Parse the input file and build the parseTrees
 local function parseFile()
@@ -104,7 +113,8 @@ local function buildTables()
 			end
 
 			-- Add the method record
-			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable }
+			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn,
+					params = paramTable, retOptional = validFnStmts[methodName] }
 		elseif p == "varDecl" then
 			-- Add field record(s)
 			local vt = javaTypes.vtFromVarType( tree.nodes[2] )
@@ -264,6 +274,9 @@ local function makeLuaFile()
 			end
 			if method.overloaded then
 				outFile:write( "overloaded = true, " )
+			end
+			if method.retOptional then
+				outFile:write( "retOptional = true, " )
 			end
 
 			-- Write this method's parameters

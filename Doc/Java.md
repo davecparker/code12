@@ -13,9 +13,9 @@
 3. [Variables]
 4. [Expressions]
 5. [Function Return Values]
-6. [Object Data Fields]
-7. [Object Method Calls]
-8. [If-else]
+6. [If-else]
+7. [Object Data Fields]
+8. [Object Method Calls]
 9. [Function Definitions]
 10. [Function Parameters]
 11. [Loops]
@@ -36,7 +36,7 @@
 </div>
 </div>
 
-###### Code12 Version 1.0
+###### Code12 Version 2.0
 
 
 ### Function Calls
@@ -741,274 +741,6 @@ ct.log( a, b, c );
 ###### [Java Language Help](#top) > [Function Return Values]
 
 
-### Object Data Fields
-The [Graphics Object Creation](API.html#graphics-object-creation)
-functions in Code12 [return a value](#function-return-values) 
-of type [GameObj](#java-data-types), which allows you to manipulate 
-the graphics object created. First you must capture the return 
-value of the function in a variable of type `GameObj`, such as:
-```
-GameObj dot = ct.circle( 50, 30, 20 );
-```
-A variable of type [GameObj](#java-data-types) acts like a container
-that has several sub-variables inside of it, which all apply to that 
-graphics object. These sub-variables are called *data fields*.
-Some of these data fields can be accessed directly using a dot (.) 
-after the `GameObj` variable name followed by the name of the sub-variable. 
-For example, `hero.x` is the x-coordinate of a `GameObj` variable named `hero`.
-
-#### Examples
-```
-GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
-dot.x = 100;             // move to right edge of screen
-```
-```
-GameObj square = ct.rect( 7, 7, 10, 10 );
-double y = ct.inputNumber( "Enter y-coordinate to move square to" );
-square.y = y;
-```
-```
-GameObj dot;
-
-public void start()
-{
-	dot = ct.circle( 0, 50, 10 );	
-}
-
-public void update()
-{
-	// Move dot a little to the right each animation frame
-	dot.x = dot.x + 1;
-}
-```
-```
-GameObj greenDot = ct.circle( 30, 50, 20, "green" );
-GameObj redDot = ct.circle( 70, 50, 20, "red" );
-redDot.visible = false;
-```
-```
-GameObj penny = ct.circle( 30, 10, 6, "orange" );
-penny.group = "coins";
-
-GameObj dime = ct.circle( 50, 10, 6, "light gray" );
-dime.group = "coins";
-
-GameObj bill = ct.rect( 75, 10, 20, 10, "dark green" );
-bill.group = "bills";
-
-ct.showAlert( "Click OK to delete the coins" );
-ct.clearGroup( "coins" );
-```
-#### Notes
-The Java data types [int](#java-data-types), [double](#java-data-types),
-and [boolean](#java-data-types) are called "primitive" data types,
-because they only take a single number to store (the boolean 
-values `true` and `false` are represented by the numbers 1 and 0
-internally). The [GameObj](#java-data-types) type, however, is a 
-complex data type that requires several numbers internally to store.
-This is an example of an "Object" data type in Java.
-
-Each `GameObj` variable contains several data fields inside it.
-These fields store the object's current position, size, speed,
-color, and more. Because you can have many `GameObj` objects in your 
-program, each one has its own memory locations for each of these
-fields, so, for example, `hero.x` may be 32 while `enemy.x` 
-might be 75.
-
-##### Getting and Setting Data Fields
-An object data field allows you to either "get" its current value,
-as in:
-```
-GameObj dot = ct.circle( 50, 30, 20 );   // circle at (50, 30)
-double xPosition = dot.x;       // sets xPosition to 50
-```
-or you can also "set" (change) a field value, as is:
-```
-GameObj dot = ct.circle( 50, 50, 20 );   // start in the center
-dot.x = 100;             // move to right edge of screen
-```
-In this statement:
-```
-dot.x = dot.x + 1;
-```
-The code first "gets" the current value of the `x` field of `dot`
-then changes ("sets") it to be 1 greater. 
-
-##### GameObj Public Data Fields
-Only some of the data fields inside a `GameObj` can be accessed
-directly. Java refers to these as "public data fields". These are:
-```
-Field       Type        Use
--------     -------     -------------------------
-x           double      The object's x-coordinate
-y           double      The object's y-coordinate
-visible     boolean     false to hide the object
-group       String      optional group name
-```
-For more information, see [GameObj Data Fields](API.html#gameobj-data-fields).
-
-###### [Java Language Help](#top) > [Object Data Fields]
-
-
-### Object Method Calls
-Code12 has several special functions that are designed 
-for use on graphics objects. When a Java function is designed to
-operate on a specific object (instead of your application as a whole), 
-it is often provided as an "*object method*", which uses a slightly
-different syntax than a normal function call.
-
-#### Example
-```
-GameObj ball = ct.circle( 50, 50, 20 );
-ball.setFillColor( "blue" );
-```
-The call to `ball.setFillColor()` above is an object method call.
-Unlike [function calls](#function-calls) that apply to your application 
-as a whole (which start with `ct.` in Code12), object methods 
-for graphics objects are called by specifying a variable of type
-[GameObj](#java-data-types) (here `ball`) to the left of the dot (.) 
-instead of `ct`. The `GameObj` variable refers to the particular 
-graphics object in your program that you want to operate on.
-
-The function [ct.circle()](API.html#ct.circle) creates a new circle
-object and also [returns a value](#function-return-values) 
-of type `GameObj` so that you can make a variable such as `ball`
-that will refer to the object that was created and then call object
-methods on it afterwards.
-
-#### More Examples
-```
-GameObj top = ct.circle( 50, 35, 10 );
-GameObj middle = ct.circle( 50, 50, 10 );
-GameObj bottom = ct.circle( 50, 65, 10 );
-
-top.setFillColor( "red" );
-middle.setFillColor( "yellow" );
-bottom.setFillColor( "green" );
-```
-```
-GameObj block = ct.rect( 10, 10, 10, 10 );
-block.setSize( 20, 5 );
-block.setXSpeed( 0.5 );
-block.setFillColorRGB( 200, 100, 50 );
-block.setLineColor( "gray" );
-block.setLineWidth( 3 );
-```
-```
-GameObj text = ct.text( "This will be underlined", 50, 30, 8 );
-double width = text.getWidth();
-double height = text.getHeight();
-double yBottom = text.y + height / 2;
-GameObj underline = ct.line( text.x - width / 2, yBottom,
-                             text.x + width / 2, yBottom );
-underline.setLineWidth( 2 );
-```
-```
-String str = "Code12";
-int numChars = str.length();
-String strLower = str.toLowerCase();
-ct.println( strLower.substring( 0, numChars - 2 ) );
-```
-#### Notes
-You can think of a [GameObj](#java-data-types) as a container
-for several sub-variables ("data fields"), all of which apply
-to a specific graphics object on the screen. You can also think
-of a variable of type `GameObj` as a reference to (like a name for) 
-the graphics object itself.
-
-In addition to the [GameObj public data fields](API.html#gameobj-data-fields),
-each `GameObj` also internally has data fields that are used to 
-store the object's size, speed, colors, and more. These fields are
-not accessible directly, but the 
-[GameObj method functions](API.html#gameobj-methods) can
-be used to access or change these properties of the object.
-There are also some method functions that perform special actions
-or tests on the object.
-
-Calling a `GameObj` method function applies only to the particular 
-`GameObj` that the method is called on, not any other `GameObj`
-objects in your program. 
-
-##### Getting and Setting Properties of an Object
-Some method functions modify the object that they are called on,
-for example:
-```
-GameObj ball = ct.circle( 50, 50, 20 );
-ball.setFillColor( "blue" );
-```
-This is often called "setting a property" of an object.
-
-Other method functions are designed to just return information 
-about the object, for example:
-```
-GameObj message = ct.text( "Hello There", 50, 50, 10 );
-double width = message.getWidth();
-```
-This is often called "getting a property" of an object.
-Method functions that "get" properties will always have
-a [return value](#function-return-values).
-
-##### Methods vs. Functions
-A call to an object method function has a variable name before 
-the dot instead of `ct`. For example:
-```
-GameObj ball = ct.circle( 50, 50, 20 );
-
-ct.setBackColor( "yellow" );    // normal function call
-ball.setFillColor( "blue" );    // method function call
-```
-> Strictly speaking, all function calls in Java are actually 
-> considered method calls in Object-Oriented terminology.
-> The "ct" in a Code12 function call is actually a variable 
-> that is provided to you by the system that refers to your 
-> program as a whole. So a call such as `ct.setBackColor()`
-> is really a call to the `setBackColor()` method on the 
-> `ct` object.
-
-So, calling a method function on a `GameObj` requires that you have
-a variable of type `GameObj` in your program to refer to the object
-with. In the following code:
-```
-ct.circle( 30, 50, 20 );
-GameObj block = ct.rect( 70, 50, 20, 30 );
-
-block.setYSpeed( 1 );
-```
-the circle is created and drawn on the screen, but the 
-[return value](#function-return-values) of `ct.circle()`
-is ignored and not assigned to a variable. This means
-there is no way to call a method function on it. 
-The rectangle, however, is assigned to the variable
-`block`, which can then be used to call method functions.
-
-##### GameObj and String Methods
-A Code12 program can call method functions on two different 
-types of data objects: [GameObj](#java-data-types) and 
-[String](#java-data-types). See the 
-[GameObj method functions](API.html#gameobj-methods) for
-the method functions supported for `GameObj` objects.
-
-Variables of type [String](#java-data-types) are technically 
-also "objects" in Java, and there are various method functions 
-designed to operate on strings.
-See [Java String Methods](API.html#java-string-methods) 
-for the methods supported by Code12.
-
-> All of the Java String methods either return information about
-> the string or create and return a new String. It is not possible 
-> to modify a String in Java.
-
-Note that `GameObj` methods can only be called on a variable
-of type `GameObj`, and `String` methods must be called on a
-variable of type `String`.
-
-The Java data types [int](#java-data-types), [double](#java-data-types),
-and [boolean](#java-data-types) are "primitive types" and do
-not support method calls.
-
-###### [Java Language Help](#top) > [Object Method Calls]
-
-
 ### If-else
 The if-else structure allows you to specify that another statement 
 (such as a [function call](#function-calls) or [variable assignment](#variables)), 
@@ -1128,7 +860,6 @@ int n = ct.inputInt( "Enter a number from 1 to 10" );
 if (n < 1 || n > 10)
 	ct.println( "That number is out of range" );
 ```
-
 ##### Boolean Expressions
 In all of the examples above, the condition for the if-else has to
 be something that results in a `true` or `false` condition.
@@ -1176,6 +907,7 @@ int age = ct.inputInt( "Enter your age" );
 if (age < 18)
 {
 	ct.println( "You are a child." );
+
 	if (ct.inputYesNo( "Is your parent with you?" ) )
 		ct.println( "You two must sit together" );
 	else
@@ -1257,109 +989,396 @@ tests `true`, then all the remaining ones are skipped. It is important to
 write the various conditions and the order of the tests in a way that 
 produces the result you want in all cases.
 
-#### Graphics and Animation Examples 
-Although an if-else structure only tests its condition and executes
-its controlled statements when it is encountered in your program,
-the way the `update()` code block works in a Code12 program makes it
-easy to test conditions repeatedly.
+##### Comparing Strings
 
-Code in your `update()` block is executed before each new animation
-frame, and animation frames happen 60 times per second, so this means 
-that the entire sequence of statements in your `update()` block is
-repeated 60 times per second, which is very often compared to human
-perception. This means that an if-else test that you put in your 
-`update()` block may appear to be tested "continuously". In fact,
-it is not tested continuously, just repeatedly and quickly.
-For example:
+It is possible to use an `if` condition to test the value of a
+[String](#java-data-types) value (for example, to see if two names 
+are the same). However, you cannot just use the `==` or `!=`
+comparison operators like you can for numbers. To compare `String`
+values, you need to call method functions on the `String` object,
+which requires the [Object Method Calls] syntax described in
+a later section.  
+
+###### [Java Language Help](#top) > [If-else]
+
+
+### Object Data Fields
+The [Graphics Object Creation](API.html#graphics-object-creation)
+functions in Code12 [return a value](#function-return-values) 
+of type [GameObj](#java-data-types), which allows you to manipulate 
+the graphics object created. First you must capture the return 
+value of the function in a variable of type `GameObj`, such as:
 ```
-GameObj dot;
-
-public void start()
-{
-	dot = ct.circle( 20, 50, 10);
-}
-
-public void update()
-{
-	if (dot.x < 50)
-		ct.println( "The dot is on the left" );
-	else
-		ct.println( "The dot is on the right" );	
-}
+GameObj ball = ct.circle( 50, 30, 20 );
 ```
-The above example might not do what you first expect (and probably
-not what you wanted if you wrote it), but it helps show how
-the code gets executed.
+A variable of type [GameObj](#java-data-types) acts like a name for a
+container that has several sub-variables inside of it, which all apply to 
+that particular graphics object. These sub-variables are called *data fields*.
+Some of these data fields can be accessed directly using a dot (.) 
+after the `GameObj` variable name followed by the name of the sub-variable. 
+For example, `ball.x` is the x-coordinate of a `GameObj` variable named `ball`.
 
-A more useful example would be:
+#### Example
 ```
-GameObj button;
-
-public void start()
+class MoveBall
 {
-	button = ct.circle( 50, 50, 20);
-}
-
-public void update()
-{
-	if (button.clicked())
-		ct.println( "You pressed the button!" );	
-}
-``` 
-which easily detects "whenever" the button is pressed.
-
-As a final example, consider this simple game, which challenges
-you to click a moving dot:
-```
-GameObj dot;
-
-public void start()
-{
-	// Make a small red dot
-	dot = ct.circle( 20, 50, 5);
-}
-
-public void update()
-{
-	// Move the dot a bit to the right each frame, but restart
-	// it on the left if it goes off-screen to the right. 
-	dot.x += 0.5;
-	if (dot.x > 100)
-		dot.x = 0;
-
-	// Did the user click on something?
-	if (ct.clicked())
+	public void start()
 	{
-		// Did they click on the dot?
-		if (dot.clicked())
-			ct.println( "You got the dot!" );
-		else
-			ct.println( "You missed" );
+		GameObj ball = ct.circle( 20, 15, 10 );
+		ct.log( ball.x, ball.y );
+
+		double xNew = ct.inputNumber( "Enter new x-coordinate to move the ball to" );
+		ball.x = xNew;
+		ct.log( ball.x, ball.y );
 	}
 }
 ```
-Note that this example includes a nested if-else structure.
-The inner `if` is only tested and executed if the outer `if` passes 
-its test. What would happen if the outer `if` were removed? 
-Try to predict the result, then try it and see. 
+Note that the syntax `ball.x` acts like a variable. Its current value can
+be retrieved, or it can also be assigned (set) to a different value, which will
+move the ball on the screen.
 
-#### Comparing Object References and null
-A comparison such as `if (a == b)` can be used to see if two numbers
-(`int` or `double`) are equal, or if two `boolean` values are equal.
-You can also compare `GameObj` objects, although what this means is 
-slightly different. 
+#### Notes
+The Java data types [int](#java-data-types), [double](#java-data-types),
+and [boolean](#java-data-types) are called "primitive" data types,
+because they only take a single number to store (the boolean 
+values `true` and `false` are represented by the numbers 1 and 0
+internally). The [GameObj](#java-data-types) type, however, is a 
+complex data type that requires several numbers internally to store.
+This is an example of an "Object" data type in Java.
 
+Each `GameObj` variable contains several data fields inside it.
+These fields store the object's current position, size, speed,
+color, and more. Because you can have many `GameObj` objects in your 
+program, each one has its own memory locations for each of these
+fields, so, for example, `hero.x` may be 32 while `enemy.x` 
+might be 75.
+
+##### GameObj Public Data Fields
+Only some of the data fields inside a `GameObj` can be accessed
+directly. Java refers to these as "public data fields". These are:
+```
+Field       Type        Use
+-------     -------     -------------------------
+x           double      The object's x-coordinate
+y           double      The object's y-coordinate
+visible     boolean     Set to false to hide the object
+group       String      Optional group name
+```
+For more information, see [GameObj Data Fields](API.html#gameobj-data-fields).
+
+##### Getting and Setting Data Fields
+An object data field allows you to either "get" its current value,
+as in:
+```
+GameObj ball = ct.circle( 50, 30, 20 );   // circle at (50, 30)
+ct.log( ball.x );                         // 50
+```
+or you can also "set" (change) a field value, as is:
+```
+GameObj ball = ct.circle( 50, 50, 20 );   // start in the center
+ball.x = 100;             // move to right edge of screen
+```
+In this statement:
+```
+ball.x = ball.x + 1;
+```
+As with regular variables, the code first "gets" the current value 
+of the `x` field of `ball` then changes ("sets") it to be 1 greater. 
+
+##### Animation Using update()
+The optional [update()](API.html#main-program-functions) code block in your 
+program executes repeatedly, before every animation frame (60 times per second). 
+By putting code in `update()`, you can make objects move smoothly on the screen 
+by changing their `x` and `y` data fields before each animation frame. 
+For example:
+
+```
+class MovingBall
+{
+	// Need a ball variable that both start() and update() can access
+	GameObj ball;
+
+	public void start()
+	{
+		// Create the ball
+		ball = ct.circle( 0, 50, 10 );	
+	}
+
+	public void update()
+	{
+		// Move the ball a little to the right each animation frame
+		ball.x = ball.x + 1;
+
+		// If the ball goes off the right edge of the screen, 
+		// then restart it at the left edge
+		if (ball.x > 100)
+			ball.x = 0;
+	}
+}
+```
+```
+class MoveDiagonal
+{
+	// Need a block variable that both start() and update() can access
+	GameObj block;
+
+	public void start()
+	{
+		// Create the block
+		block = ct.rect( 0, 20, 10, 10 );	
+	}
+
+	public void update()
+	{
+		// Move the block slowly diagonally
+		block.x += 0.5;
+		block.y += 0.2;
+	}
+}
+```
+
+###### [Java Language Help](#top) > [Object Data Fields]
+
+
+### Object Method Calls
+In addition to being able to access some [Object Data Fields] of
+graphics objects, Code12 has several special functions that are designed 
+for use on graphics objects. When a Java function is designed to
+operate on a specific object (instead of your application as a whole), 
+it is often provided as an "*object method*", which uses a slightly
+different syntax than a normal function call.
+
+See [GameObj Methods](API.html#gameobj-methods) for a list 
+of the various object method functions available for a `GameObj`. 
+
+#### Example
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+ball.setFillColor( "blue" );
+```
+The call to `ball.setFillColor()` above is an object method call.
+Unlike [function calls](#function-calls) that apply to your application 
+as a whole (which start with `ct.` in Code12), object methods 
+for graphics objects are called by specifying a variable of type
+[GameObj](#java-data-types) (here `ball`) to the left of the dot (.) 
+instead of `ct`. The `GameObj` variable refers to the particular 
+graphics object in your program that you want to operate on.
+
+The function [ct.circle()](API.html#ct.circle) creates a new circle
+object and also [returns a value](#function-return-values) 
+of type `GameObj` so that you can make a variable such as `ball`
+that will refer to the object that was created and then call object
+methods on it afterwards.
+
+#### More Examples
+```
+GameObj top = ct.circle( 50, 35, 10 );
+GameObj middle = ct.circle( 50, 50, 10 );
+GameObj bottom = ct.circle( 50, 65, 10 );
+
+top.setFillColor( "red" );
+middle.setFillColor( "yellow" );
+bottom.setFillColor( "green" );
+```
+```
+GameObj block = ct.rect( 10, 10, 10, 10 );
+block.setSize( 20, 5 );
+block.setXSpeed( 0.5 );
+block.setFillColorRGB( 200, 100, 50 );
+block.setLineColor( "gray" );
+block.setLineWidth( 3 );
+```
+```
+GameObj text = ct.text( "This will be underlined", 50, 30, 8 );
+double width = text.getWidth();
+double height = text.getHeight();
+double yBottom = text.y + height / 2;
+GameObj underline = ct.line( text.x - width / 2, yBottom,
+                             text.x + width / 2, yBottom );
+underline.setLineWidth( 2 );
+```
+#### Notes
+You can think of a [GameObj](#java-data-types) as a container
+for several sub-variables ("data fields"), all of which apply
+to a specific graphics object on the screen. You can also think
+of a variable of type `GameObj` as a reference to (like a name for) 
+the graphics object itself.
+
+In addition to the [GameObj public data fields](API.html#gameobj-data-fields),
+each `GameObj` also internally has data fields that are used to 
+store the object's size, speed, colors, and more. These fields are
+not accessible directly, but the 
+[GameObj method functions](API.html#gameobj-methods) can
+be used to access or change these properties of the object.
+There are also some method functions that perform special actions
+or tests on the object.
+
+Calling a `GameObj` method function applies only to the particular 
+`GameObj` that the method is called on, not any other `GameObj`
+objects in your program. 
+
+##### Getting and Setting Properties of an Object
+Some method functions modify the object that they are called on,
+for example:
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+ball.setFillColor( "blue" );
+```
+This is often called "setting a property" of an object.
+
+Other method functions are designed to just return information 
+about the object, for example:
+```
+GameObj message = ct.text( "Hello There", 50, 50, 10 );
+double width = message.getWidth();
+```
+This is often called "getting a property" of an object.
+Method functions that "get" properties will always have
+a [return value](#function-return-values).
+
+##### Methods vs. Functions
+A call to an object method function has a variable name before 
+the dot instead of `ct`. For example:
+```
+GameObj ball = ct.circle( 50, 50, 20 );
+
+ct.setBackColor( "yellow" );    // normal function call
+ball.setFillColor( "blue" );    // method function call
+```
+> Strictly speaking, all function calls in Java are actually 
+> considered method calls in Object-Oriented terminology.
+> The "ct" in a Code12 function call is actually a variable 
+> that is provided to you by the system that refers to your 
+> program as a whole. So a call such as `ct.setBackColor()`
+> is really a call to the `setBackColor()` method on the 
+> `ct` object.
+
+So, calling a method function on a `GameObj` requires that you have
+a variable of type `GameObj` in your program to refer to the object
+with. In the following code:
+```
+ct.circle( 30, 50, 20 );
+GameObj block = ct.rect( 70, 50, 20, 30 );
+
+block.setYSpeed( 1 );
+```
+the circle is created and drawn on the screen, but the 
+[return value](#function-return-values) of `ct.circle()`
+is ignored and not assigned to a variable. This means
+there is no way to call a method function on it. 
+The rectangle, however, is assigned to the variable
+`block`, which can then be used to call method functions.
+
+##### Using Object Methods in Animation and Games
+By using [GameObj Methods](API.html#gameobj-methods) in the
+`start()` and `update()` blocks in your program
+(see [Main Program Functions](API.html#main-program-functions)), 
+you can achieve a variety of interesting things including 
+making games. For example, this program challeges you to click 
+on a moving dot:
+```
+class ClickTheDot
+{
+	GameObj dot;
+
+	public void start()
+	{
+		// Make a small red dot and make it move to the right
+		dot = ct.circle( 0, 50, 5 );
+		dot.setXSpeed( 1 );
+		ct.println( "Try to click the dot" );
+	}
+
+	public void update()
+	{
+		// Did they click on the dot?
+		if (dot.clicked())
+			ct.showAlert( "You got it!" );
+	}
+}
+```
+Note that although an [if-else] only tests its condition and executes
+its controlled statement(s) when it is encountered in your program,
+the way the `update()` code block works in a Code12 program makes it
+easy to test conditions repeatedly. Code in your `update()` block is
+executed before each new animation frame, and animation frames happen 
+60 times per second, so this means that the entire sequence of statements 
+in your `update()` block is repeated 60 times per second, which is very 
+often compared to human perception. This means that the 
+`if (dot.clicked())` above may appear to be tested "continuously". 
+In fact, it is not tested continuously, just repeatedly and quickly.
+
+#### String Methods
+Variables of type [String](#java-data-types) are also considered 
+"objects" in Java (not primitive types like `int`, `double`, and 
+`boolean`), and there are various method functions designed to operate 
+on strings. For example:
+```
+String name = ct.inputString( "Enter your name" );
+int numChars = name.length();
+ct.println( "Your name has " + numChars + " characters in it." );
+```
+Here the method function is called `length()`, which counts the 
+number of characters in a string, so it must be called on a `String` 
+variable. The string variable to measure appears before the method 
+function, separated with a dot, as `name.length()` above, similar to 
+the syntax used for `GameObj` method functions.  
+
+See [Java String Methods](API.html#java-string-methods) 
+for the String methods supported by Code12.
+String methods must be called on a `String`, whereas GameObj methods 
+must be called on a `GameObj`.
+
+All of the Java String methods either return information about
+the string or create and return a new String. It is not possible 
+to modify a String in Java. For example:
+```
+String name = ct.inputString( "Enter your name" );
+String nameLower = name.toLowerCase();    // makes a new string
+ct.log( name, nameLower );     // original name is not modified
+```
+```
+String name = ct.inputString( "Enter your name" );
+String sub = name.substring( 0, name.length() - 2 ); 
+ct.log( name, sub );
+```
+##### Comparing Strings
+Since strings are considered objects in Java, you cannot test to 
+see if two strings have the same text by using the `==` or `!=`
+operators. Instead you must use the `str.equals()` method function. 
+For example:
+```
+String firstName = ct.inputString( "Enter your first name" );
+
+if (firstName.equals( "Dave" ))
+	ct.showAlert( "Hey, my name is Dave too!" );
+
+String lastName = ct.inputString( "Enter your last name" );
+
+if (lastName.equals( firstName ))
+	ct.showAlert( "That's weird, your first and last name are the same!" );
+```
+
+#### Object References
 The [GameObj](#java-data-types) and [String](#java-data-types) types in 
 Java are examples of *Object* types, as opposed to the *primitive* types 
 `int`, `double`, and `boolean`. Whereas a primitive type only stores a 
 single value (e.g. a single number), an Object can be made up of many 
 values (accessible via [Object Data Fields] and [Object Method Calls]).
 
-A variable of type [GameObj](#java-data-types) or [String](#java-data-types)
+In Java, a variable of type [GameObj](#java-data-types) or [String](#java-data-types)
 is technically a *reference* to the underlying object, not the object itself.
-Physically, a reference to an object is the *memory address* where
-the underlying object is stored, which is just a number.
-This distinction matters when you assign and compare object variables. 
+You can think of a reference as an arrow pointing to the object that it
+is referring to. Just like you can draw more than one arrow pointing at 
+the same object, you can create more than one reference to an object.
+
+> Physically, a reference to an object is the *memory address* where
+> the underlying object is stored in memory, which is just a number.
+> Two memory addresses that are equal then refer to the same object.
+
+This distinction between an actual object (for example, a circle on the
+screen) and a reference to the object (for example, a GameObj variable) 
+matters when you assign and compare object variables. 
 When you assign an object variable to an existing object, such as:
 ```
 GameObj dot = ct.circle( 50, 50, 20 );
@@ -1370,12 +1389,19 @@ object. It does not make a copy of the object or create another circle.
 Now both variables refer to the same object, and either one can be used 
 to access or modify it:
 ```
-GameObj dot = ct.circle( 50, 50, 20 );
-GameObj ball = dot;
+GameObj dot = ct.circle( 50, 50, 20 );   // dot starts at x = 50
+GameObj ball = dot;                      // ball now also refers to dot
 
-dot.x = 70;                 // moves the circle to x = 70
+dot.x = 70;                 // moves the dot to x = 70
 ct.println( ball.x );       // prints 70 because ball is the same as dot
-ct.println( dot == ball );  // prints true
+```
+In addition, a comparison such as `if (ball == dot)` can be used to see if
+two variables refer to the same object: 
+```
+GameObj dot = ct.circle( 50, 50, 20 );
+GameObj ball = dot;                      // ball now also refers to dot
+
+ct.println( dot == ball );   // prints true because they are the same object
 ``` 
 An example of how this is used in practice would be using the Code12 function
 [ct.objectClicked()](API.html#ct.objectclicked). This function has a return
@@ -1397,25 +1423,25 @@ class Example
 	public void update()
 	{
 		// See if the middle ball was clicked
-		GameObj obj = ct.objectClicked();
-		if ( obj == ball2 )
+		GameObj target = ct.objectClicked();
+		if ( target == ball2 )
 			ct.println( "You clicked the middle ball" );
 	}
 }
 ```
-Here the statement `GameObj obj = ct.objectClicked();` sets `obj` to
-another reference to whichever ball got clicked (note that each circle 
+Here the statement `GameObj target = ct.objectClicked();` sets `target`
+to another reference to whichever ball got clicked (note that each circle 
 already has a variable referencing it). It does not make a copy of that 
-ball or a new ball. Then the test `if ( obj == ball2 )` can be used 
-to see if the clicked object (`obj`) refers to the same object
+ball or a new ball. Then the test `if ( target == ball2 )` can be used 
+to see if the clicked object (`target`) refers to the same object
 as `ball2`, which is the middle ball. 
 
 ##### A null Object Reference
-It is also possible that none of the three balls got clicked, in which
-case the `ct.objectClicked()` function returns the special value `null`,
-which means "no object". The value `null` is pre-defined by Java for this
-purpose. You can compare an object reference to `null` to see if it
-references any object:
+It is also possible that none of the three balls in the example above 
+got clicked, in which case the `ct.objectClicked()` function returns the 
+special value `null`, which means "no object". The value `null` is pre-defined
+by Java for this purpose. You can compare an object reference to `null` to 
+see if it references an actual object:
 ```
 class Example
 {
@@ -1432,8 +1458,8 @@ class Example
 	public void update()
 	{
 		// See if any object was clicked
-		GameObj obj = ct.objectClicked();
-		if ( obj != null )
+		GameObj target = ct.objectClicked();
+		if ( target != null )
 			ct.println( "You clicked on an object" );
 	}
 }
@@ -1462,40 +1488,21 @@ class Example
 		// Print the x-coordinate of the selected ball
 		ct.println( selectedBall.x );    // prints 30
 
-		// Clear the selection (doesn't affect the circles)
+		// Delete the selected ball then clear the selection
+		selectedBall.delete();
 		selectedBall = null;
 
-		// Is there a ball selected?
+		// Now is there a ball selected?
 		if (selectedBall == null)
 			ct.println( "No ball is selected now" );
 
 		// This would produce an error if we tried it now
 		// ct.println( selectedBall.x );
 	}
-
 }
 ```
-#### Comparing Strings
-Variables of type [String](#java-data-types) are also considered objects
-in Java, so the rules for object references above also apply. 
-In particular, if you tried to compare two `String` variables with 
-`if (a == b)`, you would get true only if the two variables referenced 
-the exact same string in memory, not just if their text was the same,
-which is almost never what you want in practice. To test if two strings 
-have the same text, use the `str.equals()` method. For example:
-```
-String firstName = ct.inputString( "Enter your first name" );
 
-if (firstName.equals( "Dave" ))
-	ct.showAlert( "Hey, my name is Dave too!" );
-
-String lastName = ct.inputString( "Enter your last name" );
-
-if (lastName.equals( firstName ))
-	ct.showAlert( "That's weird, your first and last name are the same!" );
-```
-
-###### [Java Language Help](#top) > [If-else]
+###### [Java Language Help](#top) > [Object Method Calls]
 
 
 ### Function Definitions
@@ -2807,7 +2814,7 @@ the programmer.
 
 
 <footer>
-	Code12 Version 1.0
+	Code12 Version 2.0
 
 	Copyright (c) 2019 Code12. All Rights Reserved. 
 </footer> 

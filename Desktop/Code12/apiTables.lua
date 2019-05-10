@@ -8,11 +8,11 @@ return {
     fields = {
     },
     methods = {
-        ["circle"] = { vt = "GameObj", min = 3, params = {{ name = "x", vt = 1},{ name = "y", vt = 1},{ name = "diameter", vt = 1},{ name = "color", vt = "String"}}, docLink = "API.html#ct.circle" },
-        ["rect"] = { vt = "GameObj", min = 4, params = {{ name = "x", vt = 1},{ name = "y", vt = 1},{ name = "width", vt = 1},{ name = "height", vt = 1},{ name = "color", vt = "String"}}, docLink = "API.html#ct.rect" },
-        ["line"] = { vt = "GameObj", min = 4, params = {{ name = "x1", vt = 1},{ name = "y1", vt = 1},{ name = "x2", vt = 1},{ name = "y2", vt = 1},{ name = "color", vt = "String"}}, docLink = "API.html#ct.line" },
-        ["text"] = { vt = "GameObj", min = 4, params = {{ name = "s", vt = "String"},{ name = "x", vt = 1},{ name = "y", vt = 1},{ name = "height", vt = 1},{ name = "color", vt = "String"}}, docLink = "API.html#ct.text" },
-        ["image"] = { vt = "GameObj", params = {{ name = "filename", vt = "String"},{ name = "x", vt = 1},{ name = "y", vt = 1},{ name = "width", vt = 1}}, docLink = "API.html#ct.image" },
+        ["circle"] = { vt = "GameObj", min = 3, retOptional = true, params = {{ name = "x", vt = 1},{ name = "y", vt = 1},{ name = "diameter", vt = 1},{ name = "color", vt = "String"}}, docLink = "API.html#ct.circle" },
+        ["rect"] = { vt = "GameObj", min = 4, retOptional = true, params = {{ name = "x", vt = 1},{ name = "y", vt = 1},{ name = "width", vt = 1},{ name = "height", vt = 1},{ name = "color", vt = "String"}}, docLink = "API.html#ct.rect" },
+        ["line"] = { vt = "GameObj", min = 4, retOptional = true, params = {{ name = "x1", vt = 1},{ name = "y1", vt = 1},{ name = "x2", vt = 1},{ name = "y2", vt = 1},{ name = "color", vt = "String"}}, docLink = "API.html#ct.line" },
+        ["text"] = { vt = "GameObj", min = 4, retOptional = true, params = {{ name = "s", vt = "String"},{ name = "x", vt = 1},{ name = "y", vt = 1},{ name = "height", vt = 1},{ name = "color", vt = "String"}}, docLink = "API.html#ct.text" },
+        ["image"] = { vt = "GameObj", retOptional = true, params = {{ name = "filename", vt = "String"},{ name = "x", vt = 1},{ name = "y", vt = 1},{ name = "width", vt = 1}}, docLink = "API.html#ct.image" },
         ["print"] = { vt = false, params = {{ name = "value", vt = nil}}, docLink = "API.html#ct.print" },
         ["println"] = { vt = false, min = 0, params = {{ name = "value", vt = nil}}, docLink = "API.html#ct.println" },
         ["log"] = { vt = false, variadic = true, params = {{ name = "values", vt = nil}}, docLink = "API.html#ct.log" },
@@ -66,7 +66,7 @@ return {
         ["keypressed"] = "keyPressed",
         ["charTyped"] = { vt = true, params = {{ name = "charString", vt = "String"}}, docLink = "API.html#ct.chartyped" },
         ["chartyped"] = "charTyped",
-        ["loadSound"] = { vt = true, params = {{ name = "filename", vt = "String"}}, docLink = "API.html#ct.loadsound" },
+        ["loadSound"] = { vt = false, params = {{ name = "filename", vt = "String"}}, docLink = "API.html#ct.loadsound" },
         ["loadsound"] = "loadSound",
         ["sound"] = { vt = false, params = {{ name = "filename", vt = "String"}}, docLink = "API.html#ct.sound" },
         ["setSoundVolume"] = { vt = false, params = {{ name = "volume", vt = 1}}, docLink = "API.html#ct.setsoundvolume" },
@@ -110,6 +110,7 @@ return {
         ["x"] = { vt = 1 },
         ["y"] = { vt = 1 },
         ["visible"] = { vt = true },
+        ["id"] = { vt = 0 },
         ["group"] = { vt = "String" },
     },
     methods = {

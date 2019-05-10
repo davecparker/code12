@@ -59,7 +59,7 @@ class CT
 
 	// Audio
 	//------
-	boolean loadSound( String filename )
+	void loadSound( String filename )
 	void sound( String filename )
 	void setSoundVolume( double volume )
 
@@ -99,6 +99,7 @@ class GameObj
 	double x;
 	double y;
 	boolean visible;          // default true
+	int id;                   // default 0
 	String group;             // default ""
 
 	// GameObj Methods

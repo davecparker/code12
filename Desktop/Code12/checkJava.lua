@@ -657,10 +657,10 @@ local function findStaticMethod( call )
 				-- Did they use ct.objMethod instead of obj.objMethod?
 				method = lookupID( nameID, apiTables["GameObj"].methods )
 				if method then
-					if syntaxLevel < 7 then
+					if syntaxLevel < 8 then
 						err.setErrNodeSpan( classNode, nameID,
 								'GameObj methods must be called on a GameObj variable, not "ct."'
-								.. '\n(Use of object method calls requires syntax level 7)' )
+								.. '\n(Use of object method calls requires syntax level 8)' )
 						err.addDocLink( "Java.html#object-method-calls" )
 					else
 						err.setErrNodeSpan( classNode, nameID,
@@ -704,9 +704,9 @@ local function findStaticMethod( call )
 		return method, "function Math." .. nameStr
 	end
 
-	-- Unknown class name (must be levels 1-6 otherwise handled as a method).
+	-- Unknown class name (must be levels 1-7 otherwise handled as a method).
 	-- The user might have meant ct or Math, but possibly also an attempt 
-	-- at a method call at level < 7.
+	-- at a method call at level < 8.
 
 	-- Check for a known object on the left first.
 	if classNode.tt == "ID" then
@@ -714,7 +714,7 @@ local function findStaticMethod( call )
 		if varFound and (varFound.vt == "GameObj" or varFound.vt == "String") then
 			err.setErrNodeSpan( classNode, nameID, 
 					"Unknown or misspelled function name\n"
-					.. "(Object method calls require syntax level 7)" )
+					.. "(Object method calls require syntax level 8)" )
 			err.addDocLink( "Java.html" )
 			return nil
 		end
@@ -804,7 +804,7 @@ end
 -- Check a call stmt or expr structure.
 -- If there is an error then set the error state and return nil, 
 -- otherwise return the vt for the return type vt if successful.
-local function vtCheckCall( call )
+local function vtCheckCall( call, isExpr )
 	-- { s = "call", class, lValue, nameID, exprs }
 	-- Find the method
 	local method, fnName = methodAndDisplayNameFromCall( call )
@@ -814,6 +814,12 @@ local function vtCheckCall( call )
 	local refFunc = method.func   -- for user-defined methods, nil for API
 	if refFunc and refFunc.isError then
 		return nil     -- don't check calls to funcs with isError
+	end
+
+	-- Check if fn return value is ignored
+	if not isExpr and method.vt and not method.retOptional then
+		err.setErrNode( call, "Return value of " .. fnName .. " is ignored" )
+		return nil
 	end
 
 	-- Check parameter count
@@ -978,7 +984,7 @@ function checkStmt( stmt )
 		checkVar( stmt )
 	elseif s == "call" then
 		-- { s = "call", iLine, className, objLValue, nameID, exprs }
-		vtCheckCall( stmt )
+		vtCheckCall( stmt, false )
 	elseif s == "assign" then
 		-- { s = "assign", iLine, lValue, opToken, opType, expr }   opType: =, +=, -=, *=, /=, ++, --	
 		local lValue = stmt.lValue
@@ -1401,12 +1407,12 @@ local function vtExprEquality( node )
 	if javaTypes.canCompareVts( vtLeft, vtRight ) then
 		-- Don't allow comparing Strings with ==
 		if vtLeft == "String" and vtRight == "String" then
-			if syntaxLevel >= 7 then
+			if syntaxLevel >= 8 then
 				err.setErrNodeAndRef( node.opToken, node.left,
 						"Use str1.equals( str2 ) to compare two String values" )
 			else
 				err.setErrNodeAndRef( node.opToken, node.left,
-						"Strings cannot be compared with ==. You must use the equals method, which requires level 7" )
+						"Strings cannot be compared with ==. You must use the equals method, which requires level 8" )
 			end
 			err.addDocLink( "API.html#java-string-methods" )
 			return nil
@@ -1429,7 +1435,7 @@ end
 
 -- call used as an expression
 local function vtExprCall( node )
-	local vt = vtCheckCall( node ) 
+	local vt = vtCheckCall( node, true )
 	if vt == false then
 		local method, fnName = methodAndDisplayNameFromCall( node )
 		err.setErrNode( node, 
