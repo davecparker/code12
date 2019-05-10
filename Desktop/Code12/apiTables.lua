@@ -66,7 +66,7 @@ return {
         ["keypressed"] = "keyPressed",
         ["charTyped"] = { vt = true, params = {{ name = "charString", vt = "String"}}, docLink = "API.html#ct.chartyped" },
         ["chartyped"] = "charTyped",
-        ["loadSound"] = { vt = true, retOptional = true, params = {{ name = "filename", vt = "String"}}, docLink = "API.html#ct.loadsound" },
+        ["loadSound"] = { vt = false, params = {{ name = "filename", vt = "String"}}, docLink = "API.html#ct.loadsound" },
         ["loadsound"] = "loadSound",
         ["sound"] = { vt = false, params = {{ name = "filename", vt = "String"}}, docLink = "API.html#ct.sound" },
         ["setSoundVolume"] = { vt = false, params = {{ name = "volume", vt = 1}}, docLink = "API.html#ct.setsoundvolume" },
