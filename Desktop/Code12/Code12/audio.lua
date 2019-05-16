@@ -58,7 +58,7 @@ end
 -- API
 function ct.loadSound(filename)
 	-- Load and cache the sound
-	return (getSound(filename) ~= nil)
+	getSound(filename)
 end
 
 -- API
