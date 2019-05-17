@@ -40,12 +40,9 @@ function env.relativePath( fromDir, destDir )
 	local up = ".." .. chDirSeperator
 	local upDirs = string.rep( up, count )
 	
-	-- Drive that the sandbox folder is located on (Usually "C")
-	-- Used for error message if user's program is saved on a different drive
-	local docsDrive = nil
 	if env.isWindows then
 		--Checks for files saved on a drive other than the drive that the documents dir is on
-		docsDrive = string.sub( fromDir, 1, 1 ) --the drive that the documents dir is on
+		local docsDrive = string.sub( fromDir, 1, 1 ) --the drive that the documents dir is on
 		local fileDrive = string.sub( destDir, 1, 1 ) --the drive that the user's file is saved on
 		if fileDrive ~= docsDrive then
 			return false, docsDrive
