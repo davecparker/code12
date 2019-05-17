@@ -47,7 +47,7 @@ local function getSound(filename)
 	if sound then 
 		sounds[filename] = sound   -- cache it
 	else
-		if appContext and appContext.driveMismatch then 
+		if appContext and appContext.mediaDir == false then 
 			local drive = appContext.docsDrive
 			-- Image saved on flashdrive/different hard drive from code12 warning
 			runtime.warning("Cannot load sound file. Copy program folder to " .. drive .. ": drive")		

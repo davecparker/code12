@@ -145,17 +145,7 @@ function app.processUserFile()
 	-- a relative path, not absolute, and the only reliable dir to be
 	-- relative to seems to be the system.DocumentsDirectory.
 	appContext.mediaBaseDir = env.baseDirDocs
-	appContext.mediaDir = env.relativePath( env.docsDir, appContext.sourceDir )
-
-	--Checks for files saved on a drive other than the drive that the documents dir is on
-	if env.isWindows then
-		local fileDrive = string.sub( source.path, 1, 1 ) --the drive that the user's file is saved on
-		local docsDrive = string.sub( env.docsDir, 1, 1 ) --the drive that the documents dir is on
-		if fileDrive ~= docsDrive then
-			appContext.docsDrive = docsDrive
-			appContext.driveMismatch = true
-		end
-	end
+	appContext.mediaDir, appContext.docsDrive = env.relativePath( env.docsDir, appContext.sourceDir )
 
 	-- Parse the user code then do further processing
 	err.initProgram()
