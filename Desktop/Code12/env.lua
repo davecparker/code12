@@ -32,7 +32,7 @@ local byteDirSeperator             -- byte (ASCII) value of chDirSeperator
 
 -- Tries to return a relative path in the file system leading from fromDir to destDir.
 -- (Windows) If the users program is saved on a different drive from the sandbox folder
--- returns false and the letter of the drive sandbox is on,
+-- returns false and the letter of the drive sandbox is on
 -- which is used to create an error message if the user tries to load an image or audio file
 function env.relativePath( fromDir, destDir )
 	-- Count the chDirSeperators in fromDir and create upDirs to go up to root
