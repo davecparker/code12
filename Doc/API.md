@@ -4,9 +4,10 @@
 [Java Language Help](Java.html)
 </div>
 
+#### Functions that Perform Actions (Level 1+) 
+
 <div class="summary">
 <div class="summaryColumn">
-
 
 ##### [Graphics Object Creation] {#toc-graphics-object-creation}
 * [ct.circle()]
@@ -22,30 +23,48 @@
 * [ct.logm()]
 * [ct.setOutputFile()]
 
-##### [Alerts and Input Dialogs] {#toc-alerts-and-input-dialogs}
-* [ct.showAlert()]
-* [ct.inputInt()]
-* [ct.inputNumber()]
-* [ct.inputYesNo()]
-* [ct.inputString()]
+</div>
+<div class="summaryColumn">
 
 ##### [Screen Management] {#toc-screen-management}
 * [ct.setTitle()]
 * [ct.setHeight()]
-* [ct.getWidth()]
-* [ct.getHeight()]
-* [ct.getPixelsPerUnit()]
-* [ct.setScreen()]
-* [ct.getScreen()]
-* [ct.setScreenOrigin()]
-* [ct.clearScreen()]
-* [ct.clearGroup()]
 * [ct.setBackColor()]
 * [ct.setBackColorRGB()]
 * [ct.setBackImage()]
+* [ct.setScreen()]
+* [ct.setScreenOrigin()]
+* [ct.clearScreen()]
+* [ct.clearGroup()]
 
 </div>
 <div class="summaryColumn">
+
+##### [Audio] {#toc-audio}
+* [ct.loadSound()]
+* [ct.sound()]
+* [ct.setSoundVolume()]
+
+##### [Alerts and Program Control] {#toc-alerts-and-program-control}
+* [ct.showAlert()]
+* [ct.pause()]
+* [ct.stop()]
+* [ct.restart()]
+
+</div>
+</div>
+<hr>
+
+#### Functions that Return Values (Level 5+) 
+
+<div class="summary">
+<div class="summaryColumn">
+
+##### [Input Dialogs] {#toc-input-dialogs}
+* [ct.inputInt()]
+* [ct.inputNumber()]
+* [ct.inputYesNo()]
+* [ct.inputString()]
 
 ##### [Mouse and Keyboard Input] {#toc-mouse-and-keyboard-input}
 * [ct.clicked()]
@@ -55,36 +74,44 @@
 * [ct.keyPressed()]
 * [ct.charTyped()]
 
-##### [Audio] {#toc-audio}
-* [ct.loadSound()]
-* [ct.sound()]
-* [ct.setSoundVolume()]
+</div>
+<div class="summaryColumn">
 
-##### [Math Utilities] {#toc-math-utilities}
+##### [Math Functions] {#toc-math-functions}
 * [ct.random()]
 * [ct.round()]
 * [ct.roundDecimal()]
 * [ct.distance()]
 * [ct.intDiv()]
 * [ct.isError()]
+* [Java Math Functions]
 
-##### [Type Conversion] {#toc-type-conversion}
+##### [String Conversions] {#toc-string-conversions}
+* [ct.formatInt()]
+* [ct.formatDecimal()]
 * [ct.parseInt()]
 * [ct.parseNumber()]
 * [ct.canParseInt()]
 * [ct.canParseNumber()]
-* [ct.formatInt()]
-* [ct.formatDecimal()]
-
-##### [Program Control] {#toc-program-control}
-* [ct.getTimer()]
-* [ct.getVersion()]
-* [ct.pause()]
-* [ct.stop()]
-* [ct.restart()]
-
 
 </div>
+<div class="summaryColumn">
+
+##### [Program Information] {#toc-program-information}
+* [ct.getWidth()]
+* [ct.getHeight()]
+* [ct.getPixelsPerUnit()]
+* [ct.getScreen()]
+* [ct.getTimer()]
+* [ct.getVersion()]
+
+</div>
+</div>
+<hr>
+
+#### Object Fields and Method Functions (Level 7+) 
+
+<div class="summary">
 <div class="summaryColumn">
 
 ##### [GameObj Data Fields] {#toc-gameobj-data-fields}
@@ -94,19 +121,14 @@
 * [obj.id]
 * [obj.group]
 
-##### [GameObj Methods]	{#toc-gameobj-methods}
-* [obj.getType()]
+</div>
+<div class="summaryColumn">
+
+##### [GameObj Action Methods]	{#toc-gameobj-action-methods}
 * [obj.setSize()]
-* [obj.getWidth()]
-* [obj.getHeight()]
 * [obj.setXSpeed()]
 * [obj.setYSpeed()]
-* [obj.getXSpeed()]
-* [obj.getYSpeed()]
-* [obj.align()]
 * [obj.setText()]
-* [obj.getText()]
-* [obj.toString()]
 * [obj.setFillColor()]
 * [obj.setFillColorRGB()]
 * [obj.setLineColor()]
@@ -114,19 +136,59 @@
 * [obj.setLineWidth()]
 * [obj.setImage()]
 * [obj.setLayer()]
-* [obj.getLayer()]
-* [obj.delete()]
 * [obj.setClickable()]
+* [obj.align()]
+* [obj.delete()]
+
+</div>
+<div class="summaryColumn">
+
+##### [GameObj Value Methods]	{#toc-gameobj-value-methods}
+* [obj.getType()]
+* [obj.getWidth()]
+* [obj.getHeight()]
+* [obj.getXSpeed()]
+* [obj.getYSpeed()]
+* [obj.getText()]
+* [obj.getLayer()]
+* [obj.toString()]
 * [obj.clicked()]
 * [obj.containsPoint()]
 * [obj.hit()]
 * [obj.objectHitInGroup()]
 
-##### Other Functions Supported {#toc-other-functions-supported}
-* [Java Math Functions]
+##### [String Methods]	{#toc-string-methods}
 * [Java String Methods]
-* [Main Program Functions]
-* [Input Event Functions]
+
+</div>
+</div>
+<hr>
+
+#### Event Functions (Level 10+)
+
+<div class="summary">
+<div class="summaryColumn">
+
+##### [Mouse Event Functions]	{#toc-mouse-event-functions}
+* [onMousePress()]
+* [onMouseDrag()]
+* [onMouseRelease()]
+
+</div>
+<div class="summaryColumn">
+
+##### [Keyboard Event Functions]	{#toc-keyboard-event-functions}
+* [onKeyPress()]
+* [onKeyRelease()]
+* [onCharTyped()]
+
+</div>
+<div class="summaryColumn">
+
+##### [Main Program Functions]	{#toc-main-program-functions}
+* [start()]
+* [update()]
+* [onResize()]
 
 </div>
 </div>

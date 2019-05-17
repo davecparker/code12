@@ -23,6 +23,7 @@
 <div class="rightLink">
 <p><a href="Java.html">Java Language Help</a></p>
 </div>
+<h4 id="functions-that-perform-actions-level-1">Functions that Perform Actions (Level 1+)</h4>
 <div class="summary">
 <div class="summaryColumn">
 <h5 id="toc-graphics-object-creation"><a href="#graphics-object-creation">Graphics Object Creation</a></h5>
@@ -41,32 +42,48 @@
 <li><a href="#ct.logm">ct.logm()</a></li>
 <li><a href="#ct.setoutputfile">ct.setOutputFile()</a></li>
 </ul>
-<h5 id="toc-alerts-and-input-dialogs"><a href="#alerts-and-input-dialogs">Alerts and Input Dialogs</a></h5>
+</div>
+<div class="summaryColumn">
+<h5 id="toc-screen-management"><a href="#screen-management">Screen Management</a></h5>
+<ul>
+<li><a href="#ct.settitle">ct.setTitle()</a></li>
+<li><a href="#ct.setheight">ct.setHeight()</a></li>
+<li><a href="#ct.setbackcolor">ct.setBackColor()</a></li>
+<li><a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></li>
+<li><a href="#ct.setbackimage">ct.setBackImage()</a></li>
+<li><a href="#ct.setscreen">ct.setScreen()</a></li>
+<li><a href="#ct.setscreenorigin">ct.setScreenOrigin()</a></li>
+<li><a href="#ct.clearscreen">ct.clearScreen()</a></li>
+<li><a href="#ct.cleargroup">ct.clearGroup()</a></li>
+</ul>
+</div>
+<div class="summaryColumn">
+<h5 id="toc-audio"><a href="#audio">Audio</a></h5>
+<ul>
+<li><a href="#ct.loadsound">ct.loadSound()</a></li>
+<li><a href="#ct.sound">ct.sound()</a></li>
+<li><a href="#ct.setsoundvolume">ct.setSoundVolume()</a></li>
+</ul>
+<h5 id="toc-alerts-and-program-control">[Alerts and Program Control]</h5>
 <ul>
 <li><a href="#ct.showalert">ct.showAlert()</a></li>
+<li><a href="#ct.pause">ct.pause()</a></li>
+<li><a href="#ct.stop">ct.stop()</a></li>
+<li><a href="#ct.restart">ct.restart()</a></li>
+</ul>
+</div>
+</div>
+<hr>
+<h4 id="functions-that-return-values-level-5">Functions that Return Values (Level 5+)</h4>
+<div class="summary">
+<div class="summaryColumn">
+<h5 id="toc-input-dialogs">[Input Dialogs]</h5>
+<ul>
 <li><a href="#ct.inputint">ct.inputInt()</a></li>
 <li><a href="#ct.inputnumber">ct.inputNumber()</a></li>
 <li><a href="#ct.inputyesno">ct.inputYesNo()</a></li>
 <li><a href="#ct.inputstring">ct.inputString()</a></li>
 </ul>
-<h5 id="toc-screen-management"><a href="#screen-management">Screen Management</a></h5>
-<ul>
-<li><a href="#ct.settitle">ct.setTitle()</a></li>
-<li><a href="#ct.setheight">ct.setHeight()</a></li>
-<li><a href="#ct.getwidth">ct.getWidth()</a></li>
-<li><a href="#ct.getheight">ct.getHeight()</a></li>
-<li><a href="#ct.getpixelsperunit">ct.getPixelsPerUnit()</a></li>
-<li><a href="#ct.setscreen">ct.setScreen()</a></li>
-<li><a href="#ct.getscreen">ct.getScreen()</a></li>
-<li><a href="#ct.setscreenorigin">ct.setScreenOrigin()</a></li>
-<li><a href="#ct.clearscreen">ct.clearScreen()</a></li>
-<li><a href="#ct.cleargroup">ct.clearGroup()</a></li>
-<li><a href="#ct.setbackcolor">ct.setBackColor()</a></li>
-<li><a href="#ct.setbackcolorrgb">ct.setBackColorRGB()</a></li>
-<li><a href="#ct.setbackimage">ct.setBackImage()</a></li>
-</ul>
-</div>
-<div class="summaryColumn">
 <h5 id="toc-mouse-and-keyboard-input"><a href="#mouse-and-keyboard-input">Mouse and Keyboard Input</a></h5>
 <ul>
 <li><a href="#ct.clicked">ct.clicked()</a></li>
@@ -76,13 +93,9 @@
 <li><a href="#ct.keypressed">ct.keyPressed()</a></li>
 <li><a href="#ct.chartyped">ct.charTyped()</a></li>
 </ul>
-<h5 id="toc-audio"><a href="#audio">Audio</a></h5>
-<ul>
-<li><a href="#ct.loadsound">ct.loadSound()</a></li>
-<li><a href="#ct.sound">ct.sound()</a></li>
-<li><a href="#ct.setsoundvolume">ct.setSoundVolume()</a></li>
-</ul>
-<h5 id="toc-math-utilities"><a href="#math-utilities">Math Utilities</a></h5>
+</div>
+<div class="summaryColumn">
+<h5 id="toc-math-functions">[Math Functions]</h5>
 <ul>
 <li><a href="#ct.random">ct.random()</a></li>
 <li><a href="#ct.round">ct.round()</a></li>
@@ -90,25 +103,33 @@
 <li><a href="#ct.distance">ct.distance()</a></li>
 <li><a href="#ct.intdiv">ct.intDiv()</a></li>
 <li><a href="#ct.iserror">ct.isError()</a></li>
+<li><a href="#java-math-functions">Java Math Functions</a></li>
 </ul>
-<h5 id="toc-type-conversion"><a href="#type-conversion">Type Conversion</a></h5>
+<h5 id="toc-string-conversions">[String Conversions]</h5>
 <ul>
+<li><a href="#ct.formatint">ct.formatInt()</a></li>
+<li><a href="#ct.formatdecimal">ct.formatDecimal()</a></li>
 <li><a href="#ct.parseint">ct.parseInt()</a></li>
 <li><a href="#ct.parsenumber">ct.parseNumber()</a></li>
 <li><a href="#ct.canparseint">ct.canParseInt()</a></li>
 <li><a href="#ct.canparsenumber">ct.canParseNumber()</a></li>
-<li><a href="#ct.formatint">ct.formatInt()</a></li>
-<li><a href="#ct.formatdecimal">ct.formatDecimal()</a></li>
-</ul>
-<h5 id="toc-program-control"><a href="#program-control">Program Control</a></h5>
-<ul>
-<li><a href="#ct.gettimer">ct.getTimer()</a></li>
-<li><a href="#ct.getversion">ct.getVersion()</a></li>
-<li><a href="#ct.pause">ct.pause()</a></li>
-<li><a href="#ct.stop">ct.stop()</a></li>
-<li><a href="#ct.restart">ct.restart()</a></li>
 </ul>
 </div>
+<div class="summaryColumn">
+<h5 id="toc-program-information">[Program Information]</h5>
+<ul>
+<li><a href="#ct.getwidth">ct.getWidth()</a></li>
+<li><a href="#ct.getheight">ct.getHeight()</a></li>
+<li><a href="#ct.getpixelsperunit">ct.getPixelsPerUnit()</a></li>
+<li><a href="#ct.getscreen">ct.getScreen()</a></li>
+<li><a href="#ct.gettimer">ct.getTimer()</a></li>
+<li><a href="#ct.getversion">ct.getVersion()</a></li>
+</ul>
+</div>
+</div>
+<hr>
+<h4 id="object-fields-and-method-functions-level-7">Object Fields and Method Functions (Level 7+)</h4>
+<div class="summary">
 <div class="summaryColumn">
 <h5 id="toc-gameobj-data-fields"><a href="#gameobj-data-fields">GameObj Data Fields</a></h5>
 <ul>
@@ -118,20 +139,14 @@
 <li><a href="#obj.id">obj.id</a></li>
 <li><a href="#obj.group">obj.group</a></li>
 </ul>
-<h5 id="toc-gameobj-methods"><a href="#gameobj-methods">GameObj Methods</a></h5>
+</div>
+<div class="summaryColumn">
+<h5 id="toc-gameobj-action-methods">[GameObj Action Methods]</h5>
 <ul>
-<li><a href="#obj.gettype">obj.getType()</a></li>
 <li><a href="#obj.setsize">obj.setSize()</a></li>
-<li><a href="#obj.getwidth">obj.getWidth()</a></li>
-<li><a href="#obj.getheight">obj.getHeight()</a></li>
 <li><a href="#obj.setxspeed">obj.setXSpeed()</a></li>
 <li><a href="#obj.setyspeed">obj.setYSpeed()</a></li>
-<li><a href="#obj.getxspeed">obj.getXSpeed()</a></li>
-<li><a href="#obj.getyspeed">obj.getYSpeed()</a></li>
-<li><a href="#obj.align">obj.align()</a></li>
 <li><a href="#obj.settext">obj.setText()</a></li>
-<li><a href="#obj.gettext">obj.getText()</a></li>
-<li><a href="#obj.tostring">obj.toString()</a></li>
 <li><a href="#obj.setfillcolor">obj.setFillColor()</a></li>
 <li><a href="#obj.setfillcolorrgb">obj.setFillColorRGB()</a></li>
 <li><a href="#obj.setlinecolor">obj.setLineColor()</a></li>
@@ -139,20 +154,58 @@
 <li><a href="#obj.setlinewidth">obj.setLineWidth()</a></li>
 <li><a href="#obj.setimage">obj.setImage()</a></li>
 <li><a href="#obj.setlayer">obj.setLayer()</a></li>
-<li><a href="#obj.getlayer">obj.getLayer()</a></li>
-<li><a href="#obj.delete">obj.delete()</a></li>
 <li><a href="#obj.setclickable">obj.setClickable()</a></li>
+<li><a href="#obj.align">obj.align()</a></li>
+<li><a href="#obj.delete">obj.delete()</a></li>
+</ul>
+</div>
+<div class="summaryColumn">
+<h5 id="toc-gameobj-value-methods">[GameObj Value Methods]</h5>
+<ul>
+<li><a href="#obj.gettype">obj.getType()</a></li>
+<li><a href="#obj.getwidth">obj.getWidth()</a></li>
+<li><a href="#obj.getheight">obj.getHeight()</a></li>
+<li><a href="#obj.getxspeed">obj.getXSpeed()</a></li>
+<li><a href="#obj.getyspeed">obj.getYSpeed()</a></li>
+<li><a href="#obj.gettext">obj.getText()</a></li>
+<li><a href="#obj.getlayer">obj.getLayer()</a></li>
+<li><a href="#obj.tostring">obj.toString()</a></li>
 <li><a href="#obj.clicked">obj.clicked()</a></li>
 <li><a href="#obj.containspoint">obj.containsPoint()</a></li>
 <li><a href="#obj.hit">obj.hit()</a></li>
 <li><a href="#obj.objecthitingroup">obj.objectHitInGroup()</a></li>
 </ul>
-<h5 id="toc-other-functions-supported">Other Functions Supported</h5>
+<h5 id="toc-string-methods">[String Methods]</h5>
 <ul>
-<li><a href="#java-math-functions">Java Math Functions</a></li>
 <li><a href="#java-string-methods">Java String Methods</a></li>
-<li><a href="#main-program-functions">Main Program Functions</a></li>
-<li><a href="#input-event-functions">Input Event Functions</a></li>
+</ul>
+</div>
+</div>
+<hr>
+<h4 id="event-functions-level-10">Event Functions (Level 10+)</h4>
+<div class="summary">
+<div class="summaryColumn">
+<h5 id="toc-mouse-event-functions">[Mouse Event Functions]</h5>
+<ul>
+<li><a href="#onmousepress">onMousePress()</a></li>
+<li><a href="#onmousedrag">onMouseDrag()</a></li>
+<li><a href="#onmouserelease">onMouseRelease()</a></li>
+</ul>
+</div>
+<div class="summaryColumn">
+<h5 id="toc-keyboard-event-functions">[Keyboard Event Functions]</h5>
+<ul>
+<li><a href="#onkeypress">onKeyPress()</a></li>
+<li><a href="#onkeyrelease">onKeyRelease()</a></li>
+<li><a href="#onchartyped">onCharTyped()</a></li>
+</ul>
+</div>
+<div class="summaryColumn">
+<h5 id="toc-main-program-functions"><a href="#main-program-functions">Main Program Functions</a></h5>
+<ul>
+<li><a href="#start">start()</a></li>
+<li><a href="#update">update()</a></li>
+<li><a href="#onresize">onResize()</a></li>
 </ul>
 </div>
 </div>

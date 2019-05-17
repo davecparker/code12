@@ -132,7 +132,7 @@ h6 {   /* Contents back links and end of topic */
 
 ul {
     list-style: none;
-    padding-left: 2em;
+    padding-left: 0em;
 }
 
 ul a { 
@@ -149,6 +149,10 @@ ol a {
     text-decoration: none;
 }
 
+.summary {
+    margin-top: 1em;
+}
+
 .summary:after {
     content: "";
     display: table;
@@ -158,7 +162,7 @@ ol a {
 .summaryColumn {
     float: left;
     width: auto;
-    padding-left: 0.5em;
+    padding-left: 2em;
     padding-right: 2em;
 }
 
