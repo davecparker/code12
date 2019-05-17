@@ -278,9 +278,8 @@ function GameObj:newImage(group, filename, x, y, width)
 		-- Can't open image, check if user's program is on correct drive then give appropriate error
 		local appContext = runtime.appContext
 		if appContext and appContext.mediaDir == false then 
-			local drive = appContext.docsDrive
 			-- Image saved on unaccesible drive warning
-			runtime.warning("Cannot load image file. Copy program folder to " .. drive .. ": drive")	
+			runtime.warning("Cannot load image file. Copy program folder to " .. appContext.docsDrive .. ": drive")	
 		else
 			-- Filename mispelled or incorrect warning
 			runtime.warning("Cannot find image file", filename)

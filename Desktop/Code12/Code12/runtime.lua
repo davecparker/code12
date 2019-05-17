@@ -18,20 +18,20 @@ local runtime = {
 	-- The appContext table is set by main.lua when running the Code12 app,
 	-- or left nil when running a generated Lua app standalone.
 	-- appContext = {
-	--     sourceDir = string,       -- dir where user code is (absolute)
-	--     sourceFilename = string,  -- user code filename (in sourceDir)
-	--     mediaBaseDir = (const),   -- Corona baseDir to use for media files  
-	--     mediaDir = string,        -- media dir relative to mediaBaseDir
-	--     docsDrive = string,       -- drive that the sandbox folder is located on (Usually "C")
-	--     outputGroup = group,      -- display group where output should go
-	--     widthP = number,          -- pixel width of output area
-	--     heightP = number,         -- pixel height of output area
-	--     setClipSize = function,   -- called by runtime to specify output size
-	--     clearConsole = function,  -- called by runtime to clear console output
-	--     print = function,         -- called by runtime for console output
-	--     println = function,       -- called by runtime for console output
-	--     runtimeErr = function,    -- called by runtime on runtime error
-	--     arrayAssigned = function, -- called by runtime when an array var is assigned
+	--     sourceDir = string,       	-- dir where user code is (absolute)
+	--     sourceFilename = string,  	-- user code filename (in sourceDir)
+	--     mediaBaseDir = (const),   	-- Corona baseDir to use for media files  
+	--     mediaDir = string,			-- media dir relative to mediaBaseDir, or false if relative path not found
+	--     docsDrive = string,       	-- drive that the sandbox folder is located on (Usually "C")
+	--     outputGroup = group,      	-- display group where output should go
+	--     widthP = number,          	-- pixel width of output area
+	--     heightP = number,         	-- pixel height of output area
+	--     setClipSize = function,   	-- called by runtime to specify output size
+	--     clearConsole = function,  	-- called by runtime to clear console output
+	--     print = function,        	-- called by runtime for console output
+	--     println = function,       	-- called by runtime for console output
+	--     runtimeErr = function,    	-- called by runtime on runtime error
+	--     arrayAssigned = function, 	-- called by runtime when an array var is assigned
 	-- },
 }
 
