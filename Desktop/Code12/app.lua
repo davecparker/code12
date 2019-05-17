@@ -27,8 +27,8 @@ local app =  {
 	optionsFontSize = 14,
 
 	-- Web folders
-	webHelpDir = "http://www.code12.org/docs/1/",
-	-- webHelpDir = "file:///Users/davecparker/Documents/Git%20Projects/code12/Doc/Website/docs/1/",
+	webHelpDir = "http://www.code12.org/docs/2/",
+	-- webHelpDir = "file:///Users/davecparker/Documents/Git%20Projects/code12/Doc/Website/docs/2/",
 
 	-- UI metrics
 	margin = 10,                 -- generic margin to leave between many UI items
