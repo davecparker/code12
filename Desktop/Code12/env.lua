@@ -30,18 +30,25 @@ local byteDirSeperator             -- byte (ASCII) value of chDirSeperator
 
 --- Module Functions ------------------------------------------------
 
--- Return a relative path in the file system leading from fromDir to destDir.
+-- Tries to return a relative path in the file system leading from fromDir to destDir.
+-- (Windows) If the users program is saved on a different drive from the sandbox folder
+-- returns false and the letter of the drive sandbox is on,
+-- which is used to create an error message if the user tries to load an image or audio file.
 function env.relativePath( fromDir, destDir )
-	-- TODO: This is annoying and doesn't feel very reliable
-
 	-- Count the chDirSeperators in fromDir and create upDirs to go up to root
 	local _, count = string.gsub( fromDir, chDirSeperator, "." )
 	local up = ".." .. chDirSeperator
 	local upDirs = string.rep( up, count )
-
-	-- Remove the drive from destDir if any
-	-- TODO: This means it won't work across drives
+	
 	if env.isWindows then
+		--Checks for files saved on a drive other than the drive that the documents dir is on
+		local docsDrive = string.sub( fromDir, 1, 1 ) --the drive that the documents dir is on
+		local fileDrive = string.sub( destDir, 1, 1 ) --the drive that the user's file is saved on
+		if fileDrive ~= docsDrive then
+			return false, docsDrive
+		end
+
+		-- Remove the drive from destDir if any
 		local iCharColon = string.find( destDir, ":" )
 		if iCharColon then
 			destDir = string.sub( destDir, iCharColon + 1 )
