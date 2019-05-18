@@ -1483,6 +1483,34 @@ GameObj   null</code></pre>
         }
     }
 }</code></pre>
+<h5 id="passing-an-array-as-a-parameter-and-getting-the-array-length">Passing an Array as a Parameter and Getting the Array Length</h5>
+<p>You can write a function that takes an array as a parameter and then pass an array to it. For example:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Two different arrays of int
+        int[] counts = { 32, 12, 75, 42 };
+        int[] scores = { 85, 100, 65, 72, 67, 98, 0, 12 };
+
+        // Call function to get the total of each array and print it.
+        ct.println( &quot;Total of counts is &quot; + arrayTotal( counts ) );
+        ct.println( &quot;Total of scores is &quot; + arrayTotal( scores ) );
+    }
+
+    // Calculate and return the sum of all the elements in the array a.
+    int arrayTotal( int[] a )
+    {
+        int total = 0;
+        for (int i = 0; i &lt; a.length; i++)
+            total += a[i];
+        return total;
+    }
+}</code></pre>
+<p>Note that the array parameter variable is declared above as <code>int[] a</code>, so the array passed must be an array of <code>int</code>, however the number of<br />
+elements in the array is not specified. You could pass an array of <code>int</code> with any number of elements in it.</p>
+<p>A function may need to determine the number of elements in an array parameter to do its work, as shown in the example above. You can get the number of elements in any array by using the syntax <code>a.length</code>, where <code>a</code> is the array variable. This will result in an integer value that is the number of elements in the array.</p>
+<p>When passing an array as a parameter, it is important to understand that only a <em>reference</em> to the array is passed (essentially a pointer to the actual array where it lives in memory). Passing an array does <em>not</em> make a copy of the array. So, if the function modifies the elements of the array, the original array that was passed will be modified.</p>
 <h6 id="java-language-help-arrays"><a href="#top">Java Language Help</a> &gt; <a href="#arrays">Arrays</a></h6>
 <h3 id="java-data-types">Java Data Types</h3>
 <p>Code12 supports the standard Java data types <code>int</code>, <code>double</code>, <code>boolean</code>, and <code>String</code>, plus the <code>GameObj</code> type defined by Code12.</p>
