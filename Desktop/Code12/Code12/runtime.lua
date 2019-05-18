@@ -472,6 +472,7 @@ function runtime.clearProgram()
 	ct.userFns = {}
 	codeFunction = nil
 	g.runState = nil
+	ct.setTitle()    -- clear window title to default
 end
 
 -- Output the given text to where console output should go

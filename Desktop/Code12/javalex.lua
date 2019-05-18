@@ -117,7 +117,6 @@ local ttForKnownName = {
 	["code12program"]   = "ID",
 	["character"]		= "ID",      
 	["integer"]			= "ID",        
-	["number"]			= "ID",         
 	["runtime"]			= "ID",        
 	["throwable"]		= "ID",
 }
@@ -133,7 +132,6 @@ local correctCaseForLowercaseName = {
 	["code12program"]   = "Code12Program",
 	["character"]		= "Character",      
 	["integer"]			= "Integer",        
-	["number"]			= "Number",         
 	["object"]			= "Object",         
 	["runtime"]			= "Runtime",        
 	["throwable"]		= "Throwable",      
