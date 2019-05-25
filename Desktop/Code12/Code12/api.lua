@@ -240,6 +240,23 @@ function ct.toInt(x)
 	return math.floor(x)
 end
 
+-- Yield the user's code if the frame timer is overdue,
+-- and print a warning if the code appears to be stuck in an infinite loop.
+function ct.checkFrame()
+	if system.getTimer() - g.frameStartTime > 20 then    -- 60 fps is 16.7 ms
+		-- Check for apparent infinite loop
+		if system.getTimer() - g.chunkStartTime > 3000 then
+			runtime.warning( "Code has taken more than 3 seconds -- infinite loop?" )
+			g.chunkStartTime = system.getTimer();   -- reset warning timer for next interval
+		end
+		-- Yield to the main app
+		if runtime.blockAndYield() == "abort" then
+			g.runState = "stopped"
+			error("aborted")   -- caught by the runtime
+		end
+	end
+end
+
 
 -------------- String API Support Functions (not documented) --------------
 

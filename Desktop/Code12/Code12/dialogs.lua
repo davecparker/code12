@@ -263,6 +263,7 @@ local function inputValue(message, valueType)
 	end
 	if g.runState == "waiting" then
 		g.runState = "running"
+		g.chunkStartTime = system.getTimer();   -- reset infinite loop warning
 	end
 
 	-- Return the result
