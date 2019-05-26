@@ -10,13 +10,14 @@
 
 -- Global data
 local app =  {
-	-- Gray shades for the UI
+	-- Gray shades and colors for the UI
 	toolbarShade = 0.8,
 	extraShade = 0.95,
 	borderShade = 0.5,
 	enabledShade = 0.3,
 	disabledShade = 0.7,
 	defaultGridlineShade = 0.6,
+	buttonColor = { 0.082, 0.486, 0.976 },   -- Corona blue
 
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
