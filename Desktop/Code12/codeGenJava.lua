@@ -163,12 +163,11 @@ end
 
 -- Return Lua code for a variable name, which is global if isGlobal
 local function varNameCode( varName, isGlobal )
-	local luaName = nameFromLuaReservedWord[varName] or varName
+	local luaName = codeGenJava.luaName( varName )
 	if isGlobal then
 		return thisPrefix .. luaName    -- this.name
-	else
-		return luaName
 	end
+	return luaName
 end
 
 -- Return Lua code for the variable with optional array index part of an lValue. 
@@ -216,7 +215,7 @@ end
 
 -- Return Lua code for a function name
 local function fnNameCode( fnName )
-	return fnPrefix .. (nameFromLuaReservedWord[fnName] or fnName)
+	return fnPrefix .. codeGenJava.luaName( fnName )
 end
 
 -- Return Lua code for expr promoted to a string
@@ -622,6 +621,11 @@ end
 
 
 --- Module Functions ---------------------------------------------------------
+
+-- Return the Lua variable or function name for the given Java name
+function codeGenJava.luaName( name )
+	return nameFromLuaReservedWord[name] or name
+end
 
 -- Generate and return the Lua code string corresponding to the programTree,
 function codeGenJava.getLuaCode( programTree )

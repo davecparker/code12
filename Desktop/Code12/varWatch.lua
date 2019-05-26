@@ -14,6 +14,7 @@ local runtime = require("Code12.runtime")
 local app = require( "app" )
 local javaTypes = require( "javaTypes" )
 local checkJava = require( "checkJava" )
+local codeGenJava = require( "codeGenJava" )
 local buttons = require( "buttons" )
 local Scrollbar = require( "Scrollbar" )
 
@@ -192,7 +193,7 @@ local function makeDisplayData()
 				local vt = var.vt
 				local arrayType = var.arrayType
 				local varName = var.name
-				local value = var.value or ct.userVars[varName] -- (local or global var)
+				local value = var.value or ct.userVars[codeGenJava.luaName( var.name )] -- (local or global var)
 				d.initRowTexts = { varName, "" }
 				d.textIndents = stdIndents
 				-- Determine d.textForValue from vt
@@ -333,7 +334,7 @@ local function updateValues()
 				if var.isLocal then
 					value = var.value
 				else
-					value = ct.userVars[var.name]
+					value = ct.userVars[codeGenJava.luaName( var.name )]
 				end
 				local textForValue = d.textForValue
 				if index then
