@@ -7,6 +7,11 @@ class ForEachTest
 	GameObj[] objs = new GameObj[4];
 	int i = 0;
 
+	// Test names that are reserved words in Lua
+	boolean end = false;
+	String repeat = "again";
+	int local = 5;
+
 	public void start()
 	{
 		nums[0] = 1;
