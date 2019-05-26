@@ -21,7 +21,6 @@ local buttons = {}
 
 -- UI Metrics
 local margin = app.margin                  -- Space between most UI elements
-local labelColor = { 0.082, 0.486, 0.976 } -- Corona blue
 
 -- Image sheets
 local radioBtnSheet = graphics.newImageSheet( "images/radiobutton.png", { width = 256, height = 256, numFrames = 2 } )
@@ -151,7 +150,7 @@ end
 -- 	text = string for label,
 -- 	font = (optional) fort for label (defaults to native.systemFontBold)
 -- 	fontSize = (optional) font size for label (defaults to app.fontSizeUI)
--- 	colorText = (optional) true to use labelColor for text and icon (defaults to black)
+-- 	colorText = (optional) true to use app.buttonColor for text and icon (defaults to black)
 -- 	imageFile = (optional) string for image file name,
 -- 	iconSize = (optional) size of the icon (width and height) if imageFile is given (defaults to fontSize),
 -- 	defaultFillShade = default shade for the button,
@@ -175,7 +174,7 @@ function buttons.newIconAndTextButton( options )
 		icon = display.newImageRect( btnGroup, "images/" .. options.imageFile, iconSize, iconSize )
 		g.uiItem( icon )
 		if options.colorText then
-			icon:setFillColor( unpack( labelColor ) )
+			icon:setFillColor( unpack( app.buttonColor ) )
 		end
 	end
 	-- Make button label
@@ -187,7 +186,7 @@ function buttons.newIconAndTextButton( options )
 		fontSize = options.fontSize or app.fontSizeUI,
 	} )
 	if options.colorText then
-		label:setFillColor( unpack( labelColor ) )
+		label:setFillColor( unpack( app.buttonColor ) )
 	end
 	-- Make button
 	local btnHeight = math.max( iconSize or 0, label.height ) + btnOutlineMargin * 2

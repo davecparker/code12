@@ -5,6 +5,7 @@ class ForEachTest
 	String[] names = new String[4];
 	boolean[] flags = new boolean[4];
 	GameObj[] objs = new GameObj[4];
+	int i = 0;
 
 	public void start()
 	{
@@ -28,6 +29,33 @@ class ForEachTest
 		for (GameObj obj: objs)
 			ct.println( obj );
 
+		ct.println( "Infinite while loop..." );
+		while (true)
+			i++;
+
+		// ct.println( "Infinite do-while loop..." );
+		// do
+		// 	i++;
+		// while (true);
+
+		// ct.println( "Infinite for loop..." );
+		// for (;;)
+		// 	i++;
+
+	}
+
+	public void update()
+	{
+		// // Incorrect for loop, is essentially infinite
+		// for (int j = 1; j > 0 ; j++ )
+		// {
+		// 	ct.println( j );
+		// 	i++;
+		// }
+
+		objs[0].x++;
+		if (objs[0].x > 100)
+			objs[0].x = 0;
 
 	}
 

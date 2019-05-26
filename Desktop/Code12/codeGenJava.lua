@@ -508,14 +508,14 @@ end
 local function generateWhile( stmt )
 	beginLuaLine( stmt.iLine, "while " )
 	addLua( exprCode( stmt.expr ) )
-	addLua( " do")
+	addLua( " do ct.checkFrame() ")
 	generateBlockStmts( stmt.block )
 	endBlock( stmt.block )
 end
 
 -- Generate Lua code for the given doWhile stmt
 local function generateDoWhile( stmt )
-	beginLuaLine( stmt.iLine, "repeat" )
+	beginLuaLine( stmt.iLine, "repeat ct.checkFrame() " )
 	generateBlockStmts( stmt.block )
 	beginLuaLine( stmt.iLineWhile, "until not (")
 	addLua( exprCode( stmt.expr ) )
@@ -537,7 +537,7 @@ local function generateFor( stmt )
 	else
 		addLua( "true" )
 	end
-	addLua( " do" )
+	addLua( " do ct.checkFrame() " )
 
 	-- Generate the controlled stmts, nextStmt if any, and the end
 	generateBlockStmts( stmt.block )
@@ -553,7 +553,7 @@ local function generateForArray( stmt )
 	beginLuaLine( stmt.iLine, "for _i = 0, (" )
 	local exprCodeStr = exprCode( stmt.expr ) 
 	addLua( exprCodeStr )
-	addLua( ").length - 1 do " )
+	addLua( ").length - 1 do " )   -- no ct.checkFrame() because can't be infinite
 	addLua( varNameCode( stmt.var.nameID.str ) )
 	addLua( " = ct.indexArray(" )
 	addLua( exprCodeStr )
