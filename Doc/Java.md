@@ -2086,10 +2086,8 @@ changed since the first test so the result may be different). If the test is sti
 true, the body is executed again, and execution goes back to the test again. 
 The entire loop process stops once the test result becomes false.
 
-> **Warning**: If the test remains true and never changes, then the loop will execute
-> forever, resulting in an "inifite loop". This will cause your program to "hang",
-> the Code12 Application will become unreponsive, and will you need to "end task"
-> or "force quit" Code12 from the operating system, fix your code, and try again!
+> **Note**: If the test remains true and never changes, then the loop will execute
+> forever, resulting in an "infinite loop", which never finishes.
 
 ##### More "while" Loop Examples
 ```

@@ -819,6 +819,7 @@ local function vtCheckCall( call, isExpr )
 	-- Check if fn return value is ignored
 	if not isExpr and method.vt and not method.retOptional then
 		err.setErrNode( call, "Return value of " .. fnName .. " is ignored" )
+		err.addDocLink( "Java.html#function-return-values" )
 		return nil
 	end
 
