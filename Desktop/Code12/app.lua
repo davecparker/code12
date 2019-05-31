@@ -21,6 +21,7 @@ local app =  {
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
 	consoleFontSize = 14, -- default, can be changed by app.preferredFontSize
+	consoleFontYOffset = 1,
 	fontSizeUI = 12,
 	optionsFont = native.systemFont,
 	optionsFontBold = native.systemFontBold,

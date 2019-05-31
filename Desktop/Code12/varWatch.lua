@@ -472,7 +472,7 @@ function varWatch.addDisplayRows()
 					parent = row,
 					text = d.initRowTexts[colNum],
 					x = xCols[colNum] + d.textIndents[colNum],
-					y = 1,
+					y = app.consoleFontYOffset,
 					font = app.consoleFont,
 					fontSize = app.consoleFontSize,
 				} )

@@ -117,7 +117,7 @@ local function makeCodeGroup( numSourceLines )
 			parent = cg.lineNumGroup,
 			text = "", 
 			x = dxLineNum, 
-			y = math.round( (i - 1) * dyLine ),
+			y = math.round( (i - 1) * dyLine + app.consoleFontYOffset ),
 			font = app.consoleFont, 
 			fontSize = app.consoleFontSize,
 			align = "right",
