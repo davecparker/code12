@@ -24,6 +24,7 @@ local errView = composer.newScene()
 local dxChar = app.consoleFontCharWidth
 local dxExtra = 2   -- extra pixels of highlight horizontally
 local dyDocsToolbar = 24       -- height of toolbar for the docsWebView
+local dyDocsToolbarIcons = 16  -- height of back and forward button icons
 local minSourceLines = 7       -- show at least this many source lines
 local margin = app.margin
 local dyLine = app.consoleFontHeight
@@ -61,7 +62,7 @@ end
 -- Enable or disable the given toolbar button
 local function enableBtn( btn, enable )
 	if enable then
-		btn:setFillColor( app.enabledShade )
+		btn:setFillColor( unpack( app.buttonColor ) )
 	else
 		btn:setFillColor( app.disabledShade )
 	end
@@ -349,7 +350,7 @@ local function makeDocsToolbar( parent )
 	errCountText:setFillColor( 0 )
 
 	-- Back and forward buttons
-	local size = dyDocsToolbar
+	local size = dyDocsToolbarIcons
 	backBtn = display.newImageRect( docsToolbarGroup, "images/back.png", size, size )
 	backBtn.x = margin + size / 2
 	backBtn.y = yCenter

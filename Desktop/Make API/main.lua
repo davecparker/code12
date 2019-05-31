@@ -34,7 +34,6 @@ local validFnStmts = {
 	["line"]      = true,
 	["text"]      = true,
 	["image"]     = true,
-	["loadSound"] = true,
 }
 
 
@@ -113,14 +112,9 @@ local function buildTables()
 				end
 			end
 
-			-- Check if method has optional return type
-			local retOptional = nil
-			if class.name == "ct" and validFnStmts[methodName] then
-				retOptional = true
-			end
-
 			-- Add the method record
-			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn, params = paramTable, retOptional = retOptional }
+			class.methods[#class.methods + 1] = { name = methodName, vt = vtReturn,
+					params = paramTable, retOptional = validFnStmts[methodName] }
 		elseif p == "varDecl" then
 			-- Add field record(s)
 			local vt = javaTypes.vtFromVarType( tree.nodes[2] )

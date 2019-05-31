@@ -15,7 +15,7 @@ local platform = system.getInfo("platform")
 -- The global state table
 local g = {
 	-- The runtime version number
-	version = 1.0,
+	version = 2.0,
 
 	-- Platform info
 	platform = platform,
@@ -62,9 +62,11 @@ local g = {
 	yDialog = nil,         -- y coord (physical, top) for input dialog placement
 
 	-- The run state
-	runState = nil,    -- "running", "waiting", "paused", "stopped", "error", or nil
-	userFn = nil,      -- Current user function to execute (start, update, or nil) 
-	startTime = nil,   -- System time in ms when start function began, or nil before
+	runState = nil,        -- "running", "waiting", "paused", "stopped", "error", or nil
+	userFn = nil,          -- Current user function to execute (start, update, or nil) 
+	startTime = nil,       -- System time in ms when start function began, or nil before
+	frameStartTime = nil,  -- System time at start of last enterFrame event, or nil if not started
+	chunkStartTime = nil,  -- System time at start of last uninterrupted user code chunk, or nil
 }
 
 

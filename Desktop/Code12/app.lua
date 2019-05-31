@@ -10,25 +10,26 @@
 
 -- Global data
 local app =  {
-	-- Gray shades for the UI
+	-- Gray shades and colors for the UI
 	toolbarShade = 0.8,
 	extraShade = 0.95,
 	borderShade = 0.5,
 	enabledShade = 0.3,
 	disabledShade = 0.7,
 	defaultGridlineShade = 0.6,
+	buttonColor = { 0.082, 0.486, 0.976 },   -- Corona blue
 
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
-	consoleFontSize = 14,
+	consoleFontSize = 14, -- default, can be changed by app.preferredFontSize
 	fontSizeUI = 12,
 	optionsFont = native.systemFont,
 	optionsFontBold = native.systemFontBold,
 	optionsFontSize = 14,
 
 	-- Web folders
-	webHelpDir = "http://www.code12.org/docs/1/",
-	-- webHelpDir = "file:///Users/davecparker/Documents/Git%20Projects/code12/Doc/Website/docs/1/",
+	webHelpDir = "http://www.code12.org/docs/2/",
+	-- webHelpDir = "file:///Users/davecparker/Documents/Git%20Projects/code12/Doc/Website/docs/2/",
 
 	-- UI metrics
 	margin = 10,                 -- generic margin to leave between many UI items
@@ -61,6 +62,7 @@ local app =  {
 	showVarWatch = true,         -- when true, show the variable watch window
 	gridOn = false,              -- when true, the coordinate gridlines are visible over the program output
 	gridlineShade = nil,         -- current gridline shade
+	preferredFontSize = nil,     -- when set, use for app.consoleFontSize on load of user settings
 
 	-- Runtime state
 	startTime = 0,               -- system time when app started

@@ -144,8 +144,10 @@ function app.processUserFile()
 	-- Good grief, Corona requires the path to images and sounds to be
 	-- a relative path, not absolute, and the only reliable dir to be
 	-- relative to seems to be the system.DocumentsDirectory.
+	-- If a relative path cannot be found mediaDir is set to false and 
+	-- docsDrive is set to the drive letter where the sandbox folder is located
 	appContext.mediaBaseDir = env.baseDirDocs
-	appContext.mediaDir = env.relativePath( env.docsDir, appContext.sourceDir )
+	appContext.mediaDir, appContext.docsDrive = env.relativePath( env.docsDir, appContext.sourceDir )
 
 	-- Parse the user code then do further processing
 	err.initProgram()
@@ -240,6 +242,7 @@ function app.saveSettings()
 	userSettings.openFilesInEditor = app.openFilesInEditor
 	userSettings.customEditors = app.customEditors
 	userSettings.showVarWatch = app.showVarWatch
+	userSettings.preferredFontSize = app.preferredFontSize
 
 	-- Write the settings file
 	local file = io.open( settingsFilePath(), "w" )
@@ -329,6 +332,13 @@ local function loadSettings()
 		local showVarWatch = t.showVarWatch
 		if type(showVarWatch) == "boolean" then
 			app.showVarWatch = showVarWatch
+		end
+
+		-- Use the saved preferredFontSize
+		local preferredFontSize = t.preferredFontSize
+		if type(preferredFontSize) == "number" then
+			app.preferredFontSize = preferredFontSize
+			app.consoleFontSize = preferredFontSize
 		end
 	end
 

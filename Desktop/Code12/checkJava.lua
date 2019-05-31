@@ -657,10 +657,10 @@ local function findStaticMethod( call )
 				-- Did they use ct.objMethod instead of obj.objMethod?
 				method = lookupID( nameID, apiTables["GameObj"].methods )
 				if method then
-					if syntaxLevel < 7 then
+					if syntaxLevel < 8 then
 						err.setErrNodeSpan( classNode, nameID,
 								'GameObj methods must be called on a GameObj variable, not "ct."'
-								.. '\n(Use of object method calls requires syntax level 7)' )
+								.. '\n(Use of object method calls requires syntax level 8)' )
 						err.addDocLink( "Java.html#object-method-calls" )
 					else
 						err.setErrNodeSpan( classNode, nameID,
@@ -704,9 +704,9 @@ local function findStaticMethod( call )
 		return method, "function Math." .. nameStr
 	end
 
-	-- Unknown class name (must be levels 1-6 otherwise handled as a method).
+	-- Unknown class name (must be levels 1-7 otherwise handled as a method).
 	-- The user might have meant ct or Math, but possibly also an attempt 
-	-- at a method call at level < 7.
+	-- at a method call at level < 8.
 
 	-- Check for a known object on the left first.
 	if classNode.tt == "ID" then
@@ -714,7 +714,7 @@ local function findStaticMethod( call )
 		if varFound and (varFound.vt == "GameObj" or varFound.vt == "String") then
 			err.setErrNodeSpan( classNode, nameID, 
 					"Unknown or misspelled function name\n"
-					.. "(Object method calls require syntax level 7)" )
+					.. "(Object method calls require syntax level 8)" )
 			err.addDocLink( "Java.html" )
 			return nil
 		end
@@ -1416,12 +1416,12 @@ local function vtExprEquality( node )
 	if javaTypes.canCompareVts( vtLeft, vtRight ) then
 		-- Don't allow comparing Strings with ==
 		if vtLeft == "String" and vtRight == "String" then
-			if syntaxLevel >= 7 then
+			if syntaxLevel >= 8 then
 				err.setErrNodeAndRef( node.opToken, node.left,
 						"Use str1.equals( str2 ) to compare two String values" )
 			else
 				err.setErrNodeAndRef( node.opToken, node.left,
-						"Strings cannot be compared with ==. You must use the equals method, which requires level 7" )
+						"Strings cannot be compared with ==. You must use the equals method, which requires level 8" )
 			end
 			err.addDocLink( "API.html#java-string-methods" )
 			return nil

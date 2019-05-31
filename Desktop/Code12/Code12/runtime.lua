@@ -17,11 +17,12 @@ local g = require("Code12.globals")
 local runtime = {
 	-- The appContext table is set by main.lua when running the Code12 app,
 	-- or left nil when running a generated Lua app standalone.
-	-- appContext = {
+	-- appContext = { 
 	--     sourceDir = string,       -- dir where user code is (absolute)
 	--     sourceFilename = string,  -- user code filename (in sourceDir)
 	--     mediaBaseDir = (const),   -- Corona baseDir to use for media files  
-	--     mediaDir = string,        -- media dir relative to mediaBaseDir
+	--     mediaDir = string,        -- media dir relative to mediaBaseDir, or false if relative path not found
+	--     docsDrive = string,       -- drive that the sandbox folder is located on (Usually "C")
 	--     outputGroup = group,      -- display group where output should go
 	--     widthP = number,          -- pixel width of output area
 	--     heightP = number,         -- pixel height of output area
@@ -39,6 +40,7 @@ local runtime = {
 local codeFunction       -- function for the loaded Lua user program        
 local coRoutineUser      -- coroutine running an event or nil if none
 local rgbWarningText = { 0.9, 0, 0.1 }   -- warning text displays in red
+local userLocals         -- array of { name = string, value = v } for user locals
 
 
 
@@ -97,6 +99,8 @@ end
 
 -- The enterFrame listener for each frame update
 local function onNewFrame()
+	g.frameStartTime = system.getTimer()   -- to support ct.checkFrame()
+
 	-- Apply object speeds if the current screen has any and is running
 	local screen = g.screen
 	if screen == nil then
@@ -263,11 +267,33 @@ function runtime.runEventFunction(func, ...)
 		coRoutineUser = coroutine.create(func)
 		if coRoutineUser then
 			-- Start the user function, passing its parameters
+			g.chunkStartTime = system.getTimer()
 			local success, strErr = coroutine.resume(coRoutineUser, ...)
 			return coroutineStatus(success, strErr)
 		end
 	end
 	return false
+end
+
+-- Get the names and values of all currently defined local variables in 
+-- the user's code at the given stackLevel and store them in userLocals, 
+-- which can then be accessed by calling runtime.userLocals()
+function runtime.getUserLocals( stackLevel )
+	userLocals = {}
+	local i = 1
+	repeat
+		local name, value = debug.getlocal( stackLevel + 1, i )
+		if name then
+			userLocals[i] = { name = name, value = value }
+			i = i + 1
+		end
+	until not name
+end
+
+-- Return an array of { name = string, value = v } for the user local variables
+-- defined at the last call to runtime.getUserLocals()
+function runtime.userLocals()
+	return userLocals
 end
 
 -- Block and yield the user's code then return any message from the
@@ -327,13 +353,16 @@ end
 function runtime.resume()
 	if g.runState == "paused" then
 		audio.resume()
+		userLocals = nil   -- user locals are only defined when paused
 		g.runState = "running"
+		g.chunkStartTime = system.getTimer();   -- reset infinite loop warning
 	end
 end
 
 -- When the run state is paused, advance one frame then pause again.
 function runtime.stepOneFrame()
 	if g.runState == "paused" then
+		userLocals = nil   -- user locals are only defined when user code yields
 		g.runState = "running"
 		onNewFrame()
 		g.runState = "paused"
@@ -355,6 +384,7 @@ function runtime.stop( endState )
 		end
 		coRoutineUser = nil
 	end
+	userLocals = nil   -- user locals are only defined when user code is yielded
 
 	-- Stop any audio and close output file if any
 	audio.stop()
@@ -376,6 +406,8 @@ function runtime.stop( endState )
 	g.runState = endState or "stopped"
 	g.userFn = nil
 	g.startTime = nil
+	g.frameStartTime = nil
+	g.chunkStartTime = nil
 end	
 
 -- Start a new run of the user program after the user's code has been loaded
@@ -420,6 +452,8 @@ function runtime.run()
 	g.runState = "running"
 	g.userFn = ct.userFns.start
 	g.startTime = system.getTimer()
+	g.frameStartTime = g.startTime
+	g.chunkStartTime = g.startTime
 	-- Now onNewFrame called by enterFrame listener will start the action
 end
 
@@ -446,6 +480,7 @@ function runtime.clearProgram()
 	ct.userFns = {}
 	codeFunction = nil
 	g.runState = nil
+	ct.setTitle()    -- clear window title to default
 end
 
 -- Output the given text to where console output should go
@@ -479,7 +514,7 @@ function runtime.printTextLine(text, rgb)
 end
 
 -- Return the current line number in the user's code or nil if unknown
-local function userLineNumber()
+function runtime.userLineNumber()
 	-- Look back on the stack trace to find the user's code (string)
 	-- so we can get the line number.
 	local info
@@ -497,7 +532,7 @@ end
 -- Print a runtime message to the console, followed by "at line #"
 -- if the user's code line number can be determined.
 function runtime.message(message)
-	local lineNum = userLineNumber()
+	local lineNum = runtime.userLineNumber()
 	if lineNum then
 		message = message .. " at line " .. lineNum
 	end
@@ -507,7 +542,7 @@ end
 -- Print a warning message to the console with optional quoted name
 function runtime.warning(message, name)
 	local s
-	local lineNum = userLineNumber()
+	local lineNum = runtime.userLineNumber()
 	if lineNum then
 		s = "WARNING (line " .. lineNum .. "): " .. message
 	else

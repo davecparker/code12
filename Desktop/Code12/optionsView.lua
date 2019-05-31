@@ -40,6 +40,7 @@ local topBar              -- Background rectangle for title
 local closeBtn            -- Close view button
 local levelPicker         -- Syntax level picker
 local tabWidthPicker      -- Tab width picker
+local fontSizePicker      -- Font size picker
 local editorPicker        -- Text editor picker
 local varWatchPicker      -- Variable watch window mode picker
 local gridlineColorPicker -- Gridline color picker
@@ -71,9 +72,6 @@ end
 local function setSelectedOptions()
 	-- Set the filled boxes of the levelPicker
 	fillBoxes( levelPicker.switches, app.syntaxLevel )
-
-	-- Set the active segment of the tabWidthPicker
-	tabWidthPicker:setActiveSegment( app.tabWidth - 1 )
 
 	-- Set the selected radio button of the editorPicker
 	if app.useDefaultEditor or #env.installedEditors == 1 then
@@ -305,9 +303,9 @@ function optionsView:create()
 		"3. Variables",
 		"4. Expressions",
 		"5. Function Return Values",
-		"6. Object Data Fields",
-		"7. Object Method Calls",
-		"8. If-else",
+		"6. If-else",
+		"7. Object Data Fields",
+		"8. Object Method Calls",
 		"9. Function Definitions",
 		"10. Function Parameters",
 		"11. Loops",
@@ -339,9 +337,11 @@ function optionsView:create()
 		fontSize = fontSize,
 	}
 	g.uiItem( tabWidthHeader )
-	local tabWidths = {}
-	for i = 2, 8 do
-		tabWidths[i - 1] = tostring( i )
+	-- Tab width choices and their corresponding segment numbers
+	local tabWidths = { 2, 3, 4, 5, 6, 7, 8 }
+	local tabWidthSegNums = {}
+	for i, v in ipairs( tabWidths ) do
+		tabWidthSegNums[v] = i
 	end
 	-- Tab width picker
 	tabWidthPicker = widget.newSegmentedControl{
@@ -349,19 +349,57 @@ function optionsView:create()
 		y = math.round( tabWidthHeader.y + tabWidthHeader.height + app.margin * 0.5 ),
 		segments = tabWidths,
 		segmentWidth = 30,
-		defaultSegment = app.tabWidth - 1,
+		defaultSegment = tabWidthSegNums[app.tabWidth],
 		labelSize = fontSize,
 		labelColor = { default = { 0 }, over = { 0 } },
 		onPress =
 			function ( event )
-				app.tabWidth = event.target.segmentNumber + 1
+				app.tabWidth = tabWidths[event.target.segmentNumber]
 				forceReprocess = true
 			end
 	}
+	tabWidthPicker.segmentNumbers = tabWidthSegNums
 	tabWidthPicker.anchorX = 0
 	tabWidthPicker.anchorY = 0
 	optionsGroup:insert( tabWidthPicker )
 	lastPicker = tabWidthPicker
+
+	-- Font size header
+	local fontSizeHeader = display.newText{
+		parent = optionsGroup,
+		text = "Font Size for Source Code Display",
+		x = 0,
+		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
+		font = optionsFontBold,
+		fontSize = fontSize,
+	}
+	g.uiItem( fontSizeHeader )
+	-- Font size choices and their corresponding segment numbers
+	local fontSizes = { 12, 14, 18, 20, 24 }
+	local fontSizeSegNums = {}
+	for i, v in ipairs( fontSizes ) do
+		fontSizeSegNums[v] = i
+	end
+	-- Font size picker
+	fontSizePicker = widget.newSegmentedControl{
+		x = 0,
+		y = math.round( fontSizeHeader.y + fontSizeHeader.height + app.margin * 0.5 ),
+		segments = fontSizes,
+		segmentWidth = 30,
+		defaultSegment = fontSizeSegNums[app.consoleFontSize],
+		labelSize = fontSize,
+		labelColor = { default = { 0 }, over = { 0 } },
+		onPress =
+			function ( event )
+				app.preferredFontSize = fontSizes[event.target.segmentNumber]
+				env.showInfoAlert( "Code12 Options", "Font size will take effect when Code12 is restarted." )
+			end
+	}
+	fontSizePicker.segmentNumbers = fontSizeSegNums
+	fontSizePicker.anchorX = 0
+	fontSizePicker.anchorY = 0
+	optionsGroup:insert( fontSizePicker )
+	lastPicker = fontSizePicker
 
 	-- Variable Watch Window picker
 	varWatchPicker = buttons.newSettingPicker{

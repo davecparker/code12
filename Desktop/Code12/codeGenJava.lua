@@ -163,12 +163,11 @@ end
 
 -- Return Lua code for a variable name, which is global if isGlobal
 local function varNameCode( varName, isGlobal )
-	local luaName = nameFromLuaReservedWord[varName] or varName
+	local luaName = codeGenJava.luaName( varName )
 	if isGlobal then
 		return thisPrefix .. luaName    -- this.name
-	else
-		return luaName
 	end
+	return luaName
 end
 
 -- Return Lua code for the variable with optional array index part of an lValue. 
@@ -216,7 +215,7 @@ end
 
 -- Return Lua code for a function name
 local function fnNameCode( fnName )
-	return fnPrefix .. (nameFromLuaReservedWord[fnName] or fnName)
+	return fnPrefix .. codeGenJava.luaName( fnName )
 end
 
 -- Return Lua code for expr promoted to a string
@@ -336,9 +335,19 @@ local function binOpCode( expr )
 	return exprCode( expr.left ) .. luaOp .. exprCode( expr.right )
 end
 
+-- Return vt in quotes if the lua type of vt is string
+-- otherwise return the string representation of vt.
+local function vtStr( vt )
+	if type( vt ) == "string" then
+		return '"' .. vt .. '"'
+	end
+	return tostring(vt)
+end
+
 -- Return the Lua code string for a newArray expr
 local function newArrayCode( expr )
 	return "{ length = " .. exprCode( expr.lengthExpr )
+			.. ", vt = " .. vtStr( expr.vt.vt )
 			.. ", default = " ..  defaultValueCodeForVt( expr.vtElement ) .. " }"
 end
 
@@ -354,6 +363,7 @@ local function arrayInitCode( expr )
 		end
 	end
 	codeStrs[#codeStrs + 1] = "length = " .. length
+	codeStrs[#codeStrs + 1] = ", vt = " .. vtStr( expr.vt.vt )
 	codeStrs[#codeStrs + 1] = " }"
 	return table.concat( codeStrs )
 end
@@ -501,14 +511,14 @@ end
 local function generateWhile( stmt )
 	beginLuaLine( stmt.iLine, "while " )
 	addLua( exprCode( stmt.expr ) )
-	addLua( " do")
+	addLua( " do ct.checkFrame() ")
 	generateBlockStmts( stmt.block )
 	endBlock( stmt.block )
 end
 
 -- Generate Lua code for the given doWhile stmt
 local function generateDoWhile( stmt )
-	beginLuaLine( stmt.iLine, "repeat" )
+	beginLuaLine( stmt.iLine, "repeat ct.checkFrame() " )
 	generateBlockStmts( stmt.block )
 	beginLuaLine( stmt.iLineWhile, "until not (")
 	addLua( exprCode( stmt.expr ) )
@@ -518,6 +528,7 @@ end
 -- Generate Lua code for the given for stmt
 local function generateFor( stmt )
 	-- Start with the initStmt if any
+	addLua( " do " )
 	if stmt.initStmt then
 		generateStmt( stmt.initStmt )
 	end
@@ -529,7 +540,7 @@ local function generateFor( stmt )
 	else
 		addLua( "true" )
 	end
-	addLua( " do" )
+	addLua( " do ct.checkFrame() " )
 
 	-- Generate the controlled stmts, nextStmt if any, and the end
 	generateBlockStmts( stmt.block )
@@ -537,15 +548,19 @@ local function generateFor( stmt )
 		generateStmt( stmt.nextStmt )
 	end
 	endBlock( stmt.block )
+	addLua( " end" )
 end
 
 -- Generate Lua code for the given forArray stmt
 local function generateForArray( stmt )
-	beginLuaLine( stmt.iLine, "for _, " )
+	beginLuaLine( stmt.iLine, "for _i = 0, (" )
+	local exprCodeStr = exprCode( stmt.expr ) 
+	addLua( exprCodeStr )
+	addLua( ").length - 1 do " )   -- no ct.checkFrame() because can't be infinite
 	addLua( varNameCode( stmt.var.nameID.str ) )
-	addLua( " in ipairs(" )
-	addLua( exprCode( stmt.expr ) )
-	addLua( ") do" )
+	addLua( " = ct.indexArray(" )
+	addLua( exprCodeStr )
+	addLua( ", _i) ")
 	generateBlockStmts( stmt.block )
 	endBlock( stmt.block )
 end
@@ -610,6 +625,11 @@ end
 
 
 --- Module Functions ---------------------------------------------------------
+
+-- Return the Lua variable or function name for the given Java name
+function codeGenJava.luaName( name )
+	return nameFromLuaReservedWord[name] or name
+end
 
 -- Generate and return the Lua code string corresponding to the programTree,
 function codeGenJava.getLuaCode( programTree )

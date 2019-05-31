@@ -47,7 +47,13 @@ local function getSound(filename)
 	if sound then 
 		sounds[filename] = sound   -- cache it
 	else
-		runtime.warning("Cannot find sound file", filename)
+		if appContext and appContext.mediaDir == false then 
+			-- Image saved on flashdrive/different hard drive from code12 warning
+			runtime.warning("Cannot load sound file. Copy program folder to " .. appContext.docsDrive .. ": drive")		
+		else
+			-- Filename mispelled or incorrect warning
+			runtime.warning("Cannot find sound file", filename)
+		end	
 	end
 	return sound
 end
@@ -58,7 +64,7 @@ end
 -- API
 function ct.loadSound(filename)
 	-- Load and cache the sound
-	return (getSound(filename) ~= nil)
+	getSound(filename)
 end
 
 -- API

@@ -13,9 +13,9 @@ Concept                     Example
 3. Variables                int x = 50;
 4. Expressions              (i * 3) + 20
 5. Function Return Values   fish = ct.image( "goldfish.png", 100, 200, 50 )
-6. Object Data Fields       fish.x
-7. Object Method Calls      ball.setFillColor( "blue" )
-8. If-else                  if (fish.x < 0)
+6. If-else                  if (fish.x < 0)
+7. Object Data Fields       fish.x
+8. Object Method Calls      ball.setFillColor( "blue" )
 9. Function Definitions     void updateScore()
 10. Parameters              GameObj makeAsteroid( double x, double y )
 11. Loops                   for (int i = 1; i < 10; i++)
@@ -50,7 +50,7 @@ for example:
 * Indentation style is enforced.
 
 
-Ideas for Programming Concepts as Levels
+Ideas for Programming Concepts at Levels
 ========================================
 If the 12 programming concepts are taught in order, then the user can progress
 through 12 programming levels, which each add a capability. Here are some ideas
@@ -108,23 +108,23 @@ for ways to use the Code12 API at each level:
 * Use ct.round(), ct.roundDecimal(), ct.intDiv(), ct.distance(), ct.getTimer(), ct.getVersion()
 * Use ct.toInt(), ct.formatDecimal(), ct.formatInt() to prepare data for display
 
-6. Object Data Fields
+6. If-else
+----------
+* Do calculations that depend on certain value ranges
+* Use the result of ct.inputYesNo() to see if the user wants to do something or not
+* Test the result of ct.random(0, 1) for a coin flip, etc.
+* Use ct.clicked() to detect mouse clicks
+* Use ct.keyPressed() and ct.charTyped() to detect keyboard input
+
+7. Object Data Fields
 ---------------------
 * Make a GameObj move smoothly by changing its x and/or y fields in update()
 * Set the group field of a set of objects that you want to delete in bulk via ct.clearGroup()  
 
-7. Object Method Calls
+8. Object Method Calls
 ----------------------
 * Any of the GameObj methods can now be used, for many different features
 * The supported String methods can now be used to manipulate strings
-
-8. If-else
-----------
-* Use the result of ct.inputYesNo() to see if the user wants to do something or not
-* Use ct.clicked(), ct.objectClicked(), and GameObj.clicked() to detect mouse clicks
-* Use ct.keyPressed() and ct.charTyped() to detect keyboard input
-* Detect when a GameObj goes off screen in update() and recycle or bounce it
-* Use GameObj.hit(), GameObj.containsPoint() and GameObj.objectHitIngroup() to detect hits
 
 9. Function Definitions
 -----------------------

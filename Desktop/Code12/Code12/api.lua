@@ -184,8 +184,18 @@ end
 function ct.pause()
 	-- This API is ignored if not running in the Code12 app
 	if runtime.appContext then 
+		-- Get snapshot of locals for varWatch
+		runtime.getUserLocals( 2 )
+
+		--Gets the line number and assembles the paused message
+		local message = "Program paused by ct.paused()"; --In case lineNum unknown
+		local lineNum = runtime.userLineNumber()
+		if lineNum then
+			message = "Paused by ct.pause() at line " .. lineNum 
+		end
+		ct.showAlert(message);
+
 		-- Change run state to paused then block and yield
-		runtime.message("ct.pause()")
 		g.runState = "paused"
 		repeat
 			if runtime.blockAndYield() == "abort" then
@@ -228,6 +238,23 @@ end
 -- Return x truncated to an integer for an (int) type cast
 function ct.toInt(x)
 	return math.floor(x)
+end
+
+-- Yield the user's code if the frame timer is overdue,
+-- and print a warning if the code appears to be stuck in an infinite loop.
+function ct.checkFrame()
+	if system.getTimer() - g.frameStartTime > 20 then    -- 60 fps is 16.7 ms
+		-- Check for apparent infinite loop
+		if system.getTimer() - g.chunkStartTime > 3000 then
+			runtime.warning( "Code has taken more than 3 seconds -- infinite loop?" )
+			g.chunkStartTime = system.getTimer();   -- reset warning timer for next interval
+		end
+		-- Yield to the main app
+		if runtime.blockAndYield() == "abort" then
+			g.runState = "stopped"
+			error("aborted")   -- caught by the runtime
+		end
+	end
 end
 
 
