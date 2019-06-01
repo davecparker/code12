@@ -347,7 +347,7 @@ end
 -- Return the Lua code string for a newArray expr
 local function newArrayCode( expr )
 	return "{ length = " .. exprCode( expr.lengthExpr )
-			.. ", vt = " .. vtStr( expr.vt.vt )
+			.. ", vt = " .. vtStr( expr.vtElement )
 			.. ", default = " ..  defaultValueCodeForVt( expr.vtElement ) .. " }"
 end
 
@@ -363,7 +363,9 @@ local function arrayInitCode( expr )
 		end
 	end
 	codeStrs[#codeStrs + 1] = "length = " .. length
-	codeStrs[#codeStrs + 1] = ", vt = " .. vtStr( expr.vt.vt )
+	if expr.vt and expr.vt.vt then
+		codeStrs[#codeStrs + 1] = ", vt = " .. vtStr( expr.vt.vt )
+	end
 	codeStrs[#codeStrs + 1] = " }"
 	return table.concat( codeStrs )
 end
