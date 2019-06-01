@@ -602,9 +602,9 @@ int underIndentedInstanceVar;
 			b = ct.charTyped("+");
 		b = ct.charTyped(ch);
 		// Code12 API -- Audio
-		b = ct.loadSound( filename );
+		ct.loadSound( filename );
 		ct.loadSound("pow.wav");
-		if (ct.loadSound("sounds/ding.mp3"))
+		if (b)
 			ct.sound("sounds/ding.mp3");
 		ct.sound(filename);
 		ct.setSoundVolume(d);
@@ -634,7 +634,7 @@ int underIndentedInstanceVar;
 			i = ct.getTimer();
 		i = ct.getTimer() - i;
 		d = ct.getVersion();
-		ct.round(ct.getVersion());
+		i = ct.round(ct.getVersion());
 		// Code12 API -- Type Conversion
 		i = (int) d;
 		i = (int) (d * i);
@@ -899,27 +899,27 @@ int underIndentedInstanceVar;
 		// ERROR "expects type int, but String was passed" 
 		objVar.setLayer( "front" );
 		// ERROR "expects type int, but GameObj was passed"
-		ct.roundDecimal( 3.14159, objVar );
+		intVar = ct.roundDecimal( 3.14159, objVar );
 		// ERROR "expects type int, but GameObj was passed"
-		strVar.substring( objVar );
+		strVar = strVar.substring( objVar );
 
 		// ERROR "expects type double, but boolean was passed"
-		Math.pow( boolVar, 3 );
+		dblVar = Math.pow( boolVar, 3 );
 		// ERROR "expects type double, but String was passed"
-		dblFuncIntDbl( 0, "pi" );
+		dlbVar = dblFuncIntDbl( 0, "pi" );
 		// ERROR "expects type double, but String was passed"
-		objVar.containsPoint( strVar, dblVar );
+		boolVar = objVar.containsPoint( strVar, dblVar );
 		// ERROR "expects type double, but GameObj was passed"
-		Math.exp( objVar );
+		dblVar = Math.exp( objVar );
 
 		// ERROR "Too many parameters"
 		objVar.align( "left", 0 );
 		// ERROR "expects type boolean, but double was passed"
-		boolFuncBoolStringGameObj( dblVar, strVar, objVar );
+		boolVar = boolFuncBoolStringGameObj( dblVar, strVar, objVar );
 		// ERROR "expects type boolean, but String was passed"
-		boolFuncBoolStringGameObj( strVar, objVar, boolVar );
+		boolVar = boolFuncBoolStringGameObj( strVar, objVar, boolVar );
 		// ERROR "expects type boolean, but GameObj was passed"
-		boolFuncBoolStringGameObj( objVar, strVar, boolVar );
+		boolVar = boolFuncBoolStringGameObj( objVar, strVar, boolVar );
 
 		// ERROR "expects type String, but int was passed"
 		objVar.align(intVar);
@@ -936,22 +936,22 @@ int underIndentedInstanceVar;
 		// ERROR "expects type String, but boolean was passed"
 		objVar.align(true);
 		// ERROR "expects type String, but GameObj was passed"
-		strVar.equals( objVar );
+		boolVar = strVar.equals( objVar );
 
 		// ERROR "expects type GameObj, but int was passed"
-		boolFuncBoolStringGameObj( boolVar, strVar, 42 );
+		boolVar = boolFuncBoolStringGameObj( boolVar, strVar, 42 );
 		// ERROR "expects type GameObj, but double was passed"
-		objVar.hit( 0.0 );
+		boolVar = objVar.hit( 0.0 );
 		// ERROR "expects type GameObj, but boolean was passed"
-		objVar.hit( false );
+		boolVar = objVar.hit( false );
 		// ERROR "expects type GameObj, but String was passed"
-		objVar.hit( "the wall" );
+		boolVar = objVar.hit( "the wall" );
 		
 		// ERROR "requires 1 parameter"
 		if (intFuncInt() > 0)
 			voidFunc();
 		// ERROR "requires 2 parameters"
-		dblFuncIntDbl();
+		dblVar = dblFuncIntDbl();
 		// ERROR "requires 3 parameters"
 		ct.circle();
 		// ERROR "requires 4 parameters"
@@ -970,7 +970,7 @@ int underIndentedInstanceVar;
 		// ERROR "Integer divide"
 		int k = 3 / 2;
 		// ERROR "Integer divide"
-		ct.random( intVar / intVar, intVar );
+		intVar = ct.random( intVar / intVar, intVar );
 		// ERROR "Undefined variable"
 		x = x + 1;
 		// ERROR "Undefined variable"
@@ -1326,15 +1326,15 @@ int underIndentedInstanceVar;
 		Math.foo();
 		
 		// ERROR "requires 1 parameter"
-		intFuncInt();
+		intVar = intFuncInt();
 		// ERROR "requires 2 parameters"
-		dblFuncIntDbl();
+		dblVar = dblFuncIntDbl();
 		// ERROR "requires 1 parameter"
 		ct.log();
 		// ERROR "requires 2 parameters"
-		Math.atan2();
+		dblVar = Math.atan2();
 		// ERROR "requires 3 parameters"
-		boolFuncBoolStringGameObj(false, "");
+		boolVar = boolFuncBoolStringGameObj(false, "");
 		// ERROR "requires 4 parameters"
 		ct.rect(0,0,10);
 		// ERROR "Too many parameters passed"
@@ -1342,7 +1342,7 @@ int underIndentedInstanceVar;
 		// ERROR "Too many parameters passed"
 		ct.print("intVar =", intVar);
 		// ERROR "Too many parameters passed"
-		Math.atan(4,3);
+		dblVar = Math.atan(4,3);
 		// ERROR "expects type String, but int was passed"
 		ct.logm(intVar, objVar);
 
@@ -2431,12 +2431,12 @@ void underIndentedFunc()
 		if (boolVar1)
 		{
 			ct.println();
-			// ERROR "path is missing a return statement"
 		}
 		else if (boolVar2)
 		{
 			return r;
 		}
+		// ERROR "Function is missing a return statement"
 	}
 	int funcPathMissingReturn2Brackets()
 	{
@@ -2559,10 +2559,10 @@ void underIndentedFunc()
 		boolean boolVar1 = false;
 		boolean boolVar2 = false;
 		if (boolVar1)
-			// ERROR "path is missing a return statement"
 			ct.println();
 		else if (boolVar2)
 			return r;
+		// ERROR "Function is missing a return statement"
 	}
 	int funcPathMissingReturn2()
 	{

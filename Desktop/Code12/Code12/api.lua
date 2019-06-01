@@ -324,7 +324,11 @@ end
 -- if the index is invalid.
 function ct.indexArray(array, index)
 	ct.checkArrayIndex( array, index, 3 )
-	return array[index + 1] or array.default   -- Lua arrays are 1-based
+	local value = array[index + 1]   -- Lua arrays are 1-based
+	if value == nil then
+		return array.default
+	end
+	return value
 end
 
 
