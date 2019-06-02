@@ -339,8 +339,10 @@ local function loadSettings()
 		if type(preferredFontSize) == "number" then
 			app.preferredFontSize = preferredFontSize
 			app.consoleFontSize = preferredFontSize
-			app.consoleFontYOffset = env.consoleFontYOffset( preferredFontSize )
 		end
+
+		-- Adjust consoleFontYOffset
+		app.consoleFontYOffset = env.consoleFontYOffset( app.consoleFontSize )
 	end
 
 	-- Read the developer settings file

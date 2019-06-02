@@ -26,11 +26,11 @@ local env = {
 local chDirSeperator               -- directory seperator (/ on Mac, \ on Windows)
 local byteDirSeperator             -- byte (ASCII) value of chDirSeperator
 local consoleFontYOffsets = {      -- for fixing off center text on Mac in errView and varWatch
-	[12] = 0,
-	[14] = 0,
-	[18] = 0,
-	[20] = 0,
-	[24] = 0,
+	[12] = -4,
+	[14] = -2,
+	[18] = -5,
+	[20] = -7,
+	[24] = -6,
 }
 
 
@@ -277,8 +277,7 @@ function env.consoleFontYOffset( fontSize )
 	if env.isWindows then
 		return 1
 	end
-	-- return consoleFontYOffsets[fontSize]
-	return -math.round( fontSize * 0.15 )
+	return consoleFontYOffsets[fontSize]
 end
 
 
