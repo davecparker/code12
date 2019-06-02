@@ -392,7 +392,7 @@ function optionsView:create()
 		onPress =
 			function ( event )
 				app.preferredFontSize = fontSizes[event.target.segmentNumber]
-				env.showInfoAlert( "Code12 Options", "Font size will take effect when Code12 is restarted." )
+				native.showAlert( "Code12 Options", "Font size will take effect when Code12 is restarted.", { "OK" } )
 			end
 	}
 	fontSizePicker.segmentNumbers = fontSizeSegNums
