@@ -448,7 +448,7 @@ local function getControlledBlock()
 		local stmtIndent = tree.indentLevel
 		if stmtIndent <= ctrlIndent then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, ctrlTree.iLineStart, 
-					"This line should be indented more than its controlling \"%s\"", ctrlTree.p )
+					"This line should be indented more than its controlling \"%s\"", textForCtrlP( ctrlTree.p ) )
 			err.addDocLink( "Java.html#indentation-and-brace-placement" )
 		end
 		iTree = iTree + 1  -- pass the controlled stmt as expected by getLineStmts
