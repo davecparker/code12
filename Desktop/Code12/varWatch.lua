@@ -508,12 +508,14 @@ function varWatch.addDisplayRows()
 			-- Make drop down button if needed
 			if d.dropDownVisible then
 				if d.dropDownVisible == 1 then
-					local btn1 = buttons.newDropDownButton( row, row[2].x, dropDownBtnYOffset, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
+					local btn1 = buttons.newDropDownButton( row, row[2].x, dropDownBtnYOffset, dropDownBtnSize,
+					                                        dropDownBtnSize, onDropDownBtn1 )
 					btn1.rowNumber = n
 					btn1:setState{ isOn = d.var.isOpen or false }
 					row.dropDownBtn1 = btn1
 				else
-					local btn2 = buttons.newDropDownButton( row, row[2].x, dropDownBtnYOffset, dropDownBtnSize, dropDownBtnSize, onDropDownBtn2 )
+					local btn2 = buttons.newDropDownButton( row, row[2].x, dropDownBtnYOffset, dropDownBtnSize,
+					                                        dropDownBtnSize, onDropDownBtn2 )
 					btn2.rowNumber = n
 					btn2:setState{ isOn = d.var[d.index.."isOpen"] or false }
 					row.dropDownBtn2 = btn2
