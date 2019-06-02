@@ -1179,7 +1179,7 @@ while (x &lt; 100)
 </ul>
 <p>If the test result is false then the body of the loop (the code in curly brackets) is skipped, and execution continues after the loop (the loop body does not execute at all). If the test result is true, the loop body executes then execution goes back up to the line with the test and repeats the entire process. The test is evaluated again to see if it is still true (typically variable values or something will have changed since the first test so the result may be different). If the test is still true, the body is executed again, and execution goes back to the test again. The entire loop process stops once the test result becomes false.</p>
 <blockquote>
-<p><strong>Warning</strong>: If the test remains true and never changes, then the loop will execute forever, resulting in an “inifite loop”. This will cause your program to “hang”, the Code12 Application will become unreponsive, and will you need to “end task” or “force quit” Code12 from the operating system, fix your code, and try again!</p>
+<p><strong>Note</strong>: If the test remains true and never changes, then the loop will execute forever, resulting in an “infinite loop”, which never finishes.</p>
 </blockquote>
 <h5 id="more-while-loop-examples">More “while” Loop Examples</h5>
 <pre><code>// Count from 1 to 10
@@ -1483,6 +1483,34 @@ GameObj   null</code></pre>
         }
     }
 }</code></pre>
+<h5 id="passing-an-array-as-a-parameter-and-getting-the-array-length">Passing an Array as a Parameter and Getting the Array Length</h5>
+<p>You can write a function that takes an array as a parameter and then pass an array to it. For example:</p>
+<pre><code>class Example
+{
+    public void start()
+    {
+        // Two different arrays of int
+        int[] counts = { 32, 12, 75, 42 };
+        int[] scores = { 85, 100, 65, 72, 67, 98, 0, 12 };
+
+        // Call function to get the total of each array and print it.
+        ct.println( &quot;Total of counts is &quot; + arrayTotal( counts ) );
+        ct.println( &quot;Total of scores is &quot; + arrayTotal( scores ) );
+    }
+
+    // Calculate and return the sum of all the elements in the array a.
+    int arrayTotal( int[] a )
+    {
+        int total = 0;
+        for (int i = 0; i &lt; a.length; i++)
+            total += a[i];
+        return total;
+    }
+}</code></pre>
+<p>Note that the array parameter variable is declared above as <code>int[] a</code>, so the array passed must be an array of <code>int</code>, however the number of<br />
+elements in the array is not specified. You could pass an array of <code>int</code> with any number of elements in it.</p>
+<p>A function may need to determine the number of elements in an array parameter to do its work, as shown in the example above. You can get the number of elements in any array by using the syntax <code>a.length</code>, where <code>a</code> is the array variable. This will result in an integer value that is the number of elements in the array.</p>
+<p>When passing an array as a parameter, it is important to understand that only a <em>reference</em> to the array is passed (essentially a pointer to the actual array where it lives in memory). Passing an array does <em>not</em> make a copy of the array. So, if the function modifies the elements of the array, the original array that was passed will be modified.</p>
 <h6 id="java-language-help-arrays"><a href="#top">Java Language Help</a> &gt; <a href="#arrays">Arrays</a></h6>
 <h3 id="java-data-types">Java Data Types</h3>
 <p>Code12 supports the standard Java data types <code>int</code>, <code>double</code>, <code>boolean</code>, and <code>String</code>, plus the <code>GameObj</code> type defined by Code12.</p>

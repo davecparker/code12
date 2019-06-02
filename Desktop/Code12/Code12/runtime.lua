@@ -17,11 +17,12 @@ local g = require("Code12.globals")
 local runtime = {
 	-- The appContext table is set by main.lua when running the Code12 app,
 	-- or left nil when running a generated Lua app standalone.
-	-- appContext = {
+	-- appContext = { 
 	--     sourceDir = string,       -- dir where user code is (absolute)
 	--     sourceFilename = string,  -- user code filename (in sourceDir)
 	--     mediaBaseDir = (const),   -- Corona baseDir to use for media files  
-	--     mediaDir = string,        -- media dir relative to mediaBaseDir
+	--     mediaDir = string,        -- media dir relative to mediaBaseDir, or false if relative path not found
+	--     docsDrive = string,       -- drive that the sandbox folder is located on (Usually "C")
 	--     outputGroup = group,      -- display group where output should go
 	--     widthP = number,          -- pixel width of output area
 	--     heightP = number,         -- pixel height of output area
@@ -98,6 +99,8 @@ end
 
 -- The enterFrame listener for each frame update
 local function onNewFrame()
+	g.frameStartTime = system.getTimer()   -- to support ct.checkFrame()
+
 	-- Apply object speeds if the current screen has any and is running
 	local screen = g.screen
 	if screen == nil then
@@ -264,6 +267,7 @@ function runtime.runEventFunction(func, ...)
 		coRoutineUser = coroutine.create(func)
 		if coRoutineUser then
 			-- Start the user function, passing its parameters
+			g.chunkStartTime = system.getTimer()
 			local success, strErr = coroutine.resume(coRoutineUser, ...)
 			return coroutineStatus(success, strErr)
 		end
@@ -351,6 +355,7 @@ function runtime.resume()
 		audio.resume()
 		userLocals = nil   -- user locals are only defined when paused
 		g.runState = "running"
+		g.chunkStartTime = system.getTimer();   -- reset infinite loop warning
 	end
 end
 
@@ -401,6 +406,8 @@ function runtime.stop( endState )
 	g.runState = endState or "stopped"
 	g.userFn = nil
 	g.startTime = nil
+	g.frameStartTime = nil
+	g.chunkStartTime = nil
 end	
 
 -- Start a new run of the user program after the user's code has been loaded
@@ -445,6 +452,8 @@ function runtime.run()
 	g.runState = "running"
 	g.userFn = ct.userFns.start
 	g.startTime = system.getTimer()
+	g.frameStartTime = g.startTime
+	g.chunkStartTime = g.startTime
 	-- Now onNewFrame called by enterFrame listener will start the action
 end
 
@@ -471,6 +480,7 @@ function runtime.clearProgram()
 	ct.userFns = {}
 	codeFunction = nil
 	g.runState = nil
+	ct.setTitle()    -- clear window title to default
 end
 
 -- Output the given text to where console output should go

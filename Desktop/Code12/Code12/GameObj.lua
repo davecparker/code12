@@ -275,11 +275,18 @@ function GameObj:newImage(group, filename, x, y, width)
 		obj = display.newImage(group, path, baseDir, x * scale, y * scale)
 	end
 	if not obj then
-		-- Can't open image, substitute a text object with a red X
-		runtime.warning("Cannot find image file", filename)
+		-- Can't open image, check if user's program is on correct drive then give appropriate error
+		local appContext = runtime.appContext
+		if appContext and appContext.mediaDir == false then 
+			-- Image saved on unaccesible drive warning
+			runtime.warning("Cannot load image file. Copy program folder to " .. appContext.docsDrive .. ": drive")	
+		else
+			-- Filename mispelled or incorrect warning
+			runtime.warning("Cannot find image file", filename)
+		end	
+		-- Can't open image, substitute a text object with a red X and give warning message
 		return GameObj:newText(group, "[x]", x, y, width, "red")
 	end
-
 	-- Create the GameObj at the right size and scale the image, 
 	-- preserving the original image aspect.
 	local height = width * obj.height / obj.width

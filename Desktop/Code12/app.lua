@@ -10,13 +10,14 @@
 
 -- Global data
 local app =  {
-	-- Gray shades for the UI
+	-- Gray shades and colors for the UI
 	toolbarShade = 0.8,
 	extraShade = 0.95,
 	borderShade = 0.5,
 	enabledShade = 0.3,
 	disabledShade = 0.7,
 	defaultGridlineShade = 0.6,
+	buttonColor = { 0.082, 0.486, 0.976 },   -- Corona blue
 
 	-- Fonts
 	consoleFont = "NotoMono-Regular.ttf",
@@ -28,8 +29,8 @@ local app =  {
 	optionsFontSize = 14,
 
 	-- Web folders
-	webHelpDir = "http://www.code12.org/docs/1/",
-	-- webHelpDir = "file:///Users/davecparker/Documents/Git%20Projects/code12/Doc/Website/docs/1/",
+	webHelpDir = "http://www.code12.org/docs/2/",
+	-- webHelpDir = "file:///Users/davecparker/Documents/Git%20Projects/code12/Doc/Website/docs/2/",
 
 	-- UI metrics
 	margin = 10,                 -- generic margin to leave between many UI items

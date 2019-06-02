@@ -144,8 +144,10 @@ function app.processUserFile()
 	-- Good grief, Corona requires the path to images and sounds to be
 	-- a relative path, not absolute, and the only reliable dir to be
 	-- relative to seems to be the system.DocumentsDirectory.
+	-- If a relative path cannot be found mediaDir is set to false and 
+	-- docsDrive is set to the drive letter where the sandbox folder is located
 	appContext.mediaBaseDir = env.baseDirDocs
-	appContext.mediaDir = env.relativePath( env.docsDir, appContext.sourceDir )
+	appContext.mediaDir, appContext.docsDrive = env.relativePath( env.docsDir, appContext.sourceDir )
 
 	-- Parse the user code then do further processing
 	err.initProgram()
