@@ -28,12 +28,8 @@ local varWatch = {
 -- UI constants
 local gridShade = 0.8         -- shade for the table gridlines
 local topMargin = 5           -- margin for the top of the variable watch window
-local dropDownBtnSize = 10    -- width and height of the drop down buttons
 local margin = app.margin     -- space between UI elements 
 local padding = 3             -- min space between the end of text and a vertical gridline
-local stdIndents = { 0, dropDownBtnSize } -- indents for standard top-level variable display rows
-local indexOrFieldIndents = { dropDownBtnSize, dropDownBtnSize * 2 }     -- indents for rows with an index xor a field
-local indexAndFieldIndents = { 0, dropDownBtnSize * 3, dropDownBtnSize } -- indents for rows with an index and a field
 
 -- Display state
 local displayRows             -- table of rows of the variable display
@@ -41,7 +37,12 @@ local numDisplayableRows      -- number of rows that can currently be displayed
 local xCols                   -- table of x-values for the left of each column
 local charWidth               -- character width of the font used for text objects
 local rowHeight               -- height of each row in the variable display
-local maxGameObjFieldWidth       -- maximum space needed to fix longest GameObj field in the display
+local maxGameObjFieldWidth    -- maximum space needed to fix longest GameObj field in the display
+local dropDownBtnSize         -- width and height of the drop down buttons
+local dropDownBtnYOffset      -- y-value for drop down buttons relative to their row
+local stdIndents              -- indents for standard top-level variable display rows
+local indexOrFieldIndents     -- indents for rows with an index xor a field
+local indexAndFieldIndents    -- indents for rows with an index and a field
 local centerColWidth          -- width of the center column of the variable display
 local showVarWatch            -- true if variable watch is active
 
@@ -434,6 +435,12 @@ function varWatch.init()
 	scrollOffset = 0
 	charWidth = app.consoleFontCharWidth
 	rowHeight = app.consoleFontHeight + 2
+	dropDownBtnSize = rowHeight * 0.6
+	dropDownBtnYOffset = (rowHeight - dropDownBtnSize) / 2
+	stdIndents = { 0, dropDownBtnSize }
+	indexOrFieldIndents = { dropDownBtnSize, dropDownBtnSize * 2 }
+	indexAndFieldIndents = { 0, dropDownBtnSize * 3, dropDownBtnSize }
+
 	maxGameObjFieldWidth = math.ceil( charWidth * string.len("clickable") )
 	centerColWidth = dropDownBtnSize * 3 + maxGameObjFieldWidth + padding
 	Runtime:addEventListener( "enterFrame", onNewFrame )
@@ -500,14 +507,13 @@ function varWatch.addDisplayRows()
 			end
 			-- Make drop down button if needed
 			if d.dropDownVisible then
-				local yBtn = row[1].y + row[1].height / 2
 				if d.dropDownVisible == 1 then
-					local btn1 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
+					local btn1 = buttons.newDropDownButton( row, row[2].x, dropDownBtnYOffset, dropDownBtnSize, dropDownBtnSize, onDropDownBtn1 )
 					btn1.rowNumber = n
 					btn1:setState{ isOn = d.var.isOpen or false }
 					row.dropDownBtn1 = btn1
 				else
-					local btn2 = buttons.newDropDownButton( row, row[2].x, yBtn, dropDownBtnSize, dropDownBtnSize, onDropDownBtn2 )
+					local btn2 = buttons.newDropDownButton( row, row[2].x, dropDownBtnYOffset, dropDownBtnSize, dropDownBtnSize, onDropDownBtn2 )
 					btn2.rowNumber = n
 					btn2:setState{ isOn = d.var[d.index.."isOpen"] or false }
 					row.dropDownBtn2 = btn2

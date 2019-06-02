@@ -303,6 +303,7 @@ function buttons.newDropDownButton( parent, x, y, width, height, onPress )
 			y = y,
 		}
 	btn.anchorX = 1
+	btn.anchorY = 0
 	parent:insert( btn )
 	return btn
 end
