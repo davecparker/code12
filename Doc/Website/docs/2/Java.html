@@ -1179,7 +1179,7 @@ while (x &lt; 100)
 </ul>
 <p>If the test result is false then the body of the loop (the code in curly brackets) is skipped, and execution continues after the loop (the loop body does not execute at all). If the test result is true, the loop body executes then execution goes back up to the line with the test and repeats the entire process. The test is evaluated again to see if it is still true (typically variable values or something will have changed since the first test so the result may be different). If the test is still true, the body is executed again, and execution goes back to the test again. The entire loop process stops once the test result becomes false.</p>
 <blockquote>
-<p><strong>Warning</strong>: If the test remains true and never changes, then the loop will execute forever, resulting in an “inifite loop”. This will cause your program to “hang”, the Code12 Application will become unreponsive, and will you need to “end task” or “force quit” Code12 from the operating system, fix your code, and try again!</p>
+<p><strong>Note</strong>: If the test remains true and never changes, then the loop will execute forever, resulting in an “infinite loop”, which never finishes.</p>
 </blockquote>
 <h5 id="more-while-loop-examples">More “while” Loop Examples</h5>
 <pre><code>// Count from 1 to 10

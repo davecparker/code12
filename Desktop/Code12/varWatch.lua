@@ -67,7 +67,7 @@ local numPublicGameObjFields = 4
 
 --- Internal Functions ---------------------------------------------------------
 
--- Fill the vars array with the user program's global variables
+-- Fill the vars array with the user program's known variables
 local function getVars()
 	local globalVars = checkJava.globalVars()
 	if not globalVars and not localVars then
@@ -193,7 +193,7 @@ local function makeDisplayData()
 				local vt = var.vt
 				local arrayType = var.arrayType
 				local varName = var.name
-				local value = var.value or ct.userVars[codeGenJava.luaName( var.name )] -- (local or global var)
+				local value = (var.isLocal and var.value) or ct.userVars[codeGenJava.luaName( var.name )]
 				d.initRowTexts = { varName, "" }
 				d.textIndents = stdIndents
 				-- Determine d.textForValue from vt
@@ -341,7 +341,11 @@ local function updateValues()
 					if field then  -- Value of a GameObj field of a GameObj in an array
 						displayRows[i][3].text = textForValue( value[index], field )
 					else           -- Value of an indexed array
-						displayRows[i][2].text = textForValue( value[index] or value.default )
+						local elementValue = value[index]
+						if elementValue == nil then
+							elementValue = value.default
+						end 
+						displayRows[i][2].text = textForValue( elementValue  )
 					end
 				elseif field then  -- Value of a field of a GameObj
 					displayRows[i][2].text = textForValue( value, field )
