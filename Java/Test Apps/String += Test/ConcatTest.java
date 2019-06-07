@@ -64,6 +64,10 @@ class ConcatTest
 		// ct.println("str += null => error");
 		// str += null;
 		// str += getNull();
+
+		boolean flag = false;
+		flag += 2;
+
 		ct.println();
 	}
 
