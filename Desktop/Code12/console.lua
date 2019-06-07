@@ -90,7 +90,7 @@ local function updateConsole()
 				parent = textGroup,
 				text = "",
 				x = textMargin,
-				y = textMargin + (n - 1) * fontHeight,
+				y = textMargin + (n - 1) * fontHeight + app.consoleFontYOffset,
 				font = app.consoleFont,
 				fontSize = app.consoleFontSize,
 				align = "left",
