@@ -414,6 +414,14 @@ local function makeCast( nodes )
 	return { s = "cast", vtCast = vt, expr = makeExpr( nodes[4] ), firstToken = nodes[1] }
 end
 
+-- Ruturn the correct text to display for errors involving the given control pattern
+local function textForCtrlP( ctrlP )
+	if ctrlP == "elseif" then
+		return "else if"
+	end
+	return ctrlP
+end
+
 -- Get the single controlled stmt or block of controlled stmts for an 
 -- if, else, or loop, and return a block structure. 
 -- If the next item to process is a begin block then get an entire block 
@@ -440,7 +448,7 @@ local function getControlledBlock()
 		local stmtIndent = tree.indentLevel
 		if stmtIndent <= ctrlIndent then
 			err.setErrLineNumAndRefLineNum( tree.iLineStart, ctrlTree.iLineStart, 
-					"This line should be indented more than its controlling \"%s\"", ctrlTree.p )
+					"This line should be indented more than its controlling \"%s\"", textForCtrlP( ctrlTree.p ) )
 			err.addDocLink( "Java.html#indentation-and-brace-placement" )
 		end
 		iTree = iTree + 1  -- pass the controlled stmt as expected by getLineStmts
@@ -460,7 +468,7 @@ local function getControlledBlock()
 						and not (ctrlTree.p == "do" and nextTree.p == "while" and nextTree.nodes[4].p == "doWhile") then
 					err.setErrLineNumAndRefLineNum( nextTree.iLineStart, ctrlTree.iLineStart,
 							'This line is not controlled by the "%s" above it. Missing { } bracket(s) or improperly indented?', 
-							ctrlTree.p )
+							textForCtrlP( ctrlTree.p ) )
 					if ctrlTree.p == "if" or ctrlTree.p == "else" or ctrlTree.p == "elseif" then
 						err.addDocLink( "Java.html#if-else" )
 					else
