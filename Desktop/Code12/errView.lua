@@ -103,7 +103,7 @@ local function makeCodeGroup( numSourceLines )
 	g.uiItem( display.newRect( cg, 0, 0, app.width, cg.totalHeight ), 1, app.borderShade )
 
 	-- Make the highlight rectangles
-	cg.highlightGroup = g.makeGroup( cg, xText, margin )
+	cg.highlightGroup = g.makeGroup( cg, xText, margin - app.consoleFontYOffset )
 	local y = ((numSourceLines - 1) / 2) * dyLine
 	cg.lineNumRect = makeHilightRect( cg.highlightGroup, -dxChar, y, dxLineNum, dyLine )
 	cg.lineNumRect.anchorX = 1

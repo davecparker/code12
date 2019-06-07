@@ -340,6 +340,9 @@ local function loadSettings()
 			app.preferredFontSize = preferredFontSize
 			app.consoleFontSize = preferredFontSize
 		end
+
+		-- Adjust consoleFontYOffset
+		app.consoleFontYOffset = env.consoleFontYOffset( app.consoleFontSize )
 	end
 
 	-- Read the developer settings file
