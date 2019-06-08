@@ -9,7 +9,7 @@
 
 
 -- Code12 modules
-package.path = package.path .. ';../Code12/?.lua'
+package.path = package.path .. ';C:\\Users\\lando\\Documents\\code12\\Desktop\\Code12\\?.lua'
 local source = require( "source" )
 local err = require( "err" )
 local parseProgram = require( "parseProgram" )
@@ -18,9 +18,9 @@ local codeGenJava = require( "codeGenJava" )
 
 
 -- Input and output files
-local javaFilename = "ErrorTestCode.java"
-local structureFilename = "../ErrorTestStructure.txt"   -- in parent so Corona won't trigger re-run
-local outputFilename = "../ErrorTestOutput.txt"   -- in parent so Corona won't trigger re-run
+local javaFilename = "C:\\Users\\lando\\Documents\\code12\\Desktop\\Error Test\\ErrorTestCode.java"
+local structureFilename = "C:\\Users\\lando\\Documents\\code12\\Desktop\\ErrorTestStructure.txt"   -- in parent so Corona won't trigger re-run
+local outputFilename = "C:\\Users\\lando\\Documents\\code12\\Desktop\\ErrorTestOutput.txt"   -- in parent so Corona won't trigger re-run
 local outFile
 
 -- Misc state

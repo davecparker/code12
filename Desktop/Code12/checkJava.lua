@@ -944,7 +944,7 @@ local function canOpAssign( lValue, opNode, expr )
 	local isCat = vtLValue == "String" and opNode.str == "+="
 	if type( vtLValue ) ~= "number" and not isCat then
 		err.setErrNodeAndRef( opNode, lValue,
-				"%s can only be applied to type %s", opNode.str,
+				"%s cannot be applied to type %s", opNode.str,
 				javaTypes.typeNameFromVt( vtLValue ) )
 		err.addDocLink( "Java.html#java-data-types" )
 		return false
