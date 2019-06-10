@@ -63,7 +63,7 @@ local gameObjFields = {
 	"width", "height", "xSpeed", "ySpeed", "text", "fillColor", "lineColor", 
 	"lineWidth", "layer", "clickable",
 }
-local numPublicGameObjFields = 4
+local numPublicGameObjFields = 5
 
 
 --- Internal Functions ---------------------------------------------------------
