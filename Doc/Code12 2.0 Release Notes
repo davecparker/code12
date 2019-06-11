@@ -1,0 +1,75 @@
+Code12 2.0 Release Notes
+========================
+
+The changes listed below were made to Code12 since version 1.0.
+
+Also note that since some changes were made to the API and online documentation,
+the new 2.0 docs are in:
+
+     http://www.code12.org/docs/2/API.html
+     http://www.code12.org/docs/2/Java.html
+
+instead of the corresponding "docs/1/" folder where the version 1.0 docs where.
+This means that existing links to the help (e.g. reading assignments) will need 
+to be changed when you start using version 2.0. 
+
+
+Enhancements Added since Code12 1.0
+-----------------------------------
+* The "if-else" programming concept is now concept #6 instead of concept #8
+(and therefore taught before object fields and methods instead of after them).
+This allows teaching it sooner where there are various text I/O applications.
+Since it is now before object fields and methods (now concepts #7 and #8),
+the if-else examples in the Java help docs now use all text output. 
+
+* The variable watch window can now display local variables as well as the
+program's class-level variables. Since local variables go out of scope when a 
+function returns, however, you will only see them if you insert a ct.pause()
+call to pause the execution. You will then see the locals that are in scope
+at that point in the code, in a section below the class-level variables.
+
+* Ignoring the return value of a function is now considered an error
+(although this is not an error in Java, it is a very common beginner mistake).
+Exceptions are made for the graphic object creation functions (e.g. ct.circle()),
+which return a GameObj reference but have primary and useful side-effects.
+The function ct.loadSound() was changed to no longer return a boolean, so it would
+not be another exception. All other API and user-defined functions are enforced.
+
+* The font size used for the console output (e.g. ct.println() output), 
+source code error displays, and the variable watch window is now adjustable.
+You can choose from 5 sizes in the Code12 Options screen. This can be used to
+make the text easier to see when using a projector.
+
+* The beginning of the Code12 function reference is now organized into sections
+of different types of functions (e.g. returning a value or not), corresponding
+to the order in which students will learn these concepts. This makes it easier
+to identify the functions that a student can use at various levels. 
+
+* Added Java help sections for array.length and arrays as parameters.
+
+* Added obj.id as a new public data field to the GameObj type (see docs).
+
+* Calling ct.pause() now shows a popup alert in the app instead of 
+printing a message to the console.
+
+* The += operator can now be used to append a String to a String
+(but not a number to a String, this intentionally still gets an error).
+
+
+Selected Bug Fixes
+------------------
+* An "enhanced for loop" operating on an array of String or GameObj, such as:
+     for (GameObj obj: objects)
+now correctly processes the entire array instead of stopping at the first null object.
+
+* Due to technical limitations, when a Java program is run directly from a 
+flash drive on Windows (or any drive different from the system/C: drive), 
+loading images or sounds will typically fail (images will result in a red "[X]"). 
+Although we could not fix this completely, a warning message is now printed to the 
+console suggesting that the user copy their project folder to the desktop.
+
+* An infinte loop in the user's code no longer hangs the Code12 app.
+You can now use the Stop button in the toolbar to terminate the program.
+Also, the screen attempts to keep updating at close to the normal frame rate,
+and if a loop takes longer than 3 seconds without yielding for user input,
+then a warning is printed to the console as an FYI for the user.
