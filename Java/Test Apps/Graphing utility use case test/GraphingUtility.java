@@ -275,7 +275,7 @@ class GraphingUtility
             parseExpression();
         if (c.equals("["))
             operands[0] = Math.abs(operands[0]);
-        popS(operators);
+        String t = popS(operators);
     }
 
     // parses operators

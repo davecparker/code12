@@ -264,6 +264,7 @@ int underIndentedInstanceVar;
 		d=-.5;
 		d = d / 2;
 		d ++;
+		d += 5;
 		d += 0.5;
 		d -= 7;
 		d *= 8;
@@ -281,6 +282,8 @@ int underIndentedInstanceVar;
 		boolean b2 = false;
 		boolean b3 = b || b2;
 		String s = "A string variable";
+		s += " named s";
+		s += s;
 		s = s;
 		s = null;
 		// arrays
@@ -663,6 +666,8 @@ int underIndentedInstanceVar;
 		circle.visible = rect.visible;
 		line.group = s;
 		circle.group = "dots";
+		circle.group += s;
+		circle.group += objs[2].group;
 		rect.group = circle.group;
 		line.visible = s.equals("hello") || s.equals("world") && s.indexOf(line.group) == 1;
 		// Code12 API -- GameObj Methods
@@ -1042,17 +1047,17 @@ int underIndentedInstanceVar;
 		// ERROR "Array count must be an integer"
 		intArr = new int[1.5];
 
-		// ERROR "can only be applied to numbers"
+		// ERROR "++ cannot be applied to type boolean"
 		boolVar++;
-		// ERROR "can only be applied to numbers"
+		// ERROR "++ cannot be applied to type String"
 		strVar++;
-		// ERROR "can only be applied to numbers"
+		// ERROR "++ cannot be applied to type GameObj"
 		objVar++;
-		// ERROR "can only be applied to numbers"
+		// ERROR "-- cannot be applied to type boolean"
 		boolVar--;
-		// ERROR "can only be applied to numbers"
+		// ERROR "-- cannot be applied to type String"
 		strVar--;
-		// ERROR "can only be applied to numbers"
+		// ERROR "-- cannot be applied to type GameObj"
 		objVar--;
 
 		// ERROR "A for-each loop must operate on an array"
@@ -1141,16 +1146,32 @@ int underIndentedInstanceVar;
 		// ERROR "Incorrect case for type name"
 		Boolean b = false;
 
-		// ERROR "+= can only be applied to numbers"
-		strVar += "hello";
-		// ERROR "-= can only be applied to numbers"
+		// ERROR "-= cannot be applied to type String"
+		strVar -= "2.79";
+		// ERROR "-= cannot be applied to type boolean"
 		boolVar -= 1;
-		// ERROR "*= can only be applied to numbers"
+		// ERROR "*= cannot be applied to type GameObj"
 		objVar *= objVar;
-		// ERROR "/= can only be applied to numbers"
+		// ERROR "/= cannot be applied to type GameObj"
 		objVar /= 3.14;
+		// ERROR "Expression for += on String must be type String"
+		strVar += intVar;
+		// ERROR "Expression for += on String must be type String"
+		strVar += objArr[0].getLayer();
+		// ERROR "Expression for += on String must be type String"
+		strVar += dblVar;
+		// ERROR "Expression for += on String must be type String"
+		strVar += objVar.getWidth();
+		// ERROR "Expression for += on String must be type String"
+		strVar += boolVar;
+		// ERROR "Expression for += on String must be type String"
+		strVar += objVar.hit(objVar);
+		// ERROR "Expression for += on String must be type String"
+		strVar += objVar;
 		// ERROR "Expression for += must be numeric"
 		intVar += "hello";
+		// ERROR "Expression for += must be numeric"
+		intVar += strArrMethod();
 		// ERROR "Expression for -= must be numeric"
 		dblVar -= ct.rect(0,0,1,2);
 		// ERROR "Expression for *= must be numeric"
@@ -1419,7 +1440,7 @@ int underIndentedInstanceVar;
 		if (false)
 			voidFunc();
 		else if (false)
-		// ERROR "This line should be indented more than its controlling "elseif""
+		// ERROR "This line should be indented more than its controlling "else if""
 		voidFunc();
 		if (false)
 			voidFunc();
@@ -1566,7 +1587,7 @@ int underIndentedInstanceVar;
 			voidFunc();
 		else if (false)
 			voidFunc();
-		// ERROR "This line is not controlled by the "elseif" above it"
+		// ERROR "This line is not controlled by the "else if" above it"
 			voidFunc();
 		if (false)
 			voidFunc();
@@ -1733,6 +1754,11 @@ void underIndentedFunc()
 	int intMethod()
 	{
 		return 0;
+	}
+	String[] strArrMethod()
+	{
+		String[] strArr = { "foo", "bar" };
+		return strArr;
 	}
 	void voidMethod()
 	{
@@ -2021,16 +2047,20 @@ void underIndentedFunc()
 		while ( (1 + 1.0 == 2e0) + "");
 		// ERROR "Loop test must evaluate to a boolean"
 		while (boolVar + "")
-			// ERROR "can only be applied to numbers"
+			// ERROR "Expression for += on String must be type String"
 			rect.group += 1;		
-		// ERROR "can only be applied to numbers"
+		// ERROR "+= cannot be applied to type boolean"
 		boolVar += false;
 		// ERROR "must be numeric"
 		dblVar *= rect;
 		// ERROR "must be numeric"
+		dblVar += boolVar;
+		// ERROR "must be numeric"
 		dblVar += boolVar + "";
 		// ERROR "must be numeric"
 		intVar += boolVar;
+		// ERROR "must be numeric"
+		intVar += rect;
 		// ERROR "double cannot be assigned to int"
 		intVar /= classLevelInt * rect.x;
 		// ERROR "double cannot be assigned to int"

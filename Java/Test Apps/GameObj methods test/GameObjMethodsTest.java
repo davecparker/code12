@@ -252,10 +252,12 @@ class GameObjMethodsTest
                 testObjs[i].group = "reference points";
         }
         double userGivenArea = (testObjs[8].y - testObjs[7].y) * Math.pow(ct.getPixelsPerUnit(), 2);
-        double objArea = obj.getWidth() * obj.getHeight() * Math.pow(ct.getPixelsPerUnit(), 2);
+        double objArea = obj.getHeight() * Math.pow(ct.getPixelsPerUnit(), 2);
         if (!type.equals("text"))
+        {
             userGivenArea *= (testObjs[6].x - testObjs[5].x);
-
+            objArea *= obj.getWidth();
+        }
         if (userGivenArea != objArea)
             ct.showAlert("ERROR: the object did not set it's height and/or width correctly");
     }
@@ -419,28 +421,28 @@ class GameObjMethodsTest
         for (int i = 0; i < testObjs.length; i++)
         {
             testObjs[i].delete();
-            testObjs[i].getType();
-            testObjs[i].getText();
+            String a = testObjs[i].getType();
+            String b = testObjs[i].getText();
             testObjs[i].setText("deleted");
-            testObjs[i].toString();
+            String c = testObjs[i].toString();
             //testObjs[i].setSize(5, 5);
             testObjs[i].align("right");
             testObjs[i].setFillColor("green");
             testObjs[i].setFillColorRGB(255, 0, 0);
             //testObjs[i].setLineColor("blue");
             //testObjs[i].setLineColorRGB(0, 255, 255);
-            testObjs[i].getLayer();
+            int d = testObjs[i].getLayer();
             //testObjs[i].setLayer(2);
             testObjs[i].delete();
-            testObjs[i].clicked();
-            testObjs[i].containsPoint(50, 50);
-            testObjs[i].hit(testObjs[i]);
-            testObjs[i].objectHitInGroup("delete");
+            boolean e = testObjs[i].clicked();
+            boolean f = testObjs[i].containsPoint(50, 50);
+            boolean g = testObjs[i].hit(testObjs[i]);
+            GameObj h = testObjs[i].objectHitInGroup("delete");
             testObjs[i].x = testObjs[i].x;
             testObjs[i].y = testObjs[i].y;
             //testObjs[i].setSize(1, 1);
-            testObjs[i].getWidth();
-            testObjs[i].getHeight();
+            double j = testObjs[i].getWidth();
+            double k = testObjs[i].getHeight();
             testObjs[i].setXSpeed(testObjs[i].getXSpeed());
             testObjs[i].setYSpeed(testObjs[i].getYSpeed());
             //testObjs[i].setLineWidth(1);

@@ -461,7 +461,11 @@ local function generateAssign( stmt )
 		addLua( luaOpFromOpType[opType] )
 	else   -- +=, -=, *=, /=
 		addLua( lValueCode( stmt.lValue ) )
-		addLua( luaOpFromOpType[opType] )
+		if stmt.lValue.vt == "String" then
+			addLua( " .. " )
+		else
+			addLua( luaOpFromOpType[opType] )
+		end
 		addLua( "(" )
 		addLua( exprCode( stmt.expr ) )
 		addLua( ")" )

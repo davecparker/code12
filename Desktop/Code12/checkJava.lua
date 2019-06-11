@@ -939,11 +939,13 @@ end
 -- then check the lValue, then return true if the type can be op-assigned 
 -- (e.g. +=) to lValue, otherwise set the error state and return false.
 local function canOpAssign( lValue, opNode, expr )
-	-- Make sure the lValue is numeric
+	-- Make sure the lValue is String or numeric
 	local vtLValue = vtCheckLValue( lValue )   -- is read before assigned
-	if type(vtLValue) ~= "number" then
-		err.setErrNodeAndRef( opNode, lValue, 
-				"%s can only be applied to numbers", opNode.str )
+	local isCat = vtLValue == "String" and opNode.str == "+="
+	if type( vtLValue ) ~= "number" and not isCat then
+		err.setErrNodeAndRef( opNode, lValue,
+				"%s cannot be applied to type %s", opNode.str,
+				javaTypes.typeNameFromVt( vtLValue ) )
 		err.addDocLink( "Java.html#java-data-types" )
 		return false
 	end
@@ -951,8 +953,15 @@ local function canOpAssign( lValue, opNode, expr )
 	-- Check the expr if any
 	if expr then
 		local vtExpr = vtSetExprNode( expr )
-		if type(vtExpr) ~= "number" then
-			err.setErrNodeAndRef( expr, opNode, 
+		if isCat then
+			if vtExpr ~= "String" then
+				err.setErrNodeAndRef( expr, opNode,
+						"Expression for += on String must be type String" )
+				err.addDocLink( "Java.html#expressions" )
+				return false
+			end
+		elseif type( vtExpr ) ~= "number" then
+			err.setErrNodeAndRef( expr, opNode,
 					"Expression for %s must be numeric", opNode.str )
 			err.addDocLink( "Java.html#expressions" )
 			return false

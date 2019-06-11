@@ -189,7 +189,8 @@ class NaturalSelectionVisualization
     {
         for (int i = 0; i < dots.length; i++)
         {
-            if (getFitness(i) > getFitness(veteran))
+            // if (getFitness(i) > getFitness(veteran))
+            if (getFitness(i) > ct.parseNumber(maxFitness.getText()))
                 veteran = i;
         }
     }
