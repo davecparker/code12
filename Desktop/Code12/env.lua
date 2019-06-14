@@ -274,10 +274,11 @@ end
 
 -- Return the console font y-offset for the given fontSize
 function env.consoleFontYOffset( fontSize )
+	local default = 1
 	if env.isWindows then
-		return 1
+		return default
 	end
-	return consoleFontYOffsets[fontSize]
+	return consoleFontYOffsets[fontSize] or default
 end
 
 
