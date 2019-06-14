@@ -40,10 +40,10 @@ source code error displays, and the variable watch window is now adjustable.
 You can choose from 5 sizes in the Code12 Options screen. This can be used to
 make the text easier to see when using a projector.
 
-* The beginning of the Code12 function reference is now organized into sections
-of different types of functions (e.g. returning a value or not), corresponding
-to the order in which students will learn these concepts. This makes it easier
-to identify the functions that a student can use at various levels. 
+* The links at the beginning of the Code12 function reference are now organized 
+into sections of different types of functions (e.g. returning a value or not), 
+corresponding to the order in which students will learn these concepts. This makes 
+it easier to identify the functions that a student can use at various levels. 
 
 * Added Java help sections for array.length and arrays as parameters.
 
@@ -68,7 +68,7 @@ loading images or sounds will typically fail (images will result in a red "[X]")
 Although we could not fix this completely, a warning message is now printed to the 
 console suggesting that the user copy their project folder to the desktop.
 
-* An infinte loop in the user's code no longer hangs the Code12 app.
+* An infinite loop in the user's code no longer hangs the Code12 app.
 You can now use the Stop button in the toolbar to terminate the program.
 Also, the screen attempts to keep updating at close to the normal frame rate,
 and if a loop takes longer than 3 seconds without yielding for user input,
