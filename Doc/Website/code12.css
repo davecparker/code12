@@ -192,6 +192,12 @@ ol a {
     padding-right: 0;
 }
 
+.rightLink {
+    margin-top: -1em;
+    padding-top: 0;
+    text-align: right;
+}
+
 .mainBody {
     margin: 2em;
     max-width: 65em;
