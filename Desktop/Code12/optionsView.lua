@@ -367,7 +367,7 @@ function optionsView:create()
 	-- Font size header
 	local fontSizeHeader = display.newText{
 		parent = optionsGroup,
-		text = "Font Size for Source Code Display",
+		text = "Font Size for Source Code and Text Output",
 		x = 0,
 		y = math.round( lastPicker.y + lastPicker.height + sectionMargin ),
 		font = optionsFontBold,
@@ -375,7 +375,7 @@ function optionsView:create()
 	}
 	g.uiItem( fontSizeHeader )
 	-- Font size choices and their corresponding segment numbers
-	local fontSizes = { 12, 14, 18, 20, 24 }
+	local fontSizes = { 14, 20, 24 }   -- had 12 and 18 also, but these caused highlight to misalign on Windows
 	local fontSizeSegNums = {}
 	for i, v in ipairs( fontSizes ) do
 		fontSizeSegNums[v] = i
@@ -386,7 +386,7 @@ function optionsView:create()
 		y = math.round( fontSizeHeader.y + fontSizeHeader.height + app.margin * 0.5 ),
 		segments = fontSizes,
 		segmentWidth = 30,
-		defaultSegment = fontSizeSegNums[app.consoleFontSize],
+		defaultSegment = fontSizeSegNums[app.consoleFontSize] or 1,
 		labelSize = fontSize,
 		labelColor = { default = { 0 }, over = { 0 } },
 		onPress =
