@@ -2572,7 +2572,7 @@ class Example
 }
 ```
 Note that the array parameter variable is declared above as `int[] a`,
-so the array passed must be an array of `int`, however the number of   
+so the array passed must be an array of `int`, however the number of 
 elements in the array is not specified. You could pass an array of `int` 
 with any number of elements in it.
 

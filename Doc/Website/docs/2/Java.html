@@ -1507,8 +1507,7 @@ GameObj   null</code></pre>
         return total;
     }
 }</code></pre>
-<p>Note that the array parameter variable is declared above as <code>int[] a</code>, so the array passed must be an array of <code>int</code>, however the number of<br />
-elements in the array is not specified. You could pass an array of <code>int</code> with any number of elements in it.</p>
+<p>Note that the array parameter variable is declared above as <code>int[] a</code>, so the array passed must be an array of <code>int</code>, however the number of elements in the array is not specified. You could pass an array of <code>int</code> with any number of elements in it.</p>
 <p>A function may need to determine the number of elements in an array parameter to do its work, as shown in the example above. You can get the number of elements in any array by using the syntax <code>a.length</code>, where <code>a</code> is the array variable. This will result in an integer value that is the number of elements in the array.</p>
 <p>When passing an array as a parameter, it is important to understand that only a <em>reference</em> to the array is passed (essentially a pointer to the actual array where it lives in memory). Passing an array does <em>not</em> make a copy of the array. So, if the function modifies the elements of the array, the original array that was passed will be modified.</p>
 <h6 id="java-language-help-arrays"><a href="#top">Java Language Help</a> &gt; <a href="#arrays">Arrays</a></h6>
