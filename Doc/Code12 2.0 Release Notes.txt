@@ -37,7 +37,7 @@ not be another exception. All other API and user-defined functions are enforced.
 
 * The font size used for the console output (e.g. ct.println() output), 
 source code error displays, and the variable watch window is now adjustable.
-You can choose from 5 sizes in the Code12 Options screen. This can be used to
+You can choose from 3 sizes in the Code12 Options screen. This can be used to
 make the text easier to see when using a projector.
 
 * The links at the beginning of the Code12 function reference are now organized 

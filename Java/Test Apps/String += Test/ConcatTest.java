@@ -66,7 +66,7 @@ class ConcatTest
 		// str += getNull();
 
 		boolean flag = false;
-		flag += 2;
+		// flag += 2;
 
 		ct.println();
 	}

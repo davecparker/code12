@@ -28,11 +28,6 @@ import Code12.*;
 
 class MathMiscTypeConversionTest extends Code12Program
 {
-   public static void main(String[] args)
-   { 
-      Code12.run(new MathMiscTypeConversionTest()); 
-   }
-
    final double EPSILON = 0.0000001; // doubles differing by this or less will test equal
    
    boolean allTestsPassed = true;
@@ -47,16 +42,21 @@ class MathMiscTypeConversionTest extends Code12Program
    int timerStartTime;
    boolean timerStarted;
          
+   public static void main(String[] args)
+   { 
+      Code12.run(new MathMiscTypeConversionTest()); 
+   }
+
    public void start()
    {  
       // ct.random( 100, 0 ); // Throws Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: bound must be positive   
-                              //    	at java.util.Random.nextInt(Random.java:388)
-	                           //       at Code12.Game.random(Game.java:276)
+                              //       at java.util.Random.nextInt(Random.java:388)
+                              //       at Code12.Game.random(Game.java:276)
 //       try
 //       {
 //          writer = new PrintWriter( "output.txt" );
-		ct.setOutputFile( "output.txt" );
-		
+      ct.setOutputFile( "output.txt" );
+      
       ct.println( "Tests started" );
       
       runTests_random( true );
@@ -80,7 +80,7 @@ class MathMiscTypeConversionTest extends Code12Program
       {
          ct.println( "All tests passed" );
       }
-		ct.setOutputFile( null );
+      ct.setOutputFile( null );
 //          writer.close(); 
 //       }
 //       catch(Exception e)
@@ -88,7 +88,7 @@ class MathMiscTypeConversionTest extends Code12Program
 //          ct.println( "Error writing to output.txt" );
 //          ct.println( e.toString() );
 //       }
-		// init ct.getTimer() test
+      // init ct.getTimer() test
       framesPerSecondText = ct.text( "", 5, 5, 5 );
       framesPerSecondText.align( "left" ); 
       
@@ -97,7 +97,6 @@ class MathMiscTypeConversionTest extends Code12Program
       
       startButton = ct.text( "Start Timer", 5, 15, 5 );
       startButton.align( "left" );
-      startButton.clickable = true;
    
       frameCount = 0;         
       start = ct.getTimer();
@@ -173,12 +172,12 @@ class MathMiscTypeConversionTest extends Code12Program
    {
       boolean output = ct.canParseInt(s);
       if ( output != expected )
-		{
-			if ( output )
-         	printError( "ct.canParseInt(" + s + ") = true; false expected" );
-			else
-         	printError( "ct.canParseInt(" + s + ") = false; true expected" );
-		}
+      {
+         if ( output )
+            printError( "ct.canParseInt(" + s + ") = true; false expected" );
+         else
+            printError( "ct.canParseInt(" + s + ") = false; true expected" );
+      }
    }
    
    public void testParseNumber( String s, double expected )
@@ -200,11 +199,11 @@ class MathMiscTypeConversionTest extends Code12Program
       boolean output = ct.canParseNumber(s);
       if ( output != expected )
       {
-			if ( output )
-         	printError( "ct.canParseNumber(" + s + ") = true; false expected" );
-			else
-         	printError( "ct.canParseInt(" + s + ") = false; true expected" );
-		}
+         if ( output )
+            printError( "ct.canParseNumber(" + s + ") = true; false expected" );
+         else
+            printError( "ct.canParseInt(" + s + ") = false; true expected" );
+      }
    }   
    
    public void testFormatDecimal( double d, String expected )
@@ -461,7 +460,7 @@ class MathMiscTypeConversionTest extends Code12Program
          for (int i = 0; i <= 1000; i++)
          {
             testToInt( i, i );
-		     	testToInt( i / 10.0, ct.intDiv(i, 10) );
+            testToInt( i / 10.0, ct.intDiv(i, 10) );
          }
          ct.println( "(int) tests done" );
       }
@@ -650,7 +649,7 @@ class MathMiscTypeConversionTest extends Code12Program
       }
    }
    
- public void runTests_formatInt( boolean run )
+   public void runTests_formatInt( boolean run )
    {
       if ( run )
       {
